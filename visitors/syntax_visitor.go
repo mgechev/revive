@@ -5,10 +5,13 @@ import (
 	"go/ast"
 )
 
+// SyntaxVisitor implements a visitor which knows how to handle the individual
+// Go lang syntax constructs.
 type SyntaxVisitor struct {
 	Impl Visitor
 }
 
+// Visit accepts an ast.Node and traverse its children.
 func (w *SyntaxVisitor) Visit(node ast.Node) {
 	if node == nil {
 		return
@@ -181,6 +184,7 @@ func (w *SyntaxVisitor) Visit(node ast.Node) {
 	}
 }
 
+// VisitUnaryExpr visits an unary expression.
 func (w *SyntaxVisitor) VisitUnaryExpr(node *ast.UnaryExpr) {
 	w.Impl.Visit(node.X)
 }

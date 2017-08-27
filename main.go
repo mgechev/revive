@@ -2,52 +2,42 @@ package main
 
 import (
 	"fmt"
-	"go/ast"
-	"go/parser"
-	"go/token"
 
-	"github.com/mgechev/golinter/syntaxvisitor"
+	"github.com/mgechev/golinter/defaultrules"
+	"github.com/mgechev/golinter/formatters"
+	"github.com/mgechev/golinter/linter"
+	"github.com/mgechev/golinter/rules"
 )
 
-type CustomLinter struct {
-	syntaxvisitor.SyntaxVisitor
-}
-
-func (w *CustomLinter) VisitIdent(node *ast.Ident) {
-	fmt.Println("Child", node.Name)
-}
-
-// This example demonstrates how to inspect the AST of a Go program.
-func ExampleInspect() {
-	// src is the input for which we want to inspect the AST.
+func main() {
 	src := `
   package p
-  const c = 1.0
-  var X = f(3.14)*2 + c
+
+  func Test() {
+    if true {
+      return 42;
+    } else {
+      return 23;
+    }
+  }
   `
 
-	// Create the AST by parsing src.
-	fset := token.NewFileSet() // positions are relative to fset
-	f, err := parser.ParseFile(fset, "src.go", src, 0)
+	linter := linter.New(func(file string) ([]byte, error) {
+		return []byte(src), nil
+	})
+	var result []rules.Rule
+	result = append(result, &defaultrules.LintElseRule{})
+
+	failures, err := linter.Lint([]string{"foo.go", "bar.go", "baz.go"}, result)
 	if err != nil {
 		panic(err)
 	}
 
-	var visitor CustomLinter
-	visitor.SyntaxVisitor.Impl = &visitor
-	visitor.Visit(f)
+	var formatter formatters.CLIFormatter
+	output, err := formatter.Format(failures)
+	if err != nil {
+		panic(err)
+	}
 
-	// output:
-	// src.go:2:9:	p
-	// src.go:3:7:	c
-	// src.go:3:11:	1.0
-	// src.go:4:5:	X
-	// src.go:4:9:	f
-	// src.go:4:11:	3.14
-	// src.go:4:17:	2
-	// src.go:4:21:	c
-}
-
-func main() {
-	ExampleInspect()
+	fmt.Println(output)
 }
