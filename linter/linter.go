@@ -3,8 +3,8 @@ package linter
 import (
 	"go/token"
 
-	"github.com/mgechev/golinter/file"
-	"github.com/mgechev/golinter/rules"
+	"github.com/mgechev/revive/file"
+	"github.com/mgechev/revive/rules"
 )
 
 // ReadFile defines an abstraction for reading files.

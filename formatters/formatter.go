@@ -1,6 +1,6 @@
 package formatters
 
-import "github.com/mgechev/golinter/rules"
+import "github.com/mgechev/revive/rules"
 
 // FormatterMetadata configuration of a formatter
 type FormatterMetadata struct {

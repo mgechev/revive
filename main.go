@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
-	"github.com/mgechev/golinter/defaultrules"
-	"github.com/mgechev/golinter/formatters"
-	"github.com/mgechev/golinter/linter"
-	"github.com/mgechev/golinter/rules"
+	"github.com/mgechev/revive/defaultrules"
+	"github.com/mgechev/revive/formatters"
+	"github.com/mgechev/revive/linter"
+	"github.com/mgechev/revive/rules"
 )
 
 func main() {

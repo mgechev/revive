@@ -3,7 +3,7 @@ package rules
 import (
 	"go/token"
 
-	"github.com/mgechev/golinter/file"
+	"github.com/mgechev/revive/file"
 )
 
 const (

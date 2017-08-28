@@ -3,7 +3,7 @@ package formatters
 import (
 	"encoding/json"
 
-	"github.com/mgechev/golinter/rules"
+	"github.com/mgechev/revive/rules"
 )
 
 // JSONFormatter is an implementation of the Formatter interface

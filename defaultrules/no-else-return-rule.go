@@ -4,9 +4,9 @@ import (
 	"go/ast"
 	"go/token"
 
-	"github.com/mgechev/golinter/file"
-	"github.com/mgechev/golinter/rules"
-	"github.com/mgechev/golinter/visitors"
+	"github.com/mgechev/revive/file"
+	"github.com/mgechev/revive/rules"
+	"github.com/mgechev/revive/visitors"
 )
 
 const ruleName = "no-else-return"

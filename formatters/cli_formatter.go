@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/mgechev/golinter/rules"
+	"github.com/mgechev/revive/rules"
 	"github.com/olekukonko/tablewriter"
 	"github.com/ttacon/chalk"
 )

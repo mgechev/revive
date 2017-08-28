@@ -4,8 +4,8 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/mgechev/golinter/file"
-	"github.com/mgechev/golinter/rules"
+	"github.com/mgechev/revive/file"
+	"github.com/mgechev/revive/rules"
 )
 
 // Setup sets the proper pointers of given visitor.
