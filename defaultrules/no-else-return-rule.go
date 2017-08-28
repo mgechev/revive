@@ -9,7 +9,10 @@ import (
 	"github.com/mgechev/revive/visitors"
 )
 
-const ruleName = "no-else-return"
+const (
+	ruleName = "no-else-return"
+	failure  = "if block ends with a return statement, so drop this else and outdent its block"
+)
 
 // LintElseRule lints given else constructs.
 type LintElseRule struct {
@@ -48,7 +51,7 @@ func (w *lintElseVisitor) VisitIfStmt(node *ast.IfStmt) {
 	lastStmt := node.Body.List[len(node.Body.List)-1]
 	if _, ok := lastStmt.(*ast.ReturnStmt); ok {
 		w.AddFailure(rules.Failure{
-			Failure:  "if block ends with a return statement, so drop this else and outdent its block",
+			Failure:  failure,
 			Type:     rules.FailureTypeWarning,
 			Position: w.GetPosition(node.Else.Pos(), node.Else.End()),
 		})
