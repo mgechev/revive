@@ -72,7 +72,14 @@ func (f *CLIFormatter) Format(failures []rule.Failure) (string, error) {
 		output += buf.String() + "\n"
 	}
 
-	suffix := fmt.Sprintf("\n ✖ %d %s (%d errors) (%d warnings)", total, ps, totalErrors, total-totalErrors)
+	suffix := fmt.Sprintf(" %d %s (%d errors) (%d warnings)", total, ps, totalErrors, total-totalErrors)
 
+	if total > 0 && totalErrors > 0 {
+		suffix = chalk.Red.Color("\n ✖" + suffix)
+	} else if total > 0 && totalErrors == 0 {
+		suffix = chalk.Yellow.Color("\n ✖" + suffix)
+	} else {
+		suffix = chalk.Green.Color("\n" + suffix)
+	}
 	return output + suffix, nil
 }
