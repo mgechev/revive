@@ -1,9 +1,9 @@
-package formatters
+package formatter
 
 import (
 	"encoding/json"
 
-	"github.com/mgechev/revive/rules"
+	"github.com/mgechev/revive/rule"
 )
 
 // JSONFormatter is an implementation of the Formatter interface
@@ -13,7 +13,7 @@ type JSONFormatter struct {
 }
 
 // Format formats the failures gotten from the linter.
-func (f *JSONFormatter) Format(failures []rules.Failure) (string, error) {
+func (f *JSONFormatter) Format(failures []rule.Failure) (string, error) {
 	result, error := json.Marshal(failures)
 	if error != nil {
 		return "", error

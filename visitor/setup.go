@@ -1,15 +1,15 @@
-package visitors
+package visitor
 
 import (
 	"errors"
 	"reflect"
 
 	"github.com/mgechev/revive/file"
-	"github.com/mgechev/revive/rules"
+	"github.com/mgechev/revive/rule"
 )
 
 // Setup sets the proper pointers of given visitor.
-func Setup(v interface{}, conf rules.RuleConfig, file *file.File) error {
+func Setup(v interface{}, conf rule.RuleConfig, file *file.File) error {
 	val := reflect.ValueOf(v).Elem()
 	field := val.FieldByName("RuleVisitor")
 	if !field.IsValid() {

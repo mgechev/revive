@@ -1,4 +1,4 @@
-package rules
+package rule
 
 import (
 	"go/token"

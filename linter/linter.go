@@ -4,7 +4,7 @@ import (
 	"go/token"
 
 	"github.com/mgechev/revive/file"
-	"github.com/mgechev/revive/rules"
+	"github.com/mgechev/revive/rule"
 )
 
 // ReadFile defines an abstraction for reading files.
@@ -20,10 +20,10 @@ func New(reader ReadFile) Linter {
 	return Linter{reader: reader}
 }
 
-// Lint lints a set of files with the specified rules.
-func (l *Linter) Lint(filenames []string, ruleSet []rules.Rule) ([]rules.Failure, error) {
+// Lint lints a set of files with the specified rule.
+func (l *Linter) Lint(filenames []string, ruleSet []rule.Rule) ([]rule.Failure, error) {
 	var fileSet token.FileSet
-	var failures []rules.Failure
+	var failures []rule.Failure
 	for _, filename := range filenames {
 		content, err := l.reader(filename)
 		if err != nil {

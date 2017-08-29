@@ -1,4 +1,4 @@
-package visitors
+package visitor
 
 import "go/ast"
 

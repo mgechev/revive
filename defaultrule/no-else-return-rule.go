@@ -1,12 +1,12 @@
-package defaultrules
+package defaultrule
 
 import (
 	"go/ast"
 	"go/token"
 
 	"github.com/mgechev/revive/file"
-	"github.com/mgechev/revive/rules"
-	"github.com/mgechev/revive/visitors"
+	"github.com/mgechev/revive/rule"
+	"github.com/mgechev/revive/visitor"
 )
 
 const (
@@ -16,19 +16,19 @@ const (
 
 // LintElseRule lints given else constructs.
 type LintElseRule struct {
-	rules.Rule
+	rule.Rule
 }
 
 // Apply applies the rule to given file.
-func (r *LintElseRule) Apply(file *file.File, arguments rules.RuleArguments) []rules.Failure {
+func (r *LintElseRule) Apply(file *file.File, arguments rule.RuleArguments) []rule.Failure {
 	res := &lintElseVisitor{}
-	visitors.Setup(res, rules.RuleConfig{Name: ruleName, Arguments: arguments}, file)
+	visitor.Setup(res, rule.RuleConfig{Name: ruleName, Arguments: arguments}, file)
 	res.Visit(file.GetAST())
 	return res.GetFailures()
 }
 
 type lintElseVisitor struct {
-	visitors.RuleVisitor
+	visitor.RuleVisitor
 }
 
 func (w *lintElseVisitor) VisitIfStmt(node *ast.IfStmt) {
@@ -50,9 +50,9 @@ func (w *lintElseVisitor) VisitIfStmt(node *ast.IfStmt) {
 	}
 	lastStmt := node.Body.List[len(node.Body.List)-1]
 	if _, ok := lastStmt.(*ast.ReturnStmt); ok {
-		w.AddFailure(rules.Failure{
+		w.AddFailure(rule.Failure{
 			Failure:  failure,
-			Type:     rules.FailureTypeWarning,
+			Type:     rule.FailureTypeWarning,
 			Position: w.GetPosition(node.Else.Pos(), node.Else.End()),
 		})
 	}

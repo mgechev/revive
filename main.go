@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
-	"github.com/mgechev/revive/defaultrules"
-	"github.com/mgechev/revive/formatters"
+	"github.com/mgechev/revive/defaultrule"
+	"github.com/mgechev/revive/formatter"
 	"github.com/mgechev/revive/linter"
-	"github.com/mgechev/revive/rules"
+	"github.com/mgechev/revive/rule"
 )
 
 func main() {
@@ -25,15 +25,15 @@ func main() {
 	linter := linter.New(func(file string) ([]byte, error) {
 		return []byte(src), nil
 	})
-	var result []rules.Rule
-	result = append(result, &defaultrules.LintElseRule{})
+	var result []rule.Rule
+	result = append(result, &defaultrule.LintElseRule{})
 
 	failures, err := linter.Lint([]string{"foo.go", "bar.go", "baz.go"}, result)
 	if err != nil {
 		panic(err)
 	}
 
-	var formatter formatters.CLIFormatter
+	var formatter formatter.CLIFormatter
 	output, err := formatter.Format(failures)
 	if err != nil {
 		panic(err)

@@ -1,10 +1,10 @@
-package formatters
+package formatter
 
 import (
 	"bytes"
 	"fmt"
 
-	"github.com/mgechev/revive/rules"
+	"github.com/mgechev/revive/rule"
 	"github.com/olekukonko/tablewriter"
 	"github.com/ttacon/chalk"
 )
@@ -20,25 +20,25 @@ type CLIFormatter struct {
 	Metadata FormatterMetadata
 }
 
-func formatFailure(failure rules.Failure) []string {
+func formatFailure(failure rule.Failure) []string {
 	fString := chalk.Blue.Color(failure.Failure)
 	fTypeStr := string(failure.Type)
 	fType := chalk.Red.Color(fTypeStr)
 	lineColumn := failure.Position
 	pos := chalk.Dim.TextStyle(fmt.Sprintf("(%d, %d)", lineColumn.Start.Line, lineColumn.Start.Column))
-	if failure.Type == rules.FailureTypeWarning {
+	if failure.Type == rule.FailureTypeWarning {
 		fType = chalk.Yellow.Color(fTypeStr)
 	}
 	return []string{failure.GetFilename(), pos, fType, fString}
 }
 
 // Format formats the failures gotten from the linter.
-func (f *CLIFormatter) Format(failures []rules.Failure) (string, error) {
+func (f *CLIFormatter) Format(failures []rule.Failure) (string, error) {
 	var result [][]string
 	var totalErrors = 0
 	for _, f := range failures {
 		result = append(result, formatFailure(f))
-		if f.Type == rules.FailureTypeError {
+		if f.Type == rule.FailureTypeError {
 			totalErrors++
 		}
 	}
