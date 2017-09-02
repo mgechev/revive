@@ -52,5 +52,6 @@ type Config struct {
 
 // Rule defines an abstract rule.
 type Rule interface {
+	GetName() string
 	Apply(file *file.File, args Arguments) []Failure
 }

@@ -12,6 +12,7 @@ import (
 func main() {
 	src := `
   package p
+  // revive:disable
 
   func Test() {
     if true {
@@ -28,7 +29,7 @@ func main() {
 	var result []rule.Rule
 	result = append(result, &defaultrule.LintElseRule{})
 
-	failures, err := linter.Lint([]string{"foo.go", "bar.go", "baz.go"}, result)
+	failures, err := linter.Lint([]string{"foo.go" /*, "bar.go", "baz.go"*/}, result)
 	if err != nil {
 		panic(err)
 	}

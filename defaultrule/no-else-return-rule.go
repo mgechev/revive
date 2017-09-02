@@ -27,6 +27,11 @@ func (r *LintElseRule) Apply(file *file.File, arguments rule.Arguments) []rule.F
 	return res.GetFailures()
 }
 
+// GetName returns the rule name.
+func (r *LintElseRule) GetName() string {
+	return ruleName
+}
+
 type lintElseVisitor struct {
 	visitor.RuleVisitor
 }
