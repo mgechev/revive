@@ -20,9 +20,9 @@ type LintElseRule struct {
 }
 
 // Apply applies the rule to given file.
-func (r *LintElseRule) Apply(file *file.File, arguments rule.RuleArguments) []rule.Failure {
+func (r *LintElseRule) Apply(file *file.File, arguments rule.Arguments) []rule.Failure {
 	res := &lintElseVisitor{}
-	visitor.Setup(res, rule.RuleConfig{Name: ruleName, Arguments: arguments}, file)
+	visitor.Setup(res, rule.Config{Name: ruleName, Arguments: arguments}, file)
 	res.Visit(file.GetAST())
 	return res.GetFailures()
 }

@@ -16,6 +16,12 @@ const (
 // FailureType is the type for the failure types.
 type FailureType string
 
+// FailurePosition returns the failure position
+type FailurePosition struct {
+	Start token.Position
+	End   token.Position
+}
+
 // Failure defines a struct for a linting failure.
 type Failure struct {
 	Failure  string
@@ -29,21 +35,22 @@ func (f *Failure) GetFilename() string {
 	return f.Position.Start.Filename
 }
 
-// FailurePosition returns the failure position
-type FailurePosition struct {
-	Start token.Position
-	End   token.Position
+// DisabledInterval contains a single disabled interval and the associated rule name.
+type DisabledInterval struct {
+	From     token.Position
+	To       token.Position
+	RuleName string
 }
 
-// RuleArguments is type used for the arguments of a rule.
-type RuleArguments []string
+// Arguments is type used for the arguments of a rule.
+type Arguments []string
 
-type RuleConfig struct {
+type Config struct {
 	Name      string
-	Arguments RuleArguments
+	Arguments Arguments
 }
 
 // Rule defines an abstract rule.
 type Rule interface {
-	Apply(file *file.File, args RuleArguments) []Failure
+	Apply(file *file.File, args Arguments) []Failure
 }

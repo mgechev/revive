@@ -30,6 +30,7 @@ func (l *Linter) Lint(filenames []string, ruleSet []rule.Rule) ([]rule.Failure, 
 			return nil, err
 		}
 		file, err := file.New(filename, content, &fileSet)
+		disabledIntervals := l.disabledIntervals(file)
 
 		if err != nil {
 			return nil, err
@@ -37,9 +38,18 @@ func (l *Linter) Lint(filenames []string, ruleSet []rule.Rule) ([]rule.Failure, 
 
 		for _, rule := range ruleSet {
 			currentFailures := rule.Apply(file, []string{})
+			currentFailures = l.filterFailures(currentFailures, disabledIntervals)
 			failures = append(failures, currentFailures...)
 		}
 	}
 
 	return failures, nil
+}
+
+func (l *Linter) disabledIntervals(file *file.File) []rule.DisabledInterval {
+	return nil
+}
+
+func (l *Linter) filterFailures(failures []rule.Failure, disabledIntervals []rule.DisabledInterval) []rule.Failure {
+	return failures
 }

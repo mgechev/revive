@@ -11,7 +11,7 @@ import (
 type RuleVisitor struct {
 	SyntaxVisitor
 	RuleName      string
-	RuleArguments rule.RuleArguments
+	RuleArguments rule.Arguments
 	failures      []rule.Failure
 	File          *file.File
 }

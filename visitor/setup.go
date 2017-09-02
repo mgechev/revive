@@ -9,7 +9,7 @@ import (
 )
 
 // Setup sets the proper pointers of given visitor.
-func Setup(v interface{}, conf rule.RuleConfig, file *file.File) error {
+func Setup(v interface{}, conf rule.Config, file *file.File) error {
 	val := reflect.ValueOf(v).Elem()
 	field := val.FieldByName("RuleVisitor")
 	if !field.IsValid() {
