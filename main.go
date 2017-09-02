@@ -12,14 +12,15 @@ import (
 func main() {
 	src := `
   package p
-  // revive:disable
 
   func Test() {
     if true {
       return 42;
+    // revive:disable no-else-return
     } else {
       return 23;
     }
+    // revive:enable no-else-return
   }
   `
 

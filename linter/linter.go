@@ -14,6 +14,8 @@ import (
 // ReadFile defines an abstraction for reading files.
 type ReadFile func(path string) (result []byte, err error)
 
+type disabledIntervalsMap = map[string][]rule.DisabledInterval
+
 // Linter is used for linting set of files.
 type Linter struct {
 	reader ReadFile
@@ -46,6 +48,12 @@ func (l *Linter) Lint(filenames []string, ruleSet []rule.Rule) ([]rule.Failure, 
 
 		for _, rule := range ruleSet {
 			currentFailures := rule.Apply(file, []string{})
+			for idx, failure := range currentFailures {
+				if failure.RuleName == "" {
+					failure.RuleName = rule.GetName()
+					currentFailures[idx] = failure
+				}
+			}
 			currentFailures = l.filterFailures(currentFailures, disabledIntervals)
 			failures = append(failures, currentFailures...)
 		}
@@ -59,15 +67,16 @@ type enableDisableConfig struct {
 	position int
 }
 
-func (l *Linter) disabledIntervals(file *file.File, allRuleNames []string) []rule.DisabledInterval {
+func (l *Linter) disabledIntervals(file *file.File, allRuleNames []string) disabledIntervalsMap {
 	re := regexp.MustCompile(`^\s*revive:(enable|disable)(?:-(line|next-line))?(:|\s|$)`)
 
 	enabledDisabledRulesMap := make(map[string][]enableDisableConfig)
 
-	getEnabledDisabledIntervals := func() []rule.DisabledInterval {
-		var result []rule.DisabledInterval
+	getEnabledDisabledIntervals := func() disabledIntervalsMap {
+		result := make(disabledIntervalsMap)
 
 		for ruleName, disabledArr := range enabledDisabledRulesMap {
+			ruleResult := []rule.DisabledInterval{}
 			for i := 0; i < len(disabledArr); i++ {
 				interval := rule.DisabledInterval{
 					RuleName: ruleName,
@@ -81,12 +90,14 @@ func (l *Linter) disabledIntervals(file *file.File, allRuleNames []string) []rul
 					},
 				}
 				if i%2 == 0 {
-					result = append(result, interval)
+					ruleResult = append(ruleResult, interval)
 				} else {
-					result[len(result)-1].To.Line = disabledArr[i].position
+					ruleResult[len(ruleResult)-1].To.Line = disabledArr[i].position
 				}
 			}
+			result[ruleName] = ruleResult
 		}
+
 		return result
 	}
 
@@ -111,11 +122,11 @@ func (l *Linter) disabledIntervals(file *file.File, allRuleNames []string) []rul
 		var result []rule.DisabledInterval
 		for _, name := range ruleNames {
 			if modifier == "line" {
-				handleConfig(!isEnabled, line, name)
 				handleConfig(isEnabled, line, name)
+				handleConfig(!isEnabled, line, name)
 			} else if modifier == "next-line" {
-				handleConfig(!isEnabled, line+1, name)
 				handleConfig(isEnabled, line+1, name)
+				handleConfig(!isEnabled, line+1, name)
 			} else {
 				handleConfig(isEnabled, line, name)
 			}
@@ -135,6 +146,7 @@ func (l *Linter) disabledIntervals(file *file.File, allRuleNames []string) []rul
 		if len(ruleNamesString) == 2 {
 			tempNames := strings.Split(ruleNamesString[1], ",")
 			for _, name := range tempNames {
+				name = strings.Trim(name, "\n")
 				if len(name) > 0 {
 					ruleNames = append(ruleNames, name)
 				}
@@ -156,6 +168,29 @@ func (l *Linter) disabledIntervals(file *file.File, allRuleNames []string) []rul
 	return getEnabledDisabledIntervals()
 }
 
-func (l *Linter) filterFailures(failures []rule.Failure, disabledIntervals []rule.DisabledInterval) []rule.Failure {
-	return failures
+func (l *Linter) filterFailures(failures []rule.Failure, disabledIntervals disabledIntervalsMap) []rule.Failure {
+	result := []rule.Failure{}
+	for _, failure := range failures {
+		fStart := failure.Position.Start.Line
+		fEnd := failure.Position.End.Line
+		intervals, ok := disabledIntervals[failure.RuleName]
+		if !ok {
+			result = append(result, failure)
+		} else {
+			include := true
+			for _, interval := range intervals {
+				intStart := interval.From.Line
+				intEnd := interval.To.Line
+				if (fStart >= intStart && fStart <= intEnd) ||
+					(fEnd >= intStart && fEnd <= intEnd) {
+					include = false
+					break
+				}
+			}
+			if include {
+				result = append(result, failure)
+			}
+		}
+	}
+	return result
 }

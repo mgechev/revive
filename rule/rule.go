@@ -25,6 +25,7 @@ type FailurePosition struct {
 // Failure defines a struct for a linting failure.
 type Failure struct {
 	Failure  string
+	RuleName string
 	Type     FailureType
 	Position FailurePosition
 	file     *file.File
