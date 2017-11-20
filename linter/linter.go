@@ -46,13 +46,16 @@ func (l *Linter) Lint(filenames []string, ruleSet []rule.Rule) ([]rule.Failure, 
 			return nil, err
 		}
 
-		for _, rule := range ruleSet {
-			currentFailures := rule.Apply(file, []string{})
+		for _, currentRule := range ruleSet {
+			currentFailures := currentRule.Apply(file, []string{})
 			for idx, failure := range currentFailures {
 				if failure.RuleName == "" {
-					failure.RuleName = rule.Name()
-					currentFailures[idx] = failure
+					failure.RuleName = currentRule.Name()
 				}
+				if failure.Node != nil {
+					failure.Position = rule.ToFailurePosition(failure.Node.Pos(), failure.Node.End(), file)
+				}
+				currentFailures[idx] = failure
 			}
 			currentFailures = l.filterFailures(currentFailures, disabledIntervals)
 			failures = append(failures, currentFailures...)

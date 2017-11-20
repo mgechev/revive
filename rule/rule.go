@@ -29,7 +29,7 @@ type Failure struct {
 	RuleName string
 	Type     FailureType
 	Position FailurePosition
-	file     *file.File
+	Node     ast.Node
 }
 
 // GetFilename returns the filename.
@@ -57,33 +57,15 @@ type Config struct {
 type Rule interface {
 	Name() string
 	Apply(*file.File, Arguments) []Failure
-	AddFailures(...Failure)
-	Failures() []Failure
 }
 
 // AbstractRule defines an abstract rule.
 type AbstractRule struct {
-	failures []Failure
-	File     *file.File
+	Failures []Failure
 }
 
-// AddFailures adds rule failures.
-func (r *AbstractRule) AddFailures(failures ...Failure) {
-	r.failures = append(r.failures, failures...)
-}
-
-// AddFailureAtNode adds rule failure at specific node.
-func (r *AbstractRule) AddFailureAtNode(failure Failure, t ast.Node, file *file.File) {
-	failure.Position = toFailurePosition(t.Pos(), t.End(), file)
-	r.AddFailures(failure)
-}
-
-// Failures returns the rule failures.
-func (r *AbstractRule) Failures() []Failure {
-	return r.failures
-}
-
-func toFailurePosition(start token.Pos, end token.Pos, file *file.File) FailurePosition {
+// ToFailurePosition returns the failure position.
+func ToFailurePosition(start token.Pos, end token.Pos, file *file.File) FailurePosition {
 	return FailurePosition{
 		Start: file.ToPosition(start),
 		End:   file.ToPosition(end),

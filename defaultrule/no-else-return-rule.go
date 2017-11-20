@@ -14,15 +14,15 @@ const (
 )
 
 // LintElseRule lints given else constructs.
-type LintElseRule struct {
-	rule.AbstractRule
-}
+type LintElseRule struct{}
 
 // Apply applies the rule to given file.
 func (r *LintElseRule) Apply(file *file.File, arguments rule.Arguments) []rule.Failure {
-	r.File = file
-	ast.Walk(lintElse{r}, file.GetAST())
-	return r.Failures()
+	var failures []rule.Failure
+	ast.Walk(lintElse(func(failure rule.Failure) {
+		failures = append(failures, failure)
+	}), file.GetAST())
+	return failures
 }
 
 // Name returns the rule name.
@@ -30,9 +30,7 @@ func (r *LintElseRule) Name() string {
 	return ruleName
 }
 
-type lintElse struct {
-	r *LintElseRule
-}
+type lintElse func(rule.Failure)
 
 func (f lintElse) Visit(n ast.Node) ast.Visitor {
 	node, ok := n.(*ast.IfStmt)
@@ -55,10 +53,11 @@ func (f lintElse) Visit(n ast.Node) ast.Visitor {
 		}
 		lastStmt := node.Body.List[len(node.Body.List)-1]
 		if _, ok := lastStmt.(*ast.ReturnStmt); ok {
-			f.r.AddFailureAtNode(rule.Failure{
+			f(rule.Failure{
 				Failure: failure,
 				Type:    rule.FailureTypeWarning,
-			}, node.Else, f.r.File)
+				Node:    node.Else,
+			})
 			return f
 		}
 	}
