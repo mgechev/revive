@@ -1,6 +1,7 @@
 package rule
 
 import (
+	"go/ast"
 	"go/token"
 
 	"github.com/mgechev/revive/file"
@@ -58,7 +59,6 @@ type Rule interface {
 	Apply(*file.File, Arguments) []Failure
 	AddFailures(...Failure)
 	Failures() []Failure
-	Position(token.Pos, token.Pos) FailurePosition
 }
 
 // AbstractRule defines an abstract rule.
@@ -67,14 +67,15 @@ type AbstractRule struct {
 	File     *file.File
 }
 
-// Apply must be overridden by the successor struct.
-func (r *AbstractRule) Apply(file *file.File, args Arguments) {
-	panic("Apply not implemented")
-}
-
 // AddFailures adds rule failures.
 func (r *AbstractRule) AddFailures(failures ...Failure) {
 	r.failures = append(r.failures, failures...)
+}
+
+// AddFailureAtNode adds rule failure at specific node.
+func (r *AbstractRule) AddFailureAtNode(failure Failure, t ast.Node, file *file.File) {
+	failure.Position = toFailurePosition(t.Pos(), t.End(), file)
+	r.AddFailures(failure)
 }
 
 // Failures returns the rule failures.
@@ -82,12 +83,9 @@ func (r *AbstractRule) Failures() []Failure {
 	return r.failures
 }
 
-// Position returns position by given start and end token.Pos.
-func (r *AbstractRule) Position(start token.Pos, end token.Pos) FailurePosition {
-	s := r.File.ToPosition(start)
-	e := r.File.ToPosition(end)
+func toFailurePosition(start token.Pos, end token.Pos, file *file.File) FailurePosition {
 	return FailurePosition{
-		Start: s,
-		End:   e,
+		Start: file.ToPosition(start),
+		End:   file.ToPosition(end),
 	}
 }

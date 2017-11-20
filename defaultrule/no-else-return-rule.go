@@ -31,7 +31,7 @@ func (r *LintElseRule) Name() string {
 }
 
 type lintElse struct {
-	r rule.Rule
+	r *LintElseRule
 }
 
 func (f lintElse) Visit(n ast.Node) ast.Visitor {
@@ -55,11 +55,10 @@ func (f lintElse) Visit(n ast.Node) ast.Visitor {
 		}
 		lastStmt := node.Body.List[len(node.Body.List)-1]
 		if _, ok := lastStmt.(*ast.ReturnStmt); ok {
-			f.r.AddFailures(rule.Failure{
-				Failure:  failure,
-				Type:     rule.FailureTypeWarning,
-				Position: f.r.Position(node.Else.Pos(), node.Else.End()),
-			})
+			f.r.AddFailureAtNode(rule.Failure{
+				Failure: failure,
+				Type:    rule.FailureTypeWarning,
+			}, node.Else, f.r.File)
 			return f
 		}
 	}
