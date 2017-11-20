@@ -16,11 +16,9 @@ func main() {
   func Test() {
     if true {
       return 42;
-    // revive:disable no-else-return
     } else {
       return 23;
     }
-    // revive:enable no-else-return
   }
   `
 
@@ -30,7 +28,7 @@ func main() {
 	var result []rule.Rule
 	result = append(result, &defaultrule.LintElseRule{})
 
-	failures, err := linter.Lint([]string{"foo.go" /*, "bar.go", "baz.go"*/}, result)
+	failures, err := linter.Lint([]string{"foo.go", "bar.go", "baz.go"}, result)
 	if err != nil {
 		panic(err)
 	}

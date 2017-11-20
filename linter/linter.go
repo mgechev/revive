@@ -32,7 +32,7 @@ func (l *Linter) Lint(filenames []string, ruleSet []rule.Rule) ([]rule.Failure, 
 	var failures []rule.Failure
 	var ruleNames = []string{}
 	for _, r := range ruleSet {
-		ruleNames = append(ruleNames, r.GetName())
+		ruleNames = append(ruleNames, r.Name())
 	}
 	for _, filename := range filenames {
 		content, err := l.reader(filename)
@@ -50,7 +50,7 @@ func (l *Linter) Lint(filenames []string, ruleSet []rule.Rule) ([]rule.Failure, 
 			currentFailures := rule.Apply(file, []string{})
 			for idx, failure := range currentFailures {
 				if failure.RuleName == "" {
-					failure.RuleName = rule.GetName()
+					failure.RuleName = rule.Name()
 					currentFailures[idx] = failure
 				}
 			}

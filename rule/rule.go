@@ -46,13 +46,48 @@ type DisabledInterval struct {
 // Arguments is type used for the arguments of a rule.
 type Arguments []string
 
+// Config contains the rule configuration.
 type Config struct {
 	Name      string
 	Arguments Arguments
 }
 
-// Rule defines an abstract rule.
+// Rule defines an abstract rule interaface
 type Rule interface {
-	GetName() string
-	Apply(file *file.File, args Arguments) []Failure
+	Name() string
+	Apply(*file.File, Arguments) []Failure
+	AddFailures(...Failure)
+	Failures() []Failure
+	Position(token.Pos, token.Pos) FailurePosition
+}
+
+// AbstractRule defines an abstract rule.
+type AbstractRule struct {
+	failures []Failure
+	File     *file.File
+}
+
+// Apply must be overridden by the successor struct.
+func (r *AbstractRule) Apply(file *file.File, args Arguments) {
+	panic("Apply not implemented")
+}
+
+// AddFailures adds rule failures.
+func (r *AbstractRule) AddFailures(failures ...Failure) {
+	r.failures = append(r.failures, failures...)
+}
+
+// Failures returns the rule failures.
+func (r *AbstractRule) Failures() []Failure {
+	return r.failures
+}
+
+// Position returns position by given start and end token.Pos.
+func (r *AbstractRule) Position(start token.Pos, end token.Pos) FailurePosition {
+	s := r.File.ToPosition(start)
+	e := r.File.ToPosition(end)
+	return FailurePosition{
+		Start: s,
+		End:   e,
+	}
 }
