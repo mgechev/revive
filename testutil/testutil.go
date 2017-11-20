@@ -9,8 +9,8 @@ import (
 	"github.com/mgechev/revive/rule"
 )
 
-var anyRe = regexp.MustCompile(`\[\/?@(\w)\]`)
-var closingRe = regexp.MustCompile(`\[\/@(\w)\]`)
+var anyRe = regexp.MustCompile(`\[\/?@(\w+)\]`)
+var closingRe = regexp.MustCompile(`\[\/@(\w+)\]`)
 
 type pos struct {
 	start int

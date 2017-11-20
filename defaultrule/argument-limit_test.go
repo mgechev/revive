@@ -13,7 +13,7 @@ func TestArgumentLimit(t *testing.T) {
 	program := `
 	package foo
 
-	[@e]func foo(a int, b int, c int)[/@e] {
+	[@1]func foo(a int, b int, c int)[/@1] {
 		return a + b + c;
 	}
 	`
