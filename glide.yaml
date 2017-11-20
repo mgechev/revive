@@ -1,7 +1,7 @@
 package: github.com/mgechev/revive
 import:
-- package: github.com/ttacon/chalk
-  version: ~0.1.0
 - package: github.com/olekukonko/tablewriter
 - package: github.com/mattn/go-runewidth
   version: ~0.0.2
+- package: github.com/fatih/color
+  version: ~1.5.0

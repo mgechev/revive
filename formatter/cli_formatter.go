@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/mgechev/revive/rule"
 	"github.com/olekukonko/tablewriter"
-	"github.com/ttacon/chalk"
 )
 
 const (
@@ -21,13 +21,13 @@ type CLIFormatter struct {
 }
 
 func formatFailure(failure rule.Failure) []string {
-	fString := chalk.Blue.Color(failure.Failure)
+	fString := color.BlueString(failure.Failure)
 	fTypeStr := string(failure.Type)
-	fType := chalk.Red.Color(fTypeStr)
+	fType := color.RedString(fTypeStr)
 	lineColumn := failure.Position
-	pos := chalk.Dim.TextStyle(fmt.Sprintf("(%d, %d)", lineColumn.Start.Line, lineColumn.Start.Column))
+	pos := fmt.Sprintf("(%d, %d)", lineColumn.Start.Line, lineColumn.Start.Column)
 	if failure.Type == rule.FailureTypeWarning {
-		fType = chalk.Yellow.Color(fTypeStr)
+		fType = color.YellowString(fTypeStr)
 	}
 	return []string{failure.GetFilename(), pos, fType, fString}
 }
@@ -68,18 +68,19 @@ func (f *CLIFormatter) Format(failures []rule.Failure) (string, error) {
 		table.SetAutoWrapText(false)
 		table.AppendBulk(val)
 		table.Render()
-		output += chalk.Dim.TextStyle(chalk.Underline.TextStyle(filename) + "\n")
+		c := color.New(color.Underline)
+		output += c.SprintfFunc()(filename + "\n")
 		output += buf.String() + "\n"
 	}
 
 	suffix := fmt.Sprintf(" %d %s (%d errors) (%d warnings)", total, ps, totalErrors, total-totalErrors)
 
 	if total > 0 && totalErrors > 0 {
-		suffix = chalk.Red.Color("\n ✖" + suffix)
+		suffix = color.RedString("\n ✖" + suffix)
 	} else if total > 0 && totalErrors == 0 {
-		suffix = chalk.Yellow.Color("\n ✖" + suffix)
+		suffix = color.YellowString("\n ✖" + suffix)
 	} else {
-		suffix = chalk.Green.Color("\n" + suffix)
+		suffix = color.GreenString("\n" + suffix)
 	}
 	return output + suffix, nil
 }
