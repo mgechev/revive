@@ -56,7 +56,7 @@ func (w lintArgsNum) Visit(n ast.Node) ast.Visitor {
 				Type:    rule.FailureTypeWarning,
 				Node:    node.Type,
 			})
-			return nil
+			return w
 		}
 	}
 	return w
