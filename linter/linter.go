@@ -27,7 +27,7 @@ func New(reader ReadFile) Linter {
 }
 
 // Lint lints a set of files with the specified rule.
-func (l *Linter) Lint(filenames []string, ruleSet []rule.Rule) ([]rule.Failure, error) {
+func (l *Linter) Lint(filenames []string, ruleSet []rule.Rule, rulesConfig rule.RulesConfig) ([]rule.Failure, error) {
 	var fileSet token.FileSet
 	var failures []rule.Failure
 	var ruleNames = []string{}
@@ -47,7 +47,8 @@ func (l *Linter) Lint(filenames []string, ruleSet []rule.Rule) ([]rule.Failure, 
 		}
 
 		for _, currentRule := range ruleSet {
-			currentFailures := currentRule.Apply(file, []string{})
+			config := rulesConfig[currentRule.Name()]
+			currentFailures := currentRule.Apply(file, config)
 			for idx, failure := range currentFailures {
 				if failure.RuleName == "" {
 					failure.RuleName = currentRule.Name()

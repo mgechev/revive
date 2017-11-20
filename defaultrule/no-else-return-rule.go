@@ -8,11 +8,6 @@ import (
 	"github.com/mgechev/revive/rule"
 )
 
-const (
-	ruleName = "no-else-return"
-	failure  = "if block ends with a return statement, so drop this else and outdent its block"
-)
-
 // LintElseRule lints given else constructs.
 type LintElseRule struct{}
 
@@ -27,7 +22,7 @@ func (r *LintElseRule) Apply(file *file.File, arguments rule.Arguments) []rule.F
 
 // Name returns the rule name.
 func (r *LintElseRule) Name() string {
-	return ruleName
+	return "no-else-return"
 }
 
 type lintElse func(rule.Failure)
@@ -54,7 +49,7 @@ func (f lintElse) Visit(n ast.Node) ast.Visitor {
 		lastStmt := node.Body.List[len(node.Body.List)-1]
 		if _, ok := lastStmt.(*ast.ReturnStmt); ok {
 			f(rule.Failure{
-				Failure: failure,
+				Failure: "if block ends with a return statement, so drop this else and outdent its block",
 				Type:    rule.FailureTypeWarning,
 				Node:    node.Else,
 			})

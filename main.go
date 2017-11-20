@@ -19,16 +19,24 @@ func main() {
     } else {
       return 23;
     }
-  }
+	}
+	
+	func foobar(a int, b int, c int, d int) {
+		return a + b + c;
+	}
   `
 
 	linter := linter.New(func(file string) ([]byte, error) {
 		return []byte(src), nil
 	})
 	var result []rule.Rule
-	result = append(result, &defaultrule.LintElseRule{})
+	result = append(result, &defaultrule.LintElseRule{}, &defaultrule.ArgumentsLimitRule{})
 
-	failures, err := linter.Lint([]string{"foo.go", "bar.go", "baz.go"}, result)
+	var config = rule.RulesConfig{
+		"argument-limit": []string{"3"},
+	}
+
+	failures, err := linter.Lint([]string{"foo.go", "bar.go", "baz.go"}, result, config)
 	if err != nil {
 		panic(err)
 	}

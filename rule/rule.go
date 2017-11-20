@@ -53,6 +53,9 @@ type Config struct {
 	Arguments Arguments
 }
 
+// RulesConfig defiles the config for all rules.
+type RulesConfig = map[string]Arguments
+
 // Rule defines an abstract rule interaface
 type Rule interface {
 	Name() string
