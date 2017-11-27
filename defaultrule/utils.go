@@ -1,7 +1,9 @@
 package defaultrule
 
 import (
+	"fmt"
 	"go/ast"
+	"regexp"
 	"strings"
 
 	"github.com/mgechev/revive/file"
@@ -37,3 +39,65 @@ func receiverType(fn *ast.FuncDecl) string {
 	// The parser accepts much more than just the legal forms.
 	return "invalid-type"
 }
+
+var knownNameExceptions = map[string]bool{
+	"LastInsertId": true, // must match database/sql
+	"kWh":          true,
+}
+
+func isCgoExported(f *ast.FuncDecl) bool {
+	if f.Recv != nil || f.Doc == nil {
+		return false
+	}
+
+	cgoExport := regexp.MustCompile(fmt.Sprintf("(?m)^//export %s$", regexp.QuoteMeta(f.Name.Name)))
+	for _, c := range f.Doc.List {
+		if cgoExport.MatchString(c.Text) {
+			return true
+		}
+	}
+	return false
+}
+
+var commonInitialisms = map[string]bool{
+	"ACL":   true,
+	"API":   true,
+	"ASCII": true,
+	"CPU":   true,
+	"CSS":   true,
+	"DNS":   true,
+	"EOF":   true,
+	"GUID":  true,
+	"HTML":  true,
+	"HTTP":  true,
+	"HTTPS": true,
+	"ID":    true,
+	"IP":    true,
+	"JSON":  true,
+	"LHS":   true,
+	"QPS":   true,
+	"RAM":   true,
+	"RHS":   true,
+	"RPC":   true,
+	"SLA":   true,
+	"SMTP":  true,
+	"SQL":   true,
+	"SSH":   true,
+	"TCP":   true,
+	"TLS":   true,
+	"TTL":   true,
+	"UDP":   true,
+	"UI":    true,
+	"UID":   true,
+	"UUID":  true,
+	"URI":   true,
+	"URL":   true,
+	"UTF8":  true,
+	"VM":    true,
+	"XML":   true,
+	"XMPP":  true,
+	"XSRF":  true,
+	"XSS":   true,
+}
+
+var allCapsRE = regexp.MustCompile(`^[A-Z0-9_]+$`)
