@@ -30,7 +30,7 @@ func (r *BlankImportsRule) Apply(file *file.File, arguments rule.Arguments) []ru
 
 // Name returns the rule name.
 func (r *BlankImportsRule) Name() string {
-	return "argument-limit"
+	return "blank-imports"
 }
 
 type lintBlankImports struct {

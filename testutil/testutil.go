@@ -53,14 +53,14 @@ func stripAnnotations(code string) string {
 }
 
 // AssertSuccess checks if given rule runs correctly with no failures.
-func AssertSuccess(t *testing.T, code string, testingRule rule.Rule, args rule.Arguments) {
+func AssertSuccessWithName(t *testing.T, code, name string, testingRule rule.Rule, args rule.Arguments) {
 	annotations := extractFailures(code)
 	if annotations != nil {
 		t.Errorf("There should be no failure annotations when verifying successful rule analysis")
 	}
 
 	var fileSet token.FileSet
-	file, err := file.New("testing.go", []byte(stripAnnotations(code)), &fileSet)
+	file, err := file.New(name, []byte(stripAnnotations(code)), &fileSet)
 	if err != nil {
 		t.Errorf("Cannot parse testing file: %s", err.Error())
 	}
@@ -76,6 +76,11 @@ func AssertSuccess(t *testing.T, code string, testingRule rule.Rule, args rule.A
 		}
 		t.Errorf("Found %d failures in the code: %s", failuresLen, failuresText)
 	}
+}
+
+// AssertSuccess checks if given rule runs correctly with no failures.
+func AssertSuccess(t *testing.T, code string, testingRule rule.Rule, args rule.Arguments) {
+	AssertSuccessWithName(t, code, "testing.go", testingRule, args)
 }
 
 // AssertFailures checks if given rule runs correctly with failures.
