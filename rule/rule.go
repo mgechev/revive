@@ -25,11 +25,12 @@ type FailurePosition struct {
 
 // Failure defines a struct for a linting failure.
 type Failure struct {
-	Failure  string
-	RuleName string
-	Type     FailureType
-	Position FailurePosition
-	Node     ast.Node
+	Failure    string
+	RuleName   string
+	Type       FailureType
+	Position   FailurePosition
+	Node       ast.Node
+	Confidence float64
 }
 
 // GetFilename returns the filename.

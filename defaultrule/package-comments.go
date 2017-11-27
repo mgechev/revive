@@ -1,0 +1,111 @@
+package defaultrule
+
+import (
+	"fmt"
+	"go/ast"
+	"go/token"
+	"strings"
+
+	"github.com/mgechev/revive/file"
+	"github.com/mgechev/revive/rule"
+)
+
+// PackageCommentsRule lints the package comments. It complains if
+// there is no package comment, or if it is not of the right form.
+// This has a notable false positive in that a package comment
+// could rightfully appear in a different file of the same package,
+// but that's not easy to fix since this linter is file-oriented.
+type PackageCommentsRule struct{}
+
+// Apply applies the rule to given file.
+func (r *PackageCommentsRule) Apply(file *file.File, arguments rule.Arguments) []rule.Failure {
+	var failures []rule.Failure
+
+	if isTest(file) {
+		return failures
+	}
+
+	onFailure := func(failure rule.Failure) {
+		failures = append(failures, failure)
+	}
+
+	fileAst := file.GetAST()
+	w := &lintPackageComments{fileAst, file, onFailure}
+	ast.Walk(w, fileAst)
+	return failures
+}
+
+// Name returns the rule name.
+func (r *PackageCommentsRule) Name() string {
+	return "package-comments"
+}
+
+type lintPackageComments struct {
+	fileAst   *ast.File
+	file      *file.File
+	onFailure func(rule.Failure)
+}
+
+func (l *lintPackageComments) Visit(n ast.Node) ast.Visitor {
+	const ref = styleGuideBase + "#package-comments"
+	prefix := "Package " + l.fileAst.Name.Name + " "
+
+	// Look for a detached package comment.
+	// First, scan for the last comment that occurs before the "package" keyword.
+	var lastCG *ast.CommentGroup
+	for _, cg := range l.fileAst.Comments {
+		if cg.Pos() > l.fileAst.Package {
+			// Gone past "package" keyword.
+			break
+		}
+		lastCG = cg
+	}
+	if lastCG != nil && strings.HasPrefix(lastCG.Text(), prefix) {
+		endPos := l.file.ToPosition(lastCG.End())
+		pkgPos := l.file.ToPosition(l.fileAst.Package)
+		if endPos.Line+1 < pkgPos.Line {
+			// There isn't a great place to anchor this error;
+			// the start of the blank lines between the doc and the package statement
+			// is at least pointing at the location of the problem.
+			pos := token.Position{
+				Filename: endPos.Filename,
+				// Offset not set; it is non-trivial, and doesn't appear to be needed.
+				Line:   endPos.Line + 1,
+				Column: 1,
+			}
+			l.onFailure(rule.Failure{
+				Failure:    "package comment is detached; there should be no blank lines between it and the package statement",
+				Confidence: 0.9,
+				Position:   rule.FailurePosition{Start: pos},
+			})
+			return nil
+		}
+	}
+
+	if l.fileAst.Doc == nil {
+		l.onFailure(rule.Failure{
+			Failure:    "should have a package comment, unless it's in another file for this package",
+			Confidence: 0.2,
+			Node:       l.fileAst.Name,
+		})
+		return nil
+	}
+	s := l.fileAst.Doc.Text()
+	if ts := strings.TrimLeft(s, " \t"); ts != s {
+		l.onFailure(rule.Failure{
+			Failure:    "package comment should not have leading space",
+			Confidence: 1,
+			Node:       l.fileAst.Doc,
+		})
+		s = ts
+	}
+	// Only non-main packages need to keep to this form.
+	if l.fileAst.Name.Name != "main" && !strings.HasPrefix(s, prefix) {
+		l.onFailure(rule.Failure{
+			Failure:    fmt.Sprintf(`package comment should be of the form "%s..."`, prefix),
+			Confidence: 1,
+			Node:       l.fileAst.Doc,
+		})
+	}
+	return nil
+}

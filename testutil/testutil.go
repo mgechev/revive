@@ -1,6 +1,7 @@
 package testutil
 
 import (
+	"fmt"
 	"go/token"
 	"regexp"
 	"testing"
@@ -66,7 +67,14 @@ func AssertSuccess(t *testing.T, code string, testingRule rule.Rule, args rule.A
 	failures := testingRule.Apply(file, args)
 	failuresLen := len(failures)
 	if failuresLen != 0 {
-		t.Errorf("Found %d failures in the code", failuresLen)
+		failuresText := ""
+		for idx, f := range failures {
+			failuresText += f.Failure
+			if idx < len(failures)-1 {
+				failuresText += ", "
+			}
+		}
+		t.Errorf("Found %d failures in the code: %s", failuresLen, failuresText)
 	}
 }
 
@@ -106,6 +114,7 @@ func AssertFailures(t *testing.T, code string, testingRule rule.Rule, args rule.
 		end := file.ToPosition(token.Pos(val.end))
 
 		for _, f := range failures {
+			fmt.Println("#####", f.Position.Start.String(), f.Position.End.String())
 			if f.Position.Start.String() == start.String() && f.Position.End.String() == end.String() {
 				matched = true
 				break
