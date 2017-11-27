@@ -3,6 +3,7 @@ package defaultrule
 import (
 	"fmt"
 	"go/ast"
+	"go/types"
 	"regexp"
 	"strings"
 
@@ -101,3 +102,29 @@ var commonInitialisms = map[string]bool{
 }
 
 var allCapsRE = regexp.MustCompile(`^[A-Z0-9_]+$`)
+
+func isIdent(expr ast.Expr, ident string) bool {
+	id, ok := expr.(*ast.Ident)
+	return ok && id.Name == ident
+}
+
+var zeroLiteral = map[string]bool{
+	"false": true, // bool
+	// runes
+	`'\x00'`: true,
+	`'\000'`: true,
+	// strings
+	`""`: true,
+	"``": true,
+	// numerics
+	"0":   true,
+	"0.":  true,
+	"0.0": true,
+	"0i":  true,
+}
+
+func validType(T types.Type) bool {
+	return T != nil &&
+		T != types.Typ[types.Invalid] &&
+		!strings.Contains(T.String(), "invalid type") // good but not foolproof
+}
