@@ -128,3 +128,8 @@ func validType(T types.Type) bool {
 		T != types.Typ[types.Invalid] &&
 		!strings.Contains(T.String(), "invalid type") // good but not foolproof
 }
+
+func isPkgDot(expr ast.Expr, pkg, name string) bool {
+	sel, ok := expr.(*ast.SelectorExpr)
+	return ok && isIdent(sel.X, pkg) && isIdent(sel.Sel, name)
+}
