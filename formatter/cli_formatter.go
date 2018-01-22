@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
-	"github.com/mgechev/revive/rule"
+	"github.com/mgechev/revive/linter"
 	"github.com/olekukonko/tablewriter"
 )
 
@@ -17,28 +17,28 @@ const (
 // CLIFormatter is an implementation of the Formatter interface
 // which formats the errors to JSON.
 type CLIFormatter struct {
-	Metadata FormatterMetadata
+	Metadata linter.FormatterMetadata
 }
 
-func formatFailure(failure rule.Failure) []string {
+func formatFailure(failure linter.Failure) []string {
 	fString := color.BlueString(failure.Failure)
 	fTypeStr := string(failure.Type)
 	fType := color.RedString(fTypeStr)
 	lineColumn := failure.Position
 	pos := fmt.Sprintf("(%d, %d)", lineColumn.Start.Line, lineColumn.Start.Column)
-	if failure.Type == rule.FailureTypeWarning {
+	if failure.Type == linter.FailureTypeWarning {
 		fType = color.YellowString(fTypeStr)
 	}
 	return []string{failure.GetFilename(), pos, fType, fString}
 }
 
 // Format formats the failures gotten from the linter.
-func (f *CLIFormatter) Format(failures []rule.Failure) (string, error) {
+func (f *CLIFormatter) Format(failures []linter.Failure) (string, error) {
 	var result [][]string
 	var totalErrors = 0
 	for _, f := range failures {
 		result = append(result, formatFailure(f))
-		if f.Type == rule.FailureTypeError {
+		if f.Type == linter.FailureTypeError {
 			totalErrors++
 		}
 	}

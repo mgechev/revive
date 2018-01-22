@@ -1,4 +1,4 @@
-package defaultrule
+package rule
 
 import (
 	"fmt"
@@ -6,8 +6,7 @@ import (
 	"go/token"
 	"strings"
 
-	"github.com/mgechev/revive/file"
-	"github.com/mgechev/revive/rule"
+	"github.com/mgechev/revive/linter"
 )
 
 // PackageCommentsRule lints the package comments. It complains if
@@ -18,14 +17,14 @@ import (
 type PackageCommentsRule struct{}
 
 // Apply applies the rule to given file.
-func (r *PackageCommentsRule) Apply(file *file.File, arguments rule.Arguments) []rule.Failure {
-	var failures []rule.Failure
+func (r *PackageCommentsRule) Apply(file *linter.File, arguments linter.Arguments) []linter.Failure {
+	var failures []linter.Failure
 
 	if isTest(file) {
 		return failures
 	}
 
-	onFailure := func(failure rule.Failure) {
+	onFailure := func(failure linter.Failure) {
 		failures = append(failures, failure)
 	}
 
@@ -42,8 +41,8 @@ func (r *PackageCommentsRule) Name() string {
 
 type lintPackageComments struct {
 	fileAst   *ast.File
-	file      *file.File
-	onFailure func(rule.Failure)
+	file      *linter.File
+	onFailure func(linter.Failure)
 }
 
 func (l *lintPackageComments) Visit(n ast.Node) ast.Visitor {
@@ -73,17 +72,17 @@ func (l *lintPackageComments) Visit(n ast.Node) ast.Visitor {
 				Line:   endPos.Line + 1,
 				Column: 1,
 			}
-			l.onFailure(rule.Failure{
+			l.onFailure(linter.Failure{
 				Failure:    "package comment is detached; there should be no blank lines between it and the package statement",
 				Confidence: 0.9,
-				Position:   rule.FailurePosition{Start: pos},
+				Position:   linter.FailurePosition{Start: pos},
 			})
 			return nil
 		}
 	}
 
 	if l.fileAst.Doc == nil {
-		l.onFailure(rule.Failure{
+		l.onFailure(linter.Failure{
 			Failure:    "should have a package comment, unless it's in another file for this package",
 			Confidence: 0.2,
 			Node:       l.fileAst.Name,
@@ -92,7 +91,7 @@ func (l *lintPackageComments) Visit(n ast.Node) ast.Visitor {
 	}
 	s := l.fileAst.Doc.Text()
 	if ts := strings.TrimLeft(s, " \t"); ts != s {
-		l.onFailure(rule.Failure{
+		l.onFailure(linter.Failure{
 			Failure:    "package comment should not have leading space",
 			Confidence: 1,
 			Node:       l.fileAst.Doc,
@@ -101,7 +100,7 @@ func (l *lintPackageComments) Visit(n ast.Node) ast.Visitor {
 	}
 	// Only non-main packages need to keep to this form.
 	if l.fileAst.Name.Name != "main" && !strings.HasPrefix(s, prefix) {
-		l.onFailure(rule.Failure{
+		l.onFailure(linter.Failure{
 			Failure:    fmt.Sprintf(`package comment should be of the form "%s..."`, prefix),
 			Confidence: 1,
 			Node:       l.fileAst.Doc,

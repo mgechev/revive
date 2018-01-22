@@ -1,24 +1,23 @@
-package defaultrule
+package rule
 
 import (
 	"go/ast"
 
-	"github.com/mgechev/revive/file"
-	"github.com/mgechev/revive/rule"
+	"github.com/mgechev/revive/linter"
 )
 
 // ImportsRule lints given else constructs.
 type ImportsRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ImportsRule) Apply(file *file.File, arguments rule.Arguments) []rule.Failure {
-	var failures []rule.Failure
+func (r *ImportsRule) Apply(file *linter.File, arguments linter.Arguments) []linter.Failure {
+	var failures []linter.Failure
 
 	fileAst := file.GetAST()
 	walker := lintImports{
 		file:    file,
 		fileAst: fileAst,
-		onFailure: func(failure rule.Failure) {
+		onFailure: func(failure linter.Failure) {
 			failures = append(failures, failure)
 		},
 	}
@@ -34,15 +33,15 @@ func (r *ImportsRule) Name() string {
 }
 
 type lintImports struct {
-	file      *file.File
+	file      *linter.File
 	fileAst   *ast.File
-	onFailure func(rule.Failure)
+	onFailure func(linter.Failure)
 }
 
 func (w lintImports) Visit(n ast.Node) ast.Visitor {
 	for _, is := range w.fileAst.Imports {
 		if is.Name != nil && is.Name.Name == "." && !isTest(w.file) {
-			w.onFailure(rule.Failure{
+			w.onFailure(linter.Failure{
 				Confidence: 1,
 				Failure:    "should not use dot imports",
 				Node:       is,

@@ -1,6 +1,4 @@
-package formatter
-
-import "github.com/mgechev/revive/rule"
+package linter
 
 // FormatterMetadata configuration of a formatter
 type FormatterMetadata struct {
@@ -11,5 +9,5 @@ type FormatterMetadata struct {
 
 // Formatter defines an interface for failure formatters
 type Formatter interface {
-	Format([]rule.Failure) string
+	Format([]Failure) string
 }

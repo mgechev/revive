@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 
-	"github.com/mgechev/revive/defaultrule"
 	"github.com/mgechev/revive/formatter"
 	"github.com/mgechev/revive/linter"
 	"github.com/mgechev/revive/rule"
@@ -26,17 +25,17 @@ func main() {
 	}
   `
 
-	linter := linter.New(func(file string) ([]byte, error) {
+	revive := linter.New(func(file string) ([]byte, error) {
 		return []byte(src), nil
 	})
-	var result []rule.Rule
-	result = append(result, &defaultrule.LintElseRule{}, &defaultrule.ArgumentsLimitRule{})
+	var result []linter.Rule
+	result = append(result, &rule.LintElseRule{}, &rule.ArgumentsLimitRule{})
 
-	var config = rule.RulesConfig{
+	var config = linter.RulesConfig{
 		"argument-limit": []string{"3"},
 	}
 
-	failures, err := linter.Lint([]string{"foo.go", "bar.go", "baz.go"}, result, config)
+	failures, err := revive.Lint([]string{"foo.go", "bar.go", "baz.go"}, result, config)
 	if err != nil {
 		panic(err)
 	}

@@ -1,4 +1,4 @@
-package defaultrule
+package rule
 
 import (
 	"testing"

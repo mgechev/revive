@@ -1,10 +1,8 @@
-package rule
+package linter
 
 import (
 	"go/ast"
 	"go/token"
-
-	"github.com/mgechev/revive/file"
 )
 
 const (
@@ -60,7 +58,7 @@ type RulesConfig = map[string]Arguments
 // Rule defines an abstract rule interaface
 type Rule interface {
 	Name() string
-	Apply(*file.File, Arguments) []Failure
+	Apply(*File, Arguments) []Failure
 }
 
 // AbstractRule defines an abstract rule.
@@ -69,7 +67,7 @@ type AbstractRule struct {
 }
 
 // ToFailurePosition returns the failure position.
-func ToFailurePosition(start token.Pos, end token.Pos, file *file.File) FailurePosition {
+func ToFailurePosition(start token.Pos, end token.Pos, file *File) FailurePosition {
 	return FailurePosition{
 		Start: file.ToPosition(start),
 		End:   file.ToPosition(end),

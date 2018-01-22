@@ -1,4 +1,4 @@
-package defaultrule
+package rule
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/mgechev/revive/file"
+	"github.com/mgechev/revive/linter"
 )
 
 const styleGuideBase = "https://golang.org/wiki/CodeReviewComments"
@@ -16,7 +16,7 @@ const styleGuideBase = "https://golang.org/wiki/CodeReviewComments"
 // If id == nil, the answer is false.
 func isBlank(id *ast.Ident) bool { return id != nil && id.Name == "_" }
 
-func isTest(f *file.File) bool {
+func isTest(f *linter.File) bool {
 	return strings.HasSuffix(f.Name, "_test.go")
 }
 

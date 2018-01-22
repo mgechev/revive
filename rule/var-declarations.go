@@ -1,4 +1,4 @@
-package defaultrule
+package rule
 
 import (
 	"bytes"
@@ -7,22 +7,21 @@ import (
 	"go/printer"
 	"go/token"
 
-	"github.com/mgechev/revive/file"
-	"github.com/mgechev/revive/rule"
+	"github.com/mgechev/revive/linter"
 )
 
 // VarDeclarationsRule lints given else constructs.
 type VarDeclarationsRule struct{}
 
 // Apply applies the rule to given file.
-func (r *VarDeclarationsRule) Apply(file *file.File, arguments rule.Arguments) []rule.Failure {
-	var failures []rule.Failure
+func (r *VarDeclarationsRule) Apply(file *linter.File, arguments linter.Arguments) []linter.Failure {
+	var failures []linter.Failure
 
 	fileAst := file.GetAST()
 	walker := &lintVarDeclarations{
 		file:    file,
 		fileAst: fileAst,
-		onFailure: func(failure rule.Failure) {
+		onFailure: func(failure linter.Failure) {
 			failures = append(failures, failure)
 		},
 	}
@@ -39,9 +38,9 @@ func (r *VarDeclarationsRule) Name() string {
 
 type lintVarDeclarations struct {
 	fileAst   *ast.File
-	file      *file.File
+	file      *linter.File
 	lastGen   *ast.GenDecl
-	onFailure func(rule.Failure)
+	onFailure func(linter.Failure)
 }
 
 func (w *lintVarDeclarations) Visit(node ast.Node) ast.Visitor {
@@ -73,7 +72,7 @@ func (w *lintVarDeclarations) Visit(node ast.Node) ast.Visitor {
 			zero = true
 		}
 		if zero {
-			w.onFailure(rule.Failure{
+			w.onFailure(linter.Failure{
 				Confidence: 0.9,
 				Node:       rhs,
 				Failure:    fmt.Sprintf("should drop = %s from declaration of var %s; it is the zero value", render(rhs), v.Names[0]),
