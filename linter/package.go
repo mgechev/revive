@@ -10,8 +10,8 @@ import (
 
 // Package represents a package in the project.
 type Package struct {
-	Fset  *token.FileSet
-	Files map[string]*File
+	fset  *token.FileSet
+	files map[string]*File
 
 	TypesPkg  *types.Package
 	TypesInfo *types.Info
@@ -39,7 +39,7 @@ func (p *Package) IsMain() bool {
 	} else if p.main == falseValue {
 		return false
 	}
-	for _, f := range p.Files {
+	for _, f := range p.files {
 		if f.isMain() {
 			p.main = trueValue
 			return true
@@ -54,7 +54,7 @@ func (p *Package) TypeCheck() error {
 	config := &types.Config{
 		// By setting a no-op error reporter, the type checker does as much work as possible.
 		Error:    func(error) {},
-		Importer: newImporter(p.Fset),
+		Importer: newImporter(p.fset),
 	}
 	info := &types.Info{
 		Types:  make(map[ast.Expr]types.TypeAndValue),
@@ -64,11 +64,11 @@ func (p *Package) TypeCheck() error {
 	}
 	var anyFile *File
 	var astFiles []*ast.File
-	for _, f := range p.Files {
+	for _, f := range p.files {
 		anyFile = f
 		astFiles = append(astFiles, f.GetAST())
 	}
-	typesPkg, err := config.Check(anyFile.GetAST().Name.Name, p.Fset, astFiles, info)
+	typesPkg, err := config.Check(anyFile.GetAST().Name.Name, p.fset, astFiles, info)
 	// Remember the typechecking info, even if config.Check failed,
 	// since we will get partial information.
 	p.TypesPkg = typesPkg
@@ -79,7 +79,7 @@ func (p *Package) TypeCheck() error {
 func (p *Package) lint(rules []Rule, config RulesConfig) []Failure {
 	var failures []Failure
 	p.TypeCheck()
-	for _, file := range p.Files {
+	for _, file := range p.files {
 		failures = append(failures, file.lint(rules, config)...)
 	}
 	return failures

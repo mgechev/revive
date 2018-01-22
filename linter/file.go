@@ -13,19 +13,19 @@ import (
 type File struct {
 	Name    string
 	pkg     *Package
-	Content []byte
+	content []byte
 	ast     *ast.File
 }
 
 // NewFile creates a new file
 func NewFile(name string, content []byte, pkg *Package) (*File, error) {
-	f, err := parser.ParseFile(pkg.Fset, name, content, parser.ParseComments)
+	f, err := parser.ParseFile(pkg.fset, name, content, parser.ParseComments)
 	if err != nil {
 		return nil, err
 	}
 	return &File{
 		Name:    name,
-		Content: content,
+		content: content,
 		pkg:     pkg,
 		ast:     f,
 	}, nil
@@ -33,7 +33,7 @@ func NewFile(name string, content []byte, pkg *Package) (*File, error) {
 
 // ToPosition returns line and column for given position.
 func (f *File) ToPosition(pos token.Pos) token.Position {
-	return f.pkg.Fset.Position(pos)
+	return f.pkg.fset.Position(pos)
 }
 
 // GetAST returns the AST of the file

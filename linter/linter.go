@@ -44,8 +44,8 @@ func isGenerated(src []byte) bool {
 // Lint lints a set of files with the specified rule.
 func (l *Linter) Lint(filenames []string, ruleSet []Rule, rulesConfig RulesConfig) ([]Failure, error) {
 	pkg := &Package{
-		Fset:  token.NewFileSet(),
-		Files: map[string]*File{},
+		fset:  token.NewFileSet(),
+		files: map[string]*File{},
 	}
 	var pkgName string
 	for _, filename := range filenames {
@@ -68,7 +68,7 @@ func (l *Linter) Lint(filenames []string, ruleSet []Rule, rulesConfig RulesConfi
 			return nil, fmt.Errorf("%s is in package %s, not %s", filename, file.GetAST().Name.Name, pkgName)
 		}
 
-		pkg.Files[filename] = file
+		pkg.files[filename] = file
 	}
 
 	return pkg.lint(ruleSet, rulesConfig), nil
