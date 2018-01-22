@@ -25,6 +25,7 @@ type FailurePosition struct {
 type Failure struct {
 	Failure    string
 	RuleName   string
+	Category   string
 	Type       FailureType
 	Position   FailurePosition
 	Node       ast.Node

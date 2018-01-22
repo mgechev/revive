@@ -76,6 +76,14 @@ func (p *Package) TypeCheck() error {
 	return err
 }
 
+// TypeOf returns the type of an expression.
+func (p *Package) TypeOf(expr ast.Expr) types.Type {
+	if p.TypesInfo == nil {
+		return nil
+	}
+	return p.TypesInfo.TypeOf(expr)
+}
+
 func (p *Package) lint(rules []Rule, config RulesConfig) []Failure {
 	var failures []Failure
 	p.TypeCheck()

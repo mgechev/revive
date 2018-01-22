@@ -18,9 +18,8 @@ func (r *LintRangesRule) Apply(file *linter.File, arguments linter.Arguments) []
 		failures = append(failures, failure)
 	}
 
-	astFile := file.GetAST()
-	w := &lintRanges{astFile, onFailure}
-	ast.Walk(w, astFile)
+	w := &lintRanges{file, onFailure}
+	ast.Walk(w, file.GetAST())
 	return failures
 }
 
@@ -30,7 +29,7 @@ func (r *LintRangesRule) Name() string {
 }
 
 type lintRanges struct {
-	file      *ast.File
+	file      *linter.File
 	onFailure func(linter.Failure)
 }
 
@@ -49,7 +48,7 @@ func (w *lintRanges) Visit(node ast.Node) ast.Visitor {
 	}
 
 	w.onFailure(linter.Failure{
-		Failure:    fmt.Sprintf("should omit 2nd value from range; this loop is equivalent to `for %s %s range ...`", render(rs.Key), rs.Tok),
+		Failure:    fmt.Sprintf("should omit 2nd value from range; this loop is equivalent to `for %s %s range ...`", w.file.Render(rs.Key), rs.Tok),
 		Confidence: 1,
 		Node:       rs.Value,
 	})

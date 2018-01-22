@@ -1,11 +1,10 @@
 package rule
 
 import (
-	"bytes"
 	"fmt"
 	"go/ast"
-	"go/printer"
 	"go/token"
+	"go/types"
 
 	"github.com/mgechev/revive/linter"
 )
@@ -75,18 +74,45 @@ func (w *lintVarDeclarations) Visit(node ast.Node) ast.Visitor {
 			w.onFailure(linter.Failure{
 				Confidence: 0.9,
 				Node:       rhs,
-				Failure:    fmt.Sprintf("should drop = %s from declaration of var %s; it is the zero value", render(rhs), v.Names[0]),
+				Failure:    fmt.Sprintf("should drop = %s from declaration of var %s; it is the zero value", w.file.Render(rhs), v.Names[0]),
 			})
 			return nil
 		}
+		lhsTyp := w.file.Pkg.TypeOf(v.Type)
+		rhsTyp := w.file.Pkg.TypeOf(rhs)
+
+		if !validType(lhsTyp) || !validType(rhsTyp) {
+			// Type checking failed (often due to missing imports).
+			return nil
+		}
+
+		if !types.Identical(lhsTyp, rhsTyp) {
+			// Assignment to a different type is not redundant.
+			return nil
+		}
+
+		// The next three conditions are for suppressing the warning in situations
+		// where we were unable to typecheck.
+
+		// If the LHS type is an interface, don't warn, since it is probably a
+		// concrete type on the RHS. Note that our feeble lexical check here
+		// will only pick up interface{} and other literal interface types;
+		// that covers most of the cases we care to exclude right now.
+		if _, ok := v.Type.(*ast.InterfaceType); ok {
+			return nil
+		}
+		// If the RHS is an untyped const, only warn if the LHS type is its default type.
+		if defType, ok := w.file.IsUntypedConst(rhs); ok && !isIdent(v.Type, defType) {
+			return nil
+		}
+
+		w.onFailure(linter.Failure{
+			Category:   "type-inference",
+			Confidence: 0.8,
+			Node:       v.Type,
+			Failure:    fmt.Sprintf("should omit type %s from declaration of var %s; it will be inferred from the right-hand side", w.file.Render(v.Type), v.Names[0]),
+		})
+		return nil
 	}
 	return w
-}
-
-func render(x interface{}) string {
-	var buf bytes.Buffer
-	if err := printer.Fprint(&buf, token.NewFileSet(), x); err != nil {
-		panic(err)
-	}
-	return buf.String()
 }
