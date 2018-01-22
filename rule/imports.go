@@ -13,7 +13,7 @@ type ImportsRule struct{}
 func (r *ImportsRule) Apply(file *linter.File, arguments linter.Arguments) []linter.Failure {
 	var failures []linter.Failure
 
-	fileAst := file.GetAST()
+	fileAst := file.AST
 	walker := lintImports{
 		file:    file,
 		fileAst: fileAst,

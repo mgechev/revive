@@ -19,7 +19,7 @@ func (r *LintElseRule) Apply(file *linter.File, arguments linter.Arguments) []li
 	}
 
 	w := lintElse{make(map[*ast.IfStmt]bool), onFailure}
-	ast.Walk(w, file.GetAST())
+	ast.Walk(w, file.AST)
 	return failures
 }
 

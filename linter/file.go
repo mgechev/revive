@@ -17,7 +17,7 @@ type File struct {
 	Name    string
 	Pkg     *Package
 	content []byte
-	ast     *ast.File
+	AST     *ast.File
 }
 
 // NewFile creates a new file
@@ -30,18 +30,13 @@ func NewFile(name string, content []byte, pkg *Package) (*File, error) {
 		Name:    name,
 		content: content,
 		Pkg:     pkg,
-		ast:     f,
+		AST:     f,
 	}, nil
 }
 
 // ToPosition returns line and column for given position.
 func (f *File) ToPosition(pos token.Pos) token.Position {
 	return f.Pkg.fset.Position(pos)
-}
-
-// GetAST returns the AST of the file
-func (f *File) GetAST() *ast.File {
-	return f.ast
 }
 
 // Render renters a node.
@@ -83,7 +78,7 @@ func (f *File) IsUntypedConst(expr ast.Expr) (defType string, ok bool) {
 }
 
 func (f *File) isMain() bool {
-	if f.GetAST().Name.Name == "main" {
+	if f.AST.Name.Name == "main" {
 		return true
 	}
 	return false
@@ -211,7 +206,7 @@ func (f *File) disabledIntervals(rules []Rule) disabledIntervalsMap {
 		handleRules(filename, parts[2], parts[1] == "enable", line, ruleNames)
 	}
 
-	comments := f.GetAST().Comments
+	comments := f.AST.Comments
 	for _, c := range comments {
 		handleComment(f.Name, c, f.ToPosition(c.Pos()).Line)
 	}

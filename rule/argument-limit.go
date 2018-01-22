@@ -30,7 +30,7 @@ func (r *ArgumentsLimitRule) Apply(file *linter.File, arguments linter.Arguments
 		},
 	}
 
-	ast.Walk(walker, file.GetAST())
+	ast.Walk(walker, file.AST)
 
 	return failures
 }

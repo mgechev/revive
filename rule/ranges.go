@@ -19,7 +19,7 @@ func (r *LintRangesRule) Apply(file *linter.File, arguments linter.Arguments) []
 	}
 
 	w := &lintRanges{file, onFailure}
-	ast.Walk(w, file.GetAST())
+	ast.Walk(w, file.AST)
 	return failures
 }
 

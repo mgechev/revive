@@ -11,7 +11,7 @@ package rule
 // 		failures = append(failures, failure)
 // 	}
 
-// 	astFile := file.GetAST()
+// 	astFile := file.AST
 // 	w := &lintElseError{astFile, onFailure}
 // 	ast.Walk(w, astFile)
 // 	return failures

@@ -29,7 +29,7 @@ var (
 
 // isGenerated reports whether the source file is generated code
 // according the rules from https://golang.org/s/generatedcode.
-// This is inherited from the original linter.
+// This is inherited from the original go linter.
 func isGenerated(src []byte) bool {
 	sc := bufio.NewScanner(bytes.NewReader(src))
 	for sc.Scan() {
@@ -63,9 +63,9 @@ func (l *Linter) Lint(filenames []string, ruleSet []Rule, rulesConfig RulesConfi
 		}
 
 		if pkgName == "" {
-			pkgName = file.GetAST().Name.Name
-		} else if file.GetAST().Name.Name != pkgName {
-			return nil, fmt.Errorf("%s is in package %s, not %s", filename, file.GetAST().Name.Name, pkgName)
+			pkgName = file.AST.Name.Name
+		} else if file.AST.Name.Name != pkgName {
+			return nil, fmt.Errorf("%s is in package %s, not %s", filename, file.AST.Name.Name, pkgName)
 		}
 
 		pkg.files[filename] = file

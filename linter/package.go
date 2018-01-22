@@ -66,9 +66,9 @@ func (p *Package) TypeCheck() error {
 	var astFiles []*ast.File
 	for _, f := range p.files {
 		anyFile = f
-		astFiles = append(astFiles, f.GetAST())
+		astFiles = append(astFiles, f.AST)
 	}
-	typesPkg, err := config.Check(anyFile.GetAST().Name.Name, p.fset, astFiles, info)
+	typesPkg, err := config.Check(anyFile.AST.Name.Name, p.fset, astFiles, info)
 	// Remember the typechecking info, even if config.Check failed,
 	// since we will get partial information.
 	p.TypesPkg = typesPkg

@@ -21,7 +21,7 @@ func (r *NamesRule) Apply(file *linter.File, arguments linter.Arguments) []linte
 		return failures
 	}
 
-	fileAst := file.GetAST()
+	fileAst := file.AST
 	walker := lintNames{
 		file:    file,
 		fileAst: fileAst,

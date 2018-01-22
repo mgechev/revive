@@ -22,7 +22,7 @@ func (r *ExportedRule) Apply(file *linter.File, arguments linter.Arguments) []li
 		return failures
 	}
 
-	fileAst := file.GetAST()
+	fileAst := file.AST
 	walker := lintExported{
 		file:    file,
 		fileAst: fileAst,

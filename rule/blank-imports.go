@@ -13,7 +13,7 @@ type BlankImportsRule struct{}
 func (r *BlankImportsRule) Apply(file *linter.File, arguments linter.Arguments) []linter.Failure {
 	var failures []linter.Failure
 
-	fileAst := file.GetAST()
+	fileAst := file.AST
 	walker := lintBlankImports{
 		file:    file,
 		fileAst: fileAst,

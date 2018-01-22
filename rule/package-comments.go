@@ -28,7 +28,7 @@ func (r *PackageCommentsRule) Apply(file *linter.File, arguments linter.Argument
 		failures = append(failures, failure)
 	}
 
-	fileAst := file.GetAST()
+	fileAst := file.AST
 	w := &lintPackageComments{fileAst, file, onFailure}
 	ast.Walk(w, fileAst)
 	return failures
