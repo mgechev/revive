@@ -75,3 +75,12 @@ func (p *Package) TypeCheck() error {
 	p.TypesInfo = info
 	return err
 }
+
+func (p *Package) lint(rules []Rule, config RulesConfig) []Failure {
+	var failures []Failure
+	p.TypeCheck()
+	for _, file := range p.Files {
+		failures = append(failures, file.lint(rules, config)...)
+	}
+	return failures
+}
