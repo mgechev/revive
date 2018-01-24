@@ -84,8 +84,7 @@ func (f *File) isMain() bool {
 	return false
 }
 
-func (f *File) lint(rules []Rule, rulesConfig RulesConfig) []Failure {
-	var failures []Failure
+func (f *File) lint(rules []Rule, rulesConfig RulesConfig, failures chan Failure) {
 	disabledIntervals := f.disabledIntervals(rules)
 	for _, currentRule := range rules {
 		config := rulesConfig[currentRule.Name()]
@@ -100,9 +99,10 @@ func (f *File) lint(rules []Rule, rulesConfig RulesConfig) []Failure {
 			currentFailures[idx] = failure
 		}
 		currentFailures = f.filterFailures(currentFailures, disabledIntervals)
-		failures = append(failures, currentFailures...)
+		for _, failure := range currentFailures {
+			failures <- failure
+		}
 	}
-	return failures
 }
 
 type enableDisableConfig struct {

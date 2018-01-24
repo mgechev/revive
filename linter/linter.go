@@ -42,7 +42,8 @@ func isGenerated(src []byte) bool {
 }
 
 // Lint lints a set of files with the specified rule.
-func (l *Linter) Lint(filenames []string, ruleSet []Rule, rulesConfig RulesConfig) ([]Failure, error) {
+func (l *Linter) Lint(filenames []string, ruleSet []Rule, rulesConfig RulesConfig) (<-chan Failure, error) {
+	failures := make(chan Failure)
 	pkg := &Package{
 		fset:  token.NewFileSet(),
 		files: map[string]*File{},
@@ -71,5 +72,9 @@ func (l *Linter) Lint(filenames []string, ruleSet []Rule, rulesConfig RulesConfi
 		pkg.files[filename] = file
 	}
 
-	return pkg.lint(ruleSet, rulesConfig), nil
+	go (func() {
+		pkg.lint(ruleSet, rulesConfig, failures)
+	})()
+
+	return failures, nil
 }

@@ -4,6 +4,7 @@ import (
 	"go/ast"
 	"go/token"
 	"go/types"
+	"sync"
 
 	"golang.org/x/tools/go/gcexportdata"
 )
@@ -84,11 +85,16 @@ func (p *Package) TypeOf(expr ast.Expr) types.Type {
 	return p.TypesInfo.TypeOf(expr)
 }
 
-func (p *Package) lint(rules []Rule, config RulesConfig) []Failure {
-	var failures []Failure
+func (p *Package) lint(rules []Rule, config RulesConfig, failures chan Failure) {
 	p.TypeCheck()
+	var wg sync.WaitGroup
 	for _, file := range p.files {
-		failures = append(failures, file.lint(rules, config)...)
+		wg.Add(1)
+		go (func(file *File) {
+			file.lint(rules, config, failures)
+			defer wg.Done()
+		})(file)
 	}
-	return failures
+	wg.Wait()
+	close(failures)
 }

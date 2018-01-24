@@ -33,16 +33,17 @@ func formatFailure(failure linter.Failure) []string {
 }
 
 // Format formats the failures gotten from the linter.
-func (f *CLIFormatter) Format(failures []linter.Failure) (string, error) {
+func (f *CLIFormatter) Format(failures <-chan linter.Failure) (string, error) {
 	var result [][]string
 	var totalErrors = 0
-	for _, f := range failures {
+	var total = 0
+	for f := range failures {
 		result = append(result, formatFailure(f))
+		total++
 		if f.Type == linter.FailureTypeError {
 			totalErrors++
 		}
 	}
-	total := len(failures)
 	ps := "problems"
 	if total == 1 {
 		ps = "problem"
