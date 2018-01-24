@@ -30,6 +30,8 @@ type Failure struct {
 	Position   FailurePosition
 	Node       ast.Node `json:"-"`
 	Confidence float64
+	// For future use
+	ReplacementLine string
 }
 
 // GetFilename returns the filename.
