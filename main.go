@@ -35,7 +35,7 @@ func main() {
 	var config = lint.RulesConfig{
 		"argument-limit": lint.RuleConfig{
 			Arguments: []string{"3"},
-			Severity:  lint.SeverityWarning,
+			Severity:  lint.SeverityError,
 		},
 	}
 
@@ -59,8 +59,11 @@ func main() {
 
 	exitCode := 0
 	for f := range failures {
-		if c, ok := config[f.RuleName]; ok && c.Severity == lint.SeverityError {
+		if exitCode == 0 {
 			exitCode = 1
+		}
+		if c, ok := config[f.RuleName]; ok && c.Severity == lint.SeverityError {
+			exitCode = 2
 		}
 		formatChan <- f
 	}
