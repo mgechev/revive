@@ -6,11 +6,11 @@ import (
 	"github.com/mgechev/revive/linter"
 )
 
-// ImportsRule lints given else constructs.
-type ImportsRule struct{}
+// DotImportsRule lints given else constructs.
+type DotImportsRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ImportsRule) Apply(file *linter.File, arguments linter.Arguments) []linter.Failure {
+func (r *DotImportsRule) Apply(file *linter.File, arguments linter.Arguments) []linter.Failure {
 	var failures []linter.Failure
 
 	fileAst := file.AST
@@ -28,8 +28,8 @@ func (r *ImportsRule) Apply(file *linter.File, arguments linter.Arguments) []lin
 }
 
 // Name returns the rule name.
-func (r *ImportsRule) Name() string {
-	return "imports"
+func (r *DotImportsRule) Name() string {
+	return "dot-imports"
 }
 
 type lintImports struct {
@@ -39,15 +39,17 @@ type lintImports struct {
 }
 
 func (w lintImports) Visit(n ast.Node) ast.Visitor {
-	for _, is := range w.fileAst.Imports {
-		if is.Name != nil && is.Name.Name == "." && !isTest(w.file) {
+	for i, is := range w.fileAst.Imports {
+		_ = i
+		if is.Name != nil && is.Name.Name == "." && !w.file.IsTest() {
 			w.onFailure(linter.Failure{
 				Confidence: 1,
 				Failure:    "should not use dot imports",
 				Node:       is,
+				Category:   "imports",
+				URL:        "#import-dot",
 			})
 		}
-
 	}
 	return nil
 }

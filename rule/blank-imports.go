@@ -40,7 +40,7 @@ type lintBlankImports struct {
 
 func (w lintBlankImports) Visit(n ast.Node) ast.Visitor {
 	// In package main and in tests, we don't complain about blank imports.
-	if w.fileAst.Name.Name == "main" || isTest(w.file) {
+	if w.file.Pkg.IsMain() || w.file.IsTest() {
 		return nil
 	}
 
@@ -66,6 +66,8 @@ func (w lintBlankImports) Visit(n ast.Node) ast.Visitor {
 				Node:       imp,
 				Failure:    "a blank import should be only in a main or test package, or have a comment justifying it",
 				Confidence: 1,
+				Category:   "imports",
+				URL:        "",
 			})
 		}
 	}

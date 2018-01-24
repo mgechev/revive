@@ -4,6 +4,8 @@
 // license that can be found in the LICENSE file or at
 // https://developers.google.com/open-source/licenses/bsd.
 
+// The code contains changes from the original source.
+
 package testutil
 
 import (
@@ -31,7 +33,12 @@ import (
 
 var lintMatch = flag.String("lint.match", "", "restrict fixtures matches to this pattern")
 
-var rules = []linter.Rule{&rule.VarDeclarationsRule{}}
+var rules = []linter.Rule{
+	&rule.VarDeclarationsRule{},
+	&rule.PackageCommentsRule{},
+	&rule.DotImportsRule{},
+	&rule.BlankImportsRule{},
+}
 
 func TestAll(t *testing.T) {
 	baseDir := "../fixtures/"

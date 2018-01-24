@@ -30,6 +30,7 @@ type Failure struct {
 	Position   FailurePosition
 	Node       ast.Node `json:"-"`
 	Confidence float64
+	URL        string
 	// For future use
 	ReplacementLine string
 }

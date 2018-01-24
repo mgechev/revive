@@ -46,6 +46,10 @@ type lintPackageComments struct {
 }
 
 func (l *lintPackageComments) Visit(n ast.Node) ast.Visitor {
+	if l.file.IsTest() {
+		return nil
+	}
+
 	const ref = styleGuideBase + "#package-comments"
 	prefix := "Package " + l.fileAst.Name.Name + " "
 
@@ -73,9 +77,14 @@ func (l *lintPackageComments) Visit(n ast.Node) ast.Visitor {
 				Column: 1,
 			}
 			l.onFailure(linter.Failure{
-				Failure:    "package comment is detached; there should be no blank lines between it and the package statement",
+				Category: "comments",
+				Position: linter.FailurePosition{
+					Start: pos,
+					End:   pos,
+				},
 				Confidence: 0.9,
-				Position:   linter.FailurePosition{Start: pos},
+				Failure:    "package comment is detached; there should be no blank lines between it and the package statement",
+				URL:        ref,
 			})
 			return nil
 		}
@@ -83,27 +92,33 @@ func (l *lintPackageComments) Visit(n ast.Node) ast.Visitor {
 
 	if l.fileAst.Doc == nil {
 		l.onFailure(linter.Failure{
-			Failure:    "should have a package comment, unless it's in another file for this package",
+			Category:   "comments",
+			Node:       l.fileAst,
 			Confidence: 0.2,
-			Node:       l.fileAst.Name,
+			Failure:    "should have a package comment, unless it's in another file for this package",
+			URL:        ref,
 		})
 		return nil
 	}
 	s := l.fileAst.Doc.Text()
 	if ts := strings.TrimLeft(s, " \t"); ts != s {
 		l.onFailure(linter.Failure{
-			Failure:    "package comment should not have leading space",
-			Confidence: 1,
+			Category:   "comments",
 			Node:       l.fileAst.Doc,
+			Confidence: 1,
+			Failure:    "package comment should not have leading space",
+			URL:        ref,
 		})
 		s = ts
 	}
 	// Only non-main packages need to keep to this form.
-	if l.fileAst.Name.Name != "main" && !strings.HasPrefix(s, prefix) {
+	if !l.file.Pkg.IsMain() && !strings.HasPrefix(s, prefix) {
 		l.onFailure(linter.Failure{
-			Failure:    fmt.Sprintf(`package comment should be of the form "%s..."`, prefix),
-			Confidence: 1,
+			Category:   "comments",
 			Node:       l.fileAst.Doc,
+			Confidence: 1,
+			Failure:    fmt.Sprintf(`package comment should be of the form "%s..."`, prefix),
+			URL:        ref,
 		})
 	}
 	return nil

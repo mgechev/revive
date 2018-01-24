@@ -20,6 +20,9 @@ type File struct {
 	AST     *ast.File
 }
 
+// IsTest returns if the file contains tests.
+func (f *File) IsTest() bool { return strings.HasSuffix(f.Name, "_test.go") }
+
 // NewFile creates a new file
 func NewFile(name string, content []byte, pkg *Package) (*File, error) {
 	f, err := parser.ParseFile(pkg.fset, name, content, parser.ParseComments)
