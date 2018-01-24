@@ -38,6 +38,7 @@ var rules = []linter.Rule{
 	&rule.PackageCommentsRule{},
 	&rule.DotImportsRule{},
 	&rule.BlankImportsRule{},
+	&rule.ExportedRule{},
 }
 
 func TestAll(t *testing.T) {

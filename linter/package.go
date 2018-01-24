@@ -50,8 +50,8 @@ func (p *Package) IsMain() bool {
 	return false
 }
 
-// TypeCheck performs type checking for given package.
-func (p *Package) TypeCheck() error {
+// typeCheck performs type checking for given package.
+func (p *Package) typeCheck() error {
 	config := &types.Config{
 		// By setting a no-op error reporter, the type checker does as much work as possible.
 		Error:    func(error) {},
@@ -85,8 +85,63 @@ func (p *Package) TypeOf(expr ast.Expr) types.Type {
 	return p.TypesInfo.TypeOf(expr)
 }
 
+type walker struct {
+	nmap map[string]int
+	has  map[string]int
+}
+
+func (w *walker) Visit(n ast.Node) ast.Visitor {
+	fn, ok := n.(*ast.FuncDecl)
+	if !ok || fn.Recv == nil || len(fn.Recv.List) == 0 {
+		return w
+	}
+	// TODO(dsymonds): We could check the signature to be more precise.
+	recv := receiverType(fn)
+	if i, ok := w.nmap[fn.Name.Name]; ok {
+		w.has[recv] |= i
+	}
+	return w
+}
+
+func (p *Package) scanSortable() {
+	p.Sortable = make(map[string]bool)
+
+	// bitfield for which methods exist on each type.
+	const (
+		Len = 1 << iota
+		Less
+		Swap
+	)
+	nmap := map[string]int{"Len": Len, "Less": Less, "Swap": Swap}
+	has := make(map[string]int)
+	for _, f := range p.files {
+		ast.Walk(&walker{nmap, has}, f.AST)
+	}
+	for typ, ms := range has {
+		if ms == Len|Less|Swap {
+			p.Sortable[typ] = true
+		}
+	}
+}
+
+// receiverType returns the named type of the method receiver, sans "*",
+// or "invalid-type" if fn.Recv is ill formed.
+func receiverType(fn *ast.FuncDecl) string {
+	switch e := fn.Recv.List[0].Type.(type) {
+	case *ast.Ident:
+		return e.Name
+	case *ast.StarExpr:
+		if id, ok := e.X.(*ast.Ident); ok {
+			return id.Name
+		}
+	}
+	// The parser accepts much more than just the legal forms.
+	return "invalid-type"
+}
+
 func (p *Package) lint(rules []Rule, config RulesConfig, failures chan Failure) {
-	p.TypeCheck()
+	p.typeCheck()
+	p.scanSortable()
 	var wg sync.WaitGroup
 	for _, file := range p.files {
 		wg.Add(1)
