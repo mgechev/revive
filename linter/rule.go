@@ -28,7 +28,7 @@ type Failure struct {
 	Category   string
 	Type       FailureType
 	Position   FailurePosition
-	Node       ast.Node
+	Node       ast.Node `json:"-"`
 	Confidence float64
 }
 

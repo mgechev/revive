@@ -37,6 +37,7 @@ func (f *CLIFormatter) Format(failures <-chan linter.Failure) (string, error) {
 	var result [][]string
 	var totalErrors = 0
 	var total = 0
+
 	for f := range failures {
 		result = append(result, formatFailure(f))
 		total++

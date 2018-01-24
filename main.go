@@ -40,7 +40,7 @@ func main() {
 		panic(err)
 	}
 
-	var formatter formatter.CLIFormatter
+	var formatter formatter.JSONFormatter
 	output, err := formatter.Format(failures)
 	if err != nil {
 		panic(err)
