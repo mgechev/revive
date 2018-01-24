@@ -6,14 +6,14 @@ import (
 )
 
 const (
-	// FailureTypeWarning declares failures of type warning
-	FailureTypeWarning = "warning"
-	// FailureTypeError declares failures of type error.
-	FailureTypeError = "error"
+	// SeverityWarning declares failures of type warning
+	SeverityWarning = "warning"
+	// SeverityError declares failures of type error.
+	SeverityError = "error"
 )
 
-// FailureType is the type for the failure types.
-type FailureType string
+// Severity is the type for the failure types.
+type Severity string
 
 // FailurePosition returns the failure position
 type FailurePosition struct {
@@ -26,7 +26,6 @@ type Failure struct {
 	Failure    string
 	RuleName   string
 	Category   string
-	Type       FailureType
 	Position   FailurePosition
 	Node       ast.Node `json:"-"`
 	Confidence float64
@@ -48,16 +47,16 @@ type DisabledInterval struct {
 }
 
 // Arguments is type used for the arguments of a rule.
-type Arguments []string
+type Arguments = []string
 
-// Config contains the rule configuration.
-type Config struct {
-	Name      string
+// RuleConfig is type used for the rule configuration.
+type RuleConfig struct {
 	Arguments Arguments
+	Severity  Severity
 }
 
 // RulesConfig defiles the config for all rules.
-type RulesConfig = map[string]Arguments
+type RulesConfig = map[string]RuleConfig
 
 // Rule defines an abstract rule interaface
 type Rule interface {

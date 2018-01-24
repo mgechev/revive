@@ -66,7 +66,6 @@ func (w lintElse) Visit(node ast.Node) ast.Visitor {
 		}
 		w.onFailure(linter.Failure{
 			Failure: "if block ends with a return statement, so drop this else and outdent its block" + extra,
-			Type:    linter.FailureTypeWarning,
 			Node:    ifStmt.Else,
 		})
 	}

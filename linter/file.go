@@ -91,7 +91,7 @@ func (f *File) lint(rules []Rule, rulesConfig RulesConfig, failures chan Failure
 	disabledIntervals := f.disabledIntervals(rules)
 	for _, currentRule := range rules {
 		config := rulesConfig[currentRule.Name()]
-		currentFailures := currentRule.Apply(f, config)
+		currentFailures := currentRule.Apply(f, config.Arguments)
 		for idx, failure := range currentFailures {
 			if failure.RuleName == "" {
 				failure.RuleName = currentRule.Name()

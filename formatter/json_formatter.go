@@ -13,7 +13,7 @@ type JSONFormatter struct {
 }
 
 // Format formats the failures gotten from the linter.
-func (f *JSONFormatter) Format(failures <-chan linter.Failure) (string, error) {
+func (f *JSONFormatter) Format(failures <-chan linter.Failure, config linter.RulesConfig) (string, error) {
 	var slice []linter.Failure
 	for failure := range failures {
 		slice = append(slice, failure)
