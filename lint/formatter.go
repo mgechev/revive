@@ -1,4 +1,4 @@
-package linter
+package lint
 
 // FormatterMetadata configuration of a formatter
 type FormatterMetadata struct {

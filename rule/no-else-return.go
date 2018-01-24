@@ -4,17 +4,17 @@ import (
 	"go/ast"
 	"go/token"
 
-	"github.com/mgechev/revive/linter"
+	"github.com/mgechev/revive/lint"
 )
 
 // LintElseRule lints given else constructs.
 type LintElseRule struct{}
 
 // Apply applies the rule to given file.
-func (r *LintElseRule) Apply(file *linter.File, arguments linter.Arguments) []linter.Failure {
-	var failures []linter.Failure
+func (r *LintElseRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	var failures []lint.Failure
 
-	onFailure := func(failure linter.Failure) {
+	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
 
@@ -30,7 +30,7 @@ func (r *LintElseRule) Name() string {
 
 type lintElse struct {
 	ignore    map[*ast.IfStmt]bool
-	onFailure func(linter.Failure)
+	onFailure func(lint.Failure)
 }
 
 func (w lintElse) Visit(node ast.Node) ast.Visitor {
@@ -64,7 +64,7 @@ func (w lintElse) Visit(node ast.Node) ast.Visitor {
 		if shortDecl {
 			extra = " (move short variable declaration to its own line if necessary)"
 		}
-		w.onFailure(linter.Failure{
+		w.onFailure(lint.Failure{
 			Failure: "if block ends with a return statement, so drop this else and outdent its block" + extra,
 			Node:    ifStmt.Else,
 		})

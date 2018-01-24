@@ -8,15 +8,15 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/mgechev/revive/linter"
+	"github.com/mgechev/revive/lint"
 )
 
 // ExportedRule lints given else constructs.
 type ExportedRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ExportedRule) Apply(file *linter.File, arguments linter.Arguments) []linter.Failure {
-	var failures []linter.Failure
+func (r *ExportedRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	var failures []lint.Failure
 
 	if isTest(file) {
 		return failures
@@ -26,7 +26,7 @@ func (r *ExportedRule) Apply(file *linter.File, arguments linter.Arguments) []li
 	walker := lintExported{
 		file:    file,
 		fileAst: fileAst,
-		onFailure: func(failure linter.Failure) {
+		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
 		genDeclMissingComments: make(map[*ast.GenDecl]bool),
@@ -43,11 +43,11 @@ func (r *ExportedRule) Name() string {
 }
 
 type lintExported struct {
-	file                   *linter.File
+	file                   *lint.File
 	fileAst                *ast.File
 	lastGen                *ast.GenDecl
 	genDeclMissingComments map[*ast.GenDecl]bool
-	onFailure              func(linter.Failure)
+	onFailure              func(lint.Failure)
 }
 
 func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
@@ -77,7 +77,7 @@ func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
 		name = recv + "." + name
 	}
 	if fn.Doc == nil {
-		w.onFailure(linter.Failure{
+		w.onFailure(lint.Failure{
 			Node:       fn,
 			Confidence: 1,
 			URL:        "#doc-comments",
@@ -89,7 +89,7 @@ func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
 	s := fn.Doc.Text()
 	prefix := fn.Name.Name + " "
 	if !strings.HasPrefix(s, prefix) {
-		w.onFailure(linter.Failure{
+		w.onFailure(lint.Failure{
 			Node:       fn.Doc,
 			Confidence: 0.8,
 			URL:        "#doc-comments",
@@ -120,7 +120,7 @@ func (w *lintExported) checkStutter(id *ast.Ident, thing string) {
 	// the it's starting a new word and thus this name stutters.
 	rem := name[len(pkg):]
 	if next, _ := utf8.DecodeRuneInString(rem); next == '_' || unicode.IsUpper(next) {
-		w.onFailure(linter.Failure{
+		w.onFailure(lint.Failure{
 			Node:       id,
 			Confidence: 0.8,
 			URL:        "#package-names",
@@ -135,7 +135,7 @@ func (w *lintExported) lintTypeDoc(t *ast.TypeSpec, doc *ast.CommentGroup) {
 		return
 	}
 	if doc == nil {
-		w.onFailure(linter.Failure{
+		w.onFailure(lint.Failure{
 			Node:       t,
 			Confidence: 1,
 			URL:        "#doc-comments",
@@ -154,7 +154,7 @@ func (w *lintExported) lintTypeDoc(t *ast.TypeSpec, doc *ast.CommentGroup) {
 		}
 	}
 	if !strings.HasPrefix(s, t.Name.Name+" ") {
-		w.onFailure(linter.Failure{
+		w.onFailure(lint.Failure{
 			Node:       doc,
 			Confidence: 1,
 			URL:        "#doc-comments",
@@ -174,7 +174,7 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 		// Check that none are exported except for the first.
 		for _, n := range vs.Names[1:] {
 			if ast.IsExported(n.Name) {
-				w.onFailure(linter.Failure{
+				w.onFailure(lint.Failure{
 					Category:   "comments",
 					Confidence: 1,
 					Failure:    fmt.Sprintf("exported %s %s should have its own declaration", kind, n.Name),
@@ -199,7 +199,7 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 		if kind == "const" && gd.Lparen.IsValid() {
 			block = " (or a comment on this block)"
 		}
-		w.onFailure(linter.Failure{
+		w.onFailure(lint.Failure{
 			Confidence: 1,
 			Node:       vs,
 			URL:        "#doc-comments",
@@ -221,7 +221,7 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 	}
 	prefix := name + " "
 	if !strings.HasPrefix(doc.Text(), prefix) {
-		w.onFailure(linter.Failure{
+		w.onFailure(lint.Failure{
 			Confidence: 1,
 			Node:       doc,
 			URL:        "#doc-comments",

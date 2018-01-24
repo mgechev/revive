@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/mgechev/revive/formatter"
-	"github.com/mgechev/revive/linter"
+	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/rule"
 )
 
@@ -26,16 +26,16 @@ func main() {
 	}
   `
 
-	revive := linter.New(func(file string) ([]byte, error) {
+	revive := lint.New(func(file string) ([]byte, error) {
 		return []byte(src), nil
 	})
-	var result []linter.Rule
+	var result []lint.Rule
 	result = append(result, &rule.LintElseRule{}, &rule.ArgumentsLimitRule{}, &rule.NamesRule{})
 
-	var config = linter.RulesConfig{
-		"argument-limit": linter.RuleConfig{
+	var config = lint.RulesConfig{
+		"argument-limit": lint.RuleConfig{
 			Arguments: []string{"3"},
-			Severity:  linter.SeverityWarning,
+			Severity:  lint.SeverityWarning,
 		},
 	}
 
@@ -44,7 +44,7 @@ func main() {
 		panic(err)
 	}
 
-	formatChan := make(chan linter.Failure)
+	formatChan := make(chan lint.Failure)
 	exitChan := make(chan bool)
 	var output string
 
@@ -59,7 +59,7 @@ func main() {
 
 	exitCode := 0
 	for f := range failures {
-		if c, ok := config[f.RuleName]; ok && c.Severity == linter.SeverityError {
+		if c, ok := config[f.RuleName]; ok && c.Severity == lint.SeverityError {
 			exitCode = 1
 		}
 		formatChan <- f

@@ -6,15 +6,15 @@ import (
 	"go/token"
 	"strings"
 
-	"github.com/mgechev/revive/linter"
+	"github.com/mgechev/revive/lint"
 )
 
 // NamesRule lints given else constructs.
 type NamesRule struct{}
 
 // Apply applies the rule to given file.
-func (r *NamesRule) Apply(file *linter.File, arguments linter.Arguments) []linter.Failure {
-	var failures []linter.Failure
+func (r *NamesRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	var failures []lint.Failure
 
 	if isTest(file) {
 		return failures
@@ -24,14 +24,14 @@ func (r *NamesRule) Apply(file *linter.File, arguments linter.Arguments) []linte
 	walker := lintNames{
 		file:    file,
 		fileAst: fileAst,
-		onFailure: func(failure linter.Failure) {
+		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
 	}
 
 	// Package names need slightly different handling than other names.
 	if strings.Contains(walker.fileAst.Name.Name, "_") && !strings.HasSuffix(walker.fileAst.Name.Name, "_test") {
-		walker.onFailure(linter.Failure{
+		walker.onFailure(lint.Failure{
 			Failure:    "don't use an underscore in package name",
 			Confidence: 1,
 			Node:       walker.fileAst,
@@ -71,7 +71,7 @@ func check(id *ast.Ident, thing string, w *lintNames) {
 
 	// Handle two common styles from other languages that don't belong in Go.
 	if len(id.Name) >= 5 && allCapsRE.MatchString(id.Name) && strings.Contains(id.Name, "_") {
-		w.onFailure(linter.Failure{
+		w.onFailure(lint.Failure{
 			Failure:    "don't use ALL_CAPS in Go names; use CamelCase",
 			Confidence: 0.8,
 			Node:       id,
@@ -82,7 +82,7 @@ func check(id *ast.Ident, thing string, w *lintNames) {
 	}
 	if len(id.Name) > 2 && id.Name[0] == 'k' && id.Name[1] >= 'A' && id.Name[1] <= 'Z' {
 		should := string(id.Name[1]+'a'-'A') + id.Name[2:]
-		w.onFailure(linter.Failure{
+		w.onFailure(lint.Failure{
 			Failure:    fmt.Sprintf("don't use leading k in Go names; %s %s should be %s", thing, id.Name, should),
 			Confidence: 0.8,
 			Node:       id,
@@ -91,13 +91,13 @@ func check(id *ast.Ident, thing string, w *lintNames) {
 		})
 	}
 
-	should := linter.LintName(id.Name)
+	should := lint.Name(id.Name)
 	if id.Name == should {
 		return
 	}
 
 	if len(id.Name) > 2 && strings.Contains(id.Name[1:], "_") {
-		w.onFailure(linter.Failure{
+		w.onFailure(lint.Failure{
 			Failure:    fmt.Sprintf("don't use underscores in Go names; %s %s should be %s", thing, id.Name, should),
 			Confidence: 0.9,
 			Node:       id,
@@ -106,7 +106,7 @@ func check(id *ast.Ident, thing string, w *lintNames) {
 		})
 		return
 	}
-	w.onFailure(linter.Failure{
+	w.onFailure(lint.Failure{
 		Failure:    fmt.Sprintf("%s %s should be %s", thing, id.Name, should),
 		Confidence: 0.8,
 		Node:       id,
@@ -116,11 +116,11 @@ func check(id *ast.Ident, thing string, w *lintNames) {
 }
 
 type lintNames struct {
-	file                   *linter.File
+	file                   *lint.File
 	fileAst                *ast.File
 	lastGen                *ast.GenDecl
 	genDeclMissingComments map[*ast.GenDecl]bool
-	onFailure              func(linter.Failure)
+	onFailure              func(lint.Failure)
 }
 
 func (w *lintNames) Visit(n ast.Node) ast.Visitor {

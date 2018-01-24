@@ -27,12 +27,12 @@ import (
 
 	"github.com/mgechev/revive/rule"
 
-	"github.com/mgechev/revive/linter"
+	"github.com/mgechev/revive/lint"
 )
 
 var lintMatch = flag.String("lint.match", "", "restrict fixtures matches to this pattern")
 
-var rules = []linter.Rule{
+var rules = []lint.Rule{
 	&rule.VarDeclarationsRule{},
 	&rule.PackageCommentsRule{},
 	&rule.DotImportsRule{},
@@ -43,7 +43,7 @@ var rules = []linter.Rule{
 
 func TestAll(t *testing.T) {
 	baseDir := "../fixtures/"
-	l := linter.New(func(file string) ([]byte, error) {
+	l := lint.New(func(file string) ([]byte, error) {
 		return ioutil.ReadFile(baseDir + file)
 	})
 	rx, err := regexp.Compile(*lintMatch)
@@ -74,13 +74,13 @@ func TestAll(t *testing.T) {
 			continue
 		}
 
-		ps, err := l.Lint([]string{fi.Name()}, rules, map[string]linter.Arguments{})
+		ps, err := l.Lint([]string{fi.Name()}, rules, map[string]lint.Arguments{})
 		if err != nil {
 			t.Errorf("Linting %s: %v", fi.Name(), err)
 			continue
 		}
 
-		failures := []linter.Failure{}
+		failures := []lint.Failure{}
 		for f := range ps {
 			failures = append(failures, f)
 		}
@@ -275,7 +275,7 @@ func TestLintName(t *testing.T) {
 		{"IEEE802_16Bit", "IEEE802_16Bit"},
 	}
 	for _, test := range tests {
-		got := linter.LintName(test.name)
+		got := lint.Name(test.name)
 		if got != test.want {
 			t.Errorf("lintName(%q) = %q, want %q", test.name, got, test.want)
 		}

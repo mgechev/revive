@@ -1,4 +1,4 @@
-package linter
+package lint
 
 import (
 	"bufio"
@@ -29,7 +29,7 @@ var (
 
 // isGenerated reports whether the source file is generated code
 // according the rules from https://golang.org/s/generatedcode.
-// This is inherited from the original go linter.
+// This is inherited from the original go lint.
 func isGenerated(src []byte) bool {
 	sc := bufio.NewScanner(bytes.NewReader(src))
 	for sc.Scan() {

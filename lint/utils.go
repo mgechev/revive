@@ -1,12 +1,12 @@
-package linter
+package lint
 
 import (
 	"strings"
 	"unicode"
 )
 
-// LintName returns a different name if it should be different.
-func LintName(name string) (should string) {
+// Name returns a different name if it should be different.
+func Name(name string) (should string) {
 	// Fast path for simple cases: "_" and all lowercase.
 	if name == "_" {
 		return name

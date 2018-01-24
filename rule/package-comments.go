@@ -6,7 +6,7 @@ import (
 	"go/token"
 	"strings"
 
-	"github.com/mgechev/revive/linter"
+	"github.com/mgechev/revive/lint"
 )
 
 // PackageCommentsRule lints the package comments. It complains if
@@ -17,14 +17,14 @@ import (
 type PackageCommentsRule struct{}
 
 // Apply applies the rule to given file.
-func (r *PackageCommentsRule) Apply(file *linter.File, arguments linter.Arguments) []linter.Failure {
-	var failures []linter.Failure
+func (r *PackageCommentsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	var failures []lint.Failure
 
 	if isTest(file) {
 		return failures
 	}
 
-	onFailure := func(failure linter.Failure) {
+	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
 
@@ -41,8 +41,8 @@ func (r *PackageCommentsRule) Name() string {
 
 type lintPackageComments struct {
 	fileAst   *ast.File
-	file      *linter.File
-	onFailure func(linter.Failure)
+	file      *lint.File
+	onFailure func(lint.Failure)
 }
 
 func (l *lintPackageComments) Visit(n ast.Node) ast.Visitor {
@@ -76,9 +76,9 @@ func (l *lintPackageComments) Visit(n ast.Node) ast.Visitor {
 				Line:   endPos.Line + 1,
 				Column: 1,
 			}
-			l.onFailure(linter.Failure{
+			l.onFailure(lint.Failure{
 				Category: "comments",
-				Position: linter.FailurePosition{
+				Position: lint.FailurePosition{
 					Start: pos,
 					End:   pos,
 				},
@@ -91,7 +91,7 @@ func (l *lintPackageComments) Visit(n ast.Node) ast.Visitor {
 	}
 
 	if l.fileAst.Doc == nil {
-		l.onFailure(linter.Failure{
+		l.onFailure(lint.Failure{
 			Category:   "comments",
 			Node:       l.fileAst,
 			Confidence: 0.2,
@@ -102,7 +102,7 @@ func (l *lintPackageComments) Visit(n ast.Node) ast.Visitor {
 	}
 	s := l.fileAst.Doc.Text()
 	if ts := strings.TrimLeft(s, " \t"); ts != s {
-		l.onFailure(linter.Failure{
+		l.onFailure(lint.Failure{
 			Category:   "comments",
 			Node:       l.fileAst.Doc,
 			Confidence: 1,
@@ -113,7 +113,7 @@ func (l *lintPackageComments) Visit(n ast.Node) ast.Visitor {
 	}
 	// Only non-main packages need to keep to this form.
 	if !l.file.Pkg.IsMain() && !strings.HasPrefix(s, prefix) {
-		l.onFailure(linter.Failure{
+		l.onFailure(lint.Failure{
 			Category:   "comments",
 			Node:       l.fileAst.Doc,
 			Confidence: 1,

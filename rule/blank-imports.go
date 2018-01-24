@@ -3,21 +3,21 @@ package rule
 import (
 	"go/ast"
 
-	"github.com/mgechev/revive/linter"
+	"github.com/mgechev/revive/lint"
 )
 
 // BlankImportsRule lints given else constructs.
 type BlankImportsRule struct{}
 
 // Apply applies the rule to given file.
-func (r *BlankImportsRule) Apply(file *linter.File, arguments linter.Arguments) []linter.Failure {
-	var failures []linter.Failure
+func (r *BlankImportsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	var failures []lint.Failure
 
 	fileAst := file.AST
 	walker := lintBlankImports{
 		file:    file,
 		fileAst: fileAst,
-		onFailure: func(failure linter.Failure) {
+		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
 	}
@@ -34,8 +34,8 @@ func (r *BlankImportsRule) Name() string {
 
 type lintBlankImports struct {
 	fileAst   *ast.File
-	file      *linter.File
-	onFailure func(linter.Failure)
+	file      *lint.File
+	onFailure func(lint.Failure)
 }
 
 func (w lintBlankImports) Visit(n ast.Node) ast.Visitor {
@@ -62,7 +62,7 @@ func (w lintBlankImports) Visit(n ast.Node) ast.Visitor {
 
 		// This is the first blank import of a group.
 		if imp.Doc == nil && imp.Comment == nil {
-			w.onFailure(linter.Failure{
+			w.onFailure(lint.Failure{
 				Node:       imp,
 				Failure:    "a blank import should be only in a main or test package, or have a comment justifying it",
 				Confidence: 1,

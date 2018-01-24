@@ -4,17 +4,17 @@ import (
 	"fmt"
 	"go/ast"
 
-	"github.com/mgechev/revive/linter"
+	"github.com/mgechev/revive/lint"
 )
 
 // LintRangesRule lints given else constructs.
 type LintRangesRule struct{}
 
 // Apply applies the rule to given file.
-func (r *LintRangesRule) Apply(file *linter.File, arguments linter.Arguments) []linter.Failure {
-	var failures []linter.Failure
+func (r *LintRangesRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	var failures []lint.Failure
 
-	onFailure := func(failure linter.Failure) {
+	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
 
@@ -29,8 +29,8 @@ func (r *LintRangesRule) Name() string {
 }
 
 type lintRanges struct {
-	file      *linter.File
-	onFailure func(linter.Failure)
+	file      *lint.File
+	onFailure func(lint.Failure)
 }
 
 func (w *lintRanges) Visit(node ast.Node) ast.Visitor {
@@ -47,7 +47,7 @@ func (w *lintRanges) Visit(node ast.Node) ast.Visitor {
 		return w
 	}
 
-	w.onFailure(linter.Failure{
+	w.onFailure(lint.Failure{
 		Failure:    fmt.Sprintf("should omit 2nd value from range; this loop is equivalent to `for %s %s range ...`", w.file.Render(rs.Key), rs.Tok),
 		Confidence: 1,
 		Node:       rs.Value,

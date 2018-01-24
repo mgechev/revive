@@ -6,21 +6,21 @@ import (
 	"go/token"
 	"go/types"
 
-	"github.com/mgechev/revive/linter"
+	"github.com/mgechev/revive/lint"
 )
 
 // VarDeclarationsRule lints given else constructs.
 type VarDeclarationsRule struct{}
 
 // Apply applies the rule to given file.
-func (r *VarDeclarationsRule) Apply(file *linter.File, arguments linter.Arguments) []linter.Failure {
-	var failures []linter.Failure
+func (r *VarDeclarationsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	var failures []lint.Failure
 
 	fileAst := file.AST
 	walker := &lintVarDeclarations{
 		file:    file,
 		fileAst: fileAst,
-		onFailure: func(failure linter.Failure) {
+		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
 	}
@@ -37,9 +37,9 @@ func (r *VarDeclarationsRule) Name() string {
 
 type lintVarDeclarations struct {
 	fileAst   *ast.File
-	file      *linter.File
+	file      *lint.File
 	lastGen   *ast.GenDecl
-	onFailure func(linter.Failure)
+	onFailure func(lint.Failure)
 }
 
 func (w *lintVarDeclarations) Visit(node ast.Node) ast.Visitor {
@@ -71,7 +71,7 @@ func (w *lintVarDeclarations) Visit(node ast.Node) ast.Visitor {
 			zero = true
 		}
 		if zero {
-			w.onFailure(linter.Failure{
+			w.onFailure(lint.Failure{
 				Confidence: 0.9,
 				Node:       rhs,
 				Failure:    fmt.Sprintf("should drop = %s from declaration of var %s; it is the zero value", w.file.Render(rhs), v.Names[0]),
@@ -106,7 +106,7 @@ func (w *lintVarDeclarations) Visit(node ast.Node) ast.Visitor {
 			return nil
 		}
 
-		w.onFailure(linter.Failure{
+		w.onFailure(lint.Failure{
 			Category:   "type-inference",
 			Confidence: 0.8,
 			Node:       v.Type,

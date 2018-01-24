@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
-	"github.com/mgechev/revive/linter"
+	"github.com/mgechev/revive/lint"
 	"github.com/olekukonko/tablewriter"
 )
 
@@ -17,35 +17,35 @@ const (
 // CLIFormatter is an implementation of the Formatter interface
 // which formats the errors to JSON.
 type CLIFormatter struct {
-	Metadata linter.FormatterMetadata
+	Metadata lint.FormatterMetadata
 }
 
-func formatFailure(failure linter.Failure, severity linter.Severity) []string {
+func formatFailure(failure lint.Failure, severity lint.Severity) []string {
 	fString := color.BlueString(failure.Failure)
 	fTypeStr := string(severity)
 	fType := color.RedString(fTypeStr)
 	lineColumn := failure.Position
 	pos := fmt.Sprintf("(%d, %d)", lineColumn.Start.Line, lineColumn.Start.Column)
-	if severity == linter.SeverityWarning {
+	if severity == lint.SeverityWarning {
 		fType = color.YellowString(fTypeStr)
 	}
 	return []string{failure.GetFilename(), pos, fType, fString}
 }
 
-// Format formats the failures gotten from the linter.
-func (f *CLIFormatter) Format(failures <-chan linter.Failure, config linter.RulesConfig) (string, error) {
+// Format formats the failures gotten from the lint.
+func (f *CLIFormatter) Format(failures <-chan lint.Failure, config lint.RulesConfig) (string, error) {
 	var result [][]string
 	var totalErrors = 0
 	var total = 0
 
 	for f := range failures {
 		total++
-		currentType := linter.SeverityWarning
-		if config, ok := config[f.RuleName]; ok && config.Severity == linter.SeverityError {
-			currentType = linter.SeverityError
+		currentType := lint.SeverityWarning
+		if config, ok := config[f.RuleName]; ok && config.Severity == lint.SeverityError {
+			currentType = lint.SeverityError
 			totalErrors++
 		}
-		result = append(result, formatFailure(f, linter.Severity(currentType)))
+		result = append(result, formatFailure(f, lint.Severity(currentType)))
 	}
 	ps := "problems"
 	if total == 1 {
