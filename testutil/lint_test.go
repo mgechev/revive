@@ -45,6 +45,7 @@ var rules = []lint.Rule{
 	&rule.ErrorfRule{},
 	&rule.ErrorsRule{},
 	&rule.ErrorStringsRule{},
+	&rule.ReceiverNameRule{},
 }
 
 func TestAll(t *testing.T) {
