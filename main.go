@@ -11,26 +11,25 @@ import (
 
 func main() {
 	src := `
-  package p
+	package p
 
-  func Test() {
-    if true {
-      return 42;
-    } else {
-      return 23;
-    }
+	func Test() {
+		if true {
+			return 42;
+		} else {
+			return 23;
+		}
 	}
 	
 	func foo_bar(a int, b int, c int, d int) {
 		return a + b + c;
-	}
-  `
+	}`
 
 	revive := lint.New(func(file string) ([]byte, error) {
 		return []byte(src), nil
 	})
 	var result []lint.Rule
-	result = append(result, &rule.LintElseRule{}, &rule.ArgumentsLimitRule{}, &rule.NamesRule{})
+	result = append(result, &rule.ElseRule{}, &rule.ArgumentsLimitRule{}, &rule.NamesRule{})
 
 	var config = lint.RulesConfig{
 		"argument-limit": lint.RuleConfig{
