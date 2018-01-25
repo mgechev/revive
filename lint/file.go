@@ -23,6 +23,11 @@ type File struct {
 // IsTest returns if the file contains tests.
 func (f *File) IsTest() bool { return strings.HasSuffix(f.Name, "_test.go") }
 
+// Content returns the file's content.
+func (f *File) Content() []byte {
+	return f.content
+}
+
 // NewFile creates a new file
 func NewFile(name string, content []byte, pkg *Package) (*File, error) {
 	f, err := parser.ParseFile(pkg.fset, name, content, parser.ParseComments)

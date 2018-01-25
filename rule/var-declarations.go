@@ -74,6 +74,7 @@ func (w *lintVarDeclarations) Visit(node ast.Node) ast.Visitor {
 			w.onFailure(lint.Failure{
 				Confidence: 0.9,
 				Node:       rhs,
+				Category:   "zero-value",
 				Failure:    fmt.Sprintf("should drop = %s from declaration of var %s; it is the zero value", w.file.Render(rhs), v.Names[0]),
 			})
 			return nil

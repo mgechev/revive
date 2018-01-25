@@ -39,6 +39,9 @@ var rules = []lint.Rule{
 	&rule.BlankImportsRule{},
 	&rule.ExportedRule{},
 	&rule.NamesRule{},
+	&rule.ElseRule{},
+	&rule.IfReturnRule{},
+	&rule.RangeRule{},
 }
 
 func TestAll(t *testing.T) {
@@ -74,7 +77,7 @@ func TestAll(t *testing.T) {
 			continue
 		}
 
-		ps, err := l.Lint([]string{fi.Name()}, rules, map[string]lint.Arguments{})
+		ps, err := l.Lint([]string{fi.Name()}, rules, map[string]lint.RuleConfig{})
 		if err != nil {
 			t.Errorf("Linting %s: %v", fi.Name(), err)
 			continue

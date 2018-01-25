@@ -7,11 +7,11 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// LintElseRule lints given else constructs.
-type LintElseRule struct{}
+// ElseRule lints given else constructs.
+type ElseRule struct{}
 
 // Apply applies the rule to given file.
-func (r *LintElseRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ElseRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -24,8 +24,8 @@ func (r *LintElseRule) Apply(file *lint.File, arguments lint.Arguments) []lint.F
 }
 
 // Name returns the rule name.
-func (r *LintElseRule) Name() string {
-	return "no-else-return"
+func (r *ElseRule) Name() string {
+	return "else"
 }
 
 type lintElse struct {
@@ -65,8 +65,11 @@ func (w lintElse) Visit(node ast.Node) ast.Visitor {
 			extra = " (move short variable declaration to its own line if necessary)"
 		}
 		w.onFailure(lint.Failure{
-			Failure: "if block ends with a return statement, so drop this else and outdent its block" + extra,
-			Node:    ifStmt.Else,
+			Confidence: 1,
+			Node:       ifStmt.Else,
+			Category:   "indent",
+			URL:        "#indent-error-flow",
+			Failure:    "if block ends with a return statement, so drop this else and outdent its block" + extra,
 		})
 	}
 	return w
