@@ -55,8 +55,15 @@ type RuleConfig struct {
 	Severity  Severity
 }
 
-// RulesConfig defiles the config for all rules.
+// RulesConfig defines the config for all rules.
 type RulesConfig = map[string]RuleConfig
+
+// Config defines the config of the linter.
+type Config struct {
+	Confidence float64
+	Severity   Severity
+	Rules      RulesConfig
+}
 
 // Rule defines an abstract rule interaface
 type Rule interface {
