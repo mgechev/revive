@@ -47,6 +47,11 @@ var rules = []lint.Rule{
 	&rule.ErrorStringsRule{},
 	&rule.ReceiverNameRule{},
 	&rule.IncrementDecrementRule{},
+	&rule.ErrorReturnRule{},
+	&rule.UnexportedReturnRule{},
+	&rule.TimeNamesRule{},
+	&rule.ContextKeyTypeRule{},
+	&rule.ContextArgumentsRule{},
 }
 
 func TestAll(t *testing.T) {
