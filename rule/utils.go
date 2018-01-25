@@ -3,6 +3,7 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"go/token"
 	"go/types"
 	"regexp"
 	"strings"
@@ -132,4 +133,16 @@ func validType(T types.Type) bool {
 func isPkgDot(expr ast.Expr, pkg, name string) bool {
 	sel, ok := expr.(*ast.SelectorExpr)
 	return ok && isIdent(sel.X, pkg) && isIdent(sel.Sel, name)
+}
+
+func srcLine(src []byte, p token.Position) string {
+	// Run to end of line in both directions if not at line start/end.
+	lo, hi := p.Offset, p.Offset+1
+	for lo > 0 && src[lo-1] != '\n' {
+		lo--
+	}
+	for hi < len(src) && src[hi-1] != '\n' {
+		hi++
+	}
+	return string(src[lo:hi])
 }

@@ -42,6 +42,7 @@ var rules = []lint.Rule{
 	&rule.ElseRule{},
 	&rule.IfReturnRule{},
 	&rule.RangeRule{},
+	&rule.ErrorfRule{},
 }
 
 func TestAll(t *testing.T) {
