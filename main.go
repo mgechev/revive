@@ -98,6 +98,7 @@ func main() {
 	src := `
 	package p
 
+	// revive:disable:cyclomatic
 	func Test() {
 		if true || bar && baz {
 			return 42;
@@ -105,6 +106,7 @@ func main() {
 			return 23;
 		}
 	}
+	// revive:enable:cyclomatic
 	
 	func foo_bar(a int, b int, c int, d int) {
 		return a + b + c;

@@ -2,9 +2,9 @@ severity = "warning"
 confidence = 0.8
 
 [rule.else]
+  severity = "error"
 [rule.names]
 [rule.argument-limit]
   arguments = [2]
 [rule.cyclomatic]
   arguments = [3]
-  severity = "error"

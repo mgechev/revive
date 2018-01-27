@@ -22,14 +22,13 @@ type CLIFormatter struct {
 
 func formatFailure(failure lint.Failure, severity lint.Severity) []string {
 	fString := color.BlueString(failure.Failure)
-	fTypeStr := string(severity)
-	fType := color.RedString(fTypeStr)
+	fName := color.RedString(failure.RuleName)
 	lineColumn := failure.Position
 	pos := fmt.Sprintf("(%d, %d)", lineColumn.Start.Line, lineColumn.Start.Column)
 	if severity == lint.SeverityWarning {
-		fType = color.YellowString(fTypeStr)
+		fName = color.YellowString(failure.RuleName)
 	}
-	return []string{failure.GetFilename(), pos, fType, fString}
+	return []string{failure.GetFilename(), pos, fName, fString}
 }
 
 // Format formats the failures gotten from the lint.
