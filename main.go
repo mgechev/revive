@@ -78,6 +78,22 @@ func normalizeConfig(config *lint.Config) {
 	}
 }
 
+const usage = `
+Welcome to:        
+ _ __ _____   _(_)__   _____ 
+| '__/ _ \ \ / / \ \ / / _ \
+| | |  __/\ V /| |\ V /  __/
+|_|  \___| \_/ |_| \_/ \___|
+
+Usage:
+        revive [flags] <Go file or directory> ...
+Flags:
+        -c   string  path to the configuration TOML file.
+        -e   string  glob which specifies files to be excluded.
+        -f   string  formatter to be used for the output.
+        -h           output this screen.
+`
+
 func main() {
 	src := `
 	package p
