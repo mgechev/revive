@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
-	"strconv"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -18,15 +17,15 @@ type CyclomaticRule struct{}
 func (r *CyclomaticRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
-	complexity, err := strconv.Atoi(arguments[0])
-	if err != nil {
+	complexity, ok := arguments[0].(int64) // Alt. non panicking version
+	if !ok {
 		panic("invalid argument for cyclomatic complexity")
 	}
 
 	fileAst := file.AST
 	walker := lintCyclomatic{
 		file:       file,
-		complexity: complexity,
+		complexity: int(complexity),
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
@@ -39,7 +38,7 @@ func (r *CyclomaticRule) Apply(file *lint.File, arguments lint.Arguments) []lint
 
 // Name returns the rule name.
 func (r *CyclomaticRule) Name() string {
-	return "errorf"
+	return "cyclomatic"
 }
 
 type lintCyclomatic struct {

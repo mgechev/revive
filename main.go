@@ -32,6 +32,7 @@ var allRules = []lint.Rule{
 	&rule.TimeNamesRule{},
 	&rule.ContextKeyTypeRule{},
 	&rule.ContextArgumentsRule{},
+	&rule.CyclomaticRule{},
 }
 
 func getLintingRules(config *lint.Config) []lint.Rule {
@@ -82,7 +83,7 @@ func main() {
 	package p
 
 	func Test() {
-		if true {
+		if true || bar && baz {
 			return 42;
 		} else {
 			return 23;

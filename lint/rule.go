@@ -47,7 +47,7 @@ type DisabledInterval struct {
 }
 
 // Arguments is type used for the arguments of a rule.
-type Arguments = []string
+type Arguments = []interface{}
 
 // RuleConfig is type used for the rule configuration.
 type RuleConfig struct {
@@ -62,7 +62,7 @@ type RulesConfig = map[string]RuleConfig
 type Config struct {
 	Confidence float64
 	Severity   Severity
-	Rules      RulesConfig
+	Rules      RulesConfig `toml:"rule"`
 }
 
 // Rule defines an abstract rule interaface

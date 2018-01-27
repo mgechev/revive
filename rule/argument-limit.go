@@ -3,7 +3,6 @@ package rule
 import (
 	"fmt"
 	"go/ast"
-	"strconv"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -16,15 +15,16 @@ func (r *ArgumentsLimitRule) Apply(file *lint.File, arguments lint.Arguments) []
 	if len(arguments) != 1 {
 		panic(`invalid configuration for "argument-limit"`)
 	}
-	total, err := strconv.ParseInt(arguments[0], 10, 32)
-	if err != nil {
-		panic(`invalid configuration for "argument-limit"`)
+
+	total, ok := arguments[0].(int64) // Alt. non panicking version
+	if !ok {
+		panic(`invalid value passed as argument number to the "argument-list" rule`)
 	}
 
 	var failures []lint.Failure
 
 	walker := lintArgsNum{
-		total: total,
+		total: int(total),
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
@@ -41,14 +41,14 @@ func (r *ArgumentsLimitRule) Name() string {
 }
 
 type lintArgsNum struct {
-	total     int64
+	total     int
 	onFailure func(lint.Failure)
 }
 
 func (w lintArgsNum) Visit(n ast.Node) ast.Visitor {
 	node, ok := n.(*ast.FuncDecl)
 	if ok {
-		num := int64(len(node.Type.Params.List))
+		num := len(node.Type.Params.List)
 		if num > w.total {
 			w.onFailure(lint.Failure{
 				Confidence: 1,
