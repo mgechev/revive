@@ -34,6 +34,37 @@ var allRules = []lint.Rule{
 	&rule.ContextArgumentsRule{},
 }
 
+func getLintingRules(config *lint.Config) []lint.Rule {
+	rulesMap := map[string]lint.Rule{}
+	for _, r := range allRules {
+		rulesMap[r.Name()] = r
+	}
+
+	lintingRules := []lint.Rule{}
+	for name := range config.Rules {
+		rule, ok := rulesMap[name]
+		if !ok {
+			panic("cannot find rule: " + name)
+		}
+		lintingRules = append(lintingRules, rule)
+	}
+
+	return lintingRules
+}
+
+func parseConfig(path string) *lint.Config {
+	config := &lint.Config{}
+	file, err := ioutil.ReadFile(path)
+	if err != nil {
+		panic("cannot read the config file")
+	}
+	_, err = toml.Decode(string(file), config)
+	if err != nil {
+		panic("cannot parse the config file: " + err.Error())
+	}
+	return config
+}
+
 func main() {
 	src := `
 	package p
@@ -54,30 +85,8 @@ func main() {
 		return []byte(src), nil
 	})
 
-	config := &lint.Config{}
-
-	file, err := ioutil.ReadFile("config.toml")
-	if err != nil {
-		panic("cannot read the config file")
-	}
-	_, err = toml.Decode(string(file), config)
-	if err != nil {
-		panic("cannot parse the config file: " + err.Error())
-	}
-
-	rulesMap := map[string]lint.Rule{}
-	for _, r := range allRules {
-		rulesMap[r.Name()] = r
-	}
-
-	lintingRules := []lint.Rule{}
-	for name := range config.Rules {
-		rule, ok := rulesMap[name]
-		if !ok {
-			panic("cannot find rule: " + name)
-		}
-		lintingRules = append(lintingRules, rule)
-	}
+	config := parseConfig("config.toml")
+	lintingRules := getLintingRules(config)
 
 	failures, err := revive.Lint([]string{"foo.go", "bar.go", "baz.go"}, lintingRules, config.Rules)
 	if err != nil {
@@ -86,8 +95,8 @@ func main() {
 
 	formatChan := make(chan lint.Failure)
 	exitChan := make(chan bool)
-	var output string
 
+	var output string
 	go (func() {
 		var formatter formatter.CLIFormatter
 		output, err = formatter.Format(formatChan, config.Rules)
@@ -107,6 +116,10 @@ func main() {
 		}
 		formatChan <- f
 	}
+	if config.Severity == lint.SeverityError && exitCode != 0 {
+		exitCode = 2
+	}
+
 	close(formatChan)
 	<-exitChan
 	fmt.Println(output)
