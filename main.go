@@ -2,12 +2,37 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 
+	"github.com/BurntSushi/toml"
 	"github.com/mgechev/revive/formatter"
 	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/rule"
 )
+
+var allRules = []lint.Rule{
+	&rule.ArgumentsLimitRule{},
+	&rule.VarDeclarationsRule{},
+	&rule.PackageCommentsRule{},
+	&rule.DotImportsRule{},
+	&rule.BlankImportsRule{},
+	&rule.ExportedRule{},
+	&rule.NamesRule{},
+	&rule.ElseRule{},
+	&rule.IfReturnRule{},
+	&rule.RangeRule{},
+	&rule.ErrorfRule{},
+	&rule.ErrorsRule{},
+	&rule.ErrorStringsRule{},
+	&rule.ReceiverNameRule{},
+	&rule.IncrementDecrementRule{},
+	&rule.ErrorReturnRule{},
+	&rule.UnexportedReturnRule{},
+	&rule.TimeNamesRule{},
+	&rule.ContextKeyTypeRule{},
+	&rule.ContextArgumentsRule{},
+}
 
 func main() {
 	src := `
@@ -28,17 +53,33 @@ func main() {
 	revive := lint.New(func(file string) ([]byte, error) {
 		return []byte(src), nil
 	})
-	var result []lint.Rule
-	result = append(result, &rule.ElseRule{}, &rule.ArgumentsLimitRule{}, &rule.NamesRule{})
 
-	var config = lint.RulesConfig{
-		"argument-limit": lint.RuleConfig{
-			Arguments: []string{"3"},
-			Severity:  lint.SeverityError,
-		},
+	config := &lint.Config{}
+
+	file, err := ioutil.ReadFile("config.toml")
+	if err != nil {
+		panic("cannot read the config file")
+	}
+	_, err = toml.Decode(string(file), config)
+	if err != nil {
+		panic("cannot parse the config file: " + err.Error())
 	}
 
-	failures, err := revive.Lint([]string{"foo.go", "bar.go", "baz.go"}, result, config)
+	rulesMap := map[string]lint.Rule{}
+	for _, r := range allRules {
+		rulesMap[r.Name()] = r
+	}
+
+	lintingRules := []lint.Rule{}
+	for name := range config.Rules {
+		rule, ok := rulesMap[name]
+		if !ok {
+			panic("cannot find rule: " + name)
+		}
+		lintingRules = append(lintingRules, rule)
+	}
+
+	failures, err := revive.Lint([]string{"foo.go", "bar.go", "baz.go"}, lintingRules, config.Rules)
 	if err != nil {
 		panic(err)
 	}
@@ -49,7 +90,7 @@ func main() {
 
 	go (func() {
 		var formatter formatter.CLIFormatter
-		output, err = formatter.Format(formatChan, config)
+		output, err = formatter.Format(formatChan, config.Rules)
 		if err != nil {
 			panic(err)
 		}
@@ -61,7 +102,7 @@ func main() {
 		if exitCode == 0 {
 			exitCode = 1
 		}
-		if c, ok := config[f.RuleName]; ok && c.Severity == lint.SeverityError {
+		if c, ok := config.Rules[f.RuleName]; ok && c.Severity == lint.SeverityError {
 			exitCode = 2
 		}
 		formatChan <- f

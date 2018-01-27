@@ -47,7 +47,7 @@ func (r *NamesRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Fail
 
 // Name returns the rule name.
 func (r *NamesRule) Name() string {
-	return "imports"
+	return "names"
 }
 
 func checkList(fl *ast.FieldList, thing string, w *lintNames) {

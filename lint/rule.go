@@ -51,8 +51,8 @@ type Arguments = []string
 
 // RuleConfig is type used for the rule configuration.
 type RuleConfig struct {
-	Arguments Arguments
-	Severity  Severity
+	Arguments Arguments `toml:"arguments"`
+	Severity  Severity  `toml:"severity"`
 }
 
 // RulesConfig defines the config for all rules.
@@ -60,9 +60,9 @@ type RulesConfig = map[string]RuleConfig
 
 // Config defines the config of the linter.
 type Config struct {
-	Confidence float64
-	Severity   Severity
-	Rules      RulesConfig
+	Confidence float64     `toml:"confidence"`
+	Severity   Severity    `toml:"severity"`
+	Rules      RulesConfig `toml:"rules"`
 }
 
 // Rule defines an abstract rule interaface
