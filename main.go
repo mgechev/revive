@@ -65,6 +65,18 @@ func parseConfig(path string) *lint.Config {
 	return config
 }
 
+func normalizeConfig(config *lint.Config) {
+	severity := config.Severity
+	if severity != "" {
+		for k, v := range config.Rules {
+			if v.Severity == "" {
+				v.Severity = severity
+			}
+			config.Rules[k] = v
+		}
+	}
+}
+
 func main() {
 	src := `
 	package p
@@ -86,6 +98,7 @@ func main() {
 	})
 
 	config := parseConfig("config.toml")
+	normalizeConfig(config)
 	lintingRules := getLintingRules(config)
 
 	failures, err := revive.Lint([]string{"foo.go", "bar.go", "baz.go"}, lintingRules, config.Rules)
@@ -108,6 +121,9 @@ func main() {
 
 	exitCode := 0
 	for f := range failures {
+		if f.Confidence < config.Confidence {
+			continue
+		}
 		if exitCode == 0 {
 			exitCode = 1
 		}
@@ -115,9 +131,6 @@ func main() {
 			exitCode = 2
 		}
 		formatChan <- f
-	}
-	if config.Severity == lint.SeverityError && exitCode != 0 {
-		exitCode = 2
 	}
 
 	close(formatChan)

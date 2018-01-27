@@ -51,8 +51,9 @@ func (w lintArgsNum) Visit(n ast.Node) ast.Visitor {
 		num := int64(len(node.Type.Params.List))
 		if num > w.total {
 			w.onFailure(lint.Failure{
-				Failure: fmt.Sprintf("maximum number of arguments per function exceeded; max %d but got %d", w.total, num),
-				Node:    node.Type,
+				Confidence: 1,
+				Failure:    fmt.Sprintf("maximum number of arguments per function exceeded; max %d but got %d", w.total, num),
+				Node:       node.Type,
 			})
 			return w
 		}

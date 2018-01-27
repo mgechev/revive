@@ -1,12 +1,7 @@
-severity = "error"
-confidence = 1.0
+severity = "warning"
+confidence = 0.8
 
 [rules.else]
-  arguments = []
-  severity = "error"
+[rules.names]
 [rules.argument-limit]
   arguments = ['2']
-  severity = "warning"
-[rules.names]
-  arguments = []
-  severity = "error"
