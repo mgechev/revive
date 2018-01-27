@@ -60,6 +60,9 @@ func TestVarDeclaration(t *testing.T) {
 	testRule(t, "cyclomatic", &rule.CyclomaticRule{}, &lint.RuleConfig{
 		Arguments: []string{"1"},
 	})
+	testRule(t, "cyclomatic-2", &rule.CyclomaticRule{}, &lint.RuleConfig{
+		Arguments: []string{"3"},
+	})
 }
 
 func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.RuleConfig) {
@@ -91,7 +94,8 @@ func TestAll(t *testing.T) {
 	baseDir := "../fixtures/"
 
 	ignoreFiles := map[string]bool{
-		"cyclomatic.go": true,
+		"cyclomatic.go":   true,
+		"cyclomatic-2.go": true,
 	}
 
 	rx, err := regexp.Compile(*lintMatch)
