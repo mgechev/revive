@@ -1,4 +1,4 @@
-// Test of return+else warning.
+// Test of cyclomatic complexity.
 
 // Package pkg ...
 package pkg
