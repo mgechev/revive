@@ -1,6 +1,6 @@
 severity = "error"
 confidence = 1.0
-[rules]
+
 [rules.else]
   arguments = []
   severity = "error"
