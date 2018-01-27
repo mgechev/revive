@@ -19,6 +19,7 @@ import (
 	"go/token"
 	"go/types"
 	"io/ioutil"
+	"os"
 	"path"
 	"regexp"
 	"strconv"
@@ -26,6 +27,7 @@ import (
 	"testing"
 
 	"github.com/mgechev/revive/rule"
+	"github.com/pkg/errors"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -54,11 +56,44 @@ var rules = []lint.Rule{
 	&rule.ContextArgumentsRule{},
 }
 
+func TestVarDeclaration(t *testing.T) {
+	testRule(t, "cyclomatic", &rule.CyclomaticRule{}, &lint.RuleConfig{
+		Arguments: []string{"1"},
+	})
+}
+
+func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.RuleConfig) {
+	baseDir := "../fixtures/"
+	filename = filename + ".go"
+	src, err := ioutil.ReadFile(baseDir + filename)
+	if err != nil {
+		t.Fatalf("Bad filename path in test for %s: %v", rule.Name(), err)
+	}
+	stat, err := os.Stat(baseDir + filename)
+	if err != nil {
+		t.Fatalf("Cannot get file info for %s: %v", rule.Name(), err)
+	}
+	ins := parseInstructions(t, filename, src)
+	if ins == nil {
+		t.Errorf("Test file %v does not have instructions", filename)
+		return
+	}
+	if config == nil {
+		assertFailures(t, baseDir, stat, src, []lint.Rule{rule}, map[string]lint.RuleConfig{})
+		return
+	}
+	c := map[string]lint.RuleConfig{}
+	c[rule.Name()] = *config[0]
+	assertFailures(t, baseDir, stat, src, []lint.Rule{rule}, c)
+}
+
 func TestAll(t *testing.T) {
 	baseDir := "../fixtures/"
-	l := lint.New(func(file string) ([]byte, error) {
-		return ioutil.ReadFile(baseDir + file)
-	})
+
+	ignoreFiles := map[string]bool{
+		"cyclomatic.go": true,
+	}
+
 	rx, err := regexp.Compile(*lintMatch)
 	if err != nil {
 		t.Fatalf("Bad -lint.match value %q: %v", *lintMatch, err)
@@ -75,65 +110,80 @@ func TestAll(t *testing.T) {
 		if !rx.MatchString(fi.Name()) {
 			continue
 		}
+		if _, ok := ignoreFiles[fi.Name()]; ok {
+			continue
+		}
 		//t.Logf("Testing %s", fi.Name())
 		src, err := ioutil.ReadFile(path.Join(baseDir, fi.Name()))
 		if err != nil {
 			t.Fatalf("Failed reading %s: %v", fi.Name(), err)
 		}
 
-		ins := parseInstructions(t, fi.Name(), src)
-		if ins == nil {
-			t.Errorf("Test file %v does not have instructions", fi.Name())
-			continue
-		}
-
-		ps, err := l.Lint([]string{fi.Name()}, rules, map[string]lint.RuleConfig{})
+		err = assertFailures(t, baseDir, fi, src, rules, map[string]lint.RuleConfig{})
 		if err != nil {
 			t.Errorf("Linting %s: %v", fi.Name(), err)
 			continue
 		}
+	}
+}
 
-		failures := []lint.Failure{}
-		for f := range ps {
-			failures = append(failures, f)
-		}
+func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, rules []lint.Rule, config map[string]lint.RuleConfig) error {
+	l := lint.New(func(file string) ([]byte, error) {
+		return ioutil.ReadFile(baseDir + file)
+	})
 
-		for _, in := range ins {
-			ok := false
-			for i, p := range failures {
-				if p.Position.Start.Line != in.Line {
-					continue
-				}
-				if in.Match == p.Failure {
-					// check replacement if we are expecting one
-					if in.Replacement != "" {
-						// ignore any inline comments, since that would be recursive
-						r := p.ReplacementLine
-						if i := strings.Index(r, " //"); i >= 0 {
-							r = r[:i]
-						}
-						if r != in.Replacement {
-							t.Errorf("Lint failed at %s:%d; got replacement %q, want %q", fi.Name(), in.Line, r, in.Replacement)
-						}
+	ins := parseInstructions(t, fi.Name(), src)
+	if ins == nil {
+		return errors.Errorf("Test file %v does not have instructions", fi.Name())
+	}
+
+	ps, err := l.Lint([]string{fi.Name()}, rules, config)
+	if err != nil {
+
+		return err
+	}
+
+	failures := []lint.Failure{}
+	for f := range ps {
+		failures = append(failures, f)
+	}
+
+	for _, in := range ins {
+		ok := false
+		for i, p := range failures {
+			if p.Position.Start.Line != in.Line {
+				continue
+			}
+			if in.Match == p.Failure {
+				// check replacement if we are expecting one
+				if in.Replacement != "" {
+					// ignore any inline comments, since that would be recursive
+					r := p.ReplacementLine
+					if i := strings.Index(r, " //"); i >= 0 {
+						r = r[:i]
 					}
-
-					// remove this problem from ps
-					copy(failures[i:], failures[i+1:])
-					failures = failures[:len(failures)-1]
-
-					// t.Logf("/%v/ matched at %s:%d", in.Match, fi.Name(), in.Line)
-					ok = true
-					break
+					if r != in.Replacement {
+						t.Errorf("Lint failed at %s:%d; got replacement %q, want %q", fi.Name(), in.Line, r, in.Replacement)
+					}
 				}
-			}
-			if !ok {
-				t.Errorf("Lint failed at %s:%d; /%v/ did not match", fi.Name(), in.Line, in.Match)
+
+				// remove this problem from ps
+				copy(failures[i:], failures[i+1:])
+				failures = failures[:len(failures)-1]
+
+				// t.Logf("/%v/ matched at %s:%d", in.Match, fi.Name(), in.Line)
+				ok = true
+				break
 			}
 		}
-		for _, p := range failures {
-			t.Errorf("Unexpected problem at %s:%d: %v", fi.Name(), p.Position.Start.Line, p.Failure)
+		if !ok {
+			t.Errorf("Lint failed at %s:%d; /%v/ did not match", fi.Name(), in.Line, in.Match)
 		}
 	}
+	for _, p := range failures {
+		t.Errorf("Unexpected problem at %s:%d: %v", fi.Name(), p.Position.Start.Line, p.Failure)
+	}
+	return nil
 }
 
 type instruction struct {
