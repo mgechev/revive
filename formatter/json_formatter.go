@@ -6,19 +6,19 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// JSONFormatter is an implementation of the Formatter interface
+// JSON is an implementation of the Formatter interface
 // which formats the errors to JSON.
-type JSONFormatter struct {
+type JSON struct {
 	Metadata lint.FormatterMetadata
 }
 
 // Name returns the name of the formatter
-func (f *JSONFormatter) Name() string {
+func (f *JSON) Name() string {
 	return "json"
 }
 
 // Format formats the failures gotten from the lint.
-func (f *JSONFormatter) Format(failures <-chan lint.Failure, config lint.RulesConfig) (string, error) {
+func (f *JSON) Format(failures <-chan lint.Failure, config lint.RulesConfig) (string, error) {
 	var slice []lint.Failure
 	for failure := range failures {
 		slice = append(slice, failure)

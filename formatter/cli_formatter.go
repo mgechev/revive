@@ -14,14 +14,14 @@ const (
 	warningEmoji = ""
 )
 
-// CLIFormatter is an implementation of the Formatter interface
+// CLI is an implementation of the Formatter interface
 // which formats the errors to JSON.
-type CLIFormatter struct {
+type CLI struct {
 	Metadata lint.FormatterMetadata
 }
 
 // Name returns the name of the formatter
-func (f *CLIFormatter) Name() string {
+func (f *CLI) Name() string {
 	return "cli"
 }
 
@@ -37,7 +37,7 @@ func formatFailure(failure lint.Failure, severity lint.Severity) []string {
 }
 
 // Format formats the failures gotten from the lint.
-func (f *CLIFormatter) Format(failures <-chan lint.Failure, config lint.RulesConfig) (string, error) {
+func (f *CLI) Format(failures <-chan lint.Failure, config lint.RulesConfig) (string, error) {
 	var result [][]string
 	var totalErrors = 0
 	var total = 0

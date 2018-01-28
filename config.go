@@ -42,8 +42,9 @@ var allRules = append([]lint.Rule{
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
-	&formatter.CLIFormatter{},
-	&formatter.JSONFormatter{},
+	&formatter.CLI{},
+	&formatter.JSON{},
+	&formatter.Default{},
 }
 
 func getFormatters() map[string]lint.Formatter {
@@ -86,6 +87,9 @@ func parseConfig(path string) *lint.Config {
 }
 
 func normalizeConfig(config *lint.Config) {
+	if config.Confidence == 0 {
+		config.Confidence = 0.8
+	}
 	severity := config.Severity
 	if severity != "" {
 		for k, v := range config.Rules {
@@ -108,7 +112,7 @@ func getConfig() *lint.Config {
 
 func getFormatter() lint.Formatter {
 	formatters := getFormatters()
-	formatter := formatters["cli"]
+	formatter := formatters["default"]
 	if formatterName != "" {
 		f, ok := formatters[formatterName]
 		if !ok {

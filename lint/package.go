@@ -139,7 +139,7 @@ func receiverType(fn *ast.FuncDecl) string {
 	return "invalid-type"
 }
 
-func (p *Package) lint(rules []Rule, config RulesConfig, failures chan Failure) {
+func (p *Package) lint(rules []Rule, config Config, failures chan Failure) {
 	if len(p.files) == 0 {
 		close(failures)
 		return

@@ -92,11 +92,12 @@ func (f *File) isMain() bool {
 	return false
 }
 
-func (f *File) lint(rules []Rule, rulesConfig RulesConfig, failures chan Failure) {
+func (f *File) lint(rules []Rule, config Config, failures chan Failure) {
+	rulesConfig := config.Rules
 	disabledIntervals := f.disabledIntervals(rules)
 	for _, currentRule := range rules {
-		config := rulesConfig[currentRule.Name()]
-		currentFailures := currentRule.Apply(f, config.Arguments)
+		ruleConfig := rulesConfig[currentRule.Name()]
+		currentFailures := currentRule.Apply(f, ruleConfig.Arguments)
 		for idx, failure := range currentFailures {
 			if failure.RuleName == "" {
 				failure.RuleName = currentRule.Name()
@@ -108,7 +109,9 @@ func (f *File) lint(rules []Rule, rulesConfig RulesConfig, failures chan Failure
 		}
 		currentFailures = f.filterFailures(currentFailures, disabledIntervals)
 		for _, failure := range currentFailures {
-			failures <- failure
+			if failure.Confidence >= config.Confidence {
+				failures <- failure
+			}
 		}
 	}
 }

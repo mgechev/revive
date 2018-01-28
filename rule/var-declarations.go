@@ -32,7 +32,7 @@ func (r *VarDeclarationsRule) Apply(file *lint.File, arguments lint.Arguments) [
 
 // Name returns the rule name.
 func (r *VarDeclarationsRule) Name() string {
-	return "blank-imports"
+	return "var-declaration"
 }
 
 type lintVarDeclarations struct {

@@ -3,7 +3,6 @@ package lint
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"go/token"
 )
 
@@ -43,13 +42,11 @@ func isGenerated(src []byte) bool {
 
 // Lint lints a set of files with the specified rule.
 func (l *Linter) Lint(filenames []string, ruleSet []Rule, config Config) (<-chan Failure, error) {
-	rulesConfig := config.Rules
 	failures := make(chan Failure)
 	pkg := &Package{
 		fset:  token.NewFileSet(),
 		files: map[string]*File{},
 	}
-	var pkgName string
 	for _, filename := range filenames {
 		content, err := l.reader(filename)
 		if err != nil {
@@ -64,17 +61,11 @@ func (l *Linter) Lint(filenames []string, ruleSet []Rule, config Config) (<-chan
 			return nil, err
 		}
 
-		if pkgName == "" {
-			pkgName = file.AST.Name.Name
-		} else if file.AST.Name.Name != pkgName {
-			return nil, fmt.Errorf("%s is in package %s, not %s", filename, file.AST.Name.Name, pkgName)
-		}
-
 		pkg.files[filename] = file
 	}
 
 	go (func() {
-		pkg.lint(ruleSet, rulesConfig, failures)
+		pkg.lint(ruleSet, config, failures)
 	})()
 
 	return failures, nil

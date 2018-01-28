@@ -39,7 +39,7 @@ func (r *ExportedRule) Apply(file *lint.File, arguments lint.Arguments) []lint.F
 
 // Name returns the rule name.
 func (r *ExportedRule) Name() string {
-	return "imports"
+	return "exported"
 }
 
 type lintExported struct {

@@ -33,7 +33,7 @@ func (r *ErrorStringsRule) Apply(file *lint.File, arguments lint.Arguments) []li
 
 // Name returns the rule name.
 func (r *ErrorStringsRule) Name() string {
-	return "errorf"
+	return "error-strings"
 }
 
 type lintErrorStrings struct {
