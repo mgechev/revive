@@ -147,7 +147,11 @@ func getFiles() []string {
 		if err != nil {
 			panic(err)
 		}
-		matches = append(matches, m...)
+		for _, f := range m {
+			if strings.HasSuffix(f, ".go") {
+				matches = append(matches, f)
+			}
+		}
 	}
 
 	if excludeGlobs == "" {

@@ -60,7 +60,9 @@ func main() {
 
 	close(formatChan)
 	<-exitChan
-	fmt.Println(output)
+	if output != "" {
+		fmt.Println(output)
+	}
 
 	os.Exit(exitCode)
 }

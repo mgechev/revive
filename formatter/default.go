@@ -20,7 +20,7 @@ func (f *Default) Name() string {
 // Format formats the failures gotten from the lint.
 func (f *Default) Format(failures <-chan lint.Failure, config lint.RulesConfig) (string, error) {
 	for failure := range failures {
-		fmt.Printf("%v%v: %s\n", failure.GetFilename(), failure.Position.Start, failure.Failure)
+		fmt.Printf("%v: %s\n", failure.Position.Start, failure.Failure)
 	}
 	return "", nil
 }
