@@ -1,6 +1,8 @@
+ignore-generated-header = true
 severity = "warning"
 confidence = 0.8
 
+[rule.package-comments]
 [rule.else]
 [rule.names]
 [rule.argument-limit]

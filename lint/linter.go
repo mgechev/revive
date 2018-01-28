@@ -42,7 +42,8 @@ func isGenerated(src []byte) bool {
 }
 
 // Lint lints a set of files with the specified rule.
-func (l *Linter) Lint(filenames []string, ruleSet []Rule, rulesConfig RulesConfig) (<-chan Failure, error) {
+func (l *Linter) Lint(filenames []string, ruleSet []Rule, config Config) (<-chan Failure, error) {
+	rulesConfig := config.Rules
 	failures := make(chan Failure)
 	pkg := &Package{
 		fset:  token.NewFileSet(),
@@ -54,7 +55,7 @@ func (l *Linter) Lint(filenames []string, ruleSet []Rule, rulesConfig RulesConfi
 		if err != nil {
 			return nil, err
 		}
-		if isGenerated(content) {
+		if isGenerated(content) && !config.IgnoreGeneratedHeader {
 			continue
 		}
 

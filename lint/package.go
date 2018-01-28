@@ -140,6 +140,10 @@ func receiverType(fn *ast.FuncDecl) string {
 }
 
 func (p *Package) lint(rules []Rule, config RulesConfig, failures chan Failure) {
+	if len(p.files) == 0 {
+		close(failures)
+		return
+	}
 	p.typeCheck()
 	p.scanSortable()
 	var wg sync.WaitGroup

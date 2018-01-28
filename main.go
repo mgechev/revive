@@ -27,7 +27,7 @@ func main() {
 
 	lintingRules := getLintingRules(config)
 
-	failures, err := revive.Lint(files, lintingRules, config.Rules)
+	failures, err := revive.Lint(files, lintingRules, *config)
 	if err != nil {
 		panic(err)
 	}

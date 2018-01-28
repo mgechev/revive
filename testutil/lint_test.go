@@ -58,10 +58,10 @@ var rules = []lint.Rule{
 
 func TestVarDeclaration(t *testing.T) {
 	testRule(t, "cyclomatic", &rule.CyclomaticRule{}, &lint.RuleConfig{
-		Arguments: []string{"1"},
+		Arguments: []interface{}{int64(1)},
 	})
 	testRule(t, "cyclomatic-2", &rule.CyclomaticRule{}, &lint.RuleConfig{
-		Arguments: []string{"3"},
+		Arguments: []interface{}{int64(3)},
 	})
 }
 
@@ -141,7 +141,9 @@ func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, ru
 		return errors.Errorf("Test file %v does not have instructions", fi.Name())
 	}
 
-	ps, err := l.Lint([]string{fi.Name()}, rules, config)
+	ps, err := l.Lint([]string{fi.Name()}, rules, lint.Config{
+		Rules: config,
+	})
 	if err != nil {
 		return err
 	}

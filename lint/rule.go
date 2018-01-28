@@ -60,9 +60,10 @@ type RulesConfig = map[string]RuleConfig
 
 // Config defines the config of the linter.
 type Config struct {
-	Confidence float64
-	Severity   Severity
-	Rules      RulesConfig `toml:"rule"`
+	IgnoreGeneratedHeader bool `toml:"ignore-generated-header"`
+	Confidence            float64
+	Severity              Severity
+	Rules                 RulesConfig `toml:"rule"`
 }
 
 // Rule defines an abstract rule interaface
