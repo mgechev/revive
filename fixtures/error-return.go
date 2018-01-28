@@ -1,7 +1,7 @@
 // Test for returning errors.
 
 // Package foo ...
-package foo
+package pkg
 
 // Returns nothing
 func f() { // ok

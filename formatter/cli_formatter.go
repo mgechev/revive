@@ -20,6 +20,11 @@ type CLIFormatter struct {
 	Metadata lint.FormatterMetadata
 }
 
+// Name returns the name of the formatter
+func (f *CLIFormatter) Name() string {
+	return "cli"
+}
+
 func formatFailure(failure lint.Failure, severity lint.Severity) []string {
 	fString := color.BlueString(failure.Failure)
 	fName := color.RedString(failure.RuleName)

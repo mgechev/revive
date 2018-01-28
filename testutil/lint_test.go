@@ -143,7 +143,6 @@ func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, ru
 
 	ps, err := l.Lint([]string{fi.Name()}, rules, config)
 	if err != nil {
-
 		return err
 	}
 
