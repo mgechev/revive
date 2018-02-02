@@ -56,12 +56,18 @@ var rules = []lint.Rule{
 	&rule.ContextArgumentsRule{},
 }
 
-func TestVarDeclaration(t *testing.T) {
+func TestCyclomatic(t *testing.T) {
 	testRule(t, "cyclomatic", &rule.CyclomaticRule{}, &lint.RuleConfig{
 		Arguments: []interface{}{int64(1)},
 	})
 	testRule(t, "cyclomatic-2", &rule.CyclomaticRule{}, &lint.RuleConfig{
 		Arguments: []interface{}{int64(3)},
+	})
+}
+
+func TestMaxPublicStructs(t *testing.T) {
+	testRule(t, "max-public-structs", &rule.MaxPublicStructsRule{}, &lint.RuleConfig{
+		Arguments: []interface{}{int64(1)},
 	})
 }
 
@@ -94,8 +100,9 @@ func TestAll(t *testing.T) {
 	baseDir := "../fixtures/"
 
 	ignoreFiles := map[string]bool{
-		"cyclomatic.go":   true,
-		"cyclomatic-2.go": true,
+		"cyclomatic.go":         true,
+		"cyclomatic-2.go":       true,
+		"max-public-structs.go": true,
 	}
 
 	rx, err := regexp.Compile(*lintMatch)
