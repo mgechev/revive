@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
 
 	zglob "github.com/mattn/go-zglob"
@@ -13,6 +14,11 @@ import (
 	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/rule"
 )
+
+func fail(err string) {
+	fmt.Fprintln(os.Stderr, err)
+	os.Exit(1)
+}
 
 var defaultRules = []lint.Rule{
 	&rule.VarDeclarationsRule{},
@@ -65,7 +71,7 @@ func getLintingRules(config *lint.Config) []lint.Rule {
 	for name := range config.Rules {
 		rule, ok := rulesMap[name]
 		if !ok {
-			panic("cannot find rule: " + name)
+			fail("cannot find rule: " + name)
 		}
 		lintingRules = append(lintingRules, rule)
 	}
@@ -77,11 +83,11 @@ func parseConfig(path string) *lint.Config {
 	config := &lint.Config{}
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
-		panic("cannot read the config file")
+		fail("cannot read the config file")
 	}
 	_, err = toml.Decode(string(file), config)
 	if err != nil {
-		panic("cannot parse the config file: " + err.Error())
+		fail("cannot parse the config file: " + err.Error())
 	}
 	return config
 }
@@ -116,7 +122,7 @@ func getFormatter() lint.Formatter {
 	if formatterName != "" {
 		f, ok := formatters[formatterName]
 		if !ok {
-			panic("unknown formatter " + formatterName)
+			fail("unknown formatter " + formatterName)
 		}
 		formatter = f
 	}
@@ -138,14 +144,14 @@ func defaultConfig() *lint.Config {
 func getFiles() []string {
 	globs := flag.Args()
 	if len(globs) == 0 {
-		panic("files not specified")
+		fail("files not specified")
 	}
 
 	var matches []string
 	for _, g := range globs {
 		m, err := zglob.Glob(g)
 		if err != nil {
-			panic(err)
+			fail(err.Error())
 		}
 		for _, f := range m {
 			if strings.HasSuffix(f, ".go") {
@@ -163,7 +169,7 @@ func getFiles() []string {
 	for _, g := range excludeGlobSlice {
 		m, err := zglob.Glob(g)
 		if err != nil {
-			panic("error while parsing glob from exclude " + err.Error())
+			fail("error while parsing glob from exclude " + err.Error())
 		}
 		for _, match := range m {
 			excluded[match] = true

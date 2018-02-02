@@ -29,7 +29,7 @@ func main() {
 
 	failures, err := revive.Lint(files, lintingRules, *config)
 	if err != nil {
-		panic(err)
+		fail(err.Error())
 	}
 
 	formatChan := make(chan lint.Failure)
@@ -39,7 +39,7 @@ func main() {
 	go (func() {
 		output, err = formatter.Format(formatChan, config.Rules)
 		if err != nil {
-			panic(err)
+			fail(err.Error())
 		}
 		exitChan <- true
 	})()
