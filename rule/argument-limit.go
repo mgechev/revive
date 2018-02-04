@@ -48,7 +48,12 @@ type lintArgsNum struct {
 func (w lintArgsNum) Visit(n ast.Node) ast.Visitor {
 	node, ok := n.(*ast.FuncDecl)
 	if ok {
-		num := len(node.Type.Params.List)
+		num := 0
+		for _, l := range node.Type.Params.List {
+			for range l.Names {
+				num++
+			}
+		}
 		if num > w.total {
 			w.onFailure(lint.Failure{
 				Confidence: 1,
