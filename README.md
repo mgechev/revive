@@ -1,14 +1,25 @@
 # revive
 
-Fast, configurable, extensible, and beautiful linter for Go.
+Fast, configurable, extensible, flexible, and beautiful linter for Go.
 
 <p align="center">
   <img src="./assets/logo.png" alt="" width="200">
 </p>
 
+Here's how `revive` is different from `golint`:
+
+* Allows you to enable or disable rules using a configuration file.
+* Allows you to configure the linting rules with a configuration file.
+* Provides functionality to disable a specific rule or the entire linter for a file or a range of lines.
+* Provides more rules compared to `golint`.
+* Provides multiple formatters which let you customize the output.
+* Allows you to customize the return code for the entire linter or based on the failure of only some rules.
+* Open for addition of new rules or formatters.
+* Faster since it runs the rules over each file in a separate goroutine.
+
 ## Usage
 
-Revive is **configurable** linter which you can fit your needs.
+`Revive` is **configurable** linter which you can fit your needs. By default you can use `revive` with the default configuration options. This way the linter will work the same way `golint` does.
 
 ### Command Line Flags
 
@@ -24,6 +35,24 @@ Revive accepts only three command line parameters:
 ### Configuration
 
 Revive can be configured with a TOML file
+
+### Default Configuration
+
+The default configuration of `revive` can be found at `defaults.toml`. This will enable all rules available in `golint` and use their default configuration (i.e. the config which is hardcoded in `golint`).
+
+```shell
+revive -config defaults.toml github.com/mgechev/revive
+```
+
+This will use `defaults.toml`, the `default` formatter, and will run linting over the `github.com/mgechev/revive` package.
+
+### Recommended Configuration
+
+```shell
+revive -config config.toml -formatter cli github.com/mgechev/revive
+```
+
+This will use `config.toml`, the `cli` formatter, and will run linting over the `github.com/mgechev/revive` package.
 
 ## License
 
