@@ -156,7 +156,8 @@ func normalizeSplit(strs []string) []string {
 func getFiles() []string {
 	globs := normalizeSplit(flag.Args())
 	if len(globs) == 0 {
-		fail("files not specified")
+		flag.Usage()
+		return nil
 	}
 
 	files, errs := dots.Resolve(globs, normalizeSplit(excludePaths))
