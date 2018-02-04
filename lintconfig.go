@@ -142,17 +142,32 @@ func defaultConfig() *lint.Config {
 	return &defaultConfig
 }
 
+func normalizeSplit(strs []string) []string {
+	res := []string{}
+	for _, s := range strs {
+		t := strings.Trim(s, " \t")
+		if len(t) > 0 {
+			res = append(res, t)
+		}
+	}
+	return res
+}
+
 func getFiles() []string {
-	globs := flag.Args()
+	globs := normalizeSplit(flag.Args())
 	if len(globs) == 0 {
 		fail("files not specified")
 	}
 
-	files, errs := dots.Resolve(globs, strings.Split(excludePaths, " "))
+	files, errs := dots.Resolve(globs, normalizeSplit(excludePaths))
 	if errs != nil && len(errs) > 0 {
 		err := ""
-		for _, e := range errs {
-			err += e.Error() + "\n"
+		for i, e := range errs {
+			suffix := "\n"
+			if i == len(errs)-1 {
+				suffix = ""
+			}
+			err += e.Error() + suffix
 		}
 		fail(err)
 	}
@@ -160,8 +175,19 @@ func getFiles() []string {
 	return files
 }
 
+type arrayFlags []string
+
+func (i *arrayFlags) String() string {
+	return strings.Join([]string(*i), " ")
+}
+
+func (i *arrayFlags) Set(value string) error {
+	*i = append(*i, value)
+	return nil
+}
+
 var configPath string
-var excludePaths string
+var excludePaths arrayFlags
 var formatterName string
 var help bool
 
@@ -173,12 +199,12 @@ func init() {
 		originalUsage()
 	}
 	const (
-		configUsage    = "path to the configuration TOML file"
-		excludeUsage   = "glob which specifies files to be excluded"
-		formatterUsage = "formatter to be used for the output"
+		configUsage    = "path to the configuration TOML file (i.e. -config myconf.toml)"
+		excludeUsage   = "list of globs which specify files to be excluded (i.e. -exclude foo/...)"
+		formatterUsage = "formatter to be used for the output (i.e. -formatter cli)"
 	)
 	flag.StringVar(&configPath, "config", "", configUsage)
-	flag.StringVar(&excludePaths, "exclude", "", excludeUsage)
+	flag.Var(&excludePaths, "exclude", excludeUsage)
 	flag.StringVar(&formatterName, "formatter", "", formatterUsage)
 	flag.Parse()
 }
