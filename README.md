@@ -75,7 +75,7 @@ The `Arguments` type is an alias of the type `[]interface{}` which means that yo
 
 ```toml
 [rule.ban-struct-name]
-  arguments: ["Foo"]
+  arguments = ["Foo"]
 ```
 
 With the snippet above we:
