@@ -148,9 +148,13 @@ func getFiles() []string {
 		fail("files not specified")
 	}
 
-	files, err := dots.Resolve(globs, strings.Split(excludePaths, " "))
-	if err != nil {
-		fail(err.Error())
+	files, errs := dots.Resolve(globs, strings.Split(excludePaths, " "))
+	if errs != nil && len(errs) > 0 {
+		err := ""
+		for _, e := range errs {
+			err += e.Error() + "\n"
+		}
+		fail(err)
 	}
 
 	return files
