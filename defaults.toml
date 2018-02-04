@@ -1,6 +1,8 @@
-ignore-generated-header = true
+ignoreGeneratedHeader = true
 severity = "warning"
 confidence = 0.8
+errorCode = 0
+warningCode = 0
 
 [rule.package-comments]
 [rule.else]

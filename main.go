@@ -50,10 +50,10 @@ func main() {
 			continue
 		}
 		if exitCode == 0 {
-			exitCode = 1
+			exitCode = config.WarningCode
 		}
 		if c, ok := config.Rules[f.RuleName]; ok && c.Severity == lint.SeverityError {
-			exitCode = 2
+			exitCode = config.ErrorCode
 		}
 		formatChan <- f
 	}
