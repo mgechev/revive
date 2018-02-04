@@ -54,6 +54,52 @@ revive -config config.toml -formatter cli github.com/mgechev/revive
 
 This will use `config.toml`, the `cli` formatter, and will run linting over the `github.com/mgechev/revive` package.
 
+## Extension
+
+The tool can be extended with custom rules or formatters. This section contains additional information on how to implement such.
+
+**To extend the linter with a custom rule or a formatter you'll have to push it to this repository**. This is due to the limited `-buildmode=plugin` support which [works only on Linux](https://golang.org/pkg/plugin/).
+
+### Custom Rule
+
+Each rule needs to implement the `lint.Rule` interface:
+
+```go
+type Rule interface {
+	Name() string
+	Apply(*File, Arguments) []Failure
+}
+```
+
+The `Arguments` type is an alias of the type `[]interface{}` which means that you can pass arguments from any type to your rule. Let's suppose we have developed a rule called `BanStructNameRule` which disallow us to name a structure with given identifier. We can set the banned identifier by using the TOML configuration file:
+
+```toml
+[rule.ban-struct-name]
+  arguments: ["Foo"]
+```
+
+With the snippet above we:
+
+* Enable the rule `ban-struct-name` which is supposed to be the value returned by the `Name()` method of our rule.
+* Pass an argument with value `"Foo"` to the `Apply` method of the rule once invoked with a file.
+
+A sample rule implementation can be found [here](/rule/argument-limit.go).
+
+### Custom Formatter
+
+Each formatter needs to implement the following interface:
+
+```go
+type Formatter interface {
+	Format(<-chan Failure, RulesConfig) (string, error)
+	Name() string
+}
+```
+
+The `Format` method accepts a channel of `Failure` instances and the configuration the enabled rules. The `Name()` method should return an string different from the names of the already existing rules.
+
+For a sample formatter, take a look at [this file](/formatter/json.go).
+
 ## License
 
 MIT
