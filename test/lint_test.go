@@ -1,12 +1,4 @@
-// Copyright (c) 2013 The Go Authors. All rights reserved.
-//
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file or at
-// https://developers.google.com/open-source/licenses/bsd.
-
-// The code contains changes from the original source.
-
-package testutil
+package test
 
 import (
 	"bufio"
@@ -56,21 +48,6 @@ var rules = []lint.Rule{
 	&rule.ContextArgumentsRule{},
 }
 
-func TestCyclomatic(t *testing.T) {
-	testRule(t, "cyclomatic", &rule.CyclomaticRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{int64(1)},
-	})
-	testRule(t, "cyclomatic-2", &rule.CyclomaticRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{int64(3)},
-	})
-}
-
-func TestMaxPublicStructs(t *testing.T) {
-	testRule(t, "max-public-structs", &rule.MaxPublicStructsRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{int64(1)},
-	})
-}
-
 func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.RuleConfig) {
 	baseDir := "../fixtures/"
 	filename = filename + ".go"
@@ -82,17 +59,14 @@ func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.Rul
 	if err != nil {
 		t.Fatalf("Cannot get file info for %s: %v", rule.Name(), err)
 	}
-	ins := parseInstructions(t, filename, src)
-	if ins == nil {
-		t.Errorf("Test file %v does not have instructions", filename)
-		return
-	}
-	if config == nil {
-		assertFailures(t, baseDir, stat, src, []lint.Rule{rule}, map[string]lint.RuleConfig{})
-		return
-	}
 	c := map[string]lint.RuleConfig{}
-	c[rule.Name()] = *config[0]
+	if config != nil {
+		c[rule.Name()] = *config[0]
+	}
+	if parseInstructions(t, filename, src) == nil {
+		assertSuccess(t, baseDir, stat, src, []lint.Rule{rule}, c)
+		return
+	}
 	assertFailures(t, baseDir, stat, src, []lint.Rule{rule}, c)
 }
 
@@ -103,6 +77,11 @@ func TestAll(t *testing.T) {
 		"cyclomatic.go":         true,
 		"cyclomatic-2.go":       true,
 		"max-public-structs.go": true,
+		"lint-file-header1.go":  true,
+		"lint-file-header2.go":  true,
+		"lint-file-header3.go":  true,
+		"lint-file-header4.go":  true,
+		"lint-file-header5.go":  true,
 	}
 
 	rx, err := regexp.Compile(*lintMatch)
@@ -136,6 +115,28 @@ func TestAll(t *testing.T) {
 			continue
 		}
 	}
+}
+
+func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, src []byte, rules []lint.Rule, config map[string]lint.RuleConfig) error {
+	l := lint.New(func(file string) ([]byte, error) {
+		return ioutil.ReadFile(baseDir + file)
+	})
+
+	ps, err := l.Lint([]string{fi.Name()}, rules, lint.Config{
+		Rules: config,
+	})
+	if err != nil {
+		return err
+	}
+
+	failures := ""
+	for p := range ps {
+		failures += p.Failure
+	}
+	if failures != "" {
+		t.Errorf("Expected the rule to pass but got the following failures: %s", failures)
+	}
+	return nil
 }
 
 func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, rules []lint.Rule, config map[string]lint.RuleConfig) error {
