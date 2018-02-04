@@ -7,7 +7,8 @@ import (
 	"os"
 	"strings"
 
-	zglob "github.com/mattn/go-zglob"
+	"github.com/mgechev/dots"
+
 	"github.com/mgechev/revive/formatter"
 
 	"github.com/BurntSushi/toml"
@@ -147,47 +148,16 @@ func getFiles() []string {
 		fail("files not specified")
 	}
 
-	var matches []string
-	for _, g := range globs {
-		m, err := zglob.Glob(g)
-		if err != nil {
-			fail(err.Error())
-		}
-		for _, f := range m {
-			if strings.HasSuffix(f, ".go") {
-				matches = append(matches, f)
-			}
-		}
+	files, err := dots.Resolve(globs, strings.Split(excludePaths, " "))
+	if err != nil {
+		fail(err.Error())
 	}
 
-	if excludeGlobs == "" {
-		return matches
-	}
-
-	excluded := map[string]bool{}
-	excludeGlobSlice := strings.Split(excludeGlobs, " ")
-	for _, g := range excludeGlobSlice {
-		m, err := zglob.Glob(g)
-		if err != nil {
-			fail("error while parsing glob from exclude " + err.Error())
-		}
-		for _, match := range m {
-			excluded[match] = true
-		}
-	}
-
-	var finalMatches []string
-	for _, m := range matches {
-		if _, ok := excluded[m]; !ok {
-			finalMatches = append(finalMatches, m)
-		}
-	}
-
-	return finalMatches
+	return files
 }
 
 var configPath string
-var excludeGlobs string
+var excludePaths string
 var formatterName string
 var help bool
 
@@ -204,7 +174,7 @@ func init() {
 		formatterUsage = "formatter to be used for the output"
 	)
 	flag.StringVar(&configPath, "config", "", configUsage)
-	flag.StringVar(&excludeGlobs, "exclude", "", excludeUsage)
+	flag.StringVar(&excludePaths, "exclude", "", excludeUsage)
 	flag.StringVar(&formatterName, "formatter", "", formatterUsage)
 	flag.Parse()
 }
