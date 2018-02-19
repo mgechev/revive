@@ -65,6 +65,14 @@ This will use `config.toml`, the `cli` formatter, and will run linting over the 
 | `cyclomatic`        | int (for instance, `9`) |               Sets restriction ot maximum Cyclomatic complexity. |
 | `dot-imports`       |    Not configurable     |                                             Forbids `.` imports. |
 
+## Available Formatters
+
+This section lists all the available formatters and provides a screenshot for each one.
+
+### CLI
+
+![CLI formatter](/assets/cli-formatter.png)
+
 ## Extension
 
 The tool can be extended with custom rules or formatters. This section contains additional information on how to implement such.
