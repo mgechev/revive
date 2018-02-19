@@ -9,13 +9,13 @@ Fast, configurable, extensible, flexible, and beautiful linter for Go.
 Here's how `revive` is different from `golint`:
 
 * Allows you to enable or disable rules using a configuration file.
-* Allows you to configure the linting rules with a configuration file.
+* Allows you to configure the linting rules with a TOML file.
 * Provides functionality to disable a specific rule or the entire linter for a file or a range of lines.
 * Provides more rules compared to `golint`.
 * Provides multiple formatters which let you customize the output.
 * Allows you to customize the return code for the entire linter or based on the failure of only some rules.
 * Open for addition of new rules or formatters.
-* Faster since it runs the rules over each file in a separate goroutine.
+* Faster. It runs the rules over each file in a separate goroutine.
 
 ## Usage
 
@@ -23,7 +23,7 @@ Here's how `revive` is different from `golint`:
 
 ### Command Line Flags
 
-Revive accepts only three command line parameters:
+Revive accepts three command line parameters:
 
 * `config` - path to config file in TOML format.
 * `exclude` - pattern for files/directories/packages to be excluded for linting. You can specify the files you want to exclude for linting either as package name (i.e. `github.com/mgechev/revive`), list them as individual files (i.e. `file.go file2.go`), directories (i.e. `./foo/...`), or any combination of the three.
@@ -38,13 +38,13 @@ Revive can be configured with a TOML file
 
 ### Default Configuration
 
-The default configuration of `revive` can be found at `defaults.toml`. This will enable all rules available in `golint` and use their default configuration (i.e. the config which is hardcoded in `golint`).
+The default configuration of `revive` can be found at `defaults.toml`. This will enable all rules available in `golint` and use their default configuration (i.e. the way they are hardcoded in `golint`).
 
 ```shell
 revive -config defaults.toml github.com/mgechev/revive
 ```
 
-This will use `defaults.toml`, the `default` formatter, and will run linting over the `github.com/mgechev/revive` package.
+This will use the configuration file `defaults.toml`, the `default` formatter, and will run linting over the `github.com/mgechev/revive` package.
 
 ### Recommended Configuration
 
@@ -52,13 +52,13 @@ This will use `defaults.toml`, the `default` formatter, and will run linting ove
 revive -config config.toml -formatter cli github.com/mgechev/revive
 ```
 
-This will use `config.toml`, the `cli` formatter, and will run linting over the `github.com/mgechev/revive` package.
+This will use `config.toml`, the `cli` formatter, and will run linting over the `github.com/mgechev/revive` package. Keep in mind that the `cli` formatter performs aggregation and grouping of the discovered problems in your code. This means that the output will be buffered and printed at once. If you want a streaming output use `default`.
 
 ## Extension
 
 The tool can be extended with custom rules or formatters. This section contains additional information on how to implement such.
 
-**To extend the linter with a custom rule or a formatter you'll have to push it to this repository**. This is due to the limited `-buildmode=plugin` support which [works only on Linux](https://golang.org/pkg/plugin/).
+**To extend the linter with a custom rule or a formatter you'll have to push it to this repository**. This is due to the limited `-buildmode=plugin` support which [works only on Linux (with known issues)](https://golang.org/pkg/plugin/).
 
 ### Custom Rule
 
@@ -71,7 +71,11 @@ type Rule interface {
 }
 ```
 
-The `Arguments` type is an alias of the type `[]interface{}` which means that you can pass arguments from any type to your rule. Let's suppose we have developed a rule called `BanStructNameRule` which disallow us to name a structure with given identifier. We can set the banned identifier by using the TOML configuration file:
+The `Arguments` type is an alias of the type `[]interface{}`. The arguments of the rule are passed from the configuration file.
+
+#### Example
+
+Let's suppose we have developed a rule called `BanStructNameRule` which disallow us to name a structure with given identifier. We can set the banned identifier by using the TOML configuration file:
 
 ```toml
 [rule.ban-struct-name]
@@ -80,8 +84,8 @@ The `Arguments` type is an alias of the type `[]interface{}` which means that yo
 
 With the snippet above we:
 
-* Enable the rule `ban-struct-name` which is supposed to be the value returned by the `Name()` method of our rule.
-* Pass an argument with value `"Foo"` to the `Apply` method of the rule once invoked with a file.
+* Enable the rule with name `ban-struct-name`. The `Name()` method of our rule should return a string which matches `ban-struct-name`.
+* Configure the rule with the argument `Foo`. The list of arguments will be passed to `Apply(*File, Arguments)` together with the target file we're linting currently.
 
 A sample rule implementation can be found [here](/rule/argument-limit.go).
 
@@ -96,7 +100,7 @@ type Formatter interface {
 }
 ```
 
-The `Format` method accepts a channel of `Failure` instances and the configuration the enabled rules. The `Name()` method should return an string different from the names of the already existing rules.
+The `Format` method accepts a channel of `Failure` instances and the configuration of the enabled rules. The `Name()` method should return a string different from the names of the already existing rules. This string is used when specifying the formatter when invoking the `revive` CLI tool.
 
 For a sample formatter, take a look at [this file](/formatter/json.go).
 
