@@ -54,6 +54,17 @@ revive -config config.toml -formatter cli github.com/mgechev/revive
 
 This will use `config.toml`, the `cli` formatter, and will run linting over the `github.com/mgechev/revive` package. Keep in mind that the `cli` formatter performs aggregation and grouping of the discovered problems in your code. This means that the output will be buffered and printed at once. If you want a streaming output use `default`.
 
+## Available Rules
+
+| Name                |      Configuration      |                                                      Description |
+| ------------------- | :---------------------: | ---------------------------------------------------------------: |
+| `argument-limit`    | int (for instance, `4`) | Specifies the maximum number of arguments a function can receive |
+| `blank-imports`     |    Not configurable     |                                          Disallows blank imports |
+| `context-arguments` |    Not configurable     |    `context.Context` should be the first argument of a function. |
+| `context-key-type`  |    Not configurable     |       Disallows the usage of basic types in `context.WithValue`. |
+| `cyclomatic`        | int (for instance, `9`) |               Sets restriction ot maximum Cyclomatic complexity. |
+| `dot-imports`       |    Not configurable     |                                             Forbids `.` imports. |
+
 ## Extension
 
 The tool can be extended with custom rules or formatters. This section contains additional information on how to implement such.
