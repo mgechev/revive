@@ -58,12 +58,12 @@ This will use `config.toml`, the `cli` formatter, and will run linting over the 
 
 | Name                |      Configuration      |                                                      Description |
 | ------------------- | :---------------------: | ---------------------------------------------------------------: |
-| `argument-limit`    | int (for instance, `4`) | Specifies the maximum number of arguments a function can receive |
+| `cyclomatic`        | int (for instance, `9`) |               Sets restriction ot maximum Cyclomatic complexity. |
+| `context-key-type`  |    Not configurable     |       Disallows the usage of basic types in `context.WithValue`. |
+| `dot-imports`       |    Not configurable     |                                             Forbids `.` imports. |
 | `blank-imports`     |    Not configurable     |                                          Disallows blank imports |
 | `context-arguments` |    Not configurable     |    `context.Context` should be the first argument of a function. |
-| `context-key-type`  |    Not configurable     |       Disallows the usage of basic types in `context.WithValue`. |
-| `cyclomatic`        | int (for instance, `9`) |               Sets restriction ot maximum Cyclomatic complexity. |
-| `dot-imports`       |    Not configurable     |                                             Forbids `.` imports. |
+| `argument-limit`    | int (for instance, `4`) | Specifies the maximum number of arguments a function can receive |
 
 ## Available Formatters
 
