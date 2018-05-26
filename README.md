@@ -22,6 +22,12 @@ Here's how `revive` is different from `golint`:
 
 Since the default behavior of `revive` is compatible with `golint`, without providing any additional flags, the only difference you'd notice is faster execution.
 
+### Installation
+
+```bash
+go get -u github.com/mgechev/revive
+```
+
 ### Command Line Flags
 
 `revive` accepts three command line parameters:
