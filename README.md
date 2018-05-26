@@ -69,9 +69,17 @@ This will use `config.toml`, the `stylish` formatter, and will run linting over 
 
 This section lists all the available formatters and provides a screenshot for each one.
 
+### Friendly
+
+![Friendly formatter](/assets/friendly-formatter.png)
+
 ### Stylish
 
 ![Stylish formatter](/assets/stylish-formatter.png)
+
+### Default
+
+![Default formatter](/assets/default-formatter.png)
 
 ## Extension
 
