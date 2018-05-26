@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/mgechev/revive.svg?branch=master)](https://travis-ci.org/mgechev/revive)
+
 # revive
 
 Fast, configurable, extensible, flexible, and beautiful linter for Go.
