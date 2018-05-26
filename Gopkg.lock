@@ -33,12 +33,9 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/mattn/go-zglob"
-  packages = [
-    ".",
-    "fastwalk"
-  ]
-  revision = "4959821b481786922ac53e7ef25c61ae19fb7c36"
+  name = "github.com/mgechev/dots"
+  packages = ["."]
+  revision = "f7959a15f0294a13590e9706f7f87fb2a6048ba4"
 
 [[projects]]
   branch = "master"
@@ -71,6 +68,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c1a4276ae28575f764b11ca61ed7d86ce972bc09fbc476dd15ae918166258771"
+  inputs-digest = "55ca94323f5133e6922ce74ad093146191929c198c0aa732c84e7ee6070af701"
   solver-name = "gps-cdcl"
   solver-version = 1

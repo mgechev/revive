@@ -4,6 +4,6 @@ go:
   - "1.10.x"
   - master
 
-script:
-  - go build
-  - go test ./test/...
+install: make install
+script: make build && make test.all
+
