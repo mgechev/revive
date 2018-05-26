@@ -50,6 +50,7 @@ var allRules = append([]lint.Rule{
 
 var allFormatters = []lint.Formatter{
 	&formatter.Stylish{},
+	&formatter.Friendly{},
 	&formatter.JSON{},
 	&formatter.Default{},
 }

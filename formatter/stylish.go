@@ -9,11 +9,6 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-const (
-	errorEmoji   = ""
-	warningEmoji = ""
-)
-
 // Stylish is an implementation of the Formatter interface
 // which formats the errors to JSON.
 type Stylish struct {
@@ -44,9 +39,8 @@ func (f *Stylish) Format(failures <-chan lint.Failure, config lint.RulesConfig) 
 
 	for f := range failures {
 		total++
-		currentType := lint.SeverityWarning
-		if config, ok := config[f.RuleName]; ok && config.Severity == lint.SeverityError {
-			currentType = lint.SeverityError
+		currentType := severity(config, f)
+		if currentType == lint.SeverityError {
 			totalErrors++
 		}
 		result = append(result, formatFailure(f, lint.Severity(currentType)))

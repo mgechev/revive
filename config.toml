@@ -5,6 +5,7 @@ confidence = 0.8
 [rule.package-comments]
 [rule.else]
 [rule.names]
+  severity = "error"
 [rule.var-declaration]
 [rule.unexported-return]
 [rule.time-names]
