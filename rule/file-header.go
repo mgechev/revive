@@ -1,7 +1,6 @@
 package rule
 
 import (
-	"fmt"
 	"go/ast"
 	"regexp"
 
@@ -76,9 +75,6 @@ func (w lintFileHeader) Visit(n ast.Node) ast.Visitor {
 		comment += text
 	}
 
-	fmt.Println("#############")
-	fmt.Println(comment)
-	fmt.Println("#############")
 	if !w.regex.Match([]byte(comment)) {
 		w.onFailure(failure)
 	}

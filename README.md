@@ -96,14 +96,31 @@ This will use `config.toml`, the `friendly` formatter, and will run linting over
 
 ## Available Rules
 
-| Name                |      Configuration      |                                                      Description |
-| ------------------- | :---------------------: | ---------------------------------------------------------------: |
-| `cyclomatic`        | int (for instance, `9`) |               Sets restriction ot maximum Cyclomatic complexity. |
-| `context-key-type`  |    Not configurable     |       Disallows the usage of basic types in `context.WithValue`. |
-| `dot-imports`       |    Not configurable     |                                             Forbids `.` imports. |
-| `blank-imports`     |    Not configurable     |                                          Disallows blank imports |
-| `context-arguments` |    Not configurable     |    `context.Context` should be the first argument of a function. |
-| `argument-limit`    | int (for instance, `4`) | Specifies the maximum number of arguments a function can receive |
+| Name                  |  Configuration   |                           Description                            | In `golint` |
+| --------------------- | :--------------: | :--------------------------------------------------------------: | :---------: |
+| `blank-imports`       | Not configurable |                     Disallows blank imports                      |     yes     |
+| `context-arguments`   | Not configurable |  `context.Context` should be the first argument of a function.   |     yes     |
+| `context-key-type`    | Not configurable |    Disallows the usage of basic types in `context.WithValue`.    |     yes     |
+| `dot-imports`         | Not configurable |                       Forbids `.` imports.                       |     yes     |
+| `error-return`        | Not configurable |            The error return parameter should be last.            |     yes     |
+| `error-strings`       | Not configurable |                Conventions around error strings.                 |     yes     |
+| `errors`              | Not configurable |                    Naming of error variables.                    |     yes     |
+| `exported`            | Not configurable |      Naming and commenting conventions on exported symbols.      |     yes     |
+| `if-return`           | Not configurable |              Redundant if when returning an error.               |     yes     |
+| `increment-decrement` | Not configurable |      Use `i++` and `i--` instead of `i += 1` and `i -= 1`.       |     yes     |
+| `names`               | Not configurable |                          Naming rules.                           |     yes     |
+| `package-comments`    | Not configurable |                 Package commenting conventions.                  |     yes     |
+| `range`               | Not configurable |  Prevents redundant variables when iterating over a collection.  |     yes     |
+| `receiver-name`       | Not configurable |           Conventions around the naming of receivers.            |     yes     |
+| `time-name`           | Not configurable |         Conventions around the naming of time variables.         |     yes     |
+| `unexpected-return`   | Not configurable |       Warns when a public return is from unexported type.        |     yes     |
+| `unexpected-return`   | Not configurable |            Conventions around variable declarations.             |     yes     |
+| `indent-error-flow`   | Not configurable |               Prevents redundant else statements.                |     yes     |
+| `errorf`              | Not configurable | Should replace `error.New(fmt.Sprintf())` with `error.Errorf()`  |     yes     |
+| `argument-limit`      |       int        | Specifies the maximum number of arguments a function can receive |     no      |
+| `cyclomatic`          |       int        |       Sets restriction for maximum Cyclomatic complexity.        |     no      |
+| `max-public-structs`  |       int        |         The maximum number of public structs in a file.          |     no      |
+| `file-header`         |      string      |               Header which each file should have.                |     no      |
 
 ## Available Formatters
 

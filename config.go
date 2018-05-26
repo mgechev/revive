@@ -28,7 +28,7 @@ var defaultRules = []lint.Rule{
 	&rule.BlankImportsRule{},
 	&rule.ExportedRule{},
 	&rule.NamesRule{},
-	&rule.ElseRule{},
+	&rule.IndentErrorFlowRule{},
 	&rule.IfReturnRule{},
 	&rule.RangeRule{},
 	&rule.ErrorfRule{},

@@ -7,11 +7,11 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ElseRule lints given else constructs.
-type ElseRule struct{}
+// IndentErrorFlowRule lints given else constructs.
+type IndentErrorFlowRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ElseRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *IndentErrorFlowRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -24,8 +24,8 @@ func (r *ElseRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failu
 }
 
 // Name returns the rule name.
-func (r *ElseRule) Name() string {
-	return "else"
+func (r *IndentErrorFlowRule) Name() string {
+	return "indent-error-flow"
 }
 
 type lintElse struct {
