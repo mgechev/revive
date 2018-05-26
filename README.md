@@ -11,31 +11,70 @@ Here's how `revive` is different from `golint`:
 * Allows you to enable or disable rules using a configuration file.
 * Allows you to configure the linting rules with a TOML file.
 * Provides functionality to disable a specific rule or the entire linter for a file or a range of lines.
-* Provides more rules compared to `golint`.
+  * `golint` allows this only for generated files.
 * Provides multiple formatters which let you customize the output.
 * Allows you to customize the return code for the entire linter or based on the failure of only some rules.
 * Open for addition of new rules or formatters.
+* Provides more rules compared to `golint`.
 * Faster. It runs the rules over each file in a separate goroutine.
 
 ## Usage
 
-`Revive` is **configurable** linter which you can fit your needs. By default you can use `revive` with the default configuration options. This way the linter will work the same way `golint` does.
+Since the default behavior of `revive` is compatible with `golint`, without providing any additional flags, the only difference you'd notice is faster execution.
 
 ### Command Line Flags
 
-Revive accepts three command line parameters:
+`revive` accepts three command line parameters:
 
-* `config` - path to config file in TOML format.
-* `exclude` - pattern for files/directories/packages to be excluded for linting. You can specify the files you want to exclude for linting either as package name (i.e. `github.com/mgechev/revive`), list them as individual files (i.e. `file.go file2.go`), directories (i.e. `./foo/...`), or any combination of the three.
-* `formatter` - formatter to be used for the output. The currently available formatters are:
+* `-config [PATH]` - path to config file in TOML format.
+* `-exclude [PATTERN]` - pattern for files/directories/packages to be excluded for linting. You can specify the files you want to exclude for linting either as package name (i.e. `github.com/mgechev/revive`), list them as individual files (i.e. `file.go`), directories (i.e. `./foo/...`), or any combination of the three.
+* `-formatter [NAME]` - formatter to be used for the output. The currently available formatters are:
   * `default` - will output the failures the same way that `golint` does.
   * `json` - outputs the failures in JSON format.
   * `friendly` - outputs the failures when found. Shows summary of all the failures.
   * `stylish` - formats the failures in a table. Keep in mind that it doesn't stream the output so it might be perceived as slower compared to others.
 
+### Sample Invocations
+
+```shell
+revive -config revive.toml -exclude file1.go -exclude file2.go -formatter friendly github.com/mgechev/revive package/...
+```
+
+* The command above will use the configuration from `revive.toml`
+* `revive` will ignore `file1.go` and `file2.go`
+* The output will be formatted with the `friendly` formatter
+* The linter will analyze `github.com/mgechev/revive` and the files in `package`
+
 ### Configuration
 
-Revive can be configured with a TOML file
+`revive` can be configured with a TOML file. Here's a sample configuration with explanation for the individual properties:
+
+```toml
+# Ignores files with "GENERATED" header, similar to golint
+ignoreGeneratedHeader = true
+
+# Sets the default severity to "warning"
+severity = "warning"
+
+# Sets the default failure confidence. This means that linting errors
+# with less than 0.8 confidence will be ignored.
+confidence = 0.8
+
+# Sets the error code for failures with severity "error"
+errorCode = 0
+
+# Sets the error code for failures with severity "warning"
+warningCode = 0
+
+# Configuration of the `cyclomatic` rule. Here we specify that
+# the rule should fail if it detects code with higher complexity than 10.
+[rule.cyclomatic]
+  arguments = [10]
+
+# Sets the severity of the `package-comments` rule to "error".
+[rule.package-comments]
+  severity = "error"
+```
 
 ### Default Configuration
 
@@ -50,10 +89,10 @@ This will use the configuration file `defaults.toml`, the `default` formatter, a
 ### Recommended Configuration
 
 ```shell
-revive -config config.toml -formatter stylish github.com/mgechev/revive
+revive -config config.toml -formatter friendly github.com/mgechev/revive
 ```
 
-This will use `config.toml`, the `stylish` formatter, and will run linting over the `github.com/mgechev/revive` package. Keep in mind that the `stylish` formatter performs aggregation and grouping of the discovered problems in your code. This means that the output will be buffered and printed at once. If you want a streaming output use `friendly` or `default`.
+This will use `config.toml`, the `friendly` formatter, and will run linting over the `github.com/mgechev/revive` package.
 
 ## Available Rules
 
@@ -82,11 +121,11 @@ This section lists all the available formatters and provides a screenshot for ea
 
 ![Default formatter](/assets/default-formatter.png)
 
-## Extension
+## Extensibility
 
 The tool can be extended with custom rules or formatters. This section contains additional information on how to implement such.
 
-**To extend the linter with a custom rule or a formatter you'll have to push it to this repository**. This is due to the limited `-buildmode=plugin` support which [works only on Linux (with known issues)](https://golang.org/pkg/plugin/).
+**To extend the linter with a custom rule or a formatter you'll have to push it to this repository or fork it**. This is due to the limited `-buildmode=plugin` support which [works only on Linux (with known issues)](https://golang.org/pkg/plugin/).
 
 ### Custom Rule
 

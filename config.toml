@@ -1,4 +1,4 @@
-ignore-generated-header = true
+ignoreGeneratedHeader = true
 severity = "warning"
 confidence = 0.8
 
