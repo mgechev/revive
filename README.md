@@ -96,31 +96,33 @@ This will use `config.toml`, the `friendly` formatter, and will run linting over
 
 ## Available Rules
 
-| Name                  |  Configuration   |                           Description                            | In `golint` |
-| --------------------- | :--------------: | :--------------------------------------------------------------: | :---------: |
-| `blank-imports`       | Not configurable |                     Disallows blank imports                      |     yes     |
-| `context-arguments`   | Not configurable |  `context.Context` should be the first argument of a function.   |     yes     |
-| `context-key-type`    | Not configurable |    Disallows the usage of basic types in `context.WithValue`.    |     yes     |
-| `dot-imports`         | Not configurable |                       Forbids `.` imports.                       |     yes     |
-| `error-return`        | Not configurable |            The error return parameter should be last.            |     yes     |
-| `error-strings`       | Not configurable |                Conventions around error strings.                 |     yes     |
-| `errors`              | Not configurable |                    Naming of error variables.                    |     yes     |
-| `exported`            | Not configurable |      Naming and commenting conventions on exported symbols.      |     yes     |
-| `if-return`           | Not configurable |              Redundant if when returning an error.               |     yes     |
-| `increment-decrement` | Not configurable |      Use `i++` and `i--` instead of `i += 1` and `i -= 1`.       |     yes     |
-| `names`               | Not configurable |                          Naming rules.                           |     yes     |
-| `package-comments`    | Not configurable |                 Package commenting conventions.                  |     yes     |
-| `range`               | Not configurable |  Prevents redundant variables when iterating over a collection.  |     yes     |
-| `receiver-name`       | Not configurable |           Conventions around the naming of receivers.            |     yes     |
-| `time-name`           | Not configurable |         Conventions around the naming of time variables.         |     yes     |
-| `unexpected-return`   | Not configurable |       Warns when a public return is from unexported type.        |     yes     |
-| `unexpected-return`   | Not configurable |            Conventions around variable declarations.             |     yes     |
-| `indent-error-flow`   | Not configurable |               Prevents redundant else statements.                |     yes     |
-| `errorf`              | Not configurable | Should replace `error.New(fmt.Sprintf())` with `error.Errorf()`  |     yes     |
-| `argument-limit`      |       int        | Specifies the maximum number of arguments a function can receive |     no      |
-| `cyclomatic`          |       int        |       Sets restriction for maximum Cyclomatic complexity.        |     no      |
-| `max-public-structs`  |       int        |         The maximum number of public structs in a file.          |     no      |
-| `file-header`         |      string      |               Header which each file should have.                |     no      |
+List of all available rules. The rules ported from `golint` are left unchanged and indicated in the `golit` column.
+
+| Name                  | Config |                           Description                            | `golint` |
+| --------------------- | :----: | :--------------------------------------------------------------: | :------: |
+| `blank-imports`       |  N/A   |                     Disallows blank imports                      |   yes    |
+| `context-arguments`   |  N/A   |  `context.Context` should be the first argument of a function.   |   yes    |
+| `context-key-type`    |  N/A   |    Disallows the usage of basic types in `context.WithValue`.    |   yes    |
+| `dot-imports`         |  N/A   |                       Forbids `.` imports.                       |   yes    |
+| `error-return`        |  N/A   |            The error return parameter should be last.            |   yes    |
+| `error-strings`       |  N/A   |                Conventions around error strings.                 |   yes    |
+| `errors`              |  N/A   |                    Naming of error variables.                    |   yes    |
+| `exported`            |  N/A   |      Naming and commenting conventions on exported symbols.      |   yes    |
+| `if-return`           |  N/A   |              Redundant if when returning an error.               |   yes    |
+| `increment-decrement` |  N/A   |      Use `i++` and `i--` instead of `i += 1` and `i -= 1`.       |   yes    |
+| `names`               |  N/A   |                          Naming rules.                           |   yes    |
+| `package-comments`    |  N/A   |                 Package commenting conventions.                  |   yes    |
+| `range`               |  N/A   |  Prevents redundant variables when iterating over a collection.  |   yes    |
+| `receiver-name`       |  N/A   |           Conventions around the naming of receivers.            |   yes    |
+| `time-name`           |  N/A   |         Conventions around the naming of time variables.         |   yes    |
+| `unexpected-return`   |  N/A   |       Warns when a public return is from unexported type.        |   yes    |
+| `unexpected-return`   |  N/A   |            Conventions around variable declarations.             |   yes    |
+| `indent-error-flow`   |  N/A   |               Prevents redundant else statements.                |   yes    |
+| `errorf`              |  N/A   | Should replace `error.New(fmt.Sprintf())` with `error.Errorf()`  |   yes    |
+| `argument-limit`      |  int   | Specifies the maximum number of arguments a function can receive |    no    |
+| `cyclomatic`          |  int   |       Sets restriction for maximum Cyclomatic complexity.        |    no    |
+| `max-public-structs`  |  int   |         The maximum number of public structs in a file.          |    no    |
+| `file-header`         | string |               Header which each file should have.                |    no    |
 
 ## Available Formatters
 
