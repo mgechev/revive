@@ -18,6 +18,8 @@ Here's how `revive` is different from `golint`:
 * Provides more rules compared to `golint`.
 * Faster. It runs the rules over each file in a separate goroutine.
 
+_The deformed ears of this Gopher are well known but its so adorable that they are negligible_.
+
 ## Usage
 
 Since the default behavior of `revive` is compatible with `golint`, without providing any additional flags, the only difference you'd notice is faster execution.
