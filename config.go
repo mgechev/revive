@@ -49,7 +49,7 @@ var allRules = append([]lint.Rule{
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
-	&formatter.CLI{},
+	&formatter.Stylish{},
 	&formatter.JSON{},
 	&formatter.Default{},
 }
@@ -202,7 +202,7 @@ func init() {
 	const (
 		configUsage    = "path to the configuration TOML file (i.e. -config myconf.toml)"
 		excludeUsage   = "list of globs which specify files to be excluded (i.e. -exclude foo/...)"
-		formatterUsage = "formatter to be used for the output (i.e. -formatter cli)"
+		formatterUsage = "formatter to be used for the output (i.e. -formatter stylish)"
 	)
 	flag.StringVar(&configPath, "config", "", configUsage)
 	flag.Var(&excludePaths, "exclude", excludeUsage)

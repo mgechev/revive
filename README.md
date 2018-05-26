@@ -30,7 +30,7 @@ Revive accepts three command line parameters:
 * `formatter` - formatter to be used for the output. The currently available formatters are:
   * `default` - will output the warnings the same way that `golint` does.
   * `json` - outputs the warnings in JSON format.
-  * `cli` - formats the warnings in a table.
+  * `stylish` - formats the warnings in a table.
 
 ### Configuration
 
@@ -49,10 +49,10 @@ This will use the configuration file `defaults.toml`, the `default` formatter, a
 ### Recommended Configuration
 
 ```shell
-revive -config config.toml -formatter cli github.com/mgechev/revive
+revive -config config.toml -formatter stylish github.com/mgechev/revive
 ```
 
-This will use `config.toml`, the `cli` formatter, and will run linting over the `github.com/mgechev/revive` package. Keep in mind that the `cli` formatter performs aggregation and grouping of the discovered problems in your code. This means that the output will be buffered and printed at once. If you want a streaming output use `default`.
+This will use `config.toml`, the `stylish` formatter, and will run linting over the `github.com/mgechev/revive` package. Keep in mind that the `stylish` formatter performs aggregation and grouping of the discovered problems in your code. This means that the output will be buffered and printed at once. If you want a streaming output use `default`.
 
 ## Available Rules
 
@@ -69,9 +69,9 @@ This will use `config.toml`, the `cli` formatter, and will run linting over the 
 
 This section lists all the available formatters and provides a screenshot for each one.
 
-### CLI
+### Stylish
 
-![CLI formatter](/assets/cli-formatter.png)
+![Stylish formatter](/assets/stylish-formatter.png)
 
 ## Extension
 

@@ -14,15 +14,15 @@ const (
 	warningEmoji = ""
 )
 
-// CLI is an implementation of the Formatter interface
+// Stylish is an implementation of the Formatter interface
 // which formats the errors to JSON.
-type CLI struct {
+type Stylish struct {
 	Metadata lint.FormatterMetadata
 }
 
 // Name returns the name of the formatter
-func (f *CLI) Name() string {
-	return "cli"
+func (f *Stylish) Name() string {
+	return "stylish"
 }
 
 func formatFailure(failure lint.Failure, severity lint.Severity) []string {
@@ -37,7 +37,7 @@ func formatFailure(failure lint.Failure, severity lint.Severity) []string {
 }
 
 // Format formats the failures gotten from the lint.
-func (f *CLI) Format(failures <-chan lint.Failure, config lint.RulesConfig) (string, error) {
+func (f *Stylish) Format(failures <-chan lint.Failure, config lint.RulesConfig) (string, error) {
 	var result [][]string
 	var totalErrors = 0
 	var total = 0
