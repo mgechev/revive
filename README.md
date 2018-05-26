@@ -28,9 +28,10 @@ Revive accepts three command line parameters:
 * `config` - path to config file in TOML format.
 * `exclude` - pattern for files/directories/packages to be excluded for linting. You can specify the files you want to exclude for linting either as package name (i.e. `github.com/mgechev/revive`), list them as individual files (i.e. `file.go file2.go`), directories (i.e. `./foo/...`), or any combination of the three.
 * `formatter` - formatter to be used for the output. The currently available formatters are:
-  * `default` - will output the warnings the same way that `golint` does.
-  * `json` - outputs the warnings in JSON format.
-  * `stylish` - formats the warnings in a table.
+  * `default` - will output the failures the same way that `golint` does.
+  * `json` - outputs the failures in JSON format.
+  * `friendly` - outputs the failures when found. Shows summary of all the failures.
+  * `stylish` - formats the failures in a table. Keep in mind that it doesn't stream the output so it might be perceived as slower compared to others.
 
 ### Configuration
 
@@ -52,7 +53,7 @@ This will use the configuration file `defaults.toml`, the `default` formatter, a
 revive -config config.toml -formatter stylish github.com/mgechev/revive
 ```
 
-This will use `config.toml`, the `stylish` formatter, and will run linting over the `github.com/mgechev/revive` package. Keep in mind that the `stylish` formatter performs aggregation and grouping of the discovered problems in your code. This means that the output will be buffered and printed at once. If you want a streaming output use `default`.
+This will use `config.toml`, the `stylish` formatter, and will run linting over the `github.com/mgechev/revive` package. Keep in mind that the `stylish` formatter performs aggregation and grouping of the discovered problems in your code. This means that the output will be buffered and printed at once. If you want a streaming output use `friendly` or `default`.
 
 ## Available Rules
 
