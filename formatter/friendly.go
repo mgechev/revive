@@ -40,16 +40,21 @@ func (f *Friendly) Name() string {
 func (f *Friendly) Format(failures <-chan lint.Failure, config lint.RulesConfig) (string, error) {
 	errorMap := map[string]int{}
 	warningMap := map[string]int{}
+	totalErrors := 0
+	totalWarnings := 0
 	for failure := range failures {
 		sev := severity(config, failure)
 		f.printFriendlyFailure(failure, sev)
 		if sev == lint.SeverityWarning {
 			warningMap[failure.RuleName] = warningMap[failure.RuleName] + 1
+			totalWarnings++
 		}
 		if sev == lint.SeverityError {
 			errorMap[failure.RuleName] = errorMap[failure.RuleName] + 1
+			totalErrors++
 		}
 	}
+	f.printSummary(totalErrors, totalWarnings)
 	f.printStatistics(color.RedString("Errors:"), errorMap)
 	f.printStatistics(color.YellowString("Warnings:"), warningMap)
 	return "", nil
@@ -77,6 +82,36 @@ func (f *Friendly) printFilePosition(failure lint.Failure) {
 type statEntry struct {
 	name     string
 	failures int
+}
+
+func (f *Friendly) printSummary(errors, warnings int) {
+	emoji := warningEmoji
+	if errors > 0 {
+		emoji = errorEmoji
+	}
+	problemsLabel := "problems"
+	if errors+warnings == 1 {
+		problemsLabel = "problem"
+	}
+	warningsLabel := "warnings"
+	if warnings == 1 {
+		warningsLabel = "warning"
+	}
+	errorsLabel := "errors"
+	if errors == 1 {
+		errorsLabel = "error"
+	}
+	str := fmt.Sprintf("%d %s (%d %s, %d %s)", errors+warnings, problemsLabel, errors, errorsLabel, warnings, warningsLabel)
+	if errors > 0 {
+		fmt.Printf("%s %s\n", emoji, color.RedString(str))
+		fmt.Println()
+		return
+	}
+	if warnings > 0 {
+		fmt.Printf("%s %s\n", emoji, color.YellowString(str))
+		fmt.Println()
+		return
+	}
 }
 
 func (f *Friendly) printStatistics(header string, stats map[string]int) {
