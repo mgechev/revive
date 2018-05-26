@@ -5,16 +5,23 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/mgechev/revive/lint"
 )
 
-const banner = `
-Welcome to:
- _ __ _____   _(_)__  _____
+var logo = color.YellowString(` _ __ _____   _(_)__  _____
 | '__/ _ \ \ / / \ \ / / _ \
 | | |  __/\ V /| |\ V /  __/
-|_|  \___| \_/ |_| \_/ \___|
-`
+|_|  \___| \_/ |_| \_/ \___|`)
+
+var call = color.MagentaString("revive -config c.toml -formatter friendly -exclude a.go -exclude b.go ./...")
+
+var banner = fmt.Sprintf(`
+%s
+
+Example:
+  %s
+`, logo, call)
 
 func main() {
 	config := getConfig()
