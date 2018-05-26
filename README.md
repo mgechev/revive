@@ -3,7 +3,7 @@
 Fast, configurable, extensible, flexible, and beautiful linter for Go.
 
 <p align="center">
-  <img src="./assets/logo.png" alt="" width="200">
+  <img src="./assets/logo.jpg" alt="" width="200">
 </p>
 
 Here's how `revive` is different from `golint`:
