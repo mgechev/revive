@@ -111,22 +111,22 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | Name                  | Config | Description                                                      | `golint` |
 | --------------------- | :----: | :--------------------------------------------------------------- | :------: |
 | `blank-imports`       |  n/a   | Disallows blank imports                                          |   yes    |
-| `context-arguments`   |  n/a   | `context.Context` should be the first argument of a function.    |   yes    |
-| `context-key-type`    |  n/a   | Disallows the usage of basic types in `context.WithValue`.       |   yes    |
+| `context-as-argument` |  n/a   | `context.Context` should be the first argument of a function.    |   yes    |
+| `context-keys-type`   |  n/a   | Disallows the usage of basic types in `context.WithValue`.       |   yes    |
 | `dot-imports`         |  n/a   | Forbids `.` imports.                                             |   yes    |
 | `error-return`        |  n/a   | The error return parameter should be last.                       |   yes    |
 | `error-strings`       |  n/a   | Conventions around error strings.                                |   yes    |
-| `errors`              |  n/a   | Naming of error variables.                                       |   yes    |
+| `error-naming`        |  n/a   | Naming of error variables.                                       |   yes    |
 | `exported`            |  n/a   | Naming and commenting conventions on exported symbols.           |   yes    |
 | `if-return`           |  n/a   | Redundant if when returning an error.                            |   yes    |
 | `increment-decrement` |  n/a   | Use `i++` and `i--` instead of `i += 1` and `i -= 1`.            |   yes    |
-| `names`               |  n/a   | Naming rules.                                                    |   yes    |
+| `var-naming`          |  n/a   | Naming rules.                                                    |   yes    |
+| `var-declaration`     |  n/a   | Reduces redundancies around variable declaration.                |   yes    |
 | `package-comments`    |  n/a   | Package commenting conventions.                                  |   yes    |
 | `range`               |  n/a   | Prevents redundant variables when iterating over a collection.   |   yes    |
-| `receiver-name`       |  n/a   | Conventions around the naming of receivers.                      |   yes    |
-| `time-name`           |  n/a   | Conventions around the naming of time variables.                 |   yes    |
-| `unexpected-return`   |  n/a   | Warns when a public return is from unexported type.              |   yes    |
-| `unexpected-return`   |  n/a   | Conventions around variable declarations.                        |   yes    |
+| `receiver-naming`     |  n/a   | Conventions around the naming of receivers.                      |   yes    |
+| `time-naming`         |  n/a   | Conventions around the naming of time variables.                 |   yes    |
+| `unexported-return`   |  n/a   | Warns when a public return is from unexported type.              |   yes    |
 | `indent-error-flow`   |  n/a   | Prevents redundant else statements.                              |   yes    |
 | `errorf`              |  n/a   | Should replace `error.New(fmt.Sprintf())` with `error.Errorf()`  |   yes    |
 | `argument-limit`      |  int   | Specifies the maximum number of arguments a function can receive |    no    |

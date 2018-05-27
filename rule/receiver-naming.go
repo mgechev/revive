@@ -7,11 +7,11 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ReceiverNameRule lints given else constructs.
-type ReceiverNameRule struct{}
+// ReceiverNamingRule lints given else constructs.
+type ReceiverNamingRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ReceiverNameRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ReceiverNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -28,8 +28,8 @@ func (r *ReceiverNameRule) Apply(file *lint.File, arguments lint.Arguments) []li
 }
 
 // Name returns the rule name.
-func (r *ReceiverNameRule) Name() string {
-	return "receiver-names"
+func (r *ReceiverNamingRule) Name() string {
+	return "receiver-naming"
 }
 
 type lintReceiverName struct {

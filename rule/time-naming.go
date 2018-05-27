@@ -9,11 +9,11 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// TimeNamesRule lints given else constructs.
-type TimeNamesRule struct{}
+// TimeNamingRule lints given else constructs.
+type TimeNamingRule struct{}
 
 // Apply applies the rule to given file.
-func (r *TimeNamesRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *TimeNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -26,8 +26,8 @@ func (r *TimeNamesRule) Apply(file *lint.File, arguments lint.Arguments) []lint.
 }
 
 // Name returns the rule name.
-func (r *TimeNamesRule) Name() string {
-	return "time-names"
+func (r *TimeNamingRule) Name() string {
+	return "time-naming"
 }
 
 type lintTimeNames struct {

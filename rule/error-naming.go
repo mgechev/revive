@@ -9,11 +9,11 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ErrorsRule lints given else constructs.
-type ErrorsRule struct{}
+// ErrorNamingRule lints given else constructs.
+type ErrorNamingRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ErrorsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ErrorNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -31,8 +31,8 @@ func (r *ErrorsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Fai
 }
 
 // Name returns the rule name.
-func (r *ErrorsRule) Name() string {
-	return "errors"
+func (r *ErrorNamingRule) Name() string {
+	return "error-naming"
 }
 
 type lintErrors struct {

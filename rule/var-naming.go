@@ -9,11 +9,11 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// NamesRule lints given else constructs.
-type NamesRule struct{}
+// VarNamingRule lints given else constructs.
+type VarNamingRule struct{}
 
 // Apply applies the rule to given file.
-func (r *NamesRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	if isTest(file) {
@@ -46,8 +46,8 @@ func (r *NamesRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Fail
 }
 
 // Name returns the rule name.
-func (r *NamesRule) Name() string {
-	return "names"
+func (r *VarNamingRule) Name() string {
+	return "var-naming"
 }
 
 func checkList(fl *ast.FieldList, thing string, w *lintNames) {

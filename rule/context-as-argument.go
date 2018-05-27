@@ -6,11 +6,11 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ContextArgumentsRule lints given else constructs.
-type ContextArgumentsRule struct{}
+// ContextAsArgumentRule lints given else constructs.
+type ContextAsArgumentRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ContextArgumentsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ContextAsArgumentRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -28,8 +28,8 @@ func (r *ContextArgumentsRule) Apply(file *lint.File, arguments lint.Arguments) 
 }
 
 // Name returns the rule name.
-func (r *ContextArgumentsRule) Name() string {
-	return "context-arguments"
+func (r *ContextAsArgumentRule) Name() string {
+	return "context-as-argument"
 }
 
 type lintContextArguments struct {

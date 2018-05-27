@@ -8,11 +8,11 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ContextKeyTypeRule lints given else constructs.
-type ContextKeyTypeRule struct{}
+// ContextKeysType lints given else constructs.
+type ContextKeysType struct{}
 
 // Apply applies the rule to given file.
-func (r *ContextKeyTypeRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ContextKeysType) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -30,8 +30,8 @@ func (r *ContextKeyTypeRule) Apply(file *lint.File, arguments lint.Arguments) []
 }
 
 // Name returns the rule name.
-func (r *ContextKeyTypeRule) Name() string {
-	return "context-key-types"
+func (r *ContextKeysType) Name() string {
+	return "context-keys-type"
 }
 
 type lintContextKeyTypes struct {

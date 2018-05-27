@@ -27,25 +27,26 @@ var defaultRules = []lint.Rule{
 	&rule.DotImportsRule{},
 	&rule.BlankImportsRule{},
 	&rule.ExportedRule{},
-	&rule.NamesRule{},
+	&rule.VarNamingRule{},
 	&rule.IndentErrorFlowRule{},
 	&rule.IfReturnRule{},
 	&rule.RangeRule{},
 	&rule.ErrorfRule{},
-	&rule.ErrorsRule{},
+	&rule.ErrorNamingRule{},
 	&rule.ErrorStringsRule{},
-	&rule.ReceiverNameRule{},
+	&rule.ReceiverNamingRule{},
 	&rule.IncrementDecrementRule{},
 	&rule.ErrorReturnRule{},
 	&rule.UnexportedReturnRule{},
-	&rule.TimeNamesRule{},
-	&rule.ContextKeyTypeRule{},
-	&rule.ContextArgumentsRule{},
+	&rule.TimeNamingRule{},
+	&rule.ContextKeysType{},
+	&rule.ContextAsArgumentRule{},
 }
 
 var allRules = append([]lint.Rule{
 	&rule.ArgumentsLimitRule{},
 	&rule.CyclomaticRule{},
+	&rule.FileHeaderRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
