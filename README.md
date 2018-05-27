@@ -200,6 +200,30 @@ The `Format` method accepts a channel of `Failure` instances and the configurati
 
 For a sample formatter, take a look at [this file](/formatter/json.go).
 
+## Speed Comparison
+
+Compared to `golint`, `revive` performs better because it lints the files for each individual rule into a separate goroutine. Here's a basic performance benchmark on MacBook Pro Early 2013 run on kubernetes:
+
+### golint
+
+```shell
+time golint kubernetes/... > /dev/null
+
+real    0m54.837s
+user    0m57.844s
+sys     0m9.146s
+```
+
+### revive
+
+```shell
+time revive kubernetes/... > /dev/null
+
+real    0m13.515s
+user    0m53.472s
+sys     0m3.199s
+```
+
 ## License
 
 MIT
