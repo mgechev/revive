@@ -4,10 +4,13 @@ confidence = 0.8
 
 [rule.blank-imports]
 [rule.context-as-argument]
+  severity = "error"
 [rule.context-keys-type]
 [rule.dot-imports]
+  severity = "error"
 [rule.error-return]
 [rule.error-strings]
+  severity = "error"
 [rule.error-naming]
 [rule.exported]
 [rule.if-return]
