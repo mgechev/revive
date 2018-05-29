@@ -76,7 +76,7 @@ func (f *Friendly) printHeaderRow(failure lint.Failure, severity lint.Severity) 
 }
 
 func (f *Friendly) printFilePosition(failure lint.Failure) {
-	fmt.Printf("  %s:%d:%d", failure.GetFilename(), failure.Position.Start.Offset, failure.Position.End.Offset)
+	fmt.Printf("  %s:%d:%d", failure.GetFilename(), failure.Position.Start.Line, failure.Position.Start.Column)
 }
 
 type statEntry struct {
