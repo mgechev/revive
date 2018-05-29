@@ -20,7 +20,7 @@ Here's how `revive` is different from `golint`:
 - `Revive` provides more rules compared to `golint`.
 - Faster. It runs the rules over each file in a separate goroutine.
 
-_The deformed ears of this Gopher are well known but its so adorable that they are negligible_.
+_Keep in mind that in some cases the glob matching may have slightly different behavir compared to [golint](https://github.com/golang/go/issues/8768)_.
 
 ## Usage
 
