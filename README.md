@@ -10,15 +10,15 @@ Fast, configurable, extensible, flexible, and beautiful linter for Go.
 
 Here's how `revive` is different from `golint`:
 
-* Allows you to enable or disable rules using a configuration file.
-* Allows you to configure the linting rules with a TOML file.
-* Provides functionality to disable a specific rule or the entire linter for a file or a range of lines.
-  * `golint` allows this only for generated files.
-* Provides multiple formatters which let you customize the output.
-* Allows you to customize the return code for the entire linter or based on the failure of only some rules.
-* Open for addition of new rules or formatters.
-* Provides more rules compared to `golint`.
-* Faster. It runs the rules over each file in a separate goroutine.
+- Allow us to enable or disable rules using a configuration file.
+- Allows us to configure the linting rules with a TOML file.
+- Provides functionality for disabling a specific rule or the entire linter for a file or a range of lines.
+  - `golint` allows this only for generated files.
+- Provides multiple formatters which let us customize the output.
+- Allows us to customize the return code for the entire linter or based on the failure of only some rules.
+- *Everyone can extend it easily with custom rules or formatters.*
+- `Revive` provides more rules compared to `golint`.
+- Faster. It runs the rules over each file in a separate goroutine.
 
 _The deformed ears of this Gopher are well known but its so adorable that they are negligible_.
 
