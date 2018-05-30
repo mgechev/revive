@@ -6,6 +6,7 @@ Fast, configurable, extensible, flexible, and beautiful linter for Go.
 
 <p align="center">
   <img src="./assets/logo.png" alt="" width="300">
+  Logo by <a href="https://github.com/hawkgs">Georgi Serev</a>
 </p>
 
 Here's how `revive` is different from `golint`:
