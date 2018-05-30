@@ -6,6 +6,7 @@ Fast, configurable, extensible, flexible, and beautiful linter for Go.
 
 <p align="center">
   <img src="./assets/logo.png" alt="" width="300">
+  <br>
   Logo by <a href="https://github.com/hawkgs">Georgi Serev</a>
 </p>
 
