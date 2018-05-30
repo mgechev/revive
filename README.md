@@ -5,7 +5,9 @@
 Fast, configurable, extensible, flexible, and beautiful linter for Go.
 
 <p align="center">
-  <img src="./assets/demo.svg" alt="">
+  <img src="./assets/logo.png" alt="" width="300">
+  <br>
+  Logo by <a href="https://github.com/hawkgs">Georgi Serev</a>
 </p>
 
 Here's how `revive` is different from `golint`:
@@ -23,9 +25,7 @@ Here's how `revive` is different from `golint`:
 _Keep in mind that in some cases the glob matching may have slightly different behavir compared to [golint](https://github.com/golang/go/issues/8768)_.
 
 <p align="center">
-  <img src="./assets/logo.png" alt="" width="300">
-  <br>
-  Logo by <a href="https://github.com/hawkgs">Georgi Serev</a>
+  <img src="./assets/demo.svg" alt="" width="700">
 </p>
 
 ## Usage
