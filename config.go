@@ -162,17 +162,9 @@ func getFiles() []string {
 		return nil
 	}
 
-	files, errs := dots.Resolve(globs, normalizeSplit(excludePaths))
-	if errs != nil && len(errs) > 0 {
-		err := ""
-		for i, e := range errs {
-			suffix := "\n"
-			if i == len(errs)-1 {
-				suffix = ""
-			}
-			err += e.Error() + suffix
-		}
-		fail(err)
+	files, err := dots.Resolve(globs, normalizeSplit(excludePaths))
+	if err != nil {
+		fail(err.Error())
 	}
 
 	return files

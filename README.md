@@ -22,8 +22,6 @@ Here's how `revive` is different from `golint`:
 - `Revive` provides more rules compared to `golint`.
 - Faster. It runs the rules over each file in a separate goroutine.
 
-_Keep in mind that in some cases the glob matching may have slightly different behavir compared to [golint](https://github.com/golang/go/issues/8768)_.
-
 <p align="center">
   <img src="./assets/demo.svg" alt="" width="700">
 </p>
