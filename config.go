@@ -158,8 +158,7 @@ func normalizeSplit(strs []string) []string {
 func getFiles() []string {
 	globs := normalizeSplit(flag.Args())
 	if len(globs) == 0 {
-		flag.Usage()
-		return nil
+		globs = append(globs, ".")
 	}
 
 	files, err := dots.Resolve(globs, normalizeSplit(excludePaths))
