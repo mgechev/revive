@@ -16,10 +16,6 @@ type VarNamingRule struct{}
 func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
-	if isTest(file) {
-		return failures
-	}
-
 	fileAst := file.AST
 	walker := lintNames{
 		file:    file,

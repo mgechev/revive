@@ -12,7 +12,8 @@ import (
 
 import "C"
 
-var var_name int // MATCH /don't use underscores in Go names; var var_name should be varName/
+var safeUrl = "HttPS://..iaMHost..Test:443/paTh^A%ef//./%41PaTH/..//?" // MATCH /var safeUrl should be safeURL/
+var var_name int                                                       // MATCH /don't use underscores in Go names; var var_name should be varName/
 
 type t_wow struct { // MATCH /don't use underscores in Go names; type t_wow should be tWow/
 	x_damn int      // MATCH /don't use underscores in Go names; struct field x_damn should be xDamn/
