@@ -30,6 +30,10 @@ Here's how `revive` is different from `golint`:
 
 Since the default behavior of `revive` is compatible with `golint`, without providing any additional flags, the only difference you'd notice is faster execution.
 
+### Text Editors
+
+- Support for VSCode in [vscode-go](https://github.com/Microsoft/vscode-go/pull/1699).
+
 ### Installation
 
 ```bash
