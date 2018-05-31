@@ -2,7 +2,7 @@
 
 # revive
 
-Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in replacement of golint.
+Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in replacement of golint. Most importantly **revive allows you to develop your own rules and build a strict preset for enhancing your development & code review processes**.
 
 <p align="center">
   <img src="./assets/logo.png" alt="" width="300">
