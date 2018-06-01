@@ -1,4 +1,4 @@
-ignoreGeneratedHeader = true
+ignoreGeneratedHeader = false
 severity = "warning"
 confidence = 0.8
 errorCode = 0

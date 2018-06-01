@@ -69,7 +69,7 @@ revive -config revive.toml -exclude file1.go -exclude file2.go -formatter friend
 `revive` can be configured with a TOML file. Here's a sample configuration with explanation for the individual properties:
 
 ```toml
-# Ignores files with "GENERATED" header, similar to golint
+# When set to false, ignores files with "GENERATED" header, similar to golint
 ignoreGeneratedHeader = true
 
 # Sets the default severity to "warning"
