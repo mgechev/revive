@@ -232,6 +232,18 @@ user    0m53.472s
 sys     0m3.199s
 ```
 
+Keep in mind that with type checking enabled, the performance may drop to twice faster than `golint`:
+
+```shell
+time revive kubernetes/... > /dev/null
+
+real    0m26.211s
+user    2m6.708s
+sys     0m17.192s
+```
+
+Currently, type checking is enabled by default.
+
 ## License
 
 MIT
