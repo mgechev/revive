@@ -12,15 +12,16 @@ Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in r
 
 Here's how `revive` is different from `golint`:
 
-- Allow us to enable or disable rules using a configuration file.
-- Allows us to configure the linting rules with a TOML file.
-- Provides functionality for disabling a specific rule or the entire linter for a file or a range of lines.
-  - `golint` allows this only for generated files.
-- Provides multiple formatters which let us customize the output.
-- Allows us to customize the return code for the entire linter or based on the failure of only some rules.
-- *Everyone can extend it easily with custom rules or formatters.*
-- `Revive` provides more rules compared to `golint`.
-- Faster. It runs the rules over each file in a separate goroutine.
+* Allows us to enable or disable rules using a configuration file.
+* Allows us to configure the linting rules with a TOML file.
+* 2x faster running the same rules as golint.
+* Provides functionality for disabling a specific rule or the entire linter for a file or a range of lines.
+  * `golint` allows this only for generated files.
+* Optional type checking. Most rules in golint do not require type checking. If you disable them in the config file, revive will run over 6x faster than golint.
+* Provides multiple formatters which let us customize the output.
+* Allows us to customize the return code for the entire linter or based on the failure of only some rules.
+* _Everyone can extend it easily with custom rules or formatters._
+* `Revive` provides more rules compared to `golint`.
 
 <p align="center">
   <img src="./assets/demo.svg" alt="" width="700">
@@ -32,7 +33,7 @@ Since the default behavior of `revive` is compatible with `golint`, without prov
 
 ### Text Editors
 
-- Support for VSCode in [vscode-go](https://github.com/Microsoft/vscode-go/pull/1699).
+* Support for VSCode in [vscode-go](https://github.com/Microsoft/vscode-go/pull/1699).
 
 ### Installation
 
@@ -116,31 +117,31 @@ This will use `config.toml`, the `friendly` formatter, and will run linting over
 
 List of all available rules. The rules ported from `golint` are left unchanged and indicated in the `golit` column.
 
-| Name                  | Config | Description                                                      | `golint` |
-| --------------------- | :----: | :--------------------------------------------------------------- | :------: |
-| `blank-imports`       |  n/a   | Disallows blank imports                                          |   yes    |
-| `context-as-argument` |  n/a   | `context.Context` should be the first argument of a function.    |   yes    |
-| `context-keys-type`   |  n/a   | Disallows the usage of basic types in `context.WithValue`.       |   yes    |
-| `dot-imports`         |  n/a   | Forbids `.` imports.                                             |   yes    |
-| `error-return`        |  n/a   | The error return parameter should be last.                       |   yes    |
-| `error-strings`       |  n/a   | Conventions around error strings.                                |   yes    |
-| `error-naming`        |  n/a   | Naming of error variables.                                       |   yes    |
-| `exported`            |  n/a   | Naming and commenting conventions on exported symbols.           |   yes    |
-| `if-return`           |  n/a   | Redundant if when returning an error.                            |   yes    |
-| `increment-decrement` |  n/a   | Use `i++` and `i--` instead of `i += 1` and `i -= 1`.            |   yes    |
-| `var-naming`          |  n/a   | Naming rules.                                                    |   yes    |
-| `var-declaration`     |  n/a   | Reduces redundancies around variable declaration.                |   yes    |
-| `package-comments`    |  n/a   | Package commenting conventions.                                  |   yes    |
-| `range`               |  n/a   | Prevents redundant variables when iterating over a collection.   |   yes    |
-| `receiver-naming`     |  n/a   | Conventions around the naming of receivers.                      |   yes    |
-| `time-naming`         |  n/a   | Conventions around the naming of time variables.                 |   yes    |
-| `unexported-return`   |  n/a   | Warns when a public return is from unexported type.              |   yes    |
-| `indent-error-flow`   |  n/a   | Prevents redundant else statements.                              |   yes    |
-| `errorf`              |  n/a   | Should replace `error.New(fmt.Sprintf())` with `error.Errorf()`  |   yes    |
-| `argument-limit`      |  int   | Specifies the maximum number of arguments a function can receive |    no    |
-| `cyclomatic`          |  int   | Sets restriction for maximum Cyclomatic complexity.              |    no    |
-| `max-public-structs`  |  int   | The maximum number of public structs in a file.                  |    no    |
-| `file-header`         | string | Header which each file should have.                              |    no    |
+| Name                  | Config | Description                                                      | `golint` | Typed |
+| --------------------- | :----: | :--------------------------------------------------------------- | :------: | :---: |
+| `context-keys-type`   |  n/a   | Disallows the usage of basic types in `context.WithValue`.       |   yes    |  yes  |
+| `time-naming`         |  n/a   | Conventions around the naming of time variables.                 |   yes    |  yes  |
+| `var-declaration`     |  n/a   | Reduces redundancies around variable declaration.                |   yes    |  yes  |
+| `unexported-return`   |  n/a   | Warns when a public return is from unexported type.              |   yes    |  yes  |
+| `errorf`              |  n/a   | Should replace `error.New(fmt.Sprintf())` with `error.Errorf()`  |   yes    |  yes  |
+| `blank-imports`       |  n/a   | Disallows blank imports                                          |   yes    |  no   |
+| `context-as-argument` |  n/a   | `context.Context` should be the first argument of a function.    |   yes    |  no   |
+| `dot-imports`         |  n/a   | Forbids `.` imports.                                             |   yes    |  no   |
+| `error-return`        |  n/a   | The error return parameter should be last.                       |   yes    |  no   |
+| `error-strings`       |  n/a   | Conventions around error strings.                                |   yes    |  no   |
+| `error-naming`        |  n/a   | Naming of error variables.                                       |   yes    |  no   |
+| `exported`            |  n/a   | Naming and commenting conventions on exported symbols.           |   yes    |  no   |
+| `if-return`           |  n/a   | Redundant if when returning an error.                            |   yes    |  no   |
+| `increment-decrement` |  n/a   | Use `i++` and `i--` instead of `i += 1` and `i -= 1`.            |   yes    |  no   |
+| `var-naming`          |  n/a   | Naming rules.                                                    |   yes    |  no   |
+| `package-comments`    |  n/a   | Package commenting conventions.                                  |   yes    |  no   |
+| `range`               |  n/a   | Prevents redundant variables when iterating over a collection.   |   yes    |  no   |
+| `receiver-naming`     |  n/a   | Conventions around the naming of receivers.                      |   yes    |  no   |
+| `indent-error-flow`   |  n/a   | Prevents redundant else statements.                              |   yes    |  no   |
+| `argument-limit`      |  int   | Specifies the maximum number of arguments a function can receive |    no    |  no   |
+| `cyclomatic`          |  int   | Sets restriction for maximum Cyclomatic complexity.              |    no    |  no   |
+| `max-public-structs`  |  int   | The maximum number of public structs in a file.                  |    no    |  no   |
+| `file-header`         | string | Header which each file should have.                              |    no    |  no   |
 
 ## Available Formatters
 
@@ -226,14 +227,14 @@ sys     0m9.146s
 
 ```shell
 # no type checking
-time revive kubernetes/... > /dev/null
+time revive -config untyped.toml kubernetes/... > /dev/null
 
-real    0m10.526s
-user    0m54.228s
-sys     0m3.534s
+real    0m8.471s
+user    0m40.721s
+sys     0m3.262s
 ```
 
-Keep in mind that with type checking enabled, the performance may drop to twice faster than `golint`:
+Keep in mind that if you use rules which require type checking, the performance may drop to 2x faster than `golint`:
 
 ```shell
 # type checking enabled
@@ -244,7 +245,7 @@ user    2m6.708s
 sys     0m17.192s
 ```
 
-Currently, type checking is enabled by default.
+Currently, type checking is enabled by default. If you want to run the linter without type checking, remove all typed rules from the configuration file.
 
 ## License
 

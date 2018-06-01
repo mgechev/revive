@@ -24,6 +24,7 @@ func (r *ContextKeysType) Apply(file *lint.File, arguments lint.Arguments) []lin
 		},
 	}
 
+	file.Pkg.TypeCheck()
 	ast.Walk(walker, fileAst)
 
 	return failures

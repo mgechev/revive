@@ -21,6 +21,7 @@ type Package struct {
 	Sortable map[string]bool
 	// main is whether this is a "main" package.
 	main int
+	mu   sync.Mutex
 }
 
 var newImporter = func(fset *token.FileSet) types.ImporterFrom {
@@ -50,8 +51,15 @@ func (p *Package) IsMain() bool {
 	return false
 }
 
-// typeCheck performs type checking for given package.
-func (p *Package) typeCheck() error {
+// TypeCheck performs type checking for given package.
+func (p *Package) TypeCheck() error {
+	p.mu.Lock()
+	// If type checking has already been performed
+	// skip it.
+	if p.TypesInfo != nil || p.TypesPkg != nil {
+		p.mu.Unlock()
+		return nil
+	}
 	config := &types.Config{
 		// By setting a no-op error reporter, the type checker does as much work as possible.
 		Error:    func(error) {},
@@ -74,6 +82,7 @@ func (p *Package) typeCheck() error {
 	// since we will get partial information.
 	p.TypesPkg = typesPkg
 	p.TypesInfo = info
+	p.mu.Unlock()
 	return err
 }
 
@@ -140,7 +149,6 @@ func receiverType(fn *ast.FuncDecl) string {
 }
 
 func (p *Package) lint(rules []Rule, config Config, failures chan Failure) {
-	p.typeCheck()
 	p.scanSortable()
 	var wg sync.WaitGroup
 	for _, file := range p.files {
