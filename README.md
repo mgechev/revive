@@ -225,16 +225,18 @@ sys     0m9.146s
 ### revive
 
 ```shell
+# no type checking
 time revive kubernetes/... > /dev/null
 
-real    0m13.515s
-user    0m53.472s
-sys     0m3.199s
+real    0m10.526s
+user    0m54.228s
+sys     0m3.534s
 ```
 
 Keep in mind that with type checking enabled, the performance may drop to twice faster than `golint`:
 
 ```shell
+# type checking enabled
 time revive kubernetes/... > /dev/null
 
 real    0m26.211s
