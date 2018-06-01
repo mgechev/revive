@@ -64,6 +64,31 @@ revive -config revive.toml -exclude file1.go -exclude file2.go -formatter friend
 * The output will be formatted with the `friendly` formatter
 * The linter will analyze `github.com/mgechev/revive` and the files in `package`
 
+### Comment Annotations
+
+Using comments, you can disable the linter for the entire file or only range of lines:
+
+```go
+//revive:disable
+
+func Public() {}
+//revive:enable
+```
+
+The snippet above, will disable `revive` between the `revive:disable` and `revive:enable` comments. If you skip `revive:enable`, the linter will be disabled for the rest of the file.
+
+You can do the same on a rule level. In case you want to disable only a particular rule, you can use:
+
+```go
+//revive:disable:unexported-return
+func Public() private {
+  return private
+}
+//revive:enable:unexported-return
+```
+
+This way, `revive` will not warn you for that you're returning an object of an unexported type, from an exported function.
+
 ### Configuration
 
 `revive` can be configured with a TOML file. Here's a sample configuration with explanation for the individual properties:
