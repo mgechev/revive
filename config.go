@@ -155,18 +155,18 @@ func normalizeSplit(strs []string) []string {
 	return res
 }
 
-func getFiles() []string {
+func getPackages() [][]string {
 	globs := normalizeSplit(flag.Args())
 	if len(globs) == 0 {
 		globs = append(globs, ".")
 	}
 
-	files, err := dots.Resolve(globs, normalizeSplit(excludePaths))
+	packages, err := dots.ResolvePackages(globs, normalizeSplit(excludePaths))
 	if err != nil {
 		fail(err.Error())
 	}
 
-	return files
+	return packages
 }
 
 type arrayFlags []string

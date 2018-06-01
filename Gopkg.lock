@@ -35,7 +35,7 @@
   branch = "master"
   name = "github.com/mgechev/dots"
   packages = ["."]
-  revision = "1cc1f4773d0cd3a8ab98f0e79d2690ba811f9bcd"
+  revision = "3d1c0cc50642eae6291b43fdd37c7d7acfff7975"
 
 [[projects]]
   branch = "master"

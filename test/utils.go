@@ -46,7 +46,7 @@ func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, src []byte, rul
 		return ioutil.ReadFile(baseDir + file)
 	})
 
-	ps, err := l.Lint([]string{fi.Name()}, rules, lint.Config{
+	ps, err := l.Lint([][]string{[]string{fi.Name()}}, rules, lint.Config{
 		Rules: config,
 	})
 	if err != nil {
@@ -73,7 +73,7 @@ func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, ru
 		return errors.Errorf("Test file %v does not have instructions", fi.Name())
 	}
 
-	ps, err := l.Lint([]string{fi.Name()}, rules, lint.Config{
+	ps, err := l.Lint([][]string{[]string{fi.Name()}}, rules, lint.Config{
 		Rules: config,
 	})
 	if err != nil {

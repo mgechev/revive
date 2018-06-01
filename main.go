@@ -26,7 +26,7 @@ Example:
 func main() {
 	config := getConfig()
 	formatter := getFormatter()
-	files := getFiles()
+	packages := getPackages()
 
 	revive := lint.New(func(file string) ([]byte, error) {
 		return ioutil.ReadFile(file)
@@ -34,7 +34,7 @@ func main() {
 
 	lintingRules := getLintingRules(config)
 
-	failures, err := revive.Lint(files, lintingRules, *config)
+	failures, err := revive.Lint(packages, lintingRules, *config)
 	if err != nil {
 		fail(err.Error())
 	}
