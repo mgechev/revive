@@ -24,6 +24,7 @@ func (r *UnexportedReturnRule) Apply(file *lint.File, arguments lint.Arguments) 
 		},
 	}
 
+	file.Pkg.TypeCheck()
 	ast.Walk(walker, fileAst)
 
 	return failures

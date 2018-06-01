@@ -25,6 +25,7 @@ func (r *ErrorfRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Fai
 		},
 	}
 
+	file.Pkg.TypeCheck()
 	ast.Walk(walker, fileAst)
 
 	return failures
