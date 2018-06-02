@@ -17,6 +17,16 @@ func ExpErr() error { // ok
 func (hidden) ExpOnHidden() hidden { // ok
 }
 
+// Interface is exported.
+type Interface interface {
+	ExpOnHidden()
+}
+
+// ExportedAsInterface returns a hidden type as an exported interface, which is fine.
+func ExportedAsInterface() Interface { // ok
+	return Exported()
+}
+
 // T is another test type.
 type T struct{}
 
