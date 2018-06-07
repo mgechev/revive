@@ -7,11 +7,11 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// SuperfluousElse lints given else constructs.
-type SuperfluousElse struct{}
+// SuperfluousElseRule lints given else constructs.
+type SuperfluousElseRule struct{}
 
 // Apply applies the rule to given file.
-func (r *SuperfluousElse) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *SuperfluousElseRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -24,7 +24,7 @@ func (r *SuperfluousElse) Apply(file *lint.File, arguments lint.Arguments) []lin
 }
 
 // Name returns the rule name.
-func (r *SuperfluousElse) Name() string {
+func (r *SuperfluousElseRule) Name() string {
 	return "superfluous-else"
 }
 
