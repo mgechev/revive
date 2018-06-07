@@ -21,7 +21,7 @@ func (f *Stylish) Name() string {
 }
 
 func formatFailure(failure lint.Failure, severity lint.Severity) []string {
-	fString := color.BlueString(failure.Failure)
+	fString := color.CyanString(failure.Failure)
 	fName := color.RedString(failure.RuleName)
 	lineColumn := failure.Position
 	pos := fmt.Sprintf("(%d, %d)", lineColumn.Start.Line, lineColumn.Start.Column)
