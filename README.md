@@ -196,6 +196,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `cyclomatic`          |  int   | Sets restriction for maximum Cyclomatic complexity.              |    no    |  no   |
 | `max-public-structs`  |  int   | The maximum number of public structs in a file.                  |    no    |  no   |
 | `file-header`         | string | Header which each file should have.                              |    no    |  no   |
+| `empty-block`         |  n/a   | Warns on empty code blocks                                       |    no    |  no   |
 | `superfluous-else`    |  n/a   | Prevents redundant else statements (extends `indent-error-flow`) |    no    |  no   |
 
 ## Available Formatters

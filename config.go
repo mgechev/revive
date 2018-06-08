@@ -47,6 +47,7 @@ var allRules = append([]lint.Rule{
 	&rule.ArgumentsLimitRule{},
 	&rule.CyclomaticRule{},
 	&rule.FileHeaderRule{},
+	&rule.EmptyBlockRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
