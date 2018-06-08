@@ -12,3 +12,4 @@
 [rule.range]
 [rule.receiver-naming]
 [rule.indent-error-flow]
+[rule.empty-block]
