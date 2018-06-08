@@ -16,7 +16,7 @@ func g(f func() bool) string {
 		println("it's NOT empty!")
 	}
 
-	if ok := f(); ok { // MATCH /this block is empty, you can remove it/
+	if ok := f(); ok {
 		println("it's NOT empty!")
 	} else { // MATCH /this block is empty, you can remove it/
 
