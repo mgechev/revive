@@ -12,20 +12,49 @@ Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in r
 
 Here's how `revive` is different from `golint`:
 
-* Allows us to enable or disable rules using a configuration file.
-* Allows us to configure the linting rules with a TOML file.
-* 2x faster running the same rules as golint.
-* Provides functionality for disabling a specific rule or the entire linter for a file or a range of lines.
-  * `golint` allows this only for generated files.
-* Optional type checking. Most rules in golint do not require type checking. If you disable them in the config file, revive will run over 6x faster than golint.
-* Provides multiple formatters which let us customize the output.
-* Allows us to customize the return code for the entire linter or based on the failure of only some rules.
-* _Everyone can extend it easily with custom rules or formatters._
-* `Revive` provides more rules compared to `golint`.
+- Allows us to enable or disable rules using a configuration file.
+- Allows us to configure the linting rules with a TOML file.
+- 2x faster running the same rules as golint.
+- Provides functionality for disabling a specific rule or the entire linter for a file or a range of lines.
+  - `golint` allows this only for generated files.
+- Optional type checking. Most rules in golint do not require type checking. If you disable them in the config file, revive will run over 6x faster than golint.
+- Provides multiple formatters which let us customize the output.
+- Allows us to customize the return code for the entire linter or based on the failure of only some rules.
+- _Everyone can extend it easily with custom rules or formatters._
+- `Revive` provides more rules compared to `golint`.
 
 <p align="center">
   <img src="./assets/demo.svg" alt="" width="700">
 </p>
+
+<!-- TOC -->
+
+- [revive](#revive)
+  - [Usage](#usage)
+    - [Text Editors](#text-editors)
+    - [Installation](#installation)
+    - [Command Line Flags](#command-line-flags)
+    - [Sample Invocations](#sample-invocations)
+    - [Comment Annotations](#comment-annotations)
+    - [Configuration](#configuration)
+    - [Default Configuration](#default-configuration)
+    - [Recommended Configuration](#recommended-configuration)
+  - [Available Rules](#available-rules)
+  - [Available Formatters](#available-formatters)
+    - [Friendly](#friendly)
+    - [Stylish](#stylish)
+    - [Default](#default)
+  - [Extensibility](#extensibility)
+    - [Custom Rule](#custom-rule)
+      - [Example](#example)
+    - [Custom Formatter](#custom-formatter)
+  - [Speed Comparison](#speed-comparison)
+    - [golint](#golint)
+    - [revive](#revive-1)
+  - [Contributors](#contributors)
+  - [License](#license)
+
+<!-- /TOC -->
 
 ## Usage
 
@@ -33,7 +62,19 @@ Since the default behavior of `revive` is compatible with `golint`, without prov
 
 ### Text Editors
 
-* Support for VSCode in [vscode-go](https://github.com/Microsoft/vscode-go/pull/1699).
+- Support for VSCode in [vscode-go](https://github.com/Microsoft/vscode-go/pull/1699).
+- Support for vim via [w0rp/ale](https://github.com/w0rp/ale):
+
+```vim
+call ale#linter#Define('go', {
+\   'name': 'revive',
+\   'output_stream': 'both',
+\   'executable': 'revive',
+\   'read_buffer': 0,
+\   'command': 'revive %t',
+\   'callback': 'ale#handlers#unix#HandleAsWarning',
+\})
+```
 
 ### Installation
 
@@ -45,13 +86,13 @@ go get -u github.com/mgechev/revive
 
 `revive` accepts three command line parameters:
 
-* `-config [PATH]` - path to config file in TOML format.
-* `-exclude [PATTERN]` - pattern for files/directories/packages to be excluded for linting. You can specify the files you want to exclude for linting either as package name (i.e. `github.com/mgechev/revive`), list them as individual files (i.e. `file.go`), directories (i.e. `./foo/...`), or any combination of the three.
-* `-formatter [NAME]` - formatter to be used for the output. The currently available formatters are:
-  * `default` - will output the failures the same way that `golint` does.
-  * `json` - outputs the failures in JSON format.
-  * `friendly` - outputs the failures when found. Shows summary of all the failures.
-  * `stylish` - formats the failures in a table. Keep in mind that it doesn't stream the output so it might be perceived as slower compared to others.
+- `-config [PATH]` - path to config file in TOML format.
+- `-exclude [PATTERN]` - pattern for files/directories/packages to be excluded for linting. You can specify the files you want to exclude for linting either as package name (i.e. `github.com/mgechev/revive`), list them as individual files (i.e. `file.go`), directories (i.e. `./foo/...`), or any combination of the three.
+- `-formatter [NAME]` - formatter to be used for the output. The currently available formatters are:
+  - `default` - will output the failures the same way that `golint` does.
+  - `json` - outputs the failures in JSON format.
+  - `friendly` - outputs the failures when found. Shows summary of all the failures.
+  - `stylish` - formats the failures in a table. Keep in mind that it doesn't stream the output so it might be perceived as slower compared to others.
 
 ### Sample Invocations
 
@@ -59,10 +100,10 @@ go get -u github.com/mgechev/revive
 revive -config revive.toml -exclude file1.go -exclude file2.go -formatter friendly github.com/mgechev/revive package/...
 ```
 
-* The command above will use the configuration from `revive.toml`
-* `revive` will ignore `file1.go` and `file2.go`
-* The output will be formatted with the `friendly` formatter
-* The linter will analyze `github.com/mgechev/revive` and the files in `package`
+- The command above will use the configuration from `revive.toml`
+- `revive` will ignore `file1.go` and `file2.go`
+- The output will be formatted with the `friendly` formatter
+- The linter will analyze `github.com/mgechev/revive` and the files in `package`
 
 ### Comment Annotations
 
@@ -167,6 +208,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `cyclomatic`          |  int   | Sets restriction for maximum Cyclomatic complexity.              |    no    |  no   |
 | `max-public-structs`  |  int   | The maximum number of public structs in a file.                  |    no    |  no   |
 | `file-header`         | string | Header which each file should have.                              |    no    |  no   |
+| `empty-block`         |  n/a   | Warns on empty code blocks                                       |    no    |  no   |
 | `superfluous-else`    |  n/a   | Prevents redundant else statements (extends `indent-error-flow`) |    no    |  no   |
 
 ## Available Formatters
@@ -215,8 +257,8 @@ Let's suppose we have developed a rule called `BanStructNameRule` which disallow
 
 With the snippet above we:
 
-* Enable the rule with name `ban-struct-name`. The `Name()` method of our rule should return a string which matches `ban-struct-name`.
-* Configure the rule with the argument `Foo`. The list of arguments will be passed to `Apply(*File, Arguments)` together with the target file we're linting currently.
+- Enable the rule with name `ban-struct-name`. The `Name()` method of our rule should return a string which matches `ban-struct-name`.
+- Configure the rule with the argument `Foo`. The list of arguments will be passed to `Apply(*File, Arguments)` together with the target file we're linting currently.
 
 A sample rule implementation can be found [here](/rule/argument-limit.go).
 
@@ -272,6 +314,12 @@ sys     0m17.192s
 ```
 
 Currently, type checking is enabled by default. If you want to run the linter without type checking, remove all typed rules from the configuration file.
+
+## Contributors
+
+| [<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) | [<img alt="paul-at-start" src="https://avatars2.githubusercontent.com/u/5486775?v=4&s=117" width="117">](https://github.com/paul-at-start) | [<img alt="chavacava" src="https://avatars2.githubusercontent.com/u/25788468?v=4&s=117" width="117">](https://github.com/chavacava) |
+| :---------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------: |
+|                                             [mgechev](https://github.com/mgechev)                                             |                                             [paul-at-start](https://github.com/paul-at-start)                                              |                                              [chavacava](https://github.com/chavacava)                                              |
 
 ## License
 
