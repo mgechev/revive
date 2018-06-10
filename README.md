@@ -210,6 +210,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `file-header`         | string | Header which each file should have.                              |    no    |  no   |
 | `empty-block`         |  n/a   | Warns on empty code blocks                                       |    no    |  no   |
 | `superfluous-else`    |  n/a   | Prevents redundant else statements (extends `indent-error-flow`) |    no    |  no   |
+| `confusing-naming`    |  n/a   | Warns on methods with names that differ only by capitalization   |    no    |  no   |
 
 ## Available Formatters
 
