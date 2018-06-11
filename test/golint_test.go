@@ -7,9 +7,8 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/mgechev/revive/rule"
-
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
 )
 
 var lintMatch = flag.String("lint.match", "", "restrict fixtures matches to this pattern")
@@ -55,16 +54,15 @@ func TestAll(t *testing.T) {
 		if !rx.MatchString(fi.Name()) {
 			continue
 		}
-		//t.Logf("Testing %s", fi.Name())
-		src, err := ioutil.ReadFile(path.Join(baseDir, fi.Name()))
-		if err != nil {
-			t.Fatalf("Failed reading %s: %v", fi.Name(), err)
-		}
+		t.Run(fi.Name(), func(t *testing.T) {
+			src, err := ioutil.ReadFile(path.Join(baseDir, fi.Name()))
+			if err != nil {
+				t.Fatalf("Failed reading %s: %v", fi.Name(), err)
+			}
 
-		err = assertFailures(t, baseDir, fi, src, rules, map[string]lint.RuleConfig{})
-		if err != nil {
-			t.Errorf("Linting %s: %v", fi.Name(), err)
-			continue
-		}
+			if err := assertFailures(t, baseDir, fi, src, rules, map[string]lint.RuleConfig{}); err != nil {
+				t.Errorf("Linting %s: %v", fi.Name(), err)
+			}
+		})
 	}
 }
