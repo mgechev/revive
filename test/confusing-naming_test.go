@@ -8,5 +8,7 @@ import (
 
 // TestConfusingNaming rule.
 func TestConfusingNaming(t *testing.T) {
-	testRule(t, "confusing-naming", &rule.ConfusingNamingRule{})
+	testRule(t, "confusing-naming1", &rule.ConfusingNamingRule{})
+
+	testRule(t, "confusing-naming2", &rule.ConfusingNamingRule{})
 }
