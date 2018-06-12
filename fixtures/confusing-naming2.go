@@ -3,6 +3,5 @@
 // Package pkg ...
 package pkg
 
-
-func aglobal(){ // MATCH /Function 'aglobal' differs only by capitalization to other function/
+func aglobal() {
 }
