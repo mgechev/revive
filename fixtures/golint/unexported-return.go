@@ -12,14 +12,20 @@ func Exported() hidden { // MATCH /exported func Exported returns unexported typ
 
 // ExpErr returns a builtin type.
 func ExpErr() error { // ok
+  return nil
 }
 
-func (hidden) ExpOnHidden() hidden { // ok
+func (h hidden) ExpOnHidden() hidden { // ok
+  return h
+}
+
+func (hidden) ForInterface() error {
+  return nil
 }
 
 // Interface is exported.
 type Interface interface {
-	ExpOnHidden()
+	ForInterface() error
 }
 
 // ExportedAsInterface returns a hidden type as an exported interface, which is fine.

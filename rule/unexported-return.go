@@ -84,8 +84,16 @@ func (w lintUnexportedReturn) Visit(n ast.Node) ast.Visitor {
 func exportedType(typ types.Type) bool {
 	switch T := typ.(type) {
 	case *types.Named:
+		obj := T.Obj()
+		switch {
 		// Builtin types have no package.
-		return T.Obj().Pkg() == nil || T.Obj().Exported()
+		case obj.Pkg() == nil:
+		case obj.Exported():
+		default:
+			_, ok := T.Underlying().(*types.Interface)
+			return ok
+		}
+		return true
 	case *types.Map:
 		return exportedType(T.Key()) && exportedType(T.Elem())
 	case interface {

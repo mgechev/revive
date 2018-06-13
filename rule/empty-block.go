@@ -17,7 +17,7 @@ func (r *EmptyBlockRule) Apply(file *lint.File, arguments lint.Arguments) []lint
 		failures = append(failures, failure)
 	}
 
-	w := lintEmptyBlock{make(map[*ast.IfStmt]bool), onFailure}
+	w := lintEmptyBlock{make([]*ast.BlockStmt, 0), onFailure}
 	ast.Walk(w, file.AST)
 	return failures
 }
@@ -28,13 +28,29 @@ func (r *EmptyBlockRule) Name() string {
 }
 
 type lintEmptyBlock struct {
-	ignore    map[*ast.IfStmt]bool
+	ignore    []*ast.BlockStmt
 	onFailure func(lint.Failure)
 }
 
 func (w lintEmptyBlock) Visit(node ast.Node) ast.Visitor {
+	fd, ok := node.(*ast.FuncDecl)
+	if ok {
+		w.ignore = append(w.ignore, fd.Body)
+		return w
+	}
+
+	fl, ok := node.(*ast.FuncLit)
+	if ok {
+		w.ignore = append(w.ignore, fl.Body)
+		return w
+	}
+
 	block, ok := node.(*ast.BlockStmt)
 	if !ok {
+		return w
+	}
+
+	if mustIgnore(block, w.ignore) {
 		return w
 	}
 
@@ -49,4 +65,13 @@ func (w lintEmptyBlock) Visit(node ast.Node) ast.Visitor {
 	}
 
 	return w
+}
+
+func mustIgnore(block *ast.BlockStmt, blackList []*ast.BlockStmt) bool {
+	for _, b := range blackList {
+		if b == block {
+			return true
+		}
+	}
+	return false
 }
