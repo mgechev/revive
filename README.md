@@ -181,7 +181,7 @@ This will use `config.toml`, the `friendly` formatter, and will run linting over
 
 ## Available Rules
 
-List of all available rules. The rules ported from `golint` are left unchanged and indicated in the `golit` column.
+List of all available rules. The rules ported from `golint` are left unchanged and indicated in the `golint` column.
 
 | Name                  | Config | Description                                                      | `golint` | Typed |
 | --------------------- | :----: | :--------------------------------------------------------------- | :------: | :---: |
