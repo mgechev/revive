@@ -45,3 +45,5 @@ func (t foo) ABar() { // Should not warn
 func (t bar) ABar() { // MATCH /Method 'ABar' differs only by capitalization to other method of 'bar'/
 	return
 }
+
+func x() {}

@@ -3,7 +3,7 @@ package rule
 import (
 	"fmt"
 	"go/ast"
-	"log"
+
 	"strings"
 	"sync"
 
@@ -11,9 +11,10 @@ import (
 )
 
 type pkgMethods struct {
-	lp *lint.Package
-	mn map[string]map[string]bool
-	mu *sync.Mutex
+	lp   *lint.Package
+	mn   map[string]map[string]bool
+	info map[string]map[string][]*ast.Ident
+	mu   *sync.Mutex
 }
 
 type packages struct {
@@ -21,22 +22,23 @@ type packages struct {
 	mu   sync.Mutex
 }
 
-func (ps *packages) methodNames(lp *lint.Package) (map[string]map[string]bool, *sync.Mutex) {
+func (ps *packages) methodNames(lp *lint.Package) (map[string]map[string]bool, map[string]map[string][]*ast.Ident, *sync.Mutex) {
 	ps.mu.Lock()
 
 	for _, pkg := range ps.pkgs {
 		if pkg.lp == lp {
 			ps.mu.Unlock()
-			return pkg.mn, pkg.mu
+			return pkg.mn, pkg.info, pkg.mu
 		}
 	}
 
 	mn := make(map[string]map[string]bool)
+	info := make(map[string]map[string][]*ast.Ident)
 	mu := sync.Mutex{}
-	ps.pkgs = append(ps.pkgs, pkgMethods{lp: lp, mn: mn, mu: &mu})
+	ps.pkgs = append(ps.pkgs, pkgMethods{lp: lp, mn: mn, mu: &mu, info: info})
 
 	ps.mu.Unlock()
-	return mn, &mu
+	return mn, info, &mu
 }
 
 var allPkgs = packages{pkgs: make([]pkgMethods, 1)}
@@ -47,14 +49,11 @@ type ConfusingNamingRule struct{}
 // Apply applies the rule to given file.
 func (r *ConfusingNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
-
-	log.Printf("File %s, %v\n", file.Name, file.Pkg)
-
 	fileAst := file.AST
-	mn, mu := allPkgs.methodNames(file.Pkg)
-	log.Printf("File %d\n", len(mn))
+	mn, info, mu := allPkgs.methodNames(file.Pkg)
 	walker := lintConfusingNames{
 		methodNames: mn,
+		info:        info,
 		mu:          mu,
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
@@ -73,25 +72,27 @@ func (r *ConfusingNamingRule) Name() string {
 
 //checkMethodName checks if a given method/function name is similar (just case differences) to other method/function of the same struct/file.
 func checkMethodName(holder string, id *ast.Ident, w *lintConfusingNames) {
+	if id.Name == "init" && holder == defaultStructName {
+		// ignore init functions
+		return
+	}
+
 	name := strings.ToUpper(id.Name)
+
 	w.mu.Lock()
 	defer w.mu.Unlock()
-	mnOfHolder := w.methodNames[holder]
 
-	if mnOfHolder != nil {
-
-		alreadyKnown := w.methodNames[holder][name]
-
-		if alreadyKnown {
+	if w.methodNames[holder] != nil {
+		if w.methodNames[holder][name] {
 			// confusing names
-			var msg string
+			var kind string
 			if holder == defaultStructName {
-				msg = fmt.Sprintf("Function '%s' differs only by capitalization to other function in the same package", id.Name)
+				kind = "function"
 			} else {
-				msg = fmt.Sprintf("Method '%s' differs only by capitalization to other method of '%s'", id.Name, holder)
+				kind = "method"
 			}
 			w.onFailure(lint.Failure{
-				Failure:    msg,
+				Failure:    fmt.Sprintf("Method '%s' differs only by capitalization to %s '%s' in the same package", id.Name, kind, w.info[holder][name][0].Name),
 				Confidence: 1,
 				Node:       id,
 				Category:   "naming",
@@ -102,6 +103,7 @@ func checkMethodName(holder string, id *ast.Ident, w *lintConfusingNames) {
 		}
 	} else {
 		w.methodNames[holder] = make(map[string]bool, 1)
+		w.info[holder] = make(map[string][]*ast.Ident, 1)
 	}
 
 	// update the black list
@@ -109,11 +111,13 @@ func checkMethodName(holder string, id *ast.Ident, w *lintConfusingNames) {
 		println("no entry for '", holder, "'")
 	}
 	w.methodNames[holder][name] = true
+	w.info[holder][name] = append(w.info[holder][name], id)
 }
 
 type lintConfusingNames struct {
 	mu          *sync.Mutex
 	methodNames map[string]map[string]bool
+	info        map[string]map[string][]*ast.Ident
 	onFailure   func(lint.Failure)
 }
 
