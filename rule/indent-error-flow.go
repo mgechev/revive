@@ -39,6 +39,9 @@ func (w lintElse) Visit(node ast.Node) ast.Visitor {
 		return w
 	}
 	if w.ignore[ifStmt] {
+		if elseif, ok := ifStmt.Else.(*ast.IfStmt); ok {
+			w.ignore[elseif] = true
+		}
 		return w
 	}
 	if elseif, ok := ifStmt.Else.(*ast.IfStmt); ok {
@@ -74,3 +77,4 @@ func (w lintElse) Visit(node ast.Node) ast.Visitor {
 	}
 	return w
 }
+
