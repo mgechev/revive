@@ -3,6 +3,7 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"log"
 	"strings"
 	"sync"
 
@@ -47,8 +48,11 @@ type ConfusingNamingRule struct{}
 func (r *ConfusingNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
+	log.Printf("File %s, %v\n", file.Name, file.Pkg)
+
 	fileAst := file.AST
 	mn, mu := allPkgs.methodNames(file.Pkg)
+	log.Printf("File %d\n", len(mn))
 	walker := lintConfusingNames{
 		methodNames: mn,
 		mu:          mu,
