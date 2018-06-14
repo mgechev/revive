@@ -10,11 +10,15 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
+type referenceMethod struct {
+	fileName string
+	id       *ast.Ident
+}
+
 type pkgMethods struct {
-	lp   *lint.Package
-	mn   map[string]map[string]bool
-	info map[string]map[string][]*ast.Ident
-	mu   *sync.Mutex
+	pkg     *lint.Package
+	methods map[string]map[string]*referenceMethod
+	mu      *sync.Mutex
 }
 
 type packages struct {
@@ -22,23 +26,21 @@ type packages struct {
 	mu   sync.Mutex
 }
 
-func (ps *packages) methodNames(lp *lint.Package) (map[string]map[string]bool, map[string]map[string][]*ast.Ident, *sync.Mutex) {
+func (ps *packages) methodNames(lp *lint.Package) pkgMethods {
 	ps.mu.Lock()
 
 	for _, pkg := range ps.pkgs {
-		if pkg.lp == lp {
+		if pkg.pkg == lp {
 			ps.mu.Unlock()
-			return pkg.mn, pkg.info, pkg.mu
+			return pkg
 		}
 	}
 
-	mn := make(map[string]map[string]bool)
-	info := make(map[string]map[string][]*ast.Ident)
-	mu := sync.Mutex{}
-	ps.pkgs = append(ps.pkgs, pkgMethods{lp: lp, mn: mn, mu: &mu, info: info})
+	pkgm := pkgMethods{pkg: lp, methods: make(map[string]map[string]*referenceMethod), mu: &sync.Mutex{}}
+	ps.pkgs = append(ps.pkgs, pkgm)
 
 	ps.mu.Unlock()
-	return mn, info, &mu
+	return pkgm
 }
 
 var allPkgs = packages{pkgs: make([]pkgMethods, 1)}
@@ -50,11 +52,10 @@ type ConfusingNamingRule struct{}
 func (r *ConfusingNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	fileAst := file.AST
-	mn, info, mu := allPkgs.methodNames(file.Pkg)
+	pkgm := allPkgs.methodNames(file.Pkg)
 	walker := lintConfusingNames{
-		methodNames: mn,
-		info:        info,
-		mu:          mu,
+		fileName: file.Name,
+		pkgm:     pkgm,
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
@@ -77,13 +78,15 @@ func checkMethodName(holder string, id *ast.Ident, w *lintConfusingNames) {
 		return
 	}
 
+	pkgm := w.pkgm
 	name := strings.ToUpper(id.Name)
 
-	w.mu.Lock()
-	defer w.mu.Unlock()
+	pkgm.mu.Lock()
+	defer pkgm.mu.Unlock()
 
-	if w.methodNames[holder] != nil {
-		if w.methodNames[holder][name] {
+	if pkgm.methods[holder] != nil {
+		if pkgm.methods[holder][name] != nil {
+			refMethod := pkgm.methods[holder][name]
 			// confusing names
 			var kind string
 			if holder == defaultStructName {
@@ -91,8 +94,14 @@ func checkMethodName(holder string, id *ast.Ident, w *lintConfusingNames) {
 			} else {
 				kind = "method"
 			}
+			var fileName string
+			if w.fileName == refMethod.fileName {
+				fileName = "the same source file"
+			} else {
+				fileName = refMethod.fileName
+			}
 			w.onFailure(lint.Failure{
-				Failure:    fmt.Sprintf("Method '%s' differs only by capitalization to %s '%s' in the same package", id.Name, kind, w.info[holder][name][0].Name),
+				Failure:    fmt.Sprintf("Method '%s' differs only by capitalization to %s '%s' in %s", id.Name, kind, refMethod.id.Name, fileName),
 				Confidence: 1,
 				Node:       id,
 				Category:   "naming",
@@ -102,23 +111,20 @@ func checkMethodName(holder string, id *ast.Ident, w *lintConfusingNames) {
 			return
 		}
 	} else {
-		w.methodNames[holder] = make(map[string]bool, 1)
-		w.info[holder] = make(map[string][]*ast.Ident, 1)
+		pkgm.methods[holder] = make(map[string]*referenceMethod, 1)
 	}
 
 	// update the black list
-	if w.methodNames[holder] == nil {
+	if pkgm.methods[holder] == nil {
 		println("no entry for '", holder, "'")
 	}
-	w.methodNames[holder][name] = true
-	w.info[holder][name] = append(w.info[holder][name], id)
+	pkgm.methods[holder][name] = &referenceMethod{fileName: w.fileName, id: id}
 }
 
 type lintConfusingNames struct {
-	mu          *sync.Mutex
-	methodNames map[string]map[string]bool
-	info        map[string]map[string][]*ast.Ident
-	onFailure   func(lint.Failure)
+	fileName  string
+	pkgm      pkgMethods
+	onFailure func(lint.Failure)
 }
 
 const defaultStructName = "_" // used to map functions
