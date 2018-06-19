@@ -150,6 +150,26 @@ func getStructName(r *ast.FieldList) string {
 	return result
 }
 
+func checkStructFields(fields *ast.FieldList, structName string, w *lintConfusingNames) {
+	bl := make(map[string]bool, len(fields.List))
+	for _, f := range fields.List {
+		for _, id := range f.Names {
+			normName := strings.ToUpper(id.Name)
+			if bl[normName] {
+				w.onFailure(lint.Failure{
+					Failure:    fmt.Sprintf("Field '%s' differs only by capitalization to other field in the struct type %s", id.Name, structName),
+					Confidence: 1,
+					Node:       id,
+					Category:   "naming",
+					URL:        "#TODO",
+				})
+			} else {
+				bl[normName] = true
+			}
+		}
+	}
+}
+
 func (w *lintConfusingNames) Visit(n ast.Node) ast.Visitor {
 	switch v := n.(type) {
 	case *ast.FuncDecl:
@@ -159,6 +179,11 @@ func (w *lintConfusingNames) Visit(n ast.Node) ast.Visitor {
 		if ast.IsExported(v.Name.Name) || !isCgoExported(v) {
 			checkMethodName(getStructName(v.Recv), v.Name, w)
 		}
+	case *ast.TypeSpec:
+		if s, ok := v.Type.(*ast.StructType); ok {
+			checkStructFields(s.Fields, v.Name.Name, w)
+		}
+
 	default:
 		// will add other checks like field names, struct names, etc.
 	}

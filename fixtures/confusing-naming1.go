@@ -47,3 +47,16 @@ func (t bar) ABar() { // MATCH /Method 'ABar' differs only by capitalization to 
 }
 
 func x() {}
+
+type tFoo struct {
+	asd      string
+	aSd      int  // MATCH /Field 'aSd' differs only by capitalization to other field in the struct type tFoo/
+	qwe, asD bool // MATCH /Field 'asD' differs only by capitalization to other field in the struct type tFoo/
+	zxc      float32
+}
+
+type tBar struct {
+	asd string
+	qwe bool
+	zxc float32
+}
