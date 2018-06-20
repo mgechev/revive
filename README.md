@@ -181,7 +181,7 @@ This will use `config.toml`, the `friendly` formatter, and will run linting over
 
 ## Available Rules
 
-List of all available rules. The rules ported from `golint` are left unchanged and indicated in the `golit` column.
+List of all available rules. The rules ported from `golint` are left unchanged and indicated in the `golint` column.
 
 | Name                  | Config | Description                                                      | `golint` | Typed |
 | --------------------- | :----: | :--------------------------------------------------------------- | :------: | :---: |
@@ -318,9 +318,9 @@ Currently, type checking is enabled by default. If you want to run the linter wi
 
 ## Contributors
 
-| [<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) | [<img alt="chavacava" src="https://avatars2.githubusercontent.com/u/25788468?v=4&s=117" width="117">](https://github.com/chavacava) | [<img alt="paul-at-start" src="https://avatars2.githubusercontent.com/u/5486775?v=4&s=117" width="117">](https://github.com/paul-at-start) |
-| :---------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------: |
-|                                             [mgechev](https://github.com/mgechev)                                             |                                              [chavacava](https://github.com/chavacava)                                              |                                             [paul-at-start](https://github.com/paul-at-start)                                              |
+[<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) |[<img alt="chavacava" src="https://avatars2.githubusercontent.com/u/25788468?v=4&s=117" width="117">](https://github.com/chavacava) |[<img alt="tamird" src="https://avatars0.githubusercontent.com/u/1535036?v=4&s=117" width="117">](https://github.com/tamird) |[<img alt="paul-at-start" src="https://avatars2.githubusercontent.com/u/5486775?v=4&s=117" width="117">](https://github.com/paul-at-start) |[<img alt="vkrol" src="https://avatars3.githubusercontent.com/u/153412?v=4&s=117" width="117">](https://github.com/vkrol) |
+:---: |:---: |:---: |:---: |:---: |
+[mgechev](https://github.com/mgechev) |[chavacava](https://github.com/chavacava) |[tamird](https://github.com/tamird) |[paul-at-start](https://github.com/paul-at-start) |[vkrol](https://github.com/vkrol) |
 
 ## License
 
