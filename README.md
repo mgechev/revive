@@ -211,7 +211,8 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `empty-block`         |  n/a   | Warns on empty code blocks                                       |    no    |  no   |
 | `superfluous-else`    |  n/a   | Prevents redundant else statements (extends `indent-error-flow`) |    no    |  no   |
 | `confusing-naming`    |  n/a   | Warns on methods with names that differ only by capitalization   |    no    |  no   |
- 
+| `get-return      `    |  n/a   | Warns on getters that do not yield any result                    |    no    |  no   |
+
 ## Available Formatters
 
 This section lists all the available formatters and provides a screenshot for each one.
