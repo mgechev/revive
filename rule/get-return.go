@@ -37,7 +37,7 @@ func isGetter(name string) bool {
 	if strings.HasPrefix(strings.ToUpper(name), "GET") {
 		if len(name) > 3 {
 			c := name[3]
-			return (c >= 'A' && c <= 'Z')
+			return !(c >= 'a' && c <= 'z')
 		}
 	}
 
