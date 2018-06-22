@@ -30,29 +30,29 @@ Here's how `revive` is different from `golint`:
 <!-- TOC -->
 
 - [revive](#revive)
-  - [Usage](#usage)
-    - [Text Editors](#text-editors)
-    - [Installation](#installation)
-    - [Command Line Flags](#command-line-flags)
-    - [Sample Invocations](#sample-invocations)
-    - [Comment Annotations](#comment-annotations)
-    - [Configuration](#configuration)
-    - [Default Configuration](#default-configuration)
-    - [Recommended Configuration](#recommended-configuration)
-  - [Available Rules](#available-rules)
-  - [Available Formatters](#available-formatters)
-    - [Friendly](#friendly)
-    - [Stylish](#stylish)
-    - [Default](#default)
-  - [Extensibility](#extensibility)
-    - [Custom Rule](#custom-rule)
-      - [Example](#example)
-    - [Custom Formatter](#custom-formatter)
-  - [Speed Comparison](#speed-comparison)
-    - [golint](#golint)
-    - [revive](#revive-1)
-  - [Contributors](#contributors)
-  - [License](#license)
+    - [Usage](#usage)
+        - [Text Editors](#text-editors)
+        - [Installation](#installation)
+        - [Command Line Flags](#command-line-flags)
+        - [Sample Invocations](#sample-invocations)
+        - [Comment Annotations](#comment-annotations)
+        - [Configuration](#configuration)
+        - [Default Configuration](#default-configuration)
+        - [Recommended Configuration](#recommended-configuration)
+    - [Available Rules](#available-rules)
+    - [Available Formatters](#available-formatters)
+        - [Friendly](#friendly)
+        - [Stylish](#stylish)
+        - [Default](#default)
+    - [Extensibility](#extensibility)
+        - [Custom Rule](#custom-rule)
+            - [Example](#example)
+        - [Custom Formatter](#custom-formatter)
+    - [Speed Comparison](#speed-comparison)
+        - [golint](#golint)
+        - [revive](#revive-1)
+    - [Contributors](#contributors)
+    - [License](#license)
 
 <!-- /TOC -->
 
@@ -210,6 +210,8 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `file-header`         | string | Header which each file should have.                              |    no    |  no   |
 | `empty-block`         |  n/a   | Warns on empty code blocks                                       |    no    |  no   |
 | `superfluous-else`    |  n/a   | Prevents redundant else statements (extends `indent-error-flow`) |    no    |  no   |
+| `confusing-naming`    |  n/a   | Warns on methods with names that differ only by capitalization   |    no    |  no   |
+| `get-return      `    |  n/a   | Warns on getters that do not yield any result                    |    no    |  no   |
 
 ## Available Formatters
 
