@@ -212,6 +212,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `superfluous-else`    |  n/a   | Prevents redundant else statements (extends `indent-error-flow`) |    no    |  no   |
 | `confusing-naming`    |  n/a   | Warns on methods with names that differ only by capitalization   |    no    |  no   |
 | `get-return      `    |  n/a   | Warns on getters that do not yield any result                    |    no    |  no   |
+| `modifies-param`      |  n/a   | Warns on assignments to function parameters                      |    no    |  no   |
 
 ## Available Formatters
 
