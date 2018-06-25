@@ -56,24 +56,34 @@ func (w lintDeepExit) Visit(node ast.Node) ast.Visitor {
 		return w
 	}
 
-	if se, ok := node.(*ast.ExprStmt); ok {
-		if ce, ok := se.X.(*ast.CallExpr); ok { // it's a function call
-			if fc, ok := ce.Fun.(*ast.SelectorExpr); ok {
-				if id, ok := fc.X.(*ast.Ident); ok {
-					fn := fc.Sel.Name
-					pkg := id.Name
-					if w.exitFunctions[pkg][fn] { // it's a call to an exit function
-						w.onFailure(lint.Failure{
-							Confidence: 1,
-							Node:       ce,
-							Category:   "bad practice",
-							URL:        "#deep-exit",
-							Failure:    fmt.Sprintf("calls to %s.%s function should be made only in main() or init() functions", pkg, fn),
-						})
-					}
-				}
-			}
-		}
+	se, ok := node.(*ast.ExprStmt)
+	if !ok {
+		return w
+	}
+	ce, ok := se.X.(*ast.CallExpr)
+	if !ok {
+		return w
+	}
+
+	fc, ok := ce.Fun.(*ast.SelectorExpr)
+	if !ok {
+		return w
+	}
+	id, ok := fc.X.(*ast.Ident)
+	if !ok {
+		return w
+	}
+
+	fn := fc.Sel.Name
+	pkg := id.Name
+	if w.exitFunctions[pkg] != nil && w.exitFunctions[pkg][fn] { // it's a call to an exit function
+		w.onFailure(lint.Failure{
+			Confidence: 1,
+			Node:       ce,
+			Category:   "bad practice",
+			URL:        "#deep-exit",
+			Failure:    fmt.Sprintf("calls to %s.%s function should be made only in main() or init() functions", pkg, fn),
+		})
 	}
 
 	return w

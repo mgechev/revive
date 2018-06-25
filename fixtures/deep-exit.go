@@ -27,5 +27,6 @@ func bar() {
 }
 
 func bar2() {
+    bar()
     syscall.Exit(1) // MATCH /calls to syscall.Exit function should be made only in main() or init() functions/
 }
