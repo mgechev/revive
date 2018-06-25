@@ -213,6 +213,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `confusing-naming`    |  n/a   | Warns on methods with names that differ only by capitalization   |    no    |  no   |
 | `get-return      `    |  n/a   | Warns on getters that do not yield any result                    |    no    |  no   |
 | `modifies-param`      |  n/a   | Warns on assignments to function parameters                      |    no    |  no   |
+| `confusing-results`   |  n/a   | Suggests to name potentially confusing function results          |    no    |  no   |
 
 ## Available Formatters
 
