@@ -82,7 +82,7 @@ func (w lintDeepExit) Visit(node ast.Node) ast.Visitor {
 			Node:       ce,
 			Category:   "bad practice",
 			URL:        "#deep-exit",
-			Failure:    fmt.Sprintf("calls to %s.%s function should be made only in main() or init() functions", pkg, fn),
+			Failure:    fmt.Sprintf("calls to %s.%s only in main() or init() functions", pkg, fn),
 		})
 	}
 

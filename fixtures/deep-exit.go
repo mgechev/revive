@@ -7,7 +7,7 @@ import (
 )
 
 func foo0() {
-    os.Exit(1) // MATCH /calls to os.Exit function should be made only in main() or init() functions/
+    os.Exit(1) // MATCH /calls to os.Exit only in main() or init() functions/
 }
 
 func init() {
@@ -15,7 +15,7 @@ func init() {
 }
 
 func foo() {
-    log.Fatalf(1) // MATCH /calls to log.Fatalf function should be made only in main() or init() functions/
+    log.Fatalf(1) // MATCH /calls to log.Fatalf only in main() or init() functions/
 }
 
 func main() {
@@ -23,10 +23,10 @@ func main() {
 }
 
 func bar() {
-    log.Fatal(1) // MATCH /calls to log.Fatal function should be made only in main() or init() functions/
+    log.Fatal(1) // MATCH /calls to log.Fatal only in main() or init() functions/
 }
 
 func bar2() {
     bar()
-    syscall.Exit(1) // MATCH /calls to syscall.Exit function should be made only in main() or init() functions/
+    syscall.Exit(1) // MATCH /calls to syscall.Exit only in main() or init() functions/
 }
