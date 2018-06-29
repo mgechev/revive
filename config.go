@@ -53,6 +53,7 @@ var allRules = append([]lint.Rule{
 	&rule.ModifiesParamRule{},
 	&rule.DeepExitRule{},
 	&rule.ADSPrintRule{},
+	&rule.ADSLostErrRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
