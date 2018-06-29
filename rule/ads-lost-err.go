@@ -6,33 +6,33 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ADSNewErrRule lints program exit at functions other than main or init.
-type ADSNewErrRule struct{}
+// ADSLostErrRule lints program exit at functions other than main or init.
+type ADSLostErrRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ADSNewErrRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ADSLostErrRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
 
-	w := lintNewErr{onFailure, "errors", "New"}
+	w := lintLostErr{onFailure, "errors", "New"}
 	ast.Walk(w, file.AST)
 	return failures
 }
 
 // Name returns the rule name.
-func (r *ADSNewErrRule) Name() string {
+func (r *ADSLostErrRule) Name() string {
 	return "ads-newerr"
 }
 
-type lintNewErr struct {
+type lintLostErr struct {
 	onFailure  func(lint.Failure)
 	targetPkg  string
 	targetFunc string
 }
 
-func (w lintNewErr) Visit(node ast.Node) ast.Visitor {
+func (w lintLostErr) Visit(node ast.Node) ast.Visitor {
 	ce, ok := node.(*ast.CallExpr)
 	if !ok {
 		return w
@@ -58,7 +58,7 @@ func (w lintNewErr) Visit(node ast.Node) ast.Visitor {
 }
 
 type searchErr struct {
-	w  *lintNewErr
+	w  *lintLostErr
 	fc *ast.CallExpr
 }
 
@@ -73,8 +73,7 @@ func (s searchErr) Visit(node ast.Node) ast.Visitor {
 			Confidence: 0.8,
 			Node:       s.fc,
 			Category:   "bad practice",
-			URL:        "#ads-newerr",
-			Failure:    "consider errors.Wrap instead of errors.New",
+			Failure:    "original error is lost, consider using errors.NewFromError",
 		})
 
 	}
@@ -93,5 +92,4 @@ func getPkgFunc(ce *ast.CallExpr) (string, string) {
 	}
 
 	return id.Name, fc.Sel.Name
-
 }
