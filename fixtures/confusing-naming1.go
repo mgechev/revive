@@ -9,7 +9,7 @@ func (t foo) aFoo() {
 	return
 }
 
-func (t *foo) AFoo() { // MATCH /Method 'AFoo' differs only by capitalization to other method of 'foo'/
+func (t *foo) AFoo() { // MATCH /Method 'AFoo' differs only by capitalization to method 'aFoo' in the same source file/
 	return
 }
 
@@ -27,7 +27,7 @@ func aGlobal() {
 
 }
 
-func AGlobal() { // MATCH /Function 'AGlobal' differs only by capitalization to other function in the same package/
+func AGlobal() { // MATCH /Method 'AGlobal' differs only by capitalization to function 'aGlobal' in the same source file/
 }
 
 func ABar() { // Should not warn
@@ -42,7 +42,7 @@ func (t foo) ABar() { // Should not warn
 	return
 }
 
-func (t bar) ABar() { // MATCH /Method 'ABar' differs only by capitalization to other method of 'bar'/
+func (t bar) ABar() { // MATCH /Method 'ABar' differs only by capitalization to method 'aBar' in the same source file/
 	return
 }
 
