@@ -30,29 +30,29 @@ Here's how `revive` is different from `golint`:
 <!-- TOC -->
 
 - [revive](#revive)
-  - [Usage](#usage)
-    - [Text Editors](#text-editors)
-    - [Installation](#installation)
-    - [Command Line Flags](#command-line-flags)
-    - [Sample Invocations](#sample-invocations)
-    - [Comment Annotations](#comment-annotations)
-    - [Configuration](#configuration)
-    - [Default Configuration](#default-configuration)
-    - [Recommended Configuration](#recommended-configuration)
-  - [Available Rules](#available-rules)
-  - [Available Formatters](#available-formatters)
-    - [Friendly](#friendly)
-    - [Stylish](#stylish)
-    - [Default](#default)
-  - [Extensibility](#extensibility)
-    - [Custom Rule](#custom-rule)
-      - [Example](#example)
-    - [Custom Formatter](#custom-formatter)
-  - [Speed Comparison](#speed-comparison)
-    - [golint](#golint)
-    - [revive](#revive-1)
-  - [Contributors](#contributors)
-  - [License](#license)
+    - [Usage](#usage)
+        - [Text Editors](#text-editors)
+        - [Installation](#installation)
+        - [Command Line Flags](#command-line-flags)
+        - [Sample Invocations](#sample-invocations)
+        - [Comment Annotations](#comment-annotations)
+        - [Configuration](#configuration)
+        - [Default Configuration](#default-configuration)
+        - [Recommended Configuration](#recommended-configuration)
+    - [Available Rules](#available-rules)
+    - [Available Formatters](#available-formatters)
+        - [Friendly](#friendly)
+        - [Stylish](#stylish)
+        - [Default](#default)
+    - [Extensibility](#extensibility)
+        - [Custom Rule](#custom-rule)
+            - [Example](#example)
+        - [Custom Formatter](#custom-formatter)
+    - [Speed Comparison](#speed-comparison)
+        - [golint](#golint)
+        - [revive](#revive-1)
+    - [Contributors](#contributors)
+    - [License](#license)
 
 <!-- /TOC -->
 
@@ -181,7 +181,7 @@ This will use `config.toml`, the `friendly` formatter, and will run linting over
 
 ## Available Rules
 
-List of all available rules. The rules ported from `golint` are left unchanged and indicated in the `golit` column.
+List of all available rules. The rules ported from `golint` are left unchanged and indicated in the `golint` column.
 
 | Name                  | Config | Description                                                      | `golint` | Typed |
 | --------------------- | :----: | :--------------------------------------------------------------- | :------: | :---: |
@@ -211,6 +211,9 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `empty-block`         |  n/a   | Warns on empty code blocks                                       |    no    |  no   |
 | `superfluous-else`    |  n/a   | Prevents redundant else statements (extends `indent-error-flow`) |    no    |  no   |
 | `confusing-naming`    |  n/a   | Warns on methods with names that differ only by capitalization   |    no    |  no   |
+| `get-return      `    |  n/a   | Warns on getters that do not yield any result                    |    no    |  no   |
+| `modifies-param`      |  n/a   | Warns on assignments to function parameters                      |    no    |  no   |
+| `deep-exit`           |  n/a   | Looks for program exits in funcs other than `main()` or `init()` |    no    |  no   |
 
 ## Available Formatters
 
@@ -318,9 +321,9 @@ Currently, type checking is enabled by default. If you want to run the linter wi
 
 ## Contributors
 
-| [<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) | [<img alt="paul-at-start" src="https://avatars2.githubusercontent.com/u/5486775?v=4&s=117" width="117">](https://github.com/paul-at-start) | [<img alt="chavacava" src="https://avatars2.githubusercontent.com/u/25788468?v=4&s=117" width="117">](https://github.com/chavacava) |
-| :---------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------: |
-|                                             [mgechev](https://github.com/mgechev)                                             |                                             [paul-at-start](https://github.com/paul-at-start)                                              |                                              [chavacava](https://github.com/chavacava)                                              |
+[<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) |[<img alt="chavacava" src="https://avatars2.githubusercontent.com/u/25788468?v=4&s=117" width="117">](https://github.com/chavacava) |[<img alt="tamird" src="https://avatars0.githubusercontent.com/u/1535036?v=4&s=117" width="117">](https://github.com/tamird) |[<img alt="paul-at-start" src="https://avatars2.githubusercontent.com/u/5486775?v=4&s=117" width="117">](https://github.com/paul-at-start) |[<img alt="vkrol" src="https://avatars3.githubusercontent.com/u/153412?v=4&s=117" width="117">](https://github.com/vkrol) |
+:---: |:---: |:---: |:---: |:---: |
+[mgechev](https://github.com/mgechev) |[chavacava](https://github.com/chavacava) |[tamird](https://github.com/tamird) |[paul-at-start](https://github.com/paul-at-start) |[vkrol](https://github.com/vkrol) |
 
 ## License
 

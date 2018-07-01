@@ -50,6 +50,9 @@ var allRules = append([]lint.Rule{
 	&rule.EmptyBlockRule{},
 	&rule.SuperfluousElseRule{},
 	&rule.ConfusingNamingRule{},
+	&rule.GetReturnRule{},
+	&rule.ModifiesParamRule{},
+	&rule.DeepExitRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
