@@ -49,6 +49,7 @@ var allRules = append([]lint.Rule{
 	&rule.FileHeaderRule{},
 	&rule.EmptyBlockRule{},
 	&rule.SuperfluousElseRule{},
+	&rule.ConfusingNamingRule{},
 	&rule.GetReturnRule{},
 	&rule.ModifiesParamRule{},
 	&rule.DeepExitRule{},
