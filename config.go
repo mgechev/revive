@@ -52,6 +52,7 @@ var allRules = append([]lint.Rule{
 	&rule.ConfusingNamingRule{},
 	&rule.GetReturnRule{},
 	&rule.ModifiesParamRule{},
+	&rule.ConfusingResultsRule{},
 	&rule.DeepExitRule{},
 }, defaultRules...)
 
