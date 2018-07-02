@@ -49,9 +49,11 @@ var allRules = append([]lint.Rule{
 	&rule.FileHeaderRule{},
 	&rule.EmptyBlockRule{},
 	&rule.SuperfluousElseRule{},
+	&rule.ConfusingNamingRule{},
 	&rule.GetReturnRule{},
 	&rule.ModifiesParamRule{},
 	&rule.ConfusingResultsRule{},
+	&rule.DeepExitRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
