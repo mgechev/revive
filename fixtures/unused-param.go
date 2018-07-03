@@ -1,0 +1,60 @@
+package fixtures
+
+import (
+	"fmt"
+)
+
+func aFunc(a int, _ float) {
+	fmt.Printf("Hello, Golang\n")
+    b := a
+}
+
+func bFunc(b int, _ float, c string) { // MATCH /parameter 'b' seems to be unused, consider removing or renaming it as _/
+	fmt.Printf("Hello, Golang\n")
+    c := 1 // Not detected
+}
+
+func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, src []byte, rules []lint.Rule, config map[string]lint.RuleConfig) error { // MATCH /parameter 'src' seems to be unused, consider removing or renaming it as _/
+	l := lint.New(func(file string) ([]byte, error) {
+		return ioutil.ReadFile(baseDir + file)
+	})
+
+	ps, err := l.Lint([][]string{[]string{fi.Name()}}, rules, lint.Config{
+		Rules: config,
+	})
+	if err != nil {
+		return err
+	}
+
+	failures := ""
+	for p := range ps {
+		failures += p.Failure
+	}
+	if failures != "" {
+		t.Errorf("Expected the rule to pass but got the following failures: %s", failures)
+	}
+	return nil
+}
+
+func (w lintCyclomatic) Visit(n ast.Node) ast.Visitor { // MATCH /parameter 'n' seems to be unused, consider removing or renaming it as _/
+	f := w.file
+	for _, decl := range f.AST.Decls {
+		if fn, ok := decl.(*ast.FuncDecl); ok {
+			c := complexity(fn)
+			if c > w.complexity {
+				w.onFailure(lint.Failure{
+					Confidence: 1,
+					Category:   "maintenance",
+					Failure:    fmt.Sprintf("function %s has cyclomatic complexity %d", funcName(fn), c),
+					Node:       fn,
+				})
+			}
+		}
+	}
+	return nil
+}
+
+func ext۰time۰Sleep(fr *frame, args []value) value { // MATCH /parameter 'fr' seems to be unused, consider removing or renaming it as _/
+	time.Sleep(time.Duration(args[0].(int64)))
+	return nil
+}

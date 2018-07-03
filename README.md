@@ -215,6 +215,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `modifies-param`      |  n/a   | Warns on assignments to function parameters                      |    no    |  no   |
 | `confusing-results`   |  n/a   | Suggests to name potentially confusing function results          |    no    |  no   |
 | `deep-exit`           |  n/a   | Looks for program exits in funcs other than `main()` or `init()` |    no    |  no   |
+| `unused-parameter`    |  n/a   | Suggests to rename or remove unused function parameters          |    no    |  no   |
 
 ## Available Formatters
 
