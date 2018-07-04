@@ -11,13 +11,29 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-func function(param int) { // MATCH /parameter 'param' seems to be unused, consider removing or renaming it as _/
+func f1(param int) { // MATCH /parameter 'param' seems to be unused, consider removing or renaming it as _/
 	if param := fn(); predicate(param) {
 		// do stuff
 	}
 }
 
-func aFunc(a int, _ float) { // MATCH /parameter 'a' seems to be unused, consider removing or renaming it as _/
+func f2(param int) { // MATCH /parameter 'param' seems to be unused, consider removing or renaming it as _/
+	switch param := fn(); param {
+	default:
+		
+	}
+}
+
+func f3(param myStruct) { 
+	a:= param.field
+}
+
+func f4(param myStruct, c int) { // MATCH /parameter 'c' seems to be unused, consider removing or renaming it as _/ 
+	param.field = "aString"
+	param.c = "sss" 
+}
+
+func f5(a int, _ float) { // MATCH /parameter 'a' seems to be unused, consider removing or renaming it as _/
 	fmt.Printf("Hello, Golang\n")
 	{
 		if true {
@@ -27,7 +43,7 @@ func aFunc(a int, _ float) { // MATCH /parameter 'a' seems to be unused, conside
 	}
 }
 
-func bFunc(_ float, c string) { // MATCH /parameter 'c' seems to be unused, consider removing or renaming it as _/
+func f6(_ float, c string) { // MATCH /parameter 'c' seems to be unused, consider removing or renaming it as _/
 	fmt.Printf("Hello, Golang\n")
 	c := 1
 }
