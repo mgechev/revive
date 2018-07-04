@@ -37,7 +37,7 @@ type lintUnusedParamRule struct {
 func (w lintUnusedParamRule) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
 	case *ast.FuncDecl:
-		fv := funcVisitor{params: retrieveNamedParams(n.Type.Params.List)}
+		fv := newFuncVisitor(retrieveNamedParams(n.Type.Params.List))
 		if n.Body != nil {
 			ast.Walk(fv, n.Body)
 			checkUnusedParams(w, fv.params, n)
@@ -48,16 +48,77 @@ func (w lintUnusedParamRule) Visit(node ast.Node) ast.Visitor {
 	return w
 }
 
+type scope struct {
+	vars map[string]bool
+}
+
+func newScope() scope {
+	return scope{make(map[string]bool, 0)}
+}
+
+func (s *scope) addVar(exps []ast.Expr) {
+	for _, e := range exps {
+		if id, ok := e.(*ast.Ident); ok {
+			s.vars[id.Name] = true
+		}
+	}
+}
+
+type scopeStack struct {
+	stk []scope
+}
+
+func (s *scopeStack) openScope() {
+	s.stk = append(s.stk, newScope())
+}
+
+func (s *scopeStack) closeScope() {
+	if len(s.stk) > 0 {
+		s.stk = s.stk[:len(s.stk)-1]
+	}
+}
+
+func (s *scopeStack) currentScope() scope {
+	if len(s.stk) > 0 {
+		return s.stk[len(s.stk)-1]
+	}
+
+	panic("no current scope")
+}
+
+func newScopeStack() scopeStack {
+	return scopeStack{make([]scope, 0)}
+}
+
 type funcVisitor struct {
+	sStk   scopeStack
 	params map[string]bool
+}
+
+func newFuncVisitor(params map[string]bool) funcVisitor {
+	return funcVisitor{sStk: newScopeStack(), params: params}
+}
+
+func walkStmtList(v ast.Visitor, list []ast.Stmt) {
+	for _, s := range list {
+		ast.Walk(v, s)
+	}
 }
 
 func (v funcVisitor) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
+	case *ast.BlockStmt:
+		v.sStk.openScope()
+		walkStmtList(v, n.List)
+		v.sStk.closeScope()
+		return nil
+	case *ast.AssignStmt:
+		cs := v.sStk.currentScope()
+		cs.addVar(n.Lhs)
 	case *ast.Ident:
 		if n.Obj != nil {
 			if n.Obj.Kind.String() == "var" {
-				markParamAsUsed(n, v.params)
+				markParamAsUsed(n, v)
 			}
 		}
 	}
@@ -90,8 +151,14 @@ func checkUnusedParams(w lintUnusedParamRule, params map[string]bool, n *ast.Fun
 	}
 
 }
-func markParamAsUsed(id *ast.Ident, params map[string]bool) {
-	if params[id.Name] {
-		params[id.Name] = false
+func markParamAsUsed(id *ast.Ident, v funcVisitor) {
+	for _, s := range v.sStk.stk {
+		if s.vars[id.Name] {
+			return
+		}
+	}
+
+	if v.params[id.Name] {
+		v.params[id.Name] = false
 	}
 }

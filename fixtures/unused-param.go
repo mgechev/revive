@@ -4,12 +4,17 @@ import (
 	"fmt"
 )
 
-func aFunc(a int, _ float) {
+func aFunc(a int, _ float) { // MATCH /parameter 'a' seems to be unused, consider removing or renaming it as _/
 	fmt.Printf("Hello, Golang\n")
-    b := a
+	{
+		if true {
+			a:=0
+    		b := a
+		}
+	}
 }
 
-func bFunc(b int, _ float, c string) { // MATCH /parameter 'b' seems to be unused, consider removing or renaming it as _/
+func bFunc(_ float, c string) { // MATCH /parameter 'c' seems to be unused, consider removing or renaming it as _/ 
 	fmt.Printf("Hello, Golang\n")
     c := 1 // Not detected
 }
