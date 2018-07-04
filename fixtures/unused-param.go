@@ -2,21 +2,34 @@ package fixtures
 
 import (
 	"fmt"
+	"go/ast"
+	"io/ioutil"
+	"os"
+	"testing"
+	"time"
+
+	"github.com/mgechev/revive/lint"
 )
+
+func function(param int) { // MATCH /parameter 'param' seems to be unused, consider removing or renaming it as _/
+	if param := fn(); predicate(param) {
+		// do stuff
+	}
+}
 
 func aFunc(a int, _ float) { // MATCH /parameter 'a' seems to be unused, consider removing or renaming it as _/
 	fmt.Printf("Hello, Golang\n")
 	{
 		if true {
-			a:=0
-    		b := a
+			a := 2
+			b := a
 		}
 	}
 }
 
-func bFunc(_ float, c string) { // MATCH /parameter 'c' seems to be unused, consider removing or renaming it as _/ 
+func bFunc(_ float, c string) { // MATCH /parameter 'c' seems to be unused, consider removing or renaming it as _/
 	fmt.Printf("Hello, Golang\n")
-    c := 1 // Not detected
+	c := 1
 }
 
 func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, src []byte, rules []lint.Rule, config map[string]lint.RuleConfig) error { // MATCH /parameter 'src' seems to be unused, consider removing or renaming it as _/

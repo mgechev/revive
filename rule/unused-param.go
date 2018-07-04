@@ -113,6 +113,14 @@ func (v funcVisitor) Visit(node ast.Node) ast.Visitor {
 		v.sStk.closeScope()
 		return nil
 	case *ast.AssignStmt:
+		varSelector := func(n ast.Node) bool {
+			id, ok := n.(*ast.Ident)
+			return ok && id.Obj != nil && id.Obj.Kind.String() == "var"
+		}
+		uses := pickFromExpList(n.Rhs, varSelector)
+		for _, id := range uses {
+			markParamAsUsed(id.(*ast.Ident), v)
+		}
 		cs := v.sStk.currentScope()
 		cs.addVar(n.Lhs)
 	case *ast.Ident:
@@ -161,4 +169,39 @@ func markParamAsUsed(id *ast.Ident, v funcVisitor) {
 	if v.params[id.Name] {
 		v.params[id.Name] = false
 	}
+}
+
+type picker struct {
+	fselect  func(n ast.Node) bool
+	onSelect func(n ast.Node)
+}
+
+func pick(n ast.Node, fselect func(n ast.Node) bool) []interface{} {
+	var result []interface{}
+	onSelect := func(n ast.Node) {
+		result = append(result, n)
+	}
+	p := picker{fselect: fselect, onSelect: onSelect}
+	ast.Walk(p, n)
+	return result
+}
+
+func pickFromExpList(l []ast.Expr, fselect func(n ast.Node) bool) []interface{} {
+	result := make([]interface{}, 0)
+	for _, e := range l {
+		result = append(result, pick(e, fselect)...)
+	}
+	return result
+}
+
+func (p picker) Visit(node ast.Node) ast.Visitor {
+	if p.fselect == nil {
+		return nil
+	}
+
+	if p.fselect(node) {
+		p.onSelect(node)
+	}
+
+	return p
 }
