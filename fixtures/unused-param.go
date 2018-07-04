@@ -11,6 +11,10 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
+func f0(param int) {
+	param := param
+}
+
 func f1(param int) { // MATCH /parameter 'param' seems to be unused, consider removing or renaming it as _/
 	if param := fn(); predicate(param) {
 		// do stuff
