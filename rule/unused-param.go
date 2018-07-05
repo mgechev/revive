@@ -56,7 +56,7 @@ func newScope() scope {
 	return scope{make(map[string]bool, 0)}
 }
 
-func (s *scope) addVar(exps []ast.Expr) {
+func (s *scope) addVars(exps []ast.Expr) {
 	for _, e := range exps {
 		if id, ok := e.(*ast.Ident); ok {
 			s.vars[id.Name] = true
@@ -106,6 +106,10 @@ func walkStmtList(v ast.Visitor, list []ast.Stmt) {
 }
 
 func (v funcVisitor) Visit(node ast.Node) ast.Visitor {
+	varSelector := func(n ast.Node) bool {
+		id, ok := n.(*ast.Ident)
+		return ok && id.Obj != nil && id.Obj.Kind.String() == "var"
+	}
 	switch n := node.(type) {
 	case *ast.BlockStmt:
 		v.sStk.openScope()
@@ -113,22 +117,42 @@ func (v funcVisitor) Visit(node ast.Node) ast.Visitor {
 		v.sStk.closeScope()
 		return nil
 	case *ast.AssignStmt:
-		varSelector := func(n ast.Node) bool {
-			id, ok := n.(*ast.Ident)
-			return ok && id.Obj != nil && id.Obj.Kind.String() == "var"
-		}
 		uses := pickFromExpList(n.Rhs, varSelector)
 		for _, id := range uses {
 			markParamAsUsed(id.(*ast.Ident), v)
 		}
 		cs := v.sStk.currentScope()
-		cs.addVar(n.Lhs)
+		cs.addVars(n.Lhs)
 	case *ast.Ident:
 		if n.Obj != nil {
 			if n.Obj.Kind.String() == "var" {
 				markParamAsUsed(n, v)
 			}
 		}
+	case *ast.ForStmt:
+		v.sStk.openScope()
+		if n.Init != nil {
+			ast.Walk(v, n.Init)
+		}
+		uses := pickFromExpList([]ast.Expr{n.Cond}, varSelector)
+		for _, id := range uses {
+			markParamAsUsed(id.(*ast.Ident), v)
+		}
+		ast.Walk(v, n.Body)
+		v.sStk.closeScope()
+		return nil
+	case *ast.SwitchStmt:
+		v.sStk.openScope()
+		if n.Init != nil {
+			ast.Walk(v, n.Init)
+		}
+		uses := pickFromExpList([]ast.Expr{n.Tag}, varSelector)
+		for _, id := range uses {
+			markParamAsUsed(id.(*ast.Ident), v)
+		}
+		ast.Walk(v, n.Body)
+		v.sStk.closeScope()
+		return nil
 	}
 
 	return v
@@ -178,6 +202,10 @@ type picker struct {
 
 func pick(n ast.Node, fselect func(n ast.Node) bool) []interface{} {
 	var result []interface{}
+	if n == nil {
+		return result
+	}
+
 	onSelect := func(n ast.Node) {
 		result = append(result, n)
 	}

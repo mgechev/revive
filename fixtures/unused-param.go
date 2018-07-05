@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"io/ioutil"
 	"os"
+	"runtime"
 	"testing"
 	"time"
 
@@ -24,17 +25,17 @@ func f1(param int) { // MATCH /parameter 'param' seems to be unused, consider re
 func f2(param int) { // MATCH /parameter 'param' seems to be unused, consider removing or renaming it as _/
 	switch param := fn(); param {
 	default:
-		
+
 	}
 }
 
-func f3(param myStruct) { 
-	a:= param.field
+func f3(param myStruct) {
+	a := param.field
 }
 
-func f4(param myStruct, c int) { // MATCH /parameter 'c' seems to be unused, consider removing or renaming it as _/ 
+func f4(param myStruct, c int) { // MATCH /parameter 'c' seems to be unused, consider removing or renaming it as _/
 	param.field = "aString"
-	param.c = "sss" 
+	param.c = "sss"
 }
 
 func f5(a int, _ float) { // MATCH /parameter 'a' seems to be unused, consider removing or renaming it as _/
@@ -47,9 +48,57 @@ func f5(a int, _ float) { // MATCH /parameter 'a' seems to be unused, consider r
 	}
 }
 
-func f6(_ float, c string) { // MATCH /parameter 'c' seems to be unused, consider removing or renaming it as _/
-	fmt.Printf("Hello, Golang\n")
-	c := 1
+func f6(unused string) { // MATCH /parameter 'unused' seems to be unused, consider removing or renaming it as _/
+	switch unused := runtime.GOOS; unused {
+	case "darwin":
+		fmt.Println("OS X.")
+	case "linux":
+		fmt.Println("Linux.")
+	default:
+		fmt.Printf("%s.", unused)
+	}
+	for unused := 0; unused < 10; unused++ {
+		sum += unused
+	}
+	{
+		unused := 1
+	}
+}
+
+func f6bis(unused string) {
+	switch unused := runtime.GOOS; unused {
+	case "darwin":
+		fmt.Println("OS X.")
+	case "linux":
+		fmt.Println("Linux.")
+	default:
+		fmt.Printf("%s.", unused)
+	}
+	for unused := 0; unused < 10; unused++ {
+		sum += unused
+	}
+	{
+		unused := 1
+	}
+
+	fmt.Print(unused)
+}
+
+func f7(pl int) {
+	for i := 0; pl < i; i-- {
+
+	}
+}
+
+func getCompareFailCause(n *node, which int, prevValue string, prevIndex uint64) string {
+	switch which {
+	case CompareIndexNotMatch:
+		return fmt.Sprintf("[%v != %v]", prevIndex, n.ModifiedIndex)
+	case CompareValueNotMatch:
+		return fmt.Sprintf("[%v != %v]", prevValue, n.Value)
+	default:
+		return fmt.Sprintf("[%v != %v] [%v != %v]", prevValue, n.Value, prevIndex, n.ModifiedIndex)
+	}
 }
 
 func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, src []byte, rules []lint.Rule, config map[string]lint.RuleConfig) error { // MATCH /parameter 'src' seems to be unused, consider removing or renaming it as _/
