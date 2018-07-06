@@ -145,3 +145,25 @@ func ext۰time۰Sleep(fr *frame, args []value) value { // MATCH /parameter 'fr' 
 	time.Sleep(time.Duration(args[0].(int64)))
 	return nil
 }
+
+func (c *chanList) remove(id uint32) {
+	id -= c.offset
+}
+
+func (c *chanList) remove1(id uint32) {
+	id *= c.offset
+}
+
+func (c *chanList) remove2(id uint32) {
+	id /= c.offset
+}
+
+func (c *chanList) remove3(id uint32) {
+	id += c.offset
+}
+
+func encodeFixed64Rpc(dAtA []byte, offset int, v uint64, i int) int {
+	dAtA[offset+i] = uint8(v)
+
+	return 8
+}

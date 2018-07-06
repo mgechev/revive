@@ -3,6 +3,7 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"go/token"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -117,10 +118,29 @@ func (v funcVisitor) Visit(node ast.Node) ast.Visitor {
 		v.sStk.closeScope()
 		return nil
 	case *ast.AssignStmt:
-		uses := pickFromExpList(n.Rhs, varSelector)
-		for _, id := range uses {
-			markParamAsUsed(id.(*ast.Ident), v)
+		var uses []ast.Node
+		if isOpAssign(n.Tok) { // Case of id += expr
+			uses = append(uses, pickFromExpList(n.Lhs, varSelector, nil)...)
+		} else { // Case of id[expr] = expr
+			indexSelector := func(n ast.Node) bool {
+				_, ok := n.(*ast.IndexExpr)
+				return ok
+			}
+			f := func(n ast.Node) []ast.Node {
+				ie, ok := n.(*ast.IndexExpr)
+				if !ok { // not possible
+					return nil
+				}
+
+				return pick(ie.Index, varSelector, nil)
+			}
+
+			uses = append(uses, pickFromExpList(n.Lhs, indexSelector, f)...)
 		}
+
+		uses = append(uses, pickFromExpList(n.Rhs, varSelector, nil)...)
+
+		markParamListAsUsed(uses, v)
 		cs := v.sStk.currentScope()
 		cs.addVars(n.Lhs)
 	case *ast.Ident:
@@ -134,10 +154,8 @@ func (v funcVisitor) Visit(node ast.Node) ast.Visitor {
 		if n.Init != nil {
 			ast.Walk(v, n.Init)
 		}
-		uses := pickFromExpList([]ast.Expr{n.Cond}, varSelector)
-		for _, id := range uses {
-			markParamAsUsed(id.(*ast.Ident), v)
-		}
+		uses := pickFromExpList([]ast.Expr{n.Cond}, varSelector, nil)
+		markParamListAsUsed(uses, v)
 		ast.Walk(v, n.Body)
 		v.sStk.closeScope()
 		return nil
@@ -146,11 +164,24 @@ func (v funcVisitor) Visit(node ast.Node) ast.Visitor {
 		if n.Init != nil {
 			ast.Walk(v, n.Init)
 		}
-		uses := pickFromExpList([]ast.Expr{n.Tag}, varSelector)
-		for _, id := range uses {
-			markParamAsUsed(id.(*ast.Ident), v)
+		uses := pickFromExpList([]ast.Expr{n.Tag}, varSelector, nil)
+		markParamListAsUsed(uses, v)
+		// Analyze cases (they are not BlockStmt but a list of Stmt)
+		cases := n.Body.List
+		for _, c := range cases {
+			cc, ok := c.(*ast.CaseClause)
+			if !ok {
+				continue
+			}
+			uses := pickFromExpList(cc.List, varSelector, nil)
+			markParamListAsUsed(uses, v)
+			v.sStk.openScope()
+			for _, stmt := range cc.Body {
+				ast.Walk(v, stmt)
+			}
+			v.sStk.closeScope()
 		}
-		ast.Walk(v, n.Body)
+
 		v.sStk.closeScope()
 		return nil
 	}
@@ -183,7 +214,14 @@ func checkUnusedParams(w lintUnusedParamRule, params map[string]bool, n *ast.Fun
 	}
 
 }
-func markParamAsUsed(id *ast.Ident, v funcVisitor) {
+
+func markParamListAsUsed(ids []ast.Node, v funcVisitor) {
+	for _, id := range ids {
+		markParamAsUsed(id.(*ast.Ident), v)
+	}
+}
+
+func markParamAsUsed(id *ast.Ident, v funcVisitor) { // TODO: constraint parameters to receive just a list of params and a scope stack
 	for _, s := range v.sStk.stk {
 		if s.vars[id.Name] {
 			return
@@ -200,24 +238,29 @@ type picker struct {
 	onSelect func(n ast.Node)
 }
 
-func pick(n ast.Node, fselect func(n ast.Node) bool) []interface{} {
-	var result []interface{}
+func pick(n ast.Node, fselect func(n ast.Node) bool, f func(n ast.Node) []ast.Node) []ast.Node {
+	var result []ast.Node
+
 	if n == nil {
 		return result
 	}
 
+	if f == nil {
+		f = func(n ast.Node) []ast.Node { return []ast.Node{n} }
+	}
+
 	onSelect := func(n ast.Node) {
-		result = append(result, n)
+		result = append(result, f(n)...)
 	}
 	p := picker{fselect: fselect, onSelect: onSelect}
 	ast.Walk(p, n)
 	return result
 }
 
-func pickFromExpList(l []ast.Expr, fselect func(n ast.Node) bool) []interface{} {
-	result := make([]interface{}, 0)
+func pickFromExpList(l []ast.Expr, fselect func(n ast.Node) bool, f func(n ast.Node) []ast.Node) []ast.Node {
+	result := make([]ast.Node, 0)
 	for _, e := range l {
-		result = append(result, pick(e, fselect)...)
+		result = append(result, pick(e, fselect, f)...)
 	}
 	return result
 }
@@ -232,4 +275,12 @@ func (p picker) Visit(node ast.Node) ast.Visitor {
 	}
 
 	return p
+}
+
+func isOpAssign(aTok token.Token) bool {
+	return aTok == token.ADD_ASSIGN || aTok == token.AND_ASSIGN ||
+		aTok == token.MUL_ASSIGN || aTok == token.OR_ASSIGN ||
+		aTok == token.QUO_ASSIGN || aTok == token.REM_ASSIGN ||
+		aTok == token.SHL_ASSIGN || aTok == token.SHR_ASSIGN ||
+		aTok == token.SUB_ASSIGN || aTok == token.XOR_ASSIGN
 }
