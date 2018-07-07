@@ -146,8 +146,11 @@ func (w *lintExported) lintTypeDoc(t *ast.TypeSpec, doc *ast.CommentGroup) {
 	}
 
 	s := doc.Text()
-	articles := [...]string{"A", "An", "The"}
+	articles := [...]string{"A", "An", "The", "This"}
 	for _, a := range articles {
+		if t.Name.Name == a {
+			continue
+		}
 		if strings.HasPrefix(s, a+" ") {
 			s = s[len(a)+1:]
 			break
