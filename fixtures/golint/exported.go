@@ -7,6 +7,9 @@ type (
 
 	// A is shortcut for []O.
 	A = []O
+
+	// This Person type is simple
+	Person = map[string]interface{}
 )
 
 type Foo struct{} // MATCH /exported type Foo should have comment or be unexported/
