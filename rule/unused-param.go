@@ -233,50 +233,6 @@ func markParamAsUsed(id *ast.Ident, v funcVisitor) { // TODO: constraint paramet
 	}
 }
 
-type picker struct {
-	fselect  func(n ast.Node) bool
-	onSelect func(n ast.Node)
-}
-
-func pick(n ast.Node, fselect func(n ast.Node) bool, f func(n ast.Node) []ast.Node) []ast.Node {
-	var result []ast.Node
-
-	if n == nil {
-		return result
-	}
-
-	if f == nil {
-		f = func(n ast.Node) []ast.Node { return []ast.Node{n} }
-	}
-
-	onSelect := func(n ast.Node) {
-		result = append(result, f(n)...)
-	}
-	p := picker{fselect: fselect, onSelect: onSelect}
-	ast.Walk(p, n)
-	return result
-}
-
-func pickFromExpList(l []ast.Expr, fselect func(n ast.Node) bool, f func(n ast.Node) []ast.Node) []ast.Node {
-	result := make([]ast.Node, 0)
-	for _, e := range l {
-		result = append(result, pick(e, fselect, f)...)
-	}
-	return result
-}
-
-func (p picker) Visit(node ast.Node) ast.Visitor {
-	if p.fselect == nil {
-		return nil
-	}
-
-	if p.fselect(node) {
-		p.onSelect(node)
-	}
-
-	return p
-}
-
 func isOpAssign(aTok token.Token) bool {
 	return aTok == token.ADD_ASSIGN || aTok == token.AND_ASSIGN ||
 		aTok == token.MUL_ASSIGN || aTok == token.OR_ASSIGN ||
