@@ -91,6 +91,7 @@ go get -u github.com/mgechev/revive
 - `-formatter [NAME]` - formatter to be used for the output. The currently available formatters are:
   - `default` - will output the failures the same way that `golint` does.
   - `json` - outputs the failures in JSON format.
+  - `ndjson` - outputs the failures as stream in newline delimited JSON (NDJSON) format.
   - `friendly` - outputs the failures when found. Shows summary of all the failures.
   - `stylish` - formats the failures in a table. Keep in mind that it doesn't stream the output so it might be perceived as slower compared to others.
 
