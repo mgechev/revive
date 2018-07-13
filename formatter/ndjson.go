@@ -7,19 +7,19 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// JSONStream is an implementation of the Formatter interface
-// which formats the errors to JSON.
-type JSONStream struct {
+// NDJSON is an implementation of the Formatter interface
+// which formats the errors to NDJSON stream.
+type NDJSON struct {
 	Metadata lint.FormatterMetadata
 }
 
 // Name returns the name of the formatter
-func (f *JSONStream) Name() string {
-	return "json-stream"
+func (f *NDJSON) Name() string {
+	return "ndjson"
 }
 
 // Format formats the failures gotten from the lint.
-func (f *JSONStream) Format(failures <-chan lint.Failure, config lint.RulesConfig) (string, error) {
+func (f *NDJSON) Format(failures <-chan lint.Failure, config lint.RulesConfig) (string, error) {
 	enc := json.NewEncoder(os.Stdout)
 	for failure := range failures {
 		obj := jsonObject{}
