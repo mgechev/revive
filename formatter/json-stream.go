@@ -19,10 +19,13 @@ func (f *JSONStream) Name() string {
 }
 
 // Format formats the failures gotten from the lint.
-func (f *JSONStream) Format(failures <-chan lint.Failure, _ lint.RulesConfig) (string, error) {
+func (f *JSONStream) Format(failures <-chan lint.Failure, config lint.RulesConfig) (string, error) {
 	enc := json.NewEncoder(os.Stdout)
 	for failure := range failures {
-		err := enc.Encode(failure)
+		obj := jsonObject{}
+		obj.Severity = severity(config, failure)
+		obj.Failure = failure
+		err := enc.Encode(obj)
 		if err != nil {
 			return "", err
 		}
