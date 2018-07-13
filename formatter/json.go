@@ -17,11 +17,20 @@ func (f *JSON) Name() string {
 	return "json"
 }
 
+// JSONObject defines a JSON object of an failure
+type JSONObject struct {
+	Severity     lint.Severity
+	lint.Failure `json:",inline"`
+}
+
 // Format formats the failures gotten from the lint.
 func (f *JSON) Format(failures <-chan lint.Failure, config lint.RulesConfig) (string, error) {
-	var slice []lint.Failure
+	var slice []JSONObject
 	for failure := range failures {
-		slice = append(slice, failure)
+		obj := JSONObject{}
+		obj.Severity = severity(config, failure)
+		obj.Failure = failure
+		slice = append(slice, obj)
 	}
 	result, err := json.Marshal(slice)
 	if err != nil {
