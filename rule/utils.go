@@ -146,3 +146,51 @@ func srcLine(src []byte, p token.Position) string {
 	}
 	return string(src[lo:hi])
 }
+
+// pick yields a list of nodes by picking them from a sub-ast with root node n.
+// Nodes are selected by applying the fselect function
+// f function is applied to each selected node before inseting it in the final result. 
+// If f==nil then it defaults to the identity function (ie it returns the node itself)
+func pick(n ast.Node, fselect func(n ast.Node) bool, f func(n ast.Node) []ast.Node) []ast.Node {
+	var result []ast.Node
+
+	if n == nil {
+		return result
+	}
+
+	if f == nil {
+		f = func(n ast.Node) []ast.Node { return []ast.Node{n} }
+	}
+
+	onSelect := func(n ast.Node) {
+		result = append(result, f(n)...)
+	}
+	p := picker{fselect: fselect, onSelect: onSelect}
+	ast.Walk(p, n)
+	return result
+}
+
+func pickFromExpList(l []ast.Expr, fselect func(n ast.Node) bool, f func(n ast.Node) []ast.Node) []ast.Node {
+	result := make([]ast.Node, 0)
+	for _, e := range l {
+		result = append(result, pick(e, fselect, f)...)
+	}
+	return result
+}
+
+type picker struct {
+	fselect  func(n ast.Node) bool
+	onSelect func(n ast.Node)
+}
+
+func (p picker) Visit(node ast.Node) ast.Visitor {
+	if p.fselect == nil {
+		return nil
+	}
+
+	if p.fselect(node) {
+		p.onSelect(node)
+	}
+
+	return p
+}

@@ -61,6 +61,7 @@ var allFormatters = []lint.Formatter{
 	&formatter.Stylish{},
 	&formatter.Friendly{},
 	&formatter.JSON{},
+	&formatter.NDJSON{},
 	&formatter.Default{},
 }
 
