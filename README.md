@@ -96,7 +96,8 @@ go get -u github.com/mgechev/revive
   - `ndjson` - outputs the failures as stream in newline delimited JSON (NDJSON) format.
   - `friendly` - outputs the failures when found. Shows summary of all the failures.
   - `stylish` - formats the failures in a table. Keep in mind that it doesn't stream the output so it might be perceived as slower compared to others.
-
+  - `checkstyle` - outputs the failures in XML format compatible with that of Java's [Checkstyle](https://checkstyle.org/).
+  
 ### Sample Invocations
 
 ```shell

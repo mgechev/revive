@@ -63,6 +63,7 @@ var allFormatters = []lint.Formatter{
 	&formatter.JSON{},
 	&formatter.NDJSON{},
 	&formatter.Default{},
+	&formatter.Checkstyle{},
 }
 
 func getFormatters() map[string]lint.Formatter {
