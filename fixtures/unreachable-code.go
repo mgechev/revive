@@ -6,6 +6,13 @@ import (
 	"os"
 )
 
+func foo() int {
+	log.Fatalf("%s", "About to fail") // ignore
+	return 0                          // MATCH /unreachable code after this statement/
+	return 1
+	Println("unreachable")
+}
+
 func f() {
 	fmt.Println("Hello, playground")
 	if true {

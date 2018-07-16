@@ -92,6 +92,10 @@ loop:
 				continue
 			}
 
+			if _, ok := next.(*ast.ReturnStmt); ok { // return statement needed to satisfy function signature
+				continue
+			}
+
 			w.onFailure(newUnreachableCodeFailure(s))
 			break loop
 		}
