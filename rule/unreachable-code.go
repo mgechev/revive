@@ -52,7 +52,7 @@ func (w lintUnreachableCode) Visit(node ast.Node) ast.Visitor {
 	if len(blk.List) < 2 {
 		return w
 	}
-
+loop:
 	for i, stmt := range blk.List[:len(blk.List)-1] {
 		// println("iterating ", len(blk.List))
 		next := blk.List[i+1]
@@ -63,12 +63,12 @@ func (w lintUnreachableCode) Visit(node ast.Node) ast.Visitor {
 		switch s := stmt.(type) {
 		case *ast.ReturnStmt:
 			w.onFailure(newUnreachableCodeFailure(s))
-			break
+			break loop
 		case *ast.BranchStmt:
 			token := s.Tok.String()
 			if token != "fallthrough" {
 				w.onFailure(newUnreachableCodeFailure(s))
-				break
+				break loop
 			}
 		case *ast.ExprStmt:
 			ce, ok := s.X.(*ast.CallExpr)
@@ -93,7 +93,7 @@ func (w lintUnreachableCode) Visit(node ast.Node) ast.Visitor {
 			}
 
 			w.onFailure(newUnreachableCodeFailure(s))
-			break
+			break loop
 		}
 	}
 

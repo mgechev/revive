@@ -9,8 +9,10 @@ import (
 func f() {
 	fmt.Println("Hello, playground")
 	if true {
-		return     // MATCH /unreachable code after this statement/
+		return // MATCH /unreachable code after this statement/
+		Println("unreachable")
 		os.Exit(2) // ignore
+		Println("also unreachable")
 	}
 	return // MATCH /unreachable code after this statement/
 	fmt.Println("Bye, playground")
