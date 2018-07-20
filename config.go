@@ -55,6 +55,8 @@ var allRules = append([]lint.Rule{
 	&rule.ConfusingResultsRule{},
 	&rule.DeepExitRule{},
 	&rule.UnusedParamRule{},
+	&rule.UnreachableCodeRule{},
+	&rule.AddConstantRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
@@ -63,6 +65,7 @@ var allFormatters = []lint.Formatter{
 	&formatter.JSON{},
 	&formatter.NDJSON{},
 	&formatter.Default{},
+	&formatter.Checkstyle{},
 }
 
 func getFormatters() map[string]lint.Formatter {

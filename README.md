@@ -96,7 +96,8 @@ go get -u github.com/mgechev/revive
   - `ndjson` - outputs the failures as stream in newline delimited JSON (NDJSON) format.
   - `friendly` - outputs the failures when found. Shows summary of all the failures.
   - `stylish` - formats the failures in a table. Keep in mind that it doesn't stream the output so it might be perceived as slower compared to others.
-
+  - `checkstyle` - outputs the failures in XML format compatible with that of Java's [Checkstyle](https://checkstyle.org/).
+  
 ### Sample Invocations
 
 ```shell
@@ -215,10 +216,12 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `superfluous-else`    |  n/a   | Prevents redundant else statements (extends `indent-error-flow`) |    no    |  no   |
 | `confusing-naming`    |  n/a   | Warns on methods with names that differ only by capitalization   |    no    |  no   |
 | `get-return`          |  n/a   | Warns on getters that do not yield any result                    |    no    |  no   |
-| `modifies-param`      |  n/a   | Warns on assignments to function parameters                      |    no    |  no   |
+| `modifies-parameter`  |  n/a   | Warns on assignments to function parameters                      |    no    |  no   |
 | `confusing-results`   |  n/a   | Suggests to name potentially confusing function results          |    no    |  no   |
 | `deep-exit`           |  n/a   | Looks for program exits in funcs other than `main()` or `init()` |    no    |  no   |
 | `unused-parameter`    |  n/a   | Suggests to rename or remove unused function parameters          |    no    |  no   |
+| `unreachable-code`    |  n/a   | Warns on unreachable code                                        |    no    |  no   |
+| `add-constant`        |  map   | Suggests using constant for magic numbers and string literals |    no    |  no   |
 
 ## Available Formatters
 
