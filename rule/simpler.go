@@ -57,6 +57,7 @@ func (w lintSimplerRule) Visit(node ast.Node) ast.Visitor {
 		}
 
 		w.checkBinaryExpr(n)
+
 	case *ast.FuncDecl:
 		if n.Body == nil || n.Type.Results != nil {
 			return w
@@ -75,6 +76,11 @@ func (w lintSimplerRule) Visit(node ast.Node) ast.Visitor {
 		if len(rs.Results) == 0 {
 			w.newFailure(lastStmt, "omit unnecessary return statement")
 		}
+
+	case *ast.SwitchStmt:
+		w.checkSwitchBody(n.Body)
+	case *ast.TypeSwitchStmt:
+		w.checkSwitchBody(n.Body)
 	case *ast.CaseClause:
 		if n.Body == nil {
 			return w
@@ -98,10 +104,25 @@ func (w lintSimplerRule) Visit(node ast.Node) ast.Visitor {
 	return w
 }
 
+func (w lintSimplerRule) checkSwitchBody(b *ast.BlockStmt) {
+	cases := b.List
+	if len(cases) != 1 {
+		return
+	}
+
+	_, ok := cases[0].(*ast.CaseClause)
+	if !ok {
+		return
+	}
+
+	w.newFailure(b, "switch with only one case can be replaced by an if-then")
+}
+
 func isExprABooleanLit(n ast.Node) bool {
 	oper, ok := n.(*ast.Ident)
 	return ok && (oper.Name == trueName || oper.Name == falseName)
 }
+
 func (w lintSimplerRule) checkBinaryExpr(be *ast.BinaryExpr) {
 	if isExprABooleanLit(be.X) {
 		w.newFailure(be, "omit comparison with boolean constants")
