@@ -57,6 +57,7 @@ var allRules = append([]lint.Rule{
 	&rule.UnusedParamRule{},
 	&rule.UnreachableCodeRule{},
 	&rule.AddConstantRule{},
+	&rule.FlagParamRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
