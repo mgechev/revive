@@ -94,7 +94,7 @@ func (w conditionVisitor) Visit(node ast.Node) ast.Visitor {
 	}
 
 	w.linter.onFailure(lint.Failure{
-		Confidence: 0.8,
+		Confidence: 1,
 		Node:       w.fd.Type.Params,
 		Category:   "bad practice",
 		Failure:    fmt.Sprintf("parameter '%s' seems to be a control flag, avoid control coupling", uses[0]),
