@@ -38,6 +38,7 @@ Here's how `revive` is different from `golint`:
     - [Comment Annotations](#comment-annotations)
     - [Configuration](#configuration)
     - [Default Configuration](#default-configuration)
+    - [Custom Configuration](#custom-configuration)
     - [Recommended Configuration](#recommended-configuration)
   - [Available Rules](#available-rules)
   - [Available Formatters](#available-formatters)
@@ -91,13 +92,14 @@ go get -u github.com/mgechev/revive
 - `-config [PATH]` - path to config file in TOML format.
 - `-exclude [PATTERN]` - pattern for files/directories/packages to be excluded for linting. You can specify the files you want to exclude for linting either as package name (i.e. `github.com/mgechev/revive`), list them as individual files (i.e. `file.go`), directories (i.e. `./foo/...`), or any combination of the three.
 - `-formatter [NAME]` - formatter to be used for the output. The currently available formatters are:
+
   - `default` - will output the failures the same way that `golint` does.
   - `json` - outputs the failures in JSON format.
   - `ndjson` - outputs the failures as stream in newline delimited JSON (NDJSON) format.
   - `friendly` - outputs the failures when found. Shows summary of all the failures.
   - `stylish` - formats the failures in a table. Keep in mind that it doesn't stream the output so it might be perceived as slower compared to others.
   - `checkstyle` - outputs the failures in XML format compatible with that of Java's [Checkstyle](https://checkstyle.org/).
-  
+
 ### Sample Invocations
 
 ```shell
@@ -175,13 +177,49 @@ revive -config defaults.toml github.com/mgechev/revive
 
 This will use the configuration file `defaults.toml`, the `default` formatter, and will run linting over the `github.com/mgechev/revive` package.
 
-### Recommended Configuration
+### Custom Configuration
 
 ```shell
 revive -config config.toml -formatter friendly github.com/mgechev/revive
 ```
 
 This will use `config.toml`, the `friendly` formatter, and will run linting over the `github.com/mgechev/revive` package.
+
+### Recommended Configuration
+
+The following snippet contains the recommended `revive` configuration that you can use in your project:
+
+```toml
+ignoreGeneratedHeader = false
+severity = "warning"
+confidence = 0.8
+errorCode = 0
+warningCode = 0
+
+[rule.blank-imports]
+[rule.context-as-argument]
+[rule.context-keys-type]
+[rule.dot-imports]
+[rule.error-return]
+[rule.error-strings]
+[rule.error-naming]
+[rule.exported]
+[rule.if-return]
+[rule.increment-decrement]
+[rule.var-naming]
+[rule.var-declaration]
+[rule.package-comments]
+[rule.range]
+[rule.receiver-naming]
+[rule.time-naming]
+[rule.unexported-return]
+[rule.indent-error-flow]
+[rule.errorf]
+[rule.empty-block]
+[rule.superfluous-else]
+[rule.unused-parameter]
+[rule.unreachable-code]
+```
 
 ## Available Rules
 
@@ -221,7 +259,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `deep-exit`           |  n/a   | Looks for program exits in funcs other than `main()` or `init()` |    no    |  no   |
 | `unused-parameter`    |  n/a   | Suggests to rename or remove unused function parameters          |    no    |  no   |
 | `unreachable-code`    |  n/a   | Warns on unreachable code                                        |    no    |  no   |
-| `add-constant`        |  map   | Suggests using constant for magic numbers and string literals |    no    |  no   |
+| `add-constant`        |  map   | Suggests using constant for magic numbers and string literals    |    no    |  no   |
 
 ## Available Formatters
 
@@ -329,13 +367,13 @@ Currently, type checking is enabled by default. If you want to run the linter wi
 
 ## Contributors
 
-[<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) |[<img alt="chavacava" src="https://avatars2.githubusercontent.com/u/25788468?v=4&s=117" width="117">](https://github.com/chavacava) |[<img alt="morphy2k" src="https://avatars2.githubusercontent.com/u/4280578?v=4&s=117" width="117">](https://github.com/morphy2k) |[<img alt="tamird" src="https://avatars0.githubusercontent.com/u/1535036?v=4&s=117" width="117">](https://github.com/tamird) |[<img alt="paul-at-start" src="https://avatars2.githubusercontent.com/u/5486775?v=4&s=117" width="117">](https://github.com/paul-at-start) |[<img alt="vkrol" src="https://avatars3.githubusercontent.com/u/153412?v=4&s=117" width="117">](https://github.com/vkrol) |
-:---: |:---: |:---: |:---: |:---: |:---: |
-[mgechev](https://github.com/mgechev) |[chavacava](https://github.com/chavacava) |[morphy2k](https://github.com/morphy2k) |[tamird](https://github.com/tamird) |[paul-at-start](https://github.com/paul-at-start) |[vkrol](https://github.com/vkrol) |
+| [<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) | [<img alt="chavacava" src="https://avatars2.githubusercontent.com/u/25788468?v=4&s=117" width="117">](https://github.com/chavacava) | [<img alt="morphy2k" src="https://avatars2.githubusercontent.com/u/4280578?v=4&s=117" width="117">](https://github.com/morphy2k) | [<img alt="tamird" src="https://avatars0.githubusercontent.com/u/1535036?v=4&s=117" width="117">](https://github.com/tamird) | [<img alt="paul-at-start" src="https://avatars2.githubusercontent.com/u/5486775?v=4&s=117" width="117">](https://github.com/paul-at-start) | [<img alt="vkrol" src="https://avatars3.githubusercontent.com/u/153412?v=4&s=117" width="117">](https://github.com/vkrol) |
+| :---------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------: |
+|                                             [mgechev](https://github.com/mgechev)                                             |                                              [chavacava](https://github.com/chavacava)                                              |                                             [morphy2k](https://github.com/morphy2k)                                              |                                             [tamird](https://github.com/tamird)                                              |                                             [paul-at-start](https://github.com/paul-at-start)                                              |                                             [vkrol](https://github.com/vkrol)                                             |
 
-[<img alt="haya14busa" src="https://avatars0.githubusercontent.com/u/3797062?v=4&s=117" width="117">](https://github.com/haya14busa) |
-:---: |
-[haya14busa](https://github.com/haya14busa) |
+| [<img alt="haya14busa" src="https://avatars0.githubusercontent.com/u/3797062?v=4&s=117" width="117">](https://github.com/haya14busa) |
+| :----------------------------------------------------------------------------------------------------------------------------------: |
+|                                             [haya14busa](https://github.com/haya14busa)                                              |
 
 ## License
 
