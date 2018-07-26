@@ -261,6 +261,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `unreachable-code`    |  n/a   | Warns on unreachable code                                        |    no    |  no   |
 | `add-constant`        |  map   | Suggests using constant for magic numbers and string literals    |    no    |  no   |
 | `flag-parameter`      |  n/a   | Warns on boolean parameters that create a control coupling       |    no    |  no   |
+| `unnecessary-stmt`    |  n/a   | Suggests removing or simplifying unnecessary statements          |    no    |  no   |
 
 ## Available Formatters
 

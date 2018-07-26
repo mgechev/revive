@@ -1,13 +1,6 @@
 package fixtures
 
 func foo(a, b, c, d int) {
-	if bar == true { // MATCH /omit comparison with boolean constants/
-
-	}
-	for f() || false != yes { // MATCH /omit comparison with boolean constants/
-
-	}
-
 	switch n := node.(type) { // MATCH /switch with only one case can be replaced by an if-then/
 	case *ast.SwitchStmt:
 		caseSelector := func(n ast.Node) bool {
@@ -31,6 +24,12 @@ func foo(a, b, c, d int) {
 
 func bar() {
 	a := 1
+
+	switch a {
+	case 1, 2:
+		a++
+	}
+
 loop:
 	for {
 		switch a {
