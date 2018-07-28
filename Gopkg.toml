@@ -30,6 +30,10 @@
 
 [[constraint]]
   branch = "master"
+  name = "github.com/fatih/structtag"
+
+[[constraint]]
+  branch = "master"
   name = "github.com/olekukonko/tablewriter"
 
 [[constraint]]
