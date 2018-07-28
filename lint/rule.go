@@ -17,6 +17,11 @@ type Rule interface {
 	Apply(*File, Arguments) []Failure
 }
 
+// Reducer is implemented by rules that generate package-level failures
+type Reducer interface {
+	Reduce(*Package) []PkgLevelFailure
+}
+
 // AbstractRule defines an abstract rule.
 type AbstractRule struct {
 	Failures []Failure
