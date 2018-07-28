@@ -38,3 +38,9 @@ type Failure struct {
 func (f *Failure) GetFilename() string {
 	return f.Position.Start.Filename
 }
+
+// PkgLevelFailure defines a linting failure w/its file.
+type PkgLevelFailure struct {
+	File    *File
+	Failure Failure
+}

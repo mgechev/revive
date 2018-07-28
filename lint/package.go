@@ -159,4 +159,35 @@ func (p *Package) lint(rules []Rule, config Config, failures chan Failure) {
 		})(file)
 	}
 	wg.Wait()
+
+	// Here we know that all files of the package where analyzed
+
+	for _, currentRule := range rules { // We iterate over all rules and,
+		rr, ok := currentRule.(Reducer) //
+		if !ok {                        // if available,
+			continue //
+		} //
+		//
+		pkgLevelFailures := rr.Reduce(p) // we call the Reduce method
+
+		// The following code is a c&p of the code of file.lint method
+		// if necessary it can be factored-out in a common function
+		for idx, gFailure := range pkgLevelFailures {
+			failure := gFailure.Failure
+			if failure.RuleName == "" {
+				failure.RuleName = currentRule.Name()
+			}
+			if failure.Node != nil {
+				failure.Position = ToFailurePosition(failure.Node.Pos(), failure.Node.End(), gFailure.File)
+			}
+			pkgLevelFailures[idx].Failure = failure
+		}
+		// failure filtering skiped for simplicity
+		for _, gFailure := range pkgLevelFailures {
+			failure := gFailure.Failure
+			if failure.Confidence >= config.Confidence {
+				failures <- failure
+			}
+		}
+	}
 }

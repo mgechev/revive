@@ -60,6 +60,7 @@ var allRules = append([]lint.Rule{
 	&rule.FlagParamRule{},
 	&rule.UnnecessaryStmtRule{},
 	&rule.StructTagRule{},
+	&rule.PkgLevelFailuresTestRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
