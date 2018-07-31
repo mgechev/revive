@@ -64,6 +64,7 @@ Since the default behavior of `revive` is compatible with `golint`, without prov
 ### Text Editors
 
 - Support for VSCode in [vscode-go](https://github.com/Microsoft/vscode-go/pull/1699).
+- Support for Atom via [linter-revive](https://github.com/morphy2k/linter-revive).
 - Support for vim via [w0rp/ale](https://github.com/w0rp/ale):
 
 ```vim
@@ -76,8 +77,6 @@ call ale#linter#Define('go', {
 \   'callback': 'ale#handlers#unix#HandleAsWarning',
 \})
 ```
-
-- Support for Atom via [linter-revive](https://github.com/morphy2k/linter-revive).
 
 ### Installation
 
