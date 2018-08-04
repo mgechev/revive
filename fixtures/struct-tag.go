@@ -26,6 +26,22 @@ type RangeAllocation struct {
 	Data              []byte `json:"data,inline"` // MATCH /unknown option 'inline' in JSON tag/
 }
 
+type RangeAllocation struct {
+	metav1.TypeMeta   `bson:",minsize"`
+	metav1.ObjectMeta `bson:"metadata,omitempty"`
+	Range             string `bson:"range,flow"` // MATCH /unknown option 'flow' in BSON tag/
+	Data              []byte `bson:"data,inline"`
+}
+
+type TestContextSpecificTags2 struct {
+	A       int       `asn1:"explicit,tag:1"`
+	B       int       `asn1:"tag:2"`
+	S       string    `asn1:"tag:0,utf8"`
+	Ints    []int     `asn1:"set"`
+	Version int       `asn1:"optional,explicit,default:0,tag:0"` // MATCH /duplicated tag number 0/
+	Time    time.Time `asn1:"explicit,tag:4,other"`              // MATCH /unknown option 'other' in ASN1 tag/
+}
+
 type VirtualMachineRelocateSpecDiskLocator struct {
 	DynamicData
 
@@ -33,5 +49,5 @@ type VirtualMachineRelocateSpecDiskLocator struct {
 	Datastore       ManagedObjectReference          `xml:"datastore,chardata,innerxml"`
 	DiskMoveType    string                          `xml:"diskMoveType,omitempty,comment"`
 	DiskBackingInfo BaseVirtualDeviceBackingInfo    `xml:"diskBackingInfo,omitempty,any"`
-	Profile         []BaseVirtualMachineProfileSpec `xml:"profile,omitempty,typeattr"` // MATCH /unknown option 'typeattr' in XML tag/
+	Profile         []BaseVirtualMachineProfileSpec `xml:"profile,omitempty,other"` // MATCH /unknown option 'other' in XML tag/
 }

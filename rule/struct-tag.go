@@ -33,7 +33,8 @@ func (r *StructTagRule) Name() string {
 }
 
 type lintStructTagRule struct {
-	onFailure func(lint.Failure)
+	onFailure  func(lint.Failure)
+	usedTagNbr map[string]bool // list of used tag numbers
 }
 
 func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
@@ -42,7 +43,7 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 		if n.Fields == nil || n.Fields.NumFields() < 1 {
 			return nil // skip empty structs
 		}
-
+		w.usedTagNbr = map[string]bool{} // init
 		for _, f := range n.Fields.List {
 			if f.Tag != nil {
 				w.checkTaggedField(f)
@@ -59,13 +60,22 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
 	tags, err := structtag.Parse(strings.Trim(f.Tag.Value, "`"))
 	if err != nil || tags == nil {
+		w.addFailure(f.Tag, "malformed tag")
 		return
 	}
 
 	for _, tag := range tags.Tags() {
 		switch key := tag.Key; key {
 		case "asn1":
-			// Not implemented yet
+			msg, ok := w.checkASN1Tag(f.Type, tag)
+			if !ok {
+				w.addFailure(f.Tag, msg)
+			}
+		case "bson":
+			msg, ok := w.checkBSONTag(tag.Options)
+			if !ok {
+				w.addFailure(f.Tag, msg)
+			}
 		case "default":
 			if !w.typeValueMatch(f.Type, tag.Name) {
 				w.addFailure(f.Tag, "field's type and default value's type mismatch")
@@ -97,6 +107,55 @@ func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
 	}
 }
 
+func (w lintStructTagRule) checkASN1Tag(t ast.Expr, tag *structtag.Tag) (string, bool) {
+	checkList := append(tag.Options, tag.Name)
+	for _, opt := range checkList {
+		switch opt {
+		case "application", "explicit", "generalized", "ia5", "omitempty", "optional", "set", "utf8":
+
+		default:
+			if strings.HasPrefix(opt, "tag:") {
+				parts := strings.Split(opt, ":")
+				tagNumber := parts[1]
+				if w.usedTagNbr[tagNumber] {
+					return fmt.Sprintf("duplicated tag number %s", tagNumber), false
+				}
+				w.usedTagNbr[tagNumber] = true
+
+				continue
+			}
+
+			if strings.HasPrefix(opt, "default:") {
+				parts := strings.Split(opt, ":")
+				if len(parts) < 2 {
+					return "malformed default for ASN1 tag", false
+				}
+				if !w.typeValueMatch(t, parts[1]) {
+					return "field's type and default value's type mismatch", false
+				}
+
+				continue
+			}
+
+			return fmt.Sprintf("unknown option '%s' in ASN1 tag", opt), false
+		}
+	}
+
+	return "", true
+}
+
+func (w lintStructTagRule) checkBSONTag(options []string) (string, bool) {
+	for _, opt := range options {
+		switch opt {
+		case "inline", "minsize", "omitempty":
+		default:
+			return fmt.Sprintf("unknown option '%s' in BSON tag", opt), false
+		}
+	}
+
+	return "", true
+}
+
 func (w lintStructTagRule) checkJSONTag(options []string) (string, bool) {
 	for _, opt := range options {
 		switch opt {
@@ -112,7 +171,7 @@ func (w lintStructTagRule) checkJSONTag(options []string) (string, bool) {
 func (w lintStructTagRule) checkXMLTag(options []string) (string, bool) {
 	for _, opt := range options {
 		switch opt {
-		case "attr", "cdata", "chardata", "innerxml", "comment", "any", "omitempty":
+		case "any", "attr", "cdata", "chardata", "comment", "innerxml", "omitempty", "typeattr":
 		default:
 			return fmt.Sprintf("unknown option '%s' in XML tag", opt), false
 		}
