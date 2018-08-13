@@ -43,23 +43,6 @@ func retrieveParamNames(pl []*ast.Field) map[string]bool {
 	return result
 }
 
-func checkAssign(lhs []ast.Expr, w lintModifiesParamRule) {
-	for _, e := range lhs {
-		id, ok := e.(*ast.Ident)
-		if ok {
-			if w.params[id.Name] {
-				w.onFailure(lint.Failure{
-					Confidence: 0.5,
-					Node:       id,
-					Category:   "bad practice",
-					URL:        "#modifies-parameter",
-					Failure:    fmt.Sprintf("parameter '%s' seems to be a modified", id.Name),
-				})
-			}
-		}
-	}
-}
-
 func (w lintModifiesParamRule) Visit(node ast.Node) ast.Visitor {
 	switch v := node.(type) {
 	case *ast.FuncDecl:
