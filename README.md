@@ -262,6 +262,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `flag-parameter`      |  n/a   | Warns on boolean parameters that create a control coupling       |    no    |  no   |
 | `unnecessary-stmt`    |  n/a   | Suggests removing or simplifying unnecessary statements          |    no    |  no   |
 | `struct-tag`          |  n/a   | Checks common struct tags like `json`,`xml`,`yaml`               |    no    |  no   |
+| `modifies-value-receiver` |  n/a   | Warns on assignments to value-passed method receivers        |    no    |  yes  |
 
 ## Available Formatters
 
