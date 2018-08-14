@@ -123,6 +123,8 @@ func Public() {}
 
 The snippet above, will disable `revive` between the `revive:disable` and `revive:enable` comments. If you skip `revive:enable`, the linter will be disabled for the rest of the file.
 
+With `revive:disable-next-line` and `revive:disable-line` you can disable `revive` on a particular code line.
+
 You can do the same on a rule level. In case you want to disable only a particular rule, you can use:
 
 ```go
