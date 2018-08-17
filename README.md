@@ -265,6 +265,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `unnecessary-stmt`    |  n/a   | Suggests removing or simplifying unnecessary statements          |    no    |  no   |
 | `struct-tag`          |  n/a   | Checks common struct tags like `json`,`xml`,`yaml`               |    no    |  no   |
 | `modifies-value-receiver` |  n/a   | Warns on assignments to value-passed method receivers        |    no    |  yes  |
+| `bool-comp`           |  n/a   | Warns on comparisons with boolean constants                      |    no    |  no   |
 
 ## Available Formatters
 
