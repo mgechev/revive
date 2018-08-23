@@ -9,11 +9,11 @@ import (
 	"go/token"
 )
 
-// SuspiciousLogicalExprRule warns on suspicious logical expressions.
-type SuspiciousLogicalExprRule struct{}
+// ConstantLogicalExprRule warns on constant logical expressions.
+type ConstantLogicalExprRule struct{}
 
 // Apply applies the rule to given file.
-func (r *SuspiciousLogicalExprRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ConstantLogicalExprRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -21,22 +21,22 @@ func (r *SuspiciousLogicalExprRule) Apply(file *lint.File, arguments lint.Argume
 	}
 
 	astFile := file.AST
-	w := &lintSuspiciousLogicalExpr{astFile, onFailure}
+	w := &lintConstantLogicalExpr{astFile, onFailure}
 	ast.Walk(w, astFile)
 	return failures
 }
 
 // Name returns the rule name.
-func (r *SuspiciousLogicalExprRule) Name() string {
-	return "suspicious-logical-expr"
+func (r *ConstantLogicalExprRule) Name() string {
+	return "constant-logical-expr"
 }
 
-type lintSuspiciousLogicalExpr struct {
+type lintConstantLogicalExpr struct {
 	file      *ast.File
 	onFailure func(lint.Failure)
 }
 
-func (w *lintSuspiciousLogicalExpr) Visit(node ast.Node) ast.Visitor {
+func (w *lintConstantLogicalExpr) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
 	case *ast.BinaryExpr:
 		if !w.isOperatorWithLogicalResult(n.Op) {
@@ -63,7 +63,7 @@ func (w *lintSuspiciousLogicalExpr) Visit(node ast.Node) ast.Visitor {
 	return w
 }
 
-func (w *lintSuspiciousLogicalExpr) isOperatorWithLogicalResult(t token.Token) bool {
+func (w *lintConstantLogicalExpr) isOperatorWithLogicalResult(t token.Token) bool {
 	switch t {
 	case token.LAND, token.LOR, token.EQL, token.LSS, token.GTR, token.NEQ, token.LEQ, token.GEQ:
 		return true
@@ -72,7 +72,7 @@ func (w *lintSuspiciousLogicalExpr) isOperatorWithLogicalResult(t token.Token) b
 	return false
 }
 
-func (w *lintSuspiciousLogicalExpr) isInequalityOperator(t token.Token) bool {
+func (w *lintConstantLogicalExpr) isInequalityOperator(t token.Token) bool {
 	switch t {
 	case token.LSS, token.GTR, token.NEQ, token.LEQ, token.GEQ:
 		return true
@@ -81,7 +81,7 @@ func (w *lintSuspiciousLogicalExpr) isInequalityOperator(t token.Token) bool {
 	return false
 }
 
-func (w lintSuspiciousLogicalExpr) areEqual(x, y ast.Expr) bool {
+func (w lintConstantLogicalExpr) areEqual(x, y ast.Expr) bool {
 	fset := token.NewFileSet()
 	var buf1 bytes.Buffer
 	if err := format.Node(&buf1, fset, x); err != nil {
@@ -96,7 +96,7 @@ func (w lintSuspiciousLogicalExpr) areEqual(x, y ast.Expr) bool {
 	return fmt.Sprintf("%s", buf1.Bytes()) == fmt.Sprintf("%s", buf2.Bytes())
 }
 
-func (w lintSuspiciousLogicalExpr) newFailure(node ast.Node, msg string) {
+func (w lintConstantLogicalExpr) newFailure(node ast.Node, msg string) {
 	w.onFailure(lint.Failure{
 		Confidence: 1,
 		Node:       node,
