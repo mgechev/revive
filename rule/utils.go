@@ -149,7 +149,7 @@ func srcLine(src []byte, p token.Position) string {
 
 // pick yields a list of nodes by picking them from a sub-ast with root node n.
 // Nodes are selected by applying the fselect function
-// f function is applied to each selected node before inseting it in the final result. 
+// f function is applied to each selected node before inseting it in the final result.
 // If f==nil then it defaults to the identity function (ie it returns the node itself)
 func pick(n ast.Node, fselect func(n ast.Node) bool, f func(n ast.Node) []ast.Node) []ast.Node {
 	var result []ast.Node
@@ -193,4 +193,30 @@ func (p picker) Visit(node ast.Node) ast.Visitor {
 	}
 
 	return p
+}
+
+// isBoolOp returns true if the given token corresponds to
+// a bool operator
+func isBoolOp(t token.Token) bool {
+	switch t {
+	case token.LAND, token.LOR, token.EQL, token.NEQ:
+		return true
+	}
+
+	return false
+}
+
+const (
+	trueName  = "true"
+	falseName = "false"
+)
+
+func isExprABooleanLit(n ast.Node) (lexeme string, ok bool) {
+	oper, ok := n.(*ast.Ident)
+
+	if !ok {
+		return "", false
+	}
+
+	return oper.Name, (oper.Name == trueName || oper.Name == falseName)
 }
