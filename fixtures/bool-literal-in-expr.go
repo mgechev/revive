@@ -1,22 +1,22 @@
 package fixtures
 
 func foo(a, b, c, d int) bool {
-	if bar == true { // MATCH /omit boolean literal in expression/
+	if bar == true { // MATCH /omit Boolean literal in expression/
 
 	}
-	for f() || false != yes { // MATCH /omit boolean literal in expression/
+	for f() || false != yes { // MATCH /omit Boolean literal in expression/
 
 	}
 
-	return b > c == false // MATCH /omit boolean literal in expression/
+	return b > c == false // MATCH /omit Boolean literal in expression/
 }
 
 // from github.com/jmespath/go-jmespath/functions.go
 func jpfToNumber(arguments []interface{}) (interface{}, error) {
 	arg := arguments[0]
 	// code skipped
-	if arg == true || // MATCH /omit boolean literal in expression/
-		arg == false { // MATCH /omit boolean literal in expression/
+	if arg == true || // MATCH /omit Boolean literal in expression/
+		arg == false { // MATCH /omit Boolean literal in expression/
 		return nil, nil
 	}
 	return nil, errors.New("unknown type")
@@ -25,7 +25,7 @@ func jpfToNumber(arguments []interface{}) (interface{}, error) {
 // from gopkg.in/yaml.v2/resolve.go
 func resolve(tag string, in string) (rtag string, out interface{}) {
 	if err == nil {
-		if true || intv == int64(int(intv)) { // MATCH /boolean expression seems to always evaluate to true/
+		if true || intv == int64(int(intv)) { // MATCH /Boolean expression seems to always evaluate to true/
 			return yaml_INT_TAG, int(intv)
 		} else {
 			return yaml_INT_TAG, intv
@@ -37,10 +37,18 @@ func resolve(tag string, in string) (rtag string, out interface{}) {
 func packDataDomainNames(names []string, msg []byte, off int, compression map[string]int, compress bool) (int, error) {
 	var err error
 	for j := 0; j < len(names); j++ {
-		off, err = PackDomainName(names[j], msg, off, compression, false && compress) // MATCH /boolean expression seems to always evaluate to false/
+		off, err = PackDomainName(names[j], msg, off, compression, false && compress) // MATCH /Boolean expression seems to always evaluate to false/
 		if err != nil {
 			return len(msg), err
 		}
 	}
 	return off, nil
+}
+
+func isTrue(arg bool) bool {
+	return arg
+}
+
+func main() {
+	isTrue(true)
 }

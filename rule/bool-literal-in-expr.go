@@ -6,7 +6,7 @@ import (
 	"go/token"
 )
 
-// BoolLiteralRule warns when logic expressions contains boolean literals.
+// BoolLiteralRule warns when logic expressions contains Boolean literals.
 type BoolLiteralRule struct{}
 
 // Apply applies the rule to given file.
@@ -53,9 +53,9 @@ func (w *lintBoolLiteral) Visit(node ast.Node) ast.Visitor {
 		isConstant := (n.Op == token.LAND && lexeme == "false") || (n.Op == token.LOR && lexeme == "true")
 
 		if isConstant {
-			w.addFailure(n, "boolean expression seems to always evaluate to "+lexeme, "logic")
+			w.addFailure(n, "Boolean expression seems to always evaluate to "+lexeme, "logic")
 		} else {
-			w.addFailure(n, "omit boolean literal in expression", "style")
+			w.addFailure(n, "omit Boolean literal in expression", "style")
 		}
 	}
 
