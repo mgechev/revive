@@ -14,6 +14,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/rule"
+	rule2 "github.com/jchen267/revive/rule"
 )
 
 func fail(err string) {
@@ -41,6 +42,7 @@ var defaultRules = []lint.Rule{
 	&rule.TimeNamingRule{},
 	&rule.ContextKeysType{},
 	&rule.ContextAsArgumentRule{},
+	&rule2.ErrorPackageNamingRule{},
 }
 
 var allRules = append([]lint.Rule{
