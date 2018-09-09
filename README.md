@@ -232,7 +232,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `time-naming`         |  n/a   | Conventions around the naming of time variables.                 |   yes    |  yes  |
 | `var-declaration`     |  n/a   | Reduces redundancies around variable declaration.                |   yes    |  yes  |
 | `unexported-return`   |  n/a   | Warns when a public return is from unexported type.              |   yes    |  yes  |
-| `errorf`              |  n/a   | Should replace `error.New(fmt.Sprintf())` with `error.Errorf()`  |   yes    |  yes  |
+| `errorf`              |  n/a   | Should replace `errors.New(fmt.Sprintf())` with `fmt.Errorf()`   |   yes    |  yes  |
 | `blank-imports`       |  n/a   | Disallows blank imports                                          |   yes    |  no   |
 | `context-as-argument` |  n/a   | `context.Context` should be the first argument of a function.    |   yes    |  no   |
 | `dot-imports`         |  n/a   | Forbids `.` imports.                                             |   yes    |  no   |
