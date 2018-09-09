@@ -1,7 +1,6 @@
 package rule
 
 import (
-	"fmt"
 	"go/ast"
 
 	"strings"
@@ -31,7 +30,6 @@ func (r *MaxPublicStructsRule) Apply(file *lint.File, arguments lint.Arguments) 
 		panic(`invalid value passed as argument number to the "max-public-structs" rule`)
 	}
 
-	fmt.Println("Name:", max, walker.current)
 	if walker.current > max {
 		walker.onFailure(lint.Failure{
 			Failure:    "you have exceeded the maximum number of public struct declarations",
