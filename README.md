@@ -220,6 +220,7 @@ warningCode = 0
 [rule.superfluous-else]
 [rule.unused-parameter]
 [rule.unreachable-code]
+[rule.redefines-builtin-id]
 ```
 
 ## Available Rules
