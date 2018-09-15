@@ -43,58 +43,66 @@ func (lintRangValInClosureRule) retrieveParamNames(pl []*ast.Field) map[string]b
 	return result
 }
 
+// checkId checks if the given id is referenced in a closure inside the given statement block
+func (w lintRangValInClosureRule) checkId(id string, blk *ast.BlockStmt) {
+	fselect := func(n ast.Node) bool { // picks go statements
+		_, ok := n.(*ast.GoStmt)
+		return ok
+	}
+
+	goStmts := pick(blk, fselect, nil)
+
+GoStmtIter:
+	for _, gs := range goStmts {
+		gs, _ := gs.(*ast.GoStmt)
+
+		cf := gs.Call.Fun
+		fLit, ok := cf.(*ast.FuncLit)
+		if !ok {
+			continue
+		}
+
+		// check if the range value (id) is passed as argument
+		for _, arg := range gs.Call.Args {
+			ident, ok := arg.(*ast.Ident)
+			if ok {
+				if ident.Name == id {
+					continue GoStmtIter
+				}
+			}
+		}
+
+		fselect := func(n ast.Node) bool { // picks reference to the range value (id)
+			ident, ok := n.(*ast.Ident)
+			return ok && ident.Name == id
+		}
+
+		ref2Id := pick(fLit.Body, fselect, nil)
+
+		if len(ref2Id) > 0 {
+			w.onFailure(lint.Failure{
+				Confidence: 0.8,
+				Node:       fLit,
+				Category:   "logic",
+				Failure:    fmt.Sprintf("range value '%s' seems to be referenced inside the closure", id),
+			})
+		}
+	}
+}
+
 func (w lintRangValInClosureRule) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
 	case *ast.RangeStmt:
+		// check the range value
 		ident, ok := n.Value.(*ast.Ident)
-		if !ok {
-			return w
+		if ok {
+			w.checkId(ident.Name, n.Body)
 		}
 
-		id := ident.Name
-
-		fselect := func(n ast.Node) bool { // picks go statements
-			_, ok := n.(*ast.GoStmt)
-			return ok
-		}
-
-		goStmts := pick(n.Body, fselect, nil)
-
-	GoStmtIter:
-		for _, gs := range goStmts {
-			gs, _ := gs.(*ast.GoStmt)
-
-			cf := gs.Call.Fun
-			fLit, ok := cf.(*ast.FuncLit)
-			if !ok {
-				continue
-			}
-
-			// check if the range value (id) is passed as argument
-			for _, arg := range gs.Call.Args {
-				ident, ok := arg.(*ast.Ident)
-				if ok {
-					if ident.Name == id {
-						continue GoStmtIter
-					}
-				}
-			}
-
-			fselect := func(n ast.Node) bool { // picks reference to the range value (id)
-				ident, ok := n.(*ast.Ident)
-				return ok && ident.Name == id
-			}
-
-			ref2Id := pick(fLit.Body, fselect, nil)
-
-			if len(ref2Id) > 0 {
-				w.onFailure(lint.Failure{
-					Confidence: 0.8,
-					Node:       fLit,
-					Category:   "logic",
-					Failure:    fmt.Sprintf("range value '%s' seems to be referenced inside the closure", id),
-				})
-			}
+		// check the range key
+		ident, ok = n.Key.(*ast.Ident)
+		if ok {
+			w.checkId(ident.Name, n.Body)
 		}
 	}
 

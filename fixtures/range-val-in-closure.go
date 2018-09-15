@@ -1,12 +1,17 @@
 package fixtures
 
 func foo() {
-	for _, newg := range groups {
+	for i, newg := range groups {
 		go func() { // MATCH /range value 'newg' seems to be referenced inside the closure/
 			<-m.block
 			newg.run(m.opts.Context)
 		}()
 		go func() {
+			<-m.block
+			newg.run(m.opts.Context)
+		}(newg)
+		go func() { // MATCH /range value 'i' seems to be referenced inside the closure/
+			i++
 			<-m.block
 			newg.run(m.opts.Context)
 		}(newg)
