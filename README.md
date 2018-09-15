@@ -269,6 +269,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `constant-logical-expr`   |  n/a   | Warns on constant logical expressions                        |    no    |  no   |
 | `bool-literal-in-expr`|  n/a   | Suggests removing Boolean literals from logic expressions        |    no    |  no   |
 | `redefines-builtin-id`|  n/a   | Warns on redefinitions of builtin identifiers                    |    no    |  no   |
+| `waitgroup-by-value  `|  n/a   | Warns on functions taking sync.WaitGroup as a by-value parameter |    no    |  no   |
 
 ## Available Formatters
 
