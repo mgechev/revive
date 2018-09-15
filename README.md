@@ -243,7 +243,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `exported`            |  n/a   | Naming and commenting conventions on exported symbols.           |   yes    |  no   |
 | `if-return`           |  n/a   | Redundant if when returning an error.                            |   yes    |  no   |
 | `increment-decrement` |  n/a   | Use `i++` and `i--` instead of `i += 1` and `i -= 1`.            |   yes    |  no   |
-| `var-naming`          |  n/a   | Naming rules.                                                    |   yes    |  no   |
+| `var-naming`          |  whitelist & blacklist of initialisms   | Naming rules.                                                    |   yes    |  no   |
 | `package-comments`    |  n/a   | Package commenting conventions.                                  |   yes    |  no   |
 | `range`               |  n/a   | Prevents redundant variables when iterating over a collection.   |   yes    |  no   |
 | `receiver-naming`     |  n/a   | Conventions around the naming of receivers.                      |   yes    |  no   |
@@ -269,6 +269,21 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `constant-logical-expr`   |  n/a   | Warns on constant logical expressions                        |    no    |  no   |
 | `bool-literal-in-expr`|  n/a   | Suggests removing Boolean literals from logic expressions        |    no    |  no   |
 | `redefines-builtin-id`|  n/a   | Warns on redefinitions of builtin identifiers                    |    no    |  no   |
+
+## Configurable rules
+
+Here you can find how you can configure some of the existing rules:
+
+### `var-naming`
+
+This rule accepts two slices of strings, a whitelist and a blacklist of initialisms. By default the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
+
+```toml
+[rule.var-naming]
+  arguments = [["ID"], ["VM"]]
+```
+
+This way, revive will not warn for identifier called `customId` but will warn that `customVm` should be called `customVM`.
 
 ## Available Formatters
 

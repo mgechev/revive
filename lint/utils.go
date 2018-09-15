@@ -6,7 +6,7 @@ import (
 )
 
 // Name returns a different name if it should be different.
-func Name(name string) (should string) {
+func Name(name string, whitelist, blacklist []string) (should string) {
 	// Fast path for simple cases: "_" and all lowercase.
 	if name == "_" {
 		return name
@@ -56,7 +56,17 @@ func Name(name string) (should string) {
 
 		// [w,i) is a word.
 		word := string(runes[w:i])
-		if u := strings.ToUpper(word); commonInitialisms[u] {
+		ignoreInitWarnings := map[string]bool{}
+		for _, i := range whitelist {
+			ignoreInitWarnings[i] = true
+		}
+
+		extraInits := map[string]bool{}
+		for _, i := range blacklist {
+			extraInits[i] = true
+		}
+
+		if u := strings.ToUpper(word); (commonInitialisms[u] || extraInits[u]) && !ignoreInitWarnings[u] {
 			// Keep consistent case, which is lowercase only at the start.
 			if w == 0 && unicode.IsLower(runes[w]) {
 				u = strings.ToLower(u)

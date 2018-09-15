@@ -1,9 +1,10 @@
 package rule
 
 import (
-	"github.com/mgechev/revive/lint"
 	"go/ast"
 	"go/token"
+
+	"github.com/mgechev/revive/lint"
 )
 
 // BoolLiteralRule warns when logic expressions contains Boolean literals.
