@@ -1,10 +1,7 @@
 .PHONY: test
 
-deps.devtools:
-	@go get github.com/golang/dep/cmd/dep
-
-install: deps.devtools
-	@dep ensure -v
+install:
+	@go install
 
 build:
 	@go build
