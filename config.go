@@ -72,6 +72,7 @@ var allFormatters = []lint.Formatter{
 	&formatter.JSON{},
 	&formatter.NDJSON{},
 	&formatter.Default{},
+	&formatter.Unix{},
 	&formatter.Checkstyle{},
 }
 
