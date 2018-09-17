@@ -3,7 +3,6 @@ package rule
 import (
 	"fmt"
 	"go/ast"
-	"strings"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -21,7 +20,6 @@ func (r *ImportsBlacklistRule) Apply(file *lint.File, arguments lint.Arguments) 
 		if !ok {
 			panic(fmt.Sprintf("Invalid argument to the imports-blacklist rule. Expecting a string, got %T", arg))
 		}
-		argStr = strings.ToLower(strings.TrimSpace(argStr))
 		// we add quotes if nt present, because when parsed, the value of the AST node, will be quoted
 		if len(argStr) > 2 && argStr[0] != '"' && argStr[len(argStr)-1] != '"' {
 			argStr = fmt.Sprintf(`"%s"`, argStr)
