@@ -18,7 +18,10 @@ func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Argumen
 
 	max, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok {
-		panic(`invalid value passed as return results number to the "function-result-limit" rule`)
+		panic(fmt.Sprintf(`invalid value passed as return results number to the "function-result-limit" rule; need int64 but got %T`, arguments[0]))
+	}
+	if max < 0 {
+		panic(`the value passed as return results number to the "function-result-limit" rule cannot be negative`)
 	}
 
 	var failures []lint.Failure
