@@ -269,6 +269,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `constant-logical-expr`   |  n/a   | Warns on constant logical expressions                        |    no    |  no   |
 | `bool-literal-in-expr`|  n/a   | Suggests removing Boolean literals from logic expressions        |    no    |  no   |
 | `redefines-builtin-id`|  n/a   | Warns on redefinitions of builtin identifiers                    |    no    |  no   |
+| `function-result-limit` |  int | Specifies the maximum number of results a function can return    |    no    |  no   |
 | `imports-blacklist`   | []string | Disallows importing the specified packages                     |    no    |  no   |
 
 ## Configurable rules
@@ -392,13 +393,13 @@ Currently, type checking is enabled by default. If you want to run the linter wi
 
 ## Contributors
 
-[<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) |[<img alt="chavacava" src="https://avatars2.githubusercontent.com/u/25788468?v=4&s=117" width="117">](https://github.com/chavacava) |[<img alt="morphy2k" src="https://avatars2.githubusercontent.com/u/4280578?v=4&s=117" width="117">](https://github.com/morphy2k) |[<img alt="tamird" src="https://avatars0.githubusercontent.com/u/1535036?v=4&s=117" width="117">](https://github.com/tamird) |[<img alt="paul-at-start" src="https://avatars2.githubusercontent.com/u/5486775?v=4&s=117" width="117">](https://github.com/paul-at-start) |[<img alt="Jarema" src="https://avatars0.githubusercontent.com/u/7369771?v=4&s=117" width="117">](https://github.com/Jarema) |
+[<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) |[<img alt="chavacava" src="https://avatars2.githubusercontent.com/u/25788468?v=4&s=117" width="117">](https://github.com/chavacava) |[<img alt="morphy2k" src="https://avatars2.githubusercontent.com/u/4280578?v=4&s=117" width="117">](https://github.com/morphy2k) |[<img alt="z0mbie42" src="https://avatars0.githubusercontent.com/u/6172808?v=4&s=117" width="117">](https://github.com/z0mbie42) |[<img alt="tamird" src="https://avatars0.githubusercontent.com/u/1535036?v=4&s=117" width="117">](https://github.com/tamird) |[<img alt="paul-at-start" src="https://avatars2.githubusercontent.com/u/5486775?v=4&s=117" width="117">](https://github.com/paul-at-start) |
 :---: |:---: |:---: |:---: |:---: |:---: |
-[mgechev](https://github.com/mgechev) |[chavacava](https://github.com/chavacava) |[morphy2k](https://github.com/morphy2k) |[tamird](https://github.com/tamird) |[paul-at-start](https://github.com/paul-at-start) |[Jarema](https://github.com/Jarema) |
+[mgechev](https://github.com/mgechev) |[chavacava](https://github.com/chavacava) |[morphy2k](https://github.com/morphy2k) |[z0mbie42](https://github.com/z0mbie42) |[tamird](https://github.com/tamird) |[paul-at-start](https://github.com/paul-at-start) |
 
-[<img alt="vkrol" src="https://avatars3.githubusercontent.com/u/153412?v=4&s=117" width="117">](https://github.com/vkrol) |[<img alt="haya14busa" src="https://avatars0.githubusercontent.com/u/3797062?v=4&s=117" width="117">](https://github.com/haya14busa) |
-:---: |:---: |
-[vkrol](https://github.com/vkrol) |[haya14busa](https://github.com/haya14busa) |
+[<img alt="Jarema" src="https://avatars0.githubusercontent.com/u/7369771?v=4&s=117" width="117">](https://github.com/Jarema) |[<img alt="vkrol" src="https://avatars3.githubusercontent.com/u/153412?v=4&s=117" width="117">](https://github.com/vkrol) |[<img alt="haya14busa" src="https://avatars0.githubusercontent.com/u/3797062?v=4&s=117" width="117">](https://github.com/haya14busa) |
+:---: |:---: |:---: |
+[Jarema](https://github.com/Jarema) |[vkrol](https://github.com/vkrol) |[haya14busa](https://github.com/haya14busa) |
 
 ## License
 

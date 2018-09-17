@@ -65,6 +65,7 @@ var allRules = append([]lint.Rule{
 	&rule.BoolLiteralRule{},
 	&rule.RedefinesBuiltinIDRule{},
 	&rule.ImportsBlacklistRule{},
+	&rule.FunctionResultsLimitRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
@@ -73,6 +74,7 @@ var allFormatters = []lint.Formatter{
 	&formatter.JSON{},
 	&formatter.NDJSON{},
 	&formatter.Default{},
+	&formatter.Unix{},
 	&formatter.Checkstyle{},
 }
 
