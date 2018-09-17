@@ -270,6 +270,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `bool-literal-in-expr`|  n/a   | Suggests removing Boolean literals from logic expressions        |    no    |  no   |
 | `redefines-builtin-id`|  n/a   | Warns on redefinitions of builtin identifiers                    |    no    |  no   |
 | `function-result-limit` |  int | Specifies the maximum number of results a function can return    |    no    |  no   |
+| `imports-blacklist`   | []string | Disallows importing the specified packages                     |    no    |  no   |
 
 ## Configurable rules
 
