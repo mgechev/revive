@@ -275,7 +275,7 @@ func TestLintName(t *testing.T) {
 		{"IEEE802_16Bit", "IEEE802_16Bit"},
 	}
 	for _, test := range tests {
-		got := lint.Name(test.name)
+		got := lint.Name(test.name, nil, nil)
 		if got != test.want {
 			t.Errorf("lintName(%q) = %q, want %q", test.name, got, test.want)
 		}

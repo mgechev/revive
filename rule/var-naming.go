@@ -16,10 +16,23 @@ type VarNamingRule struct{}
 func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
+	var whitelist []string
+	var blacklist []string
+
+	if len(arguments) >= 1 {
+		whitelist = getList(arguments[0], "whitelist")
+	}
+
+	if len(arguments) >= 2 {
+		blacklist = getList(arguments[1], "blacklist")
+	}
+
 	fileAst := file.AST
 	walker := lintNames{
-		file:    file,
-		fileAst: fileAst,
+		file:      file,
+		fileAst:   fileAst,
+		whitelist: whitelist,
+		blacklist: blacklist,
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
@@ -87,7 +100,7 @@ func check(id *ast.Ident, thing string, w *lintNames) {
 		})
 	}
 
-	should := lint.Name(id.Name)
+	should := lint.Name(id.Name, w.whitelist, w.blacklist)
 	if id.Name == should {
 		return
 	}
@@ -117,6 +130,8 @@ type lintNames struct {
 	lastGen                *ast.GenDecl
 	genDeclMissingComments map[*ast.GenDecl]bool
 	onFailure              func(lint.Failure)
+	whitelist              []string
+	blacklist              []string
 }
 
 func (w *lintNames) Visit(n ast.Node) ast.Visitor {
@@ -201,4 +216,20 @@ func (w *lintNames) Visit(n ast.Node) ast.Visitor {
 		}
 	}
 	return w
+}
+
+func getList(arg interface{}, argName string) []string {
+	temp, ok := arg.([]interface{})
+	if !ok {
+		panic(fmt.Sprintf("Invalid argument to the var-naming rule. Expecting a %s of type slice with initialisms, got %T", argName, arg))
+	}
+	var list []string
+	for _, v := range temp {
+		if val, ok := v.(string); ok {
+			list = append(list, val)
+		} else {
+			panic(fmt.Sprintf("Invalid %s values of the var-naming rule. Expecting slice of strings but got element of type %T", val, arg))
+		}
+	}
+	return list
 }
