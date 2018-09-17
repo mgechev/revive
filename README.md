@@ -269,7 +269,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `constant-logical-expr`   |  n/a   | Warns on constant logical expressions                        |    no    |  no   |
 | `bool-literal-in-expr`|  n/a   | Suggests removing Boolean literals from logic expressions        |    no    |  no   |
 | `redefines-builtin-id`|  n/a   | Warns on redefinitions of builtin identifiers                    |    no    |  no   |
-| `return-argument-limit` |  int | Specifies the maximum number of arguments a function can return  |    no    |  no   |
+| `function-result-limit` |  int | Specifies the maximum number of arguments a function can return  |    no    |  no   |
 
 ## Available Formatters
 
