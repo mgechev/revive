@@ -1,7 +1,9 @@
 .PHONY: test
 
+export GO111MODULE=on
+
 install:
-	@go install
+	@go mod vendor
 
 build:
 	@go build
