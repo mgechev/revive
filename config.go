@@ -64,6 +64,7 @@ var allRules = append([]lint.Rule{
 	&rule.ConstantLogicalExprRule{},
 	&rule.BoolLiteralRule{},
 	&rule.RedefinesBuiltinIDRule{},
+	&rule.ImportsBlacklistRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
