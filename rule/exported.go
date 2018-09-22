@@ -15,7 +15,7 @@ import (
 type ExportedRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ExportedRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ExportedRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	if isTest(file) {

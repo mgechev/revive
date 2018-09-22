@@ -11,7 +11,7 @@ import (
 type ReceiverNamingRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ReceiverNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ReceiverNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST

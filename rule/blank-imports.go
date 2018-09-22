@@ -10,7 +10,7 @@ import (
 type BlankImportsRule struct{}
 
 // Apply applies the rule to given file.
-func (r *BlankImportsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *BlankImportsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -38,7 +38,7 @@ type lintBlankImports struct {
 	onFailure func(lint.Failure)
 }
 
-func (w lintBlankImports) Visit(n ast.Node) ast.Visitor {
+func (w lintBlankImports) Visit(_ ast.Node) ast.Visitor {
 	// In package main and in tests, we don't complain about blank imports.
 	if w.file.Pkg.IsMain() || w.file.IsTest() {
 		return nil
