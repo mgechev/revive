@@ -124,7 +124,7 @@ func (w lintModifiesValRecRule) skipType(t ast.Expr) bool {
 	return strings.HasPrefix(rtName, "[]") || strings.HasPrefix(rtName, "map[")
 }
 
-func (_ lintModifiesValRecRule) getNameFromExpr(ie ast.Expr) string {
+func (lintModifiesValRecRule) getNameFromExpr(ie ast.Expr) string {
 	ident, ok := ie.(*ast.Ident)
 	if !ok {
 		return ""

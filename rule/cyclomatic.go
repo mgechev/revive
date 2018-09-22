@@ -47,7 +47,7 @@ type lintCyclomatic struct {
 	onFailure  func(lint.Failure)
 }
 
-func (w lintCyclomatic) Visit(n ast.Node) ast.Visitor {
+func (w lintCyclomatic) Visit(_ ast.Node) ast.Visitor {
 	f := w.file
 	for _, decl := range f.AST.Decls {
 		if fn, ok := decl.(*ast.FuncDecl); ok {
