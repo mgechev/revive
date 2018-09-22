@@ -6,6 +6,7 @@ import (
 	"github.com/mgechev/revive/rule"
 )
 
-func TestRangValInClosure(t *testing.T) {
-	testRule(t, "range-val-in-closure", &rule.RangValInClosureRule{})
+// TestRangeValInClosure tests RangeValInClosure rule
+func TestRangeValInClosure(t *testing.T) {
+	testRule(t, "range-val-in-closure", &rule.RangeValInClosureRule{})
 }

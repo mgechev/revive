@@ -7,33 +7,33 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// RangValInClosureRule looks for iteration vars used in closures.
-type RangValInClosureRule struct{}
+// RangeValInClosureRule looks for iteration vars used in closures.
+type RangeValInClosureRule struct{}
 
 // Apply applies the rule to given file.
-func (r *RangValInClosureRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *RangeValInClosureRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
 
-	w := lintRangValInClosureRule{onFailure: onFailure}
+	w := lintRangeValInClosureRule{onFailure: onFailure}
 	ast.Walk(w, file.AST)
 	return failures
 }
 
 // Name returns the rule name.
-func (r *RangValInClosureRule) Name() string {
+func (r *RangeValInClosureRule) Name() string {
 	return "range-val-in-closure"
 }
 
-type lintRangValInClosureRule struct {
+type lintRangeValInClosureRule struct {
 	params    map[string]bool
 	onFailure func(lint.Failure)
 }
 
-func (lintRangValInClosureRule) retrieveParamNames(pl []*ast.Field) map[string]bool {
+func (lintRangeValInClosureRule) retrieveParamNames(pl []*ast.Field) map[string]bool {
 	result := make(map[string]bool, len(pl))
 	for _, p := range pl {
 		for _, n := range p.Names {
@@ -44,7 +44,21 @@ func (lintRangValInClosureRule) retrieveParamNames(pl []*ast.Field) map[string]b
 }
 
 // checkId checks if the given id is referenced in a closure inside the given statement block
-func (w lintRangValInClosureRule) checkId(id string, blk *ast.BlockStmt) {
+func (w lintRangeValInClosureRule) checkId(id string, blk *ast.BlockStmt) {
+	if id == "_" {
+		return
+	}
+
+	for _, stmt := range blk.List {
+		assign, ok := stmt.(*ast.AssignStmt)
+		if !ok {
+			continue
+		}
+		if len(assign.Lhs) == 1 && len(assign.Rhs) == 1 && isIdent(assign.Lhs[0], id) && isIdent(assign.Rhs[0], id) {
+			return // the range body has an assignment of the form id := id, thus using it in a closure is safe.
+		}
+	}
+
 	fselect := func(n ast.Node) bool { // picks go statements
 		_, ok := n.(*ast.GoStmt)
 		return ok
@@ -90,7 +104,7 @@ GoStmtIter:
 	}
 }
 
-func (w lintRangValInClosureRule) Visit(node ast.Node) ast.Visitor {
+func (w lintRangeValInClosureRule) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
 	case *ast.RangeStmt:
 		// check the range value

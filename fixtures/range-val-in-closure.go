@@ -35,3 +35,18 @@ func bar() {
 		}(i)
 	}
 }
+
+func foo2() {
+	for i, newg := range groups {
+		newg := newg
+		go func() {
+			<-m.block
+			newg.run(m.opts.Context)
+		}()
+		go func() { // MATCH /range value 'i' seems to be referenced inside the closure/
+			i++
+			<-m.block
+			newg.run(m.opts.Context)
+		}(newg)
+	}
+}
