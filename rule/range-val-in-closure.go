@@ -7,14 +7,14 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// RangeLoopVarRule lints given else constructs.
-type RangeLoopVarRule struct{}
+// RangeValInClosureRule lints given else constructs.
+type RangeValInClosureRule struct{}
 
 // Apply applies the rule to given file.
-func (r *RangeLoopVarRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *RangeValInClosureRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
-	walker := RangeLoopVar{
+	walker := rangeValInClosure{
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
@@ -26,15 +26,15 @@ func (r *RangeLoopVarRule) Apply(file *lint.File, arguments lint.Arguments) []li
 }
 
 // Name returns the rule name.
-func (r *RangeLoopVarRule) Name() string {
-	return "range-loop-var"
+func (r *RangeValInClosureRule) Name() string {
+	return "range-val-in-closure"
 }
 
-type RangeLoopVar struct {
+type rangeValInClosure struct {
 	onFailure func(lint.Failure)
 }
 
-func (w RangeLoopVar) Visit(node ast.Node) ast.Visitor {
+func (w rangeValInClosure) Visit(node ast.Node) ast.Visitor {
 
 	// Find the variables updated by the loop statement.
 	var vars []*ast.Ident
@@ -87,13 +87,13 @@ func (w RangeLoopVar) Visit(node ast.Node) ast.Visitor {
 	if !ok {
 		return w
 	}
+	if lit.Type == nil {
+		// Not referring to a variable (e.g. struct field name)
+		return w
+	}
 	ast.Inspect(lit.Body, func(n ast.Node) bool {
 		id, ok := n.(*ast.Ident)
 		if !ok || id.Obj == nil {
-			return true
-		}
-		if lit.Type == nil {
-			// Not referring to a variable (e.g. struct field name)
 			return true
 		}
 		for _, v := range vars {

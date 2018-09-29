@@ -13,4 +13,4 @@
 [rule.receiver-naming]
 [rule.indent-error-flow]
 [rule.empty-block]
-[rule.range-loop-var]
+[rule.range-val-in-closure]

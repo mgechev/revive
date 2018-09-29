@@ -21,4 +21,17 @@ func foo() {
 			fmt.Printf("Value: %s\n", value) // MATCH /loop variable value captured by func literal/
 		}()
 	}
+
+	for i, newg := range groups {
+		go func(newg int) {
+			newg.run(m.opts.Context,i) // MATCH /loop variable i captured by func literal/
+		}(newg)
+	}
+
+	for i, newg := range groups {
+		newg := newg
+		go func() {
+			newg.run(m.opts.Context,i) // MATCH /loop variable i captured by func literal/
+		}()
+	}
 }
