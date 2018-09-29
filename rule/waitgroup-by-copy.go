@@ -9,7 +9,7 @@ import (
 type WaitGroupByCopyRule struct{}
 
 // Apply applies the rule to given file.
-func (r *WaitGroupByCopyRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *WaitGroupByCopyRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -31,32 +31,35 @@ type lintWaitGroupByCopyRule struct {
 }
 
 func (w lintWaitGroupByCopyRule) Visit(node ast.Node) ast.Visitor {
+	// look for function declarations
 	fd, ok := node.(*ast.FuncDecl)
 	if !ok {
 		return w
 	}
 
+	// Check all function's parameters
 	for _, field := range fd.Type.Params.List {
-		ft := field.Type
-
-		se, ok := ft.(*ast.SelectorExpr)
-		if !ok {
-			continue
-		}
-
-		x, _ := se.X.(*ast.Ident)
-		sel := se.Sel.Name
-		if x.Name != "sync" || sel != "WaitGroup" {
+		if !w.isWaitGroup(field.Type) {
 			continue
 		}
 
 		w.onFailure(lint.Failure{
 			Confidence: 1,
 			Node:       field,
-			Category:   "logic",
 			Failure:    "sync.WaitGroup passed by value, the function will get a copy of the original one",
 		})
 	}
 
-	return w
+	return nil
+}
+
+func (lintWaitGroupByCopyRule) isWaitGroup(ft ast.Expr) bool {
+	se, ok := ft.(*ast.SelectorExpr)
+	if !ok {
+		return false
+	}
+
+	x, _ := se.X.(*ast.Ident)
+	sel := se.Sel.Name
+	return x.Name == "sync" && sel == "WaitGroup"
 }
