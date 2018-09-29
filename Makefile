@@ -1,10 +1,9 @@
 .PHONY: test
 
-deps.devtools:
-	@go get github.com/golang/dep/cmd/dep
+export GO111MODULE=on
 
-install: deps.devtools
-	@dep ensure -v
+install:
+	@go mod vendor
 
 build:
 	@go build

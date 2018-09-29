@@ -17,7 +17,7 @@ import (
 type PackageCommentsRule struct{}
 
 // Apply applies the rule to given file.
-func (r *PackageCommentsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *PackageCommentsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	if isTest(file) {
@@ -45,7 +45,7 @@ type lintPackageComments struct {
 	onFailure func(lint.Failure)
 }
 
-func (l *lintPackageComments) Visit(n ast.Node) ast.Visitor {
+func (l *lintPackageComments) Visit(_ ast.Node) ast.Visitor {
 	if l.file.IsTest() {
 		return nil
 	}

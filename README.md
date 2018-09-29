@@ -243,7 +243,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `exported`            |  n/a   | Naming and commenting conventions on exported symbols.           |   yes    |  no   |
 | `if-return`           |  n/a   | Redundant if when returning an error.                            |   yes    |  no   |
 | `increment-decrement` |  n/a   | Use `i++` and `i--` instead of `i += 1` and `i -= 1`.            |   yes    |  no   |
-| `var-naming`          |  n/a   | Naming rules.                                                    |   yes    |  no   |
+| `var-naming`          |  whitelist & blacklist of initialisms   | Naming rules.                                                    |   yes    |  no   |
 | `package-comments`    |  n/a   | Package commenting conventions.                                  |   yes    |  no   |
 | `range`               |  n/a   | Prevents redundant variables when iterating over a collection.   |   yes    |  no   |
 | `receiver-naming`     |  n/a   | Conventions around the naming of receivers.                      |   yes    |  no   |
@@ -269,7 +269,25 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `constant-logical-expr`   |  n/a   | Warns on constant logical expressions                        |    no    |  no   |
 | `bool-literal-in-expr`|  n/a   | Suggests removing Boolean literals from logic expressions        |    no    |  no   |
 | `redefines-builtin-id`|  n/a   | Warns on redefinitions of builtin identifiers                    |    no    |  no   |
+| `function-result-limit` |  int | Specifies the maximum number of results a function can return    |    no    |  no   |
+| `imports-blacklist`   | []string | Disallows importing the specified packages                     |    no    |  no   |
+| `range-val-in-closure`|  n/a   | Warns if range value is used in a closure dispatched as goroutine|    no    |  no   |
 | `waitgroup-by-value  `|  n/a   | Warns on functions taking sync.WaitGroup as a by-value parameter |    no    |  no   |
+
+## Configurable rules
+
+Here you can find how you can configure some of the existing rules:
+
+### `var-naming`
+
+This rule accepts two slices of strings, a whitelist and a blacklist of initialisms. By default the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
+
+```toml
+[rule.var-naming]
+  arguments = [["ID"], ["VM"]]
+```
+
+This way, revive will not warn for identifier called `customId` but will warn that `customVm` should be called `customVM`.
 
 ## Available Formatters
 
@@ -377,14 +395,15 @@ Currently, type checking is enabled by default. If you want to run the linter wi
 
 ## Contributors
 
-[<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) |[<img alt="chavacava" src="https://avatars2.githubusercontent.com/u/25788468?v=4&s=117" width="117">](https://github.com/chavacava) |[<img alt="morphy2k" src="https://avatars2.githubusercontent.com/u/4280578?v=4&s=117" width="117">](https://github.com/morphy2k) |[<img alt="tamird" src="https://avatars0.githubusercontent.com/u/1535036?v=4&s=117" width="117">](https://github.com/tamird) |[<img alt="paul-at-start" src="https://avatars2.githubusercontent.com/u/5486775?v=4&s=117" width="117">](https://github.com/paul-at-start) |[<img alt="Jarema" src="https://avatars0.githubusercontent.com/u/7369771?v=4&s=117" width="117">](https://github.com/Jarema) |
+[<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) |[<img alt="chavacava" src="https://avatars2.githubusercontent.com/u/25788468?v=4&s=117" width="117">](https://github.com/chavacava) |[<img alt="xuri" src="https://avatars2.githubusercontent.com/u/2809468?v=4&s=117" width="117">](https://github.com/xuri) |[<img alt="morphy2k" src="https://avatars2.githubusercontent.com/u/4280578?v=4&s=117" width="117">](https://github.com/morphy2k) |[<img alt="z0mbie42" src="https://avatars0.githubusercontent.com/u/6172808?v=4&s=117" width="117">](https://github.com/z0mbie42) |[<img alt="tamird" src="https://avatars0.githubusercontent.com/u/1535036?v=4&s=117" width="117">](https://github.com/tamird) |
 :---: |:---: |:---: |:---: |:---: |:---: |
-[mgechev](https://github.com/mgechev) |[chavacava](https://github.com/chavacava) |[morphy2k](https://github.com/morphy2k) |[tamird](https://github.com/tamird) |[paul-at-start](https://github.com/paul-at-start) |[Jarema](https://github.com/Jarema) |
+[mgechev](https://github.com/mgechev) |[chavacava](https://github.com/chavacava) |[xuri](https://github.com/xuri) |[morphy2k](https://github.com/morphy2k) |[z0mbie42](https://github.com/z0mbie42) |[tamird](https://github.com/tamird) |
 
-[<img alt="vkrol" src="https://avatars3.githubusercontent.com/u/153412?v=4&s=117" width="117">](https://github.com/vkrol) |[<img alt="haya14busa" src="https://avatars0.githubusercontent.com/u/3797062?v=4&s=117" width="117">](https://github.com/haya14busa) |
-:---: |:---: |
-[vkrol](https://github.com/vkrol) |[haya14busa](https://github.com/haya14busa) |
+[<img alt="paul-at-start" src="https://avatars2.githubusercontent.com/u/5486775?v=4&s=117" width="117">](https://github.com/paul-at-start) |[<img alt="psapezhko" src="https://avatars3.githubusercontent.com/u/10865586?v=4&s=117" width="117">](https://github.com/psapezhko) |[<img alt="Jarema" src="https://avatars0.githubusercontent.com/u/7369771?v=4&s=117" width="117">](https://github.com/Jarema) |[<img alt="vkrol" src="https://avatars3.githubusercontent.com/u/153412?v=4&s=117" width="117">](https://github.com/vkrol) |[<img alt="haya14busa" src="https://avatars0.githubusercontent.com/u/3797062?v=4&s=117" width="117">](https://github.com/haya14busa) |
+:---: |:---: |:---: |:---: |:---: |
+[paul-at-start](https://github.com/paul-at-start) |[psapezhko](https://github.com/psapezhko) |[Jarema](https://github.com/Jarema) |[vkrol](https://github.com/vkrol) |[haya14busa](https://github.com/haya14busa) |
 
 ## License
 
 MIT
+

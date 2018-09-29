@@ -64,6 +64,10 @@ var allRules = append([]lint.Rule{
 	&rule.ConstantLogicalExprRule{},
 	&rule.BoolLiteralRule{},
 	&rule.RedefinesBuiltinIDRule{},
+	&rule.ImportsBlacklistRule{},
+	&rule.FunctionResultsLimitRule{},
+	&rule.MaxPublicStructsRule{},
+	&rule.RangeValInClosureRule{},
 	&rule.WaitGroupByCopyRule{},
 }, defaultRules...)
 
@@ -73,6 +77,7 @@ var allFormatters = []lint.Formatter{
 	&formatter.JSON{},
 	&formatter.NDJSON{},
 	&formatter.Default{},
+	&formatter.Unix{},
 	&formatter.Checkstyle{},
 }
 

@@ -49,7 +49,7 @@ var allPkgs = packages{pkgs: make([]pkgMethods, 1)}
 type ConfusingNamingRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ConfusingNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ConfusingNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	fileAst := file.AST
 	pkgm := allPkgs.methodNames(file.Pkg)

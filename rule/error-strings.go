@@ -14,7 +14,7 @@ import (
 type ErrorStringsRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ErrorStringsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ErrorStringsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST
