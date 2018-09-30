@@ -272,6 +272,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `function-result-limit` |  int | Specifies the maximum number of results a function can return    |    no    |  no   |
 | `imports-blacklist`   | []string | Disallows importing the specified packages                     |    no    |  no   |
 | `range-val-in-closure`|  n/a   | Warns if range value is used in a closure dispatched as goroutine|    no    |  no   |
+| `waitgroup-by-value  `|  n/a   | Warns on functions taking sync.WaitGroup as a by-value parameter |    no    |  no   |
 
 ## Configurable rules
 
