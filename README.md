@@ -41,6 +41,8 @@ Here's how `revive` is different from `golint`:
     - [Custom Configuration](#custom-configuration)
     - [Recommended Configuration](#recommended-configuration)
   - [Available Rules](#available-rules)
+  - [Configurable rules](#configurable-rules)
+    - [`var-naming`](#var-naming)
   - [Available Formatters](#available-formatters)
     - [Friendly](#friendly)
     - [Stylish](#stylish)
@@ -51,7 +53,7 @@ Here's how `revive` is different from `golint`:
     - [Custom Formatter](#custom-formatter)
   - [Speed Comparison](#speed-comparison)
     - [golint](#golint)
-    - [revive](#revive-1)
+    - [revive](#revive)
   - [Contributors](#contributors)
   - [License](#license)
 
@@ -272,7 +274,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `function-result-limit` |  int | Specifies the maximum number of results a function can return    |    no    |  no   |
 | `imports-blacklist`   | []string | Disallows importing the specified packages                     |    no    |  no   |
 | `range-val-in-closure`|  n/a   | Warns if range value is used in a closure dispatched as goroutine|    no    |  no   |
-| `waitgroup-by-value  `|  n/a   | Warns on functions taking sync.WaitGroup as a by-value parameter |    no    |  no   |
+| `waitgroup-by-value`  |  n/a   | Warns on functions taking sync.WaitGroup as a by-value parameter |    no    |  no   |
 | `atomic`              |  n/a   | Check for common mistaken usages of the `sync/atomic` package    |    no    |  no   |
 
 ## Configurable rules

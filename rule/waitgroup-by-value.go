@@ -1,36 +1,37 @@
 package rule
 
 import (
-	"github.com/mgechev/revive/lint"
 	"go/ast"
+
+	"github.com/mgechev/revive/lint"
 )
 
-// WaitGroupByCopyRule lints sync.WaitGroup passed by copy in functions.
-type WaitGroupByCopyRule struct{}
+// WaitGroupByValueRule lints sync.WaitGroup passed by copy in functions.
+type WaitGroupByValueRule struct{}
 
 // Apply applies the rule to given file.
-func (r *WaitGroupByCopyRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *WaitGroupByValueRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
 
-	w := lintWaitGroupByCopyRule{onFailure: onFailure}
+	w := lintWaitGroupByValueRule{onFailure: onFailure}
 	ast.Walk(w, file.AST)
 	return failures
 }
 
 // Name returns the rule name.
-func (r *WaitGroupByCopyRule) Name() string {
-	return "waitgroup-by-copy"
+func (r *WaitGroupByValueRule) Name() string {
+	return "waitgroup-by-value"
 }
 
-type lintWaitGroupByCopyRule struct {
+type lintWaitGroupByValueRule struct {
 	onFailure func(lint.Failure)
 }
 
-func (w lintWaitGroupByCopyRule) Visit(node ast.Node) ast.Visitor {
+func (w lintWaitGroupByValueRule) Visit(node ast.Node) ast.Visitor {
 	// look for function declarations
 	fd, ok := node.(*ast.FuncDecl)
 	if !ok {
@@ -53,7 +54,7 @@ func (w lintWaitGroupByCopyRule) Visit(node ast.Node) ast.Visitor {
 	return nil
 }
 
-func (lintWaitGroupByCopyRule) isWaitGroup(ft ast.Expr) bool {
+func (lintWaitGroupByValueRule) isWaitGroup(ft ast.Expr) bool {
 	se, ok := ft.(*ast.SelectorExpr)
 	if !ok {
 		return false

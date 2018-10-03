@@ -68,8 +68,8 @@ var allRules = append([]lint.Rule{
 	&rule.FunctionResultsLimitRule{},
 	&rule.MaxPublicStructsRule{},
 	&rule.RangeValInClosureRule{},
-	&rule.WaitGroupByCopyRule{},
-  &rule.AtomicRule{},
+	&rule.WaitGroupByValueRule{},
+	&rule.AtomicRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{

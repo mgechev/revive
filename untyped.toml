@@ -14,3 +14,5 @@
 [rule.indent-error-flow]
 [rule.empty-block]
 [rule.range-val-in-closure]
+[rule.waitgroup-by-value]
+[rule.atomic]
