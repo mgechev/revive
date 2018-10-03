@@ -1,10 +1,7 @@
 package rule
 
 import (
-	"bytes"
-	"fmt"
 	"go/ast"
-	"go/printer"
 	"go/token"
 	"go/types"
 
@@ -18,7 +15,7 @@ type AtomicRule struct{}
 func (r *AtomicRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	walker := atomic{
-		file: file,
+		pkgTypesInfo: file.Pkg.TypesInfo,
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
@@ -35,8 +32,8 @@ func (r *AtomicRule) Name() string {
 }
 
 type atomic struct {
-	file      *lint.File
-	onFailure func(lint.Failure)
+	pkgTypesInfo *types.Info
+	onFailure    func(lint.Failure)
 }
 
 func (w atomic) Visit(node ast.Node) ast.Visitor {
@@ -46,10 +43,10 @@ func (w atomic) Visit(node ast.Node) ast.Visitor {
 	}
 
 	if len(n.Lhs) != len(n.Rhs) {
-		return w
+		return nil // skip assignment sub-tree
 	}
 	if len(n.Lhs) == 1 && n.Tok == token.DEFINE {
-		return w
+		return nil // skip assignment sub-tree
 	}
 
 	for i, right := range n.Rhs {
@@ -62,8 +59,8 @@ func (w atomic) Visit(node ast.Node) ast.Visitor {
 			continue
 		}
 		pkgIdent, _ := sel.X.(*ast.Ident)
-		if w.file.Pkg.TypesInfo != nil {
-			pkgName, ok := w.file.Pkg.TypesInfo.Uses[pkgIdent].(*types.PkgName)
+		if w.pkgTypesInfo != nil {
+			pkgName, ok := w.pkgTypesInfo.Uses[pkgIdent].(*types.PkgName)
 			if !ok || pkgName.Imported().Path() != "sync/atomic" {
 				continue
 			}
@@ -79,27 +76,19 @@ func (w atomic) Visit(node ast.Node) ast.Visitor {
 			broken := false
 
 			if uarg, ok := arg.(*ast.UnaryExpr); ok && uarg.Op == token.AND {
-				broken = w.gofmt(left) == w.gofmt(uarg.X)
+				broken = gofmt(left) == gofmt(uarg.X)
 			} else if star, ok := left.(*ast.StarExpr); ok {
-				broken = w.gofmt(star.X) == w.gofmt(arg)
+				broken = gofmt(star.X) == gofmt(arg)
 			}
 
 			if broken {
 				w.onFailure(lint.Failure{
 					Confidence: 1,
-					Failure:    fmt.Sprintf("direct assignment to atomic value"),
+					Failure:    "direct assignment to atomic value",
 					Node:       n,
 				})
 			}
 		}
 	}
 	return w
-}
-
-// gofmt returns a string representation of the expression.
-func (w atomic) gofmt(x ast.Expr) string {
-	buf := bytes.Buffer{}
-	fs := token.NewFileSet()
-	printer.Fprint(&buf, fs, x)
-	return buf.String()
 }
