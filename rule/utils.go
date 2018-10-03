@@ -1,8 +1,10 @@
 package rule
 
 import (
+	"bytes"
 	"fmt"
 	"go/ast"
+	"go/printer"
 	"go/token"
 	"go/types"
 	"regexp"
@@ -178,4 +180,12 @@ func isExprABooleanLit(n ast.Node) (lexeme string, ok bool) {
 	}
 
 	return oper.Name, (oper.Name == trueName || oper.Name == falseName)
+}
+
+// gofmt returns a string representation of the expression.
+func gofmt(x ast.Expr) string {
+	buf := bytes.Buffer{}
+	fs := token.NewFileSet()
+	printer.Fprint(&buf, fs, x)
+	return buf.String()
 }
