@@ -54,7 +54,7 @@ type blacklistedImports struct {
 	blacklist map[string]bool
 }
 
-func (w blacklistedImports) Visit(n ast.Node) ast.Visitor {
+func (w blacklistedImports) Visit(_ ast.Node) ast.Visitor {
 	for _, is := range w.fileAst.Imports {
 		if is.Path != nil && !w.file.IsTest() && w.blacklist[is.Path.Value] {
 			w.onFailure(lint.Failure{

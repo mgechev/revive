@@ -77,13 +77,29 @@ func (p *Package) TypeCheck() error {
 		anyFile = f
 		astFiles = append(astFiles, f.AST)
 	}
-	typesPkg, err := config.Check(anyFile.AST.Name.Name, p.fset, astFiles, info)
+
+	typesPkg, err := check(config, anyFile.AST.Name.Name, p.fset, astFiles, info)
+
 	// Remember the typechecking info, even if config.Check failed,
 	// since we will get partial information.
 	p.TypesPkg = typesPkg
 	p.TypesInfo = info
 	p.mu.Unlock()
 	return err
+}
+
+// check function encapsulates the call to go/types.Config.Check method and
+// recovers if the called method panics (see issue #59)
+func check(config *types.Config, n string, fset *token.FileSet, astFiles []*ast.File, info *types.Info) (p *types.Package, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err, _ = r.(error)
+			p = nil
+			return
+		}
+	}()
+
+	return config.Check(n, fset, astFiles, info)
 }
 
 // TypeOf returns the type of an expression.

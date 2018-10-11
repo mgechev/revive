@@ -1,11 +1,8 @@
 package rule
 
 import (
-	"bytes"
-	"fmt"
 	"github.com/mgechev/revive/lint"
 	"go/ast"
-	"go/format"
 	"go/token"
 )
 
@@ -13,7 +10,7 @@ import (
 type ConstantLogicalExprRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ConstantLogicalExprRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ConstantLogicalExprRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -43,7 +40,7 @@ func (w *lintConstantLogicalExpr) Visit(node ast.Node) ast.Visitor {
 			return w
 		}
 
-		if !w.areEqual(n.X, n.Y) {
+		if gofmt(n.X) != gofmt(n.Y) { // check if subexpressions are the same
 			return w
 		}
 
@@ -79,21 +76,6 @@ func (w *lintConstantLogicalExpr) isInequalityOperator(t token.Token) bool {
 	}
 
 	return false
-}
-
-func (w lintConstantLogicalExpr) areEqual(x, y ast.Expr) bool {
-	fset := token.NewFileSet()
-	var buf1 bytes.Buffer
-	if err := format.Node(&buf1, fset, x); err != nil {
-		return false // keep going in case of error
-	}
-
-	var buf2 bytes.Buffer
-	if err := format.Node(&buf2, fset, y); err != nil {
-		return false // keep going in case of error
-	}
-
-	return fmt.Sprintf("%s", buf1.Bytes()) == fmt.Sprintf("%s", buf2.Bytes())
 }
 
 func (w lintConstantLogicalExpr) newFailure(node ast.Node, msg string) {

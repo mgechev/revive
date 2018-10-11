@@ -56,6 +56,11 @@ func (f *File) Render(x interface{}) string {
 	return buf.String()
 }
 
+// CommentMap builds a comment map for the file.
+func (f *File) CommentMap() ast.CommentMap {
+	return ast.NewCommentMap(f.Pkg.fset, f.AST, f.AST.Comments)
+}
+
 var basicTypeKinds = map[types.BasicKind]string{
 	types.UntypedBool:    "bool",
 	types.UntypedInt:     "int",

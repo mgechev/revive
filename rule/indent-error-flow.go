@@ -11,7 +11,7 @@ import (
 type IndentErrorFlowRule struct{}
 
 // Apply applies the rule to given file.
-func (r *IndentErrorFlowRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *IndentErrorFlowRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -77,4 +77,3 @@ func (w lintElse) Visit(node ast.Node) ast.Visitor {
 	}
 	return w
 }
-

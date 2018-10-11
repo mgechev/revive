@@ -51,7 +51,7 @@ type lintFileHeader struct {
 	onFailure func(lint.Failure)
 }
 
-func (w lintFileHeader) Visit(n ast.Node) ast.Visitor {
+func (w lintFileHeader) Visit(_ ast.Node) ast.Visitor {
 	g := w.fileAst.Comments[0]
 	failure := lint.Failure{
 		Node:       w.fileAst,
