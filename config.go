@@ -70,6 +70,7 @@ var allRules = append([]lint.Rule{
 	&rule.RangeValInClosureRule{},
 	&rule.WaitGroupByValueRule{},
 	&rule.AtomicRule{},
+	&rule.EmptyLinesRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
