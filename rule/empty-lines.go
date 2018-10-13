@@ -82,7 +82,7 @@ func (w lintEmptyLines) checkEnd(block *ast.BlockStmt) {
 		return
 	}
 
-	last := w.position(lastNode.Pos())
+	last := w.position(lastNode.End())
 	if end.Line-last.Line > 1 {
 		w.onFailure(lint.Failure{
 			Confidence: 1,
