@@ -2,6 +2,8 @@
 
 package fixtures
 
+import "time"
+
 func f1(x *int) bool { // MATCH /extra empty line at the start of a block/
 
 	return x > 2
@@ -126,4 +128,35 @@ func f18(x *int) bool {
 	}
 
 	return false
+}
+
+func w() {
+	select {
+	case <-time.After(dur):
+		// TODO: Handle Ctrl-C is pressed in `mysql` client.
+		// return 1 when SLEEP() is KILLed
+	}
+	return 0, false, nil
+}
+
+func x() {
+	if tagArray[2] == "req" {
+		bit := len(u.reqFields)
+		u.reqFields = append(u.reqFields, name)
+		reqMask = uint64(1) << uint(bit)
+		// TODO: if we have more than 64 required fields, we end up
+		// not verifying that all required fields are present.
+		// Fix this, perhaps using a count of required fields?
+	}
+
+	if err == nil { // No need to refresh if the stream is over or failed.
+		// Consider any buffered body data (read from the conn but not
+		// consumed by the client) when computing flow control for this
+		// stream.
+		v := int(cs.inflow.available()) + cs.bufPipe.Len()
+		if v < transportDefaultStreamFlow-transportDefaultStreamMinRefresh {
+			streamAdd = int32(transportDefaultStreamFlow - v)
+			cs.inflow.add(streamAdd)
+		}
+	}
 }
