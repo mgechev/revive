@@ -100,9 +100,11 @@ func (w lintEmptyLines) commentBetween(position token.Position, node ast.Node) b
 		return false
 	}
 
-	commentStart := w.position(comments[0].Pos())
-	if commentStart.Line-position.Line == 1 || commentStart.Line-position.Line == -1 {
-		return true
+	for _, comment := range comments {
+		start, end := w.position(comment.Pos()), w.position(comment.End())
+		if start.Line-position.Line == 1 || position.Line-end.Line == 1 {
+			return true
+		}
 	}
 
 	return false
