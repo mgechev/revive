@@ -57,3 +57,73 @@ func f9(*int) bool {
 
 	return false
 }
+
+func f10(*int) bool { // MATCH /extra empty line at the start of a block/
+
+	if x > 2 {
+		return true
+	}
+
+	return false
+}
+
+func f11(x *int) bool {
+	if x > 2 {
+		return true
+	}
+}
+
+func f12(x *int) bool {
+	if x > 2 { // MATCH /extra empty line at the end of a block/
+		return true
+	}
+
+}
+
+func f13(x *int) bool {
+	switch {
+	case x == 2:
+		return false
+	}
+}
+
+func f14(x *int) bool {
+	switch { // MATCH /extra empty line at the end of a block/
+	case x == 2:
+		return false
+	}
+
+}
+
+func f15(x *int) bool {
+	switch {
+	case x == 2: // MATCH /extra empty line at the end of a block/
+		return false
+
+	}
+}
+
+func f16(x *int) bool {
+	return Query(
+		qm("x = ?", x),
+	).Execute()
+}
+
+func f17(x *int) bool {
+	return Query( // MATCH /extra empty line at the end of a block/
+		qm("x = ?", x),
+	).Execute()
+
+}
+
+func f18(x *int) bool {
+	if true {
+		if true { // MATCH /extra empty line at the end of a block/
+			return true
+		}
+
+		// TODO: should we handle the error here?
+	}
+
+	return false
+}
