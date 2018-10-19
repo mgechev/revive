@@ -277,6 +277,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | `waitgroup-by-value`  |  n/a   | Warns on functions taking sync.WaitGroup as a by-value parameter |    no    |  no   |
 | `atomic`              |  n/a   | Check for common mistaken usages of the `sync/atomic` package    |    no    |  no   |
 | `empty-lines`   | n/a | Warns when there are heading or trailing newlines in a block              |    no    |  no   |
+| `line-lenght-limit`   | int    | Specifies the maximum number of characters in a line             |    no    |  no   |
 
 ## Configurable rules
 
@@ -410,4 +411,3 @@ Currently, type checking is enabled by default. If you want to run the linter wi
 ## License
 
 MIT
-
