@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"go/ast"
 	"go/token"
 	"strings"
 	"unicode/utf8"
@@ -27,8 +26,7 @@ func (r *LineLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) [
 	}
 
 	var failures []lint.Failure
-
-	walker := lintLineLengthNum{
+	checker := lintLineLengthNum{
 		max:  int(max),
 		file: file,
 		onFailure: func(failure lint.Failure) {
@@ -36,7 +34,7 @@ func (r *LineLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) [
 		},
 	}
 
-	ast.Walk(walker, file.AST)
+	checker.check()
 
 	return failures
 }
@@ -52,7 +50,7 @@ type lintLineLengthNum struct {
 	onFailure func(lint.Failure)
 }
 
-func (r lintLineLengthNum) Visit(n ast.Node) ast.Visitor {
+func (r lintLineLengthNum) check() {
 	f := bytes.NewReader(r.file.Content())
 	spaces := strings.Repeat(" ", 4) // tab width = 4
 	l := 1
@@ -61,7 +59,6 @@ func (r lintLineLengthNum) Visit(n ast.Node) ast.Visitor {
 		t := s.Text()
 		t = strings.Replace(t, "\t", spaces, -1)
 		c := utf8.RuneCountInString(t)
-
 		if c > r.max {
 			r.onFailure(lint.Failure{
 				Category: "code-style",
@@ -85,5 +82,4 @@ func (r lintLineLengthNum) Visit(n ast.Node) ast.Visitor {
 		}
 		l++
 	}
-	return nil
 }
