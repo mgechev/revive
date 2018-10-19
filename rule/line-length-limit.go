@@ -22,11 +22,8 @@ func (r *LineLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) [
 	}
 
 	max, ok := arguments[0].(int64) // Alt. non panicking version
-	if !ok {
-		panic(fmt.Sprintf(`invalid value passed as return results number to the "line-length-limit" rule; need int64 but got %T`, arguments[0]))
-	}
-	if max < 0 {
-		panic(`the value passed as return results number to the "line-length-limit" rule cannot be negative`)
+	if !ok || max < 0 {
+		panic(`invalid value passed as argument number to the "line-length-limit" rule`)
 	}
 
 	var failures []lint.Failure
