@@ -71,6 +71,7 @@ var allRules = append([]lint.Rule{
 	&rule.WaitGroupByValueRule{},
 	&rule.AtomicRule{},
 	&rule.EmptyLinesRule{},
+	&rule.LineLengthLimitRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{

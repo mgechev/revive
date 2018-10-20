@@ -16,3 +16,6 @@
 [rule.range-val-in-closure]
 [rule.waitgroup-by-value]
 [rule.atomic]
+[rule.empty-lines]
+[rule.line-length-limit]
+    arguments = [200]
