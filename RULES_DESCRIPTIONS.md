@@ -159,7 +159,7 @@ _Configuration_: N/A
 
 ## dot-imports
  
- _Description_: Importing with `.` makes the programs much harder to understand because it is unclear where names belongs to the current package or to an imported package.
+ _Description_: Importing with `.` makes the programs much harder to understand because it is unclear where names belong to the current package or to an imported package.
  This rule warns when using imports `.`
 
  More information [here](https://github.com/golang/go/wiki/CodeReviewComments#import-dot)
