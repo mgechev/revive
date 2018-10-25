@@ -113,7 +113,7 @@ _Configuration_: N/A
 
 ## confusing-results
 
-_Description_: Function or methods that return multiple, no named, values of the same type may induce to error. This rule warns on those cases.
+_Description_: Function or methods that return multiple, no named, values of the same type may induce error. This rule warns on those cases.
 
 _Configuration_: N/A
 
