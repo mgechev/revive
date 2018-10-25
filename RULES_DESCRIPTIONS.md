@@ -215,7 +215,7 @@ _Configuration_: N/A
 
 ## file-header
 
-_Description_: This rule helps enforcing a common header for all source files in a project
+_Description_: This rule helps to enforce a common header for all source files in a project
 by spotting those files that do not have the specified header.
 
 _Configuration_: (string) the header to look for in source files.
