@@ -278,7 +278,7 @@ _Configuration_: N/A
 
 ## imports-blacklist
 
-_Description_: This rule allows to warn when importing packages that are black-listed by the user.
+_Description_: This rule warns when importing black-listed packages.
 
 _Configuration_: black-list of package names
 
