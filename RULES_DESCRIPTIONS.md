@@ -249,7 +249,6 @@ Example:
 
 ## get-return
 _Description_: Typically, functions with names prefixed with _Get_ are supposed to return a value.
-This rule warns on functions named _Get_* that do not return any value.
 
 _Configuration_: N/A
 
