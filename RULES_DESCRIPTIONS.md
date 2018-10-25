@@ -356,7 +356,7 @@ _Configuration_: N/A
 ## receiver-naming
 
 _Description_: By convention, receiver names in method should reflect their identity.
-For example if the receiver is of type `Parts`, `p` is an adequate name fot it.
+For example, if the receiver is of type `Parts`, `p` is an adequate name for it.
 Contrary to other languages, it is not idiomatic to name receivers as `this` or `self`.
 This rule warns when a receiver has a name, not in line with this convention.
 
