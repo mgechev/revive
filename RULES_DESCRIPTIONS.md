@@ -237,7 +237,7 @@ _Configuration_: N/A
 ## function-result-limit
 
 _Description_: Functions returning too many results can be hard to understand/use.
-This rule warns on functions returning more than a, configured, maximum number of values.
+This rule warns on functions returning more than a configured, maximum number of values.
 
 _Configuration_: (int) the maximum allowed return values
 
