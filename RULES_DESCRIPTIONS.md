@@ -168,7 +168,7 @@ _Configuration_: N/A
 
 ## empty-block
 
-_Description_: Empty blocks make code less readable and may be the symptom of a bug (unfinished refactoring?). This rule spots empty blocks in the code.
+_Description_: Empty blocks make code less readable and may be a symptom of a bug or unfinished refactoring. This rule spots empty blocks in the code.
 
 _Configuration_: N/A
 
