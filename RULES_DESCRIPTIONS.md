@@ -348,7 +348,7 @@ _Configuration_: N/A
 
 ## range-val-in-closure
 
-_Description_: Iteration variables in ranges (for-range) statements are reused at each iteration, therefore each closure created in the loop will reference the exact same variable then they will get variable's value at the time goroutines start executing.
+_Description_: Range variables in a loop are reused at each iteration; therefore a goroutine created in a loop will point to the range variable with from the upper scope. This way, the goroutine may use the variable with an undesired value.
 This rule warns when a range value (or index) is used inside a closure
 
 _Configuration_: N/A
