@@ -419,7 +419,7 @@ _Configuration_: N/A
 
 ## unnecessary-stmt
 
-_Description_: To improve the readability of code, this rule suggest to remove redundant statements like a `break` at the end of a case block.
+_Description_: To improve the readability of code, this rule suggests to remove redundant statements like a `break` at the end of a case block.
 
 _Configuration_: N/A
 
