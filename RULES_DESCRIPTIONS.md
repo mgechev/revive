@@ -290,7 +290,7 @@ Example:
 
 ## line-lenght-limit
 
-_Description_: Sometimes `gofmt` is not enough to enforce a common formating of a code-base, this rule warns in the presence of code lines longer than a configured maximum.
+_Description_: This rule warns in the presence of code lines longer than a configured maximum.
 
 _Configuration_: (int) maximum line length in characters.
 
