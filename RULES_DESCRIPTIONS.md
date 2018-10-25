@@ -59,9 +59,9 @@ _Description_: Suggests using constant for [magic numbers](https://en.wikipedia.
 _Configuration_:
 
 * `maxLitCount` : (string) maximum number of instances of a string literal that are tolerated before warn.
-* `allowStr`: (string) comma separated list of allowed string literals
-* `allowInts`: (string) comma separated list of allowed integers
-* `allowFloats`: (string) comma separated list of allowed floats
+* `allowStr`: (string) comma-separated list of allowed string literals
+* `allowInts`: (string) comma-separated list of allowed integers
+* `allowFloats`: (string) comma-separated list of allowed floats
 
 Example:
 
@@ -73,7 +73,7 @@ Example:
 ## argument-limit
 
 _Description_: Warns when a function receives more parameters than the maximum set by the rule's configuration.
-Enforcing a maximum number of parameters helps keeping code readable and maintainable.
+Enforcing a maximum number of parameters helps to keep the code readable and maintainable.
 
 _Configuration_: (int) the maximum number of parameters allowed per function.
 
@@ -86,7 +86,7 @@ Example:
 
 ## atomic
 
-_Description_: Check for common mistaken usages of the `sync/atomic` package
+_Description_: Check for commonly mistaken usages of the `sync/atomic` package
 
 _Configuration_: N/A
 
@@ -100,7 +100,6 @@ _Configuration_: N/A
 
 _Description_: Using Boolean literals (`true`, `false`) in logic expressions may make the code less readable. This rule
 suggests removing Boolean literals from logic expressions.
-The rule will also try to spot logical expressions that evaluate always to the same value.
 
 _Configuration_: N/A
 
@@ -119,9 +118,7 @@ _Configuration_: N/A
 
 ## constant-logical-expr
 
-_Description_: Using Boolean literals (`true`, `false`) in logic expressions may make the code less readable. This rule
-suggests removing Boolean literals from logic expressions.
-The rule will also try to spot logical expressions that evaluate always to the same value.
+_Description_: The rule spots logical expressions that evaluate always to the same value.
 
 _Configuration_: N/A
 
@@ -186,13 +183,13 @@ _Configuration_: N/A
 
 ## error-return
 
-_Description_: By convention, for the sake of readability, when a function returns a value of type `error`, the value must be the last one of the list of return values. This rule warns when this convention is not followed.
+_Description_: By convention, for the sake of readability, the errors should be last in the list of returned values by a function. This rule warns when this convention is not followed.
 
 _Configuration_: N/A
 
 ## error-strings
 
-_Description_: By convention, for better readability, error strings should not be capitalized or end with punctuation or a newline. This rule warns when this convention is not followed.
+_Description_: By convention, for better readability, error messages should not be capitalized or end with punctuation or a newline. This rule warns when this convention is not followed.
 
 More information [here](https://github.com/golang/go/wiki/CodeReviewComments#error-strings)
 
@@ -424,14 +421,13 @@ _Configuration_: N/A
 
 ## unreachable-code
 
-_Description_: This rule spots and propose to remove [unreachable code](https://en.wikipedia.org/wiki/Unreachable_code).
+_Description_: This rule spots and proposes to remove [unreachable code](https://en.wikipedia.org/wiki/Unreachable_code).
 
 _Configuration_: N/A
 
 ## unused-parameter
 
-_Description_: Functions or methods with unused parameters can be a symptom of an unfinished refactoring or a bug.
-This rule warns on unused parameters.
+_Description_: This rule warns on unused parameters. Functions or methods with unused parameters can be a symptom of an unfinished refactoring or a bug.
 
 _Configuration_: N/A
 
