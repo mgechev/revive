@@ -1,6 +1,6 @@
 # Description of available rules
 
-List of all available rules. 
+List of all available rules.
 
 
 - [Description of available rules](#description-of-available-rules)
@@ -92,27 +92,25 @@ _Configuration_: N/A
 
 ## blank-imports
 
-_Description_: Blank import should be only in a main or test package, or have a comment justifying it; this rule warns if that is not the case.
+_Description_: Blank import should be only in a main or test package, or have a comment justifying it.
 
 _Configuration_: N/A
 
 ## bool-literal-in-expr
 
-_Description_: Using Boolean literals (`true`, `false`) in logic expressions may make the code less readable. This rule
-suggests removing Boolean literals from logic expressions.
+_Description_: Using Boolean literals (`true`, `false`) in logic expressions may make the code less readable. This rule suggests removing Boolean literals from logic expressions.
 
 _Configuration_: N/A
 
 ## confusing-naming
 
-_Description_: Methods or fields of `struct`s that have similar names may be misleading.
-Warns on methods and fields with names that differ only by capitalization.
+_Description_: Methods or fields of `struct` that have names different only by capitalization could be confusing.
 
 _Configuration_: N/A
 
 ## confusing-results
 
-_Description_: Function or methods that return multiple, no named, values of the same type may induce error. This rule warns on those cases.
+_Description_: Function or methods that return multiple, no named, values of the same type could induce error.
 
 _Configuration_: N/A
 
@@ -124,25 +122,24 @@ _Configuration_: N/A
 
 ## context-as-argument
 
-_Description_: Is a language [convention](https://github.com/golang/go/wiki/CodeReviewComments#contexts) that `context.Context` should be the first parameter of a function. This rule spots function declarations that do not follow the convention.
+_Description_: By [convention](https://github.com/golang/go/wiki/CodeReviewComments#contexts), `context.Context` should be the first parameter of a function. This rule spots function declarations that do not follow the convention.
 
 _Configuration_: N/A
 
 ## context-keys-type
 
 _Description_: Basic types should not be used as a key in `context.WithValue`.
-This rule warns when that is the case.
 
 _Configuration_: N/A
 
 ## cyclomatic
 
-_Description_: [Cyclomatic complexity](https://en.wikipedia.org/wiki/Cyclomatic_complexity) is a measure of code complexity.
-Enforcing a maximum complexity per function helps to keep code readable and maintainable.
+_Description_: [Cyclomatic complexity](https://en.wikipedia.org/wiki/Cyclomatic_complexity) is a measure of code complexity. Enforcing a maximum complexity per function helps to keep code readable and maintainable.
 
 _Configuration_: (int) the maximum function complexity
 
 Example:
+
 ```toml
 [cyclomatic]
   arguments =[3]
@@ -155,41 +152,40 @@ _Description_: Packages exposing functions that can stop program execution by ex
 _Configuration_: N/A
 
 ## dot-imports
- 
- _Description_: Importing with `.` makes the programs much harder to understand because it is unclear where names belong to the current package or to an imported package.
- This rule warns when using imports `.`
 
- More information [here](https://github.com/golang/go/wiki/CodeReviewComments#import-dot)
+_Description_: Importing with `.` makes the programs much harder to understand because it is unclear whether names belong to the current package or to an imported package.
+
+More information [here](https://github.com/golang/go/wiki/CodeReviewComments#import-dot)
 
 _Configuration_: N/A
 
 ## empty-block
 
-_Description_: Empty blocks make code less readable and may be a symptom of a bug or unfinished refactoring. This rule spots empty blocks in the code.
+_Description_: Empty blocks make code less readable and could be a symptom of a bug or unfinished refactoring.
 
 _Configuration_: N/A
 
 ## empty-lines
 
-_Description_: Sometimes `gofmt` is not enough to enforce a common formatting of a code-base, this rule warns when there are heading or trailing newlines in code blocks.
+_Description_: Sometimes `gofmt` is not enough to enforce a common formatting of a code-base; this rule warns when there are heading or trailing newlines in code blocks.
 
 _Configuration_: N/A
 
 ## error-naming
 
-_Description_: By convention, for the sake of readability, variables holding errors must be named with the prefix `err`. This rule warns when this convention is not followed.
+_Description_: By convention, for the sake of readability, variables of type `error` must be named with the prefix `err`.
 
 _Configuration_: N/A
 
 ## error-return
 
-_Description_: By convention, for the sake of readability, the errors should be last in the list of returned values by a function. This rule warns when this convention is not followed.
+_Description_: By convention, for the sake of readability, the errors should be last in the list of returned values by a function.
 
 _Configuration_: N/A
 
 ## error-strings
 
-_Description_: By convention, for better readability, error messages should not be capitalized or end with punctuation or a newline. This rule warns when this convention is not followed.
+_Description_: By convention, for better readability, error messages should not be capitalized or end with punctuation or a newline.
 
 More information [here](https://github.com/golang/go/wiki/CodeReviewComments#error-strings)
 
@@ -203,8 +199,7 @@ _Configuration_: N/A
 
 ## exported
 
-_Description_: Exported function and methods should have comments. 
-This warns on undocumented exported functions and methods.
+_Description_: Exported function and methods should have comments. This warns on undocumented exported functions and methods.
 
 More information [here](https://github.com/golang/go/wiki/CodeReviewComments#doc-comments)
 
@@ -212,12 +207,12 @@ _Configuration_: N/A
 
 ## file-header
 
-_Description_: This rule helps to enforce a common header for all source files in a project
-by spotting those files that do not have the specified header.
+_Description_: This rule helps to enforce a common header for all source files in a project by spotting those files that do not have the specified header.
 
 _Configuration_: (string) the header to look for in source files.
 
 Example:
+
 ```toml
 [file-header]
   arguments =["This is the text that must appear at the top of source files."]
@@ -234,51 +229,52 @@ _Configuration_: N/A
 ## function-result-limit
 
 _Description_: Functions returning too many results can be hard to understand/use.
-This rule warns on functions returning more than a configured, maximum number of values.
 
 _Configuration_: (int) the maximum allowed return values
 
 Example:
+
 ```toml
 [function-result-limit]
   arguments =[3]
 ```
 
 ## get-return
+
 _Description_: Typically, functions with names prefixed with _Get_ are supposed to return a value.
 
 _Configuration_: N/A
 
 ## if-return
 
-_Description_: Checking if an error is _nil_ to just after return the error or nil is redundant; this rule warns on those cases.
+_Description_: Checking if an error is _nil_ to just after return the error or nil is redundant.
 
 _Configuration_: N/A
 
 ## increment-decrement
 
-_Description_: By convention, for better readability, incrementing an integer variable by 1 is recommended to be done using the `++` operator. 
+_Description_: By convention, for better readability, incrementing an integer variable by 1 is recommended to be done using the `++` operator.
 This rule spots expressions  like `i += 1` and `i -= 1` and proposes to change them into `i++` and `i--`.
 
 _Configuration_: N/A
 
 ## indent-error-flow
 
-_Description_: To improve the readability of code, it is recommended to reduce the indentation as much as possible. 
+_Description_: To improve the readability of code, it is recommended to reduce the indentation as much as possible.
 This rule highlights redundant _else-blocks_ that can be eliminated from the code.
 
 More information [here](https://github.com/golang/go/wiki/CodeReviewComments#indent-error-flow)
-
 
 _Configuration_: N/A
 
 ## imports-blacklist
 
-_Description_: This rule warns when importing black-listed packages.
+_Description_: Warns when importing black-listed packages.
 
 _Configuration_: black-list of package names
 
 Example:
+
 ```toml
 [imports-blacklist]
   arguments =["crypto/md5", "crypto/sha1"]
@@ -286,11 +282,12 @@ Example:
 
 ## line-lenght-limit
 
-_Description_: This rule warns in the presence of code lines longer than a configured maximum.
+_Description_: Warns in the presence of code lines longer than a configured maximum.
 
 _Configuration_: (int) maximum line length in characters.
 
 Example:
+
 ```toml
 [line-lenght-limit]
   arguments =[80]
@@ -300,11 +297,13 @@ Example:
 
 _Description_: Packages declaring too many public structs can be hard to understand/use,
 and could be a symptom of bad design.
+
 This rule warns on files declaring more than a configured, maximum number of public structs.
 
 _Configuration_: (int) the maximum allowed public structs
 
 Example:
+
 ```toml
 [max-public-structs]
   arguments =[3]
@@ -312,31 +311,27 @@ Example:
 
 ## modifies-parameter
 
-_Description_: A function that modifies its parameters can be hard to understand.
-It can also be misleading if the arguments are passed by value.
-by the caller.
+_Description_: A function that modifies its parameters can be hard to understand. It can also be misleading if the arguments are passed by value by the caller.
 This rule warns when a function modifies one or more of its parameters.
 
 _Configuration_: N/A
 
 ## modifies-value-receiver
 
-_Description_: A method that modifies its receiver value can have undesired behavior.
-The modification can be also the root of a bug because the actual value receiver may be a copy of that used at the calling site.
+_Description_: A method that modifies its receiver value can have undesired behavior. The modification can be also the root of a bug because the actual value receiver could be a copy of that used at the calling site.
 This rule warns when a method modifies its receiver.
 
 _Configuration_: N/A
 
 ## package-comments
 
-_Description_: Packages should have comments. This rule warns on undocumented 
-packages and when packages comments are detached to the `package` keyword.
+_Description_: Packages should have comments. This rule warns on undocumented packages and when packages comments are detached to the `package` keyword.
 
 More information [here](https://github.com/golang/go/wiki/CodeReviewComments#package-comments)
 
 _Configuration_: N/A
 
-## range    
+## range
 
 _Description_: This rule suggests a shorter way of writing ranges that do not use the second value.
 
@@ -344,41 +339,34 @@ _Configuration_: N/A
 
 ## range-val-in-closure
 
-_Description_: Range variables in a loop are reused at each iteration; therefore a goroutine created in a loop will point to the range variable with from the upper scope. This way, the goroutine may use the variable with an undesired value.
+_Description_: Range variables in a loop are reused at each iteration; therefore a goroutine created in a loop will point to the range variable with from the upper scope. This way, the goroutine could use the variable with an undesired value.
 This rule warns when a range value (or index) is used inside a closure
 
 _Configuration_: N/A
 
 ## receiver-naming
 
-_Description_: By convention, receiver names in a method should reflect their identity.
-For example, if the receiver is of type `Parts`, `p` is an adequate name for it.
-Contrary to other languages, it is not idiomatic to name receivers as `this` or `self`.
-This rule warns when a receiver has a name, not in line with this convention.
+_Description_: By convention, receiver names in a method should reflect their identity. For example, if the receiver is of type `Parts`, `p` is an adequate name for it. Contrary to other languages, it is not idiomatic to name receivers as `this` or `self`.
 
 _Configuration_: N/A
 
-
 ## redefines-builtin-id
 
-_Description_: Constant names like `false`, `true`, `nil`, function names like
-`append`, `make`, and basic type names like `bool`, and `byte` are not reserved words of the 
-language; therefore the can be redefined. 
+_Description_: Constant names like `false`, `true`, `nil`, function names like `append`, `make`, and basic type names like `bool`, and `byte` are not reserved words of the language; therefore the can be redefined.
 Even if possible, redefining these built in names can lead to bugs very difficult to detect.
-This rule, warns when a built-in identifier is redefined.
 
 _Configuration_: N/A
 
 ## struct-tag
 
 _Description_: Struct tags are not checked at compile time.
-This rule, checks and warns if it founds errors in common struct tags types like: asn1, default, json, protobuf, xml, yaml.
+This rule, checks and warns if it finds errors in common struct tags types like: asn1, default, json, protobuf, xml, yaml.
 
 _Configuration_: N/A
 
 ## superfluous-else
 
-_Description_: To improve the readability of code, it is recommended to reduce the indentation as minimal as possible. 
+_Description_: To improve the readability of code, it is recommended to reduce the indentation as much as possible.
 This rule highlights redundant _else-blocks_ that can be eliminated from the code.
 
 _Configuration_: N/A
@@ -396,6 +384,7 @@ _Description_: This rule warns when [variable](https://github.com/golang/go/wiki
 _Configuration_: This rule accepts two slices of strings, a whitelist and a blacklist of initialisms. By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
 
 Example:
+
 ```toml
 [rule.var-naming]
   arguments = [["ID"], ["VM"]]
@@ -415,7 +404,7 @@ _Configuration_: N/A
 
 ## unnecessary-stmt
 
-_Description_: To improve the readability of code, this rule suggests to remove redundant statements like a `break` at the end of a case block.
+_Description_: This rule suggests to remove redundant statements like a `break` at the end of a case block, for improving the code's readability.
 
 _Configuration_: N/A
 
@@ -431,10 +420,9 @@ _Description_: This rule warns on unused parameters. Functions or methods with u
 
 _Configuration_: N/A
 
-## waitgroup-by-value  
+## waitgroup-by-value
 
-_Description_: Function parameters that are passed by value, are in fact a copy of the original argument.
-Passing a copy of a `sync.WaitGroup` is usually not what the developer wants to do.
+_Description_: Function parameters that are passed by value, are in fact a copy of the original argument. Passing a copy of a `sync.WaitGroup` is usually not what the developer wants to do.
 This rule warns when a `sync.WaitGroup` expected as a by-value parameter in a function or method.
 
 _Configuration_: N/A
