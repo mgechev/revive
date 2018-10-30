@@ -6,6 +6,7 @@ script:
 - make test
 - git clone https://github.com/mgechev/revive.run revive-docs && cd revive-docs
 - npm i && npm run build
+- git config --global user.email "mgechev@gmail.com"
 - git add .
 - git commit -am 'Update docs'
 - git push --force --quiet "https://${GH_TOKEN}@${GH_REF}"
