@@ -4,6 +4,7 @@ install: make install
 script:
 - make build
 - make test
+- sudo apt-get install libpng16-dev
 - git clone https://github.com/mgechev/revive.run revive-docs && cd revive-docs
 - npm i && npm run build
 - git config --global user.email "mgechev@gmail.com"
