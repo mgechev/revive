@@ -8,6 +8,7 @@ script:
 - git clone https://github.com/mgechev/revive.run revive-docs && cd revive-docs
 - npm i && npm run build || true
 - git config --global user.email "mgechev@gmail.com"
+- git config --global user.name "mgechev"
 - git add .
 - git commit -am 'Travis CI deployment'
 - git push --force --quiet "https://${GH_TOKEN}@${GH_REF}"
