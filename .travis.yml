@@ -8,7 +8,7 @@ script:
 - npm i && npm run build
 - git config --global user.email "mgechev@gmail.com"
 - git add .
-- git commit -am 'Update docs'
+- git commit -am 'Travis CI deployment'
 - git push --force --quiet "https://${GH_TOKEN}@${GH_REF}"
 env:
   global:
