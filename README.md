@@ -300,15 +300,29 @@ This section lists all the available formatters and provides a screenshot for ea
 
 ### Friendly
 
-![Friendly formatter](/assets/friendly-formatter.png)
+![Friendly formatter](/assets/formatter-friendly.png)
 
 ### Stylish
 
-![Stylish formatter](/assets/stylish-formatter.png)
+![Stylish formatter](/assets/formatter-stylish.png)
 
 ### Default
 
-![Default formatter](/assets/default-formatter.png)
+The default formatter produces the same output as `golint`.
+
+![Default formatter](/assets/formatter-default.png)
+
+### Plain
+
+The plain formatter produces the same output as the default formatter and appends URL to the rule description.
+
+![Plain formatter](/assets/formatter-plain.png)
+
+### Unix
+
+The unix formatter produces the same output as the default formatter but surrounds the rules in `[]`.
+
+![Unix formatter](/assets/formatter-unix.png)
 
 ## Extensibility
 

@@ -7,7 +7,7 @@ import (
 )
 
 // Default is an implementation of the Formatter interface
-// which formats the errors to JSON.
+// which formats the errors to text.
 type Default struct {
 	Metadata lint.FormatterMetadata
 }
