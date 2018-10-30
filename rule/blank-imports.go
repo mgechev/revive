@@ -67,7 +67,6 @@ func (w lintBlankImports) Visit(_ ast.Node) ast.Visitor {
 				Failure:    "a blank import should be only in a main or test package, or have a comment justifying it",
 				Confidence: 1,
 				Category:   "imports",
-				URL:        "",
 			})
 		}
 	}

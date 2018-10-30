@@ -77,7 +77,6 @@ func (r lintLineLengthNum) check() {
 				},
 				Confidence: 1,
 				Failure:    fmt.Sprintf("line is %d characters, out of limit %d", c, r.max),
-				URL:        "",
 			})
 		}
 		l++

@@ -64,7 +64,6 @@ func (w lintEmptyLines) checkStart(block *ast.BlockStmt) {
 			Confidence: 1,
 			Node:       block,
 			Category:   "style",
-			URL:        "#empty-lines",
 			Failure:    "extra empty line at the start of a block",
 		})
 	}
@@ -88,7 +87,6 @@ func (w lintEmptyLines) checkEnd(block *ast.BlockStmt) {
 			Confidence: 1,
 			Node:       lastNode,
 			Category:   "style",
-			URL:        "#empty-lines",
 			Failure:    "extra empty line at the end of a block",
 		})
 	}

@@ -70,7 +70,6 @@ func checkParam(id *ast.Ident, w *lintModifiesParamRule) {
 			Confidence: 0.5, // confidence is low because of shadow variables
 			Node:       id,
 			Category:   "bad practice",
-			URL:        "#modifies-parameter",
 			Failure:    fmt.Sprintf("parameter '%s' seems to be modified", id),
 		})
 	}

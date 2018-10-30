@@ -47,7 +47,6 @@ func (w lintImports) Visit(_ ast.Node) ast.Visitor {
 				Failure:    "should not use dot imports",
 				Node:       is,
 				Category:   "imports",
-				URL:        "#import-dot",
 			})
 		}
 	}

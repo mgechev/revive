@@ -62,7 +62,6 @@ func (w lintReturnRule) Visit(node ast.Node) ast.Visitor {
 			Confidence: 0.8,
 			Node:       fd,
 			Category:   "logic",
-			URL:        "#get-return",
 			Failure:    fmt.Sprintf("function '%s' seems to be a getter but it does not return any result", fd.Name.Name),
 		})
 	}

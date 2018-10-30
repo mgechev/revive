@@ -84,7 +84,6 @@ func (l *lintPackageComments) Visit(_ ast.Node) ast.Visitor {
 				},
 				Confidence: 0.9,
 				Failure:    "package comment is detached; there should be no blank lines between it and the package statement",
-				URL:        ref,
 			})
 			return nil
 		}
@@ -96,7 +95,6 @@ func (l *lintPackageComments) Visit(_ ast.Node) ast.Visitor {
 			Node:       l.fileAst,
 			Confidence: 0.2,
 			Failure:    "should have a package comment, unless it's in another file for this package",
-			URL:        ref,
 		})
 		return nil
 	}
@@ -107,7 +105,6 @@ func (l *lintPackageComments) Visit(_ ast.Node) ast.Visitor {
 			Node:       l.fileAst.Doc,
 			Confidence: 1,
 			Failure:    "package comment should not have leading space",
-			URL:        ref,
 		})
 		s = ts
 	}
@@ -118,7 +115,6 @@ func (l *lintPackageComments) Visit(_ ast.Node) ast.Visitor {
 			Node:       l.fileAst.Doc,
 			Confidence: 1,
 			Failure:    fmt.Sprintf(`package comment should be of the form "%s..."`, prefix),
-			URL:        ref,
 		})
 	}
 	return nil

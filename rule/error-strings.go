@@ -69,7 +69,6 @@ func (w lintErrorStrings) Visit(n ast.Node) ast.Visitor {
 	w.onFailure(lint.Failure{
 		Node:       str,
 		Confidence: conf,
-		URL:        "#error-strings",
 		Category:   "errors",
 		Failure:    "error strings should not be capitalized or end with punctuation or a newline",
 	})

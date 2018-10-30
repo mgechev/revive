@@ -59,7 +59,6 @@ func (w lintEmptyBlock) Visit(node ast.Node) ast.Visitor {
 			Confidence: 1,
 			Node:       block,
 			Category:   "logic",
-			URL:        "#empty-block",
 			Failure:    "this block is empty, you can remove it",
 		})
 	}

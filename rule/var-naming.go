@@ -45,7 +45,6 @@ func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.
 			Confidence: 1,
 			Node:       walker.fileAst,
 			Category:   "naming",
-			URL:        "http://golang.org/doc/effective_go.html#package-names",
 		})
 	}
 
@@ -85,7 +84,6 @@ func check(id *ast.Ident, thing string, w *lintNames) {
 			Confidence: 0.8,
 			Node:       id,
 			Category:   "naming",
-			URL:        "#mixed-caps",
 		})
 		return
 	}
@@ -96,7 +94,6 @@ func check(id *ast.Ident, thing string, w *lintNames) {
 			Confidence: 0.8,
 			Node:       id,
 			Category:   "naming",
-			URL:        "#mixed-caps",
 		})
 	}
 
@@ -111,7 +108,6 @@ func check(id *ast.Ident, thing string, w *lintNames) {
 			Confidence: 0.9,
 			Node:       id,
 			Category:   "naming",
-			URL:        "http://golang.org/doc/effective_go.html#mixed-caps",
 		})
 		return
 	}
@@ -120,7 +116,6 @@ func check(id *ast.Ident, thing string, w *lintNames) {
 		Confidence: 0.8,
 		Node:       id,
 		Category:   "naming",
-		URL:        "#initialisms",
 	})
 }
 

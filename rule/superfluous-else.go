@@ -109,7 +109,6 @@ func newFailure(node ast.Node, msg string) lint.Failure {
 		Confidence: 1,
 		Node:       node,
 		Category:   "indent",
-		URL:        "#indent-error-flow",
 		Failure:    msg,
 	}
 }

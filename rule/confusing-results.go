@@ -54,7 +54,6 @@ func (w lintConfusingResults) Visit(n ast.Node) ast.Visitor {
 			w.onFailure(lint.Failure{
 				Node:       n,
 				Confidence: 1,
-				URL:        "#named-result-parameters",
 				Category:   "naming",
 				Failure:    "unnamed results of the same type may be confusing, consider using named results",
 			})

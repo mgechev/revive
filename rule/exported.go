@@ -80,7 +80,6 @@ func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
 		w.onFailure(lint.Failure{
 			Node:       fn,
 			Confidence: 1,
-			URL:        "#doc-comments",
 			Category:   "comments",
 			Failure:    fmt.Sprintf("exported %s %s should have comment or be unexported", kind, name),
 		})
@@ -92,7 +91,6 @@ func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
 		w.onFailure(lint.Failure{
 			Node:       fn.Doc,
 			Confidence: 0.8,
-			URL:        "#doc-comments",
 			Category:   "comments",
 			Failure:    fmt.Sprintf(`comment on exported %s %s should be of the form "%s..."`, kind, name, prefix),
 		})
@@ -123,7 +121,6 @@ func (w *lintExported) checkStutter(id *ast.Ident, thing string) {
 		w.onFailure(lint.Failure{
 			Node:       id,
 			Confidence: 0.8,
-			URL:        "#package-names",
 			Category:   "naming",
 			Failure:    fmt.Sprintf("%s name will be used as %s.%s by other packages, and that stutters; consider calling this %s", thing, pkg, name, rem),
 		})
@@ -138,7 +135,6 @@ func (w *lintExported) lintTypeDoc(t *ast.TypeSpec, doc *ast.CommentGroup) {
 		w.onFailure(lint.Failure{
 			Node:       t,
 			Confidence: 1,
-			URL:        "#doc-comments",
 			Category:   "comments",
 			Failure:    fmt.Sprintf("exported type %v should have comment or be unexported", t.Name),
 		})
@@ -160,7 +156,6 @@ func (w *lintExported) lintTypeDoc(t *ast.TypeSpec, doc *ast.CommentGroup) {
 		w.onFailure(lint.Failure{
 			Node:       doc,
 			Confidence: 1,
-			URL:        "#doc-comments",
 			Category:   "comments",
 			Failure:    fmt.Sprintf(`comment on exported type %v should be of the form "%v ..." (with optional leading article)`, t.Name, t.Name),
 		})
@@ -205,7 +200,6 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 		w.onFailure(lint.Failure{
 			Confidence: 1,
 			Node:       vs,
-			URL:        "#doc-comments",
 			Category:   "comments",
 			Failure:    fmt.Sprintf("exported %s %s should have comment%s or be unexported", kind, name, block),
 		})
@@ -227,7 +221,6 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 		w.onFailure(lint.Failure{
 			Confidence: 1,
 			Node:       doc,
-			URL:        "#doc-comments",
 			Category:   "comments",
 			Failure:    fmt.Sprintf(`comment on exported %s %s should be of the form "%s..."`, kind, name, prefix),
 		})

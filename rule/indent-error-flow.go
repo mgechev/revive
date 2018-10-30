@@ -71,7 +71,6 @@ func (w lintElse) Visit(node ast.Node) ast.Visitor {
 			Confidence: 1,
 			Node:       ifStmt.Else,
 			Category:   "indent",
-			URL:        "#indent-error-flow",
 			Failure:    "if block ends with a return statement, so drop this else and outdent its block" + extra,
 		})
 	}

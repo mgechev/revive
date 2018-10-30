@@ -105,7 +105,6 @@ func checkMethodName(holder string, id *ast.Ident, w *lintConfusingNames) {
 				Confidence: 1,
 				Node:       id,
 				Category:   "naming",
-				URL:        "#TODO",
 			})
 
 			return
@@ -161,7 +160,6 @@ func checkStructFields(fields *ast.FieldList, structName string, w *lintConfusin
 					Confidence: 1,
 					Node:       id,
 					Category:   "naming",
-					URL:        "#TODO",
 				})
 			} else {
 				bl[normName] = true

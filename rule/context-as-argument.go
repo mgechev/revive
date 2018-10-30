@@ -50,7 +50,6 @@ func (w lintContextArguments) Visit(n ast.Node) ast.Visitor {
 			w.onFailure(lint.Failure{
 				Node:       fn,
 				Category:   "arg-order",
-				URL:        "https://golang.org/pkg/context/",
 				Failure:    "context.Context should be the first parameter of a function",
 				Confidence: 0.9,
 			})
