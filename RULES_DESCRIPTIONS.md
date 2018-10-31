@@ -9,6 +9,7 @@ List of all available rules.
   - [atomic](#atomic)
   - [blank-imports](#blank-imports)
   - [bool-literal-in-expr](#bool-literal-in-expr)
+  - [call-to-gc](#call-to-gc)
   - [confusing-naming](#confusing-naming)
   - [confusing-results](#confusing-results)
   - [constant-logical-expr](#constant-logical-expr)
@@ -99,6 +100,14 @@ _Configuration_: N/A
 ## bool-literal-in-expr
 
 _Description_: Using Boolean literals (`true`, `false`) in logic expressions may make the code less readable. This rule suggests removing Boolean literals from logic expressions.
+
+_Configuration_: N/A
+
+## call-to-gc
+
+_Description_:  Explicitly invoking the garbage collector is, except for specific uses in benchmarking, very dubious.
+
+The garbage collector can be configured through environment variables as described [here](https://golang.org/pkg/runtime/).
 
 _Configuration_: N/A
 

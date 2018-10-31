@@ -72,6 +72,7 @@ var allRules = append([]lint.Rule{
 	&rule.AtomicRule{},
 	&rule.EmptyLinesRule{},
 	&rule.LineLengthLimitRule{},
+	&rule.CallToGCRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
