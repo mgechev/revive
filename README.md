@@ -47,6 +47,8 @@ Here's how `revive` is different from `golint`:
     - [Friendly](#friendly)
     - [Stylish](#stylish)
     - [Default](#default)
+    - [Plain](#plain)
+    - [Unix](#unix)
   - [Extensibility](#extensibility)
     - [Custom Rule](#custom-rule)
       - [Example](#example)
@@ -278,6 +280,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`atomic`](./RULES_DESCRIPTIONS.md#atomic)              |  n/a   | Check for common mistaken usages of the `sync/atomic` package    |    no    |  no   |
 | [`empty-lines`](./RULES_DESCRIPTIONS.md#empty-lines)   | n/a | Warns when there are heading or trailing newlines in a block              |    no    |  no   |
 | [`line-lenght-limit`](./RULES_DESCRIPTIONS.md#line-lenght-limit)   | int    | Specifies the maximum number of characters in a line             |    no    |  no   |
+| [`call-to-gc`](./RULES_DESCRIPTIONS.md#call-to-gc)   | n/a    | Warns on explicit call to the garbage collector    |    no    |  no   |
 
 ## Configurable rules
 
