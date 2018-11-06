@@ -33,7 +33,7 @@ List of all available rules.
   - [increment-decrement](#increment-decrement)
   - [indent-error-flow](#indent-error-flow)
   - [imports-blacklist](#imports-blacklist)
-  - [line-lenght-limit](#line-lenght-limit)
+  - [line-length-limit](#line-length-limit)
   - [max-public-structs](#max-public-structs)
   - [modifies-parameter](#modifies-parameter)
   - [modifies-value-receiver](#modifies-value-receiver)
@@ -289,7 +289,7 @@ Example:
   arguments =["crypto/md5", "crypto/sha1"]
 ```
 
-## line-lenght-limit
+## line-length-limit
 
 _Description_: Warns in the presence of code lines longer than a configured maximum.
 
@@ -298,7 +298,7 @@ _Configuration_: (int) maximum line length in characters.
 Example:
 
 ```toml
-[line-lenght-limit]
+[line-length-limit]
   arguments =[80]
 ```
 
