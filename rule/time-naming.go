@@ -13,7 +13,7 @@ import (
 type TimeNamingRule struct{}
 
 // Apply applies the rule to given file.
-func (r *TimeNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *TimeNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -50,7 +50,7 @@ func (w *lintTimeNames) Visit(node ast.Node) ast.Visitor {
 		if pt, ok := typ.(*types.Pointer); ok {
 			typ = pt.Elem()
 		}
-		if !isNamedType(w.file.Pkg, typ, "time", "Duration") {
+		if !isNamedType(typ, "time", "Duration") {
 			continue
 		}
 		suffix := ""
@@ -83,7 +83,7 @@ var timeSuffixes = []string{
 	"MS", "Ms",
 }
 
-func isNamedType(p *lint.Package, typ types.Type, importPath, name string) bool {
+func isNamedType(typ types.Type, importPath, name string) bool {
 	n, ok := typ.(*types.Named)
 	if !ok {
 		return false

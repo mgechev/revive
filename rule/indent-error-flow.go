@@ -11,7 +11,7 @@ import (
 type IndentErrorFlowRule struct{}
 
 // Apply applies the rule to given file.
-func (r *IndentErrorFlowRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *IndentErrorFlowRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -71,10 +71,8 @@ func (w lintElse) Visit(node ast.Node) ast.Visitor {
 			Confidence: 1,
 			Node:       ifStmt.Else,
 			Category:   "indent",
-			URL:        "#indent-error-flow",
 			Failure:    "if block ends with a return statement, so drop this else and outdent its block" + extra,
 		})
 	}
 	return w
 }
-

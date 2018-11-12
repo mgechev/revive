@@ -11,7 +11,7 @@ import (
 type DeepExitRule struct{}
 
 // Apply applies the rule to given file.
-func (r *DeepExitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *DeepExitRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
@@ -81,7 +81,6 @@ func (w lintDeepExit) Visit(node ast.Node) ast.Visitor {
 			Confidence: 1,
 			Node:       ce,
 			Category:   "bad practice",
-			URL:        "#deep-exit",
 			Failure:    fmt.Sprintf("calls to %s.%s only in main() or init() functions", pkg, fn),
 		})
 	}

@@ -12,7 +12,7 @@ import (
 type SuperfluousElseRule struct{}
 
 // Apply applies the rule to given file.
-func (r *SuperfluousElseRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *SuperfluousElseRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
@@ -109,7 +109,6 @@ func newFailure(node ast.Node, msg string) lint.Failure {
 		Confidence: 1,
 		Node:       node,
 		Category:   "indent",
-		URL:        "#indent-error-flow",
 		Failure:    msg,
 	}
 }

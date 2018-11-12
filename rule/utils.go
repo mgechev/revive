@@ -1,8 +1,10 @@
 package rule
 
 import (
+	"bytes"
 	"fmt"
 	"go/ast"
+	"go/printer"
 	"go/token"
 	"go/types"
 	"regexp"
@@ -61,47 +63,6 @@ func isCgoExported(f *ast.FuncDecl) bool {
 	return false
 }
 
-var commonInitialisms = map[string]bool{
-	"ACL":   true,
-	"API":   true,
-	"ASCII": true,
-	"CPU":   true,
-	"CSS":   true,
-	"DNS":   true,
-	"EOF":   true,
-	"GUID":  true,
-	"HTML":  true,
-	"HTTP":  true,
-	"HTTPS": true,
-	"ID":    true,
-	"IP":    true,
-	"JSON":  true,
-	"LHS":   true,
-	"QPS":   true,
-	"RAM":   true,
-	"RHS":   true,
-	"RPC":   true,
-	"SLA":   true,
-	"SMTP":  true,
-	"SQL":   true,
-	"SSH":   true,
-	"TCP":   true,
-	"TLS":   true,
-	"TTL":   true,
-	"UDP":   true,
-	"UI":    true,
-	"UID":   true,
-	"UUID":  true,
-	"URI":   true,
-	"URL":   true,
-	"UTF8":  true,
-	"VM":    true,
-	"XML":   true,
-	"XMPP":  true,
-	"XSRF":  true,
-	"XSS":   true,
-}
-
 var allCapsRE = regexp.MustCompile(`^[A-Z0-9_]+$`)
 
 func isIdent(expr ast.Expr, ident string) bool {
@@ -145,4 +106,86 @@ func srcLine(src []byte, p token.Position) string {
 		hi++
 	}
 	return string(src[lo:hi])
+}
+
+// pick yields a list of nodes by picking them from a sub-ast with root node n.
+// Nodes are selected by applying the fselect function
+// f function is applied to each selected node before inseting it in the final result.
+// If f==nil then it defaults to the identity function (ie it returns the node itself)
+func pick(n ast.Node, fselect func(n ast.Node) bool, f func(n ast.Node) []ast.Node) []ast.Node {
+	var result []ast.Node
+
+	if n == nil {
+		return result
+	}
+
+	if f == nil {
+		f = func(n ast.Node) []ast.Node { return []ast.Node{n} }
+	}
+
+	onSelect := func(n ast.Node) {
+		result = append(result, f(n)...)
+	}
+	p := picker{fselect: fselect, onSelect: onSelect}
+	ast.Walk(p, n)
+	return result
+}
+
+func pickFromExpList(l []ast.Expr, fselect func(n ast.Node) bool, f func(n ast.Node) []ast.Node) []ast.Node {
+	result := make([]ast.Node, 0)
+	for _, e := range l {
+		result = append(result, pick(e, fselect, f)...)
+	}
+	return result
+}
+
+type picker struct {
+	fselect  func(n ast.Node) bool
+	onSelect func(n ast.Node)
+}
+
+func (p picker) Visit(node ast.Node) ast.Visitor {
+	if p.fselect == nil {
+		return nil
+	}
+
+	if p.fselect(node) {
+		p.onSelect(node)
+	}
+
+	return p
+}
+
+// isBoolOp returns true if the given token corresponds to
+// a bool operator
+func isBoolOp(t token.Token) bool {
+	switch t {
+	case token.LAND, token.LOR, token.EQL, token.NEQ:
+		return true
+	}
+
+	return false
+}
+
+const (
+	trueName  = "true"
+	falseName = "false"
+)
+
+func isExprABooleanLit(n ast.Node) (lexeme string, ok bool) {
+	oper, ok := n.(*ast.Ident)
+
+	if !ok {
+		return "", false
+	}
+
+	return oper.Name, (oper.Name == trueName || oper.Name == falseName)
+}
+
+// gofmt returns a string representation of the expression.
+func gofmt(x ast.Expr) string {
+	buf := bytes.Buffer{}
+	fs := token.NewFileSet()
+	printer.Fprint(&buf, fs, x)
+	return buf.String()
 }

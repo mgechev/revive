@@ -30,29 +30,32 @@ Here's how `revive` is different from `golint`:
 <!-- TOC -->
 
 - [revive](#revive)
-    - [Usage](#usage)
-        - [Text Editors](#text-editors)
-        - [Installation](#installation)
-        - [Command Line Flags](#command-line-flags)
-        - [Sample Invocations](#sample-invocations)
-        - [Comment Annotations](#comment-annotations)
-        - [Configuration](#configuration)
-        - [Default Configuration](#default-configuration)
-        - [Recommended Configuration](#recommended-configuration)
-    - [Available Rules](#available-rules)
-    - [Available Formatters](#available-formatters)
-        - [Friendly](#friendly)
-        - [Stylish](#stylish)
-        - [Default](#default)
-    - [Extensibility](#extensibility)
-        - [Custom Rule](#custom-rule)
-            - [Example](#example)
-        - [Custom Formatter](#custom-formatter)
-    - [Speed Comparison](#speed-comparison)
-        - [golint](#golint)
-        - [revive](#revive-1)
-    - [Contributors](#contributors)
-    - [License](#license)
+  - [Usage](#usage)
+    - [Text Editors](#text-editors)
+    - [Installation](#installation)
+    - [Command Line Flags](#command-line-flags)
+    - [Sample Invocations](#sample-invocations)
+    - [Comment Annotations](#comment-annotations)
+    - [Configuration](#configuration)
+    - [Default Configuration](#default-configuration)
+    - [Custom Configuration](#custom-configuration)
+    - [Recommended Configuration](#recommended-configuration)
+  - [Available Rules](#available-rules)
+  - [Configurable rules](#configurable-rules)
+    - [`var-naming`](#var-naming)
+  - [Available Formatters](#available-formatters)
+    - [Friendly](#friendly)
+    - [Stylish](#stylish)
+    - [Default](#default)
+  - [Extensibility](#extensibility)
+    - [Custom Rule](#custom-rule)
+      - [Example](#example)
+    - [Custom Formatter](#custom-formatter)
+  - [Speed Comparison](#speed-comparison)
+    - [golint](#golint)
+    - [revive](#revive)
+  - [Contributors](#contributors)
+  - [License](#license)
 
 <!-- /TOC -->
 
@@ -63,6 +66,7 @@ Since the default behavior of `revive` is compatible with `golint`, without prov
 ### Text Editors
 
 - Support for VSCode in [vscode-go](https://github.com/Microsoft/vscode-go/pull/1699).
+- Support for Atom via [linter-revive](https://github.com/morphy2k/linter-revive).
 - Support for vim via [w0rp/ale](https://github.com/w0rp/ale):
 
 ```vim
@@ -89,10 +93,13 @@ go get -u github.com/mgechev/revive
 - `-config [PATH]` - path to config file in TOML format.
 - `-exclude [PATTERN]` - pattern for files/directories/packages to be excluded for linting. You can specify the files you want to exclude for linting either as package name (i.e. `github.com/mgechev/revive`), list them as individual files (i.e. `file.go`), directories (i.e. `./foo/...`), or any combination of the three.
 - `-formatter [NAME]` - formatter to be used for the output. The currently available formatters are:
+
   - `default` - will output the failures the same way that `golint` does.
   - `json` - outputs the failures in JSON format.
+  - `ndjson` - outputs the failures as stream in newline delimited JSON (NDJSON) format.
   - `friendly` - outputs the failures when found. Shows summary of all the failures.
   - `stylish` - formats the failures in a table. Keep in mind that it doesn't stream the output so it might be perceived as slower compared to others.
+  - `checkstyle` - outputs the failures in XML format compatible with that of Java's [Checkstyle](https://checkstyle.org/).
 
 ### Sample Invocations
 
@@ -117,6 +124,8 @@ func Public() {}
 ```
 
 The snippet above, will disable `revive` between the `revive:disable` and `revive:enable` comments. If you skip `revive:enable`, the linter will be disabled for the rest of the file.
+
+With `revive:disable-next-line` and `revive:disable-line` you can disable `revive` on a particular code line.
 
 You can do the same on a rule level. In case you want to disable only a particular rule, you can use:
 
@@ -171,7 +180,7 @@ revive -config defaults.toml github.com/mgechev/revive
 
 This will use the configuration file `defaults.toml`, the `default` formatter, and will run linting over the `github.com/mgechev/revive` package.
 
-### Recommended Configuration
+### Custom Configuration
 
 ```shell
 revive -config config.toml -formatter friendly github.com/mgechev/revive
@@ -179,41 +188,111 @@ revive -config config.toml -formatter friendly github.com/mgechev/revive
 
 This will use `config.toml`, the `friendly` formatter, and will run linting over the `github.com/mgechev/revive` package.
 
+### Recommended Configuration
+
+The following snippet contains the recommended `revive` configuration that you can use in your project:
+
+```toml
+ignoreGeneratedHeader = false
+severity = "warning"
+confidence = 0.8
+errorCode = 0
+warningCode = 0
+
+[rule.blank-imports]
+[rule.context-as-argument]
+[rule.context-keys-type]
+[rule.dot-imports]
+[rule.error-return]
+[rule.error-strings]
+[rule.error-naming]
+[rule.exported]
+[rule.if-return]
+[rule.increment-decrement]
+[rule.var-naming]
+[rule.var-declaration]
+[rule.package-comments]
+[rule.range]
+[rule.receiver-naming]
+[rule.time-naming]
+[rule.unexported-return]
+[rule.indent-error-flow]
+[rule.errorf]
+[rule.empty-block]
+[rule.superfluous-else]
+[rule.unused-parameter]
+[rule.unreachable-code]
+[rule.redefines-builtin-id]
+```
+
 ## Available Rules
 
 List of all available rules. The rules ported from `golint` are left unchanged and indicated in the `golint` column.
 
 | Name                  | Config | Description                                                      | `golint` | Typed |
 | --------------------- | :----: | :--------------------------------------------------------------- | :------: | :---: |
-| `context-keys-type`   |  n/a   | Disallows the usage of basic types in `context.WithValue`.       |   yes    |  yes  |
-| `time-naming`         |  n/a   | Conventions around the naming of time variables.                 |   yes    |  yes  |
-| `var-declaration`     |  n/a   | Reduces redundancies around variable declaration.                |   yes    |  yes  |
-| `unexported-return`   |  n/a   | Warns when a public return is from unexported type.              |   yes    |  yes  |
-| `errorf`              |  n/a   | Should replace `error.New(fmt.Sprintf())` with `error.Errorf()`  |   yes    |  yes  |
-| `blank-imports`       |  n/a   | Disallows blank imports                                          |   yes    |  no   |
-| `context-as-argument` |  n/a   | `context.Context` should be the first argument of a function.    |   yes    |  no   |
-| `dot-imports`         |  n/a   | Forbids `.` imports.                                             |   yes    |  no   |
-| `error-return`        |  n/a   | The error return parameter should be last.                       |   yes    |  no   |
-| `error-strings`       |  n/a   | Conventions around error strings.                                |   yes    |  no   |
-| `error-naming`        |  n/a   | Naming of error variables.                                       |   yes    |  no   |
-| `exported`            |  n/a   | Naming and commenting conventions on exported symbols.           |   yes    |  no   |
-| `if-return`           |  n/a   | Redundant if when returning an error.                            |   yes    |  no   |
-| `increment-decrement` |  n/a   | Use `i++` and `i--` instead of `i += 1` and `i -= 1`.            |   yes    |  no   |
-| `var-naming`          |  n/a   | Naming rules.                                                    |   yes    |  no   |
-| `package-comments`    |  n/a   | Package commenting conventions.                                  |   yes    |  no   |
-| `range`               |  n/a   | Prevents redundant variables when iterating over a collection.   |   yes    |  no   |
-| `receiver-naming`     |  n/a   | Conventions around the naming of receivers.                      |   yes    |  no   |
-| `indent-error-flow`   |  n/a   | Prevents redundant else statements.                              |   yes    |  no   |
-| `argument-limit`      |  int   | Specifies the maximum number of arguments a function can receive |    no    |  no   |
-| `cyclomatic`          |  int   | Sets restriction for maximum Cyclomatic complexity.              |    no    |  no   |
-| `max-public-structs`  |  int   | The maximum number of public structs in a file.                  |    no    |  no   |
-| `file-header`         | string | Header which each file should have.                              |    no    |  no   |
-| `empty-block`         |  n/a   | Warns on empty code blocks                                       |    no    |  no   |
-| `superfluous-else`    |  n/a   | Prevents redundant else statements (extends `indent-error-flow`) |    no    |  no   |
-| `confusing-naming`    |  n/a   | Warns on methods with names that differ only by capitalization   |    no    |  no   |
-| `get-return      `    |  n/a   | Warns on getters that do not yield any result                    |    no    |  no   |
-| `modifies-param`      |  n/a   | Warns on assignments to function parameters                      |    no    |  no   |
-| `deep-exit`           |  n/a   | Looks for program exits in funcs other than `main()` or `init()` |    no    |  no   |
+| [`context-keys-type`](./RULES_DESCRIPTIONS.md#context-key-types)   |  n/a   | Disallows the usage of basic types in `context.WithValue`.       |   yes    |  yes  |
+| [`time-naming`](./RULES_DESCRIPTIONS.md#time-naming)         |  n/a   | Conventions around the naming of time variables.                 |   yes    |  yes  |
+| [`var-declaration`](./RULES_DESCRIPTIONS.md#var-declaration)     |  n/a   | Reduces redundancies around variable declaration.                |   yes    |  yes  |
+| [`unexported-return`](./RULES_DESCRIPTIONS.md#unexported-return)   |  n/a   | Warns when a public return is from unexported type.              |   yes    |  yes  |
+| [`errorf`](./RULES_DESCRIPTIONS.md#errorf)              |  n/a   | Should replace `errors.New(fmt.Sprintf())` with `fmt.Errorf()`   |   yes    |  yes  |
+| [`blank-imports`](./RULES_DESCRIPTIONS.md#blank-imports)       |  n/a   | Disallows blank imports                                          |   yes    |  no   |
+| [`context-as-argument`](./RULES_DESCRIPTIONS.md#context-as-argument) |  n/a   | `context.Context` should be the first argument of a function.    |   yes    |  no   |
+| [`dot-imports`](./RULES_DESCRIPTIONS.md#dot-imports)         |  n/a   | Forbids `.` imports.                                             |   yes    |  no   |
+| [`error-return`](./RULES_DESCRIPTIONS.md#error-return)        |  n/a   | The error return parameter should be last.                       |   yes    |  no   |
+| [`error-strings`](./RULES_DESCRIPTIONS.md#error-strings)       |  n/a   | Conventions around error strings.                                |   yes    |  no   |
+| [`error-naming`](./RULES_DESCRIPTIONS.md#error-naming)        |  n/a   | Naming of error variables.                                       |   yes    |  no   |
+| [`exported`](./RULES_DESCRIPTIONS.md#exported)            |  n/a   | Naming and commenting conventions on exported symbols.           |   yes    |  no   |
+| [`if-return`](./RULES_DESCRIPTIONS.md#if-return)           |  n/a   | Redundant if when returning an error.                            |   yes    |  no   |
+| [`increment-decrement`](./RULES_DESCRIPTIONS.md#increment-decrement) |  n/a   | Use `i++` and `i--` instead of `i += 1` and `i -= 1`.            |   yes    |  no   |
+| [`var-naming`](./RULES_DESCRIPTIONS.md#var-naming)          |  whitelist & blacklist of initialisms   | Naming rules.                                                    |   yes    |  no   |
+| [`package-comments`](./RULES_DESCRIPTIONS.md#package-comments)    |  n/a   | Package commenting conventions.                                  |   yes    |  no   |
+| [`range`](./RULES_DESCRIPTIONS.md#range)               |  n/a   | Prevents redundant variables when iterating over a collection.   |   yes    |  no   |
+| [`receiver-naming`](./RULES_DESCRIPTIONS.md#receiver-naming)     |  n/a   | Conventions around the naming of receivers.                      |   yes    |  no   |
+| [`indent-error-flow`](./RULES_DESCRIPTIONS.md#indent-error-flow)   |  n/a   | Prevents redundant else statements.                              |   yes    |  no   |
+| [`argument-limit`](./RULES_DESCRIPTIONS.md#argument-limit)      |  int   | Specifies the maximum number of arguments a function can receive |    no    |  no   |
+| [`cyclomatic`](./RULES_DESCRIPTIONS.md#cyclomatic)          |  int   | Sets restriction for maximum Cyclomatic complexity.              |    no    |  no   |
+| [`max-public-structs`](./RULES_DESCRIPTIONS.md#max-public-structs)  |  int   | The maximum number of public structs in a file.                  |    no    |  no   |
+| [`file-header`](./RULES_DESCRIPTIONS.md#file-header)         | string | Header which each file should have.                              |    no    |  no   |
+| [`empty-block`](./RULES_DESCRIPTIONS.md#empty-block)         |  n/a   | Warns on empty code blocks                                       |    no    |  no   |
+| [`superfluous-else`](./RULES_DESCRIPTIONS.md#superfluous-else)    |  n/a   | Prevents redundant else statements (extends [`indent-error-flow`](./RULES_DESCRIPTIONS.md#indent-error-flow)) |    no    |  no   |
+| [`confusing-naming`](./RULES_DESCRIPTIONS.md#confusing-naming)    |  n/a   | Warns on methods with names that differ only by capitalization   |    no    |  no   |
+| [`get-return`](./RULES_DESCRIPTIONS.md#get-return)          |  n/a   | Warns on getters that do not yield any result                    |    no    |  no   |
+| [`modifies-parameter`](./RULES_DESCRIPTIONS.md#modifies-parameter)  |  n/a   | Warns on assignments to function parameters                      |    no    |  no   |
+| [`confusing-results`](./RULES_DESCRIPTIONS.md#confusing-results)   |  n/a   | Suggests to name potentially confusing function results          |    no    |  no   |
+| [`deep-exit`](./RULES_DESCRIPTIONS.md#deep-exit)           |  n/a   | Looks for program exits in funcs other than `main()` or `init()` |    no    |  no   |
+| [`unused-parameter`](./RULES_DESCRIPTIONS.md#unused-parameter)    |  n/a   | Suggests to rename or remove unused function parameters          |    no    |  no   |
+| [`unreachable-code`](./RULES_DESCRIPTIONS.md#unreachable-code)    |  n/a   | Warns on unreachable code                                        |    no    |  no   |
+| [`add-constant`](./RULES_DESCRIPTIONS.md#add-constant)        |  map   | Suggests using constant for magic numbers and string literals    |    no    |  no   |
+| [`flag-parameter`](./RULES_DESCRIPTIONS.md#flag-parameter)      |  n/a   | Warns on boolean parameters that create a control coupling       |    no    |  no   |
+| [`unnecessary-stmt`](./RULES_DESCRIPTIONS.md#unnecessary-stmt)    |  n/a   | Suggests removing or simplifying unnecessary statements          |    no    |  no   |
+| [`struct-tag`](./RULES_DESCRIPTIONS.md#struct-tag)          |  n/a   | Checks common struct tags like `json`,`xml`,`yaml`               |    no    |  no   |
+| [`modifies-value-receiver`](./RULES_DESCRIPTIONS.md#modifies-value-receiver) |  n/a   | Warns on assignments to value-passed method receivers        |    no    |  yes  |
+| [`constant-logical-expr`](./RULES_DESCRIPTIONS.md#constant-logical-expr)   |  n/a   | Warns on constant logical expressions                        |    no    |  no   |
+| [`bool-literal-in-expr`](./RULES_DESCRIPTIONS.md#bool-literal-in-expr)|  n/a   | Suggests removing Boolean literals from logic expressions        |    no    |  no   |
+| [`redefines-builtin-id`](./RULES_DESCRIPTIONS.md#redefines-builtin-id)|  n/a   | Warns on redefinitions of builtin identifiers                    |    no    |  no   |
+| [`function-result-limit`](./RULES_DESCRIPTIONS.md#function-result-limit) |  int | Specifies the maximum number of results a function can return    |    no    |  no   |
+| [`imports-blacklist`](./RULES_DESCRIPTIONS.md#imports-blacklist)   | []string | Disallows importing the specified packages                     |    no    |  no   |
+| [`range-val-in-closure`](./RULES_DESCRIPTIONS.md#range-val-in-closure)|  n/a   | Warns if range value is used in a closure dispatched as goroutine|    no    |  no   |
+| [`waitgroup-by-value`](./RULES_DESCRIPTIONS.md#waitgroup-by-value)  |  n/a   | Warns on functions taking sync.WaitGroup as a by-value parameter |    no    |  no   |
+| [`atomic`](./RULES_DESCRIPTIONS.md#atomic)              |  n/a   | Check for common mistaken usages of the `sync/atomic` package    |    no    |  no   |
+| [`empty-lines`](./RULES_DESCRIPTIONS.md#empty-lines)   | n/a | Warns when there are heading or trailing newlines in a block              |    no    |  no   |
+| [`line-lenght-limit`](./RULES_DESCRIPTIONS.md#line-lenght-limit)   | int    | Specifies the maximum number of characters in a line             |    no    |  no   |
+
+## Configurable rules
+
+Here you can find how you can configure some of the existing rules:
+
+### `var-naming`
+
+This rule accepts two slices of strings, a whitelist and a blacklist of initialisms. By default the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
+
+```toml
+[rule.var-naming]
+  arguments = [["ID"], ["VM"]]
+```
+
+This way, revive will not warn for identifier called `customId` but will warn that `customVm` should be called `customVM`.
 
 ## Available Formatters
 
@@ -221,15 +300,29 @@ This section lists all the available formatters and provides a screenshot for ea
 
 ### Friendly
 
-![Friendly formatter](/assets/friendly-formatter.png)
+![Friendly formatter](/assets/formatter-friendly.png)
 
 ### Stylish
 
-![Stylish formatter](/assets/stylish-formatter.png)
+![Stylish formatter](/assets/formatter-stylish.png)
 
 ### Default
 
-![Default formatter](/assets/default-formatter.png)
+The default formatter produces the same output as `golint`.
+
+![Default formatter](/assets/formatter-default.png)
+
+### Plain
+
+The plain formatter produces the same output as the default formatter and appends URL to the rule description.
+
+![Plain formatter](/assets/formatter-plain.png)
+
+### Unix
+
+The unix formatter produces the same output as the default formatter but surrounds the rules in `[]`.
+
+![Unix formatter](/assets/formatter-unix.png)
 
 ## Extensibility
 
@@ -321,9 +414,13 @@ Currently, type checking is enabled by default. If you want to run the linter wi
 
 ## Contributors
 
-[<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) |[<img alt="chavacava" src="https://avatars2.githubusercontent.com/u/25788468?v=4&s=117" width="117">](https://github.com/chavacava) |[<img alt="tamird" src="https://avatars0.githubusercontent.com/u/1535036?v=4&s=117" width="117">](https://github.com/tamird) |[<img alt="paul-at-start" src="https://avatars2.githubusercontent.com/u/5486775?v=4&s=117" width="117">](https://github.com/paul-at-start) |[<img alt="vkrol" src="https://avatars3.githubusercontent.com/u/153412?v=4&s=117" width="117">](https://github.com/vkrol) |
-:---: |:---: |:---: |:---: |:---: |
-[mgechev](https://github.com/mgechev) |[chavacava](https://github.com/chavacava) |[tamird](https://github.com/tamird) |[paul-at-start](https://github.com/paul-at-start) |[vkrol](https://github.com/vkrol) |
+[<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) |[<img alt="chavacava" src="https://avatars2.githubusercontent.com/u/25788468?v=4&s=117" width="117">](https://github.com/chavacava) |[<img alt="xuri" src="https://avatars2.githubusercontent.com/u/2809468?v=4&s=117" width="117">](https://github.com/xuri) |[<img alt="gsamokovarov" src="https://avatars0.githubusercontent.com/u/604618?v=4&s=117" width="117">](https://github.com/gsamokovarov) |[<img alt="morphy2k" src="https://avatars2.githubusercontent.com/u/4280578?v=4&s=117" width="117">](https://github.com/morphy2k) |[<img alt="z0mbie42" src="https://avatars0.githubusercontent.com/u/6172808?v=4&s=117" width="117">](https://github.com/z0mbie42) |
+:---: |:---: |:---: |:---: |:---: |:---: |
+[mgechev](https://github.com/mgechev) |[chavacava](https://github.com/chavacava) |[xuri](https://github.com/xuri) |[gsamokovarov](https://github.com/gsamokovarov) |[morphy2k](https://github.com/morphy2k) |[z0mbie42](https://github.com/z0mbie42) |
+
+[<img alt="tamird" src="https://avatars0.githubusercontent.com/u/1535036?v=4&s=117" width="117">](https://github.com/tamird) |[<img alt="paul-at-start" src="https://avatars2.githubusercontent.com/u/5486775?v=4&s=117" width="117">](https://github.com/paul-at-start) |[<img alt="psapezhko" src="https://avatars3.githubusercontent.com/u/10865586?v=4&s=117" width="117">](https://github.com/psapezhko) |[<img alt="Jarema" src="https://avatars0.githubusercontent.com/u/7369771?v=4&s=117" width="117">](https://github.com/Jarema) |[<img alt="vkrol" src="https://avatars3.githubusercontent.com/u/153412?v=4&s=117" width="117">](https://github.com/vkrol) |[<img alt="haya14busa" src="https://avatars0.githubusercontent.com/u/3797062?v=4&s=117" width="117">](https://github.com/haya14busa) |
+:---: |:---: |:---: |:---: |:---: |:---: |
+[tamird](https://github.com/tamird) |[paul-at-start](https://github.com/paul-at-start) |[psapezhko](https://github.com/psapezhko) |[Jarema](https://github.com/Jarema) |[vkrol](https://github.com/vkrol) |[haya14busa](https://github.com/haya14busa) |
 
 ## License
 

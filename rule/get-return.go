@@ -12,7 +12,7 @@ import (
 type GetReturnRule struct{}
 
 // Apply applies the rule to given file.
-func (r *GetReturnRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *GetReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -62,7 +62,6 @@ func (w lintReturnRule) Visit(node ast.Node) ast.Visitor {
 			Confidence: 0.8,
 			Node:       fd,
 			Category:   "logic",
-			URL:        "#get-return",
 			Failure:    fmt.Sprintf("function '%s' seems to be a getter but it does not return any result", fd.Name.Name),
 		})
 	}

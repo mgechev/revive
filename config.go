@@ -49,18 +49,45 @@ var allRules = append([]lint.Rule{
 	&rule.FileHeaderRule{},
 	&rule.EmptyBlockRule{},
 	&rule.SuperfluousElseRule{},
+	&rule.ConfusingNamingRule{},
 	&rule.GetReturnRule{},
 	&rule.ModifiesParamRule{},
+	&rule.ConfusingResultsRule{},
 	&rule.DeepExitRule{},
+<<<<<<< HEAD
 	&rule.ADSPrintRule{},
 	&rule.ADSLostErrRule{},
+=======
+	&rule.UnusedParamRule{},
+	&rule.UnreachableCodeRule{},
+	&rule.AddConstantRule{},
+	&rule.FlagParamRule{},
+	&rule.UnnecessaryStmtRule{},
+	&rule.StructTagRule{},
+	&rule.ModifiesValRecRule{},
+	&rule.ConstantLogicalExprRule{},
+	&rule.BoolLiteralRule{},
+	&rule.RedefinesBuiltinIDRule{},
+	&rule.ImportsBlacklistRule{},
+	&rule.FunctionResultsLimitRule{},
+	&rule.MaxPublicStructsRule{},
+	&rule.RangeValInClosureRule{},
+	&rule.WaitGroupByValueRule{},
+	&rule.AtomicRule{},
+	&rule.EmptyLinesRule{},
+	&rule.LineLengthLimitRule{},
+>>>>>>> ad7df7dc375879b9c25628acf9d643378cfaf102
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
 	&formatter.Stylish{},
 	&formatter.Friendly{},
 	&formatter.JSON{},
+	&formatter.NDJSON{},
 	&formatter.Default{},
+	&formatter.Unix{},
+	&formatter.Checkstyle{},
+	&formatter.Plain{},
 }
 
 func getFormatters() map[string]lint.Formatter {

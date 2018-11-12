@@ -14,7 +14,7 @@ import (
 type ErrorStringsRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ErrorStringsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ErrorStringsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -69,7 +69,6 @@ func (w lintErrorStrings) Visit(n ast.Node) ast.Visitor {
 	w.onFailure(lint.Failure{
 		Node:       str,
 		Confidence: conf,
-		URL:        "#error-strings",
 		Category:   "errors",
 		Failure:    "error strings should not be capitalized or end with punctuation or a newline",
 	})
