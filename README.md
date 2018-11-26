@@ -23,6 +23,14 @@ Here's how `revive` is different from `golint`:
 - _Everyone can extend it easily with custom rules or formatters._
 - `Revive` provides more rules compared to `golint`.
 
+## Who uses Revive
+
+- [`tidb`](https://github.com/pingcap/tidb) - TiDB is a distributed HTAP database compatible with the MySQL protocol
+- [`ferret`](https://github.com/MontFerret/ferret) - Declarative web scraping
+- [`gopass`](https://github.com/gopasspw/gopass) - The slightly more awesome standard unix password manager for teams
+
+*Open a PR to add your project*.
+
 <p align="center">
   <img src="./assets/demo.svg" alt="" width="700">
 </p>
