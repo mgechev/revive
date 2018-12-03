@@ -28,6 +28,7 @@ Here's how `revive` is different from `golint`:
 - [`tidb`](https://github.com/pingcap/tidb) - TiDB is a distributed HTAP database compatible with the MySQL protocol
 - [`ferret`](https://github.com/MontFerret/ferret) - Declarative web scraping
 - [`gopass`](https://github.com/gopasspw/gopass) - The slightly more awesome standard unix password manager for teams
+- [`gitea`](https://github.com/go-gitea/gitea) - Git with a cup of tea, painless self-hosted git service
 
 *Open a PR to add your project*.
 
