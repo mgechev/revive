@@ -81,7 +81,7 @@ _Configuration_: (int) the maximum number of parameters allowed per function.
 Example:
 
 ```toml
-[argument-limit]
+[rule.argument-limit]
   arguments =[4]
 ```
 
@@ -150,7 +150,7 @@ _Configuration_: (int) the maximum function complexity
 Example:
 
 ```toml
-[cyclomatic]
+[rule.cyclomatic]
   arguments =[3]
 ```
 
@@ -223,7 +223,7 @@ _Configuration_: (string) the header to look for in source files.
 Example:
 
 ```toml
-[file-header]
+[rule.file-header]
   arguments =["This is the text that must appear at the top of source files."]
 ```
 
@@ -244,7 +244,7 @@ _Configuration_: (int) the maximum allowed return values
 Example:
 
 ```toml
-[function-result-limit]
+[rule.function-result-limit]
   arguments =[3]
 ```
 
@@ -298,7 +298,7 @@ _Configuration_: (int) maximum line length in characters.
 Example:
 
 ```toml
-[line-length-limit]
+[rule.line-length-limit]
   arguments =[80]
 ```
 
@@ -314,7 +314,7 @@ _Configuration_: (int) the maximum allowed public structs
 Example:
 
 ```toml
-[max-public-structs]
+[rule.max-public-structs]
   arguments =[3]
 ```
 
