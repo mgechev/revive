@@ -127,7 +127,7 @@ type enableDisableConfig struct {
 }
 
 func (f *File) disabledIntervals(rules []Rule) disabledIntervalsMap {
-	re := regexp.MustCompile(`revive:(enable|disable)(?:-(line|next-line))?(?::([^\s]+))?`)
+	re := regexp.MustCompile(`^//[\s]*revive:(enable|disable)(?:-(line|next-line))?(?::([^\s]+))?[\s]*$`)
 
 	enabledDisabledRulesMap := make(map[string][]enableDisableConfig)
 
@@ -194,15 +194,16 @@ func (f *File) disabledIntervals(rules []Rule) disabledIntervalsMap {
 	}
 
 	handleComment := func(filename string, c *ast.CommentGroup, line int) {
-		text := c.Text()
-		matches := re.FindAllStringSubmatch(text, -1)
-		if len(matches) == 0 {
-			return
-		}
-		for _, matchParts := range matches {
+		comments := c.List
+		for _, c := range comments {
+			match := re.FindStringSubmatch(c.Text)
+			if len(match) == 0 {
+				return
+			}
+
 			ruleNames := []string{}
-			if len(matchParts) > 2 {
-				tempNames := strings.Split(matchParts[3], ",")
+			if len(match) > 2 {
+				tempNames := strings.Split(match[3], ",")
 				for _, name := range tempNames {
 					name = strings.Trim(name, "\n")
 					if len(name) > 0 {
@@ -218,7 +219,7 @@ func (f *File) disabledIntervals(rules []Rule) disabledIntervalsMap {
 				}
 			}
 
-			handleRules(filename, matchParts[2], matchParts[1] == "enable", line, ruleNames)
+			handleRules(filename, match[2], match[1] == "enable", line, ruleNames)
 		}
 	}
 
