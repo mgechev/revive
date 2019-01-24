@@ -10,3 +10,7 @@ import (
 func TestDisabledAnnotations(t *testing.T) {
 	testRule(t, "disable-annotations", &rule.ExportedRule{}, &lint.RuleConfig{})
 }
+
+func TestModifiedAnnotations(t *testing.T) {
+	testRule(t, "disable-annotations2", &rule.VarNamingRule{}, &lint.RuleConfig{})
+}
