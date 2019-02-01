@@ -85,16 +85,6 @@ func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
 		})
 		return
 	}
-	s := fn.Doc.Text()
-	prefix := fn.Name.Name + " "
-	if !strings.HasPrefix(s, prefix) {
-		w.onFailure(lint.Failure{
-			Node:       fn.Doc,
-			Confidence: 0.8,
-			Category:   "comments",
-			Failure:    fmt.Sprintf(`comment on exported %s %s should be of the form "%s..."`, kind, name, prefix),
-		})
-	}
 }
 
 func (w *lintExported) checkStutter(id *ast.Ident, thing string) {
@@ -141,25 +131,6 @@ func (w *lintExported) lintTypeDoc(t *ast.TypeSpec, doc *ast.CommentGroup) {
 		return
 	}
 
-	s := doc.Text()
-	articles := [...]string{"A", "An", "The", "This"}
-	for _, a := range articles {
-		if t.Name.Name == a {
-			continue
-		}
-		if strings.HasPrefix(s, a+" ") {
-			s = s[len(a)+1:]
-			break
-		}
-	}
-	if !strings.HasPrefix(s, t.Name.Name+" ") {
-		w.onFailure(lint.Failure{
-			Node:       doc,
-			Confidence: 1,
-			Category:   "comments",
-			Failure:    fmt.Sprintf(`comment on exported type %v should be of the form "%v ..." (with optional leading article)`, t.Name, t.Name),
-		})
-	}
 }
 
 func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genDeclMissingComments map[*ast.GenDecl]bool) {
@@ -205,25 +176,6 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 		})
 		genDeclMissingComments[gd] = true
 		return
-	}
-	// If this GenDecl has parens and a comment, we don't check its comment form.
-	if gd.Lparen.IsValid() && gd.Doc != nil {
-		return
-	}
-	// The relevant text to check will be on either vs.Doc or gd.Doc.
-	// Use vs.Doc preferentially.
-	doc := vs.Doc
-	if doc == nil {
-		doc = gd.Doc
-	}
-	prefix := name + " "
-	if !strings.HasPrefix(doc.Text(), prefix) {
-		w.onFailure(lint.Failure{
-			Confidence: 1,
-			Node:       doc,
-			Category:   "comments",
-			Failure:    fmt.Sprintf(`comment on exported %s %s should be of the form "%s..."`, kind, name, prefix),
-		})
 	}
 }
 

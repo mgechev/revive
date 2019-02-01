@@ -16,9 +16,11 @@ var lintMatch = flag.String("lint.match", "", "restrict fixtures matches to this
 var rules = []lint.Rule{
 	&rule.VarDeclarationsRule{},
 	&rule.PackageCommentsRule{},
+	&rule.PackageCommentsFormRule{},
 	&rule.DotImportsRule{},
 	&rule.BlankImportsRule{},
 	&rule.ExportedRule{},
+	&rule.ExportedFormRule{},
 	&rule.VarNamingRule{},
 	&rule.IndentErrorFlowRule{},
 	&rule.IfReturnRule{},

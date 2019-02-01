@@ -24,9 +24,11 @@ func fail(err string) {
 var defaultRules = []lint.Rule{
 	&rule.VarDeclarationsRule{},
 	&rule.PackageCommentsRule{},
+	&rule.PackageCommentsFormRule{},
 	&rule.DotImportsRule{},
 	&rule.BlankImportsRule{},
 	&rule.ExportedRule{},
+	&rule.ExportedFormRule{},
 	&rule.VarNamingRule{},
 	&rule.IndentErrorFlowRule{},
 	&rule.IfReturnRule{},
