@@ -292,6 +292,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`empty-lines`](./RULES_DESCRIPTIONS.md#empty-lines)   | n/a | Warns when there are heading or trailing newlines in a block              |    no    |  no   |
 | [`line-length-limit`](./RULES_DESCRIPTIONS.md#line-length-limit)   | int    | Specifies the maximum number of characters in a line             |    no    |  no   |
 | [`call-to-gc`](./RULES_DESCRIPTIONS.md#call-to-gc)   | n/a    | Warns on explicit call to the garbage collector    |    no    |  no   |
+| [`duplicated-imports`](./RULES_DESCRIPTIONS#duplicated-imports) | n/a  | Looks for packages that are imported two or more times   |    no    |  no   |
 
 ## Configurable rules
 
