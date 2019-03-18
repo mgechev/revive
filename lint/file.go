@@ -127,7 +127,7 @@ type enableDisableConfig struct {
 }
 
 func (f *File) disabledIntervals(rules []Rule) disabledIntervalsMap {
-	re := regexp.MustCompile(`^\s*revive:(enable|disable)(?:-(line|next-line))?(:|\s|$)`)
+	re := regexp.MustCompile(`^//[\s]*revive:(enable|disable)(?:-(line|next-line))?(?::([^\s]+))?[\s]*$`)
 
 	enabledDisabledRulesMap := make(map[string][]enableDisableConfig)
 
@@ -194,37 +194,38 @@ func (f *File) disabledIntervals(rules []Rule) disabledIntervalsMap {
 	}
 
 	handleComment := func(filename string, c *ast.CommentGroup, line int) {
-		text := c.Text()
-		parts := re.FindStringSubmatch(text)
-		if len(parts) == 0 {
-			return
-		}
-		str := re.FindString(text)
-		ruleNamesString := strings.Split(text, str)
-		ruleNames := []string{}
-		if len(ruleNamesString) == 2 {
-			tempNames := strings.Split(ruleNamesString[1], ",")
-			for _, name := range tempNames {
-				name = strings.Trim(name, "\n")
-				if len(name) > 0 {
-					ruleNames = append(ruleNames, name)
+		comments := c.List
+		for _, c := range comments {
+			match := re.FindStringSubmatch(c.Text)
+			if len(match) == 0 {
+				return
+			}
+
+			ruleNames := []string{}
+			if len(match) > 2 {
+				tempNames := strings.Split(match[3], ",")
+				for _, name := range tempNames {
+					name = strings.Trim(name, "\n")
+					if len(name) > 0 {
+						ruleNames = append(ruleNames, name)
+					}
 				}
 			}
-		}
 
-		// TODO: optimize
-		if len(ruleNames) == 0 {
-			for _, rule := range rules {
-				ruleNames = append(ruleNames, rule.Name())
+			// TODO: optimize
+			if len(ruleNames) == 0 {
+				for _, rule := range rules {
+					ruleNames = append(ruleNames, rule.Name())
+				}
 			}
-		}
 
-		handleRules(filename, parts[2], parts[1] == "enable", line, ruleNames)
+			handleRules(filename, match[2], match[1] == "enable", line, ruleNames)
+		}
 	}
 
 	comments := f.AST.Comments
 	for _, c := range comments {
-		handleComment(f.Name, c, f.ToPosition(c.Pos()).Line)
+		handleComment(f.Name, c, f.ToPosition(c.End()).Line)
 	}
 
 	return getEnabledDisabledIntervals()

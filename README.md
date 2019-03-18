@@ -12,16 +12,27 @@ Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in r
 
 Here's how `revive` is different from `golint`:
 
-- Allows us to enable or disable rules using a configuration file.
-- Allows us to configure the linting rules with a TOML file.
+- Allows to enable or disable rules using a configuration file.
+- Allows to configure the linting rules with a TOML file.
 - 2x faster running the same rules as golint.
 - Provides functionality for disabling a specific rule or the entire linter for a file or a range of lines.
   - `golint` allows this only for generated files.
 - Optional type checking. Most rules in golint do not require type checking. If you disable them in the config file, revive will run over 6x faster than golint.
 - Provides multiple formatters which let us customize the output.
-- Allows us to customize the return code for the entire linter or based on the failure of only some rules.
+- Allows to customize the return code for the entire linter or based on the failure of only some rules.
 - _Everyone can extend it easily with custom rules or formatters._
 - `Revive` provides more rules compared to `golint`.
+
+## Who uses Revive
+
+- [`tidb`](https://github.com/pingcap/tidb) - TiDB is a distributed HTAP database compatible with the MySQL protocol
+- [`ferret`](https://github.com/MontFerret/ferret) - Declarative web scraping
+- [`gopass`](https://github.com/gopasspw/gopass) - The slightly more awesome standard unix password manager for teams
+- [`gitea`](https://github.com/go-gitea/gitea) - Git with a cup of tea, painless self-hosted git service
+- [`excelize`](https://github.com/360EntSecGroup-Skylar/excelize) - Go library for reading and writing Microsoft Excel™ (XLSX) files
+- [`aurora`](https://github.com/xuri/aurora) - aurora is a web-based Beanstalk queue server console written in Go
+
+*Open a PR to add your project*.
 
 <p align="center">
   <img src="./assets/demo.svg" alt="" width="700">
@@ -47,6 +58,8 @@ Here's how `revive` is different from `golint`:
     - [Friendly](#friendly)
     - [Stylish](#stylish)
     - [Default](#default)
+    - [Plain](#plain)
+    - [Unix](#unix)
   - [Extensibility](#extensibility)
     - [Custom Rule](#custom-rule)
       - [Example](#example)
@@ -277,7 +290,8 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`waitgroup-by-value`](./RULES_DESCRIPTIONS.md#waitgroup-by-value)  |  n/a   | Warns on functions taking sync.WaitGroup as a by-value parameter |    no    |  no   |
 | [`atomic`](./RULES_DESCRIPTIONS.md#atomic)              |  n/a   | Check for common mistaken usages of the `sync/atomic` package    |    no    |  no   |
 | [`empty-lines`](./RULES_DESCRIPTIONS.md#empty-lines)   | n/a | Warns when there are heading or trailing newlines in a block              |    no    |  no   |
-| [`line-lenght-limit`](./RULES_DESCRIPTIONS.md#line-lenght-limit)   | int    | Specifies the maximum number of characters in a line             |    no    |  no   |
+| [`line-length-limit`](./RULES_DESCRIPTIONS.md#line-length-limit)   | int    | Specifies the maximum number of characters in a line             |    no    |  no   |
+| [`call-to-gc`](./RULES_DESCRIPTIONS.md#call-to-gc)   | n/a    | Warns on explicit call to the garbage collector    |    no    |  no   |
 
 ## Configurable rules
 
@@ -414,14 +428,19 @@ Currently, type checking is enabled by default. If you want to run the linter wi
 
 ## Contributors
 
-[<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) |[<img alt="chavacava" src="https://avatars2.githubusercontent.com/u/25788468?v=4&s=117" width="117">](https://github.com/chavacava) |[<img alt="xuri" src="https://avatars2.githubusercontent.com/u/2809468?v=4&s=117" width="117">](https://github.com/xuri) |[<img alt="gsamokovarov" src="https://avatars0.githubusercontent.com/u/604618?v=4&s=117" width="117">](https://github.com/gsamokovarov) |[<img alt="morphy2k" src="https://avatars2.githubusercontent.com/u/4280578?v=4&s=117" width="117">](https://github.com/morphy2k) |[<img alt="z0mbie42" src="https://avatars0.githubusercontent.com/u/6172808?v=4&s=117" width="117">](https://github.com/z0mbie42) |
+[<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) |[<img alt="chavacava" src="https://avatars2.githubusercontent.com/u/25788468?v=4&s=117" width="117">](https://github.com/chavacava) |[<img alt="xuri" src="https://avatars2.githubusercontent.com/u/2809468?v=4&s=117" width="117">](https://github.com/xuri) |[<img alt="gsamokovarov" src="https://avatars0.githubusercontent.com/u/604618?v=4&s=117" width="117">](https://github.com/gsamokovarov) |[<img alt="morphy2k" src="https://avatars2.githubusercontent.com/u/4280578?v=4&s=117" width="117">](https://github.com/morphy2k) |[<img alt="tamird" src="https://avatars0.githubusercontent.com/u/1535036?v=4&s=117" width="117">](https://github.com/tamird) |
 :---: |:---: |:---: |:---: |:---: |:---: |
-[mgechev](https://github.com/mgechev) |[chavacava](https://github.com/chavacava) |[xuri](https://github.com/xuri) |[gsamokovarov](https://github.com/gsamokovarov) |[morphy2k](https://github.com/morphy2k) |[z0mbie42](https://github.com/z0mbie42) |
+[mgechev](https://github.com/mgechev) |[chavacava](https://github.com/chavacava) |[xuri](https://github.com/xuri) |[gsamokovarov](https://github.com/gsamokovarov) |[morphy2k](https://github.com/morphy2k) |[tamird](https://github.com/tamird) |
 
-[<img alt="tamird" src="https://avatars0.githubusercontent.com/u/1535036?v=4&s=117" width="117">](https://github.com/tamird) |[<img alt="paul-at-start" src="https://avatars2.githubusercontent.com/u/5486775?v=4&s=117" width="117">](https://github.com/paul-at-start) |[<img alt="psapezhko" src="https://avatars3.githubusercontent.com/u/10865586?v=4&s=117" width="117">](https://github.com/psapezhko) |[<img alt="Jarema" src="https://avatars0.githubusercontent.com/u/7369771?v=4&s=117" width="117">](https://github.com/Jarema) |[<img alt="vkrol" src="https://avatars3.githubusercontent.com/u/153412?v=4&s=117" width="117">](https://github.com/vkrol) |[<img alt="haya14busa" src="https://avatars0.githubusercontent.com/u/3797062?v=4&s=117" width="117">](https://github.com/haya14busa) |
+[<img alt="AragurDEV" src="https://avatars0.githubusercontent.com/u/11004008?v=4&s=117" width="117">](https://github.com/AragurDEV) |[<img alt="jamesmaidment" src="https://avatars3.githubusercontent.com/u/2050324?v=4&s=117" width="117">](https://github.com/jamesmaidment) |[<img alt="mapreal19" src="https://avatars2.githubusercontent.com/u/3055997?v=4&s=117" width="117">](https://github.com/mapreal19) |[<img alt="paul-at-start" src="https://avatars2.githubusercontent.com/u/5486775?v=4&s=117" width="117">](https://github.com/paul-at-start) |[<img alt="psapezhko" src="https://avatars3.githubusercontent.com/u/10865586?v=4&s=117" width="117">](https://github.com/psapezhko) |[<img alt="ridvansumset" src="https://avatars2.githubusercontent.com/u/26631560?v=4&s=117" width="117">](https://github.com/ridvansumset) |
 :---: |:---: |:---: |:---: |:---: |:---: |
-[tamird](https://github.com/tamird) |[paul-at-start](https://github.com/paul-at-start) |[psapezhko](https://github.com/psapezhko) |[Jarema](https://github.com/Jarema) |[vkrol](https://github.com/vkrol) |[haya14busa](https://github.com/haya14busa) |
+[AragurDEV](https://github.com/AragurDEV) |[jamesmaidment](https://github.com/jamesmaidment) |[mapreal19](https://github.com/mapreal19) |[paul-at-start](https://github.com/paul-at-start) |[psapezhko](https://github.com/psapezhko) |[ridvansumset](https://github.com/ridvansumset) |
+
+[<img alt="Jarema" src="https://avatars0.githubusercontent.com/u/7369771?v=4&s=117" width="117">](https://github.com/Jarema) |[<img alt="vkrol" src="https://avatars3.githubusercontent.com/u/153412?v=4&s=117" width="117">](https://github.com/vkrol) |[<img alt="haya14busa" src="https://avatars0.githubusercontent.com/u/3797062?v=4&s=117" width="117">](https://github.com/haya14busa) |
+:---: |:---: |:---: |
+[Jarema](https://github.com/Jarema) |[vkrol](https://github.com/vkrol) |[haya14busa](https://github.com/haya14busa) |
 
 ## License
 
 MIT
+

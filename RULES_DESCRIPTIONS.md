@@ -9,6 +9,7 @@ List of all available rules.
   - [atomic](#atomic)
   - [blank-imports](#blank-imports)
   - [bool-literal-in-expr](#bool-literal-in-expr)
+  - [call-to-gc](#call-to-gc)
   - [confusing-naming](#confusing-naming)
   - [confusing-results](#confusing-results)
   - [constant-logical-expr](#constant-logical-expr)
@@ -32,7 +33,7 @@ List of all available rules.
   - [increment-decrement](#increment-decrement)
   - [indent-error-flow](#indent-error-flow)
   - [imports-blacklist](#imports-blacklist)
-  - [line-lenght-limit](#line-lenght-limit)
+  - [line-length-limit](#line-length-limit)
   - [max-public-structs](#max-public-structs)
   - [modifies-parameter](#modifies-parameter)
   - [modifies-value-receiver](#modifies-value-receiver)
@@ -80,7 +81,7 @@ _Configuration_: (int) the maximum number of parameters allowed per function.
 Example:
 
 ```toml
-[argument-limit]
+[rule.argument-limit]
   arguments =[4]
 ```
 
@@ -99,6 +100,14 @@ _Configuration_: N/A
 ## bool-literal-in-expr
 
 _Description_: Using Boolean literals (`true`, `false`) in logic expressions may make the code less readable. This rule suggests removing Boolean literals from logic expressions.
+
+_Configuration_: N/A
+
+## call-to-gc
+
+_Description_:  Explicitly invoking the garbage collector is, except for specific uses in benchmarking, very dubious.
+
+The garbage collector can be configured through environment variables as described [here](https://golang.org/pkg/runtime/).
 
 _Configuration_: N/A
 
@@ -141,7 +150,7 @@ _Configuration_: (int) the maximum function complexity
 Example:
 
 ```toml
-[cyclomatic]
+[rule.cyclomatic]
   arguments =[3]
 ```
 
@@ -214,7 +223,7 @@ _Configuration_: (string) the header to look for in source files.
 Example:
 
 ```toml
-[file-header]
+[rule.file-header]
   arguments =["This is the text that must appear at the top of source files."]
 ```
 
@@ -235,7 +244,7 @@ _Configuration_: (int) the maximum allowed return values
 Example:
 
 ```toml
-[function-result-limit]
+[rule.function-result-limit]
   arguments =[3]
 ```
 
@@ -280,7 +289,7 @@ Example:
   arguments =["crypto/md5", "crypto/sha1"]
 ```
 
-## line-lenght-limit
+## line-length-limit
 
 _Description_: Warns in the presence of code lines longer than a configured maximum.
 
@@ -289,7 +298,7 @@ _Configuration_: (int) maximum line length in characters.
 Example:
 
 ```toml
-[line-lenght-limit]
+[rule.line-length-limit]
   arguments =[80]
 ```
 
@@ -305,7 +314,7 @@ _Configuration_: (int) the maximum allowed public structs
 Example:
 
 ```toml
-[max-public-structs]
+[rule.max-public-structs]
   arguments =[3]
 ```
 

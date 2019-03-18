@@ -54,10 +54,6 @@ var allRules = append([]lint.Rule{
 	&rule.ModifiesParamRule{},
 	&rule.ConfusingResultsRule{},
 	&rule.DeepExitRule{},
-<<<<<<< HEAD
-	&rule.ADSPrintRule{},
-	&rule.ADSLostErrRule{},
-=======
 	&rule.UnusedParamRule{},
 	&rule.UnreachableCodeRule{},
 	&rule.AddConstantRule{},
@@ -76,7 +72,7 @@ var allRules = append([]lint.Rule{
 	&rule.AtomicRule{},
 	&rule.EmptyLinesRule{},
 	&rule.LineLengthLimitRule{},
->>>>>>> ad7df7dc375879b9c25628acf9d643378cfaf102
+	&rule.CallToGCRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
