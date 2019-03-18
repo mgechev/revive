@@ -80,7 +80,6 @@ func (w lintADSPrint) Visit(node ast.Node) ast.Visitor {
 			Confidence: 1,
 			Node:       ce,
 			Category:   "bad practice",
-			URL:        "#deep-exit",
 			Failure:    fmt.Sprintf("do not call %s.%s, use logger", pkg, fn),
 		})
 	}
