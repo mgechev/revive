@@ -33,6 +33,7 @@ List of all available rules.
   - [increment-decrement](#increment-decrement)
   - [indent-error-flow](#indent-error-flow)
   - [imports-blacklist](#imports-blacklist)
+  - [import-shadowing](#import-shadowing)
   - [line-length-limit](#line-length-limit)
   - [max-public-structs](#max-public-structs)
   - [modifies-parameter](#modifies-parameter)
@@ -288,6 +289,13 @@ Example:
 [imports-blacklist]
   arguments =["crypto/md5", "crypto/sha1"]
 ```
+### import-shadowing
+
+_Description_: In GO it is possible to declare identifiers (packages, structs, 
+interfaces, parameters, receivers, variables, constants...) that conflict with the 
+name of an imported package. This rule spots identifiers that shadow an import.
+
+_Configuration_: N/A
 
 ## line-length-limit
 
