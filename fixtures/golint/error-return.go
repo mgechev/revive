@@ -41,3 +41,13 @@ func l() (int, error, int) { // MATCH /error should be the last type when return
 func m() (x int, err error, y int) { // MATCH /error should be the last type when returning multiple items/
 	return 0, nil, 0
 }
+
+// Check for multiple error returns but with errors at the end.
+func n() (int, error, error) { // ok
+	return 0, nil, nil
+}
+
+// Check for multiple error returns mixed in order, but keeping one error at last position.
+func o() (int, error, int, error) { // ok
+	return 0, nil, 0, nil
+}
