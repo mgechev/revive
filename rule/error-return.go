@@ -48,7 +48,7 @@ func (w lintErrorReturn) Visit(n ast.Node) ast.Visitor {
 		return w
 	}
 	if isIdent(ret[len(ret)-1].Type, "error") {
-		return true
+		return nil
 	}
 	// An error return parameter should be the last parameter.
 	// Flag any error parameters found before the last.
