@@ -62,6 +62,7 @@ type importShadowing struct {
 	alreadySeen map[*ast.Object]struct{}
 }
 
+// Visit visits AST nodes and checks if id nodes (ast.Ident) shadow an import name
 func (w importShadowing) Visit(n ast.Node) ast.Visitor {
 	switch n := n.(type) {
 	case *ast.AssignStmt:
@@ -69,8 +70,13 @@ func (w importShadowing) Visit(n ast.Node) ast.Visitor {
 			return w // analyze variable declarations of the form id := expr
 		}
 
-		return nil
-	case *ast.CallExpr, *ast.ImportSpec, *ast.KeyValueExpr, *ast.ReturnStmt, *ast.SelectorExpr, *ast.StructType:
+		return nil // skip assigns of the form id = expr (not an id declaration)
+	case *ast.CallExpr, // skip call expressions (not an id declaration)
+		*ast.ImportSpec,   // skip import section subtree because we already have the list of imports
+		*ast.KeyValueExpr, // skip analysis of key-val expressions ({key:value}): ids of such expressions, even the same of an import name, do not shadow the import name
+		*ast.ReturnStmt,   // skip skipping analysis of returns, ids in expression were already analyzed
+		*ast.SelectorExpr, // skip analysis of selector expressions (anId.otherId): because if anId shadows an import name, it was already detected, and otherId does not shadows the import name
+		*ast.StructType:   // skip analysis of struct type because struct fields can not shadow an import name
 		return nil
 	case *ast.Ident:
 		id := n.Name
