@@ -74,6 +74,7 @@ var allRules = append([]lint.Rule{
 	&rule.LineLengthLimitRule{},
 	&rule.CallToGCRule{},
 	&rule.DuplicatedImportsRule{},
+	&rule.ImportShadowingRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
