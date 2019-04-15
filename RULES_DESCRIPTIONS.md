@@ -7,6 +7,7 @@ List of all available rules.
   - [add-constant](#add-constant)
   - [argument-limit](#argument-limit)
   - [atomic](#atomic)
+  - [bare-return](#bare-return)
   - [blank-imports](#blank-imports)
   - [bool-literal-in-expr](#bool-literal-in-expr)
   - [call-to-gc](#call-to-gc)
@@ -90,6 +91,12 @@ Example:
 ## atomic
 
 _Description_: Check for commonly mistaken usages of the `sync/atomic` package
+
+_Configuration_: N/A
+
+## bare-return
+
+_Description_: Warns on bare (a.k.a. naked) returns
 
 _Configuration_: N/A
 

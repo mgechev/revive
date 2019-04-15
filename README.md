@@ -294,6 +294,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`call-to-gc`](./RULES_DESCRIPTIONS.md#call-to-gc)   | n/a    | Warns on explicit call to the garbage collector    |    no    |  no   |
 | [`duplicated-imports`](./RULES_DESCRIPTIONS#duplicated-imports) | n/a  | Looks for packages that are imported two or more times   |    no    |  no   |
 | [`import-shadowing`](./RULES_DESCRIPTIONS.md#import-shadowing)   | n/a    | Spots identifiers that shadow an import    |    no    |  no   |
+| [`bare-return`](./RULES_DESCRIPTIONS#bare-return) | n/a  | Warns on bare returns   |    no    |  no   |
 
 ## Configurable rules
 
