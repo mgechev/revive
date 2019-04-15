@@ -18,6 +18,7 @@ List of all available rules.
   - [cyclomatic](#cyclomatic)
   - [deep-exit](#deep-exit)
   - [dot-imports](#dot-imports)
+  - [duplicated-imports](#duplicated-imports)
   - [empty-block](#empty-block)
   - [empty-lines](#empty-lines)
   - [error-naming](#error-naming)
@@ -165,6 +166,12 @@ _Configuration_: N/A
 _Description_: Importing with `.` makes the programs much harder to understand because it is unclear whether names belong to the current package or to an imported package.
 
 More information [here](https://github.com/golang/go/wiki/CodeReviewComments#import-dot)
+
+_Configuration_: N/A
+
+## duplicated-imports
+
+_Description_: It is possible to unintentionally import the same package twice. This rule looks for packages that are imported two or more times.
 
 _Configuration_: N/A
 
