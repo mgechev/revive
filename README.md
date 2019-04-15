@@ -31,6 +31,7 @@ Here's how `revive` is different from `golint`:
 - [`gitea`](https://github.com/go-gitea/gitea) - Git with a cup of tea, painless self-hosted git service
 - [`excelize`](https://github.com/360EntSecGroup-Skylar/excelize) - Go library for reading and writing Microsoft Excel™ (XLSX) files
 - [`aurora`](https://github.com/xuri/aurora) - aurora is a web-based Beanstalk queue server console written in Go
+- [`grafana`](https://github.com/grafana/grafana) - The tool for beautiful monitoring and metric analytics & dashboards for Graphite, InfluxDB & Prometheus & More
 
 *Open a PR to add your project*.
 
