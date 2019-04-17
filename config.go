@@ -76,6 +76,7 @@ var allRules = append([]lint.Rule{
 	&rule.DuplicatedImportsRule{},
 	&rule.ImportShadowingRule{},
 	&rule.BareReturnRule{},
+	&rule.UnusedReceiverRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
