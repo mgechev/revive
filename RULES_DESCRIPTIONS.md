@@ -54,6 +54,7 @@ List of all available rules.
   - [unnecessary-stmt](#unnecessary-stmt)
   - [unreachable-code](#unreachable-code)
   - [unused-parameter](#unused-parameter)
+  - [unused-receiver](#unused-receiver)
   - [waitgroup-by-value](#waitgroup-by-value)
 
 ## add-constant
@@ -448,6 +449,12 @@ _Configuration_: N/A
 ## unused-parameter
 
 _Description_: This rule warns on unused parameters. Functions or methods with unused parameters can be a symptom of an unfinished refactoring or a bug.
+
+_Configuration_: N/A
+
+## unused-receiver
+
+_Description_: This rule warns on unused method receivers. Methods with unused receivers can be a symptom of an unfinished refactoring or a bug.
 
 _Configuration_: N/A
 
