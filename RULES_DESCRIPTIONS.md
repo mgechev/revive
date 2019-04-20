@@ -7,6 +7,7 @@ List of all available rules.
   - [add-constant](#add-constant)
   - [argument-limit](#argument-limit)
   - [atomic](#atomic)
+  - [bare-return](#bare-return)
   - [blank-imports](#blank-imports)
   - [bool-literal-in-expr](#bool-literal-in-expr)
   - [call-to-gc](#call-to-gc)
@@ -53,6 +54,7 @@ List of all available rules.
   - [unnecessary-stmt](#unnecessary-stmt)
   - [unreachable-code](#unreachable-code)
   - [unused-parameter](#unused-parameter)
+  - [unused-receiver](#unused-receiver)
   - [waitgroup-by-value](#waitgroup-by-value)
 
 ## add-constant
@@ -90,6 +92,12 @@ Example:
 ## atomic
 
 _Description_: Check for commonly mistaken usages of the `sync/atomic` package
+
+_Configuration_: N/A
+
+## bare-return
+
+_Description_: Warns on bare (a.k.a. naked) returns
 
 _Configuration_: N/A
 
@@ -441,6 +449,12 @@ _Configuration_: N/A
 ## unused-parameter
 
 _Description_: This rule warns on unused parameters. Functions or methods with unused parameters can be a symptom of an unfinished refactoring or a bug.
+
+_Configuration_: N/A
+
+## unused-receiver
+
+_Description_: This rule warns on unused method receivers. Methods with unused receivers can be a symptom of an unfinished refactoring or a bug.
 
 _Configuration_: N/A
 

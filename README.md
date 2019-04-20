@@ -26,11 +26,15 @@ Here's how `revive` is different from `golint`:
 ## Who uses Revive
 
 - [`tidb`](https://github.com/pingcap/tidb) - TiDB is a distributed HTAP database compatible with the MySQL protocol
+- [`grafana`](https://github.com/grafana/grafana) - The tool for beautiful monitoring and metric analytics & dashboards for Graphite, InfluxDB & Prometheus & More
+- [`etcd`](https://github.com/etcd-io/etcd) - Distributed reliable key-value store for the most critical data of a distributed system
 - [`ferret`](https://github.com/MontFerret/ferret) - Declarative web scraping
 - [`gopass`](https://github.com/gopasspw/gopass) - The slightly more awesome standard unix password manager for teams
 - [`gitea`](https://github.com/go-gitea/gitea) - Git with a cup of tea, painless self-hosted git service
 - [`excelize`](https://github.com/360EntSecGroup-Skylar/excelize) - Go library for reading and writing Microsoft Excel™ (XLSX) files
 - [`aurora`](https://github.com/xuri/aurora) - aurora is a web-based Beanstalk queue server console written in Go
+- [`soar`](https://github.com/XiaoMi/soar) - SQL Optimizer And Rewriter
+- [`gorush`](https://github.com/appleboy/gorush) - A push notification server written in Go (Golang)
 
 *Open a PR to add your project*.
 
@@ -294,6 +298,8 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`call-to-gc`](./RULES_DESCRIPTIONS.md#call-to-gc)   | n/a    | Warns on explicit call to the garbage collector    |    no    |  no   |
 | [`duplicated-imports`](./RULES_DESCRIPTIONS#duplicated-imports) | n/a  | Looks for packages that are imported two or more times   |    no    |  no   |
 | [`import-shadowing`](./RULES_DESCRIPTIONS.md#import-shadowing)   | n/a    | Spots identifiers that shadow an import    |    no    |  no   |
+| [`bare-return`](./RULES_DESCRIPTIONS#bare-return) | n/a  | Warns on bare returns   |    no    |  no   |
+| [`unused-receiver`](./RULES_DESCRIPTIONS.md#unused-receiver)   | n/a    | Suggests to rename or remove unused method receivers    |    no    |  no   |
 
 ## Configurable rules
 
@@ -434,13 +440,13 @@ Currently, type checking is enabled by default. If you want to run the linter wi
 :---: |:---: |:---: |:---: |:---: |:---: |
 [mgechev](https://github.com/mgechev) |[chavacava](https://github.com/chavacava) |[xuri](https://github.com/xuri) |[gsamokovarov](https://github.com/gsamokovarov) |[morphy2k](https://github.com/morphy2k) |[tamird](https://github.com/tamird) |
 
-[<img alt="AragurDEV" src="https://avatars0.githubusercontent.com/u/11004008?v=4&s=117" width="117">](https://github.com/AragurDEV) |[<img alt="yangdiangzb" src="https://avatars3.githubusercontent.com/u/16643665?v=4&s=117" width="117">](https://github.com/yangdiangzb) |[<img alt="jamesmaidment" src="https://avatars3.githubusercontent.com/u/2050324?v=4&s=117" width="117">](https://github.com/jamesmaidment) |[<img alt="mapreal19" src="https://avatars2.githubusercontent.com/u/3055997?v=4&s=117" width="117">](https://github.com/mapreal19) |[<img alt="paul-at-start" src="https://avatars2.githubusercontent.com/u/5486775?v=4&s=117" width="117">](https://github.com/paul-at-start) |[<img alt="psapezhko" src="https://avatars3.githubusercontent.com/u/10865586?v=4&s=117" width="117">](https://github.com/psapezhko) |
+[<img alt="AragurDEV" src="https://avatars0.githubusercontent.com/u/11004008?v=4&s=117" width="117">](https://github.com/AragurDEV) |[<img alt="yangdiangzb" src="https://avatars3.githubusercontent.com/u/16643665?v=4&s=117" width="117">](https://github.com/yangdiangzb) |[<img alt="jamesmaidment" src="https://avatars3.githubusercontent.com/u/2050324?v=4&s=117" width="117">](https://github.com/jamesmaidment) |[<img alt="mapreal19" src="https://avatars2.githubusercontent.com/u/3055997?v=4&s=117" width="117">](https://github.com/mapreal19) |[<img alt="markelog" src="https://avatars0.githubusercontent.com/u/945528?v=4&s=117" width="117">](https://github.com/markelog) |[<img alt="paul-at-start" src="https://avatars2.githubusercontent.com/u/5486775?v=4&s=117" width="117">](https://github.com/paul-at-start) |
 :---: |:---: |:---: |:---: |:---: |:---: |
-[AragurDEV](https://github.com/AragurDEV) |[yangdiangzb](https://github.com/yangdiangzb) |[jamesmaidment](https://github.com/jamesmaidment) |[mapreal19](https://github.com/mapreal19) |[paul-at-start](https://github.com/paul-at-start) |[psapezhko](https://github.com/psapezhko) |
+[AragurDEV](https://github.com/AragurDEV) |[yangdiangzb](https://github.com/yangdiangzb) |[jamesmaidment](https://github.com/jamesmaidment) |[mapreal19](https://github.com/mapreal19) |[markelog](https://github.com/markelog) |[paul-at-start](https://github.com/paul-at-start) |
 
-[<img alt="ridvansumset" src="https://avatars2.githubusercontent.com/u/26631560?v=4&s=117" width="117">](https://github.com/ridvansumset) |[<img alt="Jarema" src="https://avatars0.githubusercontent.com/u/7369771?v=4&s=117" width="117">](https://github.com/Jarema) |[<img alt="vkrol" src="https://avatars3.githubusercontent.com/u/153412?v=4&s=117" width="117">](https://github.com/vkrol) |[<img alt="haya14busa" src="https://avatars0.githubusercontent.com/u/3797062?v=4&s=117" width="117">](https://github.com/haya14busa) |
-:---: |:---: |:---: |:---: |
-[ridvansumset](https://github.com/ridvansumset) |[Jarema](https://github.com/Jarema) |[vkrol](https://github.com/vkrol) |[haya14busa](https://github.com/haya14busa) |
+[<img alt="psapezhko" src="https://avatars3.githubusercontent.com/u/10865586?v=4&s=117" width="117">](https://github.com/psapezhko) |[<img alt="ridvansumset" src="https://avatars2.githubusercontent.com/u/26631560?v=4&s=117" width="117">](https://github.com/ridvansumset) |[<img alt="Jarema" src="https://avatars0.githubusercontent.com/u/7369771?v=4&s=117" width="117">](https://github.com/Jarema) |[<img alt="vkrol" src="https://avatars3.githubusercontent.com/u/153412?v=4&s=117" width="117">](https://github.com/vkrol) |[<img alt="haya14busa" src="https://avatars0.githubusercontent.com/u/3797062?v=4&s=117" width="117">](https://github.com/haya14busa) |
+:---: |:---: |:---: |:---: |:---: |
+[psapezhko](https://github.com/psapezhko) |[ridvansumset](https://github.com/ridvansumset) |[Jarema](https://github.com/Jarema) |[vkrol](https://github.com/vkrol) |[haya14busa](https://github.com/haya14busa) |
 
 ## License
 
