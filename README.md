@@ -33,6 +33,8 @@ Here's how `revive` is different from `golint`:
 - [`gitea`](https://github.com/go-gitea/gitea) - Git with a cup of tea, painless self-hosted git service
 - [`excelize`](https://github.com/360EntSecGroup-Skylar/excelize) - Go library for reading and writing Microsoft Excel™ (XLSX) files
 - [`aurora`](https://github.com/xuri/aurora) - aurora is a web-based Beanstalk queue server console written in Go
+- [`soar`](https://github.com/XiaoMi/soar) - SQL Optimizer And Rewriter
+- [`gorush`](https://github.com/appleboy/gorush) - A push notification server written in Go (Golang)
 
 *Open a PR to add your project*.
 
