@@ -17,8 +17,7 @@ func (r *UnhandledErrorRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 
 	fileAst := file.AST
 	walker := &lintUnhandledErrors{
-		file:    file,
-		fileAst: fileAst,
+		pkg: file.Pkg,
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
@@ -36,12 +35,14 @@ func (r *UnhandledErrorRule) Name() string {
 }
 
 type lintUnhandledErrors struct {
-	fileAst   *ast.File
-	file      *lint.File
-	lastGen   *ast.GenDecl
+	pkg       *lint.Package
 	onFailure func(lint.Failure)
 }
 
+const errorTypeName = "error"
+
+// Visit looks for statements that are function calls.
+// If the called function returns a value of type error a failure will be created.
 func (w *lintUnhandledErrors) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
 	case *ast.ExprStmt:
@@ -51,14 +52,14 @@ func (w *lintUnhandledErrors) Visit(node ast.Node) ast.Visitor {
 			return nil // not a function call
 		}
 
-		funcType := w.file.Pkg.TypeOf(fCall)
+		funcType := w.pkg.TypeOf(fCall)
 		if funcType == nil {
 			return nil // skip, type info not available
 		}
 
 		switch t := funcType.(type) {
 		case *types.Named:
-			if t.String() != "error" {
+			if t.String() != errorTypeName {
 				return nil // func call does not return an error
 			}
 
@@ -74,7 +75,7 @@ func (w *lintUnhandledErrors) Visit(node ast.Node) ast.Visitor {
 			}
 		}
 	}
-	
+
 	return w
 }
 
@@ -89,7 +90,7 @@ func (w *lintUnhandledErrors) addFailure(n *ast.CallExpr) {
 
 func returnsAnError(types *types.Tuple) bool {
 	for i := 0; i < types.Len(); i++ {
-		if types.At(i).Type().String() == "error" {
+		if types.At(i).Type().String() == errorTypeName {
 			return true
 		}
 	}
