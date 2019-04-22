@@ -51,6 +51,7 @@ List of all available rules.
   - [var-naming](#var-naming)
   - [var-declaration](#var-declaration)
   - [unexported-return](#unexported-return)
+  - [unhandled-error](#unhandled-error)
   - [unnecessary-stmt](#unnecessary-stmt)
   - [unreachable-code](#unreachable-code)
   - [unused-parameter](#unused-parameter)
@@ -431,6 +432,12 @@ _Configuration_: N/A
 ## unexported-return
 
 _Description_: This rule warns when an exported function or method returns a value of an un-exported type.
+
+_Configuration_: N/A
+
+## unhandled-error
+
+_Description_: This rule warns when errors returned by a function are not explicitly handled on the caller side.
 
 _Configuration_: N/A
 
