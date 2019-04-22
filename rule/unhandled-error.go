@@ -15,7 +15,6 @@ type UnhandledErrorRule struct{}
 func (r *UnhandledErrorRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
-	fileAst := file.AST
 	walker := &lintUnhandledErrors{
 		pkg: file.Pkg,
 		onFailure: func(failure lint.Failure) {
@@ -24,7 +23,7 @@ func (r *UnhandledErrorRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 	}
 
 	file.Pkg.TypeCheck()
-	ast.Walk(walker, fileAst)
+	ast.Walk(walker, file.AST)
 
 	return failures
 }
@@ -46,8 +45,7 @@ const errorTypeName = "error"
 func (w *lintUnhandledErrors) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
 	case *ast.ExprStmt:
-		x := n.X
-		fCall, ok := x.(*ast.CallExpr)
+		fCall, ok := n.X.(*ast.CallExpr)
 		if !ok {
 			return nil // not a function call
 		}
