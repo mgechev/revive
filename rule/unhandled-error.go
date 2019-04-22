@@ -73,7 +73,6 @@ func (w *lintUnhandledErrors) Visit(node ast.Node) ast.Visitor {
 			}
 		}
 	}
-
 	return w
 }
 
