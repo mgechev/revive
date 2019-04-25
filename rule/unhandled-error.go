@@ -81,7 +81,7 @@ func (w *lintUnhandledErrors) addFailure(n *ast.CallExpr) {
 		Category:   "bad practice",
 		Confidence: 1,
 		Node:       n,
-		Failure:    fmt.Sprintf("Unhandled error in call to function %v", n.Fun),
+		Failure:    fmt.Sprintf("Unhandled error in call to function %v", gofmt(n.Fun)),
 	})
 }
 
