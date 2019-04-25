@@ -35,6 +35,7 @@ Here's how `revive` is different from `golint`:
 - [`aurora`](https://github.com/xuri/aurora) - aurora is a web-based Beanstalk queue server console written in Go
 - [`soar`](https://github.com/XiaoMi/soar) - SQL Optimizer And Rewriter
 - [`gorush`](https://github.com/appleboy/gorush) - A push notification server written in Go (Golang)
+- [`sklearn`](https://github.com/pa-m/sklearn) - A partial port of scikit-learn written in Go
 
 *Open a PR to add your project*.
 
