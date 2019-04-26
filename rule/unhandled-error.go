@@ -38,8 +38,6 @@ type lintUnhandledErrors struct {
 	onFailure func(lint.Failure)
 }
 
-const errorTypeName = "error"
-
 // Visit looks for statements that are function calls.
 // If the called function returns a value of type error a failure will be created.
 func (w *lintUnhandledErrors) Visit(node ast.Node) ast.Visitor {
@@ -57,7 +55,7 @@ func (w *lintUnhandledErrors) Visit(node ast.Node) ast.Visitor {
 
 		switch t := funcType.(type) {
 		case *types.Named:
-			if t.String() != errorTypeName {
+			if !w.isTypeError(t) {
 				return nil // func call does not return an error
 			}
 
@@ -68,7 +66,7 @@ func (w *lintUnhandledErrors) Visit(node ast.Node) ast.Visitor {
 				return nil // skip, unable to retrieve return type of the called function
 			}
 
-			if returnsAnError(retTypes) {
+			if w.returnsAnError(retTypes) {
 				w.addFailure(fCall)
 			}
 		}
@@ -85,9 +83,16 @@ func (w *lintUnhandledErrors) addFailure(n *ast.CallExpr) {
 	})
 }
 
-func returnsAnError(types *types.Tuple) bool {
-	for i := 0; i < types.Len(); i++ {
-		if types.At(i).Type().String() == errorTypeName {
+func (*lintUnhandledErrors) isTypeError(t *types.Named) bool {
+	const errorTypeName = "_.error"
+
+	return t.Obj().Id() == errorTypeName
+}
+
+func (w *lintUnhandledErrors) returnsAnError(tt *types.Tuple) bool {
+	for i := 0; i < tt.Len(); i++ {
+		nt, ok := tt.At(i).Type().(*types.Named)
+		if ok && w.isTypeError(nt) {
 			return true
 		}
 	}
