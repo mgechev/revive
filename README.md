@@ -300,6 +300,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`import-shadowing`](./RULES_DESCRIPTIONS.md#import-shadowing)   | n/a    | Spots identifiers that shadow an import    |    no    |  no   |
 | [`bare-return`](./RULES_DESCRIPTIONS#bare-return) | n/a  | Warns on bare returns   |    no    |  no   |
 | [`unused-receiver`](./RULES_DESCRIPTIONS.md#unused-receiver)   | n/a    | Suggests to rename or remove unused method receivers    |    no    |  no   |
+| [`unhandled-error`](./RULES_DESCRIPTIONS.md#unhandled-error)   | n/a    | Warns on unhandled errors returned by funcion calls    |    no    |  yes   |
 
 ## Configurable rules
 
