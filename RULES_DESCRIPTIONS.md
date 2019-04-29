@@ -439,8 +439,14 @@ _Configuration_: N/A
 
 _Description_: This rule warns when errors returned by a function are not explicitly handled on the caller side.
 
-_Configuration_: N/A
+_Configuration_: black-list of function names
 
+Example:
+
+```toml
+[unhandled-error]
+  arguments =["fmt.Printf", "myFunction"]
+```
 ## unnecessary-stmt
 
 _Description_: This rule suggests to remove redundant statements like a `break` at the end of a case block, for improving the code's readability.
