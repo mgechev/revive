@@ -11,13 +11,13 @@ import (
 // UnhandledErrorRule lints given else constructs.
 type UnhandledErrorRule struct{}
 
-type blackListType map[string]struct{}
+type ignoreListType map[string]struct{}
 
 // Apply applies the rule to given file.
 func (r *UnhandledErrorRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
-	blacklist := make(blackListType, len(args))
+	ignoreList := make(ignoreListType, len(args))
 
 	for _, arg := range args {
 		argStr, ok := arg.(string)
@@ -25,12 +25,12 @@ func (r *UnhandledErrorRule) Apply(file *lint.File, args lint.Arguments) []lint.
 			panic(fmt.Sprintf("Invalid argument to the unhandled-error rule. Expecting a string, got %T", arg))
 		}
 
-		blacklist[argStr] = struct{}{}
+		ignoreList[argStr] = struct{}{}
 	}
 
 	walker := &lintUnhandledErrors{
-		blackList: blacklist,
-		pkg:       file.Pkg,
+		ignoreList: ignoreList,
+		pkg:        file.Pkg,
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
@@ -48,9 +48,9 @@ func (r *UnhandledErrorRule) Name() string {
 }
 
 type lintUnhandledErrors struct {
-	blackList blackListType
-	pkg       *lint.Package
-	onFailure func(lint.Failure)
+	ignoreList ignoreListType
+	pkg        *lint.Package
+	onFailure  func(lint.Failure)
 }
 
 // Visit looks for statements that are function calls.
@@ -91,7 +91,7 @@ func (w *lintUnhandledErrors) Visit(node ast.Node) ast.Visitor {
 
 func (w *lintUnhandledErrors) addFailure(n *ast.CallExpr) {
 	funcName := gofmt(n.Fun)
-	if _, mustSkip := w.blackList[funcName]; mustSkip {
+	if _, mustIgnore := w.ignoreList[funcName]; mustIgnore {
 		return
 	}
 

@@ -14,5 +14,5 @@ func TestUnhandledError(t *testing.T) {
 func TestUnhandledErrorWithBlacklist(t *testing.T) {
 	args := []interface{}{"os.Chdir", "unhandledError1"}
 
-	testRule(t, "unhandled-error-w-blacklist", &rule.UnhandledErrorRule{}, &lint.RuleConfig{Arguments: args})
+	testRule(t, "unhandled-error-w-ignorelist", &rule.UnhandledErrorRule{}, &lint.RuleConfig{Arguments: args})
 }
