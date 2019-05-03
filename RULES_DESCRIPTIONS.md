@@ -48,6 +48,7 @@ List of all available rules.
   - [struct-tag](#struct-tag)
   - [superfluous-else](#superfluous-else)
   - [time-naming](#time-naming)
+  - [too-many-indirections](#too-many-indirections)
   - [var-naming](#var-naming)
   - [var-declaration](#var-declaration)
   - [unexported-return](#unexported-return)
@@ -409,6 +410,19 @@ _Configuration_: N/A
 _Description_: Using unit-specific suffix like "Secs", "Mins", ... when naming variables of type `time.Duration` can be misleading, this rule highlights those cases.
 
 _Configuration_: N/A
+
+## too-many-indirections
+
+_Description_: Expressions that have too many indirections are hard to understand and fragile (calls and slice accesses are chained without checking for nil returns nor empty slices). This rule spots expressions with function call and/or indexing chains that are too long.
+
+_Configuration_: This rule accepts an integer to set the maximum allowed length of an indirection chain. The default maximum is 3.
+
+Example:
+
+```toml
+[rule.var-naming]
+  arguments = [4]
+```
 
 ## var-naming
 

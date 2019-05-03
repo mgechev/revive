@@ -302,6 +302,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`bare-return`](./RULES_DESCRIPTIONS#bare-return) | n/a  | Warns on bare returns   |    no    |  no   |
 | [`unused-receiver`](./RULES_DESCRIPTIONS.md#unused-receiver)   | n/a    | Suggests to rename or remove unused method receivers    |    no    |  no   |
 | [`unhandled-error`](./RULES_DESCRIPTIONS.md#unhandled-error)   | []string   | Warns on unhandled errors returned by funcion calls    |    no    |  yes   |
+| [`too-many-indirections`](./RULES_DESCRIPTIONS.md#unhandled-error)   | int   | Spots expressions with function call and/or indexing chains that are too long  |    no    |  no   |
 
 ## Configurable rules
 

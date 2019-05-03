@@ -78,6 +78,7 @@ var allRules = append([]lint.Rule{
 	&rule.BareReturnRule{},
 	&rule.UnusedReceiverRule{},
 	&rule.UnhandledErrorRule{},
+	&rule.TooManyIndirectionsRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
