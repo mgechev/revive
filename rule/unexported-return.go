@@ -12,7 +12,7 @@ import (
 type UnexportedReturnRule struct{}
 
 // Apply applies the rule to given file.
-func (r *UnexportedReturnRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *UnexportedReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST

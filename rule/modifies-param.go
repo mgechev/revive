@@ -11,7 +11,7 @@ import (
 type ModifiesParamRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ModifiesParamRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ModifiesParamRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -70,7 +70,6 @@ func checkParam(id *ast.Ident, w *lintModifiesParamRule) {
 			Confidence: 0.5, // confidence is low because of shadow variables
 			Node:       id,
 			Category:   "bad practice",
-			URL:        "#modifies-parameter",
 			Failure:    fmt.Sprintf("parameter '%s' seems to be modified", id),
 		})
 	}

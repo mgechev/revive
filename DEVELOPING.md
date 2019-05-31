@@ -11,7 +11,7 @@ go get -u github.com/mgechev/revive
 cd $GOPATH/src/github.com/mgechev/revive
 ```
 
-After that install the dependencies using dep:
+After that install the dependencies using go modules:
 
 ```bash
 make install

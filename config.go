@@ -65,6 +65,21 @@ var allRules = append([]lint.Rule{
 	&rule.ModifiesValRecRule{},
 	&rule.ConstantLogicalExprRule{},
 	&rule.BoolLiteralRule{},
+	&rule.RedefinesBuiltinIDRule{},
+	&rule.ImportsBlacklistRule{},
+	&rule.FunctionResultsLimitRule{},
+	&rule.MaxPublicStructsRule{},
+	&rule.RangeValInClosureRule{},
+	&rule.WaitGroupByValueRule{},
+	&rule.AtomicRule{},
+	&rule.EmptyLinesRule{},
+	&rule.LineLengthLimitRule{},
+	&rule.CallToGCRule{},
+	&rule.DuplicatedImportsRule{},
+	&rule.ImportShadowingRule{},
+	&rule.BareReturnRule{},
+	&rule.UnusedReceiverRule{},
+	&rule.UnhandledErrorRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
@@ -73,7 +88,9 @@ var allFormatters = []lint.Formatter{
 	&formatter.JSON{},
 	&formatter.NDJSON{},
 	&formatter.Default{},
+	&formatter.Unix{},
 	&formatter.Checkstyle{},
+	&formatter.Plain{},
 }
 
 func getFormatters() map[string]lint.Formatter {

@@ -10,7 +10,7 @@ import (
 type ErrorReturnRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ErrorReturnRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ErrorReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -46,6 +46,9 @@ func (w lintErrorReturn) Visit(n ast.Node) ast.Visitor {
 	ret := fn.Type.Results.List
 	if len(ret) <= 1 {
 		return w
+	}
+	if isIdent(ret[len(ret)-1].Type, "error") {
+		return nil
 	}
 	// An error return parameter should be the last parameter.
 	// Flag any error parameters found before the last.
