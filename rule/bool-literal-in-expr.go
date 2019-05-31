@@ -1,16 +1,17 @@
 package rule
 
 import (
-	"github.com/mgechev/revive/lint"
 	"go/ast"
 	"go/token"
+
+	"github.com/mgechev/revive/lint"
 )
 
 // BoolLiteralRule warns when logic expressions contains Boolean literals.
 type BoolLiteralRule struct{}
 
 // Apply applies the rule to given file.
-func (r *BoolLiteralRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *BoolLiteralRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {

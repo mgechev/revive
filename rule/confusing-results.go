@@ -10,7 +10,7 @@ import (
 type ConfusingResultsRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ConfusingResultsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ConfusingResultsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -54,14 +54,13 @@ func (w lintConfusingResults) Visit(n ast.Node) ast.Visitor {
 			w.onFailure(lint.Failure{
 				Node:       n,
 				Confidence: 1,
-				URL:        "#named-result-parameters",
 				Category:   "naming",
 				Failure:    "unnamed results of the same type may be confusing, consider using named results",
 			})
 			break
-		} else {
-			lastType = t.Name
 		}
+		lastType = t.Name
+
 	}
 
 	return w

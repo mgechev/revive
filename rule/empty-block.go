@@ -10,7 +10,7 @@ import (
 type EmptyBlockRule struct{}
 
 // Apply applies the rule to given file.
-func (r *EmptyBlockRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *EmptyBlockRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -59,7 +59,6 @@ func (w lintEmptyBlock) Visit(node ast.Node) ast.Visitor {
 			Confidence: 1,
 			Node:       block,
 			Category:   "logic",
-			URL:        "#empty-block",
 			Failure:    "this block is empty, you can remove it",
 		})
 	}

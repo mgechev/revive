@@ -13,7 +13,7 @@ import (
 type ErrorPackageNamingRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ErrorPackageNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ErrorPackageNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	if isTest(file) {
@@ -55,7 +55,6 @@ func (l *lintErrorPackageNaming) Visit(n ast.Node) ast.Visitor {
 			Node:       l.fileAst.Doc,
 			Confidence: 1,
 			Failure:    fmt.Sprintf(`don't use an underscore in package name`,),
-			URL: "http://golang.org/doc/effective_go.html#package-names",
 		})
 	}
 
@@ -66,7 +65,6 @@ func (l *lintErrorPackageNaming) Visit(n ast.Node) ast.Visitor {
 			Node:       l.fileAst.Doc,
 			Confidence: 1,
 			Failure:    fmt.Sprintf("don't use MixedCaps in package name; %s should be %s\n", pkgName, strings.ToLower(pkgName)),
-			URL: "http://golang.org/doc/effective_go.html#package-names",
 		})
 	}
 	return nil

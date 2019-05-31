@@ -10,7 +10,7 @@ import (
 type ContextAsArgumentRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ContextAsArgumentRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ContextAsArgumentRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -50,7 +50,6 @@ func (w lintContextArguments) Visit(n ast.Node) ast.Visitor {
 			w.onFailure(lint.Failure{
 				Node:       fn,
 				Category:   "arg-order",
-				URL:        "https://golang.org/pkg/context/",
 				Failure:    "context.Context should be the first parameter of a function",
 				Confidence: 0.9,
 			})

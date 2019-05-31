@@ -17,7 +17,7 @@ import (
 type PackageCommentsRule struct{}
 
 // Apply applies the rule to given file.
-func (r *PackageCommentsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *PackageCommentsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	if isTest(file) {
@@ -45,7 +45,7 @@ type lintPackageComments struct {
 	onFailure func(lint.Failure)
 }
 
-func (l *lintPackageComments) Visit(n ast.Node) ast.Visitor {
+func (l *lintPackageComments) Visit(_ ast.Node) ast.Visitor {
 	if l.file.IsTest() {
 		return nil
 	}
@@ -84,7 +84,6 @@ func (l *lintPackageComments) Visit(n ast.Node) ast.Visitor {
 				},
 				Confidence: 0.9,
 				Failure:    "package comment is detached; there should be no blank lines between it and the package statement",
-				URL:        ref,
 			})
 			return nil
 		}
@@ -96,7 +95,6 @@ func (l *lintPackageComments) Visit(n ast.Node) ast.Visitor {
 			Node:       l.fileAst,
 			Confidence: 0.2,
 			Failure:    "should have a package comment, unless it's in another file for this package",
-			URL:        ref,
 		})
 		return nil
 	}
@@ -107,7 +105,6 @@ func (l *lintPackageComments) Visit(n ast.Node) ast.Visitor {
 			Node:       l.fileAst.Doc,
 			Confidence: 1,
 			Failure:    "package comment should not have leading space",
-			URL:        ref,
 		})
 		s = ts
 	}
@@ -118,7 +115,6 @@ func (l *lintPackageComments) Visit(n ast.Node) ast.Visitor {
 			Node:       l.fileAst.Doc,
 			Confidence: 1,
 			Failure:    fmt.Sprintf(`package comment should be of the form "%s..."`, prefix),
-			URL:        ref,
 		})
 	}
 	return nil

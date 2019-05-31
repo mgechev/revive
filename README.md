@@ -12,16 +12,32 @@ Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in r
 
 Here's how `revive` is different from `golint`:
 
-- Allows us to enable or disable rules using a configuration file.
-- Allows us to configure the linting rules with a TOML file.
+- Allows to enable or disable rules using a configuration file.
+- Allows to configure the linting rules with a TOML file.
 - 2x faster running the same rules as golint.
 - Provides functionality for disabling a specific rule or the entire linter for a file or a range of lines.
   - `golint` allows this only for generated files.
 - Optional type checking. Most rules in golint do not require type checking. If you disable them in the config file, revive will run over 6x faster than golint.
 - Provides multiple formatters which let us customize the output.
-- Allows us to customize the return code for the entire linter or based on the failure of only some rules.
+- Allows to customize the return code for the entire linter or based on the failure of only some rules.
 - _Everyone can extend it easily with custom rules or formatters._
 - `Revive` provides more rules compared to `golint`.
+
+## Who uses Revive
+
+- [`tidb`](https://github.com/pingcap/tidb) - TiDB is a distributed HTAP database compatible with the MySQL protocol
+- [`grafana`](https://github.com/grafana/grafana) - The tool for beautiful monitoring and metric analytics & dashboards for Graphite, InfluxDB & Prometheus & More
+- [`etcd`](https://github.com/etcd-io/etcd) - Distributed reliable key-value store for the most critical data of a distributed system
+- [`ferret`](https://github.com/MontFerret/ferret) - Declarative web scraping
+- [`gopass`](https://github.com/gopasspw/gopass) - The slightly more awesome standard unix password manager for teams
+- [`gitea`](https://github.com/go-gitea/gitea) - Git with a cup of tea, painless self-hosted git service
+- [`excelize`](https://github.com/360EntSecGroup-Skylar/excelize) - Go library for reading and writing Microsoft Excel™ (XLSX) files
+- [`aurora`](https://github.com/xuri/aurora) - aurora is a web-based Beanstalk queue server console written in Go
+- [`soar`](https://github.com/XiaoMi/soar) - SQL Optimizer And Rewriter
+- [`gorush`](https://github.com/appleboy/gorush) - A push notification server written in Go (Golang)
+- [`sklearn`](https://github.com/pa-m/sklearn) - A partial port of scikit-learn written in Go
+
+*Open a PR to add your project*.
 
 <p align="center">
   <img src="./assets/demo.svg" alt="" width="700">
@@ -41,17 +57,21 @@ Here's how `revive` is different from `golint`:
     - [Custom Configuration](#custom-configuration)
     - [Recommended Configuration](#recommended-configuration)
   - [Available Rules](#available-rules)
+  - [Configurable rules](#configurable-rules)
+    - [`var-naming`](#var-naming)
   - [Available Formatters](#available-formatters)
     - [Friendly](#friendly)
     - [Stylish](#stylish)
     - [Default](#default)
+    - [Plain](#plain)
+    - [Unix](#unix)
   - [Extensibility](#extensibility)
     - [Custom Rule](#custom-rule)
       - [Example](#example)
     - [Custom Formatter](#custom-formatter)
   - [Speed Comparison](#speed-comparison)
     - [golint](#golint)
-    - [revive](#revive-1)
+    - [revive](#revive)
   - [Contributors](#contributors)
   - [License](#license)
 
@@ -220,6 +240,7 @@ warningCode = 0
 [rule.superfluous-else]
 [rule.unused-parameter]
 [rule.unreachable-code]
+[rule.redefines-builtin-id]
 ```
 
 ## Available Rules
@@ -228,46 +249,74 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 
 | Name                  | Config | Description                                                      | `golint` | Typed |
 | --------------------- | :----: | :--------------------------------------------------------------- | :------: | :---: |
-| `context-keys-type`   |  n/a   | Disallows the usage of basic types in `context.WithValue`.       |   yes    |  yes  |
-| `time-naming`         |  n/a   | Conventions around the naming of time variables.                 |   yes    |  yes  |
-| `var-declaration`     |  n/a   | Reduces redundancies around variable declaration.                |   yes    |  yes  |
-| `unexported-return`   |  n/a   | Warns when a public return is from unexported type.              |   yes    |  yes  |
-| `errorf`              |  n/a   | Should replace `error.New(fmt.Sprintf())` with `error.Errorf()`  |   yes    |  yes  |
-| `blank-imports`       |  n/a   | Disallows blank imports                                          |   yes    |  no   |
-| `context-as-argument` |  n/a   | `context.Context` should be the first argument of a function.    |   yes    |  no   |
-| `dot-imports`         |  n/a   | Forbids `.` imports.                                             |   yes    |  no   |
-| `error-return`        |  n/a   | The error return parameter should be last.                       |   yes    |  no   |
-| `error-strings`       |  n/a   | Conventions around error strings.                                |   yes    |  no   |
-| `error-naming`        |  n/a   | Naming of error variables.                                       |   yes    |  no   |
-| `exported`            |  n/a   | Naming and commenting conventions on exported symbols.           |   yes    |  no   |
-| `if-return`           |  n/a   | Redundant if when returning an error.                            |   yes    |  no   |
-| `increment-decrement` |  n/a   | Use `i++` and `i--` instead of `i += 1` and `i -= 1`.            |   yes    |  no   |
-| `var-naming`          |  n/a   | Naming rules.                                                    |   yes    |  no   |
-| `package-comments`    |  n/a   | Package commenting conventions.                                  |   yes    |  no   |
-| `range`               |  n/a   | Prevents redundant variables when iterating over a collection.   |   yes    |  no   |
-| `receiver-naming`     |  n/a   | Conventions around the naming of receivers.                      |   yes    |  no   |
-| `indent-error-flow`   |  n/a   | Prevents redundant else statements.                              |   yes    |  no   |
-| `argument-limit`      |  int   | Specifies the maximum number of arguments a function can receive |    no    |  no   |
-| `cyclomatic`          |  int   | Sets restriction for maximum Cyclomatic complexity.              |    no    |  no   |
-| `max-public-structs`  |  int   | The maximum number of public structs in a file.                  |    no    |  no   |
-| `file-header`         | string | Header which each file should have.                              |    no    |  no   |
-| `empty-block`         |  n/a   | Warns on empty code blocks                                       |    no    |  no   |
-| `superfluous-else`    |  n/a   | Prevents redundant else statements (extends `indent-error-flow`) |    no    |  no   |
-| `confusing-naming`    |  n/a   | Warns on methods with names that differ only by capitalization   |    no    |  no   |
-| `get-return`          |  n/a   | Warns on getters that do not yield any result                    |    no    |  no   |
-| `modifies-parameter`  |  n/a   | Warns on assignments to function parameters                      |    no    |  no   |
-| `confusing-results`   |  n/a   | Suggests to name potentially confusing function results          |    no    |  no   |
-| `deep-exit`           |  n/a   | Looks for program exits in funcs other than `main()` or `init()` |    no    |  no   |
-| `unused-parameter`    |  n/a   | Suggests to rename or remove unused function parameters          |    no    |  no   |
-| `unreachable-code`    |  n/a   | Warns on unreachable code                                        |    no    |  no   |
-| `add-constant`        |  map   | Suggests using constant for magic numbers and string literals    |    no    |  no   |
-| `flag-parameter`      |  n/a   | Warns on boolean parameters that create a control coupling       |    no    |  no   |
-| `unnecessary-stmt`    |  n/a   | Suggests removing or simplifying unnecessary statements          |    no    |  no   |
-| `struct-tag`          |  n/a   | Checks common struct tags like `json`,`xml`,`yaml`               |    no    |  no   |
-| `modifies-value-receiver` |  n/a   | Warns on assignments to value-passed method receivers        |    no    |  yes  |
-| `constant-logical-expr`   |  n/a   | Warns on constant logical expressions                        |    no    |  no   |
-| `bool-literal-in-expr`|  n/a   | Suggests removing Boolean literals from logic expressions        |    no    |  no   |
-| `error-package-naming`|  n/a   | Package name should be all lowercase, no underscore unless for *_test.go       |    no    |  no   |
+| [`context-keys-type`](./RULES_DESCRIPTIONS.md#context-key-types)   |  n/a   | Disallows the usage of basic types in `context.WithValue`.       |   yes    |  yes  |
+| [`time-naming`](./RULES_DESCRIPTIONS.md#time-naming)         |  n/a   | Conventions around the naming of time variables.                 |   yes    |  yes  |
+| [`var-declaration`](./RULES_DESCRIPTIONS.md#var-declaration)     |  n/a   | Reduces redundancies around variable declaration.                |   yes    |  yes  |
+| [`unexported-return`](./RULES_DESCRIPTIONS.md#unexported-return)   |  n/a   | Warns when a public return is from unexported type.              |   yes    |  yes  |
+| [`errorf`](./RULES_DESCRIPTIONS.md#errorf)              |  n/a   | Should replace `errors.New(fmt.Sprintf())` with `fmt.Errorf()`   |   yes    |  yes  |
+| [`blank-imports`](./RULES_DESCRIPTIONS.md#blank-imports)       |  n/a   | Disallows blank imports                                          |   yes    |  no   |
+| [`context-as-argument`](./RULES_DESCRIPTIONS.md#context-as-argument) |  n/a   | `context.Context` should be the first argument of a function.    |   yes    |  no   |
+| [`dot-imports`](./RULES_DESCRIPTIONS.md#dot-imports)         |  n/a   | Forbids `.` imports.                                             |   yes    |  no   |
+| [`error-return`](./RULES_DESCRIPTIONS.md#error-return)        |  n/a   | The error return parameter should be last.                       |   yes    |  no   |
+| [`error-strings`](./RULES_DESCRIPTIONS.md#error-strings)       |  n/a   | Conventions around error strings.                                |   yes    |  no   |
+| [`error-naming`](./RULES_DESCRIPTIONS.md#error-naming)        |  n/a   | Naming of error variables.                                       |   yes    |  no   |
+| [`exported`](./RULES_DESCRIPTIONS.md#exported)            |  n/a   | Naming and commenting conventions on exported symbols.           |   yes    |  no   |
+| [`if-return`](./RULES_DESCRIPTIONS.md#if-return)           |  n/a   | Redundant if when returning an error.                            |   yes    |  no   |
+| [`increment-decrement`](./RULES_DESCRIPTIONS.md#increment-decrement) |  n/a   | Use `i++` and `i--` instead of `i += 1` and `i -= 1`.            |   yes    |  no   |
+| [`var-naming`](./RULES_DESCRIPTIONS.md#var-naming)          |  whitelist & blacklist of initialisms   | Naming rules.                                                    |   yes    |  no   |
+| [`package-comments`](./RULES_DESCRIPTIONS.md#package-comments)    |  n/a   | Package commenting conventions.                                  |   yes    |  no   |
+| [`range`](./RULES_DESCRIPTIONS.md#range)               |  n/a   | Prevents redundant variables when iterating over a collection.   |   yes    |  no   |
+| [`receiver-naming`](./RULES_DESCRIPTIONS.md#receiver-naming)     |  n/a   | Conventions around the naming of receivers.                      |   yes    |  no   |
+| [`indent-error-flow`](./RULES_DESCRIPTIONS.md#indent-error-flow)   |  n/a   | Prevents redundant else statements.                              |   yes    |  no   |
+| [`argument-limit`](./RULES_DESCRIPTIONS.md#argument-limit)      |  int   | Specifies the maximum number of arguments a function can receive |    no    |  no   |
+| [`cyclomatic`](./RULES_DESCRIPTIONS.md#cyclomatic)          |  int   | Sets restriction for maximum Cyclomatic complexity.              |    no    |  no   |
+| [`max-public-structs`](./RULES_DESCRIPTIONS.md#max-public-structs)  |  int   | The maximum number of public structs in a file.                  |    no    |  no   |
+| [`file-header`](./RULES_DESCRIPTIONS.md#file-header)         | string | Header which each file should have.                              |    no    |  no   |
+| [`empty-block`](./RULES_DESCRIPTIONS.md#empty-block)         |  n/a   | Warns on empty code blocks                                       |    no    |  no   |
+| [`superfluous-else`](./RULES_DESCRIPTIONS.md#superfluous-else)    |  n/a   | Prevents redundant else statements (extends [`indent-error-flow`](./RULES_DESCRIPTIONS.md#indent-error-flow)) |    no    |  no   |
+| [`confusing-naming`](./RULES_DESCRIPTIONS.md#confusing-naming)    |  n/a   | Warns on methods with names that differ only by capitalization   |    no    |  no   |
+| [`get-return`](./RULES_DESCRIPTIONS.md#get-return)          |  n/a   | Warns on getters that do not yield any result                    |    no    |  no   |
+| [`modifies-parameter`](./RULES_DESCRIPTIONS.md#modifies-parameter)  |  n/a   | Warns on assignments to function parameters                      |    no    |  no   |
+| [`confusing-results`](./RULES_DESCRIPTIONS.md#confusing-results)   |  n/a   | Suggests to name potentially confusing function results          |    no    |  no   |
+| [`deep-exit`](./RULES_DESCRIPTIONS.md#deep-exit)           |  n/a   | Looks for program exits in funcs other than `main()` or `init()` |    no    |  no   |
+| [`unused-parameter`](./RULES_DESCRIPTIONS.md#unused-parameter)    |  n/a   | Suggests to rename or remove unused function parameters          |    no    |  no   |
+| [`unreachable-code`](./RULES_DESCRIPTIONS.md#unreachable-code)    |  n/a   | Warns on unreachable code                                        |    no    |  no   |
+| [`add-constant`](./RULES_DESCRIPTIONS.md#add-constant)        |  map   | Suggests using constant for magic numbers and string literals    |    no    |  no   |
+| [`flag-parameter`](./RULES_DESCRIPTIONS.md#flag-parameter)      |  n/a   | Warns on boolean parameters that create a control coupling       |    no    |  no   |
+| [`unnecessary-stmt`](./RULES_DESCRIPTIONS.md#unnecessary-stmt)    |  n/a   | Suggests removing or simplifying unnecessary statements          |    no    |  no   |
+| [`struct-tag`](./RULES_DESCRIPTIONS.md#struct-tag)          |  n/a   | Checks common struct tags like `json`,`xml`,`yaml`               |    no    |  no   |
+| [`modifies-value-receiver`](./RULES_DESCRIPTIONS.md#modifies-value-receiver) |  n/a   | Warns on assignments to value-passed method receivers        |    no    |  yes  |
+| [`constant-logical-expr`](./RULES_DESCRIPTIONS.md#constant-logical-expr)   |  n/a   | Warns on constant logical expressions                        |    no    |  no   |
+| [`bool-literal-in-expr`](./RULES_DESCRIPTIONS.md#bool-literal-in-expr)|  n/a   | Suggests removing Boolean literals from logic expressions        |    no    |  no   |
+| [`redefines-builtin-id`](./RULES_DESCRIPTIONS.md#redefines-builtin-id)|  n/a   | Warns on redefinitions of builtin identifiers                    |    no    |  no   |
+| [`function-result-limit`](./RULES_DESCRIPTIONS.md#function-result-limit) |  int | Specifies the maximum number of results a function can return    |    no    |  no   |
+| [`imports-blacklist`](./RULES_DESCRIPTIONS.md#imports-blacklist)   | []string | Disallows importing the specified packages                     |    no    |  no   |
+| [`range-val-in-closure`](./RULES_DESCRIPTIONS.md#range-val-in-closure)|  n/a   | Warns if range value is used in a closure dispatched as goroutine|    no    |  no   |
+| [`waitgroup-by-value`](./RULES_DESCRIPTIONS.md#waitgroup-by-value)  |  n/a   | Warns on functions taking sync.WaitGroup as a by-value parameter |    no    |  no   |
+| [`atomic`](./RULES_DESCRIPTIONS.md#atomic)              |  n/a   | Check for common mistaken usages of the `sync/atomic` package    |    no    |  no   |
+| [`empty-lines`](./RULES_DESCRIPTIONS.md#empty-lines)   | n/a | Warns when there are heading or trailing newlines in a block              |    no    |  no   |
+| [`line-length-limit`](./RULES_DESCRIPTIONS.md#line-length-limit)   | int    | Specifies the maximum number of characters in a line             |    no    |  no   |
+| [`call-to-gc`](./RULES_DESCRIPTIONS.md#call-to-gc)   | n/a    | Warns on explicit call to the garbage collector    |    no    |  no   |
+| [`duplicated-imports`](./RULES_DESCRIPTIONS#duplicated-imports) | n/a  | Looks for packages that are imported two or more times   |    no    |  no   |
+| [`import-shadowing`](./RULES_DESCRIPTIONS.md#import-shadowing)   | n/a    | Spots identifiers that shadow an import    |    no    |  no   |
+| [`bare-return`](./RULES_DESCRIPTIONS#bare-return) | n/a  | Warns on bare returns   |    no    |  no   |
+| [`unused-receiver`](./RULES_DESCRIPTIONS.md#unused-receiver)   | n/a    | Suggests to rename or remove unused method receivers    |    no    |  no   |
+| [`unhandled-error`](./RULES_DESCRIPTIONS.md#unhandled-error)   | []string   | Warns on unhandled errors returned by funcion calls    |    no    |  yes   |
+
+## Configurable rules
+
+Here you can find how you can configure some of the existing rules:
+
+### `var-naming`
+
+This rule accepts two slices of strings, a whitelist and a blacklist of initialisms. By default the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
+
+```toml
+[rule.var-naming]
+  arguments = [["ID"], ["VM"]]
+```
+
+This way, revive will not warn for identifier called `customId` but will warn that `customVm` should be called `customVM`.
 
 ## Available Formatters
 
@@ -275,15 +324,29 @@ This section lists all the available formatters and provides a screenshot for ea
 
 ### Friendly
 
-![Friendly formatter](/assets/friendly-formatter.png)
+![Friendly formatter](/assets/formatter-friendly.png)
 
 ### Stylish
 
-![Stylish formatter](/assets/stylish-formatter.png)
+![Stylish formatter](/assets/formatter-stylish.png)
 
 ### Default
 
-![Default formatter](/assets/default-formatter.png)
+The default formatter produces the same output as `golint`.
+
+![Default formatter](/assets/formatter-default.png)
+
+### Plain
+
+The plain formatter produces the same output as the default formatter and appends URL to the rule description.
+
+![Plain formatter](/assets/formatter-plain.png)
+
+### Unix
+
+The unix formatter produces the same output as the default formatter but surrounds the rules in `[]`.
+
+![Unix formatter](/assets/formatter-unix.png)
 
 ## Extensibility
 
@@ -375,13 +438,17 @@ Currently, type checking is enabled by default. If you want to run the linter wi
 
 ## Contributors
 
-| [<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) | [<img alt="chavacava" src="https://avatars2.githubusercontent.com/u/25788468?v=4&s=117" width="117">](https://github.com/chavacava) | [<img alt="morphy2k" src="https://avatars2.githubusercontent.com/u/4280578?v=4&s=117" width="117">](https://github.com/morphy2k) | [<img alt="tamird" src="https://avatars0.githubusercontent.com/u/1535036?v=4&s=117" width="117">](https://github.com/tamird) | [<img alt="paul-at-start" src="https://avatars2.githubusercontent.com/u/5486775?v=4&s=117" width="117">](https://github.com/paul-at-start) | [<img alt="vkrol" src="https://avatars3.githubusercontent.com/u/153412?v=4&s=117" width="117">](https://github.com/vkrol) |
-| :---------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------: |
-|                                             [mgechev](https://github.com/mgechev)                                             |                                              [chavacava](https://github.com/chavacava)                                              |                                             [morphy2k](https://github.com/morphy2k)                                              |                                             [tamird](https://github.com/tamird)                                              |                                             [paul-at-start](https://github.com/paul-at-start)                                              |                                             [vkrol](https://github.com/vkrol)                                             |
+[<img alt="mgechev" src="https://avatars1.githubusercontent.com/u/455023?v=4&s=117" width="117">](https://github.com/mgechev) |[<img alt="chavacava" src="https://avatars2.githubusercontent.com/u/25788468?v=4&s=117" width="117">](https://github.com/chavacava) |[<img alt="xuri" src="https://avatars2.githubusercontent.com/u/2809468?v=4&s=117" width="117">](https://github.com/xuri) |[<img alt="gsamokovarov" src="https://avatars0.githubusercontent.com/u/604618?v=4&s=117" width="117">](https://github.com/gsamokovarov) |[<img alt="morphy2k" src="https://avatars2.githubusercontent.com/u/4280578?v=4&s=117" width="117">](https://github.com/morphy2k) |[<img alt="tamird" src="https://avatars0.githubusercontent.com/u/1535036?v=4&s=117" width="117">](https://github.com/tamird) |
+:---: |:---: |:---: |:---: |:---: |:---: |
+[mgechev](https://github.com/mgechev) |[chavacava](https://github.com/chavacava) |[xuri](https://github.com/xuri) |[gsamokovarov](https://github.com/gsamokovarov) |[morphy2k](https://github.com/morphy2k) |[tamird](https://github.com/tamird) |
 
-| [<img alt="haya14busa" src="https://avatars0.githubusercontent.com/u/3797062?v=4&s=117" width="117">](https://github.com/haya14busa) |
-| :----------------------------------------------------------------------------------------------------------------------------------: |
-|                                             [haya14busa](https://github.com/haya14busa)                                              |
+[<img alt="AragurDEV" src="https://avatars0.githubusercontent.com/u/11004008?v=4&s=117" width="117">](https://github.com/AragurDEV) |[<img alt="yangdiangzb" src="https://avatars3.githubusercontent.com/u/16643665?v=4&s=117" width="117">](https://github.com/yangdiangzb) |[<img alt="jamesmaidment" src="https://avatars3.githubusercontent.com/u/2050324?v=4&s=117" width="117">](https://github.com/jamesmaidment) |[<img alt="mapreal19" src="https://avatars2.githubusercontent.com/u/3055997?v=4&s=117" width="117">](https://github.com/mapreal19) |[<img alt="markelog" src="https://avatars0.githubusercontent.com/u/945528?v=4&s=117" width="117">](https://github.com/markelog) |[<img alt="pa-m" src="https://avatars2.githubusercontent.com/u/5503106?v=4&s=117" width="117">](https://github.com/pa-m) |
+:---: |:---: |:---: |:---: |:---: |:---: |
+[AragurDEV](https://github.com/AragurDEV) |[yangdiangzb](https://github.com/yangdiangzb) |[jamesmaidment](https://github.com/jamesmaidment) |[mapreal19](https://github.com/mapreal19) |[markelog](https://github.com/markelog) |[pa-m](https://github.com/pa-m) |
+
+[<img alt="paul-at-start" src="https://avatars2.githubusercontent.com/u/5486775?v=4&s=117" width="117">](https://github.com/paul-at-start) |[<img alt="psapezhko" src="https://avatars3.githubusercontent.com/u/10865586?v=4&s=117" width="117">](https://github.com/psapezhko) |[<img alt="ridvansumset" src="https://avatars2.githubusercontent.com/u/26631560?v=4&s=117" width="117">](https://github.com/ridvansumset) |[<img alt="Jarema" src="https://avatars0.githubusercontent.com/u/7369771?v=4&s=117" width="117">](https://github.com/Jarema) |[<img alt="vkrol" src="https://avatars3.githubusercontent.com/u/153412?v=4&s=117" width="117">](https://github.com/vkrol) |[<img alt="haya14busa" src="https://avatars0.githubusercontent.com/u/3797062?v=4&s=117" width="117">](https://github.com/haya14busa) |
+:---: |:---: |:---: |:---: |:---: |:---: |
+[paul-at-start](https://github.com/paul-at-start) |[psapezhko](https://github.com/psapezhko) |[ridvansumset](https://github.com/ridvansumset) |[Jarema](https://github.com/Jarema) |[vkrol](https://github.com/vkrol) |[haya14busa](https://github.com/haya14busa) |
 
 ## License
 

@@ -35,13 +35,13 @@ func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.Rul
 		c[rule.Name()] = *config[0]
 	}
 	if parseInstructions(t, filename, src) == nil {
-		assertSuccess(t, baseDir, stat, src, []lint.Rule{rule}, c)
+		assertSuccess(t, baseDir, stat, []lint.Rule{rule}, c)
 		return
 	}
 	assertFailures(t, baseDir, stat, src, []lint.Rule{rule}, c)
 }
 
-func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, src []byte, rules []lint.Rule, config map[string]lint.RuleConfig) error {
+func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, rules []lint.Rule, config map[string]lint.RuleConfig) error {
 	l := lint.New(func(file string) ([]byte, error) {
 		return ioutil.ReadFile(baseDir + file)
 	})
@@ -220,7 +220,8 @@ func srcLine(src []byte, p token.Position) string {
 	return string(src[lo:hi])
 }
 
-func TestLine(t *testing.T) {
+// TestLine tests srcLine function
+func TestLine(t *testing.T) { //revive:disable-line:exported
 	tests := []struct {
 		src    string
 		offset int
@@ -242,7 +243,8 @@ func TestLine(t *testing.T) {
 	}
 }
 
-func TestLintName(t *testing.T) {
+// TestLintName tests lint.Name function
+func TestLintName(t *testing.T) { //revive:disable-line:exported
 	tests := []struct {
 		name, want string
 	}{
@@ -275,7 +277,7 @@ func TestLintName(t *testing.T) {
 		{"IEEE802_16Bit", "IEEE802_16Bit"},
 	}
 	for _, test := range tests {
-		got := lint.Name(test.name)
+		got := lint.Name(test.name, nil, nil)
 		if got != test.want {
 			t.Errorf("lintName(%q) = %q, want %q", test.name, got, test.want)
 		}
@@ -301,7 +303,8 @@ func exportedType(typ types.Type) bool {
 	return true
 }
 
-func TestExportedType(t *testing.T) {
+// TestExportedType tests exportedType function
+func TestExportedType(t *testing.T) { //revive:disable-line:exported
 	tests := []struct {
 		typString string
 		exp       bool
@@ -356,7 +359,8 @@ func isGenerated(src []byte) bool {
 	return false
 }
 
-func TestIsGenerated(t *testing.T) {
+// TestIsGenerated tests isGenerated function
+func TestIsGenerated(t *testing.T) { //revive:disable-line:exported
 	tests := []struct {
 		source    string
 		generated bool

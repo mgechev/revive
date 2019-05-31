@@ -13,7 +13,7 @@ import (
 type ErrorNamingRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ErrorNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ErrorNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -41,7 +41,7 @@ type lintErrors struct {
 	onFailure func(lint.Failure)
 }
 
-func (w lintErrors) Visit(n ast.Node) ast.Visitor {
+func (w lintErrors) Visit(_ ast.Node) ast.Visitor {
 	for _, decl := range w.fileAst.Decls {
 		gd, ok := decl.(*ast.GenDecl)
 		if !ok || gd.Tok != token.VAR {
