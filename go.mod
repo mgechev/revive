@@ -7,7 +7,7 @@ require (
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/mgechev/dots v0.0.0-20190603122614-18fa4c4b71cc
-	github.com/olekukonko/tablewriter v0.0.0-20180912035003-be2c049b30cc
+	github.com/olekukonko/tablewriter v0.0.1
 	github.com/pkg/errors v0.8.1
 	golang.org/x/sys v0.0.0-20190603122648-4c4f7f33c9ed // indirect
 	golang.org/x/tools v0.0.0-20190604003109-8aaa1484dc10
