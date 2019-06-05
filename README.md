@@ -297,9 +297,9 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`empty-lines`](./RULES_DESCRIPTIONS.md#empty-lines)   | n/a | Warns when there are heading or trailing newlines in a block              |    no    |  no   |
 | [`line-length-limit`](./RULES_DESCRIPTIONS.md#line-length-limit)   | int    | Specifies the maximum number of characters in a line             |    no    |  no   |
 | [`call-to-gc`](./RULES_DESCRIPTIONS.md#call-to-gc)   | n/a    | Warns on explicit call to the garbage collector    |    no    |  no   |
-| [`duplicated-imports`](./RULES_DESCRIPTIONS#duplicated-imports) | n/a  | Looks for packages that are imported two or more times   |    no    |  no   |
+| [`duplicated-imports`](./RULES_DESCRIPTIONS.md#duplicated-imports) | n/a  | Looks for packages that are imported two or more times   |    no    |  no   |
 | [`import-shadowing`](./RULES_DESCRIPTIONS.md#import-shadowing)   | n/a    | Spots identifiers that shadow an import    |    no    |  no   |
-| [`bare-return`](./RULES_DESCRIPTIONS#bare-return) | n/a  | Warns on bare returns   |    no    |  no   |
+| [`bare-return`](./RULES_DESCRIPTIONS.md#bare-return) | n/a  | Warns on bare returns   |    no    |  no   |
 | [`unused-receiver`](./RULES_DESCRIPTIONS.md#unused-receiver)   | n/a    | Suggests to rename or remove unused method receivers    |    no    |  no   |
 | [`unhandled-error`](./RULES_DESCRIPTIONS.md#unhandled-error)   | []string   | Warns on unhandled errors returned by funcion calls    |    no    |  yes   |
 
