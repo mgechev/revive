@@ -34,8 +34,13 @@ Here's how `revive` is different from `golint`:
 - [`excelize`](https://github.com/360EntSecGroup-Skylar/excelize) - Go library for reading and writing Microsoft Excel™ (XLSX) files
 - [`aurora`](https://github.com/xuri/aurora) - aurora is a web-based Beanstalk queue server console written in Go
 - [`soar`](https://github.com/XiaoMi/soar) - SQL Optimizer And Rewriter
-- [`gorush`](https://github.com/appleboy/gorush) - A push notification server written in Go (Golang)
+- [`gorush`](https://github.com/appleboy/gorush) - A push notification server written in Go (Golang)a
+- [`go-echarts`](https://github.com/chenjiandongx/go-echarts) - The adorable charts library for Golang
+- [`reviewdog`](https://github.com/reviewdog/reviewdog) - Automated code review tool integrated with any code analysis tools regardless of programming language
 - [`sklearn`](https://github.com/pa-m/sklearn) - A partial port of scikit-learn written in Go
+- [`lorawan-stack`](https://github.com/TheThingsNetwork/lorawan-stack) - The Things Network Stack for LoRaWAN V3
+- [`gofight`](https://github.com/appleboy/gofight) - Testing API Handler written in Golang.
+- [`ggz`](https://github.com/go-ggz/ggz) - An URL shortener service written in Golang
 
 *Open a PR to add your project*.
 
@@ -48,6 +53,7 @@ Here's how `revive` is different from `golint`:
 - [revive](#revive)
   - [Usage](#usage)
     - [Text Editors](#text-editors)
+    - [Bazel](#bazel)
     - [Installation](#installation)
     - [Command Line Flags](#command-line-flags)
     - [Sample Invocations](#sample-invocations)
@@ -80,6 +86,10 @@ Here's how `revive` is different from `golint`:
 ## Usage
 
 Since the default behavior of `revive` is compatible with `golint`, without providing any additional flags, the only difference you'd notice is faster execution.
+
+### Bazel
+
+If you want to use revive with Bazel, take a look at the [rules](https://github.com/atlassian/bazel-tools/tree/master/gorevive) that Atlassian maintains.
 
 ### Text Editors
 
