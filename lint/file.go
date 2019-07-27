@@ -127,7 +127,7 @@ type enableDisableConfig struct {
 }
 
 func (f *File) disabledIntervals(rules []Rule) disabledIntervalsMap {
-	re := regexp.MustCompile(`^//[\s]*revive:(enable|disable)(?:-(line|next-line))?(?::([^\s]+))?[\s]*$`)
+	re := regexp.MustCompile(`^//[\s]*revive:(enable|disable)(?:-(line|next-line))?(?::([^\s]+))?[\s]*(?: (.+))?$`)
 
 	enabledDisabledRulesMap := make(map[string][]enableDisableConfig)
 
