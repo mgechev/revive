@@ -2,8 +2,7 @@ language: go
 go: 1.11.x
 node_js: 11.15.0
 before_install:
-- openssl aes-256-cbc -K $encrypted_ff954c97a679_key -iv $encrypted_ff954c97a679_iv
-  -in .docs-deploy-key.pem.enc -out .docs-deploy-key -d
+- openssl aes-256-cbc -K $encrypted_ff954c97a679_key -iv $encrypted_ff954c97a679_iv -in .docs-deploy-key.pem.enc -out .docs-deploy-key -d
 - export GA_SERVICE_ACCOUNT_KEY=$(cat .docs-deploy-key)
 install: make install
 script:
