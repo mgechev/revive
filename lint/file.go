@@ -2,12 +2,14 @@ package lint
 
 import (
 	"bytes"
+	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/printer"
 	"go/token"
 	"go/types"
 	"math"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -99,7 +101,7 @@ func (f *File) isMain() bool {
 
 func (f *File) lint(rules []Rule, config Config, failures chan Failure) {
 	rulesConfig := config.Rules
-	disabledIntervals := f.disabledIntervals(rules)
+	disabledIntervals := f.disabledIntervals(rules, config.SpecifyDisableReason)
 	for _, currentRule := range rules {
 		ruleConfig := rulesConfig[currentRule.Name()]
 		currentFailures := currentRule.Apply(f, ruleConfig.Arguments)
@@ -126,8 +128,13 @@ type enableDisableConfig struct {
 	position int
 }
 
-func (f *File) disabledIntervals(rules []Rule) disabledIntervalsMap {
-	re := regexp.MustCompile(`^//[\s]*revive:(enable|disable)(?:-(line|next-line))?(?::([^\s]+))?[\s]*(?: (.+))?$`)
+const directiveRE = `^//[\s]*revive:(enable|disable)(?:-(line|next-line))?(?::([^\s]+))?[\s]*(?: (.+))?$`
+const directivePos = 1
+const modifierPos = 2
+const rulesPos = 3
+const reasonPos = 4
+func (f *File) disabledIntervals(rules []Rule, specifyDisableReason bool) disabledIntervalsMap {
+	re := regexp.MustCompile(directiveRE)
 
 	enabledDisabledRulesMap := make(map[string][]enableDisableConfig)
 
@@ -202,14 +209,18 @@ func (f *File) disabledIntervals(rules []Rule) disabledIntervalsMap {
 			}
 
 			ruleNames := []string{}
-			if len(match) > 2 {
-				tempNames := strings.Split(match[3], ",")
-				for _, name := range tempNames {
-					name = strings.Trim(name, "\n")
-					if len(name) > 0 {
-						ruleNames = append(ruleNames, name)
-					}
+			tempNames := strings.Split(match[rulesPos], ",")
+			for _, name := range tempNames {
+				name = strings.Trim(name, "\n")
+				if len(name) > 0 {
+					ruleNames = append(ruleNames, name)
 				}
+			}
+
+			mustCheckDisablingReason := specifyDisableReason && match[directivePos] == "enable"
+			if  mustCheckDisablingReason && strings.Trim(match[reasonPos]," ") == "" {
+				fmt.Fprintln(os.Stderr, fmt.Sprintf("%s:%d: reason of lint disabling not found.",filename,line))
+				os.Exit(1)
 			}
 
 			// TODO: optimize
@@ -219,7 +230,7 @@ func (f *File) disabledIntervals(rules []Rule) disabledIntervalsMap {
 				}
 			}
 
-			handleRules(filename, match[2], match[1] == "enable", line, ruleNames)
+			handleRules(filename, match[modifierPos], match[directivePos] == "enable", line, ruleNames)
 		}
 	}
 
