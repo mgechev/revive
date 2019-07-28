@@ -219,7 +219,7 @@ func (f *File) disabledIntervals(rules []Rule, specifyDisableReason bool) disabl
 
 			mustCheckDisablingReason := specifyDisableReason && match[directivePos] == "enable"
 			if  mustCheckDisablingReason && strings.Trim(match[reasonPos]," ") == "" {
-				fmt.Fprintln(os.Stderr, fmt.Sprintf("%s:%d: reason of lint disabling not found.",filename,line))
+				fmt.Fprintln(os.Stderr, fmt.Sprintf("%s:%d: reason of lint disabling not found.", filename,line))
 				os.Exit(1)
 			}
 
