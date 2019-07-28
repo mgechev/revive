@@ -1,5 +1,6 @@
 language: go
 go: 1.11.x
+node_js: 11.15.0
 install: make install
 script:
 - make build
