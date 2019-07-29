@@ -82,7 +82,8 @@ func (f *Stylish) Format(failures <-chan lint.Failure, config lint.RulesConfig) 
 	} else if total > 0 && totalErrors == 0 {
 		suffix = color.YellowString("\n ✖" + suffix)
 	} else {
-		suffix = color.GreenString("\n" + suffix)
+		suffix, output = "", ""
 	}
+
 	return output + suffix, nil
 }
