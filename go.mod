@@ -10,5 +10,5 @@ require (
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/pkg/errors v0.8.1
 	golang.org/x/sys v0.0.0-20190726093751-fc99dfbffb4e // indirect
-	golang.org/x/tools v0.0.0-20190728085240-fc6e2057e7f6
+	golang.org/x/tools v0.0.0-20190729094940-ff9f1409240a
 )
