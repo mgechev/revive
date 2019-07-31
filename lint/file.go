@@ -2,14 +2,12 @@ package lint
 
 import (
 	"bytes"
-	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/printer"
 	"go/token"
 	"go/types"
 	"math"
-	"os"
 	"regexp"
 	"strings"
 )
@@ -101,7 +99,7 @@ func (f *File) isMain() bool {
 
 func (f *File) lint(rules []Rule, config Config, failures chan Failure) {
 	rulesConfig := config.Rules
-	disabledIntervals := f.disabledIntervals(rules, config.SpecifyDisableReason)
+	disabledIntervals := f.disabledIntervals(rules, config.SpecifyDisableReason, failures)
 	for _, currentRule := range rules {
 		ruleConfig := rulesConfig[currentRule.Name()]
 		currentFailures := currentRule.Apply(f, ruleConfig.Arguments)
@@ -134,7 +132,7 @@ const directivePos = 1
 const modifierPos = 2
 const rulesPos = 3
 const reasonPos = 4
-func (f *File) disabledIntervals(rules []Rule, specifyDisableReason bool) disabledIntervalsMap {
+func (f *File) disabledIntervals(rules []Rule, specifyDisableReason bool, failures chan Failure) disabledIntervalsMap {
 	enabledDisabledRulesMap := make(map[string][]enableDisableConfig)
 
 	getEnabledDisabledIntervals := func() disabledIntervalsMap {
@@ -218,8 +216,13 @@ func (f *File) disabledIntervals(rules []Rule, specifyDisableReason bool) disabl
 
 			mustCheckDisablingReason := specifyDisableReason && match[directivePos] == "disable"
 			if  mustCheckDisablingReason && strings.Trim(match[reasonPos]," ") == "" {
-				fmt.Fprintln(os.Stderr, fmt.Sprintf("%s:%d: reason of lint disabling not found.", filename,line))
-				os.Exit(1)
+				failures <- Failure{
+					Confidence: 1,
+					RuleName:   "specify-disable-reason",
+					Failure:    "reason of lint disabling not found",
+					Position:   ToFailurePosition(c.Pos(), c.End(), f),
+					Node:       c,
+				}
 			}
 
 			// TODO: optimize
