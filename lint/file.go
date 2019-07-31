@@ -97,9 +97,12 @@ func (f *File) isMain() bool {
 	return false
 }
 
+const directiveSpecifyDisableReason = "specify-disable-reason"
+
 func (f *File) lint(rules []Rule, config Config, failures chan Failure) {
 	rulesConfig := config.Rules
-	disabledIntervals := f.disabledIntervals(rules, config.SpecifyDisableReason, failures)
+	_, mustSpecifyDisableReason := config.Directives[directiveSpecifyDisableReason]
+	disabledIntervals := f.disabledIntervals(rules, mustSpecifyDisableReason, failures)
 	for _, currentRule := range rules {
 		ruleConfig := rulesConfig[currentRule.Name()]
 		currentFailures := currentRule.Apply(f, ruleConfig.Arguments)
@@ -132,7 +135,7 @@ const directivePos = 1
 const modifierPos = 2
 const rulesPos = 3
 const reasonPos = 4
-func (f *File) disabledIntervals(rules []Rule, specifyDisableReason bool, failures chan Failure) disabledIntervalsMap {
+func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, failures chan Failure) disabledIntervalsMap {
 	enabledDisabledRulesMap := make(map[string][]enableDisableConfig)
 
 	getEnabledDisabledIntervals := func() disabledIntervalsMap {
@@ -214,15 +217,16 @@ func (f *File) disabledIntervals(rules []Rule, specifyDisableReason bool, failur
 				}
 			}
 
-			mustCheckDisablingReason := specifyDisableReason && match[directivePos] == "disable"
+			mustCheckDisablingReason := mustSpecifyDisableReason && match[directivePos] == "disable"
 			if  mustCheckDisablingReason && strings.Trim(match[reasonPos]," ") == "" {
 				failures <- Failure{
 					Confidence: 1,
-					RuleName:   "specify-disable-reason",
+					RuleName:   directiveSpecifyDisableReason,
 					Failure:    "reason of lint disabling not found",
 					Position:   ToFailurePosition(c.Pos(), c.End(), f),
 					Node:       c,
 				}
+				continue // skip this linter directive
 			}
 
 			// TODO: optimize
