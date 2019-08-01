@@ -130,11 +130,13 @@ type enableDisableConfig struct {
 }
 
 const directiveRE = `^//[\s]*revive:(enable|disable)(?:-(line|next-line))?(?::([^\s]+))?[\s]*(?: (.+))?$`
-var re = regexp.MustCompile(directiveRE)
 const directivePos = 1
 const modifierPos = 2
 const rulesPos = 3
 const reasonPos = 4
+
+var re = regexp.MustCompile(directiveRE)
+
 func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, failures chan Failure) disabledIntervalsMap {
 	enabledDisabledRulesMap := make(map[string][]enableDisableConfig)
 
@@ -218,7 +220,7 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, fa
 			}
 
 			mustCheckDisablingReason := mustSpecifyDisableReason && match[directivePos] == "disable"
-			if  mustCheckDisablingReason && strings.Trim(match[reasonPos]," ") == "" {
+			if mustCheckDisablingReason && strings.Trim(match[reasonPos], " ") == "" {
 				failures <- Failure{
 					Confidence: 1,
 					RuleName:   directiveSpecifyDisableReason,
@@ -226,7 +228,7 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, fa
 					Position:   ToFailurePosition(c.Pos(), c.End(), f),
 					Node:       c,
 				}
-				continue // skip this linter directive
+				continue // skip this linter disabling directive
 			}
 
 			// TODO: optimize
