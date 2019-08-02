@@ -140,7 +140,7 @@ revive -config revive.toml -exclude file1.go -exclude file2.go -formatter friend
 - The output will be formatted with the `friendly` formatter
 - The linter will analyze `github.com/mgechev/revive` and the files in `package`
 
-### Comment Annotations
+### Comment Directives
 
 Using comments, you can disable the linter for the entire file or only range of lines:
 
@@ -166,6 +166,28 @@ func Public() private {
 ```
 
 This way, `revive` will not warn you for that you're returning an object of an unexported type, from an exported function.
+
+You can document why you disable the linter by adding a trailing text in the directive, for example
+
+```go
+//revive:disable Until the code is stable
+```
+```go
+//revive:disable:cyclomatic High complexity score but easy to understand 
+```
+
+You can also configure `revive` to enforce documenting linter disabling directives by adding
+
+```toml
+[directive.specify-disable-reason]
+```
+
+in the configuration. You can set the severity (defaults to _warning_) of the violation of this directive
+
+```toml
+[directive.specify-disable-reason]
+    severity = "error"
+```
 
 ### Configuration
 
@@ -399,7 +421,7 @@ Each formatter needs to implement the following interface:
 
 ```go
 type Formatter interface {
-	Format(<-chan Failure, RulesConfig) (string, error)
+	Format(<-chan Failure, Config) (string, error)
 	Name() string
 }
 ```

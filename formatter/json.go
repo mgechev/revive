@@ -24,7 +24,7 @@ type jsonObject struct {
 }
 
 // Format formats the failures gotten from the lint.
-func (f *JSON) Format(failures <-chan lint.Failure, config lint.RulesConfig) (string, error) {
+func (f *JSON) Format(failures <-chan lint.Failure, config lint.Config) (string, error) {
 	var slice []jsonObject
 	for failure := range failures {
 		obj := jsonObject{}
