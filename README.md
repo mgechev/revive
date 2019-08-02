@@ -421,7 +421,7 @@ Each formatter needs to implement the following interface:
 
 ```go
 type Formatter interface {
-	Format(<-chan Failure, RulesConfig) (string, error)
+	Format(<-chan Failure, Config) (string, error)
 	Name() string
 }
 ```

@@ -19,7 +19,7 @@ func (f *Unix) Name() string {
 }
 
 // Format formats the failures gotten from the lint.
-func (f *Unix) Format(failures <-chan lint.Failure, _ lint.RulesConfig) (string, error) {
+func (f *Unix) Format(failures <-chan lint.Failure, _ lint.Config) (string, error) {
 	for failure := range failures {
 		fmt.Printf("%v: [%s] %s\n", failure.Position.Start, failure.RuleName, failure.Failure)
 	}

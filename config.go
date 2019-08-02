@@ -142,6 +142,12 @@ func normalizeConfig(config *lint.Config) {
 			}
 			config.Rules[k] = v
 		}
+		for k, v := range config.Directives {
+			if v.Severity == "" {
+				v.Severity = severity
+			}
+			config.Directives[k] = v
+		}
 	}
 }
 

@@ -44,7 +44,7 @@ func main() {
 
 	var output string
 	go (func() {
-		output, err = formatter.Format(formatChan, config.Rules)
+		output, err = formatter.Format(formatChan, *config)
 		if err != nil {
 			fail(err.Error())
 		}
