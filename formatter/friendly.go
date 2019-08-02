@@ -37,7 +37,7 @@ func (f *Friendly) Name() string {
 }
 
 // Format formats the failures gotten from the lint.
-func (f *Friendly) Format(failures <-chan lint.Failure, config lint.RulesConfig) (string, error) {
+func (f *Friendly) Format(failures <-chan lint.Failure, config lint.Config) (string, error) {
 	errorMap := map[string]int{}
 	warningMap := map[string]int{}
 	totalErrors := 0

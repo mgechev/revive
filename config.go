@@ -77,6 +77,7 @@ var allRules = append([]lint.Rule{
 	&rule.ImportShadowingRule{},
 	&rule.BareReturnRule{},
 	&rule.UnusedReceiverRule{},
+	&rule.UnhandledErrorRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
@@ -140,6 +141,12 @@ func normalizeConfig(config *lint.Config) {
 				v.Severity = severity
 			}
 			config.Rules[k] = v
+		}
+		for k, v := range config.Directives {
+			if v.Severity == "" {
+				v.Severity = severity
+			}
+			config.Directives[k] = v
 		}
 	}
 }

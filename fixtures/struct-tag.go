@@ -1,5 +1,7 @@
 package fixtures
 
+import "time"
+
 type decodeAndValidateRequest struct {
 	// BEAWRE : the flag of URLParam should match the const string URLParam
 	URLParam         string          `json:"-" path:"url_param" validate:"numeric"`
@@ -17,6 +19,8 @@ type decodeAndValidateRequest struct {
 	MandatoryStruct4 mandatoryStruct `json:"mandatoryStruct" required:"false"`
 	OptionalStruct   *optionalStruct `json:"optionalStruct,omitempty"`
 	OptionalQuery    string          `json:"-" querystring:"queryfoo"`
+	optionalQuery    string          `json:"-" querystring:"queryfoo"` // MATCH /tag on not-exported field optionalQuery/
+
 }
 
 type RangeAllocation struct {

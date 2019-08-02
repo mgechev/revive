@@ -9,6 +9,6 @@ type FormatterMetadata struct {
 
 // Formatter defines an interface for failure formatters
 type Formatter interface {
-	Format(<-chan Failure, RulesConfig) (string, error)
+	Format(<-chan Failure, Config) (string, error)
 	Name() string
 }
