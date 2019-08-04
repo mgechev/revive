@@ -112,7 +112,7 @@ call ale#linter#Define('go', {
 
 ### Continuous Integration
 
-[Codeac.io](https://www.codeac.io?ref=revive) - Automated code review service integrates with GitHub, Bitbucket and GitLab (even self-hosted) and helps you fight technical debt. Check yor [pull-requests](https://www.codeac.io/documentation/pull-requests.html?ref=revive) with [revive](https://www.codeac.io/documentation/revive-configuration.html?ref=revive) automatically. (free for open-source projects)
+[Codeac.io](https://www.codeac.io?ref=revive) - Automated code review service integrates with GitHub, Bitbucket and GitLab (even self-hosted) and helps you fight technical debt. Check your [pull-requests](https://www.codeac.io/documentation/pull-requests.html?ref=revive) with [revive](https://www.codeac.io/documentation/revive-configuration.html?ref=revive) automatically. (free for open-source projects)
 
 ### Installation
 
