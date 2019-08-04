@@ -41,7 +41,7 @@ Here's how `revive` is different from `golint`:
 - [`lorawan-stack`](https://github.com/TheThingsNetwork/lorawan-stack) - The Things Network Stack for LoRaWAN V3
 - [`gofight`](https://github.com/appleboy/gofight) - Testing API Handler written in Golang.
 - [`ggz`](https://github.com/go-ggz/ggz) - An URL shortener service written in Golang
-- [`Codeac.io`](https://www.codeac.io?ref=revive) - Automated code review service integrates with GitHub, Bitbucket and GitLab (even self-hosted) and helps you fight technical debt. Check yor [pull-requests](https://www.codeac.io/documentation/pull-requests.html?ref=revive) witch [revive](https://www.codeac.io/documentation/revive-configuration.html?ref=revive) automatically. (free for open-source projects)
+- [`Codeac.io`](https://www.codeac.io?ref=revive) - Automated code review service integrates with GitHub, Bitbucket and GitLab (even self-hosted) and helps you fight technical debt. Check yor [pull-requests](https://www.codeac.io/documentation/pull-requests.html?ref=revive) with [revive](https://www.codeac.io/documentation/revive-configuration.html?ref=revive) automatically. (free for open-source projects)
 
 *Open a PR to add your project*.
 
