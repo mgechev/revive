@@ -9,6 +9,6 @@ require (
 	github.com/mgechev/dots v0.0.0-20190603122614-18fa4c4b71cc
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/pkg/errors v0.8.1
-	golang.org/x/sys v0.0.0-20190801053355-cbf593c0f2f3 // indirect
+	golang.org/x/sys v0.0.0-20190804054238-51ab0e2deafa // indirect
 	golang.org/x/tools v0.0.0-20190802221608-1d1727260058
 )
