@@ -86,7 +86,7 @@ func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
 				w.addFailure(f.Tag, "field's type and default value's type mismatch")
 			}
 		case "json":
-			msg, ok := w.checkJSONTag(tag.Options)
+			msg, ok := w.checkJSONTag(tag.Name, tag.Options)
 			if !ok {
 				w.addFailure(f.Tag, msg)
 			}
@@ -161,10 +161,15 @@ func (w lintStructTagRule) checkBSONTag(options []string) (string, bool) {
 	return "", true
 }
 
-func (w lintStructTagRule) checkJSONTag(options []string) (string, bool) {
+func (w lintStructTagRule) checkJSONTag(name string, options []string) (string, bool) {
 	for _, opt := range options {
 		switch opt {
 		case "omitempty", "string":
+		case "":
+			// special case for JSON key "-"
+			if name != "-" {
+				return "option can not be empty in JSON tag", false	
+			}
 		default:
 			return fmt.Sprintf("unknown option '%s' in JSON tag", opt), false
 		}
