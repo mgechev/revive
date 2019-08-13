@@ -172,4 +172,6 @@ golang.org/x/tools v0.0.0-20190809152137-6d4652c779c4 h1:Lsfy/gJCZ5VDaOHEgAXbjOl
 golang.org/x/tools v0.0.0-20190809152137-6d4652c779c4/go.mod h1:b+2E5dAYhXwXZwtnZ6UAqBI28+e2cm9otk0dWdXHAEo=
 golang.org/x/tools v0.0.0-20190812192641-4147ede4f82b h1:baoDOzi0CqGsU/O31eEwzex3OtpnPw0nUqIYaxg8PWA=
 golang.org/x/tools v0.0.0-20190812192641-4147ede4f82b/go.mod h1:b+2E5dAYhXwXZwtnZ6UAqBI28+e2cm9otk0dWdXHAEo=
+golang.org/x/tools v0.0.0-20190813222811-9dba7caff850 h1:qpvBGLLwQ/jTyctOcuFhgTolz38tMqwQkR+DmgcQlUY=
+golang.org/x/tools v0.0.0-20190813222811-9dba7caff850/go.mod h1:b+2E5dAYhXwXZwtnZ6UAqBI28+e2cm9otk0dWdXHAEo=
 golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
