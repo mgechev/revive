@@ -34,8 +34,14 @@ Here's how `revive` is different from `golint`:
 - [`excelize`](https://github.com/360EntSecGroup-Skylar/excelize) - Go library for reading and writing Microsoft Excel™ (XLSX) files
 - [`aurora`](https://github.com/xuri/aurora) - aurora is a web-based Beanstalk queue server console written in Go
 - [`soar`](https://github.com/XiaoMi/soar) - SQL Optimizer And Rewriter
-- [`gorush`](https://github.com/appleboy/gorush) - A push notification server written in Go (Golang)
+- [`gorush`](https://github.com/appleboy/gorush) - A push notification server written in Go (Golang)a
+- [`go-echarts`](https://github.com/chenjiandongx/go-echarts) - The adorable charts library for Golang
+- [`reviewdog`](https://github.com/reviewdog/reviewdog) - Automated code review tool integrated with any code analysis tools regardless of programming language
 - [`sklearn`](https://github.com/pa-m/sklearn) - A partial port of scikit-learn written in Go
+- [`lorawan-stack`](https://github.com/TheThingsNetwork/lorawan-stack) - The Things Network Stack for LoRaWAN V3
+- [`gofight`](https://github.com/appleboy/gofight) - Testing API Handler written in Golang.
+- [`ggz`](https://github.com/go-ggz/ggz) - An URL shortener service written in Golang
+- [`Codeac.io`](https://www.codeac.io?ref=revive) - Automated code review service integrates with GitHub, Bitbucket and GitLab (even self-hosted) and helps you fight technical debt.
 
 *Open a PR to add your project*.
 
@@ -48,6 +54,8 @@ Here's how `revive` is different from `golint`:
 - [revive](#revive)
   - [Usage](#usage)
     - [Text Editors](#text-editors)
+    - [Continuous Integration](#continuous-integration)
+    - [Bazel](#bazel)
     - [Installation](#installation)
     - [Command Line Flags](#command-line-flags)
     - [Sample Invocations](#sample-invocations)
@@ -81,6 +89,10 @@ Here's how `revive` is different from `golint`:
 
 Since the default behavior of `revive` is compatible with `golint`, without providing any additional flags, the only difference you'd notice is faster execution.
 
+### Bazel
+
+If you want to use revive with Bazel, take a look at the [rules](https://github.com/atlassian/bazel-tools/tree/master/gorevive) that Atlassian maintains.
+
 ### Text Editors
 
 - Support for VSCode in [vscode-go](https://github.com/Microsoft/vscode-go/pull/1699).
@@ -97,6 +109,10 @@ call ale#linter#Define('go', {
 \   'callback': 'ale#handlers#unix#HandleAsWarning',
 \})
 ```
+
+### Continuous Integration
+
+[Codeac.io](https://www.codeac.io?ref=revive) - Automated code review service integrates with GitHub, Bitbucket and GitLab (even self-hosted) and helps you fight technical debt. Check your [pull-requests](https://www.codeac.io/documentation/pull-requests.html?ref=revive) with [revive](https://www.codeac.io/documentation/revive-configuration.html?ref=revive) automatically. (free for open-source projects)
 
 ### Installation
 
@@ -130,7 +146,7 @@ revive -config revive.toml -exclude file1.go -exclude file2.go -formatter friend
 - The output will be formatted with the `friendly` formatter
 - The linter will analyze `github.com/mgechev/revive` and the files in `package`
 
-### Comment Annotations
+### Comment Directives
 
 Using comments, you can disable the linter for the entire file or only range of lines:
 
@@ -156,6 +172,28 @@ func Public() private {
 ```
 
 This way, `revive` will not warn you for that you're returning an object of an unexported type, from an exported function.
+
+You can document why you disable the linter by adding a trailing text in the directive, for example
+
+```go
+//revive:disable Until the code is stable
+```
+```go
+//revive:disable:cyclomatic High complexity score but easy to understand 
+```
+
+You can also configure `revive` to enforce documenting linter disabling directives by adding
+
+```toml
+[directive.specify-disable-reason]
+```
+
+in the configuration. You can set the severity (defaults to _warning_) of the violation of this directive
+
+```toml
+[directive.specify-disable-reason]
+    severity = "error"
+```
 
 ### Configuration
 
@@ -297,9 +335,9 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`empty-lines`](./RULES_DESCRIPTIONS.md#empty-lines)   | n/a | Warns when there are heading or trailing newlines in a block              |    no    |  no   |
 | [`line-length-limit`](./RULES_DESCRIPTIONS.md#line-length-limit)   | int    | Specifies the maximum number of characters in a line             |    no    |  no   |
 | [`call-to-gc`](./RULES_DESCRIPTIONS.md#call-to-gc)   | n/a    | Warns on explicit call to the garbage collector    |    no    |  no   |
-| [`duplicated-imports`](./RULES_DESCRIPTIONS#duplicated-imports) | n/a  | Looks for packages that are imported two or more times   |    no    |  no   |
+| [`duplicated-imports`](./RULES_DESCRIPTIONS.md#duplicated-imports) | n/a  | Looks for packages that are imported two or more times   |    no    |  no   |
 | [`import-shadowing`](./RULES_DESCRIPTIONS.md#import-shadowing)   | n/a    | Spots identifiers that shadow an import    |    no    |  no   |
-| [`bare-return`](./RULES_DESCRIPTIONS#bare-return) | n/a  | Warns on bare returns   |    no    |  no   |
+| [`bare-return`](./RULES_DESCRIPTIONS.md#bare-return) | n/a  | Warns on bare returns   |    no    |  no   |
 | [`unused-receiver`](./RULES_DESCRIPTIONS.md#unused-receiver)   | n/a    | Suggests to rename or remove unused method receivers    |    no    |  no   |
 | [`unhandled-error`](./RULES_DESCRIPTIONS.md#unhandled-error)   | []string   | Warns on unhandled errors returned by funcion calls    |    no    |  yes   |
 
@@ -389,7 +427,7 @@ Each formatter needs to implement the following interface:
 
 ```go
 type Formatter interface {
-	Format(<-chan Failure, RulesConfig) (string, error)
+	Format(<-chan Failure, Config) (string, error)
 	Name() string
 }
 ```
@@ -453,3 +491,4 @@ Currently, type checking is enabled by default. If you want to run the linter wi
 ## License
 
 MIT
+

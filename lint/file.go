@@ -97,9 +97,12 @@ func (f *File) isMain() bool {
 	return false
 }
 
+const directiveSpecifyDisableReason = "specify-disable-reason"
+
 func (f *File) lint(rules []Rule, config Config, failures chan Failure) {
 	rulesConfig := config.Rules
-	disabledIntervals := f.disabledIntervals(rules)
+	_, mustSpecifyDisableReason := config.Directives[directiveSpecifyDisableReason]
+	disabledIntervals := f.disabledIntervals(rules, mustSpecifyDisableReason, failures)
 	for _, currentRule := range rules {
 		ruleConfig := rulesConfig[currentRule.Name()]
 		currentFailures := currentRule.Apply(f, ruleConfig.Arguments)
@@ -126,9 +129,15 @@ type enableDisableConfig struct {
 	position int
 }
 
-func (f *File) disabledIntervals(rules []Rule) disabledIntervalsMap {
-	re := regexp.MustCompile(`^//[\s]*revive:(enable|disable)(?:-(line|next-line))?(?::([^\s]+))?[\s]*$`)
+const directiveRE = `^//[\s]*revive:(enable|disable)(?:-(line|next-line))?(?::([^\s]+))?[\s]*(?: (.+))?$`
+const directivePos = 1
+const modifierPos = 2
+const rulesPos = 3
+const reasonPos = 4
 
+var re = regexp.MustCompile(directiveRE)
+
+func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, failures chan Failure) disabledIntervalsMap {
 	enabledDisabledRulesMap := make(map[string][]enableDisableConfig)
 
 	getEnabledDisabledIntervals := func() disabledIntervalsMap {
@@ -202,14 +211,24 @@ func (f *File) disabledIntervals(rules []Rule) disabledIntervalsMap {
 			}
 
 			ruleNames := []string{}
-			if len(match) > 2 {
-				tempNames := strings.Split(match[3], ",")
-				for _, name := range tempNames {
-					name = strings.Trim(name, "\n")
-					if len(name) > 0 {
-						ruleNames = append(ruleNames, name)
-					}
+			tempNames := strings.Split(match[rulesPos], ",")
+			for _, name := range tempNames {
+				name = strings.Trim(name, "\n")
+				if len(name) > 0 {
+					ruleNames = append(ruleNames, name)
 				}
+			}
+
+			mustCheckDisablingReason := mustSpecifyDisableReason && match[directivePos] == "disable"
+			if mustCheckDisablingReason && strings.Trim(match[reasonPos], " ") == "" {
+				failures <- Failure{
+					Confidence: 1,
+					RuleName:   directiveSpecifyDisableReason,
+					Failure:    "reason of lint disabling not found",
+					Position:   ToFailurePosition(c.Pos(), c.End(), f),
+					Node:       c,
+				}
+				continue // skip this linter disabling directive
 			}
 
 			// TODO: optimize
@@ -219,7 +238,7 @@ func (f *File) disabledIntervals(rules []Rule) disabledIntervalsMap {
 				}
 			}
 
-			handleRules(filename, match[2], match[1] == "enable", line, ruleNames)
+			handleRules(filename, match[modifierPos], match[directivePos] == "enable", line, ruleNames)
 		}
 	}
 

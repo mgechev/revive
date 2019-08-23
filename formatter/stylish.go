@@ -32,7 +32,7 @@ func formatFailure(failure lint.Failure, severity lint.Severity) []string {
 }
 
 // Format formats the failures gotten from the lint.
-func (f *Stylish) Format(failures <-chan lint.Failure, config lint.RulesConfig) (string, error) {
+func (f *Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string, error) {
 	var result [][]string
 	var totalErrors = 0
 	var total = 0
@@ -82,7 +82,8 @@ func (f *Stylish) Format(failures <-chan lint.Failure, config lint.RulesConfig) 
 	} else if total > 0 && totalErrors == 0 {
 		suffix = color.YellowString("\n ✖" + suffix)
 	} else {
-		suffix = color.GreenString("\n" + suffix)
+		suffix, output = "", ""
 	}
+
 	return output + suffix, nil
 }

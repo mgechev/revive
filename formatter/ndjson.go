@@ -19,7 +19,7 @@ func (f *NDJSON) Name() string {
 }
 
 // Format formats the failures gotten from the lint.
-func (f *NDJSON) Format(failures <-chan lint.Failure, config lint.RulesConfig) (string, error) {
+func (f *NDJSON) Format(failures <-chan lint.Failure, config lint.Config) (string, error) {
 	enc := json.NewEncoder(os.Stdout)
 	for failure := range failures {
 		obj := jsonObject{}

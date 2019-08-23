@@ -2,11 +2,12 @@ package rule
 
 import (
 	"fmt"
-	"github.com/fatih/structtag"
-	"github.com/mgechev/revive/lint"
 	"go/ast"
 	"strconv"
 	"strings"
+
+	"github.com/fatih/structtag"
+	"github.com/mgechev/revive/lint"
 )
 
 // StructTagRule lints struct tags.
@@ -58,6 +59,10 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 // checkTaggedField checks the tag of the given field.
 // precondition: the field has a tag
 func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
+	if len(f.Names) > 0 && !f.Names[0].IsExported() {
+		w.addFailure(f, "tag on not-exported field "+f.Names[0].Name)
+	}
+
 	tags, err := structtag.Parse(strings.Trim(f.Tag.Value, "`"))
 	if err != nil || tags == nil {
 		w.addFailure(f.Tag, "malformed tag")
@@ -81,7 +86,7 @@ func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
 				w.addFailure(f.Tag, "field's type and default value's type mismatch")
 			}
 		case "json":
-			msg, ok := w.checkJSONTag(tag.Options)
+			msg, ok := w.checkJSONTag(tag.Name, tag.Options)
 			if !ok {
 				w.addFailure(f.Tag, msg)
 			}
@@ -156,10 +161,15 @@ func (w lintStructTagRule) checkBSONTag(options []string) (string, bool) {
 	return "", true
 }
 
-func (w lintStructTagRule) checkJSONTag(options []string) (string, bool) {
+func (w lintStructTagRule) checkJSONTag(name string, options []string) (string, bool) {
 	for _, opt := range options {
 		switch opt {
 		case "omitempty", "string":
+		case "":
+			// special case for JSON key "-"
+			if name != "-" {
+				return "option can not be empty in JSON tag", false	
+			}
 		default:
 			return fmt.Sprintf("unknown option '%s' in JSON tag", opt), false
 		}
