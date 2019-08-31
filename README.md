@@ -110,6 +110,10 @@ call ale#linter#Define('go', {
 \})
 ```
 
+### GitHub Actions
+
+- [Revive Action](https://github.com/marketplace/actions/revive-action) with annotation support
+
 ### Continuous Integration
 
 [Codeac.io](https://www.codeac.io?ref=revive) - Automated code review service integrates with GitHub, Bitbucket and GitLab (even self-hosted) and helps you fight technical debt. Check your [pull-requests](https://www.codeac.io/documentation/pull-requests.html?ref=revive) with [revive](https://www.codeac.io/documentation/revive-configuration.html?ref=revive) automatically. (free for open-source projects)
