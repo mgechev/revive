@@ -85,7 +85,7 @@ func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
 		})
 		return
 	}
-	s := fn.Doc.Text()
+	s := normalizeText(fn.Doc.Text())
 	prefix := fn.Name.Name + " "
 	if !strings.HasPrefix(s, prefix) {
 		w.onFailure(lint.Failure{
@@ -141,7 +141,7 @@ func (w *lintExported) lintTypeDoc(t *ast.TypeSpec, doc *ast.CommentGroup) {
 		return
 	}
 
-	s := doc.Text()
+	s := normalizeText(doc.Text())
 	articles := [...]string{"A", "An", "The", "This"}
 	for _, a := range articles {
 		if t.Name.Name == a {
@@ -217,7 +217,8 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 		doc = gd.Doc
 	}
 	prefix := name + " "
-	if !strings.HasPrefix(doc.Text(), prefix) {
+	s := normalizeText(doc.Text())
+	if !strings.HasPrefix(s, prefix) {
 		w.onFailure(lint.Failure{
 			Confidence: 1,
 			Node:       doc,
@@ -225,6 +226,14 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 			Failure:    fmt.Sprintf(`comment on exported %s %s should be of the form "%s..."`, kind, name, prefix),
 		})
 	}
+}
+
+// normalizeText is a helper function that normalizes comment strings by:
+// * removing one leading space
+//
+// This function is needed because ast.CommentGroup.Text() does not handle //-style and /*-style comments uniformly
+func normalizeText(t string) string {
+	return strings.TrimPrefix(t, " ")
 }
 
 func (w *lintExported) Visit(n ast.Node) ast.Visitor {
