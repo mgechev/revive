@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/mgechev/dots"
+	"github.com/mitchellh/go-homedir"
 
 	"github.com/mgechev/revive/formatter"
 
@@ -233,12 +235,22 @@ func init() {
 		fmt.Println(banner)
 		originalUsage()
 	}
+	// command line help strings
 	const (
-		configUsage    = "path to the configuration TOML file (i.e. -config myconf.toml)"
+		configUsage    = "path to the configuration TOML file, defaults to $HOME/revive.toml, if present (i.e. -config myconf.toml)"
 		excludeUsage   = "list of globs which specify files to be excluded (i.e. -exclude foo/...)"
 		formatterUsage = "formatter to be used for the output (i.e. -formatter stylish)"
 	)
-	flag.StringVar(&configPath, "config", "", configUsage)
+
+	var globalConfigPath string
+	if homeDir, err := homedir.Dir(); err == nil {
+		globalConfigPath = filepath.Join(homeDir, "revive.toml")
+		if _, err := os.Stat(globalConfigPath); err != nil {
+			globalConfigPath = ""
+		}
+	}
+
+	flag.StringVar(&configPath, "config", globalConfigPath, configUsage)
 	flag.Var(&excludePaths, "exclude", excludeUsage)
 	flag.StringVar(&formatterName, "formatter", "", formatterUsage)
 	flag.Parse()
