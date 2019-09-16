@@ -89,6 +89,8 @@ Here's how `revive` is different from `golint`:
 
 Since the default behavior of `revive` is compatible with `golint`, without providing any additional flags, the only difference you'd notice is faster execution.
 
+`revive` supports a `-config` flag whose value should correspond to a TOML file describing which rules to use for `revive`'s linting. If not provided, `revive` will try to use a global config file (assumed to be located at `$HOME/revive.toml`). Otherwise, if no configuration TOML file is found then `revive` uses a built-in set of default linting rules. 
+
 ### Bazel
 
 If you want to use revive with Bazel, take a look at the [rules](https://github.com/atlassian/bazel-tools/tree/master/gorevive) that Atlassian maintains.
@@ -128,7 +130,7 @@ go get -u github.com/mgechev/revive
 
 `revive` accepts three command line parameters:
 
-- `-config [PATH]` - path to config file in TOML format.
+- `-config [PATH]` - path to config file in TOML format, defaults to `$HOME/revive.toml` if present.
 - `-exclude [PATTERN]` - pattern for files/directories/packages to be excluded for linting. You can specify the files you want to exclude for linting either as package name (i.e. `github.com/mgechev/revive`), list them as individual files (i.e. `file.go`), directories (i.e. `./foo/...`), or any combination of the three.
 - `-formatter [NAME]` - formatter to be used for the output. The currently available formatters are:
 

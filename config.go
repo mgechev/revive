@@ -175,6 +175,18 @@ func getFormatter() lint.Formatter {
 	return formatter
 }
 
+func buildDefaultConfigPath() string {
+	var result string
+	if homeDir, err := homedir.Dir(); err == nil {
+		result = filepath.Join(homeDir, "revive.toml")
+		if _, err := os.Stat(result); err != nil {
+			result = ""
+		}
+	}
+
+	return result
+}
+
 func defaultConfig() *lint.Config {
 	defaultConfig := lint.Config{
 		Confidence: 0.0,
@@ -242,15 +254,9 @@ func init() {
 		formatterUsage = "formatter to be used for the output (i.e. -formatter stylish)"
 	)
 
-	var globalConfigPath string
-	if homeDir, err := homedir.Dir(); err == nil {
-		globalConfigPath = filepath.Join(homeDir, "revive.toml")
-		if _, err := os.Stat(globalConfigPath); err != nil {
-			globalConfigPath = ""
-		}
-	}
+	defaultConfigPath := buildDefaultConfigPath()
 
-	flag.StringVar(&configPath, "config", globalConfigPath, configUsage)
+	flag.StringVar(&configPath, "config", defaultConfigPath, configUsage)
 	flag.Var(&excludePaths, "exclude", excludeUsage)
 	flag.StringVar(&formatterName, "formatter", "", formatterUsage)
 	flag.Parse()
