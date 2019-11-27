@@ -51,25 +51,34 @@ type lintFileHeader struct {
 	onFailure func(lint.Failure)
 }
 
+var (
+	multiRegexp  = regexp.MustCompile("^/\\*")
+	singleRegexp = regexp.MustCompile("^//")
+)
+
 func (w lintFileHeader) Visit(_ ast.Node) ast.Visitor {
-	g := w.fileAst.Comments[0]
 	failure := lint.Failure{
 		Node:       w.fileAst,
 		Confidence: 1,
 		Failure:    "the file doesn't have an appropriate header",
 	}
+
+	if len(w.fileAst.Comments) == 0 {
+		w.onFailure(failure)
+		return nil
+	}
+
+	g := w.fileAst.Comments[0]
 	if g == nil {
 		w.onFailure(failure)
 		return nil
 	}
-	multi := regexp.MustCompile("^/\\*")
-	single := regexp.MustCompile("^//")
 	comment := ""
 	for _, c := range g.List {
 		text := c.Text
-		if multi.Match([]byte(text)) {
+		if multiRegexp.Match([]byte(text)) {
 			text = text[2 : len(text)-2]
-		} else if single.Match([]byte(text)) {
+		} else if singleRegexp.Match([]byte(text)) {
 			text = text[2:]
 		}
 		comment += text

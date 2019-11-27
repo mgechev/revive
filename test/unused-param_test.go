@@ -11,8 +11,5 @@ func TestUnusedParam(t *testing.T) {
 }
 
 func BenchmarkUnusedParam(b *testing.B) {
-	var t *testing.T
-	for i := 0; i <= b.N; i++ {
-		testRule(t, "unused-param", &rule.UnusedParamRule{})
-	}
+	benchRule(b, "unused-param", &rule.UnusedParamRule{})
 }
