@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/parser"
+	"go/printer"
 	"go/token"
 	"go/types"
 	"io/ioutil"
@@ -18,42 +19,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-const fixtureBasePath = "../fixtures/"
-
-func benchRule(b *testing.B, filename string, rule lint.Rule, config ...*lint.RuleConfig) {
-	fixturePath := fixtureBasePath + filename + ".go"
-	stat, err := os.Stat(fixturePath)
-	if err != nil {
-		b.Fatalf("Cannot get file info for %s: %v", rule.Name(), err)
-	}
-	c := map[string]lint.RuleConfig{}
-	if config != nil {
-		c[rule.Name()] = *config[0]
-	}
-
-	l := lint.New(func(file string) ([]byte, error) {
-		return ioutil.ReadFile(fixtureBasePath + file)
-	})
-
-	for i := 0; i < b.N; i++ {
-		ps, err := l.Lint([][]string{{stat.Name()}}, []lint.Rule{rule}, lint.Config{
-			Rules: c,
-		})
-		if err != nil {
-			b.Fatalf("Unexpected error: %s", err)
-		}
-		for range ps {
-		}
-	}
-}
-
 func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.RuleConfig) {
-	fixturePath := fixtureBasePath + filename + ".go"
-	src, err := ioutil.ReadFile(fixturePath)
+	baseDir := "../fixtures/"
+	filename = filename + ".go"
+	src, err := ioutil.ReadFile(baseDir + filename)
 	if err != nil {
 		t.Fatalf("Bad filename path in test for %s: %v", rule.Name(), err)
 	}
-	stat, err := os.Stat(fixturePath)
+	stat, err := os.Stat(baseDir + filename)
 	if err != nil {
 		t.Fatalf("Cannot get file info for %s: %v", rule.Name(), err)
 	}
@@ -62,16 +35,10 @@ func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.Rul
 		c[rule.Name()] = *config[0]
 	}
 	if parseInstructions(t, filename, src) == nil {
-		err := assertSuccess(t, fixtureBasePath, stat, []lint.Rule{rule}, c)
-		if err != nil {
-			t.Fatalf("Cannot invoke 'assertSuccess' for %s: %v", rule.Name(), err)
-		}
+		assertSuccess(t, baseDir, stat, []lint.Rule{rule}, c)
 		return
 	}
-	err = assertFailures(t, fixtureBasePath, stat, src, []lint.Rule{rule}, c)
-	if err != nil {
-		t.Fatalf("Cannot invoke 'assertFailures' for %s: %v", rule.Name(), err)
-	}
+	assertFailures(t, baseDir, stat, src, []lint.Rule{rule}, c)
 }
 
 func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, rules []lint.Rule, config map[string]lint.RuleConfig) error {
@@ -79,7 +46,7 @@ func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, rules []lint.Ru
 		return ioutil.ReadFile(baseDir + file)
 	})
 
-	ps, err := l.Lint([][]string{{fi.Name()}}, rules, lint.Config{
+	ps, err := l.Lint([][]string{[]string{fi.Name()}}, rules, lint.Config{
 		Rules: config,
 	})
 	if err != nil {
@@ -106,7 +73,7 @@ func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, ru
 		return errors.Errorf("Test file %v does not have instructions", fi.Name())
 	}
 
-	ps, err := l.Lint([][]string{{fi.Name()}}, rules, lint.Config{
+	ps, err := l.Lint([][]string{[]string{fi.Name()}}, rules, lint.Config{
 		Rules: config,
 	})
 	if err != nil {
@@ -231,6 +198,14 @@ func extractReplacement(line string) (string, bool) {
 		return "", false
 	}
 	return line[a+len(start) : b], true
+}
+
+func render(fset *token.FileSet, x interface{}) string {
+	var buf bytes.Buffer
+	if err := printer.Fprint(&buf, fset, x); err != nil {
+		panic(err)
+	}
+	return buf.String()
 }
 
 func srcLine(src []byte, p token.Position) string {
