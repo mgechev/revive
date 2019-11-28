@@ -1,7 +1,6 @@
 package rule
 
 import (
-	"go/ast"
 	"regexp"
 
 	"github.com/mgechev/revive/lint"
@@ -10,68 +9,33 @@ import (
 // FileHeaderRule lints given else constructs.
 type FileHeaderRule struct{}
 
-// Apply applies the rule to given file.
-func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var failures []lint.Failure
-
-	header, ok := arguments[0].(string)
-	if !ok {
-		panic("Invalid argument to the FileHeaderRule")
-	}
-
-	regex, err := regexp.Compile(header)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	fileAst := file.AST
-	walker := lintFileHeader{
-		file:    file,
-		fileAst: fileAst,
-		regex:   regex,
-		onFailure: func(failure lint.Failure) {
-			failures = append(failures, failure)
-		},
-	}
-
-	ast.Walk(walker, fileAst)
-
-	return failures
-}
-
-// Name returns the rule name.
-func (r *FileHeaderRule) Name() string {
-	return "file-header"
-}
-
-type lintFileHeader struct {
-	file      *lint.File
-	fileAst   *ast.File
-	regex     *regexp.Regexp
-	onFailure func(lint.Failure)
-}
-
 var (
 	multiRegexp  = regexp.MustCompile("^/\\*")
 	singleRegexp = regexp.MustCompile("^//")
 )
 
-func (w lintFileHeader) Visit(_ ast.Node) ast.Visitor {
-	failure := lint.Failure{
-		Node:       w.fileAst,
-		Confidence: 1,
-		Failure:    "the file doesn't have an appropriate header",
+// Apply applies the rule to given file.
+func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	header, ok := arguments[0].(string)
+	if !ok {
+		panic("Invalid argument to the FileHeaderRule")
 	}
 
-	if len(w.fileAst.Comments) == 0 {
-		w.onFailure(failure)
-		return nil
+	failure := []lint.Failure{
+		{
+			Node:       file.AST,
+			Confidence: 1,
+			Failure:    "the file doesn't have an appropriate header",
+		},
 	}
 
-	g := w.fileAst.Comments[0]
+	if len(file.AST.Comments) == 0 {
+		return failure
+	}
+
+	g := file.AST.Comments[0]
 	if g == nil {
-		w.onFailure(failure)
-		return nil
+		return failure
 	}
 	comment := ""
 	for _, c := range g.List {
@@ -84,8 +48,18 @@ func (w lintFileHeader) Visit(_ ast.Node) ast.Visitor {
 		comment += text
 	}
 
-	if !w.regex.Match([]byte(comment)) {
-		w.onFailure(failure)
+	regex, err := regexp.Compile(header)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	if !regex.Match([]byte(comment)) {
+		return failure
 	}
 	return nil
+}
+
+// Name returns the rule name.
+func (r *FileHeaderRule) Name() string {
+	return "file-header"
 }

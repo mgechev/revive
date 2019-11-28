@@ -17,7 +17,10 @@ func TestImportsBlacklist(t *testing.T) {
 
 func BenchmarkImportsBlacklist(b *testing.B) {
 	args := []interface{}{"crypto/md5", "crypto/sha1"}
-	benchRule(b, "imports-blacklist", &rule.ImportsBlacklistRule{}, &lint.RuleConfig{
-		Arguments: args,
-	})
+	var t *testing.T
+	for i := 0; i <= b.N; i++ {
+		testRule(t, "imports-blacklist", &rule.ImportsBlacklistRule{}, &lint.RuleConfig{
+			Arguments: args,
+		})
+	}
 }

@@ -37,10 +37,4 @@ func BenchmarkLintFileHeader(b *testing.B) {
 	benchRule(b, "lint-file-header1", &rule.FileHeaderRule{}, &lint.RuleConfig{
 		Arguments: []interface{}{"foobar"},
 	})
-	//var t *testing.T
-	//for i := 0; i <= b.N; i++ {
-	//	testRule(t, "lint-file-header1", &rule.FileHeaderRule{}, &lint.RuleConfig{
-	//		Arguments: []interface{}{"foobar"},
-	//	})
-	//}
 }
