@@ -10,7 +10,7 @@ require (
 	github.com/mattn/go-isatty v0.0.9 // indirect
 	github.com/mgechev/dots v0.0.0-20190921121421-c36f7dcfbb81
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/olekukonko/tablewriter v0.0.3
+	github.com/olekukonko/tablewriter v0.0.4
 	github.com/pkg/errors v0.8.1
 	golang.org/x/tools v0.0.0-20191205012623-e84277c2c008
 )
