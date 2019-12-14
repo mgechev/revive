@@ -7,6 +7,10 @@ import (
 	"fmt"
 	ast "go/ast"
 	"log"
+	"testing"
+
+	"github.com/blang/semver"
+	"k8s.io/klog"
 )
 
 // Test IF and Boolean expr
@@ -30,7 +34,7 @@ func g(f func() bool) string { // MATCH /function g has cognitive complexity 1 (
 
 // Test Boolean expr
 func h(a, b, c, d, e, f bool) bool { // MATCH /function h has cognitive complexity 2 (> max enabled 0)/
-	return a && b && c || d || e && f //FIXME: complexity should be 3
+	return a && b && c || d || e && f //FIXME: complexity should be 3?
 }
 
 func i(a, b, c, d, e, f bool) bool { // MATCH /function i has cognitive complexity 2 (> max enabled 0)/
@@ -193,6 +197,10 @@ func v() { // MATCH /function v has cognitive complexity 2 (> max enabled 0)/
 	}
 }
 
+func v() {
+	t.Run(tc.desc, func(t *testing.T) {})
+}
+
 func w() { // MATCH /function w has cognitive complexity 3 (> max enabled 0)/
 	defer func(b bool) {
 		if b { // +1 +1(nesting)
@@ -215,4 +223,55 @@ OUT:
 		total += i
 	}
 	return total
+}
+
+// Test from K8S
+func (m *Migrator) MigrateIfNeeded(target *EtcdVersionPair) error { // MATCH /function (*Migrator).MigrateIfNeeded has cognitive complexity 18 (> max enabled 0)/
+	klog.Infof("Starting migration to %s", target)
+	err := m.dataDirectory.Initialize(target)
+	if err != nil { // +1
+		return fmt.Errorf("failed to initialize data directory %s: %v", m.dataDirectory.path, err)
+	}
+
+	var current *EtcdVersionPair
+	vfExists, err := m.dataDirectory.versionFile.Exists()
+	if err != nil { // +1
+		return err
+	}
+	if vfExists { // +1
+		current, err = m.dataDirectory.versionFile.Read()
+		if err != nil { // +1 +1
+			return err
+		}
+	} else {
+		return fmt.Errorf("existing data directory '%s' is missing version.txt file, unable to migrate", m.dataDirectory.path)
+	}
+
+	for { // +1
+		klog.Infof("Converging current version '%s' to target version '%s'", current, target)
+		currentNextMinorVersion := &EtcdVersion{Version: semver.Version{Major: current.version.Major, Minor: current.version.Minor + 1}}
+		switch { // +1 +1
+		case current.version.MajorMinorEquals(target.version) || currentNextMinorVersion.MajorMinorEquals(target.version): // +1
+			klog.Infof("current version '%s' equals or is one minor version previous of target version '%s' - migration complete", current, target)
+			err = m.dataDirectory.versionFile.Write(target)
+			if err != nil { // +1 +2
+				return fmt.Errorf("failed to write version.txt to '%s': %v", m.dataDirectory.path, err)
+			}
+			return nil
+		case current.storageVersion == storageEtcd2 && target.storageVersion == storageEtcd3: // +1
+			return fmt.Errorf("upgrading from etcd2 storage to etcd3 storage is not supported")
+		case current.version.Major == 3 && target.version.Major == 2: // +1
+			return fmt.Errorf("downgrading from etcd 3.x to 2.x is not supported")
+		case current.version.Major == target.version.Major && current.version.Minor < target.version.Minor: // +1
+			stepVersion := m.cfg.supportedVersions.NextVersionPair(current)
+			klog.Infof("upgrading etcd from %s to %s", current, stepVersion)
+			current, err = m.minorVersionUpgrade(current, stepVersion)
+		case current.version.Major == 3 && target.version.Major == 3 && current.version.Minor > target.version.Minor: // +1
+			klog.Infof("rolling etcd back from %s to %s", current, target)
+			current, err = m.rollbackEtcd3MinorVersion(current, target)
+		}
+		if err != nil { // +1 +1
+			return err
+		}
+	}
 }
