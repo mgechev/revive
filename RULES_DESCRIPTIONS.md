@@ -13,6 +13,7 @@ List of all available rules.
   - [call-to-gc](#call-to-gc)
   - [confusing-naming](#confusing-naming)
   - [confusing-results](#confusing-results)
+  - [cognitive-complexity](#cognitive-complexity)
   - [constant-logical-expr](#constant-logical-expr)
   - [context-as-argument](#context-as-argument)
   - [context-keys-type](#context-keys-type)
@@ -121,6 +122,19 @@ _Description_:  Explicitly invoking the garbage collector is, except for specifi
 The garbage collector can be configured through environment variables as described [here](https://golang.org/pkg/runtime/).
 
 _Configuration_: N/A
+
+## cognitive-complexity
+
+_Description_: [Cognitive complexity](https://www.sonarsource.com/resources/white-papers/cognitive-complexity.html) is a measure of how hard code is to understand. Enforcing a maximum complexity per function helps to keep code readable and maintainable.
+
+_Configuration_: (int) the maximum function complexity
+
+Example:
+
+```toml
+[rule.cognitive-complexity]
+  arguments =[7]
+```
 
 ## confusing-naming
 
