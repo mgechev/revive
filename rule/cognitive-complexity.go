@@ -73,7 +73,7 @@ type cognitiveComplexityVisitor struct {
 	nestingLevel int
 }
 
-// complexity calculates the cognitive complexity of an AST-subtree.
+// subTreeComplexity calculates the cognitive complexity of an AST-subtree.
 func (v cognitiveComplexityVisitor) subTreeComplexity(n ast.Node) int {
 	ast.Walk(&v, n)
 	return v.complexity
