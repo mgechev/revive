@@ -148,17 +148,14 @@ type binExprComplexityCalculator struct {
 
 func (v *binExprComplexityCalculator) Visit(n ast.Node) ast.Visitor {
 	switch n := n.(type) {
-	case *ast.UnaryExpr:
-		// TODO (chavacava): confirm if NOT should be taken into account
-		if n.Op == token.NOT {
-			v.complexity++
-		}
 	case *ast.BinaryExpr:
 		isLogicOp := n.Op == token.LAND || n.Op == token.LOR
 		if isLogicOp && n.Op != v.currentOp {
 			v.complexity++
 			v.currentOp = n.Op
 		}
+	case *ast.ParenExpr:
+		v.complexity++
 	}
 
 	return v
