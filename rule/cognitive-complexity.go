@@ -48,7 +48,7 @@ type cognitiveComplexityLinter struct {
 	onFailure     func(lint.Failure)
 }
 
-func (w cognitiveComplexityLinter) lint() ast.Visitor {
+func (w cognitiveComplexityLinter) lint() {
 	f := w.file
 	for _, decl := range f.AST.Decls {
 		if fn, ok := decl.(*ast.FuncDecl); ok {
@@ -64,8 +64,6 @@ func (w cognitiveComplexityLinter) lint() ast.Visitor {
 			}
 		}
 	}
-
-	return nil
 }
 
 type cognitiveComplexityVisitor struct {
