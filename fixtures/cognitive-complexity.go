@@ -33,8 +33,8 @@ func g(f func() bool) string { // MATCH /function g has cognitive complexity 1 (
 }
 
 // Test Boolean expr
-func h(a, b, c, d, e, f bool) bool { // MATCH /function h has cognitive complexity 2 (> max enabled 0)/
-	return a && b && c || d || e && f //FIXME: complexity should be 3?
+func h(a, b, c, d, e, f bool) bool { // MATCH /function h has cognitive complexity 3 (> max enabled 0)/
+	return a && b && c || d || e && f // +3
 }
 
 func i(a, b, c, d, e, f bool) bool { // MATCH /function i has cognitive complexity 2 (> max enabled 0)/
@@ -45,6 +45,10 @@ func i(a, b, c, d, e, f bool) bool { // MATCH /function i has cognitive complexi
 func j(a, b, c, d, e, f bool) bool { // MATCH /function j has cognitive complexity 2 (> max enabled 0)/
 	result := z(a && !(b && c)) // +2
 	return result
+}
+
+func j1(a, b, c, d, e, f bool) bool { // MATCH /function j1 has cognitive complexity 2 (> max enabled 0)/
+	return (a && !(b < 2) || c)
 }
 
 // Test Switch expr
