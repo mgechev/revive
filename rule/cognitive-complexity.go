@@ -6,6 +6,7 @@ import (
 	"go/token"
 
 	"github.com/mgechev/revive/lint"
+	"golang.org/x/tools/go/ast/astutil"
 )
 
 // CognitiveComplexityRule lints given else constructs.
@@ -133,28 +134,65 @@ func (v *cognitiveComplexityVisitor) walk(complexityIncrement int, targets ...as
 }
 
 func (cognitiveComplexityVisitor) binExpComplexity(n *ast.BinaryExpr) int {
-	calculator := binExprComplexityCalculator{complexity: 0}
-	ast.Walk(&calculator, n)
+	calculator := binExprComplexityCalculator{currentOp: []token.Token{}}
+
+	astutil.Apply(n, calculator.pre(), calculator.post())
 
 	return calculator.complexity
 }
 
 type binExprComplexityCalculator struct {
-	complexity int
-	currentOp  token.Token
+	complexity    int
+	currentOp     []token.Token // stack of bool operators
+	subexpStarted bool
 }
 
-func (v *binExprComplexityCalculator) Visit(n ast.Node) ast.Visitor {
-	switch n := n.(type) {
-	case *ast.BinaryExpr:
-		isLogicOp := n.Op == token.LAND || n.Op == token.LOR
-		if isLogicOp && n.Op != v.currentOp {
-			v.complexity++
-			v.currentOp = n.Op
-		}
-	case *ast.ParenExpr:
-		v.complexity++
-	}
+func (becc *binExprComplexityCalculator) pre() astutil.ApplyFunc {
+	return func(c *astutil.Cursor) bool {
+		switch n := c.Node().(type) {
+		case *ast.BinaryExpr:
+			isBoolOp := n.Op == token.LAND || n.Op == token.LOR
+			if !isBoolOp {
+				break
+			}
 
-	return v
+			ops := len(becc.currentOp)
+			// if
+			// 		is the first boolop in the expression OR
+			// 		is the first boolop inside a subexpression (...) OR
+			//		is not the same to the previous one
+			// then
+			//      increment complexity
+			if ops == 0 || becc.subexpStarted || n.Op != becc.currentOp[ops-1] {
+				becc.complexity++
+				becc.subexpStarted = false
+			}
+
+			becc.currentOp = append(becc.currentOp, n.Op)
+		case *ast.ParenExpr:
+			becc.subexpStarted = true
+		}
+
+		return true
+	}
+}
+
+func (becc *binExprComplexityCalculator) post() astutil.ApplyFunc {
+	return func(c *astutil.Cursor) bool {
+		switch n := c.Node().(type) {
+		case *ast.BinaryExpr:
+			isBoolOp := n.Op == token.LAND || n.Op == token.LOR
+			if !isBoolOp {
+				break
+			}
+
+			ops := len(becc.currentOp)
+			if ops > 0 {
+				becc.currentOp = becc.currentOp[:ops-1]
+			}
+		case *ast.ParenExpr:
+			becc.subexpStarted = false
+		}
+		return true
+	}
 }
