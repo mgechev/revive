@@ -13,6 +13,6 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/pkg/errors v0.8.1
-	golang.org/x/tools v0.0.0-20191218184116-bc4a8d394683
+	golang.org/x/tools v0.0.0-20191218191756-61f5e7d2990e
 	k8s.io/klog v1.0.0
 )
