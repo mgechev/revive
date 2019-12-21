@@ -31,3 +31,38 @@ func bare4(a string, b int) string {
 func bare5(a string, b int) {
 	return
 }
+
+// NR tests for issue #280
+func f280_1() (err error) {
+	func() {
+		return
+	}()
+
+	return nil
+}
+
+func f280_2() (err error) {
+	func() (r int) {
+		return // MATCH /avoid using bare returns, please add return expressions/
+	}()
+
+	return nil
+}
+
+func f280_3() (err error) {
+	func() (r int) {
+		return 1
+	}()
+
+	return // MATCH /avoid using bare returns, please add return expressions/
+}
+
+func f280_4() (err error) {
+	func() (r int) {
+		return func() (r int) {
+			return // MATCH /avoid using bare returns, please add return expressions/
+		}()
+	}()
+
+	return nil
+}
