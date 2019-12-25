@@ -26,13 +26,13 @@ func f(x int) error {
 func TestF(t *testing.T) error {
 	x := 1
 	if x > 10 {
-		return t.Error(fmt.Sprintf("something %d", x)) // MATCH /should replace t.Error(fmt.Sprintf(...)) with t.Errorf(...)/
+		t.Error(fmt.Sprintf("something %d", x)) // MATCH /should replace t.Error(fmt.Sprintf(...)) with t.Errorf(...)/
 	}
 	if x > 5 {
-		return t.Error(g("blah")) // ok
+		t.Error(g("blah")) // ok
 	}
 	if x > 4 {
-		return t.Error("something else") // ok
+		t.Error("something else") // ok
 	}
 	return nil
 }
