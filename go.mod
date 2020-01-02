@@ -5,7 +5,7 @@ go 1.12
 require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/blang/semver v3.6.1+incompatible
-	github.com/fatih/color v1.7.0
+	github.com/fatih/color v1.8.0
 	github.com/fatih/structtag v1.2.0
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/mattn/go-isatty v0.0.9 // indirect
