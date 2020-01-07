@@ -30,7 +30,7 @@ func (r *DeepExitRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 		},
 	}
 
-	w := lintDeepExit{onFailure, exitFunctions, false}
+	w := lintDeepExit{onFailure, exitFunctions, file.IsTest()}
 	ast.Walk(w, file.AST)
 	return failures
 }
@@ -43,16 +43,15 @@ func (r *DeepExitRule) Name() string {
 type lintDeepExit struct {
 	onFailure     func(lint.Failure)
 	exitFunctions map[string]map[string]bool
-	ignore        bool
+	isTestFile    bool
 }
 
 func (w lintDeepExit) Visit(node ast.Node) ast.Visitor {
-	if stmt, ok := node.(*ast.FuncDecl); ok {
-		w.updateIgnore(stmt)
-		return w
-	}
+	if fd, ok := node.(*ast.FuncDecl); ok {
+		if w.mustIgnore(fd) {
+			return nil // skip analysis of this function
+		}
 
-	if w.ignore {
 		return w
 	}
 
@@ -88,7 +87,8 @@ func (w lintDeepExit) Visit(node ast.Node) ast.Visitor {
 	return w
 }
 
-func (w *lintDeepExit) updateIgnore(fd *ast.FuncDecl) {
+func (w *lintDeepExit) mustIgnore(fd *ast.FuncDecl) bool {
 	fn := fd.Name.Name
-	w.ignore = (fn == "init" || fn == "main")
+
+	return fn == "init" || fn == "main" || (w.isTestFile && fn == "TestMain")
 }
