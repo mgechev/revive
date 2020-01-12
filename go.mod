@@ -10,7 +10,7 @@ require (
 	github.com/mgechev/dots v0.0.0-20190921121421-c36f7dcfbb81
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/olekukonko/tablewriter v0.0.4
-	github.com/pkg/errors v0.8.1
+	github.com/pkg/errors v0.9.0
 	golang.org/x/tools v0.0.0-20200110213125-a7a6caa82ab2
 	k8s.io/klog v1.0.0
 )
