@@ -46,6 +46,7 @@ List of all available rules.
   - [range-val-in-closure](#range-val-in-closure)
   - [receiver-naming](#receiver-naming)
   - [redefines-builtin-id](#redefines-builtin-id)
+  - [string-of-int](#string-of-int)
   - [struct-tag](#struct-tag)
   - [superfluous-else](#superfluous-else)
   - [time-naming](#time-naming)
@@ -403,6 +404,11 @@ _Configuration_: N/A
 
 _Description_: Constant names like `false`, `true`, `nil`, function names like `append`, `make`, and basic type names like `bool`, and `byte` are not reserved words of the language; therefore the can be redefined.
 Even if possible, redefining these built in names can lead to bugs very difficult to detect.
+
+_Configuration_: N/A
+
+## string-of-int
+_Description_:  explicit type conversion `string(i)` where `i` has an integer type other than `rune` might behave not as expected by the developer (e.g. `string(42)` is not `"42"`). This rule spot that kind of suspicious conversions. 
 
 _Configuration_: N/A
 

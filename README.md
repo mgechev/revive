@@ -347,6 +347,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`unused-receiver`](./RULES_DESCRIPTIONS.md#unused-receiver)   | n/a    | Suggests to rename or remove unused method receivers    |    no    |  no   |
 | [`unhandled-error`](./RULES_DESCRIPTIONS.md#unhandled-error)   | []string   | Warns on unhandled errors returned by funcion calls    |    no    |  yes   |
 | [`cognitive-complexity`](./RULES_DESCRIPTIONS.md#cognitive-complexity)          |  int   | Sets restriction for maximum Cognitive complexity.              |    no    |  no   |
+| [`string-of-int`](./RULES_DESCRIPTIONS.md#string-of-int)          |  n/a   | Warns on suspicious casts from int to string            |    no    |  yes   |
 
 ## Configurable rules
 
