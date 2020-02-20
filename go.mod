@@ -4,7 +4,6 @@ go 1.12
 
 require (
 	github.com/BurntSushi/toml v0.3.1
-	github.com/blang/semver v3.6.1+incompatible
 	github.com/fatih/color v1.9.0
 	github.com/fatih/structtag v1.2.0
 	github.com/mgechev/dots v0.0.0-20190921121421-c36f7dcfbb81
