@@ -9,7 +9,6 @@ import (
 	"log"
 	"testing"
 
-	"github.com/blang/semver"
 	"k8s.io/klog"
 )
 
@@ -253,7 +252,7 @@ func (m *Migrator) MigrateIfNeeded(target *EtcdVersionPair) error { // MATCH /fu
 
 	for { // +1
 		klog.Infof("Converging current version '%s' to target version '%s'", current, target)
-		currentNextMinorVersion := &EtcdVersion{Version: semver.Version{Major: current.version.Major, Minor: current.version.Minor + 1}}
+		currentNextMinorVersion := &EtcdVersion{}
 		switch { // +1 +1
 		case current.version.MajorMinorEquals(target.version) || currentNextMinorVersion.MajorMinorEquals(target.version): // +1
 			klog.Infof("current version '%s' equals or is one minor version previous of target version '%s' - migration complete", current, target)
