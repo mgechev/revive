@@ -1,6 +1,7 @@
 package rule
 
 import (
+	"fmt"
 	"go/ast"
 	"go/token"
 
@@ -36,61 +37,75 @@ type rangeValAddress struct {
 
 func (w rangeValAddress) Visit(node ast.Node) ast.Visitor {
 	n, ok := node.(*ast.RangeStmt)
-	if ok {
-		rangeValue := w.getNameFromExpr(n.Value)
-		if rangeValue == "" {
-			return w
-		}
-
-		fselect := func(n ast.Node) bool {
-			asgmt, ok := n.(*ast.AssignStmt)
-			if ok {
-				for _, exp := range asgmt.Lhs {
-					e, ok := exp.(*ast.IndexExpr)
-					if ok {
-						u, ok := e.Index.(*ast.UnaryExpr) // e.g. a[&value]...
-						if ok && u.Op == token.AND && w.getNameFromExpr(u.X) == rangeValue {
-							return true
-						}
-					}
-				}
-
-				for _, exp := range asgmt.Rhs {
-					switch e := exp.(type) {
-					case *ast.UnaryExpr: // e.g. ...&value
-						if e.Op == token.AND && w.getNameFromExpr(e.X) == rangeValue {
-							return true
-						}
-					case *ast.CallExpr: // e.g. ...append(arr, &value)
-						for _, v := range e.Args {
-							u, ok := v.(*ast.UnaryExpr)
-							if ok && u.Op == token.AND && w.getNameFromExpr(u.X) == rangeValue {
-								return true
-							}
-						}
-					}
-				}
-			}
-			return false
-		}
-
-		assignmentsToReceiver := pick(n.Body, fselect, nil)
-		for _, assignment := range assignmentsToReceiver {
-			w.onFailure(lint.Failure{
-				Node:       assignment,
-				Confidence: 1,
-				Failure:    "suspicious assignment in range-loop. variables always have the same address",
-			})
-		}
+	if !ok {
+		return w
 	}
+
+	value, ok := n.Value.(*ast.Ident)
+	if !ok {
+		return w
+	}
+
+	ast.Walk(rangeBodyVisitor{
+		valueID:   value.Obj,
+		onFailure: w.onFailure,
+	}, n.Body)
+
 	return w
 }
 
-func (rangeValAddress) getNameFromExpr(ie ast.Expr) string {
-	ident, ok := ie.(*ast.Ident)
+type rangeBodyVisitor struct {
+	valueID   *ast.Object
+	onFailure func(lint.Failure)
+}
+
+func (bw rangeBodyVisitor) Visit(node ast.Node) ast.Visitor {
+	asgmt, ok := node.(*ast.AssignStmt)
 	if !ok {
-		return ""
+		return bw
 	}
 
-	return ident.Name
+	for _, exp := range asgmt.Lhs {
+		e, ok := exp.(*ast.IndexExpr)
+		if !ok {
+			continue
+		}
+		if bw.isAccessingRangeValueAddress(e.Index) { // e.g. a[&value]...
+			bw.onFailure(bw.newFailure(e.Index))
+		}
+	}
+
+	for _, exp := range asgmt.Rhs {
+		switch e := exp.(type) {
+		case *ast.UnaryExpr: // e.g. ...&value
+			if bw.isAccessingRangeValueAddress(e) {
+				bw.onFailure(bw.newFailure(e))
+			}
+		case *ast.CallExpr: // e.g. ...append(arr, &value)
+			for _, v := range e.Args {
+				if bw.isAccessingRangeValueAddress(v) {
+					bw.onFailure(bw.newFailure(e))
+				}
+			}
+		}
+	}
+	return bw
+}
+
+func (bw rangeBodyVisitor) isAccessingRangeValueAddress(exp ast.Expr) bool {
+	u, ok := exp.(*ast.UnaryExpr)
+	if !ok {
+		return false
+	}
+
+	v, ok := u.X.(*ast.Ident)
+	return ok && u.Op == token.AND && v.Obj == bw.valueID
+}
+
+func (bw rangeBodyVisitor) newFailure(node ast.Node) lint.Failure {
+	return lint.Failure{
+		Node:       node,
+		Confidence: 1,
+		Failure:    fmt.Sprintf("suspicious assignment of '%s'. range-loop variables always have the same address", bw.valueID.Name),
+	}
 }

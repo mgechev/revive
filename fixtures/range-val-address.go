@@ -5,7 +5,7 @@ func rangeValAddress() {
 
 	mySlice := []string{"A", "B", "C"}
 	for _, value := range mySlice {
-		m["address"] = &value // MATCH /suspicious assignment in range-loop. variables always have the same address/
+		m["address"] = &value // MATCH /suspicious assignment of 'value'. range-loop variables always have the same address/
 	}
 }
 
@@ -23,7 +23,7 @@ func rangeValAddress3() {
 
 	mySlice := []string{"A", "B", "C"}
 	for _, value := range mySlice {
-		a := &value // MATCH /suspicious assignment in range-loop. variables always have the same address/
+		a := &value // MATCH /suspicious assignment of 'value'. range-loop variables always have the same address/
 		m["address"] = a
 	}
 }
@@ -33,7 +33,7 @@ func rangeValAddress4() {
 
 	mySlice := []string{"A", "B", "C"}
 	for _, value := range mySlice {
-		m = append(m, &value) // MATCH /suspicious assignment in range-loop. variables always have the same address/
+		m = append(m, &value) // MATCH /suspicious assignment of 'value'. range-loop variables always have the same address/
 	}
 }
 
@@ -42,6 +42,6 @@ func rangeValAddress5() {
 
 	mySlice := []string{"A", "B", "C"}
 	for _, value := range mySlice {
-		m[&value] = value // MATCH /suspicious assignment in range-loop. variables always have the same address/
+		m[&value] = value // MATCH /suspicious assignment of 'value'. range-loop variables always have the same address/
 	}
 }
