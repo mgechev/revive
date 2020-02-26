@@ -44,6 +44,7 @@ List of all available rules.
   - [package-comments](#package-comments)
   - [range](#range)
   - [range-val-in-closure](#range-val-in-closure)
+  - [range-val-address](#range-val-address)
   - [receiver-naming](#receiver-naming)
   - [redefines-builtin-id](#redefines-builtin-id)
   - [string-of-int](#string-of-int)
@@ -391,6 +392,12 @@ _Configuration_: N/A
 
 _Description_: Range variables in a loop are reused at each iteration; therefore a goroutine created in a loop will point to the range variable with from the upper scope. This way, the goroutine could use the variable with an undesired value.
 This rule warns when a range value (or index) is used inside a closure
+
+_Configuration_: N/A
+
+## range-val-address
+
+_Description_: Range variables in a loop are reused at each iteration. This rule warns when assigning the address of the variable.
 
 _Configuration_: N/A
 
