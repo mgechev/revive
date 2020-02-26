@@ -37,6 +37,10 @@ func retrieveParamNames(pl []*ast.Field) map[string]bool {
 	result := make(map[string]bool, len(pl))
 	for _, p := range pl {
 		for _, n := range p.Names {
+			if n.Name == "_" {
+				continue
+			}
+
 			result[n.Name] = true
 		}
 	}
