@@ -81,10 +81,12 @@ func (bw rangeBodyVisitor) Visit(node ast.Node) ast.Visitor {
 			if bw.isAccessingRangeValueAddress(e) {
 				bw.onFailure(bw.newFailure(e))
 			}
-		case *ast.CallExpr: // e.g. ...append(arr, &value)
-			for _, v := range e.Args {
-				if bw.isAccessingRangeValueAddress(v) {
-					bw.onFailure(bw.newFailure(e))
+		case *ast.CallExpr:
+			if fun, ok := e.Fun.(*ast.Ident); ok && fun.Name == "append" { // e.g. ...append(arr, &value)
+				for _, v := range e.Args {
+					if bw.isAccessingRangeValueAddress(v) {
+						bw.onFailure(bw.newFailure(e))
+					}
 				}
 			}
 		}
