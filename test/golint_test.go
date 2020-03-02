@@ -36,7 +36,7 @@ var rules = []lint.Rule{
 }
 
 func TestAll(t *testing.T) {
-	baseDir := "../fixtures/golint/"
+	baseDir := "../testdata/golint/"
 
 	rx, err := regexp.Compile(*lintMatch)
 	if err != nil {

@@ -20,7 +20,7 @@ import (
 )
 
 func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.RuleConfig) {
-	baseDir := "../fixtures/"
+	baseDir := "../testdata/"
 	filename = filename + ".go"
 	src, err := ioutil.ReadFile(baseDir + filename)
 	if err != nil {
