@@ -11,5 +11,5 @@ require (
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/pkg/errors v0.9.1
 	golang.org/x/tools v0.0.0-20200423205358-59e73619c742
-	k8s.io/klog v1.0.0
+	k8s.io/klog/v2/v2 v2.0.0
 )
