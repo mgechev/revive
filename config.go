@@ -83,6 +83,7 @@ var allRules = append([]lint.Rule{
 	&rule.UnhandledErrorRule{},
 	&rule.CognitiveComplexityRule{},
 	&rule.StringOfIntRule{},
+	&rule.LateReturnRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
