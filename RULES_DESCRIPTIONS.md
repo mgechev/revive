@@ -37,6 +37,7 @@ List of all available rules.
   - [indent-error-flow](#indent-error-flow)
   - [imports-blacklist](#imports-blacklist)
   - [import-shadowing](#import-shadowing)
+  - [late-return](#late-return)
   - [line-length-limit](#line-length-limit)
   - [max-public-structs](#max-public-structs)
   - [modifies-parameter](#modifies-parameter)
@@ -328,6 +329,29 @@ Example:
 _Description_: In GO it is possible to declare identifiers (packages, structs, 
 interfaces, parameters, receivers, variables, constants...) that conflict with the 
 name of an imported package. This rule spots identifiers that shadow an import.
+
+_Configuration_: N/A
+
+### late-return
+
+_Description_: In GO it is idiomatic to minimize nesting statements, a typical example is to avoid if-then-else constructions. This rule spots constructions like
+```go
+if cond {
+  // do something 
+} else {
+  // do other thing
+  return ...
+}
+```
+that can be rewritten into more idiomatic:
+```go
+if ! cond {
+  // do other thing
+  return ... 
+}
+
+// do something
+```
 
 _Configuration_: N/A
 
