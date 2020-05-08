@@ -37,7 +37,7 @@ List of all available rules.
   - [indent-error-flow](#indent-error-flow)
   - [imports-blacklist](#imports-blacklist)
   - [import-shadowing](#import-shadowing)
-  - [late-return](#late-return)
+  - [early-return](#early-return)
   - [line-length-limit](#line-length-limit)
   - [max-public-structs](#max-public-structs)
   - [modifies-parameter](#modifies-parameter)
@@ -332,7 +332,7 @@ name of an imported package. This rule spots identifiers that shadow an import.
 
 _Configuration_: N/A
 
-### late-return
+### early-return
 
 _Description_: In GO it is idiomatic to minimize nesting statements, a typical example is to avoid if-then-else constructions. This rule spots constructions like
 ```go

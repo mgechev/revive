@@ -6,32 +6,32 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// LateReturnRule lints given else constructs.
-type LateReturnRule struct{}
+// EarlyReturnRule lints given else constructs.
+type EarlyReturnRule struct{}
 
 // Apply applies the rule to given file.
-func (r *LateReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *EarlyReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
 
-	w := lintLateReturnRule{onFailure: onFailure}
+	w := lintEarlyReturnRule{onFailure: onFailure}
 	ast.Walk(w, file.AST)
 	return failures
 }
 
 // Name returns the rule name.
-func (r *LateReturnRule) Name() string {
-	return "late-return"
+func (r *EarlyReturnRule) Name() string {
+	return "early-return"
 }
 
-type lintLateReturnRule struct {
+type lintEarlyReturnRule struct {
 	onFailure func(lint.Failure)
 }
 
-func (w lintLateReturnRule) Visit(node ast.Node) ast.Visitor {
+func (w lintEarlyReturnRule) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
 	case *ast.IfStmt:
 		if n.Else == nil {
@@ -47,7 +47,7 @@ func (w lintLateReturnRule) Visit(node ast.Node) ast.Visitor {
 
 		lenElseBlock := len(elseBlock.List)
 		if lenElseBlock < 1 {
-			// empty else block, continue (there is another rule that warns on empty blocks) 
+			// empty else block, continue (there is another rule that warns on empty blocks)
 			return w
 		}
 
@@ -57,7 +57,7 @@ func (w lintLateReturnRule) Visit(node ast.Node) ast.Visitor {
 			w.onFailure(lint.Failure{
 				Confidence: 1,
 				Node:       n,
-				Failure:    "if c { } else {... return} can be rewritten as if !c {... return }",
+				Failure:    "if c { } else {... return} can be simplified to if !c { ... return }",
 			})
 
 			return w
@@ -70,7 +70,7 @@ func (w lintLateReturnRule) Visit(node ast.Node) ast.Visitor {
 			w.onFailure(lint.Failure{
 				Confidence: 1,
 				Node:       n,
-				Failure:    "if c {...} else {... return } can be rewritten as if !c { ... return } ...",
+				Failure:    "if c {...} else {... return } can be simplified to if !c { ... return } ...",
 			})
 		}
 	}
