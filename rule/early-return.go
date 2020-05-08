@@ -53,7 +53,7 @@ func (w lintEarlyReturnRule) Visit(node ast.Node) ast.Visitor {
 
 		lenThenBlock := len(n.Body.List)
 		if lenThenBlock < 1 {
-			// then block is empty thus the stmt can be rewritten
+			// then block is empty thus the stmt can be simplified
 			w.onFailure(lint.Failure{
 				Confidence: 1,
 				Node:       n,
@@ -63,10 +63,9 @@ func (w lintEarlyReturnRule) Visit(node ast.Node) ast.Visitor {
 			return w
 		}
 
-		elseIsShorterThanThen := lenElseBlock < lenThenBlock
 		_, lastThenStmtIsReturn := n.Body.List[lenThenBlock-1].(*ast.ReturnStmt)
 		_, lastElseStmtIsReturn := elseBlock.List[lenElseBlock-1].(*ast.ReturnStmt)
-		if lastElseStmtIsReturn && (elseIsShorterThanThen || !lastThenStmtIsReturn) {
+		if lastElseStmtIsReturn && !lastThenStmtIsReturn {
 			w.onFailure(lint.Failure{
 				Confidence: 1,
 				Node:       n,
