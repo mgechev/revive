@@ -2,7 +2,6 @@ package rule
 
 import (
 	"go/ast"
-	"reflect"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -66,21 +65,6 @@ func (w *lintIdenticalBranches) identicalBranches(branches []*ast.BlockStmt) boo
 	ref := gofmt(branches[0])
 	for i := 1; i < len(branches); i++ {
 		if gofmt(branches[i]) != ref {
-			return false
-		}
-	}
-
-	return true
-}
-
-func (w *lintIdenticalBranches) identicalBranches2(branches []*ast.BlockStmt) bool {
-	if len(branches) < 2 {
-		return false
-	}
-
-	ref := branches[0]
-	for i := 1; i < len(branches); i++ {
-		if !reflect.DeepEqual(branches[i], ref) {
 			return false
 		}
 	}
