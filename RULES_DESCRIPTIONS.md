@@ -21,6 +21,7 @@ List of all available rules.
   - [deep-exit](#deep-exit)
   - [dot-imports](#dot-imports)
   - [duplicated-imports](#duplicated-imports)
+  - [early-return](#early-return)
   - [empty-block](#empty-block)
   - [empty-lines](#empty-lines)
   - [error-naming](#error-naming)
@@ -200,6 +201,29 @@ _Configuration_: N/A
 ## duplicated-imports
 
 _Description_: It is possible to unintentionally import the same package twice. This rule looks for packages that are imported two or more times.
+
+_Configuration_: N/A
+
+### early-return
+
+_Description_: In GO it is idiomatic to minimize nesting statements, a typical example is to avoid if-then-else constructions. This rule spots constructions like
+```go
+if cond {
+  // do something 
+} else {
+  // do other thing
+  return ...
+}
+```
+that can be rewritten into more idiomatic:
+```go
+if ! cond {
+  // do other thing
+  return ... 
+}
+
+// do something
+```
 
 _Configuration_: N/A
 
