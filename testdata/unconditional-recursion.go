@@ -1,6 +1,10 @@
 package fixtures
 
-import "time"
+import (
+	"log"
+	"os"
+	"time"
+)
 
 func ur1() {
 	ur1() // MATCH /unconditional recursive call/
@@ -138,4 +142,25 @@ func ur12() {
 	go foo(ur12())                   // MATCH /unconditional recursive call/
 	go bar(1, "string", ur12(), 1.0) // MATCH /unconditional recursive call/
 	go foo(bar())
+}
+
+func urn13() {
+	if true {
+		panic("")
+	}
+	urn13()
+}
+
+func urn14() {
+	if true {
+		os.Exit(1)
+	}
+	urn14()
+}
+
+func urn15() {
+	if true {
+		log.Panic("")
+	}
+	urn15()
 }
