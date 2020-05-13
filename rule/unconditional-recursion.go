@@ -17,10 +17,6 @@ func (r *UnconditionalRecursionRule) Apply(file *lint.File, _ lint.Arguments) []
 		failures = append(failures, failure)
 	}
 
-	// err := file.Pkg.TypeCheck()
-	// if err != nil {
-	// 	panic(fmt.Sprintf("Error while type-checking file %s: %v", file.Name, err))
-	// }
 	w := lintUnconditionalRecursionRule{onFailure: onFailure}
 	ast.Walk(w, file.AST)
 	return failures
