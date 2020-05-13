@@ -164,3 +164,17 @@ func urn15() {
 	}
 	urn15()
 }
+
+func urn16(ch chan int) {
+	for range ch {
+		log.Panic("")
+	}
+	urn16(ch)
+}
+
+func urn17(ch chan int) {
+	for range ch {
+		print("")
+	}
+	urn17(ch) // MATCH /unconditional recursive call/
+}
