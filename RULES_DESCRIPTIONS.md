@@ -33,6 +33,7 @@ List of all available rules.
   - [flag-parameter](#flag-parameter)
   - [function-result-limit](#function-result-limit)
   - [get-return](#get-return)
+  - [identical-branches](#identical-branches)
   - [if-return](#if-return)
   - [increment-decrement](#increment-decrement)
   - [indent-error-flow](#indent-error-flow)
@@ -311,6 +312,12 @@ Example:
 ## get-return
 
 _Description_: Typically, functions with names prefixed with _Get_ are supposed to return a value.
+
+_Configuration_: N/A
+
+## identical-branches
+
+_Description_: an `if-then-else` conditional with identical implementations in both branches is an error.
 
 _Configuration_: N/A
 

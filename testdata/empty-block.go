@@ -2,18 +2,18 @@
 
 package fixtures
 
-func f(x int) bool {} // Must not match
+func f(x int) {} // Must not match
 
-type foo struct {}
+type foo struct{}
 
-func (f foo) f(x *int) string {} // Must not match
-func (f *foo) g(y *int) string {} // Must not match
+func (f foo) f(x *int)  {} // Must not match
+func (f *foo) g(y *int) {} // Must not match
 
-func g(f func() bool) string {
+func g(f func() bool) {
 	{ // MATCH /this block is empty, you can remove it/
 	}
 
-	a := func(e error){} // Must not match
+	_ = func(e error) {} // Must not match
 
 	if ok := f(); ok { // MATCH /this block is empty, you can remove it/
 		// only a comment
@@ -33,6 +33,15 @@ func g(f func() bool) string {
 
 	for { // MATCH /this block is empty, you can remove it/
 
+	}
+
+	// issue 386
+	var c = make(chan int)
+	for range c {
+	}
+
+	var s = "a string"
+	for range s { // MATCH /this block is empty, you can remove it/
 	}
 
 }

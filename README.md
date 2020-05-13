@@ -316,7 +316,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`cyclomatic`](./RULES_DESCRIPTIONS.md#cyclomatic)          |  int   | Sets restriction for maximum Cyclomatic complexity.              |    no    |  no   |
 | [`max-public-structs`](./RULES_DESCRIPTIONS.md#max-public-structs)  |  int   | The maximum number of public structs in a file.                  |    no    |  no   |
 | [`file-header`](./RULES_DESCRIPTIONS.md#file-header)         | string | Header which each file should have.                              |    no    |  no   |
-| [`empty-block`](./RULES_DESCRIPTIONS.md#empty-block)         |  n/a   | Warns on empty code blocks                                       |    no    |  no   |
+| [`empty-block`](./RULES_DESCRIPTIONS.md#empty-block)         |  n/a   | Warns on empty code blocks                                       |    no    |  yes   |
 | [`superfluous-else`](./RULES_DESCRIPTIONS.md#superfluous-else)    |  n/a   | Prevents redundant else statements (extends [`indent-error-flow`](./RULES_DESCRIPTIONS.md#indent-error-flow)) |    no    |  no   |
 | [`confusing-naming`](./RULES_DESCRIPTIONS.md#confusing-naming)    |  n/a   | Warns on methods with names that differ only by capitalization   |    no    |  no   |
 | [`get-return`](./RULES_DESCRIPTIONS.md#get-return)          |  n/a   | Warns on getters that do not yield any result                    |    no    |  no   |
@@ -351,6 +351,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`string-of-int`](./RULES_DESCRIPTIONS.md#string-of-int)          |  n/a   | Warns on suspicious casts from int to string            |    no    |  yes   |
 | [`early-return`](./RULES_DESCRIPTIONS.md#early-return)          |  n/a   | Spots if-then-else statements that can be refactored to simplify code reading            |    no    |  no   |
 | [`unconditional-recursion`](./RULES_DESCRIPTIONS.md#unconditional-recursion)          |  n/a   | Warns on function calls that will lead to (direct) infinite recursion |    no    |  no   |
+| [`identical-branches`](./RULES_DESCRIPTIONS.md#identical-branches)          |  n/a   | Spots if-then-else statements with identical `then` and `else` branches       |    no    |  no   |
 
 ## Configurable rules
 
