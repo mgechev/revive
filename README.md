@@ -80,6 +80,7 @@ Here's how `revive` is different from `golint`:
   - [Speed Comparison](#speed-comparison)
     - [golint](#golint)
     - [revive](#revive)
+  - [Overriding colorization detection](#overriding-colorization-detection)
   - [Contributors](#contributors)
   - [License](#license)
 
@@ -484,6 +485,18 @@ sys     0m17.192s
 ```
 
 Currently, type checking is enabled by default. If you want to run the linter without type checking, remove all typed rules from the configuration file.
+
+## Overriding colorization detection
+
+By default, `revive` determines whether or not to colorize its output based on whether it's connected to a TTY or not.
+This works for most use cases, but may not behave as expected if you use `revive` in a pipeline of commands,
+where STDOUT is being piped to another command.
+
+To force colorization, add `REVIVE_FORCE_COLOR=1` to the environment you're running in. For example:
+
+```shell
+REVIVE_FORCE_COLOR=1 revive -formatter friendly ./... | tee revive.log
+```
 
 ## Contributors
 
