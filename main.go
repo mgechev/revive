@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/fatih/color"
 	"github.com/mgechev/revive/lint"
+	"github.com/tymonx/go-color"
 )
 
 var logo = color.YellowString(` _ __ _____   _(_)__  _____

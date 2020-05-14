@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/fatih/color"
 	"github.com/mgechev/revive/lint"
 	"github.com/olekukonko/tablewriter"
+	"github.com/tymonx/go-color"
 )
 
 // Stylish is an implementation of the Formatter interface

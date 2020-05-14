@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/fatih/color"
 	"github.com/mgechev/revive/lint"
 	"github.com/olekukonko/tablewriter"
+	"github.com/tymonx/go-color"
 )
 
 var (
