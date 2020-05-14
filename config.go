@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/mgechev/dots"
 	"github.com/mitchellh/go-homedir"
 
@@ -248,6 +249,12 @@ var help bool
 var originalUsage = flag.Usage
 
 func init() {
+	// Force colorizing for no TTY environments. It works for formatters but
+	// not for -help, initialization order issue
+	if os.Getenv("REVIVE_FORCE_COLOR") == "1" {
+		color.NoColor = false
+	}
+
 	flag.Usage = func() {
 		fmt.Println(banner)
 		originalUsage()
