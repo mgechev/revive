@@ -249,14 +249,13 @@ var help bool
 var originalUsage = flag.Usage
 
 func init() {
-	// Force colorizing for no TTY environments. It works for formatters but
-	// not for -help, initialization order issue
+	// Force colorizing for no TTY environments
 	if os.Getenv("REVIVE_FORCE_COLOR") == "1" {
 		color.NoColor = false
 	}
 
 	flag.Usage = func() {
-		fmt.Println(banner)
+		fmt.Println(getBanner())
 		originalUsage()
 	}
 	// command line help strings

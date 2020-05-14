@@ -9,19 +9,25 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-var logo = color.YellowString(` _ __ _____   _(_)__  _____
+func getLogo() string {
+	return color.YellowString(` _ __ _____   _(_)__  _____
 | '__/ _ \ \ / / \ \ / / _ \
 | | |  __/\ V /| |\ V /  __/
 |_|  \___| \_/ |_| \_/ \___|`)
+}
 
-var call = color.MagentaString("revive -config c.toml -formatter friendly -exclude a.go -exclude b.go ./...")
+func getCall() string {
+	return color.MagentaString("revive -config c.toml -formatter friendly -exclude a.go -exclude b.go ./...")
+}
 
-var banner = fmt.Sprintf(`
+func getBanner() string {
+	return fmt.Sprintf(`
 %s
 
 Example:
   %s
-`, logo, call)
+`, getLogo(), getCall())
+}
 
 func main() {
 	config := getConfig()
