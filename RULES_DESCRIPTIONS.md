@@ -55,6 +55,7 @@ List of all available rules.
   - [time-naming](#time-naming)
   - [var-naming](#var-naming)
   - [var-declaration](#var-declaration)
+  - [unconditional-recursion](#unconditional-recursion)
   - [unexported-return](#unexported-return)
   - [unhandled-error](#unhandled-error)
   - [unnecessary-stmt](#unnecessary-stmt)
@@ -486,6 +487,12 @@ Example:
 ## var-declaration
 
 _Description_: This rule proposes simplifications of variable declarations.
+
+_Configuration_: N/A
+
+## unconditional-recursion
+
+_Description_: Unconditional recursive calls will produce infinite recursion, thus program stack overflow. This rule detects and warns about unconditional (direct) recursive calls.
 
 _Configuration_: N/A
 
