@@ -35,9 +35,9 @@ func g(f func() bool) {
 
 	}
 
-	// issue 386
+	// issue 386, then overwritten by issue 416
 	var c = make(chan int)
-	for range c {
+	for range c { // MATCH /this block is empty, you can remove it/
 	}
 
 	var s = "a string"
