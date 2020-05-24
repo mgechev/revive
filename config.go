@@ -87,6 +87,7 @@ var allRules = append([]lint.Rule{
 	&rule.EarlyReturnRule{},
 	&rule.UnconditionalRecursionRule{},
 	&rule.IdenticalBranchesRule{},
+	&rule.DeferRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
