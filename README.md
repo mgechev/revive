@@ -353,6 +353,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`early-return`](./RULES_DESCRIPTIONS.md#early-return)          |  n/a   | Spots if-then-else statements that can be refactored to simplify code reading            |    no    |  no   |
 | [`unconditional-recursion`](./RULES_DESCRIPTIONS.md#unconditional-recursion)          |  n/a   | Warns on function calls that will lead to (direct) infinite recursion |    no    |  no   |
 | [`identical-branches`](./RULES_DESCRIPTIONS.md#identical-branches)          |  n/a   | Spots if-then-else statements with identical `then` and `else` branches       |    no    |  no   |
+| [`defer`](./RULES_DESCRIPTIONS.md#defer)          |  map   |  Warns on some [defer gotchas](https://blog.learngoprogramming.com/5-gotchas-of-defer-in-go-golang-part-iii-36a1ab3d6ef1)       |    no    |  no   |
 
 ## Configurable rules
 
