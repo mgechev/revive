@@ -100,17 +100,12 @@ If you want to use revive with Bazel, take a look at the [rules](https://github.
 
 - Support for VSCode in [vscode-go](https://github.com/Microsoft/vscode-go/pull/1699).
 - Support for Atom via [linter-revive](https://github.com/morphy2k/linter-revive).
-- Support for vim via [w0rp/ale](https://github.com/w0rp/ale):
+- Support for vim via [dense-analysis/ale](https://github.com/dense-analysis/ale).
 
 ```vim
-call ale#linter#Define('go', {
-\   'name': 'revive',
-\   'output_stream': 'both',
-\   'executable': 'revive',
-\   'read_buffer': 0,
-\   'command': 'revive %t',
-\   'callback': 'ale#handlers#unix#HandleAsWarning',
-\})
+let g:ale_linters = {
+\   'go': ['revive'],
+\}
 ```
 
 ### GitHub Actions
