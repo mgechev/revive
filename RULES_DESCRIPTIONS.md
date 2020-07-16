@@ -57,6 +57,7 @@ List of all available rules.
   - [var-naming](#var-naming)
   - [var-declaration](#var-declaration)
   - [unconditional-recursion](#unconditional-recursion)
+  - [unexported-naming](#unexported-naming)
   - [unexported-return](#unexported-return)
   - [unhandled-error](#unhandled-error)
   - [unnecessary-stmt](#unnecessary-stmt)
@@ -514,6 +515,12 @@ _Configuration_: N/A
 ## unconditional-recursion
 
 _Description_: Unconditional recursive calls will produce infinite recursion, thus program stack overflow. This rule detects and warns about unconditional (direct) recursive calls.
+
+_Configuration_: N/A
+
+## unexported-naming
+
+_Description_: this rule warns on wrongly named un-exported symbols, i.e. un-exported symbols whose name start with a capital letter.
 
 _Configuration_: N/A
 
