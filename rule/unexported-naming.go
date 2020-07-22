@@ -108,7 +108,7 @@ func (unl unexportablenamingLinter) lintIDs(ids []*ast.Ident) {
 				Node:       id,
 				Confidence: 1,
 				Category:   "naming",
-				Failure:    fmt.Sprintf("the symbol %s can not be exported, its name should start with a lowercase letter", id.String()),
+				Failure:    fmt.Sprintf("the symbol %s is local, its name should start with a lowercase letter", id.String()),
 			})
 		}
 	}
