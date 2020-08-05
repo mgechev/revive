@@ -278,3 +278,6 @@ func (m *Migrator) MigrateIfNeeded(target *EtcdVersionPair) error { // MATCH /fu
 		}
 	}
 }
+
+// no regression test for issue #451
+func myFunc()
