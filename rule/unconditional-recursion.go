@@ -28,12 +28,12 @@ func (r *UnconditionalRecursionRule) Name() string {
 }
 
 type funcDesc struct {
-	reciverId *ast.Ident
+	reciverID *ast.Ident
 	id        *ast.Ident
 }
 
 func (fd *funcDesc) equal(other *funcDesc) bool {
-	receiversAreEqual := (fd.reciverId == nil && other.reciverId == nil) || fd.reciverId != nil && other.reciverId != nil && fd.reciverId.Name == other.reciverId.Name
+	receiversAreEqual := (fd.reciverID == nil && other.reciverID == nil) || fd.reciverID != nil && other.reciverID != nil && fd.reciverID.Name == other.reciverID.Name
 	idsAreEqual := (fd.id == nil && other.id == nil) || fd.id.Name == other.id.Name
 
 	return receiversAreEqual && idsAreEqual
@@ -69,26 +69,26 @@ func (w lintUnconditionalRecursionRule) Visit(node ast.Node) ast.Visitor {
 
 		w.currentFunc = &funcStatus{&funcDesc{rec, n.Name}, false}
 	case *ast.CallExpr:
-		var funcId *ast.Ident
+		var funcID *ast.Ident
 		var selector *ast.Ident
 		switch c := n.Fun.(type) {
 		case *ast.Ident:
 			selector = nil
-			funcId = c
+			funcID = c
 		case *ast.SelectorExpr:
 			var ok bool
 			selector, ok = c.X.(*ast.Ident)
 			if !ok { // a.b....Foo()
 				return nil
 			}
-			funcId = c.Sel
+			funcID = c.Sel
 		default:
 			return w
 		}
 
 		if w.currentFunc != nil && // not in a func body
 			!w.currentFunc.seenConditionalExit && // there is a conditional exit in the function
-			w.currentFunc.funcDesc.equal(&funcDesc{selector, funcId}) {
+			w.currentFunc.funcDesc.equal(&funcDesc{selector, funcID}) {
 			w.onFailure(lint.Failure{
 				Category:   "logic",
 				Confidence: 1,

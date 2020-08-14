@@ -1,0 +1,25 @@
+name: Lint
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.14
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Run Revive Action
+      uses: morphy2k/revive-action@v1.3.3
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

@@ -109,7 +109,7 @@ func (v *cognitiveComplexityVisitor) Visit(n ast.Node) ast.Visitor {
 		return nil // skip visiting binexp sub-tree (already visited by binExpComplexity)
 	case *ast.BranchStmt:
 		if n.Label != nil {
-			v.complexity += 1
+			v.complexity++
 		}
 	}
 	// TODO handle (at least) direct recursion
