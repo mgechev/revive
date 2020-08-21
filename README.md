@@ -35,11 +35,20 @@ Here's how `revive` is different from `golint`:
 - [`aurora`](https://github.com/xuri/aurora) - aurora is a web-based Beanstalk queue server console written in Go
 - [`soar`](https://github.com/XiaoMi/soar) - SQL Optimizer And Rewriter
 - [`gorush`](https://github.com/appleboy/gorush) - A push notification server written in Go (Golang)a
+- [`dry`](https://github.com/moncho/dry) - dry - A Docker manager for the terminal.
 - [`go-echarts`](https://github.com/chenjiandongx/go-echarts) - The adorable charts library for Golang
 - [`reviewdog`](https://github.com/reviewdog/reviewdog) - Automated code review tool integrated with any code analysis tools regardless of programming language
-- [`sklearn`](https://github.com/pa-m/sklearn) - A partial port of scikit-learn written in Go
+- [`rudder-server`](https://github.com/rudderlabs/rudder-server) - Privacy and Security focused Segment-alternative, in Golang and React.
+- [`sklearn`](https://github.com/pa-m/sklearn) - A partial port of scikit-learn written in Go.
+- [`protoc-gen-doc`](https://github.com/pseudomuto/protoc-gen-doc) - Documentation generator plugin for Google Protocol Buffers.
+- [`llvm`](https://github.com/llir/llvm) - Library for interacting with LLVM IR in pure Go.
+- [`jenkins-library`](https://github.com/SAP/jenkins-library) - Jenkins shared library for Continuous Delivery pipelines by SAP.
+- [`pd`](https://github.com/tikv/pd) - Placement driver for TiKV.
+- [`shellhub`](https://github.com/shellhub-io/shellhub) - ShellHub enables teams to easily access any Linux device behind firewall and NAT.
 - [`lorawan-stack`](https://github.com/TheThingsNetwork/lorawan-stack) - The Things Network Stack for LoRaWAN V3
+- [`gin-jwt`](https://github.com/appleboy/gin-jwt) - This is a JWT middleware for Gin framework.
 - [`gofight`](https://github.com/appleboy/gofight) - Testing API Handler written in Golang.
+- [`Beaver`](https://github.com/Clivern/Beaver) - A Real Time Messaging Server.
 - [`ggz`](https://github.com/go-ggz/ggz) - An URL shortener service written in Golang
 - [`Codeac.io`](https://www.codeac.io?ref=revive) - Automated code review service integrates with GitHub, Bitbucket and GitLab (even self-hosted) and helps you fight technical debt.
 
