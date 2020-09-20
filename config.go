@@ -14,7 +14,7 @@ import (
 
 	"github.com/mgechev/revive/formatter"
 
-	"github.com/BurntSushi/toml"
+	toml "github.com/pelletier/go-toml"
 	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/rule"
 )
@@ -134,7 +134,7 @@ func parseConfig(path string) *lint.Config {
 	if err != nil {
 		fail("cannot read the config file")
 	}
-	_, err = toml.Decode(string(file), config)
+	err = toml.Unmarshal(file, config)
 	if err != nil {
 		fail("cannot parse the config file: " + err.Error())
 	}
