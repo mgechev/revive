@@ -10,5 +10,5 @@ require (
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/pelletier/go-toml v1.8.1
 	github.com/pkg/errors v0.9.1
-	golang.org/x/tools v0.0.0-20200921210052-fa0125251cc4
+	golang.org/x/tools v0.0.0-20200922173257-82fe25c37531
 )
