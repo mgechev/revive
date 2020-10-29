@@ -1,28 +1,16 @@
-package main
+package config
 
 import (
-	"flag"
+	"errors"
 	"fmt"
 	"io/ioutil"
-	"os"
-	"path/filepath"
-	"strings"
-
-	"github.com/fatih/color"
-	"github.com/mgechev/dots"
-	"github.com/mitchellh/go-homedir"
 
 	"github.com/mgechev/revive/formatter"
 
-	toml "github.com/pelletier/go-toml"
+	"github.com/BurntSushi/toml"
 	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/rule"
 )
-
-func fail(err string) {
-	fmt.Fprintln(os.Stderr, err)
-	os.Exit(1)
-}
 
 var defaultRules = []lint.Rule{
 	&rule.VarDeclarationsRule{},
@@ -110,7 +98,8 @@ func getFormatters() map[string]lint.Formatter {
 	return result
 }
 
-func getLintingRules(config *lint.Config) []lint.Rule {
+// GetLintingRules yields the linting rules activated in the configuration
+func GetLintingRules(config *lint.Config) ([]lint.Rule, error) {
 	rulesMap := map[string]lint.Rule{}
 	for _, r := range allRules {
 		rulesMap[r.Name()] = r
@@ -120,25 +109,25 @@ func getLintingRules(config *lint.Config) []lint.Rule {
 	for name := range config.Rules {
 		rule, ok := rulesMap[name]
 		if !ok {
-			fail("cannot find rule: " + name)
+			return nil, fmt.Errorf("cannot find rule: %s", name)
 		}
 		lintingRules = append(lintingRules, rule)
 	}
 
-	return lintingRules
+	return lintingRules, nil
 }
 
-func parseConfig(path string) *lint.Config {
+func parseConfig(path string) (*lint.Config, error) {
 	config := &lint.Config{}
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
-		fail("cannot read the config file")
+		return nil, errors.New("cannot read the config file")
 	}
-	err = toml.Unmarshal(file, config)
+	_, err = toml.Decode(string(file), config)
 	if err != nil {
-		fail("cannot parse the config file: " + err.Error())
+		return nil, fmt.Errorf("cannot parse the config file: %v", err)
 	}
-	return config
+	return config, nil
 }
 
 func normalizeConfig(config *lint.Config) {
@@ -162,38 +151,32 @@ func normalizeConfig(config *lint.Config) {
 	}
 }
 
-func getConfig() *lint.Config {
+// GetConfig yields the configuration
+func GetConfig(configPath string) (*lint.Config, error) {
 	config := defaultConfig()
 	if configPath != "" {
-		config = parseConfig(configPath)
+		var err error
+		config, err = parseConfig(configPath)
+		if err != nil {
+			return nil, err
+		}
 	}
 	normalizeConfig(config)
-	return config
+	return config, nil
 }
 
-func getFormatter() lint.Formatter {
+// GetFormatter yields the formatter for lint failures
+func GetFormatter(formatterName string) (lint.Formatter, error) {
 	formatters := getFormatters()
 	formatter := formatters["default"]
 	if formatterName != "" {
 		f, ok := formatters[formatterName]
 		if !ok {
-			fail("unknown formatter " + formatterName)
+			return nil, fmt.Errorf("unknown formatter %v", formatterName)
 		}
 		formatter = f
 	}
-	return formatter
-}
-
-func buildDefaultConfigPath() string {
-	var result string
-	if homeDir, err := homedir.Dir(); err == nil {
-		result = filepath.Join(homeDir, "revive.toml")
-		if _, err := os.Stat(result); err != nil {
-			result = ""
-		}
-	}
-
-	return result
+	return formatter, nil
 }
 
 func defaultConfig() *lint.Config {
@@ -206,72 +189,4 @@ func defaultConfig() *lint.Config {
 		defaultConfig.Rules[r.Name()] = lint.RuleConfig{}
 	}
 	return &defaultConfig
-}
-
-func normalizeSplit(strs []string) []string {
-	res := []string{}
-	for _, s := range strs {
-		t := strings.Trim(s, " \t")
-		if len(t) > 0 {
-			res = append(res, t)
-		}
-	}
-	return res
-}
-
-func getPackages() [][]string {
-	globs := normalizeSplit(flag.Args())
-	if len(globs) == 0 {
-		globs = append(globs, ".")
-	}
-
-	packages, err := dots.ResolvePackages(globs, normalizeSplit(excludePaths))
-	if err != nil {
-		fail(err.Error())
-	}
-
-	return packages
-}
-
-type arrayFlags []string
-
-func (i *arrayFlags) String() string {
-	return strings.Join([]string(*i), " ")
-}
-
-func (i *arrayFlags) Set(value string) error {
-	*i = append(*i, value)
-	return nil
-}
-
-var configPath string
-var excludePaths arrayFlags
-var formatterName string
-var help bool
-
-var originalUsage = flag.Usage
-
-func init() {
-	// Force colorizing for no TTY environments
-	if os.Getenv("REVIVE_FORCE_COLOR") == "1" {
-		color.NoColor = false
-	}
-
-	flag.Usage = func() {
-		fmt.Println(getBanner())
-		originalUsage()
-	}
-	// command line help strings
-	const (
-		configUsage    = "path to the configuration TOML file, defaults to $HOME/revive.toml, if present (i.e. -config myconf.toml)"
-		excludeUsage   = "list of globs which specify files to be excluded (i.e. -exclude foo/...)"
-		formatterUsage = "formatter to be used for the output (i.e. -formatter stylish)"
-	)
-
-	defaultConfigPath := buildDefaultConfigPath()
-
-	flag.StringVar(&configPath, "config", defaultConfigPath, configUsage)
-	flag.Var(&excludePaths, "exclude", excludeUsage)
-	flag.StringVar(&formatterName, "formatter", "", formatterUsage)
-	flag.Parse()
 }
