@@ -2,6 +2,7 @@ package rule
 
 import (
 	"go/ast"
+	"strings"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -44,6 +45,8 @@ func (w lintBlankImports) Visit(_ ast.Node) ast.Visitor {
 		return nil
 	}
 
+	const embedImportPath = `"embed"`
+
 	// The first element of each contiguous group of blank imports should have
 	// an explanatory comment of some kind.
 	for i, imp := range w.fileAst.Imports {
@@ -52,12 +55,19 @@ func (w lintBlankImports) Visit(_ ast.Node) ast.Visitor {
 		if !isBlank(imp.Name) {
 			continue // Ignore non-blank imports.
 		}
+
 		if i > 0 {
 			prev := w.fileAst.Imports[i-1]
 			prevPos := w.file.ToPosition(prev.Pos())
-			if isBlank(prev.Name) && prevPos.Line+1 == pos.Line {
-				continue // A subsequent blank in a group.
+
+			isSubsequentBlancInAGroup := isBlank(prev.Name) && prevPos.Line+1 == pos.Line && prev.Path.Value != embedImportPath
+			if isSubsequentBlancInAGroup {
+				continue
 			}
+		}
+
+		if imp.Path.Value == embedImportPath && w.fileHasValidEmbedComment() {
+			continue
 		}
 
 		// This is the first blank import of a group.
@@ -71,4 +81,16 @@ func (w lintBlankImports) Visit(_ ast.Node) ast.Visitor {
 		}
 	}
 	return nil
+}
+
+func (w lintBlankImports) fileHasValidEmbedComment() bool {
+	for _, commentGroup := range w.fileAst.Comments {
+		for _, comment := range commentGroup.List {
+			if strings.HasPrefix(comment.Text, "//go:embed ") {
+				return true
+			}
+		}
+	}
+
+	return false
 }

@@ -38,6 +38,11 @@ import (
 	_ "go/token"
 )
 
+import (
+	_ "embed"
+	/* MATCH:42 /a blank import should be only in a main or test package, or have a comment justifying it/ */
+)
+
 var (
 	_ fmt.Stringer // for "fmt"
 	_ ast.Node     // for "go/ast"
