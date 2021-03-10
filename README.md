@@ -108,6 +108,7 @@ If you want to use revive with Bazel, take a look at the [rules](https://github.
 ### Text Editors
 
 - Support for VSCode in [vscode-go](https://github.com/Microsoft/vscode-go/pull/1699).
+- Support for GoLand via [File Watchers](https://dev.to/s0xzwasd/configure-revive-go-linter-in-goland-2ggl).  
 - Support for Atom via [linter-revive](https://github.com/morphy2k/linter-revive).
 - Support for vim via [dense-analysis/ale](https://github.com/dense-analysis/ale).
 
