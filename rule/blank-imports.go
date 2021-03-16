@@ -22,8 +22,8 @@ func (r *BlankImportsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failu
 	}
 
 	const (
-		message         = "a blank import should be only in a main or test package, or have a comment justifying it"
-		category        = "imports"
+		message  = "a blank import should be only in a main or test package, or have a comment justifying it"
+		category = "imports"
 
 		embedImportPath = `"embed"`
 	)
