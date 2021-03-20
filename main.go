@@ -29,6 +29,11 @@ func main() {
 	if err != nil {
 		fail(err.Error())
 	}
+
+	if len(excludePaths) == 0 { // if no excludes were set in the command line
+		excludePaths = conf.Exclude // use those from the configuration
+	}
+
 	packages, err := getPackages(excludePaths)
 	if err != nil {
 		fail(err.Error())
