@@ -33,6 +33,7 @@ List of all available rules.
   - [file-header](#file-header)
   - [flag-parameter](#flag-parameter)
   - [function-result-limit](#function-result-limit)
+  - [function-length](#function-length)
   - [get-return](#get-return)
   - [identical-branches](#identical-branches)
   - [if-return](#if-return)
@@ -330,6 +331,20 @@ Example:
 [rule.function-result-limit]
   arguments =[3]
 ```
+
+## function-length
+
+_Description_: Functions too long (with many statements and/or lines) can be hard to understand.
+
+_Configuration_: (int,int) the maximum allowed statements and lines. Must be non-negative integers. Set to 0 to disable the check
+
+Example:
+
+```toml
+[rule.function-length]
+  arguments =[10,0]
+```
+Will check for functions exceeding 10 statements and will not check the number of lines of functions
 
 ## get-return
 
