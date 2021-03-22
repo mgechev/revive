@@ -139,6 +139,7 @@ var configPath string
 var excludePaths arrayFlags
 var formatterName string
 var help bool
+var versionFlag bool
 
 var originalUsage = flag.Usage
 
@@ -180,18 +181,6 @@ func init() {
 		color.NoColor = false
 	}
 
-	// Output build info (version, commit, date and builtBy)
-	if len(os.Args) > 1 && os.Args[1] == "--version" {
-		fmt.Printf(
-			"Current revive version %v commit %v, built @%v by %v.\n",
-			version,
-			commit,
-			date,
-			builtBy,
-		)
-		return
-	}
-
 	flag.Usage = func() {
 		fmt.Println(getBanner())
 		originalUsage()
@@ -202,6 +191,7 @@ func init() {
 		configUsage    = "path to the configuration TOML file, defaults to $HOME/revive.toml, if present (i.e. -config myconf.toml)"
 		excludeUsage   = "list of globs which specify files to be excluded (i.e. -exclude foo/...)"
 		formatterUsage = "formatter to be used for the output (i.e. -formatter stylish)"
+		versionUsage   = "get revive version"
 	)
 
 	defaultConfigPath := buildDefaultConfigPath()
@@ -209,5 +199,18 @@ func init() {
 	flag.StringVar(&configPath, "config", defaultConfigPath, configUsage)
 	flag.Var(&excludePaths, "exclude", excludeUsage)
 	flag.StringVar(&formatterName, "formatter", "", formatterUsage)
+	flag.BoolVar(&versionFlag, "version", false, versionUsage)
 	flag.Parse()
+
+	// Output build info (version, commit, date and builtBy)
+	if versionFlag {
+		fmt.Printf(
+			"Current revive version %v commit %v, built @%v by %v.\n",
+			version,
+			commit,
+			date,
+			builtBy,
+		)
+		os.Exit(0)
+	}
 }
