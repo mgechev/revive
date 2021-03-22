@@ -15,6 +15,13 @@ import (
 	"github.com/mitchellh/go-homedir"
 )
 
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+	builtBy = "unknown"
+)
+
 func fail(err string) {
 	fmt.Fprintln(os.Stderr, err)
 	os.Exit(1)
@@ -173,10 +180,23 @@ func init() {
 		color.NoColor = false
 	}
 
+	// Output build info (version, commit, date and builtBy)
+	if len(os.Args) > 1 && os.Args[1] == "--version" {
+		fmt.Printf(
+			"Current revive version %v commit %v, built @%v by %v.\n",
+			version,
+			commit,
+			date,
+			builtBy,
+		)
+		return
+	}
+
 	flag.Usage = func() {
 		fmt.Println(getBanner())
 		originalUsage()
 	}
+
 	// command line help strings
 	const (
 		configUsage    = "path to the configuration TOML file, defaults to $HOME/revive.toml, if present (i.e. -config myconf.toml)"
