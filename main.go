@@ -15,6 +15,13 @@ import (
 	"github.com/mitchellh/go-homedir"
 )
 
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+	builtBy = "unknown"
+)
+
 func fail(err string) {
 	fmt.Fprintln(os.Stderr, err)
 	os.Exit(1)
@@ -132,6 +139,7 @@ var configPath string
 var excludePaths arrayFlags
 var formatterName string
 var help bool
+var versionFlag bool
 
 var originalUsage = flag.Usage
 
@@ -177,11 +185,13 @@ func init() {
 		fmt.Println(getBanner())
 		originalUsage()
 	}
+
 	// command line help strings
 	const (
 		configUsage    = "path to the configuration TOML file, defaults to $HOME/revive.toml, if present (i.e. -config myconf.toml)"
 		excludeUsage   = "list of globs which specify files to be excluded (i.e. -exclude foo/...)"
 		formatterUsage = "formatter to be used for the output (i.e. -formatter stylish)"
+		versionUsage   = "get revive version"
 	)
 
 	defaultConfigPath := buildDefaultConfigPath()
@@ -189,5 +199,18 @@ func init() {
 	flag.StringVar(&configPath, "config", defaultConfigPath, configUsage)
 	flag.Var(&excludePaths, "exclude", excludeUsage)
 	flag.StringVar(&formatterName, "formatter", "", formatterUsage)
+	flag.BoolVar(&versionFlag, "version", false, versionUsage)
 	flag.Parse()
+
+	// Output build info (version, commit, date and builtBy)
+	if versionFlag {
+		fmt.Printf(
+			"Current revive version %v commit %v, built @%v by %v.\n",
+			version,
+			commit,
+			date,
+			builtBy,
+		)
+		os.Exit(0)
+	}
 }
