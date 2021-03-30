@@ -34,6 +34,7 @@ Here's how `revive` is different from `golint`:
 - [`excelize`](https://github.com/360EntSecGroup-Skylar/excelize) - Go library for reading and writing Microsoft Excel™ (XLSX) files
 - [`aurora`](https://github.com/xuri/aurora) - aurora is a web-based Beanstalk queue server console written in Go
 - [`soar`](https://github.com/XiaoMi/soar) - SQL Optimizer And Rewriter
+- [`pyroscope`](https://github.com/pyroscope-io/pyroscope) - Continuous profiling platform
 - [`gorush`](https://github.com/appleboy/gorush) - A push notification server written in Go (Golang)a
 - [`dry`](https://github.com/moncho/dry) - dry - A Docker manager for the terminal.
 - [`go-echarts`](https://github.com/chenjiandongx/go-echarts) - The adorable charts library for Golang
@@ -108,7 +109,7 @@ If you want to use revive with Bazel, take a look at the [rules](https://github.
 ### Text Editors
 
 - Support for VSCode in [vscode-go](https://github.com/Microsoft/vscode-go/pull/1699).
-- Support for GoLand via [File Watchers](https://dev.to/s0xzwasd/configure-revive-go-linter-in-goland-2ggl).  
+- Support for GoLand via [File Watchers](https://dev.to/s0xzwasd/configure-revive-go-linter-in-goland-2ggl).
 - Support for Atom via [linter-revive](https://github.com/morphy2k/linter-revive).
 - Support for vim via [dense-analysis/ale](https://github.com/dense-analysis/ale).
 
