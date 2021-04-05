@@ -83,6 +83,7 @@ Here's how `revive` is different from `golint`:
     - [Default](#default)
     - [Plain](#plain)
     - [Unix](#unix)
+    - [SARIF](#sarif)
   - [Extensibility](#extensibility)
     - [Custom Rule](#custom-rule)
       - [Example](#example)
@@ -407,6 +408,12 @@ The plain formatter produces the same output as the default formatter and append
 The unix formatter produces the same output as the default formatter but surrounds the rules in `[]`.
 
 ![Unix formatter](/assets/formatter-unix.png)
+
+### SARIF
+The `sarif`  formatter produces outputs in SARIF, for _Static Analysis Results Interchange Format_, a standard JSON-based format for the output of static analysis tools defined and promoted by [OASIS](https://www.oasis-open.org/).
+
+Current supported version of the standard is [SARIF-v2.1.0](https://docs.oasis-open.org/sarif/sarif/v2.1.0/csprd01/sarif-v2.1.0-csprd01.html
+).
 
 ## Extensibility
 
