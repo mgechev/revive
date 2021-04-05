@@ -89,6 +89,7 @@ var allFormatters = []lint.Formatter{
 	&formatter.Unix{},
 	&formatter.Checkstyle{},
 	&formatter.Plain{},
+	&formatter.Sarif{},
 }
 
 func getFormatters() map[string]lint.Formatter {

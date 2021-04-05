@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/BurntSushi/toml v0.3.1
+	github.com/chavacava/garif v0.0.0-20210405163807-87a70f3d418b
 	github.com/fatih/color v1.10.0
 	github.com/fatih/structtag v1.2.0
 	github.com/mgechev/dots v0.0.0-20190921121421-c36f7dcfbb81
