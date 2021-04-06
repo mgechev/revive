@@ -7,7 +7,7 @@ import (
 	"github.com/mgechev/revive/rule"
 )
 
-func TestStringFormat(t *testing.T) {
+func TestStringRegex(t *testing.T) {
 	testRule(t, "string-regex", &rule.StringRegexRule{}, &lint.RuleConfig{
 		Arguments: []interface{}{
 			[]string{
