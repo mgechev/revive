@@ -87,9 +87,9 @@ func (w lintStringRegexRule) lintMessage(s string, node ast.Node) {
 		}
 		var failure string
 		if rule.ErrorMessage != nil {
-			failure = fmt.Sprintf("message doesn't match user defined regex (%s)", *rule.ErrorMessage)
+			failure = fmt.Sprintf("string literal doesn't match user defined regex (%s)", *rule.ErrorMessage)
 		} else {
-			failure = fmt.Sprintf("message doesn't match user defined regex /%s/", rule.Regexp.String())
+			failure = fmt.Sprintf("string literal doesn't match user defined regex /%s/", rule.Regexp.String())
 		}
 		w.onFailure(lint.Failure{
 			Confidence: 1,

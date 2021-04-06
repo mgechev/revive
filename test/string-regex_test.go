@@ -12,7 +12,7 @@ func TestStringRegex(t *testing.T) {
 		Arguments: []interface{}{
 			[]string{
 				"/^[A-Z]/",
-				"must be capitalized"},
+				"must start with a capital letter"},
 
 			[]string{
 				"/[^\\.]$/"}}}) // must not end with a period
