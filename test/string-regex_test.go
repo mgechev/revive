@@ -8,9 +8,12 @@ import (
 )
 
 func TestStringFormat(t *testing.T) {
-	testRule(t, "string-regex-capitalized", &rule.StringRegexRule{}, &lint.RuleConfig{
+	testRule(t, "string-regex", &rule.StringRegexRule{}, &lint.RuleConfig{
 		Arguments: []interface{}{
 			[]string{
 				"/^[A-Z]/",
-				"must be capitalized"}}})
+				"must be capitalized"},
+
+			[]string{
+				"/[^\\.]$/"}}}) // must not end with a period
 }

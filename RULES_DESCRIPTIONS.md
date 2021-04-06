@@ -53,6 +53,7 @@ List of all available rules.
   - [redefines-builtin-id](#redefines-builtin-id)
   - [string-of-int](#string-of-int)
   - [struct-tag](#struct-tag)
+  - [string-regex](#string-regex)
   - [superfluous-else](#superfluous-else)
   - [time-naming](#time-naming)
   - [var-naming](#var-naming)
@@ -487,6 +488,20 @@ _Configuration_: N/A
 _Description_:  explicit type conversion `string(i)` where `i` has an integer type other than `rune` might behave not as expected by the developer (e.g. `string(42)` is not `"42"`). This rule spot that kind of suspicious conversions. 
 
 _Configuration_: N/A
+
+## string-regex
+
+_Description_: This rule allows you to configure a list of regular expressions that string literals are checked against.
+This is geared towards user facing applications where string literals are often used for messages that will be presented to users, so it may be desirable to enforce consistent formatting.
+
+_Configuration_: Each argument is a slice containing two strings, only the first string is required. The first string is a regular expression (beginning and ending with a / character), which will be applied to string literals. The second string (optional) is a message containing the purpose for that regex, which will be used in lint errors.
+
+Example:
+
+```toml
+[rule.string-regex]
+  arguments = [["/^[^A-Z]/"], "must not start with a capital letter"], ["/[^\.!?]$/" "must not end in punctuation"], ["/^[^\n]+$/", "must not contain line breaks"]]
+```
 
 ## struct-tag
 

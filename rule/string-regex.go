@@ -65,7 +65,7 @@ func (w *lintStringRegexRule) parseArguments(arguments lint.Arguments) {
 		// Strip / characters from the ends of rule[0] before compiling
 		regex, err := regexp.Compile(rule[0][1 : len(rule[0])-1])
 		if err != nil {
-			panic(fmt.Sprintf("unable to compile argument %d as regexp", i))
+			panic(fmt.Sprintf("unable to compile argument %s as regexp", rule[0]))
 		}
 		var errorMessage *string = nil
 		if len(rule) >= 2 {
