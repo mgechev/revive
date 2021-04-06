@@ -10,10 +10,10 @@ import (
 func TestStringRegex(t *testing.T) {
 	testRule(t, "string-regex", &rule.StringRegexRule{}, &lint.RuleConfig{
 		Arguments: []interface{}{
-			[]string{
+			[]interface{}{
 				"/^[A-Z]/",
 				"must start with a capital letter"},
 
-			[]string{
+			[]interface{}{
 				"/[^\\.]$/"}}}) // must not end with a period
 }

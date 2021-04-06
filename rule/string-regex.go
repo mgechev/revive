@@ -58,25 +58,39 @@ func (w lintStringRegexRule) Visit(node ast.Node) ast.Visitor {
 
 func (w *lintStringRegexRule) parseArguments(arguments lint.Arguments) {
 	for i, argument := range arguments {
-		rule, ok := argument.([]string)
-		if !ok {
-			panic(fmt.Sprintf("unable to parse argument %d", i))
-		}
-		// Strip / characters from the ends of rule[0] before compiling
-		regex, err := regexp.Compile(rule[0][1 : len(rule[0])-1])
-		if err != nil {
-			panic(fmt.Sprintf("unable to compile argument %s as regexp", rule[0]))
-		}
-		var errorMessage *string = nil
-		if len(rule) >= 2 {
-			errorMessage = new(string)
-			*errorMessage = rule[1]
-		}
+		regex, errorMessage := w.parseArgument(argument, i)
 		w.rules = append(w.rules, stringRegexSubrule{
 			Regexp:       regex,
 			ErrorMessage: errorMessage,
 		})
 	}
+}
+
+func (w lintStringRegexRule) parseArgument(argument interface{}, argNum int) (regex *regexp.Regexp, errorMessage *string) {
+	g, ok := argument.([]interface{}) // Cast to generic slice first
+	if !ok {
+		panic(fmt.Sprintf("unable to parse argument %d", argNum))
+	}
+	var rule []string
+	for i, obj := range g {
+		val, ok := obj.(string)
+		if !ok {
+			panic(fmt.Sprintf("unable to parse argument %d, option %d", argNum, i))
+		}
+		rule = append(rule, val)
+	}
+	// Strip / characters from the beginning and end of rule[0] before compiling
+	regex, err := regexp.Compile(rule[0][1 : len(rule[0])-1])
+	if err != nil {
+		panic(fmt.Sprintf("unable to compile %s as regexp (argument %d, option %d)", rule[0], argNum, 0))
+	}
+
+	// Parse custom error message if provided
+	errorMessage = nil
+	if len(rule) == 2 {
+		errorMessage = &rule[1]
+	}
+	return regex, errorMessage
 }
 
 func (w lintStringRegexRule) lintMessage(s string, node ast.Node) {
