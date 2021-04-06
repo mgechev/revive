@@ -500,7 +500,10 @@ Example:
 
 ```toml
 [rule.string-regex]
-  arguments = [["/^[^A-Z]/"], "must not start with a capital letter"], ["/[^\.!?]$/" "must not end in punctuation"], ["/^[^\n]+$/", "must not contain line breaks"]]
+  arguments = [
+    ["/^[^A-Z]/", "must not start with a capital letter"],
+    ["/[^\\.!?]$/", "must not end in punctuation"],
+    ["/^[^\\n]+$/", "must not contain line breaks"]]
 ```
 
 ## struct-tag
