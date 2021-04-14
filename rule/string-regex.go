@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 	"regexp"
+	"strconv"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -38,8 +39,25 @@ type lintStringRegexRule struct {
 }
 
 type stringRegexSubrule struct {
+	Scope        stringRegexScope
 	Regexp       *regexp.Regexp
 	ErrorMessage *string
+}
+
+type stringRegexScope struct {
+	Func     string // Function name the rule is scoped to
+	Argument int    // (optional) Which argument in calls to the function is checked against the rule (the first argument is checked by default)
+	Member   string // (optional) If the argument to be checked is a struct, which member of the struct is checked against the rule (top level members only)
+}
+
+var checkStringRegexScope = struct {
+	Basic              *regexp.Regexp
+	WithArgument       *regexp.Regexp
+	WithArgumentMember *regexp.Regexp
+}{
+	Basic:              regexp.MustCompile("^[A-Za-z]+"),
+	WithArgument:       regexp.MustCompile("\\[\\d\\]"),
+	WithArgumentMember: regexp.MustCompilePOSIX("^\\[\\d\\]\\.\\K[A-Za-z]+$"),
 }
 
 func (w lintStringRegexRule) Visit(node ast.Node) ast.Visitor {
@@ -58,39 +76,59 @@ func (w lintStringRegexRule) Visit(node ast.Node) ast.Visitor {
 
 func (w *lintStringRegexRule) parseArguments(arguments lint.Arguments) {
 	for i, argument := range arguments {
-		regex, errorMessage := w.parseArgument(argument, i)
+		scope, regex, errorMessage := w.parseArgument(argument, i)
 		w.rules = append(w.rules, stringRegexSubrule{
+			Scope:        scope,
 			Regexp:       regex,
 			ErrorMessage: errorMessage,
 		})
 	}
 }
 
-func (w lintStringRegexRule) parseArgument(argument interface{}, argNum int) (regex *regexp.Regexp, errorMessage *string) {
+func (w lintStringRegexRule) parseArgument(argument interface{}, ruleNum int) (scope stringRegexScope, regex *regexp.Regexp, errorMessage *string) {
 	g, ok := argument.([]interface{}) // Cast to generic slice first
 	if !ok {
-		panic(fmt.Sprintf("unable to parse argument %d", argNum))
+		panic(fmt.Sprintf("unable to parse argument %d", ruleNum))
 	}
 	var rule []string
 	for i, obj := range g {
 		val, ok := obj.(string)
 		if !ok {
-			panic(fmt.Sprintf("unable to parse argument %d, option %d", argNum, i))
+			panic(fmt.Sprintf("unable to parse argument %d, option %d", ruleNum, i))
 		}
 		rule = append(rule, val)
 	}
-	// Strip / characters from the beginning and end of rule[0] before compiling
-	regex, err := regexp.Compile(rule[0][1 : len(rule[0])-1])
+
+	// Parse rule scope
+	scope = stringRegexScope{}
+	c := checkStringRegexScope
+	if funcName := c.Basic.FindString(rule[0]); len(funcName) > 0 {
+		scope.Func = funcName
+	} else {
+		panic(fmt.Sprintf("rule scope doesn't start with a valid function name (argument %d, option 0)", ruleNum))
+	}
+	if arg := c.WithArgument.FindString(rule[0]); len(arg) > 0 {
+		argNum, err := strconv.Atoi(arg)
+		if err != nil {
+			panic(fmt.Sprintf("invalid argument number given in rule scope (argument %d, option 0)", ruleNum))
+		}
+		scope.Argument = argNum
+	}
+	if member := c.WithArgumentMember.FindString(rule[0]); len(member) > 0 {
+		scope.Member = member
+	}
+
+	// Strip / characters from the beginning and end of rule[1] before compiling
+	regex, err := regexp.Compile(rule[1][1 : len(rule[1])-1])
 	if err != nil {
-		panic(fmt.Sprintf("unable to compile %s as regexp (argument %d, option %d)", rule[0], argNum, 0))
+		panic(fmt.Sprintf("unable to compile %s as regexp (argument %d, option 1)", rule[1], ruleNum))
 	}
 
 	// Parse custom error message if provided
-	errorMessage = nil
 	if len(rule) == 2 {
 		errorMessage = &rule[1]
 	}
-	return regex, errorMessage
+	return scope, regex, errorMessage
 }
 
 func (w lintStringRegexRule) lintMessage(s string, node ast.Node) {
