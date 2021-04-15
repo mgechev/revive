@@ -11,9 +11,11 @@ func TestStringRegex(t *testing.T) {
 	testRule(t, "string-regex", &rule.StringRegexRule{}, &lint.RuleConfig{
 		Arguments: []interface{}{
 			[]interface{}{
+				"stringRegexMethod1", // The first argument is checked by default
 				"/^[A-Z]/",
 				"must start with a capital letter"},
 
 			[]interface{}{
-				"/[^\\.]$/"}}}) // must not end with a period
+				"stringRegexMethod2[2].d",
+				"/[^\\.]$/"}}}) // Must not end with a period
 }
