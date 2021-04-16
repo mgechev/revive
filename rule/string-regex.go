@@ -81,13 +81,13 @@ func (w lintStringRegexRule) parseArgument(argument interface{}, ruleNum int) (s
 	if !ok {
 		panic(fmt.Sprintf("unable to parse argument %d", ruleNum))
 	}
-	var rule []string
+	rule := make([]string, len(g))
 	for i, obj := range g {
 		val, ok := obj.(string)
 		if !ok {
 			panic(fmt.Sprintf("unable to parse argument %d, option %d", ruleNum, i))
 		}
-		rule = append(rule, val)
+		rule[i] = val
 	}
 
 	// Parse rule scope
@@ -101,7 +101,6 @@ func (w lintStringRegexRule) parseArgument(argument interface{}, ruleNum int) (s
 		var err error
 		scope.argument, err = strconv.Atoi(matches[2])
 		if err != nil {
-			fmt.Println(len(matches))
 			panic(fmt.Sprintf("unable to parse rule scope argument number (argument %d, option 0)", ruleNum))
 		}
 	}
@@ -153,16 +152,18 @@ func (w lintStringRegexRule) getCallName(call *ast.CallExpr) (callName string, o
 	if ident, ok := call.Fun.(*ast.Ident); ok {
 		// Local function call
 		return ident.Name, true
-	} else if selector, ok := call.Fun.(*ast.SelectorExpr); ok {
+	}
+
+	if selector, ok := call.Fun.(*ast.SelectorExpr); ok {
 		// Scoped function call
 		scope, ok := selector.X.(*ast.Ident)
 		if !ok {
 			return "", false
 		}
 		return scope.Name + "." + selector.Sel.Name, true
-	} else {
-		return "", false
 	}
+
+	return "", false
 }
 
 // #endregion
@@ -220,7 +221,7 @@ func (rule stringRegexSubrule) lintMessage(s string, node ast.Node) {
 	}
 	var failure string
 	if len(rule.errorMessage) > 0 {
-		failure = fmt.Sprintf("string literal doesn't match user defined regex (%s)", rule.errorMessage)
+		failure = rule.errorMessage
 	} else {
 		failure = fmt.Sprintf("string literal doesn't match user defined regex /%s/", rule.regexp.String())
 	}
