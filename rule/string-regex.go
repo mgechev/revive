@@ -46,16 +46,16 @@ type lintStringRegexRule struct {
 }
 
 type stringRegexSubrule struct {
-	Parent       *lintStringRegexRule
-	Scope        stringRegexSubruleScope
-	Regexp       *regexp.Regexp
-	ErrorMessage string
+	parent       *lintStringRegexRule
+	scope        stringRegexSubruleScope
+	regexp       *regexp.Regexp
+	errorMessage string
 }
 
 type stringRegexSubruleScope struct {
-	Func     string // Function name the rule is scoped to
-	Argument int    // (optional) Which argument in calls to the function is checked against the rule (the first argument is checked by default)
-	Field    string // (optional) If the argument to be checked is a struct, which member of the struct is checked against the rule (top level members only)
+	funcName string // Function name the rule is scoped to
+	argument int    // (optional) Which argument in calls to the function is checked against the rule (the first argument is checked by default)
+	field    string // (optional) If the argument to be checked is a struct, which member of the struct is checked against the rule (top level members only)
 }
 
 var parseStringRegexScope = regexp.MustCompile("^([A-Za-z][\\.A-Za-z0-9]+)(?:\\[([0-9]+)\\])?(?:\\.([A-Za-z]+))?$")
@@ -68,10 +68,10 @@ func (w *lintStringRegexRule) parseArguments(arguments lint.Arguments) {
 	for i, argument := range arguments {
 		scope, regex, errorMessage := w.parseArgument(argument, i)
 		w.rules = append(w.rules, stringRegexSubrule{
-			Parent:       w,
-			Scope:        scope,
-			Regexp:       regex,
-			ErrorMessage: errorMessage,
+			parent:       w,
+			scope:        scope,
+			regexp:       regex,
+			errorMessage: errorMessage,
 		})
 	}
 }
@@ -96,17 +96,17 @@ func (w lintStringRegexRule) parseArgument(argument interface{}, ruleNum int) (s
 	if matches == nil {
 		panic(fmt.Sprintf("unable to parse rule scope (argument %d, option 0)", ruleNum))
 	}
-	scope.Func = matches[1]
+	scope.funcName = matches[1]
 	if len(matches[2]) > 0 {
 		var err error
-		scope.Argument, err = strconv.Atoi(matches[2])
+		scope.argument, err = strconv.Atoi(matches[2])
 		if err != nil {
 			fmt.Println(len(matches))
 			panic(fmt.Sprintf("unable to parse rule scope argument number (argument %d, option 0)", ruleNum))
 		}
 	}
 	if len(matches[3]) > 0 {
-		scope.Field = matches[3]
+		scope.field = matches[3]
 	}
 
 	// Strip / characters from the beginning and end of rule[1] before compiling
@@ -140,7 +140,7 @@ func (w lintStringRegexRule) Visit(node ast.Node) ast.Visitor {
 	}
 
 	for _, rule := range w.rules {
-		if rule.Scope.Func == callName {
+		if rule.scope.funcName == callName {
 			rule.Apply(call)
 		}
 	}
@@ -171,14 +171,14 @@ func (w lintStringRegexRule) getCallName(call *ast.CallExpr) (callName string, o
 
 // Apply a single regex rule to a call expression (should be done after verifying the that the call expression matches the rule's scope)
 func (rule stringRegexSubrule) Apply(call *ast.CallExpr) {
-	if len(call.Args) <= rule.Scope.Argument {
+	if len(call.Args) <= rule.scope.argument {
 		// TODO: should cases where calls are incompatible with scope cause failures?
 		return
 	}
 
-	arg := call.Args[rule.Scope.Argument]
+	arg := call.Args[rule.scope.argument]
 	var lit *ast.BasicLit
-	if len(rule.Scope.Field) > 0 {
+	if len(rule.scope.field) > 0 {
 		// Try finding the scope's Field, treating arg as a composite literal
 		composite, ok := arg.(*ast.CompositeLit)
 		if !ok {
@@ -190,7 +190,7 @@ func (rule stringRegexSubrule) Apply(call *ast.CallExpr) {
 				continue
 			}
 			key, ok := kv.Key.(*ast.Ident)
-			if !ok || key.Name != rule.Scope.Field {
+			if !ok || key.Name != rule.scope.field {
 				continue
 			}
 
@@ -215,16 +215,16 @@ func (rule stringRegexSubrule) Apply(call *ast.CallExpr) {
 
 func (rule stringRegexSubrule) lintMessage(s string, node ast.Node) {
 	// Fail if the string doesn't match the user's regex
-	if rule.Regexp.MatchString(s) {
+	if rule.regexp.MatchString(s) {
 		return
 	}
 	var failure string
-	if len(rule.ErrorMessage) > 0 {
-		failure = fmt.Sprintf("string literal doesn't match user defined regex (%s)", rule.ErrorMessage)
+	if len(rule.errorMessage) > 0 {
+		failure = fmt.Sprintf("string literal doesn't match user defined regex (%s)", rule.errorMessage)
 	} else {
-		failure = fmt.Sprintf("string literal doesn't match user defined regex /%s/", rule.Regexp.String())
+		failure = fmt.Sprintf("string literal doesn't match user defined regex /%s/", rule.regexp.String())
 	}
-	rule.Parent.onFailure(lint.Failure{
+	rule.parent.onFailure(lint.Failure{
 		Confidence: 1,
 		Failure:    failure,
 		Node:       node})
