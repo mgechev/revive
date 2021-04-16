@@ -17,5 +17,9 @@ func TestStringRegex(t *testing.T) {
 
 			[]interface{}{
 				"stringRegexMethod2[2].d",
-				"/[^\\.]$/"}}}) // Must not end with a period
+				"/[^\\.]$/"}, // Must not end with a period
+			[]interface{}{
+				"s.Method3[2]",
+				"/^[^Tt][^Hh]/",
+				"must not start with 'th'"}}})
 }

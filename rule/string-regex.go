@@ -58,7 +58,7 @@ type stringRegexSubruleScope struct {
 	Field    string // (optional) If the argument to be checked is a struct, which member of the struct is checked against the rule (top level members only)
 }
 
-var parseStringRegexScope = regexp.MustCompile("^([A-Za-z][A-Za-z0-9]+)(?:\\[([0-9]+)\\])?(?:\\.([A-Za-z]+))?$")
+var parseStringRegexScope = regexp.MustCompile("^([A-Za-z][\\.A-Za-z0-9]+)(?:\\[([0-9]+)\\])?(?:\\.([A-Za-z]+))?$")
 
 // #endregion
 
