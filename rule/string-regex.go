@@ -79,13 +79,16 @@ func (w *lintStringRegexRule) parseArguments(arguments lint.Arguments) {
 func (w lintStringRegexRule) parseArgument(argument interface{}, ruleNum int) (scope stringRegexSubruleScope, regex *regexp.Regexp, errorMessage string) {
 	g, ok := argument.([]interface{}) // Cast to generic slice first
 	if !ok {
-		panic(fmt.Sprintf("unable to parse argument %d", ruleNum))
+		w.configError("argument is not a slice", ruleNum, 0)
+	}
+	if len(g) < 2 {
+		w.configError("less than two slices found in argument, scope and regex are required", ruleNum, len(g)-1)
 	}
 	rule := make([]string, len(g))
 	for i, obj := range g {
 		val, ok := obj.(string)
 		if !ok {
-			panic(fmt.Sprintf("unable to parse argument %d, option %d", ruleNum, i))
+			w.configError("unexpected value, string was expected", ruleNum, i)
 		}
 		rule[i] = val
 	}
@@ -94,14 +97,18 @@ func (w lintStringRegexRule) parseArgument(argument interface{}, ruleNum int) (s
 	scope = stringRegexSubruleScope{}
 	matches := parseStringRegexScope.FindStringSubmatch(rule[0])
 	if matches == nil {
-		panic(fmt.Sprintf("unable to parse rule scope (argument %d, option 0)", ruleNum))
+		// The rule's scope didn't match the parsing regex at all, probably a configuration error
+		w.parseError("unable to parse rule scope", ruleNum, 0)
+	} else if len(matches) != 4 {
+		// The rule's scope matched the parsing regex, but an unexpected number of submatches was returned, probably a bug
+		w.parseError(fmt.Sprintf("unexpected number of submatches when parsing scope: %d, expected 4", len(matches)), ruleNum, 0)
 	}
 	scope.funcName = matches[1]
 	if len(matches[2]) > 0 {
 		var err error
 		scope.argument, err = strconv.Atoi(matches[2])
 		if err != nil {
-			panic(fmt.Sprintf("unable to parse rule scope argument number (argument %d, option 0)", ruleNum))
+			w.parseError("unable to parse argument number in rule scope", ruleNum, 0)
 		}
 	}
 	if len(matches[3]) > 0 {
@@ -111,7 +118,7 @@ func (w lintStringRegexRule) parseArgument(argument interface{}, ruleNum int) (s
 	// Strip / characters from the beginning and end of rule[1] before compiling
 	regex, err := regexp.Compile(rule[1][1 : len(rule[1])-1])
 	if err != nil {
-		panic(fmt.Sprintf("unable to compile %s as regexp (argument %d, option 1)", rule[1], ruleNum))
+		w.parseError(fmt.Sprintf("unable to compile %s as regexp", rule[1]), ruleNum, 1)
 	}
 
 	// Use custom error message if provided
@@ -119,6 +126,16 @@ func (w lintStringRegexRule) parseArgument(argument interface{}, ruleNum int) (s
 		errorMessage = rule[2]
 	}
 	return scope, regex, errorMessage
+}
+
+// Report an invalid config, this is specifically the user's fault
+func (w lintStringRegexRule) configError(msg string, ruleNum, option int) {
+	panic(fmt.Sprintf("invalid configuration for string-regex: %s (argument %d, option %d)", msg, ruleNum, option))
+}
+
+// Report a general config parsing failure, this may be the user's fault, but it isn't known for certain
+func (w lintStringRegexRule) parseError(msg string, ruleNum, option int) {
+	panic(fmt.Sprintf("failed to parse configuration for string-regex: %s (argument %d, option %d)", msg, ruleNum, option))
 }
 
 // #endregion
