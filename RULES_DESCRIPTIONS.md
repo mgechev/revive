@@ -509,7 +509,7 @@ Example:
   arguments = [
     ["core.WriteError[1].Message", "/^([^A-Z]|$)/", "must not start with a capital letter"],
     ["fmt.Errorf[0]", "/(^|[^\\.!?])$/", "must not end in punctuation"],
-    ["panic[0]", "/^[^\\n]*$/", "must not contain line breaks"]]
+    ["panic", "/^[^\\n]*$/", "must not contain line breaks"]]
 ```
 
 ## struct-tag

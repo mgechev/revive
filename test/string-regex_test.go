@@ -53,6 +53,20 @@ func TestStringRegexArgumentParsing(t *testing.T) {
 					1}},
 			expectedError: stringPtr("invalid configuration for string-regex: less than two slices found in argument, scope and regex are required [argument 0, option 0]")},
 		{
+			name: "Empty Scope",
+			config: lint.Arguments{
+				[]interface{}{
+					"",
+					"//"}},
+			expectedError: stringPtr("invalid configuration for string-regex: empty scope provided [argument 0, option 0]")},
+		{
+			name: "Small or Empty Regex",
+			config: lint.Arguments{
+				[]interface{}{
+					"method[1].a",
+					"-"}},
+			expectedError: stringPtr("invalid configuration for string-regex: regex is too small (regexes should begin and end with '/') [argument 0, option 1]")},
+		{
 			name: "Bad Scope",
 			config: lint.Arguments{
 				[]interface{}{
@@ -60,12 +74,22 @@ func TestStringRegexArgumentParsing(t *testing.T) {
 					"//"}},
 			expectedError: stringPtr("failed to parse configuration for string-regex: unable to parse rule scope [argument 0, option 0]")},
 		{
-			name: "Small/Empty Regex",
+			name: "Bad Regex",
 			config: lint.Arguments{
 				[]interface{}{
 					"method[1].a",
-					"-"}},
-			expectedError: stringPtr("invalid configuration for string-regex: regex is too small (regexes should begin and end with '/') [argument 0, option 1]")}}
+					"/(/"}},
+			expectedError: stringPtr("failed to parse configuration for string-regex: unable to compile /(/ as regexp [argument 0, option 1]")},
+		{
+			name: "Sample Config",
+			config: lint.Arguments{
+				[]interface{}{
+					"core.WriteError[1].Message", "/^([^A-Z]$)/", "must not start with a capital letter"},
+				[]interface{}{
+					"fmt.Errorf[0]", "/^|[^\\.!?]$/", "must not end in punctuation"},
+				[]interface{}{
+					"panic", "/^[^\\n]*$/", "must not contain line breaks"}},
+			expectedError: nil}}
 
 	for _, a := range tests {
 		t.Run(a.name, func(t *testing.T) {
