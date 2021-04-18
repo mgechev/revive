@@ -7,16 +7,16 @@ import (
 	"github.com/mgechev/revive/rule"
 )
 
-func TestStringRegex(t *testing.T) {
-	testRule(t, "string-regex", &rule.StringRegexRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{
+func TestStringFormat(t *testing.T) {
+	testRule(t, "string-format", &rule.StringFormatRule{}, &lint.RuleConfig{
+		Arguments: lint.Arguments{
 			[]interface{}{
-				"stringRegexMethod1", // The first argument is checked by default
+				"stringFormatMethod1", // The first argument is checked by default
 				"/^[A-Z]/",
 				"must start with a capital letter"},
 
 			[]interface{}{
-				"stringRegexMethod2[2].d",
+				"stringFormatMethod2[2].d",
 				"/[^\\.]$/"}, // Must not end with a period
 			[]interface{}{
 				"s.Method3[2]",
@@ -24,8 +24,8 @@ func TestStringRegex(t *testing.T) {
 				"must not start with 'th'"}}})
 }
 
-func TestStringRegexArgumentParsing(t *testing.T) {
-	r := &rule.StringRegexRule{}
+func TestStringFormatArgumentParsing(t *testing.T) {
+	r := &rule.StringFormatRule{}
 	type argumentsTest struct {
 		name          string
 		config        lint.Arguments
@@ -39,47 +39,47 @@ func TestStringRegexArgumentParsing(t *testing.T) {
 			name: "Not a Slice",
 			config: lint.Arguments{
 				"this is not a slice"},
-			expectedError: stringPtr("invalid configuration for string-regex: argument is not a slice [argument 0, option 0]")},
+			expectedError: stringPtr("invalid configuration for string-format: argument is not a slice [argument 0, option 0]")},
 		{
 			name: "Missing Regex",
 			config: lint.Arguments{
 				[]interface{}{
 					"method[0]"}},
-			expectedError: stringPtr("invalid configuration for string-regex: less than two slices found in argument, scope and regex are required [argument 0, option 0]")},
+			expectedError: stringPtr("invalid configuration for string-format: less than two slices found in argument, scope and regex are required [argument 0, option 0]")},
 		{
 			name: "Bad Argument Type",
 			config: lint.Arguments{
 				[]interface{}{
 					1}},
-			expectedError: stringPtr("invalid configuration for string-regex: less than two slices found in argument, scope and regex are required [argument 0, option 0]")},
+			expectedError: stringPtr("invalid configuration for string-format: less than two slices found in argument, scope and regex are required [argument 0, option 0]")},
 		{
 			name: "Empty Scope",
 			config: lint.Arguments{
 				[]interface{}{
 					"",
 					"//"}},
-			expectedError: stringPtr("invalid configuration for string-regex: empty scope provided [argument 0, option 0]")},
+			expectedError: stringPtr("invalid configuration for string-format: empty scope provided [argument 0, option 0]")},
 		{
 			name: "Small or Empty Regex",
 			config: lint.Arguments{
 				[]interface{}{
 					"method[1].a",
 					"-"}},
-			expectedError: stringPtr("invalid configuration for string-regex: regex is too small (regexes should begin and end with '/') [argument 0, option 1]")},
+			expectedError: stringPtr("invalid configuration for string-format: regex is too small (regexes should begin and end with '/') [argument 0, option 1]")},
 		{
 			name: "Bad Scope",
 			config: lint.Arguments{
 				[]interface{}{
 					"1.a",
 					"//"}},
-			expectedError: stringPtr("failed to parse configuration for string-regex: unable to parse rule scope [argument 0, option 0]")},
+			expectedError: stringPtr("failed to parse configuration for string-format: unable to parse rule scope [argument 0, option 0]")},
 		{
 			name: "Bad Regex",
 			config: lint.Arguments{
 				[]interface{}{
 					"method[1].a",
 					"/(/"}},
-			expectedError: stringPtr("failed to parse configuration for string-regex: unable to compile /(/ as regexp [argument 0, option 1]")},
+			expectedError: stringPtr("failed to parse configuration for string-format: unable to compile /(/ as regexp [argument 0, option 1]")},
 		{
 			name: "Sample Config",
 			config: lint.Arguments{

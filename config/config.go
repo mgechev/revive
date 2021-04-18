@@ -72,7 +72,7 @@ var allRules = append([]lint.Rule{
 	&rule.UnhandledErrorRule{},
 	&rule.CognitiveComplexityRule{},
 	&rule.StringOfIntRule{},
-	&rule.StringRegexRule{},
+	&rule.StringFormatRule{},
 	&rule.EarlyReturnRule{},
 	&rule.UnconditionalRecursionRule{},
 	&rule.IdenticalBranchesRule{},

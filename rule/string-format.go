@@ -12,31 +12,31 @@ import (
 
 // #region Revive API
 
-// StringRegexRule lints strings and/or comments according to a set of regular expressions given as Arguments
-type StringRegexRule struct{}
+// StringFormatRule lints strings and/or comments according to a set of regular expressions given as Arguments
+type StringFormatRule struct{}
 
 // Apply applies the rule to the given file.
-func (r *StringRegexRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *StringFormatRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
 
-	w := lintStringRegexRule{onFailure: onFailure}
+	w := lintStringFormatRule{onFailure: onFailure}
 	w.parseArguments(arguments)
 	ast.Walk(w, file.AST)
 
 	return failures
 }
 
-func (r *StringRegexRule) Name() string {
-	return "string-regex"
+func (r *StringFormatRule) Name() string {
+	return "string-format"
 }
 
-// Public wrapper around lintStringRegexRule.parseArguments used for testing, returns the error message provided to panic, or nil if no error was encountered
-func (r *StringRegexRule) ParseArgumentsTest(arguments lint.Arguments) *string {
-	w := lintStringRegexRule{}
+// Public wrapper around w.parseArguments used for testing, returns the error message provided to panic, or nil if no error was encountered
+func (r *StringFormatRule) ParseArgumentsTest(arguments lint.Arguments) *string {
+	w := lintStringFormatRule{}
 	c := make(chan interface{})
 	// Parse the arguments in a goroutine, defer a recover() call, return the error encountered (or nil if there was no error)
 	go func() {
@@ -58,21 +58,21 @@ func (r *StringRegexRule) ParseArgumentsTest(arguments lint.Arguments) *string {
 
 // #region Internal structure
 
-type lintStringRegexRule struct {
+type lintStringFormatRule struct {
 	onFailure func(lint.Failure)
 
-	rules              []stringRegexSubrule
+	rules              []stringFormatSubrule
 	stringDeclarations map[string]string
 }
 
-type stringRegexSubrule struct {
-	parent       *lintStringRegexRule
-	scope        stringRegexSubruleScope
+type stringFormatSubrule struct {
+	parent       *lintStringFormatRule
+	scope        stringFormatSubruleScope
 	regexp       *regexp.Regexp
 	errorMessage string
 }
 
-type stringRegexSubruleScope struct {
+type stringFormatSubruleScope struct {
 	funcName string // Function name the rule is scoped to
 	argument int    // (optional) Which argument in calls to the function is checked against the rule (the first argument is checked by default)
 	field    string // (optional) If the argument to be checked is a struct, which member of the struct is checked against the rule (top level members only)
@@ -81,17 +81,17 @@ type stringRegexSubruleScope struct {
 // Regex inserted to match valid function/struct field identifiers
 const identRegex = "[_A-Za-z][_A-Za-z0-9]*"
 
-var parseStringRegexScope = regexp.MustCompile(
+var parseStringFormatScope = regexp.MustCompile(
 	fmt.Sprintf("^(%s(?:\\.%s)?)(?:\\[([0-9]+)\\](?:\\.(%s))?)?$", identRegex, identRegex, identRegex))
 
 // #endregion
 
 // #region Argument parsing
 
-func (w *lintStringRegexRule) parseArguments(arguments lint.Arguments) {
+func (w *lintStringFormatRule) parseArguments(arguments lint.Arguments) {
 	for i, argument := range arguments {
 		scope, regex, errorMessage := w.parseArgument(argument, i)
-		w.rules = append(w.rules, stringRegexSubrule{
+		w.rules = append(w.rules, stringFormatSubrule{
 			parent:       w,
 			scope:        scope,
 			regexp:       regex,
@@ -100,7 +100,7 @@ func (w *lintStringRegexRule) parseArguments(arguments lint.Arguments) {
 	}
 }
 
-func (w lintStringRegexRule) parseArgument(argument interface{}, ruleNum int) (scope stringRegexSubruleScope, regex *regexp.Regexp, errorMessage string) {
+func (w lintStringFormatRule) parseArgument(argument interface{}, ruleNum int) (scope stringFormatSubruleScope, regex *regexp.Regexp, errorMessage string) {
 	g, ok := argument.([]interface{}) // Cast to generic slice first
 	if !ok {
 		w.configError("argument is not a slice", ruleNum, 0)
@@ -125,8 +125,8 @@ func (w lintStringRegexRule) parseArgument(argument interface{}, ruleNum int) (s
 	}
 
 	// Parse rule scope
-	scope = stringRegexSubruleScope{}
-	matches := parseStringRegexScope.FindStringSubmatch(rule[0])
+	scope = stringFormatSubruleScope{}
+	matches := parseStringFormatScope.FindStringSubmatch(rule[0])
 	if matches == nil {
 		// The rule's scope didn't match the parsing regex at all, probably a configuration error
 		w.parseError("unable to parse rule scope", ruleNum, 0)
@@ -160,20 +160,20 @@ func (w lintStringRegexRule) parseArgument(argument interface{}, ruleNum int) (s
 }
 
 // Report an invalid config, this is specifically the user's fault
-func (w lintStringRegexRule) configError(msg string, ruleNum, option int) {
-	panic(fmt.Sprintf("invalid configuration for string-regex: %s [argument %d, option %d]", msg, ruleNum, option))
+func (w lintStringFormatRule) configError(msg string, ruleNum, option int) {
+	panic(fmt.Sprintf("invalid configuration for string-format: %s [argument %d, option %d]", msg, ruleNum, option))
 }
 
 // Report a general config parsing failure, this may be the user's fault, but it isn't known for certain
-func (w lintStringRegexRule) parseError(msg string, ruleNum, option int) {
-	panic(fmt.Sprintf("failed to parse configuration for string-regex: %s [argument %d, option %d]", msg, ruleNum, option))
+func (w lintStringFormatRule) parseError(msg string, ruleNum, option int) {
+	panic(fmt.Sprintf("failed to parse configuration for string-format: %s [argument %d, option %d]", msg, ruleNum, option))
 }
 
 // #endregion
 
 // #region Node traversal
 
-func (w lintStringRegexRule) Visit(node ast.Node) ast.Visitor {
+func (w lintStringFormatRule) Visit(node ast.Node) ast.Visitor {
 	// First, check if node is a call expression
 	call, ok := node.(*ast.CallExpr)
 	if !ok {
@@ -196,7 +196,7 @@ func (w lintStringRegexRule) Visit(node ast.Node) ast.Visitor {
 }
 
 // Return the name of a call expression in the form of package.Func or Func
-func (w lintStringRegexRule) getCallName(call *ast.CallExpr) (callName string, ok bool) {
+func (w lintStringFormatRule) getCallName(call *ast.CallExpr) (callName string, ok bool) {
 	if ident, ok := call.Fun.(*ast.Ident); ok {
 		// Local function call
 		return ident.Name, true
@@ -218,10 +218,9 @@ func (w lintStringRegexRule) getCallName(call *ast.CallExpr) (callName string, o
 
 // #region Linting logic
 
-// Apply a single regex rule to a call expression (should be done after verifying the that the call expression matches the rule's scope)
-func (rule stringRegexSubrule) Apply(call *ast.CallExpr) {
+// Apply a single format rule to a call expression (should be done after verifying the that the call expression matches the rule's scope)
+func (rule stringFormatSubrule) Apply(call *ast.CallExpr) {
 	if len(call.Args) <= rule.scope.argument {
-		// TODO: should cases where calls are incompatible with scope cause failures?
 		return
 	}
 
@@ -262,7 +261,7 @@ func (rule stringRegexSubrule) Apply(call *ast.CallExpr) {
 	rule.lintMessage(unquoted, lit)
 }
 
-func (rule stringRegexSubrule) lintMessage(s string, node ast.Node) {
+func (rule stringFormatSubrule) lintMessage(s string, node ast.Node) {
 	// Fail if the string doesn't match the user's regex
 	if rule.regexp.MatchString(s) {
 		return

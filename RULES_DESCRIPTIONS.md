@@ -53,7 +53,7 @@ List of all available rules.
   - [redefines-builtin-id](#redefines-builtin-id)
   - [string-of-int](#string-of-int)
   - [struct-tag](#struct-tag)
-  - [string-regex](#string-regex)
+  - [string-format](#string-format)
   - [superfluous-else](#superfluous-else)
   - [time-naming](#time-naming)
   - [var-naming](#var-naming)
@@ -489,7 +489,7 @@ _Description_:  explicit type conversion `string(i)` where `i` has an integer ty
 
 _Configuration_: N/A
 
-## string-regex
+## string-format
 
 _Description_: This rule allows you to configure a list of regular expressions that string literals in certain function calls are checked against.
 This is geared towards user facing applications where string literals are often used for messages that will be presented to users, so it may be desirable to enforce consistent formatting.
@@ -505,7 +505,7 @@ _Configuration_: Each argument is a slice containing 2-3 strings: a scope, a reg
 Example:
 
 ```toml
-[rule.string-regex]
+[rule.string-format]
   arguments = [
     ["core.WriteError[1].Message", "/^([^A-Z]|$)/", "must not start with a capital letter"],
     ["fmt.Errorf[0]", "/(^|[^\\.!?])$/", "must not end in punctuation"],
