@@ -78,7 +78,11 @@ type stringRegexSubruleScope struct {
 	field    string // (optional) If the argument to be checked is a struct, which member of the struct is checked against the rule (top level members only)
 }
 
-var parseStringRegexScope = regexp.MustCompile("^([A-Za-z][\\.A-Za-z0-9]+)(?:\\[([0-9]+)\\])?(?:\\.([A-Za-z]+))?$")
+// Regex inserted to match valid function/struct field identifiers
+const identRegex = "[_A-Za-z][_A-Za-z0-9]*"
+
+var parseStringRegexScope = regexp.MustCompile(
+	fmt.Sprintf("^(%s(?:\\.%s)?)(?:\\[([0-9]+)\\](?:\\.(%s))?)?$", identRegex, identRegex, identRegex))
 
 // #endregion
 

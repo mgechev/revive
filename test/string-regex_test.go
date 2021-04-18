@@ -88,8 +88,13 @@ func TestStringRegexArgumentParsing(t *testing.T) {
 				[]interface{}{
 					"fmt.Errorf[0]", "/^|[^\\.!?]$/", "must not end in punctuation"},
 				[]interface{}{
-					"panic", "/^[^\\n]*$/", "must not contain line breaks"}},
-			expectedError: nil}}
+					"panic", "/^[^\\n]*$/", "must not contain line breaks"}}},
+		{
+			name: "Underscores in Scope",
+			config: lint.Arguments{
+				[]interface{}{
+					"some_pkg._some_function_name[5].some_member",
+					"//"}}}}
 
 	for _, a := range tests {
 		t.Run(a.name, func(t *testing.T) {
