@@ -34,6 +34,26 @@ func (r *StringRegexRule) Name() string {
 	return "string-regex"
 }
 
+// Public wrapper around lintStringRegexRule.parseArguments used for testing, returns the error message provided to panic, or nil if no error was encountered
+func (r *StringRegexRule) ParseArgumentsTest(arguments lint.Arguments) *string {
+	w := lintStringRegexRule{}
+	c := make(chan interface{})
+	// Parse the arguments in a goroutine, defer a recover() call, return the error encountered (or nil if there was no error)
+	go func() {
+		defer func() {
+			err := recover()
+			c <- err
+		}()
+		w.parseArguments(arguments)
+	}()
+	err := <-c
+	if err != nil {
+		e := fmt.Sprintf("%s", err)
+		return &e
+	}
+	return nil
+}
+
 // #endregion
 
 // #region Internal structure
@@ -93,6 +113,13 @@ func (w lintStringRegexRule) parseArgument(argument interface{}, ruleNum int) (s
 		rule[i] = val
 	}
 
+	// Validate scope and regex length
+	if len(rule[0]) == 0 {
+		w.configError("empty scope provided", ruleNum, 0)
+	} else if len(rule[1]) < 2 {
+		w.configError("regex is too small (regexes should begin and end with '/')", ruleNum, 1)
+	}
+
 	// Parse rule scope
 	scope = stringRegexSubruleScope{}
 	matches := parseStringRegexScope.FindStringSubmatch(rule[0])
@@ -130,12 +157,12 @@ func (w lintStringRegexRule) parseArgument(argument interface{}, ruleNum int) (s
 
 // Report an invalid config, this is specifically the user's fault
 func (w lintStringRegexRule) configError(msg string, ruleNum, option int) {
-	panic(fmt.Sprintf("invalid configuration for string-regex: %s (argument %d, option %d)", msg, ruleNum, option))
+	panic(fmt.Sprintf("invalid configuration for string-regex: %s [argument %d, option %d]", msg, ruleNum, option))
 }
 
 // Report a general config parsing failure, this may be the user's fault, but it isn't known for certain
 func (w lintStringRegexRule) parseError(msg string, ruleNum, option int) {
-	panic(fmt.Sprintf("failed to parse configuration for string-regex: %s (argument %d, option %d)", msg, ruleNum, option))
+	panic(fmt.Sprintf("failed to parse configuration for string-regex: %s [argument %d, option %d]", msg, ruleNum, option))
 }
 
 // #endregion
