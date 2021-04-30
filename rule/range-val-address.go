@@ -77,7 +77,7 @@ func (bw rangeBodyVisitor) Visit(node ast.Node) ast.Visitor {
 
 	for _, exp := range asgmt.Rhs {
 		switch e := exp.(type) {
-		case *ast.UnaryExpr: // e.g. ...&value
+		case *ast.UnaryExpr: // e.g. ...&value, ...&value.id
 			if bw.isAccessingRangeValueAddress(e) {
 				bw.onFailure(bw.newFailure(e))
 			}
@@ -100,8 +100,21 @@ func (bw rangeBodyVisitor) isAccessingRangeValueAddress(exp ast.Expr) bool {
 		return false
 	}
 
+	if u.Op != token.AND {
+		return false
+	}
+
 	v, ok := u.X.(*ast.Ident)
-	return ok && u.Op == token.AND && v.Obj == bw.valueID
+	if !ok {
+		var s *ast.SelectorExpr
+		s, ok = u.X.(*ast.SelectorExpr)
+		if !ok {
+			return false
+		}
+		v, ok = s.X.(*ast.Ident)
+	}
+
+	return ok && v.Obj == bw.valueID
 }
 
 func (bw rangeBodyVisitor) newFailure(node ast.Node) lint.Failure {
