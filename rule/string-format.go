@@ -30,11 +30,12 @@ func (r *StringFormatRule) Apply(file *lint.File, arguments lint.Arguments) []li
 	return failures
 }
 
+// Name returns the rule name.
 func (r *StringFormatRule) Name() string {
 	return "string-format"
 }
 
-// Public wrapper around w.parseArguments used for testing, returns the error message provided to panic, or nil if no error was encountered
+// ParseArgumentsTest is a public wrapper around w.parseArguments used for testing. Returns the error message provided to panic, or nil if no error was encountered
 func (r *StringFormatRule) ParseArgumentsTest(arguments lint.Arguments) *string {
 	w := lintStringFormatRule{}
 	c := make(chan interface{})
