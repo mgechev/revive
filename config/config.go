@@ -103,20 +103,20 @@ func getFormatters() map[string]lint.Formatter {
 
 // GetLintingRules yields the linting rules that must be applied by the linter
 func GetLintingRules(config *lint.Config) ([]lint.Rule, error) {
-	if config.ActivateAllRules {
+	if config.EnableAllRules {
 		return getAllRules(config)
 	}
 
-	return getActivatedRules(config)
+	return getEnabledRules(config)
 }
 
-// getAllRules yields the list of all available rules except those deactivated by configuration
+// getAllRules yields the list of all available rules except those disabled by configuration
 func getAllRules(config *lint.Config) ([]lint.Rule, error) {
 	lintingRules := []lint.Rule{}
 	for _, r := range allRules {
 		ruleConf := config.Rules[r.Name()]
-		if ruleConf.Deactivated {
-			continue // skip deactivated rules
+		if ruleConf.Disabled {
+			continue // skip disabled rules
 		}
 
 		lintingRules = append(lintingRules, r)
@@ -125,8 +125,8 @@ func getAllRules(config *lint.Config) ([]lint.Rule, error) {
 	return lintingRules, nil
 }
 
-// getActivatedRules yields the list of rules that are activated by configuration
-func getActivatedRules(config *lint.Config) ([]lint.Rule, error) {
+// getEnabledRules yields the list of rules that are enabled by configuration
+func getEnabledRules(config *lint.Config) ([]lint.Rule, error) {
 	rulesMap := map[string]lint.Rule{}
 	for _, r := range allRules {
 		rulesMap[r.Name()] = r
@@ -139,8 +139,8 @@ func getActivatedRules(config *lint.Config) ([]lint.Rule, error) {
 			return nil, fmt.Errorf("cannot find rule: %s", name)
 		}
 
-		if ruleConfig.Deactivated {
-			continue // skip deactivated rules
+		if ruleConfig.Disabled {
+			continue // skip disabled rules
 		}
 
 		lintingRules = append(lintingRules, rule)
