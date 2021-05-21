@@ -291,7 +291,6 @@ enableAllRules = true
     Arguments = [7]
 [rule.function-result-limit]    
     Arguments = [3]
-
 ```
 
 ### Default Configuration
@@ -595,4 +594,3 @@ REVIVE_FORCE_COLOR=1 revive -formatter friendly ./... | tee revive.log
 ## License
 
 MIT
-
