@@ -240,6 +240,59 @@ warningCode = 0
   severity = "error"
 ```
 
+By default `revive` will enable only the linting rules that are named in the configuration file.
+For example, the previous configuration file makes `revive` to enable only _cyclomatic_ and _package-comments_ linting rules.
+
+To enable all available rules you need to add:
+
+```toml
+enableAllRules = true
+```
+
+This will enable all available rules no matter of what rules are named in the configuration file.
+
+To disable a rule, you simply mark it as disabled in the configuration.
+For example:
+
+```toml
+[rule.line-length-limit]
+    Disabled = true
+```
+When enabling all rules you still need/can provide specific configurations for rules.
+The following files is an example configuration were all rules are enabled, with exception to those that are explicitly disabled, and some rules are configured with particular arguments:
+
+```toml
+severity = "warning"
+confidence = 0.8
+errorCode = 0
+warningCode = 0
+
+# Enable all available rules
+enableAllRules = true
+
+# Disabled rules
+[rule.blank-imports]
+    Disabled = true
+[rule.file-header]
+    Disabled = true
+[rule.max-public-structs]
+    Disabled = true
+[rule.line-length-limit]
+    Disabled = true
+[rule.function-length]
+    Disabled = true
+
+# Rule tunning
+[rule.argument-limit]
+    Arguments = [5]
+[rule.cyclomatic]    
+    Arguments = [10]
+[rule.cognitive-complexity]    
+    Arguments = [7]
+[rule.function-result-limit]    
+    Arguments = [3]
+```
+
 ### Default Configuration
 
 The default configuration of `revive` can be found at `defaults.toml`. This will enable all rules available in `golint` and use their default configuration (i.e. the way they are hardcoded in `golint`).
@@ -541,4 +594,3 @@ REVIVE_FORCE_COLOR=1 revive -formatter friendly ./... | tee revive.log
 ## License
 
 MIT
-

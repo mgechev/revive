@@ -14,6 +14,9 @@ type MaxPublicStructsRule struct{}
 // Apply applies the rule to given file.
 func (r *MaxPublicStructsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
+	if len(arguments) == 0 {
+		panic("not enough arguments for " + r.Name())
+	}
 
 	fileAst := file.AST
 	walker := &lintMaxPublicStructs{
