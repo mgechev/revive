@@ -63,9 +63,11 @@ Here's how `revive` is different from `golint`:
 
 - [revive](#revive)
   - [Usage](#usage)
+    - [Bazel](#bazel)
     - [Text Editors](#text-editors)
     - [Continuous Integration](#continuous-integration)
-    - [Bazel](#bazel)
+    - [Linter Aggregators](#linter-aggregators)
+      - [golangci-lint](#golangci-lint)
     - [Installation](#installation)
     - [Command Line Flags](#command-line-flags)
     - [Sample Invocations](#sample-invocations)
@@ -127,6 +129,39 @@ let g:ale_linters = {
 ### Continuous Integration
 
 [Codeac.io](https://www.codeac.io?ref=revive) - Automated code review service integrates with GitHub, Bitbucket and GitLab (even self-hosted) and helps you fight technical debt. Check your [pull-requests](https://www.codeac.io/documentation/pull-requests.html?ref=revive) with [revive](https://www.codeac.io/documentation/revive-configuration.html?ref=revive) automatically. (free for open-source projects)
+
+### Linter aggregators
+
+#### golangci-lint
+To enable `revive` in `golangci-lint` you need to add `revive` to the list of enabled linters:
+
+```yaml
+# golangci-lint configuration file
+linters:
+   enable:
+     - revive
+```
+Then `revive` can be configured by adding an entry to the `linters-settings` section of the configuration, for example:
+
+```yaml
+# golangci-lint configuration file
+linters-settings:
+  revive:
+    ignore-generated-header: true
+    severity: warning
+    rules:
+      - name: atomic
+      - name: line-length-limit
+        severity: error
+        arguments: [80]
+      - name: unhandled-error
+        arguments : ["fmt.Printf", "myFunction"]
+```
+
+The above configuration enables three rules of `revive`: _atomic_, _line-length-limit_ and _unhandled-error_ and pass some arguments to the last two. 
+The [Configuration](#configuration) section of this document provides details on how to configure `revive`. Note that while `revive` configuration is in TOML, that of `golangci-lint` is in YAML.
+
+Please notice that if no particular configuration is provided, `revive` will behave as `go-lint` does, i.e. all `go-lint` rules are enabled (the [Available Rules table](#available-rules) details what are the `go-lint` rules). When a configuration is provided, only rules in the configuration are enabled.
 
 ### Installation
 
