@@ -45,16 +45,19 @@ func (w lintContextArguments) Visit(n ast.Node) ast.Visitor {
 	}
 	// A context.Context should be the first parameter of a function.
 	// Flag any that show up after the first.
+	previousArgIsCtx := isPkgDot(fn.Type.Params.List[0].Type, "context", "Context")
 	for _, arg := range fn.Type.Params.List[1:] {
-		if isPkgDot(arg.Type, "context", "Context") {
+		argIsCtx := isPkgDot(arg.Type, "context", "Context")
+		if argIsCtx && !previousArgIsCtx {
 			w.onFailure(lint.Failure{
-				Node:       fn,
+				Node:       arg,
 				Category:   "arg-order",
 				Failure:    "context.Context should be the first parameter of a function",
 				Confidence: 0.9,
 			})
 			break // only flag one
 		}
+		previousArgIsCtx = argIsCtx
 	}
 	return w
 }
