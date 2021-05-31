@@ -17,7 +17,7 @@ func (r *CallToGCRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	}
 
 	var gcTriggeringFunctions = map[string]map[string]bool{
-		"runtime": map[string]bool{"GC": true},
+		"runtime": {"GC": true},
 	}
 
 	w := lintCallToGC{onFailure, gcTriggeringFunctions}

@@ -19,8 +19,8 @@ func (r *SuperfluousElseRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 	}
 
 	var branchingFunctions = map[string]map[string]bool{
-		"os": map[string]bool{"Exit": true},
-		"log": map[string]bool{
+		"os": {"Exit": true},
+		"log": {
 			"Fatal":   true,
 			"Fatalf":  true,
 			"Fatalln": true,
