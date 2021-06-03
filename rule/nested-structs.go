@@ -7,12 +7,10 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
+// NestedStructs lints nested structs.
 type NestedStructs struct{}
 
-func (r *NestedStructs) Name() string {
-	return "nested-structs"
-}
-
+// Apply applies the rule to given file.
 func (r *NestedStructs) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
@@ -39,6 +37,11 @@ func (r *NestedStructs) Apply(file *lint.File, arguments lint.Arguments) []lint.
 	}
 
 	return failures
+}
+
+// Name returns the rule name.
+func (r *NestedStructs) Name() string {
+	return "nested-structs"
 }
 
 type lintNestedStructs struct {
