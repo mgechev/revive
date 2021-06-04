@@ -1,7 +1,7 @@
-package fixtures // MATCH /no nested structs are allowed, got 1/
+package fixtures
 
 type Foo struct {
-	Bar struct {
+	Bar struct { // MATCH /no nested structs are allowed/
 	}
 }
 
