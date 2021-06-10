@@ -41,6 +41,8 @@ type lintNestedStructs struct {
 
 func (l *lintNestedStructs) Visit(n ast.Node) ast.Visitor {
 	switch v := n.(type) {
+	case *ast.FuncDecl:
+		return nil
 	case *ast.Field:
 		if _, ok := v.Type.(*ast.StructType); ok {
 			l.onFailure(lint.Failure{
