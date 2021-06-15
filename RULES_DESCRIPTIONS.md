@@ -45,6 +45,7 @@ List of all available rules.
   - [max-public-structs](#max-public-structs)
   - [modifies-parameter](#modifies-parameter)
   - [modifies-value-receiver](#modifies-value-receiver)
+  - [nested-structs](#nested-structs)
   - [package-comments](#package-comments)
   - [range](#range)
   - [range-val-in-closure](#range-val-in-closure)
@@ -441,6 +442,12 @@ _Configuration_: N/A
 
 _Description_: A method that modifies its receiver value can have undesired behavior. The modification can be also the root of a bug because the actual value receiver could be a copy of that used at the calling site.
 This rule warns when a method modifies its receiver.
+
+_Configuration_: N/A
+
+## nested-structs
+
+_Description_: Packages declaring structs that contain other inline struct definitions can be hard to understand/read for other developers.
 
 _Configuration_: N/A
 
