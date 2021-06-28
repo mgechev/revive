@@ -8,6 +8,7 @@ import (
 	_ "net/http"
 	"strings"
 	str "strings"
+	"fixtures" // Test case for issue #534
 )
 
 const str = "" // MATCH /The name 'str' shadows an import name/
