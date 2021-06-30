@@ -317,7 +317,7 @@ enableAllRules = true
 [rule.function-length]
     Disabled = true
 
-# Rule tunning
+# Rule tuning
 [rule.argument-limit]
     Arguments = [5]
 [rule.cyclomatic]
