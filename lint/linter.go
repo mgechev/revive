@@ -7,6 +7,7 @@ import (
 	"go/token"
 	"os"
 	"regexp"
+	"runtime"
 	"strconv"
 	"sync"
 )
@@ -35,17 +36,30 @@ var (
 func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-chan Failure, error) {
 	failures := make(chan Failure)
 
+	concurrency := runtime.NumCPU()
+	jobs := make(chan []string, 1024)
+
 	var wg sync.WaitGroup
-	for _, pkg := range packages {
-		wg.Add(1)
-		go func(pkg []string) {
-			if err := l.lintPackage(pkg, ruleSet, config, failures); err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
+	wg.Add(concurrency)
+
+	for i := 1; i <= concurrency; i++ {
+		go func(jobs <-chan []string) {
+			for job := range jobs {
+				if err := l.lintPackage(job, ruleSet, config, failures); err != nil {
+					fmt.Fprintln(os.Stderr, err)
+					os.Exit(1)
+				}
 			}
-			defer wg.Done()
-		}(pkg)
+			wg.Done()
+		}(jobs)
 	}
+
+	go func() {
+		for _, pkg := range packages {
+			jobs <- pkg
+		}
+		close(jobs)
+	}()
 
 	go func() {
 		wg.Wait()
