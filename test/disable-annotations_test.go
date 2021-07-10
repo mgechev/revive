@@ -14,3 +14,7 @@ func TestDisabledAnnotations(t *testing.T) {
 func TestModifiedAnnotations(t *testing.T) {
 	testRule(t, "disable-annotations2", &rule.VarNamingRule{}, &lint.RuleConfig{})
 }
+
+func TestDisableNextLineAnnotations(t *testing.T) {
+	testRule(t, "disable-annotations3", &rule.VarNamingRule{}, &lint.RuleConfig{})
+}
