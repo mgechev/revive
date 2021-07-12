@@ -207,7 +207,7 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, fa
 		for _, c := range comments {
 			match := re.FindStringSubmatch(c.Text)
 			if len(match) == 0 {
-				return
+				continue
 			}
 
 			ruleNames := []string{}
