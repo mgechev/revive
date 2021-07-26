@@ -29,6 +29,7 @@ var commonMethods = map[string]bool{
 	"ServeHTTP": true,
 	"String":    true,
 	"Write":     true,
+	"Unwrap":    true,
 }
 
 func receiverType(fn *ast.FuncDecl) string {
