@@ -1,5 +1,7 @@
 github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
+github.com/BurntSushi/toml v0.4.1 h1:GaI7EiDXDRfa8VshkTj7Fym7ha+y8/XxIgD2okUIjLw=
+github.com/BurntSushi/toml v0.4.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/chavacava/garif v0.0.0-20210405163807-87a70f3d418b h1:StHNkfM8nXnNQnk5/0uYYhIqvvENd14hoHPnZsakTNo=
 github.com/chavacava/garif v0.0.0-20210405163807-87a70f3d418b/go.mod h1:Qjyv4H3//PWVzTeCezG2b9IRn6myJxJSr4TD/xo6ojU=
 github.com/chavacava/garif v0.0.0-20210405164556-e8a0a408d6af h1:spmv8nSH9h5oCQf40jt/ufBCt9j0/58u4G+rkeMqXGI=

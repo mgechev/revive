@@ -3,7 +3,7 @@ module github.com/mgechev/revive
 go 1.12
 
 require (
-	github.com/BurntSushi/toml v0.3.1
+	github.com/BurntSushi/toml v0.4.1
 	github.com/chavacava/garif v0.0.0-20210405164556-e8a0a408d6af
 	github.com/fatih/color v1.12.0
 	github.com/fatih/structtag v1.2.0
