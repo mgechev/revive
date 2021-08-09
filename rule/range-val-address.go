@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
+	"strings"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -52,7 +53,7 @@ func (w rangeValAddress) Visit(node ast.Node) ast.Visitor {
 	t := w.file.Pkg.TypeOf(value)
 
 	ast.Walk(rangeBodyVisitor{
-		valueIsStarExpr: t.String()[:1] == "*",
+		valueIsStarExpr: strings.HasPrefix(t.String(), "*"),
 		valueID:         value.Obj,
 		onFailure:       w.onFailure,
 	}, n.Body)
