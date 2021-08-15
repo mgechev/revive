@@ -80,6 +80,7 @@ var allRules = append([]lint.Rule{
 	&rule.FunctionLength{},
 	&rule.NestedStructs{},
 	&rule.IfReturnRule{},
+	&rule.UselessBreak{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
