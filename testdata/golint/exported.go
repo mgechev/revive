@@ -3,6 +3,9 @@ package golint
 
 import "net/http"
 
+//  GolintFoo is a dummy function
+func GolintFoo() {} // MATCH /func name will be used as golint.GolintFoo by other packages, and that stutters; consider calling this Foo/
+
 type (
 	// O is a shortcut (alias) for map[string]interface{}, e.g. a JSON object.
 	O = map[string]interface{}
@@ -53,3 +56,5 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {}                // MATC
 func Read(p []byte) (n int, err error)                 { return 0, nil } // MATCH /exported function Read should have comment or be unexported/
 func Write(p []byte) (n int, err error)                { return 0, nil } // MATCH /exported function Write should have comment or be unexported/
 func Unwrap(err error) error                           { return nil }    // MATCH /exported function Unwrap should have comment or be unexported/
+
+// The following cases are tests for issue 555
