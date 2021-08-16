@@ -41,6 +41,11 @@ func (w *lintUselessBreak) Visit(node ast.Node) ast.Visitor {
 		ast.Walk(w, v.Body)
 		w.inLoopBody = false
 		return nil
+	case *ast.RangeStmt:
+		w.inLoopBody = true
+		ast.Walk(w, v.Body)
+		w.inLoopBody = false
+		return nil
 	case *ast.CommClause:
 		for _, n := range v.Body {
 			w.inspectCaseStatement(n)

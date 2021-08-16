@@ -1,6 +1,9 @@
 package fixtures
 
-import "reflect"
+import (
+	ast "go/ast"
+	"reflect"
+)
 
 func UselessBreaks() {
 
@@ -28,7 +31,7 @@ func UselessBreaks() {
 	for {
 		switch {
 		case c1:
-			break // MATCH /useless break in case clause (WARN: this break statement affects the switch or select statement and not the loop enclosing it)/
+			break // MATCH /useless break in case clause (WARN: this break statement affects this switch or select statement and not the loop enclosing it)/
 		}
 	}
 
@@ -37,7 +40,7 @@ func UselessBreaks() {
 		case *ast.FuncLit:
 			found = true
 			funcLit = node
-			break // MATCH /useless break in case clause (WARN: this break statement affects the switch or select statement and not the loop enclosing it)/
+			break // MATCH /useless break in case clause (WARN: this break statement affects this switch or select statement and not the loop enclosing it)/
 		}
 	}
 
