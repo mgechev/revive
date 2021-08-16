@@ -400,7 +400,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`error-return`](./RULES_DESCRIPTIONS.md#error-return)        |  n/a   | The error return parameter should be last.                       |   yes    |  no   |
 | [`error-strings`](./RULES_DESCRIPTIONS.md#error-strings)       |  n/a   | Conventions around error strings.                                |   yes    |  no   |
 | [`error-naming`](./RULES_DESCRIPTIONS.md#error-naming)        |  n/a   | Naming of error variables.                                       |   yes    |  no   |
-| [`exported`](./RULES_DESCRIPTIONS.md#exported)            |  n/a   | Naming and commenting conventions on exported symbols.           |   yes    |  no   |
+| [`exported`](./RULES_DESCRIPTIONS.md#exported)            |  []string   | Naming and commenting conventions on exported symbols.           |   yes    |  no   |
 | [`if-return`](./RULES_DESCRIPTIONS.md#if-return)           |  n/a   | Redundant if when returning an error.                            |   no    |  no   |
 | [`increment-decrement`](./RULES_DESCRIPTIONS.md#increment-decrement) |  n/a   | Use `i++` and `i--` instead of `i += 1` and `i -= 1`.            |   yes    |  no   |
 | [`var-naming`](./RULES_DESCRIPTIONS.md#var-naming)          |  whitelist & blacklist of initialisms   | Naming rules.                                                    |   yes    |  no   |

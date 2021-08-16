@@ -18,3 +18,9 @@ func TestExportedWithChecksOnMethodsOfPrivateTypes(t *testing.T) {
 
 	testRule(t, "exported-issue-552", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: args})
 }
+
+func TestExportedReplacingStuttersByRepetitive(t *testing.T) {
+	args := []interface{}{"sayRepetitiveInsteadOfStutters"}
+
+	testRule(t, "exported-issue-519", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: args})
+}
