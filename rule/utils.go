@@ -190,3 +190,10 @@ func gofmt(x interface{}) string {
 	printer.Fprint(&buf, fs, x)
 	return buf.String()
 }
+
+// checkNumberOfArguments fails if the given number of arguments is not, at least, the expected one
+func checkNumberOfArguments(expected int, args lint.Arguments, ruleName string) {
+	if len(args) < expected {
+		panic(fmt.Sprintf("not enough arguments for %s rule, expected %d, got %d. Please check the rule's documentation", ruleName, expected, len(args)))
+	}
+}

@@ -14,16 +14,14 @@ type CognitiveComplexityRule struct{}
 
 // Apply applies the rule to given file.
 func (r *CognitiveComplexityRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var failures []lint.Failure
+	checkNumberOfArguments(1, arguments, r.Name())
 
-	const expectedArgumentsCount = 1
-	if len(arguments) < expectedArgumentsCount {
-		panic(fmt.Sprintf("not enough arguments for cognitive-complexity, expected %d, got %d", expectedArgumentsCount, len(arguments)))
-	}
 	complexity, ok := arguments[0].(int64)
 	if !ok {
 		panic(fmt.Sprintf("invalid argument type for cognitive-complexity, expected int64, got %T", arguments[0]))
 	}
+
+	var failures []lint.Failure
 
 	linter := cognitiveComplexityLinter{
 		file:          file,

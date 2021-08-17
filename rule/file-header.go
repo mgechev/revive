@@ -16,9 +16,7 @@ var (
 
 // Apply applies the rule to given file.
 func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	if len(arguments) != 1 {
-		panic(`invalid configuration for "file-header" rule`)
-	}
+	checkNumberOfArguments(1, arguments, r.Name())
 
 	header, ok := arguments[0].(string)
 	if !ok {

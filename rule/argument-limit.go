@@ -12,9 +12,7 @@ type ArgumentsLimitRule struct{}
 
 // Apply applies the rule to given file.
 func (r *ArgumentsLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	if len(arguments) != 1 {
-		panic(`invalid configuration for "argument-limit"`)
-	}
+	checkNumberOfArguments(1, arguments, r.Name())
 
 	total, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok {
