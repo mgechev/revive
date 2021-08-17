@@ -62,13 +62,13 @@ Here's how `revive` is different from `golint`:
 <!-- TOC -->
 
 - [revive](#revive)
+  - [Installation](#installation)
   - [Usage](#usage)
     - [Bazel](#bazel)
     - [Text Editors](#text-editors)
     - [Continuous Integration](#continuous-integration)
     - [Linter Aggregators](#linter-aggregators)
       - [golangci-lint](#golangci-lint)
-    - [Installation](#installation)
     - [Command Line Flags](#command-line-flags)
     - [Sample Invocations](#sample-invocations)
     - [Comment Annotations](#comment-annotations)
@@ -98,6 +98,19 @@ Here's how `revive` is different from `golint`:
   - [License](#license)
 
 <!-- /TOC -->
+
+## Installation
+
+```bash
+go install github.com/mgechev/revive@latest
+```
+
+or get a released executable from the [Releases](https://github.com/mgechev/revive/releases) page.
+
+You can install the main branch (including the last commit) with:
+```bash
+go install github.com/mgechev/revive@master
+```
 
 ## Usage
 
@@ -162,12 +175,6 @@ The above configuration enables three rules of `revive`: _atomic_, _line-length-
 The [Configuration](#configuration) section of this document provides details on how to configure `revive`. Note that while `revive` configuration is in TOML, that of `golangci-lint` is in YAML.
 
 Please notice that if no particular configuration is provided, `revive` will behave as `go-lint` does, i.e. all `go-lint` rules are enabled (the [Available Rules table](#available-rules) details what are the `go-lint` rules). When a configuration is provided, only rules in the configuration are enabled.
-
-### Installation
-
-```bash
-go get -u github.com/mgechev/revive
-```
 
 ### Command Line Flags
 
