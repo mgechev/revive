@@ -12,9 +12,7 @@ type FunctionResultsLimitRule struct{}
 
 // Apply applies the rule to given file.
 func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	if len(arguments) != 1 {
-		panic(`invalid configuration for "function-result-limit"`)
-	}
+	checkNumberOfArguments(1, arguments, r.Name())
 
 	max, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok {

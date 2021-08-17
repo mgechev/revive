@@ -13,10 +13,14 @@ type MaxPublicStructsRule struct{}
 
 // Apply applies the rule to given file.
 func (r *MaxPublicStructsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var failures []lint.Failure
-	if len(arguments) == 0 {
-		panic("not enough arguments for " + r.Name())
+	checkNumberOfArguments(1, arguments, r.Name())
+
+	max, ok := arguments[0].(int64) // Alt. non panicking version
+	if !ok {
+		panic(`invalid value passed as argument number to the "max-public-structs" rule`)
 	}
+
+	var failures []lint.Failure
 
 	fileAst := file.AST
 	walker := &lintMaxPublicStructs{
@@ -27,11 +31,6 @@ func (r *MaxPublicStructsRule) Apply(file *lint.File, arguments lint.Arguments) 
 	}
 
 	ast.Walk(walker, fileAst)
-
-	max, ok := arguments[0].(int64) // Alt. non panicking version
-	if !ok {
-		panic(`invalid value passed as argument number to the "max-public-structs" rule`)
-	}
 
 	if walker.current > max {
 		walker.onFailure(lint.Failure{

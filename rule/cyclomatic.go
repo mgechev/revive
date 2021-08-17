@@ -15,15 +15,14 @@ type CyclomaticRule struct{}
 
 // Apply applies the rule to given file.
 func (r *CyclomaticRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var failures []lint.Failure
+	checkNumberOfArguments(1, arguments, r.Name())
 
-	if len(arguments) == 0 {
-		panic("not enough arguments for " + r.Name())
-	}
 	complexity, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok {
 		panic("invalid argument for cyclomatic complexity")
 	}
+
+	var failures []lint.Failure
 
 	fileAst := file.AST
 	walker := lintCyclomatic{
