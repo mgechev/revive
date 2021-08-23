@@ -50,10 +50,13 @@ func (w rangeValAddress) Visit(node ast.Node) ast.Visitor {
 		return w
 	}
 
-	t := w.file.Pkg.TypeOf(value)
+	valueIsStarExpr := false
+	if t := w.file.Pkg.TypeOf(value); t != nil {
+		valueIsStarExpr = strings.HasPrefix(t.String(), "*")
+	}
 
 	ast.Walk(rangeBodyVisitor{
-		valueIsStarExpr: strings.HasPrefix(t.String(), "*"),
+		valueIsStarExpr: valueIsStarExpr,
 		valueID:         value.Obj,
 		onFailure:       w.onFailure,
 	}, n.Body)
