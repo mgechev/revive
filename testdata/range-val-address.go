@@ -57,3 +57,84 @@ func rangeValAddress6() {
 		m = append(m, &value.id) // MATCH /suspicious assignment of 'value'. range-loop variables always have the same address/
 	}
 }
+
+func rangeValAddress7() {
+	type v struct {
+		id string
+	}
+	m := []*string{}
+
+	for _, value := range []v{{id: "A"}, {id: "B"}, {id: "C"}} {
+		m = append(m, &value.id) // MATCH /suspicious assignment of 'value'. range-loop variables always have the same address/
+	}
+}
+
+func rangeValAddress8() {
+	type v struct {
+		id string
+	}
+	m := []*string{}
+
+	mySlice := []*v{{id: "A"}, {id: "B"}, {id: "C"}}
+	for _, value := range mySlice {
+		m = append(m, &value.id)
+	}
+}
+
+func rangeValAddress9() {
+	type v struct {
+		id string
+	}
+	m := []*string{}
+
+	mySlice := map[string]*v{"a": {id: "A"}, "b": {id: "B"}, "c": {id: "C"}}
+	for _, value := range mySlice {
+		m = append(m, &value.id)
+	}
+}
+
+func rangeValAddress10() {
+	type v struct {
+		id string
+	}
+	m := []*string{}
+
+	for _, value := range map[string]*v{"a": {id: "A"}, "b": {id: "B"}, "c": {id: "C"}} {
+		m = append(m, &value.id)
+	}
+}
+
+func rangeValAddress11() {
+	type v struct {
+		id string
+	}
+	m := map[string]*string{}
+
+	for key, value := range map[string]*v{"a": {id: "A"}, "b": {id: "B"}, "c": {id: "C"}} {
+		m[key] = &value.id
+	}
+}
+
+func rangeValAddress12() {
+	type v struct {
+		id string
+	}
+	m := map[string]*string{}
+
+	for key, value := range map[string]v{"a": {id: "A"}, "b": {id: "B"}, "c": {id: "C"}} {
+		m[key] = &value.id // MATCH /suspicious assignment of 'value'. range-loop variables always have the same address/
+	}
+}
+
+func rangeValAddress13() {
+	type v struct {
+		id string
+	}
+	m := []*string{}
+
+	otherSlice := map[string]*v{"a": {id: "A"}, "b": {id: "B"}, "c": {id: "C"}}
+	mySlice := otherSlice
+	for _, value := range mySlice {
+		m = append(m, &value.id)
+	}
+}
