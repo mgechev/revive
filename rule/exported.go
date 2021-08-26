@@ -15,11 +15,18 @@ import (
 type ExportedRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ExportedRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *ExportedRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	if isTest(file) {
 		return failures
+	}
+
+	checkPrivateReceivers, disableStutteringCheck, sayRepetitiveInsteadOfStutters := r.getConf(args)
+
+	stuttersMsg := "stutters"
+	if sayRepetitiveInsteadOfStutters {
+		stuttersMsg = "is repetitive"
 	}
 
 	fileAst := file.AST
@@ -30,6 +37,9 @@ func (r *ExportedRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 			failures = append(failures, failure)
 		},
 		genDeclMissingComments: make(map[*ast.GenDecl]bool),
+		checkPrivateReceivers:  checkPrivateReceivers,
+		disableStutteringCheck: disableStutteringCheck,
+		stuttersMsg:            stuttersMsg,
 	}
 
 	ast.Walk(&walker, fileAst)
@@ -42,12 +52,41 @@ func (r *ExportedRule) Name() string {
 	return "exported"
 }
 
+func (r *ExportedRule) getConf(args lint.Arguments) (checkPrivateReceivers bool, disableStutteringCheck bool, sayRepetitiveInsteadOfStutters bool) {
+	// if any, we expect a slice of strings as configuration
+	if len(args) < 1 {
+		return
+	}
+	for _, flag := range args {
+		flagStr, ok := flag.(string)
+		if !ok {
+			panic(fmt.Sprintf("Invalid argument for the %s rule: expecting a string, got %T", r.Name(), flag))
+		}
+
+		switch flagStr {
+		case "checkPrivateReceivers":
+			checkPrivateReceivers = true
+		case "disableStutteringCheck":
+			disableStutteringCheck = true
+		case "sayRepetitiveInsteadOfStutters":
+			sayRepetitiveInsteadOfStutters = true
+		default:
+			panic(fmt.Sprintf("Unknown configuration flag %s for %s rule", flagStr, r.Name()))
+		}
+	}
+
+	return
+}
+
 type lintExported struct {
 	file                   *lint.File
 	fileAst                *ast.File
 	lastGen                *ast.GenDecl
 	genDeclMissingComments map[*ast.GenDecl]bool
 	onFailure              func(lint.Failure)
+	checkPrivateReceivers  bool
+	disableStutteringCheck bool
+	stuttersMsg            string
 }
 
 func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
@@ -61,7 +100,7 @@ func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
 		// method
 		kind = "method"
 		recv := receiverType(fn)
-		if !ast.IsExported(recv) {
+		if !ast.IsExported(recv) && !w.checkPrivateReceivers {
 			// receiver is unexported
 			return
 		}
@@ -98,6 +137,10 @@ func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
 }
 
 func (w *lintExported) checkStutter(id *ast.Ident, thing string) {
+	if w.disableStutteringCheck {
+		return
+	}
+
 	pkg, name := w.fileAst.Name.Name, id.Name
 	if !ast.IsExported(name) {
 		// unexported name
@@ -122,7 +165,7 @@ func (w *lintExported) checkStutter(id *ast.Ident, thing string) {
 			Node:       id,
 			Confidence: 0.8,
 			Category:   "naming",
-			Failure:    fmt.Sprintf("%s name will be used as %s.%s by other packages, and that stutters; consider calling this %s", thing, pkg, name, rem),
+			Failure:    fmt.Sprintf("%s name will be used as %s.%s by other packages, and that %s; consider calling this %s", thing, pkg, name, w.stuttersMsg, rem),
 		})
 	}
 }
