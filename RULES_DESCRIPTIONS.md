@@ -232,7 +232,7 @@ _Description_: It is possible to unintentionally import the same package twice. 
 
 _Configuration_: N/A
 
-### early-return
+## early-return
 
 _Description_: In GO it is idiomatic to minimize nesting statements, a typical example is to avoid if-then-else constructions. This rule spots constructions like
 ```go
@@ -408,7 +408,7 @@ Example:
 [imports-blacklist]
   arguments =["crypto/md5", "crypto/sha1"]
 ```
-### import-shadowing
+## import-shadowing
 
 _Description_: In GO it is possible to declare identifiers (packages, structs, 
 interfaces, parameters, receivers, variables, constants...) that conflict with the 
