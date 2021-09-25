@@ -1,0 +1,12 @@
+ignoreGeneratedHeader = false
+severity = "warning"
+confidence = 0.8
+errorCode = 0
+warningCode = 0
+
+enableAllRules = true
+
+[rule.exported]
+    disabled=true
+[rule.cyclomatic]
+    disabled=true    
