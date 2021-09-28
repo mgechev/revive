@@ -56,6 +56,7 @@ List of all available rules.
   - [struct-tag](#struct-tag)
   - [string-format](#string-format)
   - [superfluous-else](#superfluous-else)
+  - [time-equal](#time-equal)
   - [time-naming](#time-naming)
   - [var-naming](#var-naming)
   - [var-declaration](#var-declaration)
@@ -544,6 +545,12 @@ _Configuration_: N/A
 
 _Description_: To improve the readability of code, it is recommended to reduce the indentation as much as possible.
 This rule highlights redundant _else-blocks_ that can be eliminated from the code.
+
+_Configuration_: N/A
+
+## time-equal
+
+_Description_: This rule warns when using `==` and `!=` for equality check `time.Time` and suggest to `time.time.Equal` method, for about information follow this [link](https://pkg.go.dev/time#Time)
 
 _Configuration_: N/A
 
