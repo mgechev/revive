@@ -42,6 +42,12 @@ func (l *lintTimeEqual) Visit(node ast.Node) ast.Visitor {
 		return l
 	}
 
+	switch expr.Op {
+	case token.EQL, token.NEQ:
+	default:
+		return l
+	}
+
 	xtyp := l.file.Pkg.TypeOf(expr.X)
 	ytyp := l.file.Pkg.TypeOf(expr.Y)
 
@@ -55,8 +61,6 @@ func (l *lintTimeEqual) Visit(node ast.Node) ast.Visitor {
 		failure = fmt.Sprintf("use %s.Equal(%s) instead of %q operator", expr.X, expr.Y, expr.Op)
 	case token.NEQ:
 		failure = fmt.Sprintf("use !%s.Equal(%s) instead of %q operator", expr.X, expr.Y, expr.Op)
-	default:
-		return l
 	}
 
 	l.onFailure(lint.Failure{
