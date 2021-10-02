@@ -4,12 +4,17 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"math"
 
 	"github.com/mgechev/revive/formatter"
 
 	"github.com/BurntSushi/toml"
 	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/rule"
+)
+
+const (
+	defaultConfidence = 0.8
 )
 
 var defaultRules = []lint.Rule{
@@ -129,7 +134,9 @@ func GetLintingRules(config *lint.Config) ([]lint.Rule, error) {
 }
 
 func parseConfig(path string) (*lint.Config, error) {
-	config := &lint.Config{}
+	config := &lint.Config{
+		Confidence: math.Inf(1),
+	}
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, errors.New("cannot read the config file")
@@ -142,8 +149,7 @@ func parseConfig(path string) (*lint.Config, error) {
 }
 
 func normalizeConfig(config *lint.Config) {
-	const defaultConfidence = 0.8
-	if config.Confidence == 0 {
+	if config.Confidence == math.Inf(1) {
 		config.Confidence = defaultConfidence
 	}
 
@@ -210,7 +216,7 @@ func GetFormatter(formatterName string) (lint.Formatter, error) {
 
 func defaultConfig() *lint.Config {
 	defaultConfig := lint.Config{
-		Confidence: 0.0,
+		Confidence: math.Inf(1),
 		Severity:   lint.SeverityWarning,
 		Rules:      map[string]lint.RuleConfig{},
 	}
