@@ -28,7 +28,11 @@ func TestGetConfig(t *testing.T) {
 			wantError: "cannot parse the config file",
 		},
 		"default config": {
-			wantConfig: defaultConfig(),
+			wantConfig: func() *lint.Config {
+				c := defaultConfig()
+				normalizeConfig(c)
+				return c
+			}(),
 		},
 	}
 
@@ -40,7 +44,7 @@ func TestGetConfig(t *testing.T) {
 				t.Fatalf("Unexpected error\n\t%v", err)
 			case err != nil && !strings.Contains(err.Error(), tc.wantError):
 				t.Fatalf("Expected error\n\t%q\ngot:\n\t%v", tc.wantError, err)
-			case tc.wantConfig != nil && reflect.DeepEqual(cfg, tc.wantConfig):
+			case tc.wantConfig != nil && !reflect.DeepEqual(cfg, tc.wantConfig):
 				t.Fatalf("Expected config\n\t%+v\ngot:\n\t%+v", tc.wantConfig, cfg)
 			}
 
