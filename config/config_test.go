@@ -11,9 +11,10 @@ import (
 
 func TestGetConfig(t *testing.T) {
 	tt := map[string]struct {
-		confPath   string
-		wantConfig *lint.Config
-		wantError  string
+		confPath       string
+		wantConfig     *lint.Config
+		wantError      string
+		wantConfidence float64
 	}{
 		"non-reg issue #470": {
 			confPath:  "testdata/issue-470.toml",
@@ -33,6 +34,15 @@ func TestGetConfig(t *testing.T) {
 				normalizeConfig(c)
 				return c
 			}(),
+			wantConfidence: defaultConfidence,
+		},
+		"config from file issue #585": {
+			confPath:       "testdata/issue-585.toml",
+			wantConfidence: 0.0,
+		},
+		"config from file default confidence issue #585": {
+			confPath:       "testdata/issue-585-defaultConfidence.toml",
+			wantConfidence: defaultConfidence,
 		},
 	}
 
@@ -46,8 +56,9 @@ func TestGetConfig(t *testing.T) {
 				t.Fatalf("Expected error\n\t%q\ngot:\n\t%v", tc.wantError, err)
 			case tc.wantConfig != nil && !reflect.DeepEqual(cfg, tc.wantConfig):
 				t.Fatalf("Expected config\n\t%+v\ngot:\n\t%+v", tc.wantConfig, cfg)
+			case tc.wantConfig != nil && tc.wantConfidence != cfg.Confidence:
+				t.Fatalf("Expected confidence\n\t%+v\ngot:\n\t%+v", tc.wantConfidence, cfg.Confidence)
 			}
-
 		})
 	}
 }
@@ -88,7 +99,6 @@ func TestGetLintingRules(t *testing.T) {
 			case len(rules) != tc.wantRulesCount:
 				t.Fatalf("Expected %v enabled linting rules got: %v", tc.wantRulesCount, len(rules))
 			}
-
 		})
 	}
 }
