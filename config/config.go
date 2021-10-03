@@ -4,17 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"math"
 
 	"github.com/mgechev/revive/formatter"
 
 	"github.com/BurntSushi/toml"
 	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/rule"
-)
-
-const (
-	defaultConfidence = 0.8
 )
 
 var defaultRules = []lint.Rule{
@@ -86,7 +81,6 @@ var allRules = append([]lint.Rule{
 	&rule.NestedStructs{},
 	&rule.IfReturnRule{},
 	&rule.UselessBreak{},
-	&rule.TimeEqualRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
@@ -133,26 +127,19 @@ func GetLintingRules(config *lint.Config) ([]lint.Rule, error) {
 	return lintingRules, nil
 }
 
-func parseConfig(path string) (*lint.Config, error) {
-	config := &lint.Config{
-		Confidence: math.Inf(1),
-	}
+func parseConfig(path string, config *lint.Config) error {
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
-		return nil, errors.New("cannot read the config file")
+		return errors.New("cannot read the config file")
 	}
 	_, err = toml.Decode(string(file), config)
 	if err != nil {
-		return nil, fmt.Errorf("cannot parse the config file: %v", err)
+		return fmt.Errorf("cannot parse the config file: %v", err)
 	}
-	return config, nil
+	return nil
 }
 
 func normalizeConfig(config *lint.Config) {
-	if config.Confidence == math.Inf(1) {
-		config.Confidence = defaultConfidence
-	}
-
 	if len(config.Rules) == 0 {
 		config.Rules = map[string]lint.RuleConfig{}
 	}
@@ -186,16 +173,23 @@ func normalizeConfig(config *lint.Config) {
 	}
 }
 
+const defaultConfidence = 0.8
+
 // GetConfig yields the configuration
 func GetConfig(configPath string) (*lint.Config, error) {
-	config := defaultConfig()
-	if configPath != "" {
-		var err error
-		config, err = parseConfig(configPath)
+	var config = &lint.Config{}
+	switch {
+	case configPath != "":
+		config.Confidence = defaultConfidence
+		err := parseConfig(configPath, config)
 		if err != nil {
 			return nil, err
 		}
+
+	default: // no configuration provided
+		config = defaultConfig()
 	}
+
 	normalizeConfig(config)
 	return config, nil
 }
@@ -216,7 +210,7 @@ func GetFormatter(formatterName string) (lint.Formatter, error) {
 
 func defaultConfig() *lint.Config {
 	defaultConfig := lint.Config{
-		Confidence: math.Inf(1),
+		Confidence: defaultConfidence,
 		Severity:   lint.SeverityWarning,
 		Rules:      map[string]lint.RuleConfig{},
 	}
