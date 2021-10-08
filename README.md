@@ -36,7 +36,7 @@ Here's how `revive` is different from `golint`:
 - [`aurora`](https://github.com/xuri/aurora) - aurora is a web-based Beanstalk queue server console written in Go
 - [`soar`](https://github.com/XiaoMi/soar) - SQL Optimizer And Rewriter
 - [`pyroscope`](https://github.com/pyroscope-io/pyroscope) - Continuous profiling platform
-- [`gorush`](https://github.com/appleboy/gorush) - A push notification server written in Go (Golang)a
+- [`gorush`](https://github.com/appleboy/gorush) - A push notification server written in Go (Golang).
 - [`dry`](https://github.com/moncho/dry) - dry - A Docker manager for the terminal.
 - [`go-echarts`](https://github.com/chenjiandongx/go-echarts) - The adorable charts library for Golang
 - [`reviewdog`](https://github.com/reviewdog/reviewdog) - Automated code review tool integrated with any code analysis tools regardless of programming language
