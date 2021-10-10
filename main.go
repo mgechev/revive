@@ -198,7 +198,7 @@ func init() {
 		excludeUsage    = "list of globs which specify files to be excluded (i.e. -exclude foo/...)"
 		formatterUsage  = "formatter to be used for the output (i.e. -formatter stylish)"
 		versionUsage    = "get revive version"
-		exitStatusUsage = "set exit status to 1 if any issues are found, overwrites status set in config"
+		exitStatusUsage = "set exit status to 1 if any issues are found, overwrites error status set in config"
 	)
 
 	defaultConfigPath := buildDefaultConfigPath()
