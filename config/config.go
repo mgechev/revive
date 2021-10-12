@@ -82,6 +82,7 @@ var allRules = append([]lint.Rule{
 	&rule.IfReturnRule{},
 	&rule.UselessBreak{},
 	&rule.TimeEqualRule{},
+	&rule.BannedCharsRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
@@ -111,7 +112,7 @@ func GetLintingRules(config *lint.Config) ([]lint.Rule, error) {
 		rulesMap[r.Name()] = r
 	}
 
-	lintingRules := []lint.Rule{}
+	var lintingRules []lint.Rule
 	for name, ruleConfig := range config.Rules {
 		rule, ok := rulesMap[name]
 		if !ok {

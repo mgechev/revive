@@ -125,7 +125,7 @@ func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, ru
 
 type instruction struct {
 	Line        int    // the line number this applies to
-	Match       string // what pattern to match
+	Match       string // which pattern to match
 	Replacement string // what the suggested replacement line should be
 }
 
