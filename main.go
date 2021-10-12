@@ -36,6 +36,10 @@ func main() {
 	if err != nil {
 		fail(err.Error())
 	}
+	if setExitStatus {
+		conf.ErrorCode = 1
+		conf.WarningCode = 1
+	}
 
 	if len(excludePaths) == 0 { // if no excludes were set in the command line
 		excludePaths = conf.Exclude // use those from the configuration
@@ -135,11 +139,14 @@ func (i *arrayFlags) Set(value string) error {
 	return nil
 }
 
-var configPath string
-var excludePaths arrayFlags
-var formatterName string
-var help bool
-var versionFlag bool
+var (
+	configPath    string
+	excludePaths  arrayFlags
+	formatterName string
+	help          bool
+	versionFlag   bool
+	setExitStatus bool
+)
 
 var originalUsage = flag.Usage
 
@@ -188,10 +195,11 @@ func init() {
 
 	// command line help strings
 	const (
-		configUsage    = "path to the configuration TOML file, defaults to $HOME/revive.toml, if present (i.e. -config myconf.toml)"
-		excludeUsage   = "list of globs which specify files to be excluded (i.e. -exclude foo/...)"
-		formatterUsage = "formatter to be used for the output (i.e. -formatter stylish)"
-		versionUsage   = "get revive version"
+		configUsage     = "path to the configuration TOML file, defaults to $HOME/revive.toml, if present (i.e. -config myconf.toml)"
+		excludeUsage    = "list of globs which specify files to be excluded (i.e. -exclude foo/...)"
+		formatterUsage  = "formatter to be used for the output (i.e. -formatter stylish)"
+		versionUsage    = "get revive version"
+		exitStatusUsage = "set exit status to 1 if any issues are found, overwrites errorCode and warningCode in config"
 	)
 
 	defaultConfigPath := buildDefaultConfigPath()
@@ -200,6 +208,7 @@ func init() {
 	flag.Var(&excludePaths, "exclude", excludeUsage)
 	flag.StringVar(&formatterName, "formatter", "", formatterUsage)
 	flag.BoolVar(&versionFlag, "version", false, versionUsage)
+	flag.BoolVar(&setExitStatus, "set_exit_status", false, exitStatusUsage)
 	flag.Parse()
 
 	// Output build info (version, commit, date and builtBy)
