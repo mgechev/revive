@@ -38,14 +38,7 @@ func main() {
 	}
 	if setExitStatus {
 		conf.ErrorCode = 1
-		conf.Severity = lint.SeverityError
-		for name, c := range conf.Rules {
-			conf.Rules[name] = lint.RuleConfig{
-				Arguments: c.Arguments,
-				Severity:  lint.SeverityError,
-				Disabled:  c.Disabled,
-			}
-		}
+		conf.WarningCode = 1
 	}
 
 	if len(excludePaths) == 0 { // if no excludes were set in the command line
@@ -206,7 +199,7 @@ func init() {
 		excludeUsage    = "list of globs which specify files to be excluded (i.e. -exclude foo/...)"
 		formatterUsage  = "formatter to be used for the output (i.e. -formatter stylish)"
 		versionUsage    = "get revive version"
-		exitStatusUsage = "set exit status to 1 if any issues are found, overwrites status set in config and sets default severity to error"
+		exitStatusUsage = "set exit status to 1 if any issues are found, overwrites errorCode and warningCode in config"
 	)
 
 	defaultConfigPath := buildDefaultConfigPath()
