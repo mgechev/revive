@@ -22,6 +22,18 @@ builds:
       - darwin
       - windows
 
+dockers:
+- image_templates: ["ghcr.io/mgechev/revive:{{ .Version }}"]
+  dockerfile: Dockerfile
+  build_flag_templates:
+  - --label=org.opencontainers.image.title={{ .ProjectName }}
+  - --label=org.opencontainers.image.description={{ .ProjectName }}
+  - --label=org.opencontainers.image.url=https://github.com/mgechev/revive
+  - --label=org.opencontainers.image.source=https://github.com/mgechev/revive
+  - --label=org.opencontainers.image.version={{ .Version }}
+  - --label=org.opencontainers.image.revision={{ .FullCommit }}
+  - --label=org.opencontainers.image.licenses=MIT
+  
 changelog:
   filters:
     exclude:

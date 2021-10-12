@@ -119,6 +119,19 @@ Since the default behavior of `revive` is compatible with `golint`, without prov
 
 `revive` supports a `-config` flag whose value should correspond to a TOML file describing which rules to use for `revive`'s linting. If not provided, `revive` will try to use a global config file (assumed to be located at `$HOME/revive.toml`). Otherwise, if no configuration TOML file is found then `revive` uses a built-in set of default linting rules.
 
+### Docker
+A volume needs to be mounted to share the current repository with the container.  
+Please refer to the [bind mounts Docker documentation](https://docs.docker.com/storage/bind-mounts/)
+
+```bash
+docker run -v "$(pwd)":/var/<repository> ghcr.io/mgechev/revive:v1.1.2-next -config /var/<repository>/revive.toml -formatter stylish ./var/kidle/...
+```
+
+- `-v` is for the volume  
+- `ghcr.io/mgechev/revive:v1.1.2-next ` is the image name and its version corresponding to `revive` command
+- The provided flags are the same as the binary usage.
+
+
 ### Bazel
 
 If you want to use revive with Bazel, take a look at the [rules](https://github.com/atlassian/bazel-tools/tree/master/gorevive) that Atlassian maintains.
