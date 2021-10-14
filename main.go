@@ -214,7 +214,7 @@ func init() {
 	// Output build info (version, commit, date and builtBy)
 	if versionFlag {
 		fmt.Printf(
-			"Current revive version %v commit %v, built @%v by %v.\n",
+			"Version:\t%s\nCommit:\t\t%s\nBuilt\t\t%s by %s\n",
 			version,
 			commit,
 			date,
