@@ -8,6 +8,7 @@ List of all available rules.
   - [argument-limit](#argument-limit)
   - [atomic](#atomic)
   - [bare-return](#bare-return)
+  - [banned-characters](#banned-characters)
   - [blank-imports](#blank-imports)
   - [bool-literal-in-expr](#bool-literal-in-expr)
   - [call-to-gc](#call-to-gc)
@@ -114,6 +115,19 @@ _Configuration_: N/A
 _Description_: Warns on bare (a.k.a. naked) returns
 
 _Configuration_: N/A
+
+## banned-characters
+
+_Description_: Checks given banned characters in identifiers(func, var, const). Comments are not checked.
+
+_Configuration_: This rule accepts a slice of strings, the characters to ban.
+
+Example:
+
+```toml
+[rule.banned-characters]
+  arguments =["Ω","Σ","σ"]
+```
 
 ## blank-imports
 

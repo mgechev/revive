@@ -19,12 +19,12 @@ func StringTest() {
 		o struct{ x int }
 	)
 	const p = 0
-	_ = string(i) // MATCH /dubious convertion of an integer into a string, use strconv.Itoa/
+	_ = string(i) // MATCH /dubious conversion of an integer into a string, use strconv.Itoa/
 	_ = string(j)
 	_ = string(k)
-	_ = string(p)    // MATCH /dubious convertion of an integer into a string, use strconv.Itoa/
-	_ = A(l)         // MATCH /dubious convertion of an integer into a string, use strconv.Itoa/
-	_ = B(m)         // MATCH /dubious convertion of an integer into a string, use strconv.Itoa/
-	_ = string(n[1]) // MATCH /dubious convertion of an integer into a string, use strconv.Itoa/
-	_ = string(o.x)  // MATCH /dubious convertion of an integer into a string, use strconv.Itoa/
+	_ = string(p)    // MATCH /dubious conversion of an integer into a string, use strconv.Itoa/
+	_ = A(l)         // MATCH /dubious conversion of an integer into a string, use strconv.Itoa/
+	_ = B(m)         // MATCH /dubious conversion of an integer into a string, use strconv.Itoa/
+	_ = string(n[1]) // MATCH /dubious conversion of an integer into a string, use strconv.Itoa/
+	_ = string(o.x)  // MATCH /dubious conversion of an integer into a string, use strconv.Itoa/
 }
