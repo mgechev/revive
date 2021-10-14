@@ -463,7 +463,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`function-length`](./RULES_DESCRIPTIONS.md#function-length)          |  n/a   |  Warns on functions exceeding the statements or lines max |    no    |  no   |
 | [`nested-structs`](./RULES_DESCRIPTIONS.md#nested-structs)          |  n/a   |  Warns on structs within structs |    no    |  no   |
 | [`useless-break`](./RULES_DESCRIPTIONS.md#useless-break)          |  n/a   |  Warns on useless `break` statements in case clauses |    no    |  no   |
-| [`banned-characters`](./RULES_DESCRIPTIONS.md#banned-characters)          |  n/a   |  Checks banned characters in files |    no    |  no   |
+| [`banned-characters`](./RULES_DESCRIPTIONS.md#banned-characters)          |  n/a   |  Checks banned characters in identifiers |    no    |  no   |
 
 ## Configurable rules
 

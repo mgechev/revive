@@ -1,8 +1,9 @@
 package rule
 
 import (
-	"bytes"
 	"fmt"
+	"go/ast"
+	"strings"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -17,22 +18,17 @@ func (r *BannedCharsRule) Apply(file *lint.File, arguments lint.Arguments) []lin
 	var failures []lint.Failure
 
 	checkNumberOfArguments(1, arguments, bannedCharsRuleName)
-	bannedCharList := r.getBannedList(arguments)
+	bannedCharList := r.getBannedCharsList(arguments)
 
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
 
-	// check if file content holds banned characters
-	for _, c := range bannedCharList {
-		ok := bytes.ContainsAny(file.Content(), c)
-		if ok {
-			onFailure(lint.Failure{
-				Failure: fmt.Sprintf("banned character found: %s", c),
-			})
-		}
+	w := lintBannedCharsRule{
+		bannedChars: bannedCharList,
+		onFailure:   onFailure,
 	}
-
+	ast.Walk(w, file.AST)
 	return failures
 }
 
@@ -41,8 +37,8 @@ func (r *BannedCharsRule) Name() string {
 	return bannedCharsRuleName
 }
 
-// getBannedList converts arguments into the banned characters list
-func (r *BannedCharsRule) getBannedList(args lint.Arguments) []string {
+// getBannedCharsList converts arguments into the banned characters list
+func (r *BannedCharsRule) getBannedCharsList(args lint.Arguments) []string {
 	var bannedChars []string
 	for _, char := range args {
 		charStr, ok := char.(string)
@@ -53,4 +49,30 @@ func (r *BannedCharsRule) getBannedList(args lint.Arguments) []string {
 	}
 
 	return bannedChars
+}
+
+type lintBannedCharsRule struct {
+	bannedChars []string
+	onFailure   func(lint.Failure)
+}
+
+// Visit checks for each node if an identifier contains banned characters
+func (w lintBannedCharsRule) Visit(node ast.Node) ast.Visitor {
+	n, ok := node.(*ast.Ident)
+	if !ok {
+		return w
+	}
+	for _, c := range w.bannedChars {
+		ok := strings.Contains(n.Name, c)
+		if ok {
+			w.onFailure(lint.Failure{
+				Confidence: 1,
+				Failure:    fmt.Sprintf("banned character found: %s", c),
+				RuleName:   bannedCharsRuleName,
+				Node:       n,
+			})
+		}
+	}
+
+	return w
 }

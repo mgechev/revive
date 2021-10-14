@@ -118,7 +118,7 @@ _Configuration_: N/A
 
 ## banned-characters
 
-_Description_: Checks given banned characters in files.
+_Description_: Checks given banned characters in identifiers(func, var, const). Comments are not checked.
 
 _Configuration_: This rule accepts a slice of strings, the characters to ban.
 
