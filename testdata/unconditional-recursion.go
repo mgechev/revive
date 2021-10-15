@@ -178,3 +178,12 @@ func urn17(ch chan int) {
 	}
 	urn17(ch) // MATCH /unconditional recursive call/
 }
+
+// Tests for #596
+func (*fooType) BarFunc() {
+	BarFunc()
+}
+
+func (_ *fooType) BazFunc() {
+	BazFunc()
+}
