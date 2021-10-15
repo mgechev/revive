@@ -17,6 +17,7 @@ builds:
   -
     env:
       - CGO_ENABLED=0
+      - BUILDER=GoReleaser
     goos:
       - linux
       - darwin
