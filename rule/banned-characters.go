@@ -9,23 +9,26 @@ import (
 )
 
 // BannedCharsRule checks if a file contains banned characters.
-type BannedCharsRule struct{}
+type BannedCharsRule struct {
+	bannedCharList []string
+}
 
 const bannedCharsRuleName = "banned-characters"
 
 // Apply applied the rule to the given file.
 func (r *BannedCharsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	if r.bannedCharList == nil {
+		checkNumberOfArguments(1, arguments, bannedCharsRuleName)
+		r.bannedCharList = r.getBannedCharsList(arguments)
+	}
+
 	var failures []lint.Failure
-
-	checkNumberOfArguments(1, arguments, bannedCharsRuleName)
-	bannedCharList := r.getBannedCharsList(arguments)
-
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
 
 	w := lintBannedCharsRule{
-		bannedChars: bannedCharList,
+		bannedChars: r.bannedCharList,
 		onFailure:   onFailure,
 	}
 	ast.Walk(w, file.AST)

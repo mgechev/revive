@@ -11,23 +11,27 @@ import (
 // Based on https://github.com/fzipp/gocyclo
 
 // CyclomaticRule lints given else constructs.
-type CyclomaticRule struct{}
+type CyclomaticRule struct {
+	maxComplexity int
+}
 
 // Apply applies the rule to given file.
 func (r *CyclomaticRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	checkNumberOfArguments(1, arguments, r.Name())
+	if r.maxComplexity < 1 {
+		checkNumberOfArguments(1, arguments, r.Name())
 
-	complexity, ok := arguments[0].(int64) // Alt. non panicking version
-	if !ok {
-		panic("invalid argument for cyclomatic complexity")
+		complexity, ok := arguments[0].(int64) // Alt. non panicking version
+		if !ok {
+			panic("invalid argument for cyclomatic complexity")
+		}
+		r.maxComplexity = int(complexity)
 	}
 
 	var failures []lint.Failure
-
 	fileAst := file.AST
 	walker := lintCyclomatic{
 		file:       file,
-		complexity: int(complexity),
+		complexity: r.maxComplexity,
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},

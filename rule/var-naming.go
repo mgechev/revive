@@ -10,29 +10,33 @@ import (
 )
 
 // VarNamingRule lints given else constructs.
-type VarNamingRule struct{}
+type VarNamingRule struct {
+	configured bool
+	whitelist  []string
+	blacklist  []string
+}
 
 // Apply applies the rule to given file.
 func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
-	var whitelist []string
-	var blacklist []string
+	if !r.configured {
+		if len(arguments) >= 1 {
+			r.whitelist = getList(arguments[0], "whitelist")
+		}
 
-	if len(arguments) >= 1 {
-		whitelist = getList(arguments[0], "whitelist")
-	}
-
-	if len(arguments) >= 2 {
-		blacklist = getList(arguments[1], "blacklist")
+		if len(arguments) >= 2 {
+			r.blacklist = getList(arguments[1], "blacklist")
+		}
+		r.configured = true
 	}
 
 	fileAst := file.AST
 	walker := lintNames{
 		file:      file,
 		fileAst:   fileAst,
-		whitelist: whitelist,
-		blacklist: blacklist,
+		whitelist: r.whitelist,
+		blacklist: r.blacklist,
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
