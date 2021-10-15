@@ -131,7 +131,6 @@ docker run -v "$(pwd)":/var/<repository> ghcr.io/mgechev/revive:v1.1.2-next -con
 - `ghcr.io/mgechev/revive:v1.1.2-next ` is the image name and its version corresponding to `revive` command
 - The provided flags are the same as the binary usage.
 
-
 ### Bazel
 
 If you want to use revive with Bazel, take a look at the [rules](https://github.com/atlassian/bazel-tools/tree/master/gorevive) that Atlassian maintains.
