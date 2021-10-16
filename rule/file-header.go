@@ -23,7 +23,7 @@ func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) []lint
 		var ok bool
 		r.header, ok = arguments[0].(string)
 		if !ok {
-			panic(fmt.Sprintf("invalid argument for "file-header" rule: first argument should be a string, got %T", arguments[0]))
+			panic(fmt.Sprintf("invalid argument for \"file-header\" rule: first argument should be a string, got %T", arguments[0]))
 		}
 	}
 
