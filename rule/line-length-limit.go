@@ -18,7 +18,7 @@ type LineLengthLimitRule struct {
 
 // Apply applies the rule to given file.
 func (r *LineLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	if r.max < 1 {
+	if r.max == 0 {
 		checkNumberOfArguments(1, arguments, r.Name())
 
 		max, ok := arguments[0].(int64) // Alt. non panicking version

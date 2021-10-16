@@ -17,7 +17,7 @@ type CyclomaticRule struct {
 
 // Apply applies the rule to given file.
 func (r *CyclomaticRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	if r.maxComplexity < 1 {
+	if r.maxComplexity == 0 {
 		checkNumberOfArguments(1, arguments, r.Name())
 
 		complexity, ok := arguments[0].(int64) // Alt. non panicking version

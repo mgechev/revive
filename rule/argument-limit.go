@@ -14,7 +14,7 @@ type ArgumentsLimitRule struct {
 
 // Apply applies the rule to given file.
 func (r *ArgumentsLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	if r.total < 1 {
+	if r.total == 0 {
 		checkNumberOfArguments(1, arguments, r.Name())
 
 		total, ok := arguments[0].(int64) // Alt. non panicking version
