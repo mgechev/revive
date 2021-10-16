@@ -22,7 +22,7 @@ func (r *CyclomaticRule) Apply(file *lint.File, arguments lint.Arguments) []lint
 
 		complexity, ok := arguments[0].(int64) // Alt. non panicking version
 		if !ok {
-			panic("invalid argument for cyclomatic complexity")
+			panic(fmt.Sprintf("invalid argument for cyclomatic complexity; expected int but got %T", arguments[0]))
 		}
 		r.maxComplexity = int(complexity)
 	}
