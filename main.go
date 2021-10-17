@@ -238,5 +238,6 @@ func init() {
 		}
 
 		fmt.Printf("Version:\t%s\n%s", version, buildInfo)
+		os.Exit(0)
 	}
 }
