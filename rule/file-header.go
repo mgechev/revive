@@ -1,6 +1,7 @@
 package rule
 
 import (
+	"fmt"
 	"regexp"
 
 	"github.com/mgechev/revive/lint"
