@@ -47,6 +47,7 @@ List of all available rules.
   - [modifies-parameter](#modifies-parameter)
   - [modifies-value-receiver](#modifies-value-receiver)
   - [nested-structs](#nested-structs)
+  - [optimize-operands-order](#optimize-operands-order)
   - [package-comments](#package-comments)
   - [range](#range)
   - [range-val-in-closure](#range-val-in-closure)
@@ -561,6 +562,21 @@ _Description_: To improve the readability of code, it is recommended to reduce t
 This rule highlights redundant _else-blocks_ that can be eliminated from the code.
 
 _Configuration_: N/A
+
+## optimize-operands-order
+
+_Description_: To improve slightly efficiency, order of terms in a conditional expression can speed up its average evaluation time.
+This rule spots caller on the left side of a conditional expression and a non-caller on the right side. 
+To avoid making a function call in those cases where the caller is evaluated to false.
+
+_Configuration_: N/A
+
+Example:
+
+    if isGenerated(content) && !config.IgnoreGeneratedHeader {
+Swap left and right side :
+
+    if !config.IgnoreGeneratedHeader && isGenerated(content) {
 
 ## time-equal
 
