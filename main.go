@@ -13,6 +13,7 @@ import (
 	"github.com/mgechev/dots"
 	"github.com/mgechev/revive/config"
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/logging"
 	"github.com/mitchellh/go-homedir"
 )
 
@@ -29,6 +30,11 @@ func fail(err string) {
 }
 
 func main() {
+	log, err := logging.GetLogger()
+	if err != nil {
+		fail(err.Error())
+	}
+
 	conf, err := config.GetConfig(configPath)
 	if err != nil {
 		fail(err.Error())
@@ -59,6 +65,8 @@ func main() {
 	if err != nil {
 		fail(err.Error())
 	}
+
+	log.Println("Config loaded")
 
 	failures, err := revive.Lint(packages, lintingRules, *conf)
 	if err != nil {
