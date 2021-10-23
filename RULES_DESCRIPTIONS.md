@@ -481,6 +481,19 @@ _Description_: Packages declaring structs that contain other inline struct defin
 
 _Configuration_: N/A
 
+## optimize-operands-order
+
+_Description_: conditional expressions can be written to take advantage of short circuit evaluation and speed up its average evaluation time by forcing the evaluation of less time-consuming terms before more costly ones. This rule spots logical expressions where the order of evaluation of terms seems non optimal. Please notice that confidence of this rule is low and is up to the user to decide if the suggested rewrite of the expression keeps the semantics of the original one.
+
+_Configuration_: N/A
+
+Example:
+
+    if isGenerated(content) && !config.IgnoreGeneratedHeader {
+Swap left and right side :
+
+    if !config.IgnoreGeneratedHeader && isGenerated(content) {
+
 ## package-comments
 
 _Description_: Packages should have comments. This rule warns on undocumented packages and when packages comments are detached to the `package` keyword.
@@ -562,21 +575,6 @@ _Description_: To improve the readability of code, it is recommended to reduce t
 This rule highlights redundant _else-blocks_ that can be eliminated from the code.
 
 _Configuration_: N/A
-
-## optimize-operands-order
-
-_Description_: To improve slightly efficiency, order of terms in a conditional expression can speed up its average evaluation time.
-This rule spots caller on the left side of a conditional expression and a non-caller on the right side. 
-To avoid making a function call in those cases where the caller is evaluated to false.
-
-_Configuration_: N/A
-
-Example:
-
-    if isGenerated(content) && !config.IgnoreGeneratedHeader {
-Swap left and right side :
-
-    if !config.IgnoreGeneratedHeader && isGenerated(content) {
 
 ## time-equal
 
