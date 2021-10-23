@@ -29,7 +29,7 @@ func (r *ImportsBlacklistRule) Apply(file *lint.File, arguments lint.Arguments) 
 			}
 			// we add quotes if not present, because when parsed, the value of the AST node, will be quoted
 			if len(argStr) > 2 && argStr[0] != '"' && argStr[len(argStr)-1] != '"' {
-				argStr = fmt.Sprintf(`"%s"`, argStr)
+				argStr = fmt.Sprintf(`%q`, argStr)
 			}
 			r.blacklist[argStr] = true
 		}
