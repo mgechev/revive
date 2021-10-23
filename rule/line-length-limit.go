@@ -61,7 +61,7 @@ func (r lintLineLengthNum) check() {
 	s := bufio.NewScanner(f)
 	for s.Scan() {
 		t := s.Text()
-		t = strings.Replace(t, "\t", spaces, -1)
+		t = strings.ReplaceAll(t, "\t", spaces)
 		c := utf8.RuneCountInString(t)
 		if c > r.max {
 			r.onFailure(lint.Failure{

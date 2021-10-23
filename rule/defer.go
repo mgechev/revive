@@ -88,7 +88,7 @@ func (w lintDeferRule) Visit(node ast.Node) ast.Visitor {
 			w.newFailure("return in a defer function has no effect", n, 1.0, "logic", "return")
 		}
 	case *ast.CallExpr:
-		if isIdent(n.Fun, "recover") && !w.inADefer {
+		if !w.inADefer && isIdent(n.Fun, "recover") {
 			// confidence is not 1 because recover can be in a function that is deferred elsewhere
 			w.newFailure("recover must be called inside a deferred function", n, 0.8, "logic", "recover")
 		}
