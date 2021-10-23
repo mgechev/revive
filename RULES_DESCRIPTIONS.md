@@ -47,6 +47,7 @@ List of all available rules.
   - [modifies-parameter](#modifies-parameter)
   - [modifies-value-receiver](#modifies-value-receiver)
   - [nested-structs](#nested-structs)
+  - [optimize-operands-order](#optimize-operands-order)
   - [package-comments](#package-comments)
   - [range](#range)
   - [range-val-in-closure](#range-val-in-closure)
@@ -479,6 +480,19 @@ _Configuration_: N/A
 _Description_: Packages declaring structs that contain other inline struct definitions can be hard to understand/read for other developers.
 
 _Configuration_: N/A
+
+## optimize-operands-order
+
+_Description_: conditional expressions can be written to take advantage of short circuit evaluation and speed up its average evaluation time by forcing the evaluation of less time-consuming terms before more costly ones. This rule spots logical expressions where the order of evaluation of terms seems non optimal. Please notice that confidence of this rule is low and is up to the user to decide if the suggested rewrite of the expression keeps the semantics of the original one.
+
+_Configuration_: N/A
+
+Example:
+
+    if isGenerated(content) && !config.IgnoreGeneratedHeader {
+Swap left and right side :
+
+    if !config.IgnoreGeneratedHeader && isGenerated(content) {
 
 ## package-comments
 
