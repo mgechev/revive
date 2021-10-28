@@ -35,7 +35,7 @@ func (r *ErrorStringsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failu
 	walker := lintErrorStrings{
 		file:           file,
 		fileAst:        fileAst,
-		printFunctions: errorFunctions,
+		errorFunctions: errorFunctions,
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
@@ -54,7 +54,7 @@ func (r *ErrorStringsRule) Name() string {
 type lintErrorStrings struct {
 	file           *lint.File
 	fileAst        *ast.File
-	printFunctions map[string]map[string]struct{}
+	errorFunctions map[string]map[string]struct{}
 	onFailure      func(lint.Failure)
 }
 
@@ -105,7 +105,7 @@ func (w lintErrorStrings) match(expr *ast.CallExpr) bool {
 	}
 	// retrieve the package
 	id, ok := sel.X.(*ast.Ident)
-	functions, ok := w.printFunctions[id.Name]
+	functions, ok := w.errorFunctions[id.Name]
 	if !ok {
 		return false
 	}
