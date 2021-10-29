@@ -105,6 +105,9 @@ func (w lintErrorStrings) match(expr *ast.CallExpr) bool {
 	}
 	// retrieve the package
 	id, ok := sel.X.(*ast.Ident)
+	if !ok {
+		return false
+	}
 	functions, ok := w.errorFunctions[id.Name]
 	if !ok {
 		return false
