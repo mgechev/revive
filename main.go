@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime/debug"
@@ -58,7 +57,7 @@ func main() {
 	}
 
 	revive := lint.New(func(file string) ([]byte, error) {
-		return ioutil.ReadFile(file)
+		return os.ReadFile(file)
 	})
 
 	lintingRules, err := config.GetLintingRules(conf)

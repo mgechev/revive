@@ -2,7 +2,7 @@ package test
 
 import (
 	"flag"
-	"io/ioutil"
+	"os"
 	"path"
 	"regexp"
 	"testing"
@@ -42,9 +42,9 @@ func TestAll(t *testing.T) {
 		t.Fatalf("Bad -lint.match value %q: %v", *lintMatch, err)
 	}
 
-	fis, err := ioutil.ReadDir(baseDir)
+	fis, err := os.ReadDir(baseDir)
 	if err != nil {
-		t.Fatalf("ioutil.ReadDir: %v", err)
+		t.Fatalf("os.ReadDir: %v", err)
 	}
 	if len(fis) == 0 {
 		t.Fatalf("no files in %v", baseDir)
@@ -54,12 +54,18 @@ func TestAll(t *testing.T) {
 			continue
 		}
 		t.Run(fi.Name(), func(t *testing.T) {
-			src, err := ioutil.ReadFile(path.Join(baseDir, fi.Name()))
+			src, err := os.ReadFile(path.Join(baseDir, fi.Name()))
 			if err != nil {
 				t.Fatalf("Failed reading %s: %v", fi.Name(), err)
 			}
 
-			if err := assertFailures(t, baseDir, fi, src, rules, map[string]lint.RuleConfig{}); err != nil {
+			stat, err := os.Stat(path.Join(baseDir, fi.Name()))
+
+			if err != nil {
+				t.Fatalf("Cannot get file info for %s: %v", fi.Name(), err)
+			}
+
+			if err := assertFailures(t, baseDir, stat, src, rules, map[string]lint.RuleConfig{}); err != nil {
 				t.Errorf("Linting %s: %v", fi.Name(), err)
 			}
 		})
