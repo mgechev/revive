@@ -31,7 +31,6 @@ var rules = []lint.Rule{
 	&rule.UnexportedReturnRule{},
 	&rule.TimeNamingRule{},
 	&rule.ContextKeysType{},
-	&rule.ContextAsArgumentRule{},
 }
 
 func TestAll(t *testing.T) {

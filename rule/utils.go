@@ -66,6 +66,14 @@ func isCgoExported(f *ast.FuncDecl) bool {
 
 var allCapsRE = regexp.MustCompile(`^[A-Z0-9_]+$`)
 
+func identStr(expr ast.Expr) (string, bool) {
+	id, ok := expr.(*ast.Ident)
+	if !ok {
+		return "", false
+	}
+	return id.Name, true
+}
+
 func isIdent(expr ast.Expr, ident string) bool {
 	id, ok := expr.(*ast.Ident)
 	return ok && id.Name == ident
@@ -92,9 +100,40 @@ func validType(T types.Type) bool {
 		!strings.Contains(T.String(), "invalid type") // good but not foolproof
 }
 
+func astExprTypeStr(expr ast.Expr) (string, bool) {
+	switch v := expr.(type) {
+	case *ast.Ident:
+		return identStr(v)
+	case *ast.StarExpr:
+		subID, ok := astExprTypeStr(v.X)
+		if !ok {
+			return "", false
+		}
+		return "*" + subID, true
+	case *ast.SelectorExpr:
+		pkg, ok := identStr(v.X)
+		if !ok {
+			return "", false
+		}
+		sel, ok := identStr(v.Sel)
+		if !ok {
+			return "", false
+		}
+		return pkg + "." + sel, true
+	}
+	return "", false
+}
+
+// isPkgDot checks if the expression is <pkg>.<name>
 func isPkgDot(expr ast.Expr, pkg, name string) bool {
 	sel, ok := expr.(*ast.SelectorExpr)
 	return ok && isIdent(sel.X, pkg) && isIdent(sel.Sel, name)
+}
+
+// isPtrPkgDot checks if the expression is *<pkg>.<name>.
+func isPtrPkgDot(expr ast.Expr, pkg, name string) bool {
+	star, ok := expr.(*ast.StarExpr)
+	return ok && isPkgDot(star.X, pkg, name)
 }
 
 func srcLine(src []byte, p token.Position) string {
