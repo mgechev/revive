@@ -14,27 +14,24 @@ type ContextAsArgumentRule struct {
 // Apply applies the rule to given file.
 func (r *ContextAsArgumentRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
 	var allowTypesBefore []string
-	if len(args) > 1 {
+	if len(args) != 1 {
 		panic(fmt.Sprintf("Invalid argument to the context-as-argument rule. Expecting a single k,v map only, got %v args", len(args)))
 	}
-	if len(args) == 1 {
-		argKV, ok := args[0].(map[string]interface{})
-		if !ok {
-			panic(fmt.Sprintf("Invalid argument to the context-as-argument rule. Expecting a k,v map, got %T", args[0]))
-		}
-		for k, v := range argKV {
-			switch k {
-			case "allowTypesBefore":
-				typesBefore, ok := v.([]string)
-				if !ok {
-					panic(fmt.Sprintf("Invalid argument to the context-as-argument.allowTypesBefore rule. Expecting a []string, got %T", v))
-				}
-				allowTypesBefore = typesBefore
-			default:
-				panic(fmt.Sprintf("Invalid argument to the context-as-argument rule. Unrecognized key %s", k))
+	argKV, ok := args[0].(map[string]interface{})
+	if !ok {
+		panic(fmt.Sprintf("Invalid argument to the context-as-argument rule. Expecting a k,v map, got %T", args[0]))
+	}
+	for k, v := range argKV {
+		switch k {
+		case "allowTypesBefore":
+			typesBefore, ok := v.([]string)
+			if !ok {
+				panic(fmt.Sprintf("Invalid argument to the context-as-argument.allowTypesBefore rule. Expecting a []string, got %T", v))
 			}
+			allowTypesBefore = typesBefore
+		default:
+			panic(fmt.Sprintf("Invalid argument to the context-as-argument rule. Unrecognized key %s", k))
 		}
-		// validate there's no other unrecognized args
 	}
 
 	var failures []lint.Failure
