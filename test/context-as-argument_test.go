@@ -11,13 +11,9 @@ func TestContextAsArgument(t *testing.T) {
 	testRule(t, "context-as-argument", &rule.ContextAsArgumentRule{}, &lint.RuleConfig{
 		Arguments: []interface{}{
 			map[string]interface{}{
-				"allowTypesBefore": []string{
-					"AllowedBeforeType",
-					"AllowedBeforeStruct",
-					"*AllowedBeforePtrStruct",
-					"*testing.T",
-				},
+				"allowTypesBefore": "AllowedBeforeType,AllowedBeforeStruct,*AllowedBeforePtrStruct,*testing.T",
 			},
 		},
-	})
+	},
+	)
 }
