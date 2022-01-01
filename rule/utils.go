@@ -92,6 +92,7 @@ func validType(T types.Type) bool {
 		!strings.Contains(T.String(), "invalid type") // good but not foolproof
 }
 
+// isPkgDot checks if the expression is <pkg>.<name>
 func isPkgDot(expr ast.Expr, pkg, name string) bool {
 	sel, ok := expr.(*ast.SelectorExpr)
 	return ok && isIdent(sel.X, pkg) && isIdent(sel.Sel, name)
@@ -129,14 +130,6 @@ func pick(n ast.Node, fselect func(n ast.Node) bool, f func(n ast.Node) []ast.No
 	}
 	p := picker{fselect: fselect, onSelect: onSelect}
 	ast.Walk(p, n)
-	return result
-}
-
-func pickFromExpList(l []ast.Expr, fselect func(n ast.Node) bool, f func(n ast.Node) []ast.Node) []ast.Node {
-	result := make([]ast.Node, 0)
-	for _, e := range l {
-		result = append(result, pick(e, fselect, f)...)
-	}
 	return result
 }
 

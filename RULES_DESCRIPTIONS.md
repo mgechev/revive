@@ -187,7 +187,16 @@ _Configuration_: N/A
 
 _Description_: By [convention](https://github.com/golang/go/wiki/CodeReviewComments#contexts), `context.Context` should be the first parameter of a function. This rule spots function declarations that do not follow the convention.
 
-_Configuration_: N/A
+_Configuration_:
+
+* `allowTypesBefore` : (string) comma-separated list of types that may be before 'context.Context'
+
+Example:
+
+```toml
+[rule.context-as-argument]
+  arguments = [{allowTypesBefore = "*testing.T,*github.com/user/repo/testing.Harness"}]
+```
 
 ## context-keys-type
 
@@ -253,7 +262,7 @@ _Configuration_: N/A
 _Description_: In GO it is idiomatic to minimize nesting statements, a typical example is to avoid if-then-else constructions. This rule spots constructions like
 ```go
 if cond {
-  // do something 
+  // do something
 } else {
   // do other thing
   return ...
@@ -263,7 +272,7 @@ that can be rewritten into more idiomatic:
 ```go
 if ! cond {
   // do other thing
-  return ... 
+  return ...
 }
 
 // do something
@@ -315,8 +324,8 @@ _Description_: Exported function and methods should have comments. This warns on
 
 More information [here](https://github.com/golang/go/wiki/CodeReviewComments#doc-comments)
 
-_Configuration_: ([]string) rule flags. 
-Please notice that without configuration, the default behavior of the rule is that of its `golint` counterpart. 
+_Configuration_: ([]string) rule flags.
+Please notice that without configuration, the default behavior of the rule is that of its `golint` counterpart.
 Available flags are:
 
 * _checkPrivateReceivers_ enables checking public methods of private types
@@ -426,8 +435,8 @@ Example:
 ```
 ## import-shadowing
 
-_Description_: In GO it is possible to declare identifiers (packages, structs, 
-interfaces, parameters, receivers, variables, constants...) that conflict with the 
+_Description_: In GO it is possible to declare identifiers (packages, structs,
+interfaces, parameters, receivers, variables, constants...) that conflict with the
 name of an imported package. This rule spots identifiers that shadow an import.
 
 _Configuration_: N/A
@@ -517,7 +526,7 @@ _Configuration_: N/A
 
 ## range-val-address
 
-_Description_: Range variables in a loop are reused at each iteration. This rule warns when assigning the address of the variable, passing the address to append() or using it in a map. 
+_Description_: Range variables in a loop are reused at each iteration. This rule warns when assigning the address of the variable, passing the address to append() or using it in a map.
 
 _Configuration_: N/A
 
@@ -535,7 +544,7 @@ Even if possible, redefining these built in names can lead to bugs very difficul
 _Configuration_: N/A
 
 ## string-of-int
-_Description_:  explicit type conversion `string(i)` where `i` has an integer type other than `rune` might behave not as expected by the developer (e.g. `string(42)` is not `"42"`). This rule spot that kind of suspicious conversions. 
+_Description_:  explicit type conversion `string(i)` where `i` has an integer type other than `rune` might behave not as expected by the developer (e.g. `string(42)` is not `"42"`). This rule spot that kind of suspicious conversions.
 
 _Configuration_: N/A
 
@@ -548,7 +557,7 @@ _Configuration_: Each argument is a slice containing 2-3 strings: a scope, a reg
 
 1. The first string defines a scope. This controls which string literals the regex will apply to, and is defined as a function argument. It must contain at least a function name (`core.WriteError`). Scopes may optionally contain a number specifying which argument in the function to check (`core.WriteError[1]`), as well as a struct field (`core.WriteError[1].Message`, only works for top level fields). Function arguments are counted starting at 0, so `[0]` would refer to the first argument, `[1]` would refer to the second, etc. If no argument number is provided, the first argument will be used (same as `[0]`).
 
-2. The second string is a regular expression (beginning and ending with a `/` character), which will be used to check the string literals in the scope. 
+2. The second string is a regular expression (beginning and ending with a `/` character), which will be used to check the string literals in the scope.
 
 3. The third string (optional) is a message containing the purpose for the regex, which will be used in lint errors.
 
@@ -663,8 +672,8 @@ _Configuration_: N/A
 
 ## useless-break
 
-_Description_: This rule warns on useless `break` statements in case clauses of switch and select statements. GO, unlike other programming languages like C, only executes statements of the selected case while ignoring the subsequent case clauses. 
-Therefore, inserting a `break` at the end of a case clause has no effect. 
+_Description_: This rule warns on useless `break` statements in case clauses of switch and select statements. GO, unlike other programming languages like C, only executes statements of the selected case while ignoring the subsequent case clauses.
+Therefore, inserting a `break` at the end of a case clause has no effect.
 
 Because `break` statements are rarely used in case clauses, when switch or select statements are inside a for-loop, the programmer might wrongly assume that a `break` in a case clause will take the control out of the loop.
 The rule emits a specific warning for such cases.
