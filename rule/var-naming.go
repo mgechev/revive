@@ -145,7 +145,12 @@ func (w *lintNames) Visit(n ast.Node) ast.Visitor {
 			}
 		}
 	case *ast.FuncDecl:
-		if w.file.IsTest() && (strings.HasPrefix(v.Name.Name, "Example") || strings.HasPrefix(v.Name.Name, "Test") || strings.HasPrefix(v.Name.Name, "Benchmark")) {
+		funcName := v.Name.Name
+		if w.file.IsTest() &&
+			(strings.HasPrefix(funcName, "Example") ||
+				strings.HasPrefix(funcName, "Test") ||
+				strings.HasPrefix(funcName, "Benchmark") ||
+				strings.HasPrefix(funcName, "Fuzz")) {
 			return w
 		}
 
