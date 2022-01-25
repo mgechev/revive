@@ -59,7 +59,7 @@ func main() {
 
 	revive := lint.New(func(file string) ([]byte, error) {
 		return ioutil.ReadFile(file)
-	})
+	}, maxOpenFiles)
 
 	lintingRules, err := config.GetLintingRules(conf)
 	if err != nil {
@@ -155,6 +155,7 @@ var (
 	help          bool
 	versionFlag   bool
 	setExitStatus bool
+	maxOpenFiles  int
 )
 
 var originalUsage = flag.Usage
@@ -204,11 +205,12 @@ func init() {
 
 	// command line help strings
 	const (
-		configUsage     = "path to the configuration TOML file, defaults to $HOME/revive.toml, if present (i.e. -config myconf.toml)"
-		excludeUsage    = "list of globs which specify files to be excluded (i.e. -exclude foo/...)"
-		formatterUsage  = "formatter to be used for the output (i.e. -formatter stylish)"
-		versionUsage    = "get revive version"
-		exitStatusUsage = "set exit status to 1 if any issues are found, overwrites errorCode and warningCode in config"
+		configUsage       = "path to the configuration TOML file, defaults to $HOME/revive.toml, if present (i.e. -config myconf.toml)"
+		excludeUsage      = "list of globs which specify files to be excluded (i.e. -exclude foo/...)"
+		formatterUsage    = "formatter to be used for the output (i.e. -formatter stylish)"
+		versionUsage      = "get revive version"
+		exitStatusUsage   = "set exit status to 1 if any issues are found, overwrites errorCode and warningCode in config"
+		maxOpenFilesUsage = "maximum number of open files at the same time"
 	)
 
 	defaultConfigPath := buildDefaultConfigPath()
@@ -218,6 +220,7 @@ func init() {
 	flag.StringVar(&formatterName, "formatter", "", formatterUsage)
 	flag.BoolVar(&versionFlag, "version", false, versionUsage)
 	flag.BoolVar(&setExitStatus, "set_exit_status", false, exitStatusUsage)
+	flag.IntVar(&maxOpenFiles, "max_open_files", 0, maxOpenFilesUsage)
 	flag.Parse()
 
 	// Output build info (version, commit, date and builtBy)
