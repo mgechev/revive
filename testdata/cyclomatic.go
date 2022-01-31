@@ -5,7 +5,7 @@ package pkg
 
 import "log"
 
-func f(x int) bool { // MATCH /function f has cyclomatic complexity 4/
+func f(x int) bool { // MATCH /function f has cyclomatic complexity 4 (> max enabled 1)/
 	if x > 0 && true || false {
 		return true
 	} else {
@@ -14,7 +14,7 @@ func f(x int) bool { // MATCH /function f has cyclomatic complexity 4/
 	return false
 }
 
-func g(f func() bool) string { // MATCH /function g has cyclomatic complexity 2/
+func g(f func() bool) string { // MATCH /function g has cyclomatic complexity 2 (> max enabled 1)/
 	if ok := f(); ok {
 		return "it's okay"
 	} else {
