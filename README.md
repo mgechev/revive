@@ -191,7 +191,7 @@ Please notice that if no particular configuration is provided, `revive` will beh
 
 ### Command Line Flags
 
-`revive` accepts three command line parameters:
+`revive` accepts the following command line parameters:
 
 - `-config [PATH]` - path to config file in TOML format, defaults to `$HOME/revive.toml` if present.
 - `-exclude [PATTERN]` - pattern for files/directories/packages to be excluded for linting. You can specify the files you want to exclude for linting either as package name (i.e. `github.com/mgechev/revive`), list them as individual files (i.e. `file.go`), directories (i.e. `./foo/...`), or any combination of the three.
@@ -203,7 +203,10 @@ Please notice that if no particular configuration is provided, `revive` will beh
   - `friendly` - outputs the failures when found. Shows summary of all the failures.
   - `stylish` - formats the failures in a table. Keep in mind that it doesn't stream the output so it might be perceived as slower compared to others.
   - `checkstyle` - outputs the failures in XML format compatible with that of Java's [Checkstyle](https://checkstyle.org/).
-- `-set_exit_status` - set exit status to 1 if any issues are found, overwrites errorCode and warningCode in config.
+- `-max_open_files` -  maximum number of open files at the same time. Defaults to unlimited.
+- `-set_exit_status` - set exit status to 1 if any issues are found, overwrites `errorCode` and `warningCode` in config.
+- `-version` - get revive version.
+
 
 ### Sample Invocations
 
