@@ -45,13 +45,13 @@ func (w *lintConstantLogicalExpr) Visit(node ast.Node) ast.Visitor {
 			return w
 		}
 
-		// Handles cases like: a <= b, a == b, a >= b
+		// Handles cases like: a <= a, a == a, a >= a
 		if w.isEqualityOperator(n.Op) {
 			w.newFailure(n, "expression always evaluates to true")
 			return w
 		}
 
-		// Handles cases like: a < b, a > b, a != b
+		// Handles cases like: a < a, a > a, a != a
 		if w.isInequalityOperator(n.Op) {
 			w.newFailure(n, "expression always evaluates to false")
 			return w
