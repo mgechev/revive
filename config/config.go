@@ -180,7 +180,7 @@ const defaultConfidence = 0.8
 
 // GetConfig yields the configuration
 func GetConfig(configPath string) (*lint.Config, error) {
-	var config = &lint.Config{}
+	config := &lint.Config{}
 	switch {
 	case configPath != "":
 		config.Confidence = defaultConfidence
