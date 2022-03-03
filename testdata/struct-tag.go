@@ -20,9 +20,9 @@ type decodeAndValidateRequest struct {
 	OptionalStruct   *optionalStruct `json:"optionalStruct,omitempty"`
 	OptionalQuery    string          `json:"-" querystring:"queryfoo"`
 	optionalQuery    string          `json:"-" querystring:"queryfoo"` // MATCH /tag on not-exported field optionalQuery/
-	// No-reg test for bug https://github.com/mgechev/revive/issues/208
-	Tiret			 string          `json:"-,"`
-	BadTiret         string          `json:"other,"` // MATCH /option can not be empty in JSON tag/
+	// No-reg test for bug https://github.com/deepsourcelabs/revive/issues/208
+	Tiret    string `json:"-,"`
+	BadTiret string `json:"other,"` // MATCH /option can not be empty in JSON tag/
 }
 
 type RangeAllocation struct {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 
-	"github.com/mgechev/revive/lint"
+	"github.com/deepsourcelabs/revive/lint"
 )
 
 // UnusedParamRule lints unused params in functions.

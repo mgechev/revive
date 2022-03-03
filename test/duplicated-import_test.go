@@ -3,7 +3,7 @@ package test
 import (
 	"testing"
 
-	"github.com/mgechev/revive/rule"
+	"github.com/deepsourcelabs/revive/rule"
 )
 
 func TestDuplicatedImports(t *testing.T) {

@@ -3,8 +3,8 @@ package test
 import (
 	"testing"
 
-	"github.com/mgechev/revive/lint"
-	"github.com/mgechev/revive/rule"
+	"github.com/deepsourcelabs/revive/lint"
+	"github.com/deepsourcelabs/revive/rule"
 )
 
 func TestImportsBlacklist(t *testing.T) {

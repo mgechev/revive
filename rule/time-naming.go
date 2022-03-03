@@ -6,7 +6,7 @@ import (
 	"go/types"
 	"strings"
 
-	"github.com/mgechev/revive/lint"
+	"github.com/deepsourcelabs/revive/lint"
 )
 
 // TimeNamingRule lints given else constructs.

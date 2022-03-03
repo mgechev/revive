@@ -3,7 +3,7 @@ package fixtures
 import (
 	"fmt"
 
-	"github.com/mgechev/revive/lint"
+	"github.com/deepsourcelabs/revive/lint"
 )
 
 func (f *Unix) Name() string { // MATCH /method receiver 'f' is not referenced in method's body, consider removing or renaming it as _/

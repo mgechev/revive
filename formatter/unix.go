@@ -3,7 +3,7 @@ package formatter
 import (
 	"fmt"
 
-	"github.com/mgechev/revive/lint"
+	"github.com/deepsourcelabs/revive/lint"
 )
 
 // Unix is an implementation of the Formatter interface

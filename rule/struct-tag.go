@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/deepsourcelabs/revive/lint"
 	"github.com/fatih/structtag"
-	"github.com/mgechev/revive/lint"
 )
 
 // StructTagRule lints struct tags.
