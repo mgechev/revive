@@ -1,5 +1,7 @@
 package fixtures
 
+import "fmt"
+
 // from github.com/ugorji/go/codec/helper.go
 func isNaN(f float64) bool { return f != f } // MATCH /expression always evaluates to false/
 
@@ -9,9 +11,9 @@ func foo1(f float64) bool { return foo2(2.) > foo2(2.) } // MATCH /expression al
 
 func foo2(f float64) bool { return f < f } // MATCH /expression always evaluates to false/
 
-func foo3(f float64) bool { return f <= f } // MATCH /expression always evaluates to false/
+func foo3(f float64) bool { return f <= f } // MATCH /expression always evaluates to true/
 
-func foo4(f float64) bool { return f >= f } // MATCH /expression always evaluates to false/
+func foo4(f float64) bool { return f >= f } // MATCH /expression always evaluates to true/
 
 func foo5(f float64) bool { return f == f } // MATCH /expression always evaluates to true/
 

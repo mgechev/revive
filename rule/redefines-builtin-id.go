@@ -2,9 +2,10 @@ package rule
 
 import (
 	"fmt"
-	"github.com/mgechev/revive/lint"
 	"go/ast"
 	"go/token"
+
+	"github.com/mgechev/revive/lint"
 )
 
 // RedefinesBuiltinIDRule warns when a builtin identifier is shadowed.
@@ -14,14 +15,14 @@ type RedefinesBuiltinIDRule struct{}
 func (r *RedefinesBuiltinIDRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
-	var builtInConstAndVars = map[string]bool{
+	builtInConstAndVars := map[string]bool{
 		"true":  true,
 		"false": true,
 		"iota":  true,
 		"nil":   true,
 	}
 
-	var builtFunctions = map[string]bool{
+	builtFunctions := map[string]bool{
 		"append":  true,
 		"cap":     true,
 		"close":   true,
@@ -39,7 +40,7 @@ func (r *RedefinesBuiltinIDRule) Apply(file *lint.File, _ lint.Arguments) []lint
 		"recover": true,
 	}
 
-	var builtInTypes = map[string]bool{
+	builtInTypes := map[string]bool{
 		"ComplexType": true,
 		"FloatType":   true,
 		"IntegerType": true,
