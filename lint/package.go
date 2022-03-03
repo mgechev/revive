@@ -1,9 +1,12 @@
 package lint
 
 import (
+	"fmt"
 	"go/ast"
 	"go/token"
 	"go/types"
+	"os"
+	"sort"
 	"sync"
 
 	"golang.org/x/tools/go/gcexportdata"
@@ -166,13 +169,28 @@ func receiverType(fn *ast.FuncDecl) string {
 
 func (p *Package) lint(rules []Rule, config Config, failures chan Failure) {
 	p.scanSortable()
-	var wg sync.WaitGroup
+
+	// sort the rules to make the order of the execution of the rules deterministic
+	sort.Slice(rules, func(i, j int) bool { return rules[i].Name() < rules[j].Name() })
+
+	wg := &sync.WaitGroup{}
+
 	for _, file := range p.files {
 		wg.Add(1)
-		go (func(file *File) {
+		go func(file *File) {
+			// As recover can be done from the same goroutine where the panic
+			// occurs, handling it here. It is done to capture the panics in
+			// revive's multiple rules.
+			defer func() {
+				if r := recover(); r != nil {
+					fmt.Fprintln(os.Stderr, "revive: goroutine panicked:", r)
+				}
+				wg.Done()
+			}()
+
 			file.lint(rules, config, failures)
-			defer wg.Done()
-		})(file)
+		}(file)
 	}
+
 	wg.Wait()
 }
