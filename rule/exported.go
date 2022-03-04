@@ -17,6 +17,7 @@ type ExportedRule struct {
 	checkPrivateReceivers  bool
 	disableStutteringCheck bool
 	stuttersMsg            string
+	disableNilDoc          bool
 }
 
 // Apply applies the rule to given file.
@@ -29,7 +30,7 @@ func (r *ExportedRule) Apply(file *lint.File, args lint.Arguments) []lint.Failur
 
 	if !r.configured {
 		var sayRepetitiveInsteadOfStutters bool
-		r.checkPrivateReceivers, r.disableStutteringCheck, sayRepetitiveInsteadOfStutters = r.getConf(args)
+		r.checkPrivateReceivers, r.disableStutteringCheck, sayRepetitiveInsteadOfStutters, r.disableNilDoc = r.getConf(args)
 		r.stuttersMsg = "stutters"
 		if sayRepetitiveInsteadOfStutters {
 			r.stuttersMsg = "is repetitive"
@@ -49,6 +50,7 @@ func (r *ExportedRule) Apply(file *lint.File, args lint.Arguments) []lint.Failur
 		checkPrivateReceivers:  r.checkPrivateReceivers,
 		disableStutteringCheck: r.disableStutteringCheck,
 		stuttersMsg:            r.stuttersMsg,
+		disableNilDoc:          r.disableNilDoc,
 	}
 
 	ast.Walk(&walker, fileAst)
@@ -61,7 +63,7 @@ func (r *ExportedRule) Name() string {
 	return "exported"
 }
 
-func (r *ExportedRule) getConf(args lint.Arguments) (checkPrivateReceivers, disableStutteringCheck, sayRepetitiveInsteadOfStutters bool) {
+func (r *ExportedRule) getConf(args lint.Arguments) (checkPrivateReceivers bool, disableStutteringCheck bool, sayRepetitiveInsteadOfStutters bool, disableNilDoc bool) {
 	// if any, we expect a slice of strings as configuration
 	if len(args) < 1 {
 		return
@@ -79,6 +81,8 @@ func (r *ExportedRule) getConf(args lint.Arguments) (checkPrivateReceivers, disa
 			disableStutteringCheck = true
 		case "sayRepetitiveInsteadOfStutters":
 			sayRepetitiveInsteadOfStutters = true
+		case "disableNilDoc":
+			disableNilDoc = true
 		default:
 			panic(fmt.Sprintf("Unknown configuration flag %s for %s rule", flagStr, r.Name()))
 		}
@@ -96,6 +100,7 @@ type lintExported struct {
 	checkPrivateReceivers  bool
 	disableStutteringCheck bool
 	stuttersMsg            string
+	disableNilDoc          bool
 }
 
 func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
@@ -125,12 +130,14 @@ func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
 		name = recv + "." + name
 	}
 	if fn.Doc == nil {
-		w.onFailure(lint.Failure{
-			Node:       fn,
-			Confidence: 1,
-			Category:   "comments",
-			Failure:    fmt.Sprintf("exported %s %s should have comment or be unexported", kind, name),
-		})
+		if !w.disableNilDoc {
+			w.onFailure(lint.Failure{
+				Node:       fn,
+				Confidence: 1,
+				Category:   "comments",
+				Failure:    fmt.Sprintf("exported %s %s should have comment or be unexported", kind, name),
+			})
+		}
 		return
 	}
 	s := normalizeText(fn.Doc.Text())
@@ -184,12 +191,14 @@ func (w *lintExported) lintTypeDoc(t *ast.TypeSpec, doc *ast.CommentGroup) {
 		return
 	}
 	if doc == nil {
-		w.onFailure(lint.Failure{
-			Node:       t,
-			Confidence: 1,
-			Category:   "comments",
-			Failure:    fmt.Sprintf("exported type %v should have comment or be unexported", t.Name),
-		})
+		if !w.disableNilDoc {
+			w.onFailure(lint.Failure{
+				Node:       t,
+				Confidence: 1,
+				Category:   "comments",
+				Failure:    fmt.Sprintf("exported type %v should have comment or be unexported", t.Name),
+			})
+		}
 		return
 	}
 
@@ -242,20 +251,22 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 	}
 
 	if vs.Doc == nil && gd.Doc == nil {
-		if genDeclMissingComments[gd] {
-			return
+		if !w.disableNilDoc {
+			if genDeclMissingComments[gd] {
+				return
+			}
+			block := ""
+			if kind == "const" && gd.Lparen.IsValid() {
+				block = " (or a comment on this block)"
+			}
+			w.onFailure(lint.Failure{
+				Confidence: 1,
+				Node:       vs,
+				Category:   "comments",
+				Failure:    fmt.Sprintf("exported %s %s should have comment%s or be unexported", kind, name, block),
+			})
+			genDeclMissingComments[gd] = true
 		}
-		block := ""
-		if kind == "const" && gd.Lparen.IsValid() {
-			block = " (or a comment on this block)"
-		}
-		w.onFailure(lint.Failure{
-			Confidence: 1,
-			Node:       vs,
-			Category:   "comments",
-			Failure:    fmt.Sprintf("exported %s %s should have comment%s or be unexported", kind, name, block),
-		})
-		genDeclMissingComments[gd] = true
 		return
 	}
 	// If this GenDecl has parens and a comment, we don't check its comment form.
