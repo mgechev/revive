@@ -8,6 +8,7 @@ import (
 	"go/token"
 	"go/types"
 	"math"
+	"reflect"
 	"regexp"
 	"strings"
 )
@@ -102,6 +103,15 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) {
 	disabledIntervals := f.disabledIntervals(rules, mustSpecifyDisableReason, failures)
 	for _, currentRule := range rules {
 		ruleConfig := rulesConfig[currentRule.Name()]
+
+		// NOTE(SS): Use reflect.ValueOf followed by Elem to return value that the interface v
+		// contains or that the pointer v points to and Type gives the type for v. And then use reflect.New
+		// followed by more method calls to make a copy of value stored in currentRule.
+		//
+		// This is done to avoid data race in revive. Previously some state was shared b/w
+		// goroutines spawned in "func (*Linter) Lint".
+		currentRule = reflect.New(reflect.ValueOf(currentRule).Elem().Type()).Interface().(Rule)
+
 		currentFailures := currentRule.Apply(f, ruleConfig.Arguments)
 		for idx, failure := range currentFailures {
 			if failure.RuleName == "" {

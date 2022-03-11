@@ -6,7 +6,6 @@ import (
 	"go/token"
 	"go/types"
 	"os"
-	"sort"
 	"sync"
 
 	"golang.org/x/tools/go/gcexportdata"
@@ -167,30 +166,24 @@ func receiverType(fn *ast.FuncDecl) string {
 	return "invalid-type"
 }
 
+// NOTE(SS): lint runs serially now instead of concurrently i.e., spawning goroutine
+// for every file. There could a minor delay in parsing of files but it's guaranteed
+// to have no data race now.
+//
+// To enable parallization, changes in multiple areas are required. Will discuss
+// with the upstream's maintainer and send a patch to upstream (if approved). Until then,
+// this is good enough.
 func (p *Package) lint(rules []Rule, config Config, failures chan Failure) {
+	// As recover can be done from the same goroutine where the panic
+	// occurs, handling it here. It is done to capture the panics in
+	// revive's multiple rules.
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Fprintln(os.Stderr, "revive: goroutine panicked:", r)
+		}
+	}()
 	p.scanSortable()
-
-	// sort the rules to make the order of the execution of the rules deterministic
-	sort.Slice(rules, func(i, j int) bool { return rules[i].Name() < rules[j].Name() })
-
-	wg := &sync.WaitGroup{}
-
 	for _, file := range p.files {
-		wg.Add(1)
-		go func(file *File) {
-			// As recover can be done from the same goroutine where the panic
-			// occurs, handling it here. It is done to capture the panics in
-			// revive's multiple rules.
-			defer func() {
-				if r := recover(); r != nil {
-					fmt.Fprintln(os.Stderr, "revive: goroutine panicked:", r)
-				}
-				wg.Done()
-			}()
-
-			file.lint(rules, config, failures)
-		}(file)
+		file.lint(rules, config, failures)
 	}
-
-	wg.Wait()
 }

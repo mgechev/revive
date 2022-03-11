@@ -7,6 +7,7 @@ import (
 	"go/token"
 	"os"
 	"regexp"
+	"sort"
 	"strconv"
 	"sync"
 )
@@ -56,6 +57,9 @@ var (
 // Lint lints a set of files with the specified rule.
 func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-chan Failure, error) {
 	failures := make(chan Failure)
+
+	// sort the ruleSet to make the order of the execution of the rules deterministic
+	sort.Slice(ruleSet, func(i, j int) bool { return ruleSet[i].Name() < ruleSet[j].Name() })
 
 	var wg sync.WaitGroup
 	for _, pkg := range packages {
