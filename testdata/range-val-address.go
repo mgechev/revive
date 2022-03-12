@@ -138,3 +138,26 @@ func rangeValAddress13() {
 		m = append(m, &value.id)
 	}
 }
+
+func rangeValAddress14() {
+	type v struct {
+		id *string
+	}
+
+	m := []v{}
+	for _, value := range []string{"A", "B", "C"} {
+		a := v{id: &value} // MATCH /suspicious assignment of 'value'. range-loop variables always have the same address/
+		m = append(m, a)
+	}
+}
+
+func rangeValAddress15() {
+	type v struct {
+		id *string
+	}
+
+	m := []v{}
+	for _, value := range []string{"A", "B", "C"} {
+		m = append(m, v{id: &value}) // MATCH /suspicious assignment of 'value'. range-loop variables always have the same address/
+	}
+}
