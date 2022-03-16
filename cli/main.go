@@ -62,12 +62,10 @@ func RunRevive(extraRules ...lint.Rule) {
 		return ioutil.ReadFile(file)
 	}, maxOpenFiles)
 
-	lintingRules, err := config.GetLintingRules(conf)
+	lintingRules, err := config.GetLintingRules(conf, extraRules)
 	if err != nil {
 		fail(err.Error())
 	}
-
-	lintingRules = append(lintingRules, extraRules...)
 
 	log.Println("Config loaded")
 
