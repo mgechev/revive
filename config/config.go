@@ -133,8 +133,6 @@ func GetLintingRules(config *lint.Config, extraRules []lint.Rule) ([]lint.Rule, 
 		lintingRules = append(lintingRules, rule)
 	}
 
-	lintingRules = append(lintingRules, extraRules...)
-
 	return lintingRules, nil
 }
 
