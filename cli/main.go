@@ -35,6 +35,14 @@ type ExtraRule struct {
 	DefaultConfig lint.RuleConfig
 }
 
+// NewExtraRule returns a configured extra rule
+func NewExtraRule(rule lint.Rule, defaultConfig lint.RuleConfig) ExtraRule {
+	return ExtraRule{
+		Rule:          rule,
+		DefaultConfig: defaultConfig,
+	}
+}
+
 // RunRevive runs the CLI for revive.
 func RunRevive(extraRules ...ExtraRule) {
 	log, err := logging.GetLogger()
