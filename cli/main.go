@@ -50,11 +50,9 @@ func RunRevive(extraRules ...ExtraRule) {
 		fail(err.Error())
 	}
 
-	extraRuleInstances := make([]lint.Rule, len(extraRules))
-	ruleConfigs := make([]lint.RuleConfig, len(extraRules))
-	for i, extraRule := range extraRules {
-		extraRuleInstances[i] = extraRule.Rule
-		ruleConfigs[i] = extraRule.DefaultConfig
+	formatter, err := config.GetFormatter(formatterName)
+	if err != nil {
+		fail(err.Error())
 	}
 
 	conf, err := config.GetConfig(configPath)
@@ -62,21 +60,28 @@ func RunRevive(extraRules ...ExtraRule) {
 		fail(err.Error())
 	}
 
-	for i, ruleConfig := range ruleConfigs {
-		ruleName := extraRuleInstances[i].Name()
-		if _, ok := conf.Rules[ruleName]; !ok {
-			conf.Rules[ruleName] = ruleConfig
-		}
-	}
-
-	formatter, err := config.GetFormatter(formatterName)
-	if err != nil {
-		fail(err.Error())
-	}
 	if setExitStatus {
 		conf.ErrorCode = 1
 		conf.WarningCode = 1
 	}
+
+	extraRuleInstances := make([]lint.Rule, len(extraRules))
+	for i, extraRule := range extraRules {
+		extraRuleInstances[i] = extraRule.Rule
+
+		ruleName := extraRule.Rule.Name()
+		_, isRuleAlreadyConfigured := conf.Rules[ruleName]
+		if !isRuleAlreadyConfigured {
+			conf.Rules[ruleName] = extraRule.DefaultConfig
+		}
+	}
+
+	lintingRules, err := config.GetLintingRules(conf, extraRuleInstances)
+	if err != nil {
+		fail(err.Error())
+	}
+
+	log.Println("Config loaded")
 
 	if len(excludePaths) == 0 { // if no excludes were set in the command line
 		excludePaths = conf.Exclude // use those from the configuration
@@ -86,17 +91,9 @@ func RunRevive(extraRules ...ExtraRule) {
 	if err != nil {
 		fail(err.Error())
 	}
-
 	revive := lint.New(func(file string) ([]byte, error) {
 		return ioutil.ReadFile(file)
 	}, maxOpenFiles)
-
-	lintingRules, err := config.GetLintingRules(conf, extraRuleInstances)
-	if err != nil {
-		fail(err.Error())
-	}
-
-	log.Println("Config loaded")
 
 	failures, err := revive.Lint(packages, lintingRules, *conf)
 	if err != nil {
