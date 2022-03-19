@@ -29,17 +29,38 @@ func fail(err string) {
 	os.Exit(1)
 }
 
+// ExtraRule configures a new rule to be used with revive.
+type ExtraRule struct {
+	Rule          lint.Rule
+	DefaultConfig lint.RuleConfig
+}
+
 // RunRevive runs the CLI for revive.
-func RunRevive(extraRules ...lint.Rule) {
+func RunRevive(extraRules ...ExtraRule) {
 	log, err := logging.GetLogger()
 	if err != nil {
 		fail(err.Error())
+	}
+
+	extraRuleInstances := make([]lint.Rule, len(extraRules))
+	ruleConfigs := make([]lint.RuleConfig, len(extraRules))
+	for i, extraRule := range extraRules {
+		extraRuleInstances[i] = extraRule.Rule
+		ruleConfigs[i] = extraRule.DefaultConfig
 	}
 
 	conf, err := config.GetConfig(configPath)
 	if err != nil {
 		fail(err.Error())
 	}
+
+	for i, ruleConfig := range ruleConfigs {
+		ruleName := extraRuleInstances[i].Name()
+		if _, ok := conf.Rules[ruleName]; !ok {
+			conf.Rules[ruleName] = ruleConfig
+		}
+	}
+
 	formatter, err := config.GetFormatter(formatterName)
 	if err != nil {
 		fail(err.Error())
@@ -62,7 +83,7 @@ func RunRevive(extraRules ...lint.Rule) {
 		return ioutil.ReadFile(file)
 	}, maxOpenFiles)
 
-	lintingRules, err := config.GetLintingRules(conf, extraRules)
+	lintingRules, err := config.GetLintingRules(conf, extraRuleInstances)
 	if err != nil {
 		fail(err.Error())
 	}
