@@ -537,9 +537,11 @@ Current supported version of the standard is [SARIF-v2.1.0](https://docs.oasis-o
 
 The tool can be extended with custom rules or formatters. This section contains additional information on how to implement such.
 
-**To extend the linter with a custom rule or a formatter you'll have to push it to this repository or fork it**. This is due to the limited `-buildmode=plugin` support which [works only on Linux (with known issues)](https://golang.org/pkg/plugin/).
+To extend the linter with a custom rule you can push it to this repository or use `revive` as a library (see below)
 
-### Custom Rule
+To add a custom formatter you'll have to push it to this repository or fork it. This is due to the limited `-buildmode=plugin` support which [works only on Linux (with known issues)](https://golang.org/pkg/plugin/).
+
+### Writing a Custom Rule
 
 Each rule needs to implement the `lint.Rule` interface:
 
@@ -567,6 +569,36 @@ With the snippet above we:
 - Configure the rule with the argument `Foo`. The list of arguments will be passed to `Apply(*File, Arguments)` together with the target file we're linting currently.
 
 A sample rule implementation can be found [here](/rule/argument-limit.go).
+
+#### Using `revive` as a library
+If a rule is specific to your use case 
+(i.e. it is not a good candidate to be added to `revive`'s rule set) you can add it to your own linter using `revive` as linting engine.
+
+The following code shows how to use `revive` in your own application.
+In the example only one rule is added (`myRule`), of course, you can add as many as you need to. 
+Your rules can be configured programmatically or with the standard `revive` configuration file.
+The full rule set of `revive` is also actionable by your application.
+
+```go
+package main
+
+import (
+	"github.com/mgechev/revive/cli"
+	"github.com/mgechev/revive/lint"
+)
+
+func main() {
+	cli.RunRevive(cli.NewExtraRule(&myRule{}, lint.RuleConfig{}))
+}
+
+type myRule struct{}
+
+func (f myRule) Name() string {
+	return "myRule"
+}
+
+func (f myRule) Apply(*lint.File, lint.Arguments) []lint.Failure { ... }
+```
 
 ### Custom Formatter
 
