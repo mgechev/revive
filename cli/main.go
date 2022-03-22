@@ -33,7 +33,7 @@ func RunRevive(extraRules ...revivelib.ExtraRule) {
 		fail(err.Error())
 	}
 
-	revive, err := revivelib.NewRevive(
+	revive, err := revivelib.New(
 		formatterName,
 		conf,
 		setExitStatus,

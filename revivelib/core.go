@@ -23,8 +23,8 @@ type Revive struct {
 	ExcludePaths ArrayFlags
 }
 
-// NewRevive creates a new instance of Revive lint runner.
-func NewRevive(
+// New creates a new instance of Revive lint runner.
+func New(
 	formatterName string,
 	conf *lint.Config,
 	setExitStatus bool,

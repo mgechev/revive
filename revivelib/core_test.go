@@ -50,7 +50,7 @@ func getMockRevive(t *testing.T) *revivelib.Revive {
 		t.Fatal(err)
 	}
 
-	revive, err := revivelib.NewRevive(
+	revive, err := revivelib.New(
 		"stylish", conf,
 		true,
 		2048,
