@@ -3,17 +3,14 @@ package cli
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime/debug"
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/mgechev/dots"
 	"github.com/mgechev/revive/config"
-	"github.com/mgechev/revive/lint"
-	"github.com/mgechev/revive/logging"
+	"github.com/mgechev/revive/revivelib"
 	"github.com/mitchellh/go-homedir"
 )
 
@@ -29,109 +26,35 @@ func fail(err string) {
 	os.Exit(1)
 }
 
-// ExtraRule configures a new rule to be used with revive.
-type ExtraRule struct {
-	Rule          lint.Rule
-	DefaultConfig lint.RuleConfig
-}
-
-// NewExtraRule returns a configured extra rule
-func NewExtraRule(rule lint.Rule, defaultConfig lint.RuleConfig) ExtraRule {
-	return ExtraRule{
-		Rule:          rule,
-		DefaultConfig: defaultConfig,
-	}
-}
-
 // RunRevive runs the CLI for revive.
-func RunRevive(extraRules ...ExtraRule) {
-	log, err := logging.GetLogger()
-	if err != nil {
-		fail(err.Error())
-	}
-
-	formatter, err := config.GetFormatter(formatterName)
-	if err != nil {
-		fail(err.Error())
-	}
-
+func RunRevive(extraRules ...revivelib.ExtraRule) {
 	conf, err := config.GetConfig(configPath)
 	if err != nil {
 		fail(err.Error())
 	}
 
-	if setExitStatus {
-		conf.ErrorCode = 1
-		conf.WarningCode = 1
-	}
-
-	extraRuleInstances := make([]lint.Rule, len(extraRules))
-	for i, extraRule := range extraRules {
-		extraRuleInstances[i] = extraRule.Rule
-
-		ruleName := extraRule.Rule.Name()
-		_, isRuleAlreadyConfigured := conf.Rules[ruleName]
-		if !isRuleAlreadyConfigured {
-			conf.Rules[ruleName] = extraRule.DefaultConfig
-		}
-	}
-
-	lintingRules, err := config.GetLintingRules(conf, extraRuleInstances)
+	revive, err := revivelib.NewRevive(
+		formatterName,
+		conf,
+		setExitStatus,
+		maxOpenFiles,
+		excludePaths,
+		extraRules...,
+	)
 	if err != nil {
 		fail(err.Error())
 	}
 
-	log.Println("Config loaded")
-
-	if len(excludePaths) == 0 { // if no excludes were set in the command line
-		excludePaths = conf.Exclude // use those from the configuration
-	}
-
-	packages, err := getPackages(excludePaths)
-	if err != nil {
-		fail(err.Error())
-	}
-	revive := lint.New(func(file string) ([]byte, error) {
-		return ioutil.ReadFile(file)
-	}, maxOpenFiles)
-
-	failures, err := revive.Lint(packages, lintingRules, *conf)
+	failures, err := revive.Lint(flag.Args()...)
 	if err != nil {
 		fail(err.Error())
 	}
 
-	formatChan := make(chan lint.Failure)
-	exitChan := make(chan bool)
-
-	var output string
-	go (func() {
-		output, err = formatter.Format(formatChan, *conf)
-		if err != nil {
-			fail(err.Error())
-		}
-		exitChan <- true
-	})()
-
-	exitCode := 0
-	for f := range failures {
-		if f.Confidence < conf.Confidence {
-			continue
-		}
-		if exitCode == 0 {
-			exitCode = conf.WarningCode
-		}
-		if c, ok := conf.Rules[f.RuleName]; ok && c.Severity == lint.SeverityError {
-			exitCode = conf.ErrorCode
-		}
-		if c, ok := conf.Directives[f.RuleName]; ok && c.Severity == lint.SeverityError {
-			exitCode = conf.ErrorCode
-		}
-
-		formatChan <- f
+	output, exitCode, err := revive.Format(failures)
+	if err != nil {
+		fail(err.Error())
 	}
 
-	close(formatChan)
-	<-exitChan
 	if output != "" {
 		fmt.Println(output)
 	}
@@ -139,45 +62,9 @@ func RunRevive(extraRules ...ExtraRule) {
 	os.Exit(exitCode)
 }
 
-func normalizeSplit(strs []string) []string {
-	res := []string{}
-	for _, s := range strs {
-		t := strings.Trim(s, " \t")
-		if len(t) > 0 {
-			res = append(res, t)
-		}
-	}
-	return res
-}
-
-func getPackages(excludePaths arrayFlags) ([][]string, error) {
-	globs := normalizeSplit(flag.Args())
-	if len(globs) == 0 {
-		globs = append(globs, ".")
-	}
-
-	packages, err := dots.ResolvePackages(globs, normalizeSplit(excludePaths))
-	if err != nil {
-		return nil, err
-	}
-
-	return packages, nil
-}
-
-type arrayFlags []string
-
-func (i *arrayFlags) String() string {
-	return strings.Join([]string(*i), " ")
-}
-
-func (i *arrayFlags) Set(value string) error {
-	*i = append(*i, value)
-	return nil
-}
-
 var (
 	configPath    string
-	excludePaths  arrayFlags
+	excludePaths  revivelib.ArrayFlags
 	formatterName string
 	help          bool
 	versionFlag   bool
