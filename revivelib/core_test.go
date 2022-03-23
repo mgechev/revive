@@ -51,7 +51,7 @@ func getMockRevive(t *testing.T) *revivelib.Revive {
 	}
 
 	revive, err := revivelib.New(
-		"stylish", conf,
+		conf,
 		true,
 		2048,
 		[]string{"./tests"},
@@ -66,10 +66,6 @@ func getMockRevive(t *testing.T) *revivelib.Revive {
 
 func TestReviveCreateInstance(t *testing.T) {
 	revive := getMockRevive(t)
-
-	if revive.Formatter == nil {
-		t.Fatal("Formatter can't be nil.")
-	}
 
 	if revive.Config == nil {
 		t.Fatal("Could not load config.")
@@ -161,7 +157,7 @@ func TestReviveFormat(t *testing.T) {
 	}
 
 	// ACT
-	failures, exitCode, err := revive.Format(failuresChan)
+	failures, exitCode, err := revive.Format("stylish", failuresChan)
 
 	// ASSERT
 	if err != nil {

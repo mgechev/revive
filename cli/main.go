@@ -34,7 +34,6 @@ func RunRevive(extraRules ...revivelib.ExtraRule) {
 	}
 
 	revive, err := revivelib.New(
-		formatterName,
 		conf,
 		setExitStatus,
 		maxOpenFiles,
@@ -50,7 +49,7 @@ func RunRevive(extraRules ...revivelib.ExtraRule) {
 		fail(err.Error())
 	}
 
-	output, exitCode, err := revive.Format(failures)
+	output, exitCode, err := revive.Format(formatterName, failures)
 	if err != nil {
 		fail(err.Error())
 	}

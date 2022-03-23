@@ -15,7 +15,6 @@ import (
 // Revive is responsible for running linters and formatters
 // and returning a set of results.
 type Revive struct {
-	Formatter    lint.Formatter
 	Config       *lint.Config
 	LintingRules []lint.Rule
 	Logger       *log.Logger
@@ -25,7 +24,6 @@ type Revive struct {
 
 // New creates a new instance of Revive lint runner.
 func New(
-	formatterName string,
 	conf *lint.Config,
 	setExitStatus bool,
 	maxOpenFiles int,
@@ -35,11 +33,6 @@ func New(
 	log, err := logging.GetLogger()
 	if err != nil {
 		return nil, errors.Wrap(err, "initializing revive - getting logger")
-	}
-
-	formatter, err := config.GetFormatter(formatterName)
-	if err != nil {
-		return nil, errors.Wrap(err, "initializing revive - getting formatter")
 	}
 
 	if setExitStatus {
@@ -73,7 +66,6 @@ func New(
 	return &Revive{
 		Logger:       log,
 		Config:       conf,
-		Formatter:    formatter,
 		LintingRules: lintingRules,
 		MaxOpenFiles: maxOpenFiles,
 		ExcludePaths: excludePaths,
@@ -123,18 +115,23 @@ func (r *Revive) GetLintFailures(failuresChan <-chan lint.Failure) []lint.Failur
 }
 
 // Format gets the output for a given failures channel from Lint.
-func (r *Revive) Format(failuresChan <-chan lint.Failure) (string, int, error) {
+func (r *Revive) Format(
+	formatterName string,
+	failuresChan <-chan lint.Failure,
+) (string, int, error) {
 	conf := r.Config
 	formatChan := make(chan lint.Failure)
 	exitChan := make(chan bool)
 
-	var (
-		output string
-		err    error
-	)
+	formatter, err := config.GetFormatter(formatterName)
+	if err != nil {
+		return "", 0, errors.Wrap(err, "formatting - getting formatter")
+	}
+
+	var output string
 
 	go func() {
-		output, err = r.Formatter.Format(formatChan, *conf)
+		output, err = formatter.Format(formatChan, *conf)
 
 		exitChan <- true
 	}()
