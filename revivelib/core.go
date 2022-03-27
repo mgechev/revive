@@ -15,11 +15,11 @@ import (
 // Revive is responsible for running linters and formatters
 // and returning a set of results.
 type Revive struct {
-	Config       *lint.Config
-	LintingRules []lint.Rule
-	Logger       *log.Logger
-	MaxOpenFiles int
-	ExcludePaths ArrayFlags
+	config          *lint.Config
+	lintingRules    []lint.Rule
+	logger          *log.Logger
+	maxOpenFiles    int
+	excludePatterns ArrayFlags
 }
 
 // New creates a new instance of Revive lint runner.
@@ -27,7 +27,7 @@ func New(
 	conf *lint.Config,
 	setExitStatus bool,
 	maxOpenFiles int,
-	excludePaths ArrayFlags,
+	excludePatterns ArrayFlags,
 	extraRules ...ExtraRule,
 ) (*Revive, error) {
 	log, err := logging.GetLogger()
@@ -59,22 +59,22 @@ func New(
 
 	log.Println("Config loaded")
 
-	if len(excludePaths) == 0 { // if no excludes were set in the command line
-		excludePaths = conf.Exclude // use those from the configuration
+	if len(excludePatterns) == 0 { // if no excludes were set in the command line
+		excludePatterns = conf.Exclude // use those from the configuration
 	}
 
 	return &Revive{
-		Logger:       log,
-		Config:       conf,
-		LintingRules: lintingRules,
-		MaxOpenFiles: maxOpenFiles,
-		ExcludePaths: excludePaths,
+		logger:          log,
+		config:          conf,
+		lintingRules:    lintingRules,
+		maxOpenFiles:    maxOpenFiles,
+		excludePatterns: excludePatterns,
 	}, nil
 }
 
 // Lint files in the specified paths.
-func (r *Revive) Lint(files ...string) (<-chan lint.Failure, error) {
-	packages, err := getPackages(files, r.ExcludePaths)
+func (r *Revive) Lint(includePatterns ...string) (<-chan lint.Failure, error) {
+	packages, err := getPackages(includePatterns, r.excludePatterns)
 	if err != nil {
 		return nil, errors.Wrap(err, "linting - getting packages")
 	}
@@ -87,9 +87,9 @@ func (r *Revive) Lint(files ...string) (<-chan lint.Failure, error) {
 		}
 
 		return contents, nil
-	}, r.MaxOpenFiles)
+	}, r.maxOpenFiles)
 
-	failures, err := revive.Lint(packages, r.LintingRules, *r.Config)
+	failures, err := revive.Lint(packages, r.lintingRules, *r.config)
 	if err != nil {
 		return nil, errors.Wrap(err, "linting - retrieving failures channel")
 	}
@@ -99,7 +99,7 @@ func (r *Revive) Lint(files ...string) (<-chan lint.Failure, error) {
 
 // GetLintFailures gets the list of failures for a given failures channel from Lint.
 func (r *Revive) GetLintFailures(failuresChan <-chan lint.Failure) []lint.Failure {
-	conf := r.Config
+	conf := r.config
 
 	result := []lint.Failure{}
 
@@ -119,7 +119,7 @@ func (r *Revive) Format(
 	formatterName string,
 	failuresChan <-chan lint.Failure,
 ) (string, int, error) {
-	conf := r.Config
+	conf := r.config
 	formatChan := make(chan lint.Failure)
 	exitChan := make(chan bool)
 
@@ -168,13 +168,13 @@ func (r *Revive) Format(
 	return output, exitCode, nil
 }
 
-func getPackages(files []string, excludePaths ArrayFlags) ([][]string, error) {
-	globs := normalizeSplit(files)
+func getPackages(includePatterns []string, excludePatterns ArrayFlags) ([][]string, error) {
+	globs := normalizeSplit(includePatterns)
 	if len(globs) == 0 {
 		globs = append(globs, ".")
 	}
 
-	packages, err := dots.ResolvePackages(globs, normalizeSplit(excludePaths))
+	packages, err := dots.ResolvePackages(globs, normalizeSplit(excludePatterns))
 	if err != nil {
 		return nil, errors.Wrap(err, "getting packages - resolving packages in dots")
 	}

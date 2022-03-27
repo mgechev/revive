@@ -64,39 +64,6 @@ func getMockRevive(t *testing.T) *revivelib.Revive {
 	return revive
 }
 
-func TestReviveCreateInstance(t *testing.T) {
-	revive := getMockRevive(t)
-
-	if revive.Config == nil {
-		t.Fatal("Could not load config.")
-	}
-
-	if len(revive.ExcludePaths) != 1 {
-		t.Fatal("Should contain exclude path")
-	}
-
-	if revive.MaxOpenFiles != 2048 {
-		t.Fatal("Expected MaxOpenFiles to be 2048")
-	}
-
-	if revive.LintingRules == nil || len(revive.LintingRules) == 0 {
-		t.Fatal("Linting rules not loaded.")
-	}
-
-	rules := map[string]lint.Rule{}
-	for _, rule := range revive.LintingRules {
-		rules[rule.Name()] = rule
-	}
-
-	if _, ok := rules["mock-rule"]; !ok {
-		t.Fatal("Didn't load mock rule.")
-	}
-
-	if revive.Config.ErrorCode != 1 && revive.Config.WarningCode != 1 {
-		t.Fatal("Didn't set the codes in the config instance.")
-	}
-}
-
 func TestReviveLint(t *testing.T) {
 	// ARRANGE
 	revive := getMockRevive(t)
