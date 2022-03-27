@@ -81,8 +81,10 @@ func TestReviveLint(t *testing.T) {
 		failureList = append(failureList, failure)
 	}
 
-	if len(failureList) != 3 {
-		t.Fatalf("Expected failures to have %d failures, but it has %d.", 3, len(failureList))
+	const expected = 3
+	got := len(failureList)
+	if got != expected {
+		t.Fatalf("Expected failures to have %d failures, but it has %d.", expected, got)
 	}
 
 	errmsg := "redundant if ...; err != nil check, just return error instead."
@@ -104,8 +106,10 @@ func TestReviveGetLintErrors(t *testing.T) {
 	failureList := revive.GetLintFailures(failures)
 
 	// ASSERT
-	if len(failureList) != 3 {
-		t.Fatalf("Expected failures to have %d failures, but it has %d.", 3, len(failureList))
+	const expected = 3
+	got := len(failureList)
+	if got != expected {
+		t.Fatalf("Expected failures to have %d failures, but it has %d.", expected, got)
 	}
 
 	errmsg := "redundant if ...; err != nil check, just return error instead."
@@ -142,7 +146,8 @@ func TestReviveFormat(t *testing.T) {
 		}
 	}
 
-	if exitCode != 1 {
-		t.Fatalf("Expected exit code to be %d, but it was %d.", 1, exitCode)
+	const expected = 1
+	if exitCode != expected {
+		t.Fatalf("Expected exit code to be %d, but it was %d.", expected, exitCode)
 	}
 }
