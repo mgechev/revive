@@ -741,6 +741,12 @@ REVIVE_FORCE_COLOR=1 revive -formatter friendly ./... | tee revive.log
 :---: |:---: |:---: |:---: |:---: |:---: |
 [ridvansumset](https://github.com/ridvansumset) |[Jarema](https://github.com/Jarema) |[vkrol](https://github.com/vkrol) |[haya14busa](https://github.com/haya14busa) |[sina-devel](https://github.com/sina-devel) |[techknowlogick](https://github.com/techknowlogick) |
 
+
+[<img alt="heynemann" src="https://avatars.githubusercontent.com/u/60965?v=4&s=117" width="117">](https://github.com/heynemann) | | | | | |
+|:---: |:---: |:---: |:---: |:---: |:---: |
+[heynemann](https://github.com/heynemann) | | | | | |
+
+
 ## License
 
 MIT
