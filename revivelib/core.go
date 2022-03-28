@@ -119,10 +119,13 @@ func (r *Revive) Format(
 		return "", 0, errors.Wrap(err, "formatting - getting formatter")
 	}
 
-	var output string
+	var (
+		output    string
+		formatErr error
+	)
 
 	go func() {
-		output, err = formatter.Format(formatChan, *conf)
+		output, formatErr = formatter.Format(formatChan, *conf)
 
 		exitChan <- true
 	}()
@@ -152,7 +155,7 @@ func (r *Revive) Format(
 	close(formatChan)
 	<-exitChan
 
-	if err != nil {
+	if formatErr != nil {
 		return "", exitCode, errors.Wrap(err, "formatting")
 	}
 
