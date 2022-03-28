@@ -616,16 +616,18 @@ func LintMyFile(file string) {
 	conf, _:= config.GetConfig("../defaults.toml")
 
 	revive, _ := revivelib.New(
-		conf,
-		true,
-		2048,
+		conf,  // Configuration file
+		true,  // Set exit status
+		2048,  // Max open files
+
+        // Then add as many extra rules as you need
 		revivelib.NewExtraRule(&myRule{}, lint.RuleConfig{}),
 	)
 
 	failuresChan, err := revive.Lint(
  		revivelib.Include(file),
  		revivelib.Exclude("./fixtures"),
- 		// You can use as many revivelib.Include or revivelib.Exclude as you want
+ 		// You can use as many revivelib.Include or revivelib.Exclude as required
  	)
   	if err != nil {
   	 	panic("Shouldn't have failed: " + err.Error)
