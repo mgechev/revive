@@ -588,7 +588,55 @@ import (
 )
 
 func main() {
-	cli.RunRevive(cli.NewExtraRule(&myRule{}, lint.RuleConfig{}))
+	cli.RunRevive(revivelib.NewExtraRule(&myRule{}, lint.RuleConfig{}))
+}
+
+type myRule struct{}
+
+func (f myRule) Name() string {
+	return "myRule"
+}
+
+func (f myRule) Apply(*lint.File, lint.Arguments) []lint.Failure { ... }
+```
+
+You can still go further and use `revive` without its cli, as part of your library, or your own cli:
+
+```go
+package mylib
+
+import (
+	"github.com/mgechev/revive/cli"
+	"github.com/mgechev/revive/revivelib"
+	"github.com/mgechev/revive/lint"
+)
+
+// Error checking removed for clarity
+func LintMyFile(file string) {
+	conf, _:= config.GetConfig("../defaults.toml")
+
+	revive, _ := revivelib.New(
+		conf,
+		true,
+		2048,
+		revivelib.NewExtraRule(&myRule{}, lint.RuleConfig{}),
+	)
+
+	failuresChan, err := revive.Lint(
+        revivelib.Include(file),
+        revivelib.Exclude("./fixtures"),
+        // You can use as many revivelib.Include or revivelib.Exclude as you want
+    )
+	if err != nil {
+        panic("Shouldn't have failed: " + err.Error)
+	}
+
+    // Now let's return the formatted errors
+	failures, exitCode, _ := revive.Format("stylish", failuresChan)
+
+    // failures is the string with all formatted lint error messages
+    // exit code is 0 if no errors, 1 if errors (unless config options change it)
+    // ... do something with them
 }
 
 type myRule struct{}
