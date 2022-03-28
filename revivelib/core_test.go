@@ -1,7 +1,6 @@
 package revivelib_test
 
 import (
-	"go/ast"
 	"strings"
 	"testing"
 
@@ -10,71 +9,17 @@ import (
 	"github.com/mgechev/revive/revivelib"
 )
 
-type mockRule struct {
-}
-
-func (r *mockRule) Name() string {
-	return "mock-rule"
-}
-
-// Apply applies the rule to given file.
-func (r *mockRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var failures []lint.Failure
-
-	walker := mockWalker{
-		file: file,
-		onFailure: func(failure lint.Failure) {
-			failures = append(failures, failure)
-		},
-	}
-
-	ast.Walk(walker, file.AST)
-
-	return failures
-}
-
-type mockWalker struct {
-	file      *lint.File
-	onFailure func(lint.Failure)
-}
-
-func (w mockWalker) Visit(n ast.Node) ast.Visitor {
-	return w
-}
-
-func getMockRevive(t *testing.T) *revivelib.Revive {
-	t.Helper()
-
-	conf, err := config.GetConfig("../defaults.toml")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	revive, err := revivelib.New(
-		conf,
-		true,
-		2048,
-		[]string{"./tests"},
-		revivelib.NewExtraRule(&mockRule{}, lint.RuleConfig{}),
-	)
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-
-	return revive
-}
-
 func TestReviveLint(t *testing.T) {
 	// ARRANGE
 	revive := getMockRevive(t)
 
 	// ACT
-	failures, err := revive.Lint("../testdata/if-return.go")
+	failures, err := revive.Lint(revivelib.Include("../testdata/if-return.go"))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	//ASSERT
+	// ASSERT
 	failureList := []lint.Failure{}
 
 	for failure := range failures {
@@ -82,6 +27,7 @@ func TestReviveLint(t *testing.T) {
 	}
 
 	const expected = 3
+
 	got := len(failureList)
 	if got != expected {
 		t.Fatalf("Expected failures to have %d failures, but it has %d.", expected, got)
@@ -97,7 +43,7 @@ func TestReviveGetLintErrors(t *testing.T) {
 	// ARRANGE
 	revive := getMockRevive(t)
 
-	failures, err := revive.Lint("../testdata/if-return.go")
+	failures, err := revive.Lint(revivelib.Include("../testdata/if-return.go"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -122,7 +68,7 @@ func TestReviveFormat(t *testing.T) {
 	// ARRANGE
 	revive := getMockRevive(t)
 
-	failuresChan, err := revive.Lint("../testdata/if-return.go")
+	failuresChan, err := revive.Lint(revivelib.Include("../testdata/if-return.go"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -150,4 +96,36 @@ func TestReviveFormat(t *testing.T) {
 	if exitCode != expected {
 		t.Fatalf("Expected exit code to be %d, but it was %d.", expected, exitCode)
 	}
+}
+
+type mockRule struct {
+}
+
+func (r *mockRule) Name() string {
+	return "mock-rule"
+}
+
+func (r *mockRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	return nil
+}
+
+func getMockRevive(t *testing.T) *revivelib.Revive {
+	t.Helper()
+
+	conf, err := config.GetConfig("../defaults.toml")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	revive, err := revivelib.New(
+		conf,
+		true,
+		2048,
+		revivelib.NewExtraRule(&mockRule{}, lint.RuleConfig{}),
+	)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	return revive
 }

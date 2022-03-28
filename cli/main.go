@@ -37,14 +37,24 @@ func RunRevive(extraRules ...revivelib.ExtraRule) {
 		conf,
 		setExitStatus,
 		maxOpenFiles,
-		excludePaths,
 		extraRules...,
 	)
 	if err != nil {
 		fail(err.Error())
 	}
 
-	failures, err := revive.Lint(flag.Args()...)
+	files := flag.Args()
+	packages := []revivelib.LintPattern{}
+
+	for _, file := range files {
+		packages = append(packages, revivelib.Include(file))
+	}
+
+	for _, file := range excludePaths {
+		packages = append(packages, revivelib.Exclude(file))
+	}
+
+	failures, err := revive.Lint(packages...)
 	if err != nil {
 		fail(err.Error())
 	}

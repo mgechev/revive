@@ -15,11 +15,10 @@ import (
 // Revive is responsible for running linters and formatters
 // and returning a set of results.
 type Revive struct {
-	config          *lint.Config
-	lintingRules    []lint.Rule
-	logger          *log.Logger
-	maxOpenFiles    int
-	excludePatterns ArrayFlags
+	config       *lint.Config
+	lintingRules []lint.Rule
+	logger       *log.Logger
+	maxOpenFiles int
 }
 
 // New creates a new instance of Revive lint runner.
@@ -27,7 +26,6 @@ func New(
 	conf *lint.Config,
 	setExitStatus bool,
 	maxOpenFiles int,
-	excludePatterns ArrayFlags,
 	extraRules ...ExtraRule,
 ) (*Revive, error) {
 	log, err := logging.GetLogger()
@@ -59,22 +57,32 @@ func New(
 
 	log.Println("Config loaded")
 
-	if len(excludePatterns) == 0 { // if no excludes were set in the command line
-		excludePatterns = conf.Exclude // use those from the configuration
-	}
-
 	return &Revive{
-		logger:          log,
-		config:          conf,
-		lintingRules:    lintingRules,
-		maxOpenFiles:    maxOpenFiles,
-		excludePatterns: excludePatterns,
+		logger:       log,
+		config:       conf,
+		lintingRules: lintingRules,
+		maxOpenFiles: maxOpenFiles,
 	}, nil
 }
 
-// Lint files in the specified paths.
-func (r *Revive) Lint(includePatterns ...string) (<-chan lint.Failure, error) {
-	packages, err := getPackages(includePatterns, r.excludePatterns)
+// Lint the included patterns, skipping excluded ones
+func (r *Revive) Lint(patterns ...LintPattern) (<-chan lint.Failure, error) {
+	includePatterns := []string{}
+	excludePatterns := []string{}
+
+	for _, lintpkg := range patterns {
+		if lintpkg.IsExclude() {
+			excludePatterns = append(excludePatterns, lintpkg.GetPattern())
+		} else {
+			includePatterns = append(includePatterns, lintpkg.GetPattern())
+		}
+	}
+
+	if len(excludePatterns) == 0 { // if no excludes were set
+		excludePatterns = r.config.Exclude // use those from the configuration
+	}
+
+	packages, err := getPackages(includePatterns, excludePatterns)
 	if err != nil {
 		return nil, errors.Wrap(err, "linting - getting packages")
 	}

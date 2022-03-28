@@ -14,10 +14,6 @@ func TestReviveCreateInstance(t *testing.T) {
 		t.Fatal("Could not load config.")
 	}
 
-	if len(revive.excludePatterns) != 1 {
-		t.Fatal("Should contain exclude path")
-	}
-
 	if revive.maxOpenFiles != 2048 {
 		t.Fatal("Expected MaxOpenFiles to be 2048")
 	}
@@ -63,7 +59,6 @@ func getMockRevive(t *testing.T) *Revive {
 		conf,
 		true,
 		2048,
-		[]string{"./tests"},
 		NewExtraRule(&mockRule{}, lint.RuleConfig{}),
 	)
 	if err != nil {
