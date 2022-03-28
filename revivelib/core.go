@@ -105,23 +105,6 @@ func (r *Revive) Lint(patterns ...LintPattern) (<-chan lint.Failure, error) {
 	return failures, nil
 }
 
-// GetLintFailures gets the list of failures for a given failures channel from Lint.
-func (r *Revive) GetLintFailures(failuresChan <-chan lint.Failure) []lint.Failure {
-	conf := r.config
-
-	result := []lint.Failure{}
-
-	for failure := range failuresChan {
-		if failure.Confidence < conf.Confidence {
-			continue
-		}
-
-		result = append(result, failure)
-	}
-
-	return result
-}
-
 // Format gets the output for a given failures channel from Lint.
 func (r *Revive) Format(
 	formatterName string,

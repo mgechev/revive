@@ -39,31 +39,6 @@ func TestReviveLint(t *testing.T) {
 	}
 }
 
-func TestReviveGetLintErrors(t *testing.T) {
-	// ARRANGE
-	revive := getMockRevive(t)
-
-	failures, err := revive.Lint(revivelib.Include("../testdata/if-return.go"))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// ACT
-	failureList := revive.GetLintFailures(failures)
-
-	// ASSERT
-	const expected = 3
-	got := len(failureList)
-	if got != expected {
-		t.Fatalf("Expected failures to have %d failures, but it has %d.", expected, got)
-	}
-
-	errmsg := "redundant if ...; err != nil check, just return error instead."
-	if failureList[0].Failure != errmsg {
-		t.Fatalf("Expected failure[0] to be '%s', but it was '%s'", errmsg, failureList[0].Failure)
-	}
-}
-
 func TestReviveFormat(t *testing.T) {
 	// ARRANGE
 	revive := getMockRevive(t)
