@@ -1,57 +1,33 @@
 package revivelib
 
-// LintPattern returns either an include or exclude package
-type LintPattern interface {
-	IsExclude() bool
-	GetPattern() string
+// LintPattern indicates a pattern to be included/excluded when linting
+type LintPattern struct {
+	isExclude bool
+	pattern   string
 }
 
-// IncludePattern indicates a package that's included in the lint
-type IncludePattern struct {
-	Path string
+// IsExclude - should this pattern be included or excluded when linting
+func (p *LintPattern) IsExclude() bool {
+	return p.isExclude
 }
 
-// IsExclude package
-func (p *IncludePattern) IsExclude() bool {
-	return false
+// GetPattern - returns the actual pattern
+func (p *LintPattern) GetPattern() string {
+	return p.pattern
 }
 
-// GetPattern for this include
-func (p *IncludePattern) GetPattern() string {
-	return p.Path
-}
-
-// Ensure we respect the LintPattern interface
-var _ LintPattern = (*IncludePattern)(nil)
-
-// Include this path in the linter
-func Include(path string) *IncludePattern {
-	return &IncludePattern{
-		Path: path,
+// Include this pattern when linting
+func Include(pattern string) *LintPattern {
+	return &LintPattern{
+		isExclude: false,
+		pattern:   pattern,
 	}
 }
 
-// ExcludePattern indicates a package that's included in the lint
-type ExcludePattern struct {
-	Path string
-}
-
-// IsExclude package
-func (p *ExcludePattern) IsExclude() bool {
-	return true
-}
-
-// GetPattern for this include
-func (p *ExcludePattern) GetPattern() string {
-	return p.Path
-}
-
-// Ensure we respect the LintPattern interface
-var _ LintPattern = (*ExcludePattern)(nil)
-
-// Exclude this path in the linter
-func Exclude(path string) *ExcludePattern {
-	return &ExcludePattern{
-		Path: path,
+// Exclude this pattern when linting
+func Exclude(pattern string) *LintPattern {
+	return &LintPattern{
+		isExclude: true,
+		pattern:   pattern,
 	}
 }

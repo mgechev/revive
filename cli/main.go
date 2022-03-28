@@ -44,7 +44,7 @@ func RunRevive(extraRules ...revivelib.ExtraRule) {
 	}
 
 	files := flag.Args()
-	packages := []revivelib.LintPattern{}
+	packages := []*revivelib.LintPattern{}
 
 	for _, file := range files {
 		packages = append(packages, revivelib.Include(file))
