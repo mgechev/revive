@@ -623,20 +623,20 @@ func LintMyFile(file string) {
 	)
 
 	failuresChan, err := revive.Lint(
-        revivelib.Include(file),
-        revivelib.Exclude("./fixtures"),
-        // You can use as many revivelib.Include or revivelib.Exclude as you want
-    )
-	if err != nil {
-        panic("Shouldn't have failed: " + err.Error)
-	}
+ 		revivelib.Include(file),
+ 		revivelib.Exclude("./fixtures"),
+ 		// You can use as many revivelib.Include or revivelib.Exclude as you want
+ 	)
+  	if err != nil {
+  	 	panic("Shouldn't have failed: " + err.Error)
+  	}
 
-    // Now let's return the formatted errors
+  	// Now let's return the formatted errors
 	failures, exitCode, _ := revive.Format("stylish", failuresChan)
 
-    // failures is the string with all formatted lint error messages
-    // exit code is 0 if no errors, 1 if errors (unless config options change it)
-    // ... do something with them
+  	// failures is the string with all formatted lint error messages
+  	// exit code is 0 if no errors, 1 if errors (unless config options change it)
+  	// ... do something with them
 }
 
 type myRule struct{}
