@@ -586,6 +586,7 @@ package main
 import (
 	"github.com/mgechev/revive/cli"
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/revivelib"
 )
 
 func main() {
