@@ -588,7 +588,57 @@ import (
 )
 
 func main() {
-	cli.RunRevive(cli.NewExtraRule(&myRule{}, lint.RuleConfig{}))
+	cli.RunRevive(revivelib.NewExtraRule(&myRule{}, lint.RuleConfig{}))
+}
+
+type myRule struct{}
+
+func (f myRule) Name() string {
+	return "myRule"
+}
+
+func (f myRule) Apply(*lint.File, lint.Arguments) []lint.Failure { ... }
+```
+
+You can still go further and use `revive` without its cli, as part of your library, or your own cli:
+
+```go
+package mylib
+
+import (
+	"github.com/mgechev/revive/cli"
+	"github.com/mgechev/revive/revivelib"
+	"github.com/mgechev/revive/lint"
+)
+
+// Error checking removed for clarity
+func LintMyFile(file string) {
+	conf, _:= config.GetConfig("../defaults.toml")
+
+	revive, _ := revivelib.New(
+		conf,  // Configuration file
+		true,  // Set exit status
+		2048,  // Max open files
+
+        // Then add as many extra rules as you need
+		revivelib.NewExtraRule(&myRule{}, lint.RuleConfig{}),
+	)
+
+	failuresChan, err := revive.Lint(
+ 		revivelib.Include(file),
+ 		revivelib.Exclude("./fixtures"),
+ 		// You can use as many revivelib.Include or revivelib.Exclude as required
+ 	)
+  	if err != nil {
+  	 	panic("Shouldn't have failed: " + err.Error)
+  	}
+
+  	// Now let's return the formatted errors
+	failures, exitCode, _ := revive.Format("stylish", failuresChan)
+
+  	// failures is the string with all formatted lint error messages
+  	// exit code is 0 if no errors, 1 if errors (unless config options change it)
+  	// ... do something with them
 }
 
 type myRule struct{}
@@ -690,6 +740,12 @@ REVIVE_FORCE_COLOR=1 revive -formatter friendly ./... | tee revive.log
 [<img alt="ridvansumset" src="https://avatars.githubusercontent.com/u/26631560?v=4&s=117" width="117">](https://github.com/ridvansumset) |[<img alt="Jarema" src="https://avatars.githubusercontent.com/u/7369771?v=4&s=117" width="117">](https://github.com/Jarema) |[<img alt="vkrol" src="https://avatars.githubusercontent.com/u/153412?v=4&s=117" width="117">](https://github.com/vkrol) |[<img alt="haya14busa" src="https://avatars.githubusercontent.com/u/3797062?v=4&s=117" width="117">](https://github.com/haya14busa) |[<img alt="sina-devel" src="https://avatars.githubusercontent.com/u/61763643?v=4&s=117" width="117">](https://github.com/sina-devel) |[<img alt="techknowlogick" src="https://avatars.githubusercontent.com/u/164197?v=4&s=117" width="117">](https://github.com/techknowlogick) |
 :---: |:---: |:---: |:---: |:---: |:---: |
 [ridvansumset](https://github.com/ridvansumset) |[Jarema](https://github.com/Jarema) |[vkrol](https://github.com/vkrol) |[haya14busa](https://github.com/haya14busa) |[sina-devel](https://github.com/sina-devel) |[techknowlogick](https://github.com/techknowlogick) |
+
+
+[<img alt="heynemann" src="https://avatars.githubusercontent.com/u/60965?v=4&s=117" width="117">](https://github.com/heynemann) | | | | | |
+|:---: |:---: |:---: |:---: |:---: |:---: |
+[heynemann](https://github.com/heynemann) | | | | | |
+
 
 ## License
 
