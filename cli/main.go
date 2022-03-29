@@ -50,7 +50,7 @@ func RunRevive(extraRules ...revivelib.ExtraRule) {
 		packages = append(packages, revivelib.Include(file))
 	}
 
-	for _, file := range excludePaths {
+	for _, file := range excludePatterns {
 		packages = append(packages, revivelib.Exclude(file))
 	}
 
@@ -72,13 +72,12 @@ func RunRevive(extraRules ...revivelib.ExtraRule) {
 }
 
 var (
-	configPath    string
-	excludePaths  revivelib.ArrayFlags
-	formatterName string
-	help          bool
-	versionFlag   bool
-	setExitStatus bool
-	maxOpenFiles  int
+	configPath      string
+	excludePatterns revivelib.ArrayFlags
+	formatterName   string
+	versionFlag     bool
+	setExitStatus   bool
+	maxOpenFiles    int
 )
 
 var originalUsage = flag.Usage
@@ -139,7 +138,7 @@ func init() {
 	defaultConfigPath := buildDefaultConfigPath()
 
 	flag.StringVar(&configPath, "config", defaultConfigPath, configUsage)
-	flag.Var(&excludePaths, "exclude", excludeUsage)
+	flag.Var(&excludePatterns, "exclude", excludeUsage)
 	flag.StringVar(&formatterName, "formatter", "", formatterUsage)
 	flag.BoolVar(&versionFlag, "version", false, versionUsage)
 	flag.BoolVar(&setExitStatus, "set_exit_status", false, exitStatusUsage)
