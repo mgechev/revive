@@ -84,6 +84,7 @@ var allRules = append([]lint.Rule{
 	&rule.TimeEqualRule{},
 	&rule.BannedCharsRule{},
 	&rule.OptimizeOperandsOrderRule{},
+	&rule.UseAnyRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
