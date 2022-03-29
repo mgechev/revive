@@ -622,7 +622,7 @@ func LintMyFile(file string) {
 		true,  // Set exit status
 		2048,  // Max open files
 
-        // Then add as many extra rules as you need
+		// Then add as many extra rules as you need
 		revivelib.NewExtraRule(&myRule{}, lint.RuleConfig{}),
 	)
 
