@@ -136,7 +136,6 @@ func (w *lintRedefinesBuiltinID) Visit(node ast.Node) ast.Visitor {
 
 			if ok, bt := w.isBuiltIn(id.Name); ok {
 				var msg string
-				println(bt, id.Name)
 				switch bt {
 				case "constant or variable":
 					if n.Tok == token.DEFINE {
