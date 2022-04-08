@@ -13,7 +13,6 @@ type AtomicRule struct{}
 
 // Apply applies the rule to given file.
 func (r *AtomicRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
-	print("-")
 	var failures []lint.Failure
 	walker := atomic{
 		pkgTypesInfo: file.Pkg.TypesInfo,
