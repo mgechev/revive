@@ -21,7 +21,7 @@ type Package struct {
 	Sortable map[string]bool
 	// main is whether this is a "main" package.
 	main int
-	mu   sync.Mutex
+	sync.Mutex
 }
 
 var newImporter = func(fset *token.FileSet) types.ImporterFrom {
@@ -36,6 +36,9 @@ var (
 
 // IsMain returns if that's the main package.
 func (p *Package) IsMain() bool {
+	p.Lock()
+	defer p.Unlock()
+
 	if p.main == trueValue {
 		return true
 	} else if p.main == falseValue {
@@ -53,11 +56,12 @@ func (p *Package) IsMain() bool {
 
 // TypeCheck performs type checking for given package.
 func (p *Package) TypeCheck() error {
-	p.mu.Lock()
+	p.Lock()
+	defer p.Unlock()
+
 	// If type checking has already been performed
 	// skip it.
 	if p.TypesInfo != nil || p.TypesPkg != nil {
-		p.mu.Unlock()
 		return nil
 	}
 	config := &types.Config{
@@ -84,7 +88,7 @@ func (p *Package) TypeCheck() error {
 	// since we will get partial information.
 	p.TypesPkg = typesPkg
 	p.TypesInfo = info
-	p.mu.Unlock()
+
 	return err
 }
 
