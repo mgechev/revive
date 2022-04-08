@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"go/token"
 	"strings"
+	"sync"
 	"unicode/utf8"
 
 	"github.com/mgechev/revive/lint"
@@ -14,10 +15,12 @@ import (
 // LineLengthLimitRule lints given else constructs.
 type LineLengthLimitRule struct {
 	max int
+	sync.RWMutex
 }
 
 // Apply applies the rule to given file.
 func (r *LineLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	r.Lock()
 	if r.max == 0 {
 		checkNumberOfArguments(1, arguments, r.Name())
 
@@ -28,8 +31,10 @@ func (r *LineLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) [
 
 		r.max = int(max)
 	}
+	r.Unlock()
 
 	var failures []lint.Failure
+	r.RLock()
 	checker := lintLineLengthNum{
 		max:  r.max,
 		file: file,
@@ -37,6 +42,7 @@ func (r *LineLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) [
 			failures = append(failures, failure)
 		},
 	}
+	r.RUnlock()
 
 	checker.check()
 

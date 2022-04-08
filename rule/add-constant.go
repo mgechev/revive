@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -33,10 +34,12 @@ func (wl whiteList) add(kind, list string) {
 type AddConstantRule struct {
 	whiteList   whiteList
 	strLitLimit int
+	sync.RWMutex
 }
 
 // Apply applies the rule to given file.
 func (r *AddConstantRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	r.Lock()
 	if r.whiteList == nil {
 		r.strLitLimit = defaultStrLitLimit
 		r.whiteList = newWhiteList()
@@ -80,14 +83,16 @@ func (r *AddConstantRule) Apply(file *lint.File, arguments lint.Arguments) []lin
 			}
 		}
 	}
-
+	r.Unlock()
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
 
+	r.RLock()
 	w := lintAddConstantRule{onFailure: onFailure, strLits: make(map[string]int), strLitLimit: r.strLitLimit, whiteLst: r.whiteList}
+	r.RUnlock()
 
 	ast.Walk(w, file.AST)
 

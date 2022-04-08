@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"reflect"
+	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -12,18 +13,22 @@ import (
 type FunctionLength struct {
 	maxStmt  int
 	maxLines int
+	sync.RWMutex
 }
 
 // Apply applies the rule to given file.
 func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	r.Lock()
 	if r.maxLines == 0 {
 		maxStmt, maxLines := r.parseArguments(arguments)
 		r.maxStmt = int(maxStmt)
 		r.maxLines = int(maxLines)
 	}
+	r.Unlock()
 
 	var failures []lint.Failure
 
+	r.RLock()
 	walker := lintFuncLength{
 		file:     file,
 		maxStmt:  r.maxStmt,
@@ -32,6 +37,7 @@ func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) []lint
 			failures = append(failures, failure)
 		},
 	}
+	r.RUnlock()
 
 	ast.Walk(walker, file.AST)
 

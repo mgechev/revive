@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/types"
+	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -11,12 +12,14 @@ import (
 // UnhandledErrorRule lints given else constructs.
 type UnhandledErrorRule struct {
 	ignoreList ignoreListType
+	sync.RWMutex
 }
 
 type ignoreListType map[string]struct{}
 
 // Apply applies the rule to given file.
 func (r *UnhandledErrorRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
+	r.Lock()
 	if r.ignoreList == nil {
 		r.ignoreList = make(ignoreListType, len(args))
 
@@ -29,9 +32,10 @@ func (r *UnhandledErrorRule) Apply(file *lint.File, args lint.Arguments) []lint.
 			r.ignoreList[argStr] = struct{}{}
 		}
 	}
+	r.Unlock()
 
 	var failures []lint.Failure
-
+	r.RLock()
 	walker := &lintUnhandledErrors{
 		ignoreList: r.ignoreList,
 		pkg:        file.Pkg,
@@ -39,6 +43,7 @@ func (r *UnhandledErrorRule) Apply(file *lint.File, args lint.Arguments) []lint.
 			failures = append(failures, failure)
 		},
 	}
+	r.RUnlock()
 
 	file.Pkg.TypeCheck()
 	ast.Walk(walker, file.AST)

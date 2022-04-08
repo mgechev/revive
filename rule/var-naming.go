@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 	"strings"
+	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -14,12 +15,14 @@ type VarNamingRule struct {
 	configured bool
 	whitelist  []string
 	blacklist  []string
+	sync.RWMutex
 }
 
 // Apply applies the rule to given file.
 func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
+	r.Lock()
 	if !r.configured {
 		if len(arguments) >= 1 {
 			r.whitelist = getList(arguments[0], "whitelist")
@@ -30,8 +33,10 @@ func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.
 		}
 		r.configured = true
 	}
+	r.Unlock()
 
 	fileAst := file.AST
+	r.RLock()
 	walker := lintNames{
 		file:      file,
 		fileAst:   fileAst,
@@ -41,6 +46,7 @@ func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.
 			failures = append(failures, failure)
 		},
 	}
+	r.RUnlock()
 
 	// Package names need slightly different handling than other names.
 	if strings.Contains(walker.fileAst.Name.Name, "_") && !strings.HasSuffix(walker.fileAst.Name.Name, "_test") {

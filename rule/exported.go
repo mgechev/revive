@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 	"strings"
+	"sync"
 	"unicode"
 	"unicode/utf8"
 
@@ -17,6 +18,7 @@ type ExportedRule struct {
 	checkPrivateReceivers  bool
 	disableStutteringCheck bool
 	stuttersMsg            string
+	sync.RWMutex
 }
 
 // Apply applies the rule to given file.
@@ -27,6 +29,7 @@ func (r *ExportedRule) Apply(file *lint.File, args lint.Arguments) []lint.Failur
 		return failures
 	}
 
+	r.Lock()
 	if !r.configured {
 		var sayRepetitiveInsteadOfStutters bool
 		r.checkPrivateReceivers, r.disableStutteringCheck, sayRepetitiveInsteadOfStutters = r.getConf(args)
@@ -37,8 +40,10 @@ func (r *ExportedRule) Apply(file *lint.File, args lint.Arguments) []lint.Failur
 
 		r.configured = true
 	}
+	r.Unlock()
 
 	fileAst := file.AST
+	r.RLock()
 	walker := lintExported{
 		file:    file,
 		fileAst: fileAst,
@@ -50,6 +55,7 @@ func (r *ExportedRule) Apply(file *lint.File, args lint.Arguments) []lint.Failur
 		disableStutteringCheck: r.disableStutteringCheck,
 		stuttersMsg:            r.stuttersMsg,
 	}
+	r.RUnlock()
 
 	ast.Walk(&walker, fileAst)
 

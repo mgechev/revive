@@ -2,6 +2,7 @@ package rule
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -9,6 +10,7 @@ import (
 // ImportsBlacklistRule lints given else constructs.
 type ImportsBlacklistRule struct {
 	blacklist map[string]bool
+	sync.RWMutex
 }
 
 // Apply applies the rule to given file.
@@ -19,6 +21,7 @@ func (r *ImportsBlacklistRule) Apply(file *lint.File, arguments lint.Arguments) 
 		return failures // skip, test file
 	}
 
+	r.Lock()
 	if r.blacklist == nil {
 		r.blacklist = make(map[string]bool, len(arguments))
 
@@ -34,7 +37,9 @@ func (r *ImportsBlacklistRule) Apply(file *lint.File, arguments lint.Arguments) 
 			r.blacklist[argStr] = true
 		}
 	}
+	r.Unlock()
 
+	r.RLock()
 	for _, is := range file.AST.Imports {
 		path := is.Path
 		if path != nil && r.blacklist[path.Value] {
@@ -46,6 +51,7 @@ func (r *ImportsBlacklistRule) Apply(file *lint.File, arguments lint.Arguments) 
 			})
 		}
 	}
+	r.RUnlock()
 
 	return failures
 }
