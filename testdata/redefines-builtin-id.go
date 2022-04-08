@@ -9,7 +9,7 @@ func append(i, j int) { // MATCH /redefinition of the built-in function append/
 
 }
 
-type Type int16 // MATCH /redefinition of the built-in type Type/
+type string int16 // MATCH /redefinition of the built-in type string/
 
 func delete(set []int64, i int) (y []int64) { // MATCH /redefinition of the built-in function delete/
 	for j, v := range set {
