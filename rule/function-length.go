@@ -13,11 +13,10 @@ import (
 type FunctionLength struct {
 	maxStmt  int
 	maxLines int
-	sync.RWMutex
+	sync.Mutex
 }
 
-// Apply applies the rule to given file.
-func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *FunctionLength) configure(arguments lint.Arguments) {
 	r.Lock()
 	if r.maxLines == 0 {
 		maxStmt, maxLines := r.parseArguments(arguments)
@@ -25,10 +24,14 @@ func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) []lint
 		r.maxLines = int(maxLines)
 	}
 	r.Unlock()
+}
+
+// Apply applies the rule to given file.
+func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	r.configure(arguments)
 
 	var failures []lint.Failure
 
-	r.RLock()
 	walker := lintFuncLength{
 		file:     file,
 		maxStmt:  r.maxStmt,
@@ -37,7 +40,6 @@ func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) []lint
 			failures = append(failures, failure)
 		},
 	}
-	r.RUnlock()
 
 	ast.Walk(walker, file.AST)
 

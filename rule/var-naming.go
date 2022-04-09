@@ -15,13 +15,10 @@ type VarNamingRule struct {
 	configured bool
 	whitelist  []string
 	blacklist  []string
-	sync.RWMutex
+	sync.Mutex
 }
 
-// Apply applies the rule to given file.
-func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var failures []lint.Failure
-
+func (r *VarNamingRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	if !r.configured {
 		if len(arguments) >= 1 {
@@ -34,9 +31,16 @@ func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.
 		r.configured = true
 	}
 	r.Unlock()
+}
+
+// Apply applies the rule to given file.
+func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	r.configure(arguments)
+
+	var failures []lint.Failure
 
 	fileAst := file.AST
-	r.RLock()
+
 	walker := lintNames{
 		file:      file,
 		fileAst:   fileAst,
@@ -46,7 +50,6 @@ func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.
 			failures = append(failures, failure)
 		},
 	}
-	r.RUnlock()
 
 	// Package names need slightly different handling than other names.
 	if strings.Contains(walker.fileAst.Name.Name, "_") && !strings.HasSuffix(walker.fileAst.Name.Name, "_test") {

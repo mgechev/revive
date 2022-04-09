@@ -14,11 +14,10 @@ import (
 // CyclomaticRule lints given else constructs.
 type CyclomaticRule struct {
 	maxComplexity int
-	sync.RWMutex
+	sync.Mutex
 }
 
-// Apply applies the rule to given file.
-func (r *CyclomaticRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *CyclomaticRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	if r.maxComplexity == 0 {
 		checkNumberOfArguments(1, arguments, r.Name())
@@ -30,10 +29,15 @@ func (r *CyclomaticRule) Apply(file *lint.File, arguments lint.Arguments) []lint
 		r.maxComplexity = int(complexity)
 	}
 	r.Unlock()
+}
+
+// Apply applies the rule to given file.
+func (r *CyclomaticRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	r.configure(arguments)
 
 	var failures []lint.Failure
 	fileAst := file.AST
-	r.RLock()
+
 	walker := lintCyclomatic{
 		file:       file,
 		complexity: r.maxComplexity,
@@ -41,7 +45,7 @@ func (r *CyclomaticRule) Apply(file *lint.File, arguments lint.Arguments) []lint
 			failures = append(failures, failure)
 		},
 	}
-	r.RUnlock()
+
 	ast.Walk(walker, fileAst)
 
 	return failures

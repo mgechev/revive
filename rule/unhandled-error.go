@@ -12,18 +12,17 @@ import (
 // UnhandledErrorRule lints given else constructs.
 type UnhandledErrorRule struct {
 	ignoreList ignoreListType
-	sync.RWMutex
+	sync.Mutex
 }
 
 type ignoreListType map[string]struct{}
 
-// Apply applies the rule to given file.
-func (r *UnhandledErrorRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
+func (r *UnhandledErrorRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	if r.ignoreList == nil {
-		r.ignoreList = make(ignoreListType, len(args))
+		r.ignoreList = make(ignoreListType, len(arguments))
 
-		for _, arg := range args {
+		for _, arg := range arguments {
 			argStr, ok := arg.(string)
 			if !ok {
 				panic(fmt.Sprintf("Invalid argument to the unhandled-error rule. Expecting a string, got %T", arg))
@@ -33,9 +32,14 @@ func (r *UnhandledErrorRule) Apply(file *lint.File, args lint.Arguments) []lint.
 		}
 	}
 	r.Unlock()
+}
+
+// Apply applies the rule to given file.
+func (r *UnhandledErrorRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
+	r.configure(args)
 
 	var failures []lint.Failure
-	r.RLock()
+
 	walker := &lintUnhandledErrors{
 		ignoreList: r.ignoreList,
 		pkg:        file.Pkg,
@@ -43,7 +47,6 @@ func (r *UnhandledErrorRule) Apply(file *lint.File, args lint.Arguments) []lint.
 			failures = append(failures, failure)
 		},
 	}
-	r.RUnlock()
 
 	file.Pkg.TypeCheck()
 	ast.Walk(walker, file.AST)

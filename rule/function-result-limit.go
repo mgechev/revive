@@ -11,11 +11,10 @@ import (
 // FunctionResultsLimitRule lints given else constructs.
 type FunctionResultsLimitRule struct {
 	max int
-	sync.RWMutex
+	sync.Mutex
 }
 
-// Apply applies the rule to given file.
-func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *FunctionResultsLimitRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	if r.max == 0 {
 		checkNumberOfArguments(1, arguments, r.Name())
@@ -30,17 +29,20 @@ func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Argumen
 		r.max = int(max)
 	}
 	r.Unlock()
+}
+
+// Apply applies the rule to given file.
+func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	r.configure(arguments)
 
 	var failures []lint.Failure
 
-	r.RLock()
 	walker := lintFunctionResultsNum{
 		max: r.max,
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
 	}
-	r.RUnlock()
 
 	ast.Walk(walker, file.AST)
 

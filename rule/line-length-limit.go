@@ -15,11 +15,10 @@ import (
 // LineLengthLimitRule lints given else constructs.
 type LineLengthLimitRule struct {
 	max int
-	sync.RWMutex
+	sync.Mutex
 }
 
-// Apply applies the rule to given file.
-func (r *LineLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *LineLengthLimitRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	if r.max == 0 {
 		checkNumberOfArguments(1, arguments, r.Name())
@@ -32,9 +31,14 @@ func (r *LineLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) [
 		r.max = int(max)
 	}
 	r.Unlock()
+}
+
+// Apply applies the rule to given file.
+func (r *LineLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	r.configure(arguments)
 
 	var failures []lint.Failure
-	r.RLock()
+
 	checker := lintLineLengthNum{
 		max:  r.max,
 		file: file,
@@ -42,7 +46,6 @@ func (r *LineLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) [
 			failures = append(failures, failure)
 		},
 	}
-	r.RUnlock()
 
 	checker.check()
 

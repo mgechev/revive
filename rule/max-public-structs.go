@@ -11,11 +11,10 @@ import (
 // MaxPublicStructsRule lints given else constructs.
 type MaxPublicStructsRule struct {
 	max int64
-	sync.RWMutex
+	sync.Mutex
 }
 
-// Apply applies the rule to given file.
-func (r *MaxPublicStructsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *MaxPublicStructsRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	if r.max < 1 {
 		checkNumberOfArguments(1, arguments, r.Name())
@@ -27,18 +26,23 @@ func (r *MaxPublicStructsRule) Apply(file *lint.File, arguments lint.Arguments) 
 		r.max = max
 	}
 	r.Unlock()
+}
+
+// Apply applies the rule to given file.
+func (r *MaxPublicStructsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	r.configure(arguments)
 
 	var failures []lint.Failure
 
 	fileAst := file.AST
-	r.RLock()
+
 	walker := &lintMaxPublicStructs{
 		fileAst: fileAst,
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
 	}
-	r.RUnlock()
+
 	ast.Walk(walker, fileAst)
 
 	if walker.current > r.max {

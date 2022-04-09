@@ -11,24 +11,26 @@ import (
 // DeferRule lints unused params in functions.
 type DeferRule struct {
 	allow map[string]bool
-	sync.RWMutex
+	sync.Mutex
 }
 
-// Apply applies the rule to given file.
-func (r *DeferRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *DeferRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	if r.allow == nil {
 		r.allow = r.allowFromArgs(arguments)
 	}
+	r.Unlock()
+}
+
+// Apply applies the rule to given file.
+func (r *DeferRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	r.configure(arguments)
+
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
-	r.Unlock()
-
-	r.RLock()
 	w := lintDeferRule{onFailure: onFailure, allow: r.allow}
-	r.RUnlock()
 
 	ast.Walk(w, file.AST)
 
