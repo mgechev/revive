@@ -68,7 +68,7 @@ func checkContextKeyType(w lintContextKeyTypes, x *ast.CallExpr) {
 	if len(x.Args) != 3 {
 		return
 	}
-	key := f.Pkg.TypesInfo.Types[x.Args[1]]
+	key := f.Pkg.TypesInfo().Types[x.Args[1]]
 
 	if ktyp, ok := key.Type.(*types.Basic); ok && ktyp.Kind() != types.Invalid {
 		w.onFailure(lint.Failure{

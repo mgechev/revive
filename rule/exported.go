@@ -126,7 +126,8 @@ func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
 		}
 		switch name {
 		case "Len", "Less", "Swap":
-			if w.file.Pkg.Sortable[recv] {
+			sortables := w.file.Pkg.Sortable()
+			if sortables[recv] {
 				return
 			}
 		}

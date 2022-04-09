@@ -14,11 +14,11 @@ type Package struct {
 	fset  *token.FileSet
 	files map[string]*File
 
-	TypesPkg  *types.Package
-	TypesInfo *types.Info
+	typesPkg  *types.Package
+	typesInfo *types.Info
 
 	// sortable is the set of types in the package that implement sort.Interface.
-	Sortable map[string]bool
+	sortable map[string]bool
 	// main is whether this is a "main" package.
 	main int
 	sync.Mutex
@@ -54,6 +54,24 @@ func (p *Package) IsMain() bool {
 	return false
 }
 
+func (p *Package) TypesPkg() *types.Package {
+	p.Lock()
+	defer p.Unlock()
+	return p.typesPkg
+}
+
+func (p *Package) TypesInfo() *types.Info {
+	p.Lock()
+	defer p.Unlock()
+	return p.typesInfo
+}
+
+func (p *Package) Sortable() map[string]bool {
+	p.Lock()
+	defer p.Unlock()
+	return p.sortable
+}
+
 // TypeCheck performs type checking for given package.
 func (p *Package) TypeCheck() error {
 	p.Lock()
@@ -61,7 +79,7 @@ func (p *Package) TypeCheck() error {
 
 	// If type checking has already been performed
 	// skip it.
-	if p.TypesInfo != nil || p.TypesPkg != nil {
+	if p.typesInfo != nil || p.typesPkg != nil {
 		return nil
 	}
 	config := &types.Config{
@@ -86,8 +104,8 @@ func (p *Package) TypeCheck() error {
 
 	// Remember the typechecking info, even if config.Check failed,
 	// since we will get partial information.
-	p.TypesPkg = typesPkg
-	p.TypesInfo = info
+	p.typesPkg = typesPkg
+	p.typesInfo = info
 
 	return err
 }
@@ -108,10 +126,10 @@ func check(config *types.Config, n string, fset *token.FileSet, astFiles []*ast.
 
 // TypeOf returns the type of an expression.
 func (p *Package) TypeOf(expr ast.Expr) types.Type {
-	if p.TypesInfo == nil {
+	if p.typesInfo == nil {
 		return nil
 	}
-	return p.TypesInfo.TypeOf(expr)
+	return p.typesInfo.TypeOf(expr)
 }
 
 type walker struct {
@@ -133,7 +151,7 @@ func (w *walker) Visit(n ast.Node) ast.Visitor {
 }
 
 func (p *Package) scanSortable() {
-	p.Sortable = make(map[string]bool)
+	p.sortable = make(map[string]bool)
 
 	// bitfield for which methods exist on each type.
 	const (
@@ -148,7 +166,7 @@ func (p *Package) scanSortable() {
 	}
 	for typ, ms := range has {
 		if ms == Len|Less|Swap {
-			p.Sortable[typ] = true
+			p.sortable[typ] = true
 		}
 	}
 }
