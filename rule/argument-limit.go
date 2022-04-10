@@ -48,7 +48,7 @@ func (r *ArgumentsLimitRule) Apply(file *lint.File, arguments lint.Arguments) []
 }
 
 // Name returns the rule name.
-func (r *ArgumentsLimitRule) Name() string {
+func (*ArgumentsLimitRule) Name() string {
 	return "argument-limit"
 }
 

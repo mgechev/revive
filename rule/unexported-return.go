@@ -12,7 +12,7 @@ import (
 type UnexportedReturnRule struct{}
 
 // Apply applies the rule to given file.
-func (r *UnexportedReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*UnexportedReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -31,7 +31,7 @@ func (r *UnexportedReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.F
 }
 
 // Name returns the rule name.
-func (r *UnexportedReturnRule) Name() string {
+func (*UnexportedReturnRule) Name() string {
 	return "unexported-return"
 }
 
@@ -82,24 +82,24 @@ func (w lintUnexportedReturn) Visit(n ast.Node) ast.Visitor {
 // It is imprecise, and will err on the side of returning true,
 // such as for composite types.
 func exportedType(typ types.Type) bool {
-	switch T := typ.(type) {
+	switch t := typ.(type) {
 	case *types.Named:
-		obj := T.Obj()
+		obj := t.Obj()
 		switch {
 		// Builtin types have no package.
 		case obj.Pkg() == nil:
 		case obj.Exported():
 		default:
-			_, ok := T.Underlying().(*types.Interface)
+			_, ok := t.Underlying().(*types.Interface)
 			return ok
 		}
 		return true
 	case *types.Map:
-		return exportedType(T.Key()) && exportedType(T.Elem())
+		return exportedType(t.Key()) && exportedType(t.Elem())
 	case interface {
 		Elem() types.Type
 	}: // array, slice, pointer, chan
-		return exportedType(T.Elem())
+		return exportedType(t.Elem())
 	}
 	// Be conservative about other types, such as struct, interface, etc.
 	return true

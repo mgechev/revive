@@ -11,7 +11,7 @@ import (
 type EmptyLinesRule struct{}
 
 // Apply applies the rule to given file.
-func (r *EmptyLinesRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*EmptyLinesRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -24,7 +24,7 @@ func (r *EmptyLinesRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure
 }
 
 // Name returns the rule name.
-func (r *EmptyLinesRule) Name() string {
+func (*EmptyLinesRule) Name() string {
 	return "empty-lines"
 }
 

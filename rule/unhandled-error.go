@@ -55,7 +55,7 @@ func (r *UnhandledErrorRule) Apply(file *lint.File, args lint.Arguments) []lint.
 }
 
 // Name returns the rule name.
-func (r *UnhandledErrorRule) Name() string {
+func (*UnhandledErrorRule) Name() string {
 	return "unhandled-error"
 }
 

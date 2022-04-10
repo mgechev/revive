@@ -55,7 +55,7 @@ func (r *AddConstantRule) Apply(file *lint.File, arguments lint.Arguments) []lin
 }
 
 // Name returns the rule name.
-func (r *AddConstantRule) Name() string {
+func (*AddConstantRule) Name() string {
 	return "add-constant"
 }
 

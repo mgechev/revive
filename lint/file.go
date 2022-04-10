@@ -249,7 +249,7 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, fa
 	return getEnabledDisabledIntervals()
 }
 
-func (f *File) filterFailures(failures []Failure, disabledIntervals disabledIntervalsMap) []Failure {
+func (File) filterFailures(failures []Failure, disabledIntervals disabledIntervalsMap) []Failure {
 	result := []Failure{}
 	for _, failure := range failures {
 		fStart := failure.Position.Start.Line

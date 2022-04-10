@@ -288,16 +288,16 @@ func TestLintName(t *testing.T) { //revive:disable-line:exported
 // It is imprecise, and will err on the side of returning true,
 // such as for composite types.
 func exportedType(typ types.Type) bool {
-	switch T := typ.(type) {
+	switch t := typ.(type) {
 	case *types.Named:
 		// Builtin types have no package.
-		return T.Obj().Pkg() == nil || T.Obj().Exported()
+		return t.Obj().Pkg() == nil || t.Obj().Exported()
 	case *types.Map:
-		return exportedType(T.Key()) && exportedType(T.Elem())
+		return exportedType(t.Key()) && exportedType(t.Elem())
 	case interface {
 		Elem() types.Type
 	}: // array, slice, pointer, chan
-		return exportedType(T.Elem())
+		return exportedType(t.Elem())
 	}
 	// Be conservative about other types, such as struct, interface, etc.
 	return true

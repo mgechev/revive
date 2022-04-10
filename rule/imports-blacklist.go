@@ -59,6 +59,6 @@ func (r *ImportsBlacklistRule) Apply(file *lint.File, arguments lint.Arguments) 
 }
 
 // Name returns the rule name.
-func (r *ImportsBlacklistRule) Name() string {
+func (*ImportsBlacklistRule) Name() string {
 	return "imports-blacklist"
 }

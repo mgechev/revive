@@ -82,10 +82,10 @@ var zeroLiteral = map[string]bool{
 	"0i":  true,
 }
 
-func validType(T types.Type) bool {
-	return T != nil &&
-		T != types.Typ[types.Invalid] &&
-		!strings.Contains(T.String(), "invalid type") // good but not foolproof
+func validType(t types.Type) bool {
+	return t != nil &&
+		t != types.Typ[types.Invalid] &&
+		!strings.Contains(t.String(), "invalid type") // good but not foolproof
 }
 
 // isPkgDot checks if the expression is <pkg>.<name>

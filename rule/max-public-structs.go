@@ -58,7 +58,7 @@ func (r *MaxPublicStructsRule) Apply(file *lint.File, arguments lint.Arguments) 
 }
 
 // Name returns the rule name.
-func (r *MaxPublicStructsRule) Name() string {
+func (*MaxPublicStructsRule) Name() string {
 	return "max-public-structs"
 }
 

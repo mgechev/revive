@@ -52,7 +52,7 @@ func (r *CyclomaticRule) Apply(file *lint.File, arguments lint.Arguments) []lint
 }
 
 // Name returns the rule name.
-func (r *CyclomaticRule) Name() string {
+func (*CyclomaticRule) Name() string {
 	return "cyclomatic"
 }
 

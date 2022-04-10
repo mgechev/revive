@@ -67,7 +67,7 @@ func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.
 }
 
 // Name returns the rule name.
-func (r *VarNamingRule) Name() string {
+func (*VarNamingRule) Name() string {
 	return "var-naming"
 }
 

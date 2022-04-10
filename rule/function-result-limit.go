@@ -50,7 +50,7 @@ func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Argumen
 }
 
 // Name returns the rule name.
-func (r *FunctionResultsLimitRule) Name() string {
+func (*FunctionResultsLimitRule) Name() string {
 	return "function-result-limit"
 }
 
