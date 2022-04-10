@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 	"strings"
+	"sync"
 	"unicode"
 	"unicode/utf8"
 
@@ -17,19 +18,14 @@ type ExportedRule struct {
 	checkPrivateReceivers  bool
 	disableStutteringCheck bool
 	stuttersMsg            string
+	sync.Mutex
 }
 
-// Apply applies the rule to given file.
-func (r *ExportedRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
-	var failures []lint.Failure
-
-	if file.IsTest() {
-		return failures
-	}
-
+func (r *ExportedRule) configure(arguments lint.Arguments) {
+	r.Lock()
 	if !r.configured {
 		var sayRepetitiveInsteadOfStutters bool
-		r.checkPrivateReceivers, r.disableStutteringCheck, sayRepetitiveInsteadOfStutters = r.getConf(args)
+		r.checkPrivateReceivers, r.disableStutteringCheck, sayRepetitiveInsteadOfStutters = r.getConf(arguments)
 		r.stuttersMsg = "stutters"
 		if sayRepetitiveInsteadOfStutters {
 			r.stuttersMsg = "is repetitive"
@@ -37,8 +33,20 @@ func (r *ExportedRule) Apply(file *lint.File, args lint.Arguments) []lint.Failur
 
 		r.configured = true
 	}
+	r.Unlock()
+}
+
+// Apply applies the rule to given file.
+func (r *ExportedRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
+	r.configure(args)
+
+	var failures []lint.Failure
+	if file.IsTest() {
+		return failures
+	}
 
 	fileAst := file.AST
+
 	walker := lintExported{
 		file:    file,
 		fileAst: fileAst,
@@ -118,7 +126,8 @@ func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
 		}
 		switch name {
 		case "Len", "Less", "Swap":
-			if w.file.Pkg.Sortable[recv] {
+			sortables := w.file.Pkg.Sortable()
+			if sortables[recv] {
 				return
 			}
 		}

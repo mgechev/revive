@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
+	"sync"
 
 	"github.com/mgechev/revive/lint"
 	"golang.org/x/tools/go/ast/astutil"
@@ -12,10 +13,11 @@ import (
 // CognitiveComplexityRule lints given else constructs.
 type CognitiveComplexityRule struct {
 	maxComplexity int
+	sync.Mutex
 }
 
-// Apply applies the rule to given file.
-func (r *CognitiveComplexityRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *CognitiveComplexityRule) configure(arguments lint.Arguments) {
+	r.Lock()
 	if r.maxComplexity == 0 {
 		checkNumberOfArguments(1, arguments, r.Name())
 
@@ -25,8 +27,15 @@ func (r *CognitiveComplexityRule) Apply(file *lint.File, arguments lint.Argument
 		}
 		r.maxComplexity = int(complexity)
 	}
+	r.Unlock()
+}
+
+// Apply applies the rule to given file.
+func (r *CognitiveComplexityRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	r.configure(arguments)
 
 	var failures []lint.Failure
+
 	linter := cognitiveComplexityLinter{
 		file:          file,
 		maxComplexity: r.maxComplexity,

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"reflect"
+	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -12,15 +13,22 @@ import (
 type FunctionLength struct {
 	maxStmt  int
 	maxLines int
+	sync.Mutex
 }
 
-// Apply applies the rule to given file.
-func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *FunctionLength) configure(arguments lint.Arguments) {
+	r.Lock()
 	if r.maxLines == 0 {
 		maxStmt, maxLines := r.parseArguments(arguments)
 		r.maxStmt = int(maxStmt)
 		r.maxLines = int(maxLines)
 	}
+	r.Unlock()
+}
+
+// Apply applies the rule to given file.
+func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	r.configure(arguments)
 
 	var failures []lint.Failure
 

@@ -81,7 +81,6 @@ func (l *Linter) lintPackage(filenames []string, ruleSet []Rule, config Config, 
 	pkg := &Package{
 		fset:  token.NewFileSet(),
 		files: map[string]*File{},
-		mu:    sync.Mutex{},
 	}
 	for _, filename := range filenames {
 		content, err := l.readFile(filename)

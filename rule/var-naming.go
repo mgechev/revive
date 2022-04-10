@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 	"strings"
+	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -14,12 +15,11 @@ type VarNamingRule struct {
 	configured bool
 	whitelist  []string
 	blacklist  []string
+	sync.Mutex
 }
 
-// Apply applies the rule to given file.
-func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var failures []lint.Failure
-
+func (r *VarNamingRule) configure(arguments lint.Arguments) {
+	r.Lock()
 	if !r.configured {
 		if len(arguments) >= 1 {
 			r.whitelist = getList(arguments[0], "whitelist")
@@ -30,8 +30,17 @@ func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.
 		}
 		r.configured = true
 	}
+	r.Unlock()
+}
+
+// Apply applies the rule to given file.
+func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	r.configure(arguments)
+
+	var failures []lint.Failure
 
 	fileAst := file.AST
+
 	walker := lintNames{
 		file:      file,
 		fileAst:   fileAst,
