@@ -21,7 +21,7 @@ type Package struct {
 	sortable map[string]bool
 	// main is whether this is a "main" package.
 	main int
-	sync.Mutex
+	sync.RWMutex
 }
 
 var newImporter = func(fset *token.FileSet) types.ImporterFrom {
@@ -54,21 +54,24 @@ func (p *Package) IsMain() bool {
 	return false
 }
 
+// TypesPkg yields information on this package
 func (p *Package) TypesPkg() *types.Package {
-	p.Lock()
-	defer p.Unlock()
+	p.RLock()
+	defer p.RUnlock()
 	return p.typesPkg
 }
 
+// TypesInfo yields type information of this package identifiers
 func (p *Package) TypesInfo() *types.Info {
-	p.Lock()
-	defer p.Unlock()
+	p.RLock()
+	defer p.RUnlock()
 	return p.typesInfo
 }
 
+// Sortable yields a map of sortable types in this package
 func (p *Package) Sortable() map[string]bool {
-	p.Lock()
-	defer p.Unlock()
+	p.RLock()
+	defer p.RUnlock()
 	return p.sortable
 }
 
