@@ -15,7 +15,7 @@ type FileHeaderRule struct {
 }
 
 var (
-	multiRegexp  = regexp.MustCompile("^/\\*")
+	multiRegexp  = regexp.MustCompile(`^/\*`)
 	singleRegexp = regexp.MustCompile("^//")
 )
 

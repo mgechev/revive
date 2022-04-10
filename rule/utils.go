@@ -13,8 +13,6 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-const styleGuideBase = "https://golang.org/wiki/CodeReviewComments"
-
 // isBlank returns whether id is the blank identifier "_".
 // If id == nil, the answer is false.
 func isBlank(id *ast.Ident) bool { return id != nil && id.Name == "_" }

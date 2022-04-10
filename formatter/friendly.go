@@ -68,7 +68,7 @@ func (f *Friendly) printHeaderRow(failure lint.Failure, severity lint.Severity) 
 	fmt.Print(f.table([][]string{{emoji, "https://revive.run/r#" + failure.RuleName, color.GreenString(failure.Failure)}}))
 }
 
-func (f *Friendly) printFilePosition(failure lint.Failure) {
+func (*Friendly) printFilePosition(failure lint.Failure) {
 	fmt.Printf("  %s:%d:%d", failure.GetFilename(), failure.Position.Start.Line, failure.Position.Start.Column)
 }
 

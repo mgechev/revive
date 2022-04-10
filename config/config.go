@@ -155,8 +155,8 @@ func normalizeConfig(config *lint.Config) {
 	}
 	if config.EnableAllRules {
 		// Add to the configuration all rules not yet present in it
-		for _, rule := range allRules {
-			ruleName := rule.Name()
+		for _, r := range allRules {
+			ruleName := r.Name()
 			_, alreadyInConf := config.Rules[ruleName]
 			if alreadyInConf {
 				continue

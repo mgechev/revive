@@ -50,7 +50,6 @@ func (l *lintPackageComments) Visit(_ ast.Node) ast.Visitor {
 		return nil
 	}
 
-	const ref = styleGuideBase + "#package-comments"
 	prefix := "Package " + l.fileAst.Name.Name + " "
 
 	// Look for a detached package comment.

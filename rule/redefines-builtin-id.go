@@ -159,7 +159,7 @@ func (w lintRedefinesBuiltinID) addFailure(node ast.Node, msg string) {
 	})
 }
 
-func (w lintRedefinesBuiltinID) isBuiltIn(id string) (r bool, builtInKind string) {
+func (lintRedefinesBuiltinID) isBuiltIn(id string) (r bool, builtInKind string) {
 	if builtFunctions[id] {
 		return true, "function"
 	}

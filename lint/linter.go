@@ -136,7 +136,7 @@ func addInvalidFileFailure(filename, errStr string, failures chan Failure) {
 // errPosRegexp matches with an NewFile error message
 // i.e. :  corrupted.go:10:4: expected '}', found 'EOF
 // first group matches the line and the second group, the column
-var errPosRegexp = regexp.MustCompile(".*:(\\d*):(\\d*):.*$")
+var errPosRegexp = regexp.MustCompile(`.*:(\d*):(\d*):.*$`)
 
 // getPositionInvalidFile gets the position of the error in an invalid file
 func getPositionInvalidFile(filename, s string) FailurePosition {

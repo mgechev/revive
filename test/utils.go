@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"go/ast"
 	"go/parser"
-	"go/printer"
 	"go/token"
 	"go/types"
 	"io/ioutil"
@@ -198,14 +197,6 @@ func extractReplacement(line string) (string, bool) {
 		return "", false
 	}
 	return line[a+len(start) : b], true
-}
-
-func render(fset *token.FileSet, x interface{}) string {
-	var buf bytes.Buffer
-	if err := printer.Fprint(&buf, fset, x); err != nil {
-		panic(err)
-	}
-	return buf.String()
 }
 
 func srcLine(src []byte, p token.Position) string {

@@ -61,9 +61,7 @@ func (StringFormatRule) ParseArgumentsTest(arguments lint.Arguments) *string {
 
 type lintStringFormatRule struct {
 	onFailure func(lint.Failure)
-
-	rules              []stringFormatSubrule
-	stringDeclarations map[string]string
+	rules     []stringFormatSubrule
 }
 
 type stringFormatSubrule struct {
@@ -262,18 +260,18 @@ func (r *stringFormatSubrule) Apply(call *ast.CallExpr) {
 	r.lintMessage(unquoted, lit)
 }
 
-func (rule stringFormatSubrule) lintMessage(s string, node ast.Node) {
+func (r *stringFormatSubrule) lintMessage(s string, node ast.Node) {
 	// Fail if the string doesn't match the user's regex
-	if rule.regexp.MatchString(s) {
+	if r.regexp.MatchString(s) {
 		return
 	}
 	var failure string
-	if len(rule.errorMessage) > 0 {
-		failure = rule.errorMessage
+	if len(r.errorMessage) > 0 {
+		failure = r.errorMessage
 	} else {
-		failure = fmt.Sprintf("string literal doesn't match user defined regex /%s/", rule.regexp.String())
+		failure = fmt.Sprintf("string literal doesn't match user defined regex /%s/", r.regexp.String())
 	}
-	rule.parent.onFailure(lint.Failure{
+	r.parent.onFailure(lint.Failure{
 		Confidence: 1,
 		Failure:    failure,
 		Node:       node,

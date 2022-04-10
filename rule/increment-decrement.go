@@ -35,7 +35,6 @@ func (*IncrementDecrementRule) Name() string {
 
 type lintIncrementDecrement struct {
 	file      *lint.File
-	fileAst   *ast.File
 	onFailure func(lint.Failure)
 }
 
