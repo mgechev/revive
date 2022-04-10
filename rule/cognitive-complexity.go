@@ -44,13 +44,13 @@ func (r *CognitiveComplexityRule) Apply(file *lint.File, arguments lint.Argument
 		},
 	}
 
-	linter.lint()
+	linter.lintCognitiveComplexity()
 
 	return failures
 }
 
 // Name returns the rule name.
-func (r *CognitiveComplexityRule) Name() string {
+func (*CognitiveComplexityRule) Name() string {
 	return "cognitive-complexity"
 }
 
@@ -60,7 +60,7 @@ type cognitiveComplexityLinter struct {
 	onFailure     func(lint.Failure)
 }
 
-func (w cognitiveComplexityLinter) lint() {
+func (w cognitiveComplexityLinter) lintCognitiveComplexity() {
 	f := w.file
 	for _, decl := range f.AST.Decls {
 		if fn, ok := decl.(*ast.FuncDecl); ok && fn.Body != nil {

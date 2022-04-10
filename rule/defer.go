@@ -38,11 +38,11 @@ func (r *DeferRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Fail
 }
 
 // Name returns the rule name.
-func (r *DeferRule) Name() string {
+func (*DeferRule) Name() string {
 	return "defer"
 }
 
-func (r *DeferRule) allowFromArgs(args lint.Arguments) map[string]bool {
+func (*DeferRule) allowFromArgs(args lint.Arguments) map[string]bool {
 	if len(args) < 1 {
 		allow := map[string]bool{
 			"loop":        true,

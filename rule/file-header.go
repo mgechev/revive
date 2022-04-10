@@ -15,7 +15,7 @@ type FileHeaderRule struct {
 }
 
 var (
-	multiRegexp  = regexp.MustCompile("^/\\*")
+	multiRegexp  = regexp.MustCompile(`^/\*`)
 	singleRegexp = regexp.MustCompile("^//")
 )
 
@@ -75,6 +75,6 @@ func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) []lint
 }
 
 // Name returns the rule name.
-func (r *FileHeaderRule) Name() string {
+func (*FileHeaderRule) Name() string {
 	return "file-header"
 }

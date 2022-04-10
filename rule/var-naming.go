@@ -67,7 +67,7 @@ func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.
 }
 
 // Name returns the rule name.
-func (r *VarNamingRule) Name() string {
+func (*VarNamingRule) Name() string {
 	return "var-naming"
 }
 
@@ -133,13 +133,11 @@ func check(id *ast.Ident, thing string, w *lintNames) {
 }
 
 type lintNames struct {
-	file                   *lint.File
-	fileAst                *ast.File
-	lastGen                *ast.GenDecl
-	genDeclMissingComments map[*ast.GenDecl]bool
-	onFailure              func(lint.Failure)
-	whitelist              []string
-	blacklist              []string
+	file      *lint.File
+	fileAst   *ast.File
+	onFailure func(lint.Failure)
+	whitelist []string
+	blacklist []string
 }
 
 func (w *lintNames) Visit(n ast.Node) ast.Visitor {

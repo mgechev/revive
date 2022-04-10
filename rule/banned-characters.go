@@ -45,7 +45,7 @@ func (r *BannedCharsRule) Apply(file *lint.File, arguments lint.Arguments) []lin
 }
 
 // Name returns the rule name
-func (r *BannedCharsRule) Name() string {
+func (*BannedCharsRule) Name() string {
 	return bannedCharsRuleName
 }
 

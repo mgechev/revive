@@ -17,7 +17,7 @@ import (
 type PackageCommentsRule struct{}
 
 // Apply applies the rule to given file.
-func (r *PackageCommentsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*PackageCommentsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	if file.IsTest() {
@@ -35,7 +35,7 @@ func (r *PackageCommentsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 }
 
 // Name returns the rule name.
-func (r *PackageCommentsRule) Name() string {
+func (*PackageCommentsRule) Name() string {
 	return "package-comments"
 }
 
@@ -50,7 +50,6 @@ func (l *lintPackageComments) Visit(_ ast.Node) ast.Visitor {
 		return nil
 	}
 
-	const ref = styleGuideBase + "#package-comments"
 	prefix := "Package " + l.fileAst.Name.Name + " "
 
 	// Look for a detached package comment.

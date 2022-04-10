@@ -53,7 +53,7 @@ func (r *LineLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) [
 }
 
 // Name returns the rule name.
-func (r *LineLengthLimitRule) Name() string {
+func (*LineLengthLimitRule) Name() string {
 	return "line-length-limit"
 }
 
