@@ -77,7 +77,7 @@ type statEntry struct {
 	failures int
 }
 
-func (Friendly) printSummary(errors, warnings int) {
+func (*Friendly) printSummary(errors, warnings int) {
 	emoji := getWarningEmoji()
 	if errors > 0 {
 		emoji = getErrorEmoji()
@@ -126,7 +126,7 @@ func (f *Friendly) printStatistics(header string, stats map[string]int) {
 	fmt.Println(f.table(formatted))
 }
 
-func (Friendly) table(rows [][]string) string {
+func (*Friendly) table(rows [][]string) string {
 	buf := new(bytes.Buffer)
 	table := tablewriter.NewWriter(buf)
 	table.SetBorder(false)
