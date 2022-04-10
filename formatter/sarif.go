@@ -23,7 +23,7 @@ func (*Sarif) Name() string {
 const reviveSite = "https://revive.run"
 
 // Format formats the failures gotten from the lint.
-func (Sarif) Format(failures <-chan lint.Failure, cfg lint.Config) (string, error) {
+func (*Sarif) Format(failures <-chan lint.Failure, cfg lint.Config) (string, error) {
 	sarifLog := newReviveRunLog(cfg)
 
 	for failure := range failures {

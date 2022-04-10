@@ -10,7 +10,7 @@ import (
 type IdenticalBranchesRule struct{}
 
 // Apply applies the rule to given file.
-func (IdenticalBranchesRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*IdenticalBranchesRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {

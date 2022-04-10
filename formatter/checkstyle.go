@@ -29,7 +29,7 @@ type issue struct {
 }
 
 // Format formats the failures gotten from the lint.
-func (Checkstyle) Format(failures <-chan lint.Failure, config lint.Config) (string, error) {
+func (*Checkstyle) Format(failures <-chan lint.Failure, config lint.Config) (string, error) {
 	issues := map[string][]issue{}
 	for failure := range failures {
 		buf := new(bytes.Buffer)

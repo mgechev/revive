@@ -62,7 +62,7 @@ func (r *BlankImportsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failu
 	return failures
 }
 
-func (BlankImportsRule) fileHasValidEmbedComment(fileAst *ast.File) bool {
+func (*BlankImportsRule) fileHasValidEmbedComment(fileAst *ast.File) bool {
 	for _, commentGroup := range fileAst.Comments {
 		for _, comment := range commentGroup.List {
 			if strings.HasPrefix(comment.Text, "//go:embed ") {

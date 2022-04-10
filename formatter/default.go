@@ -18,7 +18,7 @@ func (*Default) Name() string {
 }
 
 // Format formats the failures gotten from the lint.
-func (Default) Format(failures <-chan lint.Failure, _ lint.Config) (string, error) {
+func (*Default) Format(failures <-chan lint.Failure, _ lint.Config) (string, error) {
 	for failure := range failures {
 		fmt.Printf("%v: %s\n", failure.Position.Start, failure.Failure)
 	}

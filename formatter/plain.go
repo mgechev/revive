@@ -18,7 +18,7 @@ func (*Plain) Name() string {
 }
 
 // Format formats the failures gotten from the lint.
-func (Plain) Format(failures <-chan lint.Failure, _ lint.Config) (string, error) {
+func (*Plain) Format(failures <-chan lint.Failure, _ lint.Config) (string, error) {
 	for failure := range failures {
 		fmt.Printf("%v: %s %s\n", failure.Position.Start, failure.Failure, "https://revive.run/r#"+failure.RuleName)
 	}

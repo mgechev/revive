@@ -12,7 +12,7 @@ import (
 type ContextKeysType struct{}
 
 // Apply applies the rule to given file.
-func (ContextKeysType) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*ContextKeysType) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST
