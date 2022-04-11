@@ -92,7 +92,7 @@ func TestGetLintingRules(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Unexpected error while loading conf: %v", err)
 			}
-			rules, err := GetLintingRules(cfg)
+			rules, err := GetLintingRules(cfg, []lint.Rule{})
 			switch {
 			case err != nil:
 				t.Fatalf("Unexpected error\n\t%v", err)
@@ -130,7 +130,7 @@ func TestGetGlobalSeverity(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Unexpected error while loading conf: %v", err)
 			}
-			rules, err := GetLintingRules(cfg)
+			rules, err := GetLintingRules(cfg, []lint.Rule{})
 			if err != nil {
 				t.Fatalf("Unexpected error while loading conf: %v", err)
 			}

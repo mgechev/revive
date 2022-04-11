@@ -30,3 +30,8 @@ func fred() interface{} {
 
 	return s
 }
+
+// issue 664
+type Bad struct {
+	Field []struct{} // MATCH /no nested structs are allowed/
+}

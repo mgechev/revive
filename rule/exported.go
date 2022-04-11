@@ -23,7 +23,7 @@ type ExportedRule struct {
 func (r *ExportedRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
-	if isTest(file) {
+	if file.IsTest() {
 		return failures
 	}
 

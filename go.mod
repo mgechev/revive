@@ -3,15 +3,15 @@ module github.com/deepsourcelabs/revive
 go 1.17
 
 require (
-	github.com/BurntSushi/toml v1.0.0
-	github.com/chavacava/garif v0.0.0-20210405164556-e8a0a408d6af
+	github.com/BurntSushi/toml v1.1.0
+	github.com/chavacava/garif v0.0.0-20220316182200-5cad0b5181d4
 	github.com/fatih/color v1.13.0
 	github.com/fatih/structtag v1.2.0
 	github.com/mgechev/dots v0.0.0-20210922191527-e955255bf517
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pkg/errors v0.9.1
-	golang.org/x/tools v0.1.9
+	golang.org/x/tools v0.1.10
 )
 
 require (

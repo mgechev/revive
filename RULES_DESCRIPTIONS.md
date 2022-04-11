@@ -70,6 +70,7 @@ List of all available rules.
   - [unreachable-code](#unreachable-code)
   - [unused-parameter](#unused-parameter)
   - [unused-receiver](#unused-receiver)
+  - [use-any](#use-any)
   - [useless-break](#useless-break)
   - [waitgroup-by-value](#waitgroup-by-value)
 
@@ -667,6 +668,12 @@ _Configuration_: N/A
 ## unused-receiver
 
 _Description_: This rule warns on unused method receivers. Methods with unused receivers can be a symptom of an unfinished refactoring or a bug.
+
+_Configuration_: N/A
+
+## use-any
+
+_Description_: Since GO 1.18, `interface{}` has an alias: `any`. This rule proposes to replace instances of `interface{}` with `any`.
 
 _Configuration_: N/A
 
