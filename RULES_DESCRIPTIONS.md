@@ -19,6 +19,7 @@ List of all available rules.
   - [context-as-argument](#context-as-argument)
   - [context-keys-type](#context-keys-type)
   - [cyclomatic](#cyclomatic)
+  - [datarace](#datarace)
   - [deep-exit](#deep-exit)
   - [defer](#defer)
   - [dot-imports](#dot-imports)
@@ -217,6 +218,11 @@ Example:
 [rule.cyclomatic]
   arguments =[3]
 ```
+## datarace
+
+_Description_: This rule spots potential dataraces caused by go-routines capturing (by-reference) particular identifiers of the function from which go-routines are created. The rule is able to spot two of such cases: go-routines capturing named return values, and capturing `for-range` values.
+
+_Configuration_: N/A
 
 ## deep-exit
 

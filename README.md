@@ -482,6 +482,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`banned-characters`](./RULES_DESCRIPTIONS.md#banned-characters)          |  n/a   |  Checks banned characters in identifiers |    no    |  no   |
 | [`optimize-operands-order`](./RULES_DESCRIPTIONS.md#optimize-operands-order)          |  n/a   |  Checks inefficient conditional expressions |    no    |  no   |
 | [`use-any`](./RULES_DESCRIPTIONS.md#use-any)          |  n/a   |  Proposes to replace `interface{}` with its alias `any` |    no    |  no   |
+| [`datarace`](./RULES_DESCRIPTIONS.md#datarace)          |  n/a   |  Spots potential dataraces |    no    |  no   |
 
 ## Configurable rules
 
