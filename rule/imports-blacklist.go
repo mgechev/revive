@@ -18,6 +18,8 @@ var replaceRegexp = regexp.MustCompile(`/?\*\*/?`)
 
 func (r *ImportsBlacklistRule) configure(arguments lint.Arguments) {
 	r.Lock()
+	defer r.Unlock()
+
 	if r.blacklist == nil {
 		r.blacklist = make([]*regexp.Regexp, 0)
 
@@ -28,15 +30,14 @@ func (r *ImportsBlacklistRule) configure(arguments lint.Arguments) {
 			}
 			regStr, err := regexp.Compile(fmt.Sprintf(`(?m)"%s"$`, replaceRegexp.ReplaceAllString(argStr, `(\W|\w)*`)))
 			if err != nil {
-				panic(fmt.Sprintf("Invalid argument to the imports-blacklist rule. Expecting a regular expression is parsable %T", argStr))
+				panic(fmt.Sprintf("Invalid argument to the imports-blacklist rule. Expecting %q to be a valid regular expression, got: %v", argStr, err))
 			}
 			r.blacklist = append(r.blacklist, regStr)
 		}
 	}
-	r.Unlock()
 }
 
-func (r *ImportsBlacklistRule) matchBlacklist(path string) bool {
+func (r *ImportsBlacklistRule) isBlacklisted(path string) bool {
 	for _, regex := range r.blacklist {
 		if regex.MatchString(path) {
 			return true
@@ -57,7 +58,7 @@ func (r *ImportsBlacklistRule) Apply(file *lint.File, arguments lint.Arguments) 
 
 	for _, is := range file.AST.Imports {
 		path := is.Path
-		if path != nil && r.matchBlacklist(path.Value) {
+		if path != nil && r.isBlacklisted(path.Value) {
 			failures = append(failures, lint.Failure{
 				Confidence: 1,
 				Failure:    "should not use the following blacklisted import: " + path.Value,
