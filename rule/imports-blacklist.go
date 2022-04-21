@@ -2,6 +2,7 @@ package rule
 
 import (
 	"fmt"
+	"regexp"
 	"sync"
 
 	"github.com/mgechev/revive/lint"
@@ -9,28 +10,39 @@ import (
 
 // ImportsBlacklistRule lints given else constructs.
 type ImportsBlacklistRule struct {
-	blacklist map[string]bool
+	blacklist []*regexp.Regexp
 	sync.Mutex
 }
+
+var replaceRegexp = regexp.MustCompile(`/?\*\*/?`)
 
 func (r *ImportsBlacklistRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	if r.blacklist == nil {
-		r.blacklist = make(map[string]bool, len(arguments))
+		r.blacklist = make([]*regexp.Regexp, 0)
 
 		for _, arg := range arguments {
 			argStr, ok := arg.(string)
 			if !ok {
 				panic(fmt.Sprintf("Invalid argument to the imports-blacklist rule. Expecting a string, got %T", arg))
 			}
-			// we add quotes if not present, because when parsed, the value of the AST node, will be quoted
-			if len(argStr) > 2 && argStr[0] != '"' && argStr[len(argStr)-1] != '"' {
-				argStr = fmt.Sprintf(`%q`, argStr)
+			regStr, err := regexp.Compile(fmt.Sprintf(`(?m)"%s"$`, replaceRegexp.ReplaceAllString(argStr, `(\W|\w)*`)))
+			if err != nil {
+				panic(fmt.Sprintf("Invalid argument to the imports-blacklist rule. Expecting a regular expression is parsable %T", argStr))
 			}
-			r.blacklist[argStr] = true
+			r.blacklist = append(r.blacklist, regStr)
 		}
 	}
 	r.Unlock()
+}
+
+func (r *ImportsBlacklistRule) matchBlacklist(path string) bool {
+	for _, regex := range r.blacklist {
+		if regex.MatchString(path) {
+			return true
+		}
+	}
+	return false
 }
 
 // Apply applies the rule to given file.
@@ -45,7 +57,7 @@ func (r *ImportsBlacklistRule) Apply(file *lint.File, arguments lint.Arguments) 
 
 	for _, is := range file.AST.Imports {
 		path := is.Path
-		if path != nil && r.blacklist[path.Value] {
+		if path != nil && r.matchBlacklist(path.Value) {
 			failures = append(failures, lint.Failure{
 				Confidence: 1,
 				Failure:    "should not use the following blacklisted import: " + path.Value,
