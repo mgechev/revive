@@ -56,7 +56,7 @@ func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.
 		walker.onFailure(lint.Failure{
 			Failure:    "don't use an underscore in package name",
 			Confidence: 1,
-			Node:       walker.fileAst,
+			Node:       walker.fileAst.Name,
 			Category:   "naming",
 		})
 	}
