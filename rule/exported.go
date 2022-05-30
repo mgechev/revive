@@ -9,6 +9,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/mgechev/revive/internal/typeparams"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -116,7 +117,7 @@ func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
 	if fn.Recv != nil && len(fn.Recv.List) > 0 {
 		// method
 		kind = "method"
-		recv := receiverType(fn)
+		recv := typeparams.ReceiverType(fn)
 		if !w.checkPrivateReceivers && !ast.IsExported(recv) {
 			// receiver is unexported
 			return

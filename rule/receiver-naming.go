@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 
+	"github.com/mgechev/revive/internal/typeparams"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -65,7 +66,7 @@ func (w lintReceiverName) Visit(n ast.Node) ast.Visitor {
 		})
 		return w
 	}
-	recv := receiverType(fn)
+	recv := typeparams.ReceiverType(fn)
 	if prev, ok := w.typeReceiver[recv]; ok && prev != name {
 		w.onFailure(lint.Failure{
 			Node:       n,
