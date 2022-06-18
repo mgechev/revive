@@ -7,6 +7,8 @@ import (
 	"sync"
 
 	"golang.org/x/tools/go/gcexportdata"
+
+	"github.com/mgechev/revive/internal/typeparams"
 )
 
 // Package represents a package in the project.
@@ -146,7 +148,7 @@ func (w *walker) Visit(n ast.Node) ast.Visitor {
 		return w
 	}
 	// TODO(dsymonds): We could check the signature to be more precise.
-	recv := receiverType(fn)
+	recv := typeparams.ReceiverType(fn)
 	if i, ok := w.nmap[fn.Name.Name]; ok {
 		w.has[recv] |= i
 	}
@@ -172,21 +174,6 @@ func (p *Package) scanSortable() {
 			p.sortable[typ] = true
 		}
 	}
-}
-
-// receiverType returns the named type of the method receiver, sans "*",
-// or "invalid-type" if fn.Recv is ill formed.
-func receiverType(fn *ast.FuncDecl) string {
-	switch e := fn.Recv.List[0].Type.(type) {
-	case *ast.Ident:
-		return e.Name
-	case *ast.StarExpr:
-		if id, ok := e.X.(*ast.Ident); ok {
-			return id.Name
-		}
-	}
-	// The parser accepts much more than just the legal forms.
-	return "invalid-type"
 }
 
 func (p *Package) lint(rules []Rule, config Config, failures chan Failure) {

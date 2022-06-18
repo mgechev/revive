@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/types"
 
+	"github.com/mgechev/revive/internal/typeparams"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -55,7 +56,7 @@ func (w lintUnexportedReturn) Visit(n ast.Node) ast.Visitor {
 	thing := "func"
 	if fn.Recv != nil && len(fn.Recv.List) > 0 {
 		thing = "method"
-		if !ast.IsExported(receiverType(fn)) {
+		if !ast.IsExported(typeparams.ReceiverType(fn)) {
 			// Don't report exported methods of unexported types,
 			// such as private implementations of sort.Interface.
 			return nil

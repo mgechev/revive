@@ -26,19 +26,6 @@ var commonMethods = map[string]bool{
 	"Unwrap":    true,
 }
 
-func receiverType(fn *ast.FuncDecl) string {
-	switch e := fn.Recv.List[0].Type.(type) {
-	case *ast.Ident:
-		return e.Name
-	case *ast.StarExpr:
-		if id, ok := e.X.(*ast.Ident); ok {
-			return id.Name
-		}
-	}
-	// The parser accepts much more than just the legal forms.
-	return "invalid-type"
-}
-
 var knownNameExceptions = map[string]bool{
 	"LastInsertId": true, // must match database/sql
 	"kWh":          true,
