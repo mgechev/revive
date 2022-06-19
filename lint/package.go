@@ -36,6 +36,11 @@ var (
 	notSet     = 3
 )
 
+// Files return package's files.
+func (p *Package) Files() map[string]*File {
+	return p.files
+}
+
 // IsMain returns if that's the main package.
 func (p *Package) IsMain() bool {
 	p.Lock()
