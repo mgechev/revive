@@ -11,7 +11,9 @@ import (
 var unexp = errors.New("some unexported error") // MATCH /error var unexp should have name of the form errFoo/
 
 // Exp ...
-var Exp = errors.New("some exported error") // MATCH /error var Exp should have name of the form ErrFoo/
+var Exp = errors.New("some exported error")
+
+// MATCH:14 /error var Exp should have name of the form ErrFoo/
 
 var (
 	e1 = fmt.Errorf("blah %d", 4) // MATCH /error var e1 should have name of the form errFoo/

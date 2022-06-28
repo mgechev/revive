@@ -251,7 +251,7 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 		return
 	}
 
-	if vs.Doc == nil && gd.Doc == nil {
+	if vs.Doc == nil && vs.Comment == nil && gd.Doc == nil {
 		if genDeclMissingComments[gd] {
 			return
 		}
@@ -274,10 +274,16 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 	}
 	// The relevant text to check will be on either vs.Doc or gd.Doc.
 	// Use vs.Doc preferentially.
-	doc := vs.Doc
-	if doc == nil {
+	var doc *ast.CommentGroup
+	switch {
+	case vs.Doc != nil:
+		doc = vs.Doc
+	case vs.Comment != nil && gd.Doc == nil:
+		doc = vs.Comment
+	default:
 		doc = gd.Doc
 	}
+
 	prefix := name + " "
 	s := normalizeText(doc.Text())
 	if !strings.HasPrefix(s, prefix) {

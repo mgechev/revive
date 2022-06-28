@@ -24,15 +24,22 @@ type V string
 
 func (*V) H() {} // MATCH /exported method V.H should have comment or be unexported/
 
-var W = "foo" // MATCH /exported var W should have comment or be unexported/
+var W = "foo"
 
-const X = "bar" // MATCH /exported const X should have comment or be unexported/
+// MATCH:27 /exported var W should have comment or be unexported/
 
-var Y, Z int // MATCH /exported var Z should have its own declaration/
+const X = "bar"
+
+// MATCH:31 /exported const X should have comment or be unexported/
+
+var Y, Z int
+
+// MATCH:35 /exported var Z should have its own declaration/
 
 // Location should be okay, since the other var name is an underscore.
 var Location, _ = time.LoadLocation("Europe/Istanbul") // not Constantinople
 
 // this is improperly documented
-// MATCH /comment on exported const Thing should be of the form "Thing ..."/
 const Thing = "wonderful"
+
+// MATCH:42 /comment on exported const Thing should be of the form "Thing ..."/
