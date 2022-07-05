@@ -350,6 +350,8 @@ enableAllRules = true
     Arguments = [7]
 [rule.function-result-limit]
     Arguments = [3]
+[rule.error-strings]
+    Arguments = ["mypackage.Error"]
 ```
 
 ### Default Configuration
@@ -410,7 +412,6 @@ warningCode = 0
 ## Available Rules
 
 List of all available rules. The rules ported from `golint` are left unchanged and indicated in the `golint` column.
-
 | Name                  | Config | Description                                                      | `golint` | Typed |
 | --------------------- | :----: | :--------------------------------------------------------------- | :------: | :---: |
 | [`context-keys-type`](./RULES_DESCRIPTIONS.md#context-key-types)   |  n/a   | Disallows the usage of basic types in `context.WithValue`.       |   yes    |  yes  |
@@ -423,7 +424,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`context-as-argument`](./RULES_DESCRIPTIONS.md#context-as-argument) |  n/a   | `context.Context` should be the first argument of a function.    |   yes    |  no   |
 | [`dot-imports`](./RULES_DESCRIPTIONS.md#dot-imports)         |  n/a   | Forbids `.` imports.                                             |   yes    |  no   |
 | [`error-return`](./RULES_DESCRIPTIONS.md#error-return)        |  n/a   | The error return parameter should be last.                       |   yes    |  no   |
-| [`error-strings`](./RULES_DESCRIPTIONS.md#error-strings)       |  n/a   | Conventions around error strings.                                |   yes    |  no   |
+| [`error-strings`](./RULES_DESCRIPTIONS.md#error-strings)       |  []string   | Conventions around error strings.                                |   yes    |  no   |
 | [`error-naming`](./RULES_DESCRIPTIONS.md#error-naming)        |  n/a   | Naming of error variables.                                       |   yes    |  no   |
 | [`exported`](./RULES_DESCRIPTIONS.md#exported)            |  []string   | Naming and commenting conventions on exported symbols.           |   yes    |  no   |
 | [`if-return`](./RULES_DESCRIPTIONS.md#if-return)           |  n/a   | Redundant if when returning an error.                            |   no    |  no   |
