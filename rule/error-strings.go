@@ -5,6 +5,7 @@ import (
 	"go/token"
 	"strconv"
 	"strings"
+	"sync"
 	"unicode"
 	"unicode/utf8"
 
@@ -12,10 +13,20 @@ import (
 )
 
 // ErrorStringsRule lints given else constructs.
-type ErrorStringsRule struct{}
+type ErrorStringsRule struct {
+	errorFunctions map[string]map[string]struct{}
+	sync.Mutex
+}
 
-func (r *ErrorStringsRule) configure(arguments lint.Arguments) map[string]map[string]struct{} {
-	errorFunctions := map[string]map[string]struct{}{
+func (r *ErrorStringsRule) configure(arguments lint.Arguments) {
+	r.Lock()
+	defer r.Unlock()
+
+	if r.errorFunctions != nil {
+		return
+	}
+
+	r.errorFunctions = map[string]map[string]struct{}{
 		"fmt": {
 			"Errorf": {},
 		},
@@ -37,26 +48,25 @@ func (r *ErrorStringsRule) configure(arguments lint.Arguments) map[string]map[st
 				invalidCustomFunctions = append(invalidCustomFunctions, functionName)
 				continue
 			}
-			errorFunctions[fields[0]] = map[string]struct{}{fields[1]: {}}
+			r.errorFunctions[fields[0]] = map[string]struct{}{fields[1]: {}}
 		}
 	}
 	if len(invalidCustomFunctions) != 0 {
 		panic("found invalid custom function: " + strings.Join(invalidCustomFunctions, ","))
 	}
-	return errorFunctions
 }
 
 // Apply applies the rule to given file.
 func (r *ErrorStringsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
-	errorFunctions := r.configure(arguments)
+	r.configure(arguments)
 
 	fileAst := file.AST
 	walker := lintErrorStrings{
 		file:           file,
 		fileAst:        fileAst,
-		errorFunctions: errorFunctions,
+		errorFunctions: r.errorFunctions,
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
