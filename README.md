@@ -53,6 +53,7 @@ Here's how `revive` is different from `golint`:
 - [`Beaver`](https://github.com/Clivern/Beaver) - A Real Time Messaging Server.
 - [`ggz`](https://github.com/go-ggz/ggz) - An URL shortener service written in Golang
 - [`Codeac.io`](https://www.codeac.io?ref=revive) - Automated code review service integrates with GitHub, Bitbucket and GitLab (even self-hosted) and helps you fight technical debt.
+- [`DevLake`](https://github.com/apache/incubator-devlake) - Apache DevLake is an open-source dev data platform to ingest, analyze, and visualize the fragmented data from DevOps tools，which can distill insights to improve engineering productivity.
 
 *Open a PR to add your project*.
 
