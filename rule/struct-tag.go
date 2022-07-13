@@ -73,16 +73,31 @@ func (w lintStructTagRule) checkTagNameIfNeed(tag *structtag.Tag) (string, bool)
 		return "", true
 	}
 
+	tagName := w.getTagName(tag)
 	// We concat the key and name as the mapping key here
 	// to allow the same tag name in different tag type.
-	key := tag.Key + ":" + tag.Name
+	key := tag.Key + ":" + tagName
 	if _, ok := w.usedTagName[key]; ok {
-		return fmt.Sprintf("duplicate tag name: '%s'", tag.Name), false
+		return fmt.Sprintf("duplicate tag name: '%s'", tagName), false
 	}
 
 	w.usedTagName[key] = true
 
 	return "", true
+}
+
+func (lintStructTagRule) getTagName(tag *structtag.Tag) string {
+	switch tag.Key {
+	case "protobuf":
+		for _, option := range tag.Options {
+			if strings.HasPrefix(option, "name=") {
+				return strings.TrimLeft(option, "name=")
+			}
+		}
+		return "protobuf tag lacks name"
+	default:
+		return tag.Name
+	}
 }
 
 // checkTaggedField checks the tag of the given field.

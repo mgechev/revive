@@ -79,9 +79,9 @@ type TestDuplicatedYAMLTags struct {
 }
 
 type TestDuplicatedProtobufTags struct {
-	A int `protobuf:"b"`
-	B int `protobuf:"c"`
-	C int `protobuf:"c"` // MATCH /duplicate tag name: 'c'/
+	A int `protobuf:"varint,name=b"`
+	B int `protobuf:"varint,name=c"`
+	C int `protobuf:"varint,name=c"` // MATCH /duplicate tag name: 'c'/
 }
 
 // test case from
