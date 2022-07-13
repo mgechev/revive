@@ -58,17 +58,27 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 }
 
 func (w lintStructTagRule) checkTagNameIfNeed(tag *structtag.Tag) (string, bool) {
-	if tag.Key != "bson" && tag.Key != "json" && tag.Key != "xml" &&
-		tag.Key != "yaml" && tag.Key != "protobuf" {
+	isUnnamedTag := tag.Name == "" || tag.Name == "-"
+	if isUnnamedTag {
 		return "", true
 	}
-	if tag.Name == "" || tag.Name == "-" {
+
+	needsToCheckTagName := tag.Key == "bson" ||
+		tag.Key == "json" ||
+		tag.Key == "xml" ||
+		tag.Key == "yaml" ||
+		tag.Key == "protobuf"
+
+	if !needsToCheckTagName {
 		return "", true
 	}
+
 	if _, ok := w.usedTagName[tag.Name]; ok {
 		return fmt.Sprintf("duplicate tag name: '%s'", tag.Name), false
 	}
+
 	w.usedTagName[tag.Name] = true
+
 	return "", true
 }
 
@@ -88,8 +98,8 @@ func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
 	for _, tag := range tags.Tags() {
 		if msg, ok := w.checkTagNameIfNeed(tag); !ok {
 			w.addFailure(f.Tag, msg)
-			continue
 		}
+
 		switch key := tag.Key; key {
 		case "asn1":
 			msg, ok := w.checkASN1Tag(f.Type, tag)
