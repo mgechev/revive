@@ -34,8 +34,9 @@ func (*StructTagRule) Name() string {
 }
 
 type lintStructTagRule struct {
-	onFailure  func(lint.Failure)
-	usedTagNbr map[string]bool // list of used tag numbers
+	onFailure   func(lint.Failure)
+	usedTagNbr  map[string]bool // list of used tag numbers
+	usedTagName map[string]bool // list of used tag keys
 }
 
 func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
@@ -44,7 +45,8 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 		if n.Fields == nil || n.Fields.NumFields() < 1 {
 			return nil // skip empty structs
 		}
-		w.usedTagNbr = map[string]bool{} // init
+		w.usedTagNbr = map[string]bool{}  // init
+		w.usedTagName = map[string]bool{} // init
 		for _, f := range n.Fields.List {
 			if f.Tag != nil {
 				w.checkTaggedField(f)
@@ -53,6 +55,21 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 	}
 
 	return w
+}
+
+func (w lintStructTagRule) checkTagNameIfNeed(tag *structtag.Tag) (string, bool) {
+	if tag.Key != "bson" && tag.Key != "json" && tag.Key != "xml" &&
+		tag.Key != "yaml" && tag.Key != "protobuf" {
+		return "", true
+	}
+	if tag.Name == "" || tag.Name == "-" {
+		return "", true
+	}
+	if _, ok := w.usedTagName[tag.Name]; ok {
+		return fmt.Sprintf("duplicate tag name: '%s'", tag.Name), false
+	}
+	w.usedTagName[tag.Name] = true
+	return "", true
 }
 
 // checkTaggedField checks the tag of the given field.
@@ -69,6 +86,10 @@ func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
 	}
 
 	for _, tag := range tags.Tags() {
+		if msg, ok := w.checkTagNameIfNeed(tag); !ok {
+			w.addFailure(f.Tag, msg)
+			continue
+		}
 		switch key := tag.Key; key {
 		case "asn1":
 			msg, ok := w.checkASN1Tag(f.Type, tag)

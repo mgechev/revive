@@ -7,22 +7,23 @@ type decodeAndValidateRequest struct {
 	URLParam         string          `json:"-" path:"url_param" validate:"numeric"`
 	Text             string          `json:"text" validate:"max=10"`
 	DefaultInt       int             `json:"defaultInt" default:"10.0"` // MATCH /field's type and default value's type mismatch/
-	DefaultInt2      int             `json:"defaultInt" default:"10"`
+	DefaultInt2      int             `json:"defaultInt2" default:"10"`
+	DefaultInt3      int             `json:"defaultInt2" default:"11"` // MATCH /duplicate tag name: 'defaultInt2'/
 	DefaultString    string          `json:"defaultString" default:"foo"`
 	DefaultBool      bool            `json:"defaultBool" default:"trues"` // MATCH /field's type and default value's type mismatch/
-	DefaultBool2     bool            `json:"defaultBool" default:"true"`
-	DefaultBool3     bool            `json:"defaultBool" default:"false"`
+	DefaultBool2     bool            `json:"defaultBool2" default:"true"`
+	DefaultBool3     bool            `json:"defaultBool3" default:"false"`
 	DefaultFloat     float64         `json:"defaultFloat" default:"f10.0"` // MATCH /field's type and default value's type mismatch/
-	DefaultFloat2    float64         `json:"defaultFloat" default:"10.0"`
+	DefaultFloat2    float64         `json:"defaultFloat2" default:"10.0"`
 	MandatoryStruct  mandatoryStruct `json:"mandatoryStruct" required:"trues"` // MATCH /required should be 'true' or 'false'/
-	MandatoryStruct2 mandatoryStruct `json:"mandatoryStruct" required:"true"`
-	MandatoryStruct4 mandatoryStruct `json:"mandatoryStruct" required:"false"`
+	MandatoryStruct2 mandatoryStruct `json:"mandatoryStruct2" required:"true"`
+	MandatoryStruct4 mandatoryStruct `json:"mandatoryStruct4" required:"false"`
 	OptionalStruct   *optionalStruct `json:"optionalStruct,omitempty"`
 	OptionalQuery    string          `json:"-" querystring:"queryfoo"`
 	optionalQuery    string          `json:"-" querystring:"queryfoo"` // MATCH /tag on not-exported field optionalQuery/
 	// No-reg test for bug https://github.com/mgechev/revive/issues/208
-	Tiret			 string          `json:"-,"`
-	BadTiret         string          `json:"other,"` // MATCH /option can not be empty in JSON tag/
+	Tiret    string `json:"-,"`
+	BadTiret string `json:"other,"` // MATCH /option can not be empty in JSON tag/
 }
 
 type RangeAllocation struct {
