@@ -73,11 +73,14 @@ func (w lintStructTagRule) checkTagNameIfNeed(tag *structtag.Tag) (string, bool)
 		return "", true
 	}
 
-	if _, ok := w.usedTagName[tag.Name]; ok {
+	// We concat the key and name as the mapping key here
+	// to allow the same tag name in different tag type.
+	key := tag.Key + ":" + tag.Name
+	if _, ok := w.usedTagName[key]; ok {
 		return fmt.Sprintf("duplicate tag name: '%s'", tag.Name), false
 	}
 
-	w.usedTagName[tag.Name] = true
+	w.usedTagName[key] = true
 
 	return "", true
 }
