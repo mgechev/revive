@@ -34,8 +34,9 @@ func (*StructTagRule) Name() string {
 }
 
 type lintStructTagRule struct {
-	onFailure  func(lint.Failure)
-	usedTagNbr map[string]bool // list of used tag numbers
+	onFailure   func(lint.Failure)
+	usedTagNbr  map[string]bool // list of used tag numbers
+	usedTagName map[string]bool // list of used tag keys
 }
 
 func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
@@ -44,7 +45,8 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 		if n.Fields == nil || n.Fields.NumFields() < 1 {
 			return nil // skip empty structs
 		}
-		w.usedTagNbr = map[string]bool{} // init
+		w.usedTagNbr = map[string]bool{}  // init
+		w.usedTagName = map[string]bool{} // init
 		for _, f := range n.Fields.List {
 			if f.Tag != nil {
 				w.checkTaggedField(f)
@@ -53,6 +55,49 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 	}
 
 	return w
+}
+
+func (w lintStructTagRule) checkTagNameIfNeed(tag *structtag.Tag) (string, bool) {
+	isUnnamedTag := tag.Name == "" || tag.Name == "-"
+	if isUnnamedTag {
+		return "", true
+	}
+
+	needsToCheckTagName := tag.Key == "bson" ||
+		tag.Key == "json" ||
+		tag.Key == "xml" ||
+		tag.Key == "yaml" ||
+		tag.Key == "protobuf"
+
+	if !needsToCheckTagName {
+		return "", true
+	}
+
+	tagName := w.getTagName(tag)
+	// We concat the key and name as the mapping key here
+	// to allow the same tag name in different tag type.
+	key := tag.Key + ":" + tagName
+	if _, ok := w.usedTagName[key]; ok {
+		return fmt.Sprintf("duplicate tag name: '%s'", tagName), false
+	}
+
+	w.usedTagName[key] = true
+
+	return "", true
+}
+
+func (lintStructTagRule) getTagName(tag *structtag.Tag) string {
+	switch tag.Key {
+	case "protobuf":
+		for _, option := range tag.Options {
+			if strings.HasPrefix(option, "name=") {
+				return strings.TrimLeft(option, "name=")
+			}
+		}
+		return "protobuf tag lacks name"
+	default:
+		return tag.Name
+	}
 }
 
 // checkTaggedField checks the tag of the given field.
@@ -69,6 +114,10 @@ func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
 	}
 
 	for _, tag := range tags.Tags() {
+		if msg, ok := w.checkTagNameIfNeed(tag); !ok {
+			w.addFailure(f.Tag, msg)
+		}
+
 		switch key := tag.Key; key {
 		case "asn1":
 			msg, ok := w.checkASN1Tag(f.Type, tag)
