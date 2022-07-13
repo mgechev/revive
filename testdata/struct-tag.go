@@ -4,11 +4,12 @@ import "time"
 
 type decodeAndValidateRequest struct {
 	// BEAWRE : the flag of URLParam should match the const string URLParam
-	URLParam         string          `json:"-" path:"url_param" validate:"numeric"`
-	Text             string          `json:"text" validate:"max=10"`
-	DefaultInt       int             `json:"defaultInt" default:"10.0"` // MATCH /field's type and default value's type mismatch/
-	DefaultInt2      int             `json:"defaultInt2" default:"10"`
-	DefaultInt3      int             `json:"defaultInt2" default:"11"` // MATCH /duplicate tag name: 'defaultInt2'/
+	URLParam    string `json:"-" path:"url_param" validate:"numeric"`
+	Text        string `json:"text" validate:"max=10"`
+	DefaultInt  int    `json:"defaultInt" default:"10.0"` // MATCH /field's type and default value's type mismatch/
+	DefaultInt2 int    `json:"defaultInt2" default:"10"`
+	// MATCH:12 /unknown option 'inline' in JSON tag/
+	DefaultInt3      int             `json:"defaultInt2,inline" default:"11"` // MATCH /duplicate tag name: 'defaultInt2'/
 	DefaultString    string          `json:"defaultString" default:"foo"`
 	DefaultBool      bool            `json:"defaultBool" default:"trues"` // MATCH /field's type and default value's type mismatch/
 	DefaultBool2     bool            `json:"defaultBool2" default:"true"`
@@ -57,4 +58,28 @@ type VirtualMachineRelocateSpecDiskLocator struct {
 	DiskMoveType    string                          `xml:"diskMoveType,omitempty,comment"`
 	DiskBackingInfo BaseVirtualDeviceBackingInfo    `xml:"diskBackingInfo,omitempty,any"`
 	Profile         []BaseVirtualMachineProfileSpec `xml:"profile,omitempty,other"` // MATCH /unknown option 'other' in XML tag/
+}
+
+type TestDuplicatedXMLTags struct {
+	A int `xml:"a"`
+	B int `xml:"a"` // MATCH /duplicate tag name: 'a'/
+	C int `xml:"c"`
+}
+
+type TestDuplicatedBSONTags struct {
+	A int `bson:"b"`
+	B int `bson:"b"` // MATCH /duplicate tag name: 'b'/
+	C int `bson:"c"`
+}
+
+type TestDuplicatedYAMLTags struct {
+	A int `yaml:"b"`
+	B int `yaml:"c"`
+	C int `yaml:"c"` // MATCH /duplicate tag name: 'c'/
+}
+
+type TestDuplicatedProtobufTags struct {
+	A int `protobuf:"b"`
+	B int `protobuf:"c"`
+	C int `protobuf:"c"` // MATCH /duplicate tag name: 'c'/
 }
