@@ -83,3 +83,22 @@ type TestDuplicatedProtobufTags struct {
 	B int `protobuf:"c"`
 	C int `protobuf:"c"` // MATCH /duplicate tag name: 'c'/
 }
+
+// test case from
+// sigs.k8s.io/kustomize/api/types/helmchartargs.go
+
+type HelmChartArgs struct {
+	ChartName        string                 `json:"chartName,omitempty" yaml:"chartName,omitempty"`
+	ChartVersion     string                 `json:"chartVersion,omitempty" yaml:"chartVersion,omitempty"`
+	ChartRepoURL     string                 `json:"chartRepoUrl,omitempty" yaml:"chartRepoUrl,omitempty"`
+	ChartHome        string                 `json:"chartHome,omitempty" yaml:"chartHome,omitempty"`
+	ChartRepoName    string                 `json:"chartRepoName,omitempty" yaml:"chartRepoName,omitempty"`
+	HelmBin          string                 `json:"helmBin,omitempty" yaml:"helmBin,omitempty"`
+	HelmHome         string                 `json:"helmHome,omitempty" yaml:"helmHome,omitempty"`
+	Values           string                 `json:"values,omitempty" yaml:"values,omitempty"`
+	ValuesLocal      map[string]interface{} `json:"valuesLocal,omitempty" yaml:"valuesLocal,omitempty"`
+	ValuesMerge      string                 `json:"valuesMerge,omitempty" yaml:"valuesMerge,omitempty"`
+	ReleaseName      string                 `json:"releaseName,omitempty" yaml:"releaseName,omitempty"`
+	ReleaseNamespace string                 `json:"releaseNamespace,omitempty" yaml:"releaseNamespace,omitempty"`
+	ExtraArgs        []string               `json:"extraArgs,omitempty" yaml:"extraArgs,omitempty"`
+}
