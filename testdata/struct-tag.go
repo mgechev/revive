@@ -46,8 +46,9 @@ type TestContextSpecificTags2 struct {
 	B       int       `asn1:"tag:2"`
 	S       string    `asn1:"tag:0,utf8"`
 	Ints    []int     `asn1:"set"`
-	Version int       `asn1:"optional,explicit,default:0,tag:0"` // MATCH /duplicated tag number 0/
-	Time    time.Time `asn1:"explicit,tag:4,other"`              // MATCH /unknown option 'other' in ASN1 tag/
+	Version int       `asn1:"optional,explicit,default:0,tag:000"` // MATCH /duplicated tag number 0/
+	Time    time.Time `asn1:"explicit,tag:4,other"`                // MATCH /unknown option 'other' in ASN1 tag/
+	X       int       `asn1:"explicit,tag:invalid"`                // MATCH /ASN1 tag must be a number, got 'invalid'/
 }
 
 type VirtualMachineRelocateSpecDiskLocator struct {
@@ -112,7 +113,7 @@ type Simple struct {
 	OSint32Str           *int32   `protobuf:"zigzag32,11,opt,name=o_sint32_str,json=oSint32Str"`
 	OSint64Str           *int64   `protobuf:"zigzag64,13,opt,name=o_sint32_str,json=oSint64Str"` // MATCH /duplicate tag name: 'o_sint32_str'/
 	OFloat               *float32 `protobuf:"fixed32,14,opt,name=o_float,json=oFloat"`
-	ODouble              *float64 `protobuf:"fixed64,14,opt,name=o_double,json=oDouble"`       // MATCH /duplicated tag number 14/
+	ODouble              *float64 `protobuf:"fixed64,014,opt,name=o_double,json=oDouble"`      // MATCH /duplicated tag number 14/
 	ODoubleStr           *float64 `protobuf:"fixed6,17,opt,name=o_double_str,json=oDoubleStr"` // MATCH /invalid protobuf tag name 'fixed6'/
 	OString              *string  `protobuf:"bytes,18,opt,name=o_string,json=oString"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`

@@ -35,7 +35,7 @@ func (*StructTagRule) Name() string {
 
 type lintStructTagRule struct {
 	onFailure   func(lint.Failure)
-	usedTagNbr  map[string]bool // list of used tag numbers
+	usedTagNbr  map[int]bool    // list of used tag numbers
 	usedTagName map[string]bool // list of used tag keys
 }
 
@@ -45,7 +45,7 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 		if n.Fields == nil || n.Fields.NumFields() < 1 {
 			return nil // skip empty structs
 		}
-		w.usedTagNbr = map[string]bool{}  // init
+		w.usedTagNbr = map[int]bool{}     // init
 		w.usedTagName = map[string]bool{} // init
 		for _, f := range n.Fields.List {
 			if f.Tag != nil {
@@ -177,10 +177,14 @@ func (w lintStructTagRule) checkASN1Tag(t ast.Expr, tag *structtag.Tag) (string,
 			if strings.HasPrefix(opt, "tag:") {
 				parts := strings.Split(opt, ":")
 				tagNumber := parts[1]
-				if w.usedTagNbr[tagNumber] {
-					return fmt.Sprintf("duplicated tag number %s", tagNumber), false
+				number, err := strconv.Atoi(tagNumber)
+				if err != nil {
+					return fmt.Sprintf("ASN1 tag must be a number, got '%s'", tagNumber), false
 				}
-				w.usedTagNbr[tagNumber] = true
+				if w.usedTagNbr[number] {
+					return fmt.Sprintf("duplicated tag number %v", number), false
+				}
+				w.usedTagNbr[number] = true
 
 				continue
 			}
@@ -294,13 +298,12 @@ func (w lintStructTagRule) checkProtobufTag(tag *structtag.Tag) (string, bool) {
 	// check options
 	seenOptions := map[string]bool{}
 	for _, opt := range tag.Options {
-		if _, err := strconv.Atoi(opt); err == nil {
-			_, alreadySeen := w.usedTagNbr[opt]
-			fmt.Printf("opt %s already seen? %v\n", opt, alreadySeen)
+		if number, err := strconv.Atoi(opt); err == nil {
+			_, alreadySeen := w.usedTagNbr[number]
 			if alreadySeen {
-				return fmt.Sprintf("duplicated tag number %s", opt), false
+				return fmt.Sprintf("duplicated tag number %v", number), false
 			}
-			w.usedTagNbr[opt] = true
+			w.usedTagNbr[number] = true
 			continue // option is an integer
 		}
 
