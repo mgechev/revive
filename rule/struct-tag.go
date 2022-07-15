@@ -35,7 +35,7 @@ func (*StructTagRule) Name() string {
 
 type lintStructTagRule struct {
 	onFailure   func(lint.Failure)
-	usedTagNbr  map[string]bool // list of used tag numbers
+	usedTagNbr  map[int]bool    // list of used tag numbers
 	usedTagName map[string]bool // list of used tag keys
 }
 
@@ -45,7 +45,7 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 		if n.Fields == nil || n.Fields.NumFields() < 1 {
 			return nil // skip empty structs
 		}
-		w.usedTagNbr = map[string]bool{}  // init
+		w.usedTagNbr = map[int]bool{}     // init
 		w.usedTagName = map[string]bool{} // init
 		for _, f := range n.Fields.List {
 			if f.Tag != nil {
@@ -74,6 +74,10 @@ func (w lintStructTagRule) checkTagNameIfNeed(tag *structtag.Tag) (string, bool)
 	}
 
 	tagName := w.getTagName(tag)
+	if tagName == "" {
+		return "", true // No tag name found
+	}
+
 	// We concat the key and name as the mapping key here
 	// to allow the same tag name in different tag type.
 	key := tag.Key + ":" + tagName
@@ -94,7 +98,7 @@ func (lintStructTagRule) getTagName(tag *structtag.Tag) string {
 				return strings.TrimLeft(option, "name=")
 			}
 		}
-		return "protobuf tag lacks name"
+		return "" //protobuf tag lacks 'name' option
 	default:
 		return tag.Name
 	}
@@ -139,7 +143,10 @@ func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
 				w.addFailure(f.Tag, msg)
 			}
 		case "protobuf":
-			// Not implemented yet
+			msg, ok := w.checkProtobufTag(tag)
+			if !ok {
+				w.addFailure(f.Tag, msg)
+			}
 		case "required":
 			if tag.Name != "true" && tag.Name != "false" {
 				w.addFailure(f.Tag, "required should be 'true' or 'false'")
@@ -170,10 +177,14 @@ func (w lintStructTagRule) checkASN1Tag(t ast.Expr, tag *structtag.Tag) (string,
 			if strings.HasPrefix(opt, "tag:") {
 				parts := strings.Split(opt, ":")
 				tagNumber := parts[1]
-				if w.usedTagNbr[tagNumber] {
-					return fmt.Sprintf("duplicated tag number %s", tagNumber), false
+				number, err := strconv.Atoi(tagNumber)
+				if err != nil {
+					return fmt.Sprintf("ASN1 tag must be a number, got '%s'", tagNumber), false
 				}
-				w.usedTagNbr[tagNumber] = true
+				if w.usedTagNbr[number] {
+					return fmt.Sprintf("duplicated tag number %v", number), false
+				}
+				w.usedTagNbr[number] = true
 
 				continue
 			}
@@ -273,6 +284,57 @@ func (lintStructTagRule) typeValueMatch(t ast.Expr, val string) bool {
 	}
 
 	return typeMatches
+}
+
+func (w lintStructTagRule) checkProtobufTag(tag *structtag.Tag) (string, bool) {
+	// check name
+	switch tag.Name {
+	case "bytes", "fixed32", "fixed64", "group", "varint", "zigzag32", "zigzag64":
+		// do nothing
+	default:
+		return fmt.Sprintf("invalid protobuf tag name '%s'", tag.Name), false
+	}
+
+	// check options
+	seenOptions := map[string]bool{}
+	for _, opt := range tag.Options {
+		if number, err := strconv.Atoi(opt); err == nil {
+			_, alreadySeen := w.usedTagNbr[number]
+			if alreadySeen {
+				return fmt.Sprintf("duplicated tag number %v", number), false
+			}
+			w.usedTagNbr[number] = true
+			continue // option is an integer
+		}
+
+		switch {
+		case opt == "opt" || opt == "proto3" || opt == "rep" || opt == "req":
+			// do nothing
+		case strings.Contains(opt, "="):
+			o := strings.Split(opt, "=")[0]
+			_, alreadySeen := seenOptions[o]
+			if alreadySeen {
+				return fmt.Sprintf("protobuf tag has duplicated option '%s'", o), false
+			}
+			seenOptions[o] = true
+			continue
+		}
+	}
+	_, hasName := seenOptions["name"]
+	if !hasName {
+		return "protobuf tag lacks mandatory option 'name'", false
+	}
+
+	for k := range seenOptions {
+		switch k {
+		case "name", "json":
+			// do nothing
+		default:
+			return fmt.Sprintf("unknown option '%s' in protobuf tag", k), false
+		}
+	}
+
+	return "", true
 }
 
 func (w lintStructTagRule) addFailure(n ast.Node, msg string) {

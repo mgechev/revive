@@ -46,8 +46,9 @@ type TestContextSpecificTags2 struct {
 	B       int       `asn1:"tag:2"`
 	S       string    `asn1:"tag:0,utf8"`
 	Ints    []int     `asn1:"set"`
-	Version int       `asn1:"optional,explicit,default:0,tag:0"` // MATCH /duplicated tag number 0/
-	Time    time.Time `asn1:"explicit,tag:4,other"`              // MATCH /unknown option 'other' in ASN1 tag/
+	Version int       `asn1:"optional,explicit,default:0,tag:000"` // MATCH /duplicated tag number 0/
+	Time    time.Time `asn1:"explicit,tag:4,other"`                // MATCH /unknown option 'other' in ASN1 tag/
+	X       int       `asn1:"explicit,tag:invalid"`                // MATCH /ASN1 tag must be a number, got 'invalid'/
 }
 
 type VirtualMachineRelocateSpecDiskLocator struct {
@@ -101,4 +102,21 @@ type HelmChartArgs struct {
 	ReleaseName      string                 `json:"releaseName,omitempty" yaml:"releaseName,omitempty"`
 	ReleaseNamespace string                 `json:"releaseNamespace,omitempty" yaml:"releaseNamespace,omitempty"`
 	ExtraArgs        []string               `json:"extraArgs,omitempty" yaml:"extraArgs,omitempty"`
+}
+
+// Test message for holding primitive types.
+type Simple struct {
+	OBool                *bool    `protobuf:"varint,1,req,json=oBool"`                           // MATCH /protobuf tag lacks mandatory option 'name'/
+	OInt32               *int32   `protobuf:"varint,2,opt,name=o_int32,jsonx=oInt32"`            // MATCH /unknown option 'jsonx' in protobuf tag/
+	OInt32Str            *int32   `protobuf:"varint,3,rep,name=o_int32_str,name=oInt32Str"`      // MATCH /protobuf tag has duplicated option 'name'/
+	OInt64               *int64   `protobuf:"varint,4,opt,json=oInt64,name=o_int64,json=oInt64"` // MATCH /protobuf tag has duplicated option 'json'/
+	OSint32Str           *int32   `protobuf:"zigzag32,11,opt,name=o_sint32_str,json=oSint32Str"`
+	OSint64Str           *int64   `protobuf:"zigzag64,13,opt,name=o_sint32_str,json=oSint64Str"` // MATCH /duplicate tag name: 'o_sint32_str'/
+	OFloat               *float32 `protobuf:"fixed32,14,opt,name=o_float,json=oFloat"`
+	ODouble              *float64 `protobuf:"fixed64,014,opt,name=o_double,json=oDouble"`      // MATCH /duplicated tag number 14/
+	ODoubleStr           *float64 `protobuf:"fixed6,17,opt,name=o_double_str,json=oDoubleStr"` // MATCH /invalid protobuf tag name 'fixed6'/
+	OString              *string  `protobuf:"bytes,18,opt,name=o_string,json=oString"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
