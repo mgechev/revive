@@ -16,6 +16,11 @@ func (*UnreachableCodeRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 		failures = append(failures, failure)
 	}
 
+	testingFunctions := map[string]bool{
+		"Fatal":   true,
+		"Fatalf":  true,
+		"FailNow": true,
+	}
 	branchingFunctions := map[string]map[string]bool{
 		"os": {"Exit": true},
 		"log": {
@@ -26,6 +31,9 @@ func (*UnreachableCodeRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 			"Panicf":  true,
 			"Panicln": true,
 		},
+		"t": testingFunctions,
+		"b": testingFunctions,
+		"f": testingFunctions,
 	}
 
 	w := lintUnreachableCode{onFailure, branchingFunctions}
