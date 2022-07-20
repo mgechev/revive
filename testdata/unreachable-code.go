@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"testing"
 )
 
 func foo() int {
@@ -34,4 +35,26 @@ func g() {
 	}
 
 	fmt.Println("Bye, playground")
+}
+
+func TestA(t *testing.T) {
+	tests := make([]int, 100)
+	for i := range tests {
+		println("i: ", i)
+		if i == 0 {
+			t.Fatal("i == 0") // MATCH /unreachable code after this statement/
+			println("unreachable")
+			continue
+		}
+		if i == 1 {
+			t.Fatalf("i:%d", i) // MATCH /unreachable code after this statement/
+			println("unreachable")
+			continue
+		}
+		if i == 2 {
+			t.FailNow() // MATCH /unreachable code after this statement/
+			println("unreachable")
+			continue
+		}
+	}
 }
