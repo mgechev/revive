@@ -1,11 +1,13 @@
 package revivelib
 
 import (
+	"flag"
 	"io/ioutil"
 	"log"
 	"strings"
 
-	"github.com/mgechev/dots"
+	"golang.org/x/tools/go/packages"
+
 	"github.com/mgechev/revive/config"
 	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/logging"
@@ -162,6 +164,7 @@ func (r *Revive) Format(
 	return output, exitCode, nil
 }
 
+/*
 func getPackages(includePatterns []string, excludePatterns ArrayFlags) ([][]string, error) {
 	globs := normalizeSplit(includePatterns)
 	if len(globs) == 0 {
@@ -174,6 +177,25 @@ func getPackages(includePatterns []string, excludePatterns ArrayFlags) ([][]stri
 	}
 
 	return packages, nil
+}
+*/
+
+func getPackages(includePatterns []string, excludePatterns ArrayFlags) ([]*packages.Package, error) {
+	globs := normalizeSplit(flag.Args())
+	if len(globs) == 0 {
+		globs = append(globs, ".")
+	}
+
+	cfg := &packages.Config{Mode: packages.LoadSyntax}
+	pckgs, err := packages.Load(cfg, globs...)
+	if err != nil {
+		return nil, errors.Wrap(err, "loading packages")
+	}
+	if packages.PrintErrors(pckgs) > 0 {
+		return nil, errors.Wrap(err, "loading packages")
+	}
+
+	return pckgs, nil
 }
 
 func normalizeSplit(strs []string) []string {

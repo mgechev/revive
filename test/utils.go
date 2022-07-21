@@ -16,6 +16,7 @@ import (
 
 	"github.com/mgechev/revive/lint"
 	"github.com/pkg/errors"
+	"golang.org/x/tools/go/packages"
 )
 
 func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.RuleConfig) {
@@ -45,7 +46,11 @@ func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, rules []lint.Ru
 		return ioutil.ReadFile(baseDir + file)
 	}, 0)
 
-	ps, err := l.Lint([][]string{{fi.Name()}}, rules, lint.Config{
+	pkgs, err := loadFileAsPackage(`../testdata/` + fi.Name())
+	if err != nil {
+		return err
+	}
+	ps, err := l.Lint(pkgs, rules, lint.Config{
 		Rules: config,
 	})
 	if err != nil {
@@ -62,6 +67,18 @@ func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, rules []lint.Ru
 	return nil
 }
 
+func loadFileAsPackage(filename string) ([]*packages.Package, error) {
+	cfg := &packages.Config{Mode: packages.LoadSyntax}
+	pckgs, err := packages.Load(cfg, filename)
+	if err != nil {
+		return nil, errors.Wrap(err, "loading packages")
+	}
+	if packages.PrintErrors(pckgs) > 0 {
+		return nil, errors.Wrap(err, "loading packages")
+	}
+	return pckgs, nil
+}
+
 func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, rules []lint.Rule, config map[string]lint.RuleConfig) error {
 	l := lint.New(func(file string) ([]byte, error) {
 		return ioutil.ReadFile(baseDir + file)
@@ -72,7 +89,11 @@ func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, ru
 		return errors.Errorf("Test file %v does not have instructions", fi.Name())
 	}
 
-	ps, err := l.Lint([][]string{{fi.Name()}}, rules, lint.Config{
+	pkgs, err := loadFileAsPackage(`../testdata/` + fi.Name())
+	if err != nil {
+		return err
+	}
+	ps, err := l.Lint(pkgs, rules, lint.Config{
 		Rules: config,
 	})
 	if err != nil {

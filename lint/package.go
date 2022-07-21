@@ -7,23 +7,29 @@ import (
 	"sync"
 
 	"golang.org/x/tools/go/gcexportdata"
+	"golang.org/x/tools/go/packages"
 
 	"github.com/mgechev/revive/internal/typeparams"
 )
 
 // Package represents a package in the project.
 type Package struct {
-	fset  *token.FileSet
+	goPkg *packages.Package
 	files map[string]*File
-
-	typesPkg  *types.Package
-	typesInfo *types.Info
 
 	// sortable is the set of types in the package that implement sort.Interface.
 	sortable map[string]bool
 	// main is whether this is a "main" package.
 	main int
 	sync.RWMutex
+}
+
+func NewPackage(pkg *packages.Package) Package {
+	return Package{
+		goPkg:    pkg,
+		files:    map[string]*File{},
+		sortable: map[string]bool{},
+	}
 }
 
 var newImporter = func(fset *token.FileSet) types.ImporterFrom {
@@ -65,14 +71,14 @@ func (p *Package) IsMain() bool {
 func (p *Package) TypesPkg() *types.Package {
 	p.RLock()
 	defer p.RUnlock()
-	return p.typesPkg
+	return p.goPkg.Types
 }
 
 // TypesInfo yields type information of this package identifiers
 func (p *Package) TypesInfo() *types.Info {
 	p.RLock()
 	defer p.RUnlock()
-	return p.typesInfo
+	return p.goPkg.TypesInfo
 }
 
 // Sortable yields a map of sortable types in this package
@@ -83,41 +89,45 @@ func (p *Package) Sortable() map[string]bool {
 }
 
 // TypeCheck performs type checking for given package.
+
 func (p *Package) TypeCheck() error {
-	p.Lock()
-	defer p.Unlock()
+	return nil // TODO delete this function
+	/*
+		p.Lock()
+		defer p.Unlock()
 
-	// If type checking has already been performed
-	// skip it.
-	if p.typesInfo != nil || p.typesPkg != nil {
-		return nil
-	}
-	config := &types.Config{
-		// By setting a no-op error reporter, the type checker does as much work as possible.
-		Error:    func(error) {},
-		Importer: newImporter(p.fset),
-	}
-	info := &types.Info{
-		Types:  make(map[ast.Expr]types.TypeAndValue),
-		Defs:   make(map[*ast.Ident]types.Object),
-		Uses:   make(map[*ast.Ident]types.Object),
-		Scopes: make(map[ast.Node]*types.Scope),
-	}
-	var anyFile *File
-	var astFiles []*ast.File
-	for _, f := range p.files {
-		anyFile = f
-		astFiles = append(astFiles, f.AST)
-	}
+		// If type checking has already been performed
+		// skip it.
+		if p.typesInfo != nil || p.typesPkg != nil {
+			return nil
+		}
+		config := &types.Config{
+			// By setting a no-op error reporter, the type checker does as much work as possible.
+			Error:    func(error) {},
+			Importer: newImporter(p.fset),
+		}
+		info := &types.Info{
+			Types:  make(map[ast.Expr]types.TypeAndValue),
+			Defs:   make(map[*ast.Ident]types.Object),
+			Uses:   make(map[*ast.Ident]types.Object),
+			Scopes: make(map[ast.Node]*types.Scope),
+		}
+		var anyFile *File
+		var astFiles []*ast.File
+		for _, f := range p.files {
+			anyFile = f
+			astFiles = append(astFiles, f.AST)
+		}
 
-	typesPkg, err := check(config, anyFile.AST.Name.Name, p.fset, astFiles, info)
+		typesPkg, err := check(config, anyFile.AST.Name.Name, p.fset, astFiles, info)
 
-	// Remember the typechecking info, even if config.Check failed,
-	// since we will get partial information.
-	p.typesPkg = typesPkg
-	p.typesInfo = info
+		// Remember the typechecking info, even if config.Check failed,
+		// since we will get partial information.
+		p.typesPkg = typesPkg
+		p.typesInfo = info
 
-	return err
+		return err
+	*/
 }
 
 // check function encapsulates the call to go/types.Config.Check method and
@@ -136,10 +146,10 @@ func check(config *types.Config, n string, fset *token.FileSet, astFiles []*ast.
 
 // TypeOf returns the type of an expression.
 func (p *Package) TypeOf(expr ast.Expr) types.Type {
-	if p.typesInfo == nil {
+	if p.goPkg.TypesInfo == nil {
 		return nil
 	}
-	return p.typesInfo.TypeOf(expr)
+	return p.goPkg.TypesInfo.TypeOf(expr)
 }
 
 type walker struct {

@@ -21,7 +21,7 @@ func (*TimeEqualRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 
 	w := &lintTimeEqual{file, onFailure}
 	if w.file.Pkg.TypeCheck() != nil {
-		return nil
+		panic(1)
 	}
 
 	ast.Walk(w, file.AST)

@@ -3,7 +3,6 @@ package lint
 import (
 	"bytes"
 	"go/ast"
-	"go/parser"
 	"go/printer"
 	"go/token"
 	"go/types"
@@ -14,10 +13,9 @@ import (
 
 // File abstraction used for representing files.
 type File struct {
-	Name    string
-	Pkg     *Package
-	content []byte
-	AST     *ast.File
+	Name string
+	Pkg  *Package
+	AST  *ast.File
 }
 
 // IsTest returns if the file contains tests.
@@ -25,9 +23,13 @@ func (f *File) IsTest() bool { return strings.HasSuffix(f.Name, "_test.go") }
 
 // Content returns the file's content.
 func (f *File) Content() []byte {
-	return f.content
+	buf := bytes.Buffer{}
+	fs := token.NewFileSet()
+	printer.Fprint(&buf, fs, f.AST)
+	return buf.Bytes()
 }
 
+/*
 // NewFile creates a new file
 func NewFile(name string, content []byte, pkg *Package) (*File, error) {
 	f, err := parser.ParseFile(pkg.fset, name, content, parser.ParseComments)
@@ -41,16 +43,17 @@ func NewFile(name string, content []byte, pkg *Package) (*File, error) {
 		AST:     f,
 	}, nil
 }
+*/
 
 // ToPosition returns line and column for given position.
 func (f *File) ToPosition(pos token.Pos) token.Position {
-	return f.Pkg.fset.Position(pos)
+	return f.Pkg.goPkg.Fset.Position(pos)
 }
 
 // Render renders a node.
 func (f *File) Render(x interface{}) string {
 	var buf bytes.Buffer
-	if err := printer.Fprint(&buf, f.Pkg.fset, x); err != nil {
+	if err := printer.Fprint(&buf, f.Pkg.goPkg.Fset, x); err != nil {
 		panic(err)
 	}
 	return buf.String()
@@ -58,7 +61,7 @@ func (f *File) Render(x interface{}) string {
 
 // CommentMap builds a comment map for the file.
 func (f *File) CommentMap() ast.CommentMap {
-	return ast.NewCommentMap(f.Pkg.fset, f.AST, f.AST.Comments)
+	return ast.NewCommentMap(f.Pkg.goPkg.Fset, f.AST, f.AST.Comments)
 }
 
 var basicTypeKinds = map[types.BasicKind]string{
@@ -77,7 +80,7 @@ func (f *File) IsUntypedConst(expr ast.Expr) (defType string, ok bool) {
 	// Re-evaluate expr outside its context to see if it's untyped.
 	// (An expr evaluated within, for example, an assignment context will get the type of the LHS.)
 	exprStr := f.Render(expr)
-	tv, err := types.Eval(f.Pkg.fset, f.Pkg.TypesPkg(), expr.Pos(), exprStr)
+	tv, err := types.Eval(f.Pkg.goPkg.Fset, f.Pkg.goPkg.Types, expr.Pos(), exprStr)
 	if err != nil {
 		return "", false
 	}

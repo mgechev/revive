@@ -1,14 +1,15 @@
 package lint
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
 	"go/token"
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 	"sync"
+
+	"golang.org/x/tools/go/packages"
 )
 
 // ReadFile defines an abstraction for reading files.
@@ -49,18 +50,18 @@ func (l Linter) readFile(path string) (result []byte, err error) {
 }
 
 var (
-	genHdr = []byte("// Code generated ")
-	genFtr = []byte(" DO NOT EDIT.")
+	genHdr = "// Code generated "
+	genFtr = " DO NOT EDIT."
 )
 
 // Lint lints a set of files with the specified rule.
-func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-chan Failure, error) {
+func (l *Linter) Lint(pckgs []*packages.Package, ruleSet []Rule, config Config) (<-chan Failure, error) {
 	failures := make(chan Failure)
 
 	var wg sync.WaitGroup
-	for _, pkg := range packages {
+	for _, pkg := range pckgs {
 		wg.Add(1)
-		go func(pkg []string) {
+		go func(pkg *packages.Package) {
 			if err := l.lintPackage(pkg, ruleSet, config, failures); err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
@@ -77,33 +78,38 @@ func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-cha
 	return failures, nil
 }
 
-func (l *Linter) lintPackage(filenames []string, ruleSet []Rule, config Config, failures chan Failure) error {
-	pkg := &Package{
-		fset:  token.NewFileSet(),
-		files: map[string]*File{},
-	}
-	for _, filename := range filenames {
-		content, err := l.readFile(filename)
-		if err != nil {
-			return err
-		}
-		if !config.IgnoreGeneratedHeader && isGenerated(content) {
+func (l *Linter) lintPackage(goPkg *packages.Package, ruleSet []Rule, config Config, failures chan Failure) error {
+	lintPkg := NewPackage(goPkg)
+	for _, file := range goPkg.Syntax {
+		/*
+			content, err := l.readFile(filename)
+			if err != nil {
+				return err
+			}*/
+
+		if !config.IgnoreGeneratedHeader && isGenerated(file.Doc.Text()) {
 			continue
 		}
-
-		file, err := NewFile(filename, content, pkg)
-		if err != nil {
-			addInvalidFileFailure(filename, err.Error(), failures)
-			continue
+		/*
+			file, err := NewFile(filename, content, pkg)
+			if err != nil {
+				addInvalidFileFailure(filename, err.Error(), failures)
+				continue
+			}
+		*/
+		newFile := File{
+			Name: file.Name.Name,
+			Pkg:  &lintPkg,
+			AST:  file,
 		}
-		pkg.files[filename] = file
+		lintPkg.files[file.Name.String()] = &newFile
 	}
 
-	if len(pkg.files) == 0 {
+	if len(lintPkg.files) == 0 {
 		return nil
 	}
 
-	pkg.lint(ruleSet, config, failures)
+	lintPkg.lint(ruleSet, config, failures)
 
 	return nil
 }
@@ -111,15 +117,8 @@ func (l *Linter) lintPackage(filenames []string, ruleSet []Rule, config Config, 
 // isGenerated reports whether the source file is generated code
 // according the rules from https://golang.org/s/generatedcode.
 // This is inherited from the original go lint.
-func isGenerated(src []byte) bool {
-	sc := bufio.NewScanner(bytes.NewReader(src))
-	for sc.Scan() {
-		b := sc.Bytes()
-		if bytes.HasPrefix(b, genHdr) && bytes.HasSuffix(b, genFtr) && len(b) >= len(genHdr)+len(genFtr) {
-			return true
-		}
-	}
-	return false
+func isGenerated(fileComment string) bool {
+	return strings.HasPrefix(fileComment, genHdr) && strings.HasSuffix(fileComment, genFtr) && len(fileComment) >= len(genHdr)+len(genFtr)
 }
 
 // addInvalidFileFailure adds a failure for an invalid formatted file
