@@ -45,11 +45,12 @@ func (*DeferRule) Name() string {
 func (*DeferRule) allowFromArgs(args lint.Arguments) map[string]bool {
 	if len(args) < 1 {
 		allow := map[string]bool{
-			"loop":        true,
-			"call-chain":  true,
-			"method-call": true,
-			"return":      true,
-			"recover":     true,
+			"loop":              true,
+			"call-chain":        true,
+			"method-call":       true,
+			"return":            true,
+			"recover":           true,
+			"immediate-recover": true,
 		}
 
 		return allow
@@ -97,11 +98,29 @@ func (w lintDeferRule) Visit(node ast.Node) ast.Visitor {
 		}
 	case *ast.CallExpr:
 		if !w.inADefer && isIdent(n.Fun, "recover") {
+			// func fn() { recover() }
+			//
 			// confidence is not 1 because recover can be in a function that is deferred elsewhere
 			w.newFailure("recover must be called inside a deferred function", n, 0.8, "logic", "recover")
+		} else if w.inADefer && !w.inAFuncLit && isIdent(n.Fun, "recover") {
+			// defer helper(recover())
+			//
+			// confidence is not truly 1 because this could be in a correctly-deferred func,
+			// but it is very likely to be a misunderstanding of defer's behavior around arguments.
+			w.newFailure("recover must be called inside a deferred function, this is executing recover immediately", n, 1, "logic", "immediate-recover")
 		}
 	case *ast.DeferStmt:
+		if isIdent(n.Call.Fun, "recover") {
+			// defer recover()
+			//
+			// confidence is not truly 1 because this could be in a correctly-deferred func,
+			// but normally this doesn't suppress a panic, and even if it did it would silently discard the value.
+			w.newFailure("recover must be called inside a deferred function, this is executing recover immediately", n, 1, "logic", "immediate-recover")
+		}
 		w.visitSubtree(n.Call.Fun, true, false, false)
+		for _, a := range n.Call.Args {
+			w.visitSubtree(a, true, false, false) // check arguments, they should not contain recover()
+		}
 
 		if w.inALoop {
 			w.newFailure("prefer not to defer inside loops", n, 1.0, "bad practice", "loop")
@@ -110,6 +129,8 @@ func (w lintDeferRule) Visit(node ast.Node) ast.Visitor {
 		switch fn := n.Call.Fun.(type) {
 		case *ast.CallExpr:
 			w.newFailure("prefer not to defer chains of function calls", fn, 1.0, "bad practice", "call-chain")
+			// make sure the call/args does not trigger recover() immediately
+			w.visitSubtree(fn, true, false, false)
 		case *ast.SelectorExpr:
 			if id, ok := fn.X.(*ast.Ident); ok {
 				isMethodCall := id != nil && id.Obj != nil && id.Obj.Kind == ast.Typ
@@ -125,7 +146,7 @@ func (w lintDeferRule) Visit(node ast.Node) ast.Visitor {
 }
 
 func (w lintDeferRule) visitSubtree(n ast.Node, inADefer, inALoop, inAFuncLit bool) {
-	nw := &lintDeferRule{
+	nw := lintDeferRule{
 		onFailure:  w.onFailure,
 		inADefer:   inADefer,
 		inALoop:    inALoop,

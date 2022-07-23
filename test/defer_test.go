@@ -23,3 +23,67 @@ func TestDeferOthersDisabled(t *testing.T) {
 		Arguments: []interface{}{[]interface{}{"loop"}},
 	})
 }
+
+func TestDemonstrateIneffectiveDefers(t *testing.T) {
+	mustPanic := func() {
+		if r := recover(); r == nil {
+			t.Fatal("recover should not have suppressed the panic")
+		}
+	}
+	mustNotPanic := func() {
+		if r := recover(); r != nil {
+			t.Fatal("recover should have suppressed the panic, got:", r)
+		}
+	}
+	t.Run("too-deep", func(t *testing.T) {
+		recoverer := func() {
+			recover()
+		}
+		helper := func() {
+			recoverer() // this does not work, which is the motivating force behind the "must be deferred" lint
+		}
+		defer mustPanic()
+		func() {
+			defer helper()
+			panic("should escape")
+		}()
+	})
+	t.Run("immediate", func(t *testing.T) {
+		t.Run("call", func(t *testing.T) {
+			defer mustPanic()
+			func() {
+				defer recover() // recovers immediately, does not suppress panic
+				panic("should escape")
+			}()
+		})
+		t.Run("arg", func(t *testing.T) {
+			defer mustPanic()
+			func() {
+				defer t.Log("nothing recovered:", recover()) // recovers immediately because args are collected immediately, does not suppress panic
+				panic("should escape")
+			}()
+		})
+	})
+	t.Run("correct-immediate", func(t *testing.T) {
+		// constructs I've never seen in practice, but these DO work despite violating the lint.
+		// the lint currently claims confidence=1, but if legitimate uses like this are found, it may deserve 0.8.
+		t.Run("call", func(t *testing.T) {
+			defer mustNotPanic()
+			func() {
+				defer func() {
+					defer recover() // called in defer, works but hides result
+				}()
+				panic("captured but ignored")
+			}()
+		})
+		t.Run("arg", func(t *testing.T) {
+			defer mustNotPanic()
+			func() {
+				defer func() {
+					defer t.Log("successfully recovered:", recover()) // called in defer, works
+				}()
+				panic("captured")
+			}()
+		})
+	})
+}
