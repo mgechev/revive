@@ -129,8 +129,6 @@ func (w lintDeferRule) Visit(node ast.Node) ast.Visitor {
 		switch fn := n.Call.Fun.(type) {
 		case *ast.CallExpr:
 			w.newFailure("prefer not to defer chains of function calls", fn, 1.0, "bad practice", "call-chain")
-			// make sure the call/args does not trigger recover() immediately
-			w.visitSubtree(fn, true, false, false)
 		case *ast.SelectorExpr:
 			if id, ok := fn.X.(*ast.Ident); ok {
 				isMethodCall := id != nil && id.Obj != nil && id.Obj.Kind == ast.Typ
