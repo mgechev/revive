@@ -48,6 +48,21 @@ func TestDemonstrateIneffectiveDefers(t *testing.T) {
 			panic("should escape")
 		}()
 	})
+	t.Run("dynamic-closure", func(t *testing.T) {
+		// rarely seen, but also a bad pattern.
+		// Go does not know that `func()` calls `recover()`, so it does not generate the necessary capturing code.
+		//
+		// this is not currently detected or blocked.
+		// doing so precisely is probably not possible, but "arguments cannot contain recover() anywhere" may be good.
+		defer mustPanic()
+		helper := func(recoverer func()) {
+			recoverer()
+		}
+		func() {
+			defer helper(func() { recover() }) // seemingly valid, but does not work
+			panic("should escape")
+		}()
+	})
 	t.Run("immediate", func(t *testing.T) {
 		t.Run("call", func(t *testing.T) {
 			defer mustPanic()

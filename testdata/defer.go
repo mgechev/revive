@@ -29,4 +29,7 @@ func deferrer() {
 	helper := func(_ interface{}) {}
 
 	defer helper(recover()) // MATCH /recover must be called inside a deferred function, this is executing recover immediately/
+
+	// does not work, but not currently blocked.
+	defer helper(func() { recover() })
 }
