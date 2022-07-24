@@ -17,12 +17,19 @@ func deferrer() {
 	defer tt.m() // MATCH /be careful when deferring calls to methods without pointer receiver/
 
 	defer func() error {
-		return errors.New("error") //MATCH /return in a defer function has no effect/
+		return errors.New("error") // MATCH /return in a defer function has no effect/
 	}()
 
-	defer recover()
+	defer recover() // MATCH /recover must be called inside a deferred function, this is executing recover immediately/
 
-	recover() //MATCH /recover must be called inside a deferred function/
+	recover() // MATCH /recover must be called inside a deferred function/
 
 	defer deferrer()
+
+	helper := func(_ interface{}) {}
+
+	defer helper(recover()) // MATCH /recover must be called inside a deferred function, this is executing recover immediately/
+
+	// does not work, but not currently blocked.
+	defer helper(func() { recover() })
 }
