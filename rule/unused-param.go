@@ -53,7 +53,7 @@ func (w lintUnusedParamRule) Visit(node ast.Node) ast.Visitor {
 			return nil // skip, is a function prototype
 		}
 
-		structFields := map[*ast.Object]bool{}
+		structFields := map[*ast.Ident]bool{}
 
 		// inspect the func body looking for references to parameters
 		// except struct field keys.
@@ -72,7 +72,7 @@ func (w lintUnusedParamRule) Visit(node ast.Node) ast.Visitor {
 					for _, e := range lit.Elts {
 						if kv, ok := e.(*ast.KeyValueExpr); ok {
 							if ident, ok := kv.Key.(*ast.Ident); ok {
-								structFields[ident.Obj] = true
+								structFields[ident] = true
 							}
 						}
 					}
@@ -84,7 +84,7 @@ func (w lintUnusedParamRule) Visit(node ast.Node) ast.Visitor {
 				return false
 			}
 
-			if params[ident.Obj] && !structFields[ident.Obj] {
+			if params[ident.Obj] && !structFields[ident] {
 				params[ident.Obj] = false // mark as used
 			}
 

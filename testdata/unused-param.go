@@ -127,6 +127,17 @@ func f12(unused string) {
 	}
 }
 
+func f13(unused string) {
+	_ = struct {
+		unused string
+	}{
+		unused: "",
+	}
+	_ = mapType{
+		unused: nil,
+	}
+}
+
 func getCompareFailCause(n *node, which int, prevValue string, prevIndex uint64) string {
 	switch which {
 	case CompareIndexNotMatch:
