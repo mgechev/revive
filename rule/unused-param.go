@@ -3,6 +3,7 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"go/types"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -18,7 +19,12 @@ func (*UnusedParamRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 		failures = append(failures, failure)
 	}
 
-	w := lintUnusedParamRule{onFailure: onFailure}
+	file.Pkg.TypeCheck()
+
+	w := lintUnusedParamRule{
+		typesInfo: file.Pkg.TypesInfo(),
+		onFailure: onFailure,
+	}
 
 	ast.Walk(w, file.AST)
 
@@ -31,6 +37,7 @@ func (*UnusedParamRule) Name() string {
 }
 
 type lintUnusedParamRule struct {
+	typesInfo *types.Info
 	onFailure func(lint.Failure)
 }
 
@@ -46,16 +53,38 @@ func (w lintUnusedParamRule) Visit(node ast.Node) ast.Visitor {
 			return nil // skip, is a function prototype
 		}
 
-		// inspect the func body looking for references to parameters
-		fselect := func(n ast.Node) bool {
-			ident, isAnID := n.(*ast.Ident)
+		structFields := map[*ast.Object]bool{}
 
+		// inspect the func body looking for references to parameters
+		// except struct field keys.
+		fselect := func(n ast.Node) bool {
+			if lit, ok := n.(*ast.CompositeLit); ok {
+				isStruct := false
+
+				switch lit.Type.(type) {
+				case *ast.StructType:
+					isStruct = true
+				case *ast.Ident:
+					_, isStruct = w.typesInfo.TypeOf(lit.Type).Underlying().(*types.Struct)
+				}
+
+				if isStruct {
+					for _, e := range lit.Elts {
+						if kv, ok := e.(*ast.KeyValueExpr); ok {
+							if ident, ok := kv.Key.(*ast.Ident); ok {
+								structFields[ident.Obj] = true
+							}
+						}
+					}
+				}
+			}
+
+			ident, isAnID := n.(*ast.Ident)
 			if !isAnID {
 				return false
 			}
 
-			_, isAParam := params[ident.Obj]
-			if isAParam {
+			if params[ident.Obj] && !structFields[ident.Obj] {
 				params[ident.Obj] = false // mark as used
 			}
 

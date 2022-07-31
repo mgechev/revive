@@ -90,6 +90,43 @@ func f7(pl int) {
 	}
 }
 
+func f8(unused string) { // MATCH /parameter 'unused' seems to be unused, consider removing or renaming it as _/
+	_ = struct {
+		unused string
+	}{}
+}
+
+type structType struct {
+	unused string
+}
+
+func f9(unused string) { // MATCH /parameter 'unused' seems to be unused, consider removing or renaming it as _/
+	r := structType{}
+	r.unused = ""
+}
+
+func f10(unused string) { // MATCH /parameter 'unused' seems to be unused, consider removing or renaming it as _/
+	_ = structType{
+		unused: "",
+	}
+}
+
+func f11(unused string) { // MATCH /parameter 'unused' seems to be unused, consider removing or renaming it as _/
+	_ = struct {
+		unused string
+	}{
+		unused: "",
+	}
+}
+
+type mapType map[string]interface{}
+
+func f12(unused string) {
+	_ = mapType{
+		unused: nil,
+	}
+}
+
 func getCompareFailCause(n *node, which int, prevValue string, prevIndex uint64) string {
 	switch which {
 	case CompareIndexNotMatch:
