@@ -104,12 +104,22 @@ Example:
 
 func buildDefaultConfigPath() string {
 	var result string
+	var homeDirFile string
+	configFileName := "revive.toml"
+
+	configDirFile := filepath.Join(os.Getenv("XDG_CONFIG_HOME"), configFileName)
 	if homeDir, err := homedir.Dir(); err == nil {
-		result = filepath.Join(homeDir, "revive.toml")
-		if _, err := os.Stat(result); err != nil {
-			result = ""
-		}
+		homeDirFile = filepath.Join(homeDir, configFileName)
 	}
+
+	if _, err := os.Stat(configDirFile); err == nil {
+		result = configDirFile
+	} else if _, err := os.Stat(homeDirFile); err == nil {
+		result = homeDirFile
+	} else {
+		result = ""
+	}
+    print(result)
 
 	return result
 }
@@ -127,7 +137,7 @@ func init() {
 
 	// command line help strings
 	const (
-		configUsage       = "path to the configuration TOML file, defaults to $HOME/revive.toml, if present (i.e. -config myconf.toml)"
+		configUsage       = "path to the configuration TOML file, defaults to $XDG_CONFIG_HOME/revive.toml or $HOME/revive.toml, if present (i.e. -config myconf.toml)"
 		excludeUsage      = "list of globs which specify files to be excluded (i.e. -exclude foo/...)"
 		formatterUsage    = "formatter to be used for the output (i.e. -formatter stylish)"
 		versionUsage      = "get revive version"
