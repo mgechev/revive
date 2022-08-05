@@ -9,6 +9,18 @@ import (
 	"os"
 )
 
+func FP_DeepSource(a []byte) {
+	for {
+		if b, err := os.ReadFile(""); err != nil {
+			// not a valid date/time
+			continue
+		} else {
+			a = b
+			b = a
+		}
+	}
+}
+
 func h(f func() bool) string {
 	for {
 		if ok := f(); ok {

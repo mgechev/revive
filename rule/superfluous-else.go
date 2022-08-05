@@ -8,6 +8,29 @@ import (
 	"github.com/deepsourcelabs/revive/lint"
 )
 
+func findBlockStmtRef(block *ast.BlockStmt, obj *ast.Object) bool {
+	var found bool
+
+	fn := func(node ast.Node) bool {
+		id, ok := node.(*ast.Ident)
+		if !ok {
+			return true
+		}
+
+		if obj != id.Obj {
+			return true
+		}
+		found = true
+		return false
+	}
+
+	// Only recurse the block's tree and nothing else. Try to find
+	// idenitifers that refer to the same obj.
+	ast.Inspect(block, fn)
+
+	return found
+}
+
 // SuperfluousElseRule lints given else constructs.
 type SuperfluousElseRule struct{}
 
@@ -61,7 +84,9 @@ func (w lintSuperfluousElse) Visit(node ast.Node) ast.Visitor {
 		w.ignore[elseif] = true
 		return w
 	}
-	if _, ok := ifStmt.Else.(*ast.BlockStmt); !ok {
+
+	elseBlock, ok := ifStmt.Else.(*ast.BlockStmt)
+	if !ok {
 		// only care about elses without conditions
 		return w
 	}
@@ -77,6 +102,23 @@ func (w lintSuperfluousElse) Visit(node ast.Node) ast.Visitor {
 	extra := ""
 	if shortDecl {
 		extra = " (move short variable declaration to its own line if necessary)"
+	}
+
+	assignStmt, ok := ifStmt.Init.(*ast.AssignStmt)
+	if ok && assignStmt.Tok == token.DEFINE { // only ":=" assignment are considered
+		for _, lhs := range assignStmt.Lhs {
+			ident, ok := lhs.(*ast.Ident)
+			if !ok {
+				continue
+			}
+			obj := ident.Obj
+			if obj == nil {
+				continue
+			}
+			if findBlockStmtRef(elseBlock, obj) {
+				return w
+			}
+		}
 	}
 
 	lastStmt := ifStmt.Body.List[len(ifStmt.Body.List)-1]
