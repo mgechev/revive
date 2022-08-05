@@ -1,5 +1,13 @@
 package fixtures
 
+import "path/filepath"
+
+func renameTestFile(name string, old string, new string) {
+	old = filepath.Join(name, old)
+	new = filepath.Join(name, new) // MATCH /redefinition of the built-in function new/
+	new = filepath.Join(name)
+}
+
 func (this data) vmethod() {
 	nil := true // MATCH /assignment creates a shadow of built-in identifier nil/
 	iota = 1    // MATCH /assignment modifies built-in identifier iota/

@@ -69,7 +69,7 @@ func (*RedefinesBuiltinIDRule) Apply(file *lint.File, _ lint.Arguments) []lint.F
 	}
 
 	astFile := file.AST
-	w := &lintRedefinesBuiltinID{onFailure}
+	w := &lintRedefinesBuiltinID{onFailure, make(map[*ast.Object]bool)}
 	ast.Walk(w, astFile)
 
 	return failures
@@ -82,6 +82,7 @@ func (*RedefinesBuiltinIDRule) Name() string {
 
 type lintRedefinesBuiltinID struct {
 	onFailure func(lint.Failure)
+	visited   map[*ast.Object]bool
 }
 
 func (w *lintRedefinesBuiltinID) Visit(node ast.Node) ast.Visitor {
@@ -95,6 +96,12 @@ func (w *lintRedefinesBuiltinID) Visit(node ast.Node) ast.Visitor {
 			}
 			id := typeSpec.Name.Name
 			if ok, bt := w.isBuiltIn(id); ok {
+				if !w.visited[typeSpec.Name.Obj] {
+					w.visited[typeSpec.Name.Obj] = true
+				} else {
+					return nil
+				}
+
 				w.addFailure(n, fmt.Sprintf("redefinition of the built-in %s %s", bt, id))
 			}
 		case token.VAR, token.CONST:
@@ -105,6 +112,11 @@ func (w *lintRedefinesBuiltinID) Visit(node ast.Node) ast.Visitor {
 				}
 				for _, name := range valSpec.Names {
 					if ok, bt := w.isBuiltIn(name.Name); ok {
+						if !w.visited[name.Obj] {
+							w.visited[name.Obj] = true
+						} else {
+							return nil
+						}
 						w.addFailure(n, fmt.Sprintf("redefinition of the built-in %s %s", bt, name))
 					}
 				}
@@ -120,6 +132,11 @@ func (w *lintRedefinesBuiltinID) Visit(node ast.Node) ast.Visitor {
 
 		id := n.Name.Name
 		if ok, bt := w.isBuiltIn(id); ok {
+			if !w.visited[n.Name.Obj] {
+				w.visited[n.Name.Obj] = true
+			} else {
+				return nil
+			}
 			w.addFailure(n, fmt.Sprintf("redefinition of the built-in %s %s", bt, id))
 		}
 	case *ast.AssignStmt:
@@ -130,6 +147,11 @@ func (w *lintRedefinesBuiltinID) Visit(node ast.Node) ast.Visitor {
 			}
 
 			if ok, bt := w.isBuiltIn(id.Name); ok {
+				if !w.visited[id.Obj] {
+					w.visited[id.Obj] = true
+				} else {
+					return nil
+				}
 				var msg string
 				switch bt {
 				case "constant or variable":
