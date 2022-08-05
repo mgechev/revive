@@ -14,7 +14,7 @@ import (
 type StructTagRule struct{}
 
 // Apply applies the rule to given file.
-func (r *StructTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*StructTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -29,13 +29,14 @@ func (r *StructTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 }
 
 // Name returns the rule name.
-func (r *StructTagRule) Name() string {
+func (*StructTagRule) Name() string {
 	return "struct-tag"
 }
 
 type lintStructTagRule struct {
-	onFailure  func(lint.Failure)
-	usedTagNbr map[string]bool // list of used tag numbers
+	onFailure   func(lint.Failure)
+	usedTagNbr  map[string]bool // list of used tag numbers
+	usedTagName map[string]bool // list of used tag keys
 }
 
 func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
@@ -44,7 +45,8 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 		if n.Fields == nil || n.Fields.NumFields() < 1 {
 			return nil // skip empty structs
 		}
-		w.usedTagNbr = map[string]bool{} // init
+		w.usedTagNbr = map[string]bool{}  // init
+		w.usedTagName = map[string]bool{} // init
 		for _, f := range n.Fields.List {
 			if f.Tag != nil {
 				w.checkTaggedField(f)
@@ -53,6 +55,49 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 	}
 
 	return w
+}
+
+func (w lintStructTagRule) checkTagNameIfNeed(tag *structtag.Tag) (string, bool) {
+	isUnnamedTag := tag.Name == "" || tag.Name == "-"
+	if isUnnamedTag {
+		return "", true
+	}
+
+	needsToCheckTagName := tag.Key == "bson" ||
+		tag.Key == "json" ||
+		tag.Key == "xml" ||
+		tag.Key == "yaml" ||
+		tag.Key == "protobuf"
+
+	if !needsToCheckTagName {
+		return "", true
+	}
+
+	tagName := w.getTagName(tag)
+	// We concat the key and name as the mapping key here
+	// to allow the same tag name in different tag type.
+	key := tag.Key + ":" + tagName
+	if _, ok := w.usedTagName[key]; ok {
+		return fmt.Sprintf("duplicate tag name: '%s'", tagName), false
+	}
+
+	w.usedTagName[key] = true
+
+	return "", true
+}
+
+func (lintStructTagRule) getTagName(tag *structtag.Tag) string {
+	switch tag.Key {
+	case "protobuf":
+		for _, option := range tag.Options {
+			if strings.HasPrefix(option, "name=") {
+				return strings.TrimLeft(option, "name=")
+			}
+		}
+		return "protobuf tag lacks name"
+	default:
+		return tag.Name
+	}
 }
 
 // checkTaggedField checks the tag of the given field.
@@ -69,6 +114,10 @@ func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
 	}
 
 	for _, tag := range tags.Tags() {
+		if msg, ok := w.checkTagNameIfNeed(tag); !ok {
+			w.addFailure(f.Tag, msg)
+		}
+
 		switch key := tag.Key; key {
 		case "asn1":
 			msg, ok := w.checkASN1Tag(f.Type, tag)
@@ -148,7 +197,7 @@ func (w lintStructTagRule) checkASN1Tag(t ast.Expr, tag *structtag.Tag) (string,
 	return "", true
 }
 
-func (w lintStructTagRule) checkBSONTag(options []string) (string, bool) {
+func (lintStructTagRule) checkBSONTag(options []string) (string, bool) {
 	for _, opt := range options {
 		switch opt {
 		case "inline", "minsize", "omitempty":
@@ -160,7 +209,7 @@ func (w lintStructTagRule) checkBSONTag(options []string) (string, bool) {
 	return "", true
 }
 
-func (w lintStructTagRule) checkJSONTag(name string, options []string) (string, bool) {
+func (lintStructTagRule) checkJSONTag(name string, options []string) (string, bool) {
 	for _, opt := range options {
 		switch opt {
 		case "omitempty", "string":
@@ -177,7 +226,7 @@ func (w lintStructTagRule) checkJSONTag(name string, options []string) (string, 
 	return "", true
 }
 
-func (w lintStructTagRule) checkXMLTag(options []string) (string, bool) {
+func (lintStructTagRule) checkXMLTag(options []string) (string, bool) {
 	for _, opt := range options {
 		switch opt {
 		case "any", "attr", "cdata", "chardata", "comment", "innerxml", "omitempty", "typeattr":
@@ -189,7 +238,7 @@ func (w lintStructTagRule) checkXMLTag(options []string) (string, bool) {
 	return "", true
 }
 
-func (w lintStructTagRule) checkYAMLTag(options []string) (string, bool) {
+func (lintStructTagRule) checkYAMLTag(options []string) (string, bool) {
 	for _, opt := range options {
 		switch opt {
 		case "flow", "inline", "omitempty":
@@ -201,7 +250,7 @@ func (w lintStructTagRule) checkYAMLTag(options []string) (string, bool) {
 	return "", true
 }
 
-func (w lintStructTagRule) typeValueMatch(t ast.Expr, val string) bool {
+func (lintStructTagRule) typeValueMatch(t ast.Expr, val string) bool {
 	tID, ok := t.(*ast.Ident)
 	if !ok {
 		return true

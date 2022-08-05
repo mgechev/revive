@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"go/ast"
 	"go/parser"
-	"go/printer"
 	"go/token"
 	"go/types"
 	"io/ioutil"
@@ -200,14 +199,6 @@ func extractReplacement(line string) (string, bool) {
 	return line[a+len(start) : b], true
 }
 
-func render(fset *token.FileSet, x interface{}) string {
-	var buf bytes.Buffer
-	if err := printer.Fprint(&buf, fset, x); err != nil {
-		panic(err)
-	}
-	return buf.String()
-}
-
 func srcLine(src []byte, p token.Position) string {
 	// Run to end of line in both directions if not at line start/end.
 	lo, hi := p.Offset, p.Offset+1
@@ -288,16 +279,16 @@ func TestLintName(t *testing.T) { //revive:disable-line:exported
 // It is imprecise, and will err on the side of returning true,
 // such as for composite types.
 func exportedType(typ types.Type) bool {
-	switch T := typ.(type) {
+	switch t := typ.(type) {
 	case *types.Named:
 		// Builtin types have no package.
-		return T.Obj().Pkg() == nil || T.Obj().Exported()
+		return t.Obj().Pkg() == nil || t.Obj().Exported()
 	case *types.Map:
-		return exportedType(T.Key()) && exportedType(T.Elem())
+		return exportedType(t.Key()) && exportedType(t.Elem())
 	case interface {
 		Elem() types.Type
 	}: // array, slice, pointer, chan
-		return exportedType(T.Elem())
+		return exportedType(t.Elem())
 	}
 	// Be conservative about other types, such as struct, interface, etc.
 	return true

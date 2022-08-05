@@ -28,7 +28,7 @@ func New(
 	maxOpenFiles int,
 	extraRules ...ExtraRule,
 ) (*Revive, error) {
-	log, err := logging.GetLogger()
+	logger, err := logging.GetLogger()
 	if err != nil {
 		return nil, errors.Wrap(err, "initializing revive - getting logger")
 	}
@@ -55,10 +55,10 @@ func New(
 		return nil, errors.Wrap(err, "initializing revive - gettint lint rules")
 	}
 
-	log.Println("Config loaded")
+	logger.Println("Config loaded")
 
 	return &Revive{
-		logger:       log,
+		logger:       logger,
 		config:       conf,
 		lintingRules: lintingRules,
 		maxOpenFiles: maxOpenFiles,

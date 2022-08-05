@@ -15,5 +15,5 @@ build:
 	@go build -ldflags='$(VERSION_FLAGS)'
 
 test:
-	@go test -v ./...
+	@go test -v -race ./...
 

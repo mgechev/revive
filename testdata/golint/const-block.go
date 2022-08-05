@@ -4,11 +4,14 @@
 package foo
 
 const (
+	InlineComment = "ShouldBeOK" // InlineComment is a valid comment
+
 	// Prefix for something.
 	// MATCH /comment on exported const InlineWhatever should be of the form "InlineWhatever ..."/
 	InlineWhatever = "blah"
 
-	Whatsit = "missing_comment" // MATCH /exported const Whatsit should have comment (or a comment on this block) or be unexported/
+	Whatsit = "missing_comment"
+	// MATCH:13 /exported const Whatsit should have comment (or a comment on this block) or be unexported/
 
 	// We should only warn once per block for missing comments,
 	// but always complain about malformed comments.
@@ -29,8 +32,11 @@ const (
 
 // The comment on the previous const block shouldn't flow through to here.
 
-const UndocAgain = 6 // MATCH /exported const UndocAgain should have comment or be unexported/
+const UndocAgain = 6
+
+// MATCH:35 /exported const UndocAgain should have comment or be unexported/
 
 const (
-	SomeUndocumented = 7 // MATCH /exported const SomeUndocumented should have comment (or a comment on this block) or be unexported/
+	SomeUndocumented = 7
+	// MATCH:40 /exported const SomeUndocumented should have comment (or a comment on this block) or be unexported/
 )

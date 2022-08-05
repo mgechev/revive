@@ -3,6 +3,7 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"sync"
 
 	"github.com/deepsourcelabs/revive/lint"
 )
@@ -10,18 +11,25 @@ import (
 // DeferRule lints unused params in functions.
 type DeferRule struct {
 	allow map[string]bool
+	sync.Mutex
+}
+
+func (r *DeferRule) configure(arguments lint.Arguments) {
+	r.Lock()
+	if r.allow == nil {
+		r.allow = r.allowFromArgs(arguments)
+	}
+	r.Unlock()
 }
 
 // Apply applies the rule to given file.
 func (r *DeferRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	if r.allow == nil {
-		r.allow = r.allowFromArgs(arguments)
-	}
+	r.configure(arguments)
+
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
-
 	w := lintDeferRule{onFailure: onFailure, allow: r.allow}
 
 	ast.Walk(w, file.AST)
@@ -30,11 +38,11 @@ func (r *DeferRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Fail
 }
 
 // Name returns the rule name.
-func (r *DeferRule) Name() string {
+func (*DeferRule) Name() string {
 	return "defer"
 }
 
-func (r *DeferRule) allowFromArgs(args lint.Arguments) map[string]bool {
+func (*DeferRule) allowFromArgs(args lint.Arguments) map[string]bool {
 	if len(args) < 1 {
 		allow := map[string]bool{
 			"loop":        true,

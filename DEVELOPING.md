@@ -7,8 +7,8 @@ This document explains how to build, test, and develop features for revive.
 In order to install all the dependencies run:
 
 ```bash
-go get -u github.com/mgechev/revive
-cd $GOPATH/src/github.com/mgechev/revive
+go get -u github.com/deepsourcelabs/revive
+cd $GOPATH/src/github.com/deepsourcelabs/revive
 ```
 
 After that install the dependencies using go modules:
@@ -29,7 +29,7 @@ The command will produce the `revive` binary in the root of the project.
 
 ## Development of rules
 
-If you want to develop a new rule, follow as an example the already existing rules in the [rule package](https://github.com/mgechev/revive/tree/master/rule).
+If you want to develop a new rule, follow as an example the already existing rules in the [rule package](https://github.com/deepsourcelabs/revive/tree/master/rule).
 
 All rules should implement the following interface:
 
@@ -42,7 +42,7 @@ type Rule interface {
 
 ## Development of formatters
 
-If you want to develop a new formatter, follow as an example the already existing formatters in the [formatter package](https://github.com/mgechev/revive/tree/master/formatter).
+If you want to develop a new formatter, follow as an example the already existing formatters in the [formatter package](https://github.com/deepsourcelabs/revive/tree/master/formatter).
 
 All formatters should implement the following interface:
 
