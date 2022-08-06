@@ -2,11 +2,10 @@ package lint
 
 import (
 	"go/ast"
+	"go/importer"
 	"go/token"
 	"go/types"
 	"sync"
-
-	"golang.org/x/tools/go/gcexportdata"
 
 	"github.com/mgechev/revive/internal/typeparams"
 )
@@ -24,10 +23,6 @@ type Package struct {
 	// main is whether this is a "main" package.
 	main int
 	sync.RWMutex
-}
-
-var newImporter = func(fset *token.FileSet) types.ImporterFrom {
-	return gcexportdata.NewImporter(fset, make(map[string]*types.Package))
 }
 
 var (
@@ -95,7 +90,7 @@ func (p *Package) TypeCheck() error {
 	config := &types.Config{
 		// By setting a no-op error reporter, the type checker does as much work as possible.
 		Error:    func(error) {},
-		Importer: newImporter(p.fset),
+		Importer: importer.Default(),
 	}
 	info := &types.Info{
 		Types:  make(map[ast.Expr]types.TypeAndValue),
