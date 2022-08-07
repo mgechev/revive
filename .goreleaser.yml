@@ -23,10 +23,6 @@ builds:
       - darwin
       - windows
 
-    ignore:
-      - goos: windows
-        goarch: arm64
-
 dockers:
 - image_templates: ["ghcr.io/mgechev/revive:{{ .Version }}"]
   dockerfile: Dockerfile
