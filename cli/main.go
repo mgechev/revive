@@ -119,7 +119,6 @@ func buildDefaultConfigPath() string {
 	} else {
 		result = ""
 	}
-    print(result)
 
 	return result
 }
