@@ -341,6 +341,8 @@ enableAllRules = true
     Disabled = true
 [rule.function-length]
     Disabled = true
+[rule.banned-characters]
+    Disabled = true
 
 # Rule tuning
 [rule.argument-limit]
