@@ -143,11 +143,21 @@ If you want to use revive with Bazel, take a look at the [rules](https://github.
 - Support for Atom via [linter-revive](https://github.com/morphy2k/linter-revive).
 - Support for vim via [dense-analysis/ale](https://github.com/dense-analysis/ale).
 
-```vim
-let g:ale_linters = {
-\   'go': ['revive'],
-\}
-```
+  ```vim
+  let g:ale_linters = {
+  \   'go': ['revive'],
+  \}
+  ```
+
+- Support for Neovim via [null-ls.nvim](https://github.com/jose-elias-alvarez/null-ls.nvim).
+
+  ```lua
+  require("null-ls").setup({
+      sources = {
+          require("null-ls").builtins.diagnostics.revive
+      },
+  })
+  ```
 
 ### GitHub Actions
 
