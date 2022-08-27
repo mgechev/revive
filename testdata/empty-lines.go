@@ -168,3 +168,6 @@ func ShouldNotWarn() {
 
 	// comment
 }
+
+// NR test for issue #739
+func NotWarnInSingleLineFunction() { println("foo") }
