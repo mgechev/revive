@@ -35,3 +35,8 @@ func fred() interface{} {
 type Bad struct {
 	Field []struct{} // MATCH /no nested structs are allowed/
 }
+
+// issue744
+type issue744 struct {
+	c chan struct{}
+}
