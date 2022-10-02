@@ -9,7 +9,7 @@ A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
-1. I updated revive `go get -u github.com/mgechev/revive`
+1. I updated revive `go install github.com/mgechev/revive@latest`
 2. I run it with the following flags & configuration file:
 
 ```shell

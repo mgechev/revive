@@ -4,14 +4,14 @@ This document explains how to build, test, and develop features for revive.
 
 ## Installation
 
-In order to install all the dependencies run:
+Clone the project:
 
-```bash
-go get -u github.com/mgechev/revive
-cd $GOPATH/src/github.com/mgechev/revive
+```
+git clone git@github.com:mgechev/revive.git
+cd revive
 ```
 
-After that install the dependencies using go modules:
+In order to fetch all the dependencies run:
 
 ```bash
 make install
