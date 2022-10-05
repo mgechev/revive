@@ -73,7 +73,7 @@ Here's how `revive` is different from `golint`:
       - [golangci-lint](#golangci-lint)
     - [Command Line Flags](#command-line-flags)
     - [Sample Invocations](#sample-invocations)
-    - [Comment Annotations](#comment-annotations)
+    - [Comment Directives](#comment-directives)
     - [Configuration](#configuration)
     - [Default Configuration](#default-configuration)
     - [Custom Configuration](#custom-configuration)
