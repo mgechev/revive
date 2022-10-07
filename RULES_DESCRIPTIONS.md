@@ -85,12 +85,13 @@ _Configuration_:
 * `allowStr`: (string) comma-separated list of allowed string literals
 * `allowInts`: (string) comma-separated list of allowed integers
 * `allowFloats`: (string) comma-separated list of allowed floats
+* `ignoreFuncs`: (string) comma separated list of function name regexp patterns to exclude
 
 Example:
 
 ```toml
 [rule.add-constant]
-  arguments = [{maxLitCount = "3",allowStrs ="\"\"",allowInts="0,1,2",allowFloats="0.0,0.,1.0,1.,2.0,2."}]
+  arguments = [{maxLitCount = "3",allowStrs ="\"\"",allowInts="0,1,2",allowFloats="0.0,0.,1.0,1.,2.0,2.","ignoreFuncs": "os.*,fmt.Println,make"}]
 ```
 
 ## argument-limit
