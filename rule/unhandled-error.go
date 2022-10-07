@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/types"
+	"regexp"
 	"sync"
 
 	"github.com/mgechev/revive/lint"
@@ -11,24 +12,23 @@ import (
 
 // UnhandledErrorRule lints given else constructs.
 type UnhandledErrorRule struct {
-	ignoreList ignoreListType
+	ignoreList []*regexp.Regexp
 	sync.Mutex
 }
-
-type ignoreListType map[string]struct{}
 
 func (r *UnhandledErrorRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	if r.ignoreList == nil {
-		r.ignoreList = make(ignoreListType, len(arguments))
-
 		for _, arg := range arguments {
 			argStr, ok := arg.(string)
 			if !ok {
 				panic(fmt.Sprintf("Invalid argument to the unhandled-error rule. Expecting a string, got %T", arg))
 			}
 
-			r.ignoreList[argStr] = struct{}{}
+			if argStr == "" {
+				continue
+			}
+			r.ignoreList = append(r.ignoreList, regexp.MustCompile(argStr))
 		}
 	}
 	r.Unlock()
@@ -60,7 +60,7 @@ func (*UnhandledErrorRule) Name() string {
 }
 
 type lintUnhandledErrors struct {
-	ignoreList ignoreListType
+	ignoreList []*regexp.Regexp
 	pkg        *lint.Package
 	onFailure  func(lint.Failure)
 }
@@ -103,7 +103,7 @@ func (w *lintUnhandledErrors) Visit(node ast.Node) ast.Visitor {
 
 func (w *lintUnhandledErrors) addFailure(n *ast.CallExpr) {
 	funcName := gofmt(n.Fun)
-	if _, mustIgnore := w.ignoreList[funcName]; mustIgnore {
+	if w.isIgnoredFunc(funcName) {
 		return
 	}
 
@@ -113,6 +113,16 @@ func (w *lintUnhandledErrors) addFailure(n *ast.CallExpr) {
 		Node:       n,
 		Failure:    fmt.Sprintf("Unhandled error in call to function %v", funcName),
 	})
+}
+
+func (w *lintUnhandledErrors) isIgnoredFunc(funcName string) bool {
+	for _, pattern := range w.ignoreList {
+		if pattern.MatchString(funcName) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (*lintUnhandledErrors) isTypeError(t *types.Named) bool {

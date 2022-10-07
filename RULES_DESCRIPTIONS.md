@@ -647,13 +647,13 @@ _Configuration_: N/A
 
 _Description_: This rule warns when errors returned by a function are not explicitly handled on the caller side.
 
-_Configuration_: function names to ignore
+_Configuration_: function names regexp patterns to ignore
 
 Example:
 
 ```toml
 [unhandled-error]
-  arguments =["fmt.Printf", "myFunction"]
+  arguments =["os.*,fmt.Printf", "myFunction"]
 ```
 ## unnecessary-stmt
 
