@@ -1,5 +1,10 @@
 package fixtures
 
+import (
+	"fmt"
+	"os"
+)
+
 func foo(a, b, c, d int) {
 	a = 1.0 // ignore
 	b = "ignore"
@@ -13,4 +18,21 @@ func foo(a, b, c, d int) {
 			println("lit")
 		}
 	}
+
+	println(0666)           // MATCH /avoid magic numbers like '0666', create a named constant for it/
+	os.Chmod("test", 0666)  // ignore
+	os.FindProcess(102100)  // ignore
+	fmt.Println("test", 12) // ignore
+	fmt.Printf("%d", 100)   // MATCH /avoid magic numbers like '100', create a named constant for it/
+	ignoredFunc(1000)       // ignore
+	println("The result of calling myFunc is: ", ignoredFunc(100))
+	println("The result of calling myFunc is: ", notIgnoredFunc(100)) // MATCH /avoid magic numbers like '100', create a named constant for it/
+}
+
+func ignoredFunc(num int) int {
+	return num
+}
+
+func notIgnoredFunc(num int) int {
+	return num
 }
