@@ -19,5 +19,6 @@ func unhandledError2() error {
 	net.ResolveTCPAddr("tcp4", "localhost:8080")
 	os.Chdir("..")
 	_ = os.Chdir("..")
+	osXChdir()
 	return err
 }
