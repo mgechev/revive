@@ -23,9 +23,10 @@ func foo(a, b, c, d int) {
 	os.Chmod("test", 0666)  // ignore
 	os.FindProcess(102100)  // ignore
 	fmt.Println("test", 12) // ignore
+	myPrintln("test", 12)   // sure we want to ignore?
 	fmt.Printf("%d", 100)   // MATCH /avoid magic numbers like '100', create a named constant for it/
 	ignoredFunc(1000)       // ignore
-	Not2ignoredFunc(1000)   // shure we want to ignore?
+	Not2ignoredFunc(1000)   // sure we want to ignore?
 	println("The result of calling myFunc is: ", ignoredFunc(100))
 	println("The result of calling myFunc is: ", notIgnoredFunc(100)) // MATCH /avoid magic numbers like '100', create a named constant for it/
 }
