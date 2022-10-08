@@ -25,6 +25,7 @@ func foo(a, b, c, d int) {
 	fmt.Println("test", 12) // ignore
 	fmt.Printf("%d", 100)   // MATCH /avoid magic numbers like '100', create a named constant for it/
 	ignoredFunc(1000)       // ignore
+	Not2ignoredFunc(1000)   // shure we want to ignore?
 	println("The result of calling myFunc is: ", ignoredFunc(100))
 	println("The result of calling myFunc is: ", notIgnoredFunc(100)) // MATCH /avoid magic numbers like '100', create a named constant for it/
 }
