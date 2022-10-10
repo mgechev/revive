@@ -91,16 +91,16 @@ func (w lintAddConstantRule) Visit(node ast.Node) ast.Visitor {
 
 func (w lintAddConstantRule) checkFunc(expr *ast.CallExpr) {
 	fName := w.getFuncName(expr)
-	if w.isIgnoredFunc(fName) {
-		return
-	}
 
 	for _, arg := range expr.Args {
 		switch t := arg.(type) {
-		case *ast.BasicLit:
-			w.checkLit(t)
 		case *ast.CallExpr:
 			w.checkFunc(t)
+		case *ast.BasicLit:
+			if w.isIgnoredFunc(fName) {
+				continue
+			}
+			w.checkLit(t)
 		}
 	}
 }
@@ -221,10 +221,17 @@ func (r *AddConstantRule) configure(arguments lint.Arguments) {
 					}
 
 					for _, exclude := range strings.Split(excludes, ",") {
+						exclude = strings.Trim(exclude, " ")
 						if exclude == "" {
-							continue
+							panic("Invalid argument to the add-constant rule, expected string must not be empty.")
 						}
-						r.ignoreFunctions = append(r.ignoreFunctions, regexp.MustCompile(exclude))
+
+						exp, err := regexp.Compile(exclude)
+						if err != nil {
+							panic(fmt.Sprintf("Invalid argument to the add-constant rule, regexp error %s. Got '%v'", err, v))
+						}
+
+						r.ignoreFunctions = append(r.ignoreFunctions, exp)
 					}
 				}
 			}

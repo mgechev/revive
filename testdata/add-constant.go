@@ -23,12 +23,23 @@ func foo(a, b, c, d int) {
 	os.Chmod("test", 0666)  // ignore
 	os.FindProcess(102100)  // ignore
 	fmt.Println("test", 12) // ignore
-	myPrintln("test", 12)   // sure we want to ignore?
 	fmt.Printf("%d", 100)   // MATCH /avoid magic numbers like '100', create a named constant for it/
 	ignoredFunc(1000)       // ignore
-	Not2ignoredFunc(1000)   // sure we want to ignore?
-	println("The result of calling myFunc is: ", ignoredFunc(100))
-	println("The result of calling myFunc is: ", notIgnoredFunc(100)) // MATCH /avoid magic numbers like '100', create a named constant for it/
+
+	println("The result of calling myFunc is: ", ignoredFunc(100))             // ignore
+	println("result is: ", ignoredFunc(notIgnoredFunc(ignoredFunc(100))))      // ignore
+	println("result of calling myFunc is: ", notIgnoredFunc(ignoredFunc(100))) // ignore
+
+	println("result myFunc is: ", notIgnoredFunc(100))           // MATCH /avoid magic numbers like '100', create a named constant for it/
+	println("The result is: ", ignoredFunc(notIgnoredFunc(100))) // MATCH /avoid magic numbers like '100', create a named constant for it/
+}
+
+func myPrintln(s string, num int) {
+
+}
+
+func not2ignoredFunc(num int) int {
+	return num
 }
 
 func ignoredFunc(num int) int {
