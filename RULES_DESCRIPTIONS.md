@@ -91,7 +91,7 @@ Example:
 
 ```toml
 [rule.add-constant]
-  arguments = [{maxLitCount = "3",allowStrs ="\"\"",allowInts="0,1,2",allowFloats="0.0,0.,1.0,1.,2.0,2.","ignoreFuncs": "os.*,fmt.Println,make"}]
+  arguments = [{maxLitCount = "3",allowStrs ="\"\"",allowInts="0,1,2",allowFloats="0.0,0.,1.0,1.,2.0,2.","ignoreFuncs": "os\\.*,fmt\\.Println,make"}]
 ```
 
 ## argument-limit
