@@ -217,18 +217,18 @@ func (r *AddConstantRule) configure(arguments lint.Arguments) {
 				case "ignoreFuncs":
 					excludes, ok := v.(string)
 					if !ok {
-						panic(fmt.Sprintf("Invalid argument to the add-constant rule, string expected. Got '%v' (%T)", v, v))
+						panic(fmt.Sprintf("Invalid argument to the ignoreFuncs parameter of add-constant rule, string expected. Got '%v' (%T)", v, v))
 					}
 
 					for _, exclude := range strings.Split(excludes, ",") {
 						exclude = strings.Trim(exclude, " ")
 						if exclude == "" {
-							panic("Invalid argument to the add-constant rule, expected string must not be empty.")
+							panic("Invalid argument to the ignoreFuncs parameter of add-constant rule, expected regular expression must not be empty.")
 						}
 
 						exp, err := regexp.Compile(exclude)
 						if err != nil {
-							panic(fmt.Sprintf("Invalid argument to the add-constant rule, regexp error %s. Got '%v'", err, v))
+							panic(fmt.Sprintf("Invalid argument to the ignoreFuncs parameter of add-constant rule: regexp %q does not compile: %v", exclude, err))
 						}
 
 						r.ignoreFunctions = append(r.ignoreFunctions, exp)
