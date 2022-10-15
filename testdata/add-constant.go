@@ -24,7 +24,9 @@ func foo(a, b, c, d int) {
 	os.FindProcess(102100)  // ignore
 	fmt.Println("test", 12) // ignore
 	fmt.Printf("%d", 100)   // MATCH /avoid magic numbers like '100', create a named constant for it/
+	myPrintln("%d", 100)    // MATCH /avoid magic numbers like '100', create a named constant for it/
 	ignoredFunc(1000)       // ignore
+	ignoredFunc1(1000)      // ignore - match regexp too
 
 	println("The result of calling myFunc is: ", ignoredFunc(100))             // ignore
 	println("result is: ", ignoredFunc(notIgnoredFunc(ignoredFunc(100))))      // ignore
@@ -38,7 +40,7 @@ func myPrintln(s string, num int) {
 
 }
 
-func not2ignoredFunc(num int) int {
+func ignoredFunc1(num int) int {
 	return num
 }
 
