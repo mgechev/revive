@@ -11,7 +11,7 @@ func TestUnhandledError(t *testing.T) {
 	testRule(t, "unhandled-error", &rule.UnhandledErrorRule{})
 }
 
-func TestUnhandledErrorWithBlacklist(t *testing.T) {
+func TestUnhandledErrorWithIgnoreList(t *testing.T) {
 	args := []interface{}{
 		"unhandledError1",
 		"fmt\\.Print.*",
