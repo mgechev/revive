@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/types"
 	"regexp"
+	"strings"
 	"sync"
 
 	"github.com/mgechev/revive/lint"
@@ -25,10 +26,17 @@ func (r *UnhandledErrorRule) configure(arguments lint.Arguments) {
 				panic(fmt.Sprintf("Invalid argument to the unhandled-error rule. Expecting a string, got %T", arg))
 			}
 
+			argStr = strings.Trim(argStr, " ")
 			if argStr == "" {
-				continue
+				panic("Invalid argument to the unhandled-error rule, expected regular expression must not be empty.")
 			}
-			r.ignoreList = append(r.ignoreList, regexp.MustCompile(argStr))
+
+			exp, err := regexp.Compile(argStr)
+			if err != nil {
+				panic(fmt.Sprintf("Invalid argument to the unhandled-error rule: regexp %q does not compile: %v", argStr, err))
+			}
+
+			r.ignoreList = append(r.ignoreList, exp)
 		}
 	}
 	r.Unlock()
@@ -102,8 +110,8 @@ func (w *lintUnhandledErrors) Visit(node ast.Node) ast.Visitor {
 }
 
 func (w *lintUnhandledErrors) addFailure(n *ast.CallExpr) {
-	funcName := gofmt(n.Fun)
-	if w.isIgnoredFunc(funcName) {
+	name := w.funcName(n)
+	if w.isIgnoredFunc(name) {
 		return
 	}
 
@@ -111,8 +119,21 @@ func (w *lintUnhandledErrors) addFailure(n *ast.CallExpr) {
 		Category:   "bad practice",
 		Confidence: 1,
 		Node:       n,
-		Failure:    fmt.Sprintf("Unhandled error in call to function %v", funcName),
+		Failure:    fmt.Sprintf("Unhandled error in call to function %v", gofmt(n.Fun)),
 	})
+}
+
+func (w *lintUnhandledErrors) funcName(call *ast.CallExpr) string {
+	fn, ok := w.getFunc(call)
+	if !ok {
+		return gofmt(call.Fun)
+	}
+
+	name := fn.FullName()
+	name = strings.Replace(name, "(", "", -1)
+	name = strings.Replace(name, ")", "", -1)
+
+	return name
 }
 
 func (w *lintUnhandledErrors) isIgnoredFunc(funcName string) bool {
@@ -139,4 +160,18 @@ func (w *lintUnhandledErrors) returnsAnError(tt *types.Tuple) bool {
 		}
 	}
 	return false
+}
+
+func (w *lintUnhandledErrors) getFunc(call *ast.CallExpr) (*types.Func, bool) {
+	sel, ok := call.Fun.(*ast.SelectorExpr)
+	if !ok {
+		return nil, false
+	}
+
+	fn, ok := w.pkg.TypesInfo().ObjectOf(sel.Sel).(*types.Func)
+	if !ok {
+		return nil, false
+	}
+
+	return fn, true
 }

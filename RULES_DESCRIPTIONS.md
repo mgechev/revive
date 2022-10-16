@@ -653,7 +653,7 @@ Example:
 
 ```toml
 [unhandled-error]
-  arguments =["os.*,fmt.Printf", "myFunction"]
+  arguments =["os\\.(Create|WriteFile|Chmod)", "fmt\\.Print.*", "myFunction", "net\\.*"]
 ```
 ## unnecessary-stmt
 
