@@ -1,8 +1,8 @@
 package test
 
-import(
+import (
 	"testing"
-	
+
 	"github.com/mgechev/revive/rule"
 )
 
