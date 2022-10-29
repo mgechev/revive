@@ -16,7 +16,9 @@ type hello struct {
 	random `json:random`
 }
 
-// MATCH:18 /no space between comment symbol and comment text/
+// MATCH:21 /no space between comment delimiter and comment text/
 
 //This comment does not respect the spacing rule!
 var a string
+
+//myOwnDirective: do something
