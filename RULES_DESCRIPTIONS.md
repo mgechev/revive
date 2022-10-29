@@ -13,6 +13,7 @@ List of all available rules.
   - [bool-literal-in-expr](#bool-literal-in-expr)
   - [call-to-gc](#call-to-gc)
   - [confusing-naming](#confusing-naming)
+  - [comment-spacings](#comment-spacings)
   - [confusing-results](#confusing-results)
   - [cognitive-complexity](#cognitive-complexity)
   - [constant-logical-expr](#constant-logical-expr)
@@ -168,6 +169,24 @@ Example:
   arguments =[7]
 ```
 
+## comment-spacings
+_Description_: Spots comments of the form:
+```go
+//This is a malformed comment: no space between // and the start of the sentence
+```
+
+_Configuration_: ([]string) list of exceptions. For example, to accept comments of the form
+```go
+//mypragma: activate something
+```
+You need to add `"mypragma"` in the configuration
+
+Example:
+
+```toml
+[rule.comment-spacings]
+  arguments =["mypragma","otherpragma"]
+```
 ## confusing-naming
 
 _Description_: Methods or fields of `struct` that have names different only by capitalization could be confusing.
