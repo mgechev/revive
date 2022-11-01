@@ -20,7 +20,7 @@ func TestStringFormat(t *testing.T) {
 				"/[^\\.]$/"}, // Must not end with a period
 			[]interface{}{
 				"s.Method3[2]",
-				"/^[^Tt][^Hh]/",
+				"!/^[Tt][Hh]/",
 				"must not start with 'th'"}}})
 }
 

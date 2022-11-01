@@ -13,6 +13,7 @@ List of all available rules.
   - [bool-literal-in-expr](#bool-literal-in-expr)
   - [call-to-gc](#call-to-gc)
   - [confusing-naming](#confusing-naming)
+  - [comment-spacings](#comment-spacings)
   - [confusing-results](#confusing-results)
   - [cognitive-complexity](#cognitive-complexity)
   - [constant-logical-expr](#constant-logical-expr)
@@ -85,12 +86,13 @@ _Configuration_:
 * `allowStr`: (string) comma-separated list of allowed string literals
 * `allowInts`: (string) comma-separated list of allowed integers
 * `allowFloats`: (string) comma-separated list of allowed floats
+* `ignoreFuncs`: (string) comma-separated list of function names regexp patterns to exclude
 
 Example:
 
 ```toml
 [rule.add-constant]
-  arguments = [{maxLitCount = "3",allowStrs ="\"\"",allowInts="0,1,2",allowFloats="0.0,0.,1.0,1.,2.0,2."}]
+  arguments = [{maxLitCount = "3",allowStrs ="\"\"",allowInts="0,1,2",allowFloats="0.0,0.,1.0,1.,2.0,2.","ignoreFuncs": "os\\.*,fmt\\.Println,make"}]
 ```
 
 ## argument-limit
@@ -167,6 +169,24 @@ Example:
   arguments =[7]
 ```
 
+## comment-spacings
+_Description_: Spots comments of the form:
+```go
+//This is a malformed comment: no space between // and the start of the sentence
+```
+
+_Configuration_: ([]string) list of exceptions. For example, to accept comments of the form
+```go
+//mypragma: activate something
+```
+You need to add `"mypragma"` in the configuration
+
+Example:
+
+```toml
+[rule.comment-spacings]
+  arguments =["mypragma","otherpragma"]
+```
 ## confusing-naming
 
 _Description_: Methods or fields of `struct` that have names different only by capitalization could be confusing.
@@ -564,11 +584,14 @@ This is geared towards user facing applications where string literals are often 
 
 _Configuration_: Each argument is a slice containing 2-3 strings: a scope, a regex, and an optional error message.
 
-1. The first string defines a scope. This controls which string literals the regex will apply to, and is defined as a function argument. It must contain at least a function name (`core.WriteError`). Scopes may optionally contain a number specifying which argument in the function to check (`core.WriteError[1]`), as well as a struct field (`core.WriteError[1].Message`, only works for top level fields). Function arguments are counted starting at 0, so `[0]` would refer to the first argument, `[1]` would refer to the second, etc. If no argument number is provided, the first argument will be used (same as `[0]`).
+1. The first string defines a **scope**. This controls which string literals the regex will apply to, and is defined as a function argument. It must contain at least a function name (`core.WriteError`). Scopes may optionally contain a number specifying which argument in the function to check (`core.WriteError[1]`), as well as a struct field (`core.WriteError[1].Message`, only works for top level fields). Function arguments are counted starting at 0, so `[0]` would refer to the first argument, `[1]` would refer to the second, etc. If no argument number is provided, the first argument will be used (same as `[0]`).
 
-2. The second string is a regular expression (beginning and ending with a `/` character), which will be used to check the string literals in the scope.
+2. The second string is a **regular expression** (beginning and ending with a `/` character), which will be used to check the string literals in the scope. The default semantics is "_strings matching the regular expression are OK_". If you need to inverse the semantics you can add a `!` just before the first `/`. Examples:
 
-3. The third string (optional) is a message containing the purpose for the regex, which will be used in lint errors.
+    * with `"/^[A-Z].*$/"` the rule will **accept** strings starting with capital letters
+    * with `"!/^[A-Z].*$/"` the rule will a **fail** on strings starting with capital letters
+
+3. The third string (optional) is a **message** containing the purpose for the regex, which will be used in lint errors.
 
 Example:
 
