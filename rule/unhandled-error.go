@@ -132,13 +132,14 @@ func (w *lintUnhandledErrors) funcName(call *ast.CallExpr) string {
 	name := fn.FullName()
 	name = strings.Replace(name, "(", "", -1)
 	name = strings.Replace(name, ")", "", -1)
+	name = strings.Replace(name, "*", "", -1)
 
 	return name
 }
 
 func (w *lintUnhandledErrors) isIgnoredFunc(funcName string) bool {
 	for _, pattern := range w.ignoreList {
-		if pattern.MatchString(funcName) {
+		if len(pattern.FindString(funcName)) == len(funcName) {
 			return true
 		}
 	}

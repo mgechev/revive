@@ -676,7 +676,7 @@ Example:
 
 ```toml
 [unhandled-error]
-  arguments =["os\\.(Create|WriteFile|Chmod)", "fmt\\.Print.*", "myFunction", "net\\.*"]
+  arguments =["os\.(Create|WriteFile|Chmod)", "fmt\.Print", "myFunction", "net\..*", "bytes\.Buffer\.Write"]
 ```
 ## unnecessary-stmt
 
