@@ -40,3 +40,8 @@ type Bad struct {
 type issue744 struct {
 	c chan struct{}
 }
+
+// issue 781
+type mySetInterface interface {
+	GetSet() map[string]struct{}
+}
