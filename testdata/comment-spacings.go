@@ -28,3 +28,14 @@ Should be valid
 */
 
 //	Tabs between comment delimeter and comment text should be fine
+
+// MATCH:34 /no space between comment delimiter and comment text/
+
+/*Not valid
+ */
+
+/*	valid
+ */
+
+/* valid
+ */
