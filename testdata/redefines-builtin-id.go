@@ -29,3 +29,6 @@ var any int // MATCH /redefinition of the built-in type any/
 const any = 1 // MATCH /redefinition of the built-in type any/
 
 var i, copy int // MATCH /redefinition of the built-in function copy/
+
+// issue #792
+type ()
