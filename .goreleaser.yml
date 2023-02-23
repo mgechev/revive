@@ -24,17 +24,22 @@ builds:
       - windows
 
 dockers:
-- image_templates: ["ghcr.io/mgechev/revive:{{ .Version }}"]
-  dockerfile: Dockerfile
-  build_flag_templates:
-  - --label=org.opencontainers.image.title={{ .ProjectName }}
-  - --label=org.opencontainers.image.description={{ .ProjectName }}
-  - --label=org.opencontainers.image.url=https://github.com/mgechev/revive
-  - --label=org.opencontainers.image.source=https://github.com/mgechev/revive
-  - --label=org.opencontainers.image.version={{ .Version }}
-  - --label=org.opencontainers.image.revision={{ .FullCommit }}
-  - --label=org.opencontainers.image.licenses=MIT
-  
+  - image_templates:
+      - "ghcr.io/mgechev/revive:{{ .Version }}"
+      - "ghcr.io/mgechev/revive:{{ .Tag }}"
+      - "ghcr.io/mgechev/revive:v{{ .Major }}.{{ .Minor }}"
+      - "ghcr.io/mgechev/revive:v{{ .Major }}"
+      - "ghcr.io/mgechev/revive:latest"
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - --label=org.opencontainers.image.created={{.Date}}
+      - --label=org.opencontainers.image.title={{ .ProjectName }}
+      - "--label=org.opencontainers.image.description=🔥 ~6x faster, stricter, configurable, extensible, and beautiful drop-in replacement for golint"
+      - --label=org.opencontainers.image.url=https://github.com/mgechev/revive
+      - --label=org.opencontainers.image.source=https://github.com/mgechev/revive
+      - --label=org.opencontainers.image.version={{ .Version }}
+      - --label=org.opencontainers.image.revision={{ .FullCommit }}
+      - --label=org.opencontainers.image.licenses=MIT
 changelog:
   filters:
     exclude:
