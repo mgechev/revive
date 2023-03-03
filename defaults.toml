@@ -23,3 +23,8 @@ warningCode = 0
 [rule.unexported-return]
 [rule.indent-error-flow]
 [rule.errorf]
+[rule.empty-block]
+[rule.superfluous-else]
+[rule.unused-parameter]
+[rule.unreachable-code]
+[rule.redefines-builtin-id]
