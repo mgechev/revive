@@ -2,12 +2,20 @@
 
 package fixtures
 
+import "net/http"
+
 func f(x int) {} // Must not match
 
 type foo struct{}
 
 func (f foo) f(x *int)  {} // Must not match
 func (f *foo) g(y *int) {} // Must not match
+
+
+func h() {
+	go http.ListenAndServe()
+	select {} // Must not match
+}
 
 func g(f func() bool) {
 	{ // MATCH /this block is empty, you can remove it/
@@ -44,4 +52,9 @@ func g(f func() bool) {
 	for range s { // MATCH /this block is empty, you can remove it/
 	}
 
+	select {
+	case _, ok := <-c:
+		if ok { // MATCH /this block is empty, you can remove it/
+		}
+	}
 }
