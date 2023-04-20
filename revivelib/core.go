@@ -52,7 +52,7 @@ func New(
 
 	lintingRules, err := config.GetLintingRules(conf, extraRuleInstances)
 	if err != nil {
-		return nil, errors.Wrap(err, "initializing revive - gettint lint rules")
+		return nil, errors.Wrap(err, "initializing revive - getting lint rules")
 	}
 
 	logger.Println("Config loaded")
