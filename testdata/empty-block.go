@@ -11,7 +11,6 @@ type foo struct{}
 func (f foo) f(x *int)  {} // Must not match
 func (f *foo) g(y *int) {} // Must not match
 
-
 func h() {
 	go http.ListenAndServe()
 	select {} // Must not match
@@ -43,6 +42,10 @@ func g(f func() bool) {
 
 	}
 
+	for true { // MATCH /this block is empty, you can remove it/
+
+	}
+
 	// issue 386, then overwritten by issue 416
 	var c = make(chan int)
 	for range c { // MATCH /this block is empty, you can remove it/
@@ -57,4 +60,34 @@ func g(f func() bool) {
 		if ok { // MATCH /this block is empty, you can remove it/
 		}
 	}
+
+	// issue 810
+	next := 0
+	iter := func(v *int) bool {
+		*v = next
+		next++
+		fmt.Println(*v)
+		return next < 10
+	}
+
+	z := 0
+	for iter(&z) { // Must not match
+	}
+
+	for process() { // Must not match
+	}
+
+	var it iterator
+	for it.next() { // Must not match
+	}
+}
+
+func process() bool {
+	return false
+}
+
+type iterator struct{}
+
+func (it *iterator) next() bool {
+	return false
 }
