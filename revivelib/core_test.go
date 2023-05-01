@@ -26,16 +26,11 @@ func TestReviveLint(t *testing.T) {
 		failureList = append(failureList, failure)
 	}
 
-	const expected = 3
+	const expected = 5
 
 	got := len(failureList)
 	if got != expected {
 		t.Fatalf("Expected failures to have %d failures, but it has %d.", expected, got)
-	}
-
-	errmsg := "redundant if ...; err != nil check, just return error instead."
-	if failureList[0].Failure != errmsg {
-		t.Fatalf("Expected failure[0] to be '%s', but it was '%s'", errmsg, failureList[0].Failure)
 	}
 }
 
@@ -57,13 +52,15 @@ func TestReviveFormat(t *testing.T) {
 	}
 
 	errorMsgs := []string{
-		"(15, 2)  https://revive.run/r#if-return  redundant if ...; err != nil check, just return error instead.",
-		"(88, 3)  https://revive.run/r#if-return  redundant if ...; err != nil check, just return error instead.",
-		"(95, 3)  https://revive.run/r#if-return  redundant if ...; err != nil check, just return error instead.",
+		"(91, 3)  https://revive.run/r#unreachable-code  unreachable code after this statement",
+		"(98, 3)  https://revive.run/r#unreachable-code  unreachable code after this statement",
+		"(15, 2)  https://revive.run/r#if-return         redundant if ...; err != nil check, just return error instead.",
+		"(88, 3)  https://revive.run/r#if-return         redundant if ...; err != nil check, just return error instead.",
+		"(95, 3)  https://revive.run/r#if-return         redundant if ...; err != nil check, just return error instead.",
 	}
 	for _, errorMsg := range errorMsgs {
 		if !strings.Contains(failures, errorMsg) {
-			t.Fatalf("Expected formatted failures '%s' to contain '%s', but it didn't.", failures, errorMsg)
+			t.Fatalf("Expected formatted failures\n'%s'\nto contain\n'%s', but it didn't.", failures, errorMsg)
 		}
 	}
 
