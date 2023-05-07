@@ -38,3 +38,12 @@ func h(f func() bool, x int) string {
 	}
 }
 
+func i() string {
+	if err == author.ErrCourseNotFound {
+		return "not found"
+	} else if err == author.AnotherError {
+		return "something else"
+	} else { // MATCH /if block ends with a return statement, so drop this else and outdent its block/
+		return "okay"
+	}
+}

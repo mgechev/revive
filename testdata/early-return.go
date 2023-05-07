@@ -2,6 +2,8 @@
 
 package fixtures
 
+import "os"
+
 func earlyRet() bool {
 	if cond { //   MATCH /if c { ... } else { ... return } can be simplified to if !c { ... return } .../
 		println()
@@ -123,5 +125,11 @@ func earlyRet() bool {
 		println(x)
 	} else {
 		return false
+	}
+
+	if cond { //MATCH /if c { ... } else { ... os.Exit() } can be simplified to if !c { ... os.Exit() } .../
+		println()
+	} else {
+		os.Exit(0)
 	}
 }
