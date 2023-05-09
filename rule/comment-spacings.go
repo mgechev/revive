@@ -23,6 +23,7 @@ func (r *CommentSpacingsRule) configure(arguments lint.Arguments) {
 		r.allowList = []string{
 			"//go:",
 			"//revive:",
+			"//nolint:",
 		}
 
 		for _, arg := range arguments {
