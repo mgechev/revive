@@ -39,3 +39,6 @@ Should be valid
 
 /* valid
  */
+
+//nolint:staticcheck // nolint should be in the default list of acceptable comments.
+var b string
