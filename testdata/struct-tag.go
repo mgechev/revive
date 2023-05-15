@@ -116,6 +116,8 @@ type Simple struct {
 	ODouble              *float64 `protobuf:"fixed64,014,opt,name=o_double,json=oDouble"`      // MATCH /duplicated tag number 14/
 	ODoubleStr           *float64 `protobuf:"fixed6,17,opt,name=o_double_str,json=oDoubleStr"` // MATCH /invalid protobuf tag name 'fixed6'/
 	OString              *string  `protobuf:"bytes,18,opt,name=o_string,json=oString"`
+	OString2             *string  `protobuf:"bytes,name=ameno"`
+	OString3             *string  `protobuf:"bytes,name=ameno"` // MATCH /duplicate tag name: 'ameno'/
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
