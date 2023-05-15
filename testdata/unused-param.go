@@ -3,7 +3,6 @@ package fixtures
 import (
 	"fmt"
 	"go/ast"
-	"io/ioutil"
 	"os"
 	"runtime"
 	"testing"
@@ -103,7 +102,7 @@ func getCompareFailCause(n *node, which int, prevValue string, prevIndex uint64)
 
 func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, src []byte, rules []lint.Rule, config map[string]lint.RuleConfig) error { // MATCH /parameter 'src' seems to be unused, consider removing or renaming it as _/
 	l := lint.New(func(file string) ([]byte, error) {
-		return ioutil.ReadFile(baseDir + file)
+		return os.ReadFile(baseDir + file)
 	})
 
 	ps, err := l.Lint([][]string{[]string{fi.Name()}}, rules, lint.Config{
