@@ -2,7 +2,10 @@
 
 package fixtures
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
 func f(x int) {} // Must not match
 
@@ -90,4 +93,9 @@ type iterator struct{}
 
 func (it *iterator) next() bool {
 	return false
+}
+
+type test struct {
+	foo []chan struct{}     // Must not match
+	bar map[string]struct{} // Must not match
 }
