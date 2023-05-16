@@ -2,7 +2,6 @@ package logging
 
 import (
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 )
@@ -27,7 +26,7 @@ func GetLogger() (*log.Logger, error) {
 		}
 	} else {
 		// Suppress all logging output if debug mode is disabled
-		writer = ioutil.Discard
+		writer = io.Discard
 	}
 
 	logger = log.New(writer, "", log.LstdFlags)

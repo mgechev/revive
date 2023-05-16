@@ -3,7 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/mgechev/revive/formatter"
 
@@ -140,7 +140,7 @@ func GetLintingRules(config *lint.Config, extraRules []lint.Rule) ([]lint.Rule, 
 }
 
 func parseConfig(path string, config *lint.Config) error {
-	file, err := ioutil.ReadFile(path)
+	file, err := os.ReadFile(path)
 	if err != nil {
 		return errors.New("cannot read the config file")
 	}

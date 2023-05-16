@@ -8,7 +8,6 @@ import (
 	"go/parser"
 	"go/token"
 	"go/types"
-	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
@@ -21,7 +20,7 @@ import (
 func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.RuleConfig) {
 	baseDir := "../testdata/"
 	filename = filename + ".go"
-	src, err := ioutil.ReadFile(baseDir + filename)
+	src, err := os.ReadFile(baseDir + filename)
 	if err != nil {
 		t.Fatalf("Bad filename path in test for %s: %v", rule.Name(), err)
 	}
@@ -42,7 +41,7 @@ func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.Rul
 
 func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, rules []lint.Rule, config map[string]lint.RuleConfig) error {
 	l := lint.New(func(file string) ([]byte, error) {
-		return ioutil.ReadFile(baseDir + file)
+		return os.ReadFile(baseDir + file)
 	}, 0)
 
 	ps, err := l.Lint([][]string{{fi.Name()}}, rules, lint.Config{
@@ -64,7 +63,7 @@ func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, rules []lint.Ru
 
 func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, rules []lint.Rule, config map[string]lint.RuleConfig) error {
 	l := lint.New(func(file string) ([]byte, error) {
-		return ioutil.ReadFile(baseDir + file)
+		return os.ReadFile(baseDir + file)
 	}, 0)
 
 	ins := parseInstructions(t, fi.Name(), src)

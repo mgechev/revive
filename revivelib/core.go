@@ -1,8 +1,8 @@
 package revivelib
 
 import (
-	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/mgechev/dots"
@@ -88,7 +88,7 @@ func (r *Revive) Lint(patterns ...*LintPattern) (<-chan lint.Failure, error) {
 	}
 
 	revive := lint.New(func(file string) ([]byte, error) {
-		contents, err := ioutil.ReadFile(file)
+		contents, err := os.ReadFile(file)
 
 		if err != nil {
 			return nil, errors.Wrap(err, "reading file "+file)
