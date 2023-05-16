@@ -18,6 +18,17 @@ type Quux struct {
 type Quuz struct {
 }
 
+type Quiz struct {
+	s struct{} // MATCH /no nested structs are allowed/
+}
+
+type nestedStructInChan struct {
+	c chan struct {
+		a int
+		b struct{ c int } // MATCH /no nested structs are allowed/
+	}
+}
+
 func waldo() (s struct{ b bool }) { return s }
 
 func fred() interface{} {
@@ -44,4 +55,10 @@ type issue744 struct {
 // issue 781
 type mySetInterface interface {
 	GetSet() map[string]struct{}
+}
+
+// issue 824
+type test struct {
+	foo []chan struct{}     // Must not match
+	bar map[string]struct{} // Must not match
 }
