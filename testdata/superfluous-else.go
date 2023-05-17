@@ -4,9 +4,9 @@
 package pkg
 
 import (
-	"os"
 	"fmt"
 	"log"
+	"os"
 )
 
 func h(f func() bool) string {
@@ -74,72 +74,82 @@ func j(f func() bool) string {
 }
 
 func fatal1() string {
-		if f() {
-			a := 1
-			log.Fatal("x")
-		} else { // MATCH /if block ends with call to log.Fatal function, so drop this else and outdent its block/
-			log.Printf("non-positive")
-		}
+	if f() {
+		a := 1
+		log.Fatal("x")
+	} else { // MATCH /if block ends with call to log.Fatal function, so drop this else and outdent its block/
+		log.Printf("non-positive")
+	}
 	return "ok"
 }
 
 func fatal2() string {
-		if f() {
-			a := 1
-			log.Fatalf("x")
-		} else { // MATCH /if block ends with call to log.Fatalf function, so drop this else and outdent its block/
-			log.Printf("non-positive")
-		}
+	if f() {
+		a := 1
+		log.Fatalf("x")
+	} else { // MATCH /if block ends with call to log.Fatalf function, so drop this else and outdent its block/
+		log.Printf("non-positive")
+	}
 	return "ok"
 }
 
 func fatal3() string {
-		if f() {
-			a := 1
-			log.Fatalln("x")
-		} else { // MATCH /if block ends with call to log.Fatalln function, so drop this else and outdent its block/
-			log.Printf("non-positive")
-		}
+	if f() {
+		a := 1
+		log.Fatalln("x")
+	} else { // MATCH /if block ends with call to log.Fatalln function, so drop this else and outdent its block/
+		log.Printf("non-positive")
+	}
 	return "ok"
 }
 
 func exit1() string {
-		if f() {
-			a := 1
-			os.Exit(2)
-		} else { // MATCH /if block ends with call to os.Exit function, so drop this else and outdent its block/
-			log.Printf("non-positive")
-		}
+	if f() {
+		a := 1
+		os.Exit(2)
+	} else { // MATCH /if block ends with call to os.Exit function, so drop this else and outdent its block/
+		log.Printf("non-positive")
+	}
 	return "ok"
 }
 
 func Panic1() string {
-		if f() {
-			a := 1
-			log.Panic(2)
-		} else { // MATCH /if block ends with call to log.Panic function, so drop this else and outdent its block/
-			log.Printf("non-positive")
-		}
+	if f() {
+		a := 1
+		log.Panic(2)
+	} else { // MATCH /if block ends with call to log.Panic function, so drop this else and outdent its block/
+		log.Printf("non-positive")
+	}
 	return "ok"
 }
 
 func Panic2() string {
-		if f() {
-			a := 1
-			log.Panicf(2)
-		} else { // MATCH /if block ends with call to log.Panicf function, so drop this else and outdent its block/
-			log.Printf("non-positive")
-		}
+	if f() {
+		a := 1
+		log.Panicf(2)
+	} else { // MATCH /if block ends with call to log.Panicf function, so drop this else and outdent its block/
+		log.Printf("non-positive")
+	}
 	return "ok"
 }
 
 func Panic3() string {
-		if f() {
-			a := 1
-			log.Panicln(2)
-		} else { // MATCH /if block ends with call to log.Panicln function, so drop this else and outdent its block/
-			log.Printf("non-positive")
-		}
+	if f() {
+		a := 1
+		log.Panicln(2)
+	} else { // MATCH /if block ends with call to log.Panicln function, so drop this else and outdent its block/
+		log.Printf("non-positive")
+	}
+	return "ok"
+}
+
+func Panic4() string {
+	if f() {
+		a := 1
+		panic(2)
+	} else { // MATCH /if block ends with call to panic function, so drop this else and outdent its block/
+		log.Printf("non-positive")
+	}
 	return "ok"
 }
 
@@ -153,5 +163,15 @@ func noreg_19(f func() bool, x int) string {
 		os.Exit(1) // "okay"
 	} else {
 		// side effect
+	}
+}
+
+func MultiBranch() string {
+	if _, ok := f(); ok {
+		continue
+	} else if _, err := get(); err == nil {
+		continue
+	} else { // MATCH /if block ends with a continue statement, so drop this else and outdent its block (move short variable declaration to its own line if necessary)/
+		delete(m, x)
 	}
 }
