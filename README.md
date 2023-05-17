@@ -449,10 +449,10 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`range`](./RULES_DESCRIPTIONS.md#range)               |  n/a   | Prevents redundant variables when iterating over a collection.   |   yes    |  no   |
 | [`receiver-naming`](./RULES_DESCRIPTIONS.md#receiver-naming)     |  n/a   | Conventions around the naming of receivers.                      |   yes    |  no   |
 | [`indent-error-flow`](./RULES_DESCRIPTIONS.md#indent-error-flow)   |  n/a   | Prevents redundant else statements.                              |   yes    |  no   |
-| [`argument-limit`](./RULES_DESCRIPTIONS.md#argument-limit)      |  int   | Specifies the maximum number of arguments a function can receive |    no    |  no   |
-| [`cyclomatic`](./RULES_DESCRIPTIONS.md#cyclomatic)          |  int   | Sets restriction for maximum Cyclomatic complexity.              |    no    |  no   |
-| [`max-public-structs`](./RULES_DESCRIPTIONS.md#max-public-structs)  |  int   | The maximum number of public structs in a file.                  |    no    |  no   |
-| [`file-header`](./RULES_DESCRIPTIONS.md#file-header)         | string | Header which each file should have.                              |    no    |  no   |
+| [`argument-limit`](./RULES_DESCRIPTIONS.md#argument-limit)      |  int (defaults to 8)  | Specifies the maximum number of arguments a function can receive |    no    |  no   |
+| [`cyclomatic`](./RULES_DESCRIPTIONS.md#cyclomatic)          |  int (defaults to 10)   | Sets restriction for maximum Cyclomatic complexity.              |    no    |  no   |
+| [`max-public-structs`](./RULES_DESCRIPTIONS.md#max-public-structs)  |  int (defaults to 5)  | The maximum number of public structs in a file.                  |    no    |  no   |
+| [`file-header`](./RULES_DESCRIPTIONS.md#file-header)         | string (defaults to none)| Header which each file should have.                              |    no    |  no   |
 | [`empty-block`](./RULES_DESCRIPTIONS.md#empty-block)         |  n/a   | Warns on empty code blocks                                       |    no    |  yes   |
 | [`superfluous-else`](./RULES_DESCRIPTIONS.md#superfluous-else)    |  n/a   | Prevents redundant else statements (extends [`indent-error-flow`](./RULES_DESCRIPTIONS.md#indent-error-flow)) |    no    |  no   |
 | [`confusing-naming`](./RULES_DESCRIPTIONS.md#confusing-naming)    |  n/a   | Warns on methods with names that differ only by capitalization   |    no    |  no   |
@@ -465,26 +465,26 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`add-constant`](./RULES_DESCRIPTIONS.md#add-constant)        |  map   | Suggests using constant for magic numbers and string literals    |    no    |  no   |
 | [`flag-parameter`](./RULES_DESCRIPTIONS.md#flag-parameter)      |  n/a   | Warns on boolean parameters that create a control coupling       |    no    |  no   |
 | [`unnecessary-stmt`](./RULES_DESCRIPTIONS.md#unnecessary-stmt)    |  n/a   | Suggests removing or simplifying unnecessary statements          |    no    |  no   |
-| [`struct-tag`](./RULES_DESCRIPTIONS.md#struct-tag)          |  []string   | Checks common struct tags like `json`,`xml`,`yaml`               |    no    |  no   |
+| [`struct-tag`](./RULES_DESCRIPTIONS.md#struct-tag)          |  []string   | Checks common struct tags like `json`, `xml`, `yaml`               |    no    |  no   |
 | [`modifies-value-receiver`](./RULES_DESCRIPTIONS.md#modifies-value-receiver) |  n/a   | Warns on assignments to value-passed method receivers        |    no    |  yes  |
 | [`constant-logical-expr`](./RULES_DESCRIPTIONS.md#constant-logical-expr)   |  n/a   | Warns on constant logical expressions                        |    no    |  no   |
 | [`bool-literal-in-expr`](./RULES_DESCRIPTIONS.md#bool-literal-in-expr)|  n/a   | Suggests removing Boolean literals from logic expressions        |    no    |  no   |
 | [`redefines-builtin-id`](./RULES_DESCRIPTIONS.md#redefines-builtin-id)|  n/a   | Warns on redefinitions of builtin identifiers                    |    no    |  no   |
-| [`function-result-limit`](./RULES_DESCRIPTIONS.md#function-result-limit) |  int | Specifies the maximum number of results a function can return    |    no    |  no   |
+| [`function-result-limit`](./RULES_DESCRIPTIONS.md#function-result-limit) |  int (defaults to 3)| Specifies the maximum number of results a function can return    |    no    |  no   |
 | [`imports-blacklist`](./RULES_DESCRIPTIONS.md#imports-blacklist)   | []string | Disallows importing the specified packages                     |    no    |  no   |
 | [`range-val-in-closure`](./RULES_DESCRIPTIONS.md#range-val-in-closure)|  n/a   | Warns if range value is used in a closure dispatched as goroutine|    no    |  no   |
 | [`range-val-address`](./RULES_DESCRIPTIONS.md#range-val-address)|  n/a   | Warns if address of range value is used dangerously |    no    |  yes   |
 | [`waitgroup-by-value`](./RULES_DESCRIPTIONS.md#waitgroup-by-value)  |  n/a   | Warns on functions taking sync.WaitGroup as a by-value parameter |    no    |  no   |
 | [`atomic`](./RULES_DESCRIPTIONS.md#atomic)              |  n/a   | Check for common mistaken usages of the `sync/atomic` package    |    no    |  no   |
 | [`empty-lines`](./RULES_DESCRIPTIONS.md#empty-lines)   | n/a | Warns when there are heading or trailing newlines in a block              |    no    |  no   |
-| [`line-length-limit`](./RULES_DESCRIPTIONS.md#line-length-limit)   | int    | Specifies the maximum number of characters in a line             |    no    |  no   |
+| [`line-length-limit`](./RULES_DESCRIPTIONS.md#line-length-limit)   | int (defaults to 80) | Specifies the maximum number of characters in a line             |    no    |  no   |
 | [`call-to-gc`](./RULES_DESCRIPTIONS.md#call-to-gc)   | n/a    | Warns on explicit call to the garbage collector    |    no    |  no   |
 | [`duplicated-imports`](./RULES_DESCRIPTIONS.md#duplicated-imports) | n/a  | Looks for packages that are imported two or more times   |    no    |  no   |
 | [`import-shadowing`](./RULES_DESCRIPTIONS.md#import-shadowing)   | n/a    | Spots identifiers that shadow an import    |    no    |  no   |
 | [`bare-return`](./RULES_DESCRIPTIONS.md#bare-return) | n/a  | Warns on bare returns   |    no    |  no   |
 | [`unused-receiver`](./RULES_DESCRIPTIONS.md#unused-receiver)   | n/a    | Suggests to rename or remove unused method receivers    |    no    |  no   |
 | [`unhandled-error`](./RULES_DESCRIPTIONS.md#unhandled-error)   | []string   | Warns on unhandled errors returned by function calls    |    no    |  yes   |
-| [`cognitive-complexity`](./RULES_DESCRIPTIONS.md#cognitive-complexity)          |  int   | Sets restriction for maximum Cognitive complexity.              |    no    |  no   |
+| [`cognitive-complexity`](./RULES_DESCRIPTIONS.md#cognitive-complexity)          |  int (defaults to 7) | Sets restriction for maximum Cognitive complexity.              |    no    |  no   |
 | [`string-of-int`](./RULES_DESCRIPTIONS.md#string-of-int)          |  n/a   | Warns on suspicious casts from int to string            |    no    |  yes   |
 | [`string-format`](./RULES_DESCRIPTIONS.md#string-format)          |  map   | Warns on specific string literals that fail one or more user-configured regular expressions            |    no    |  no   |
 | [`early-return`](./RULES_DESCRIPTIONS.md#early-return)          |  n/a   | Spots if-then-else statements where the predicate may be inverted to reduce nesting |    no    |  no   |
@@ -492,10 +492,10 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`identical-branches`](./RULES_DESCRIPTIONS.md#identical-branches)          |  n/a   | Spots if-then-else statements with identical `then` and `else` branches       |    no    |  no   |
 | [`defer`](./RULES_DESCRIPTIONS.md#defer)          |  map   |  Warns on some [defer gotchas](https://blog.learngoprogramming.com/5-gotchas-of-defer-in-go-golang-part-iii-36a1ab3d6ef1)       |    no    |  no   |
 | [`unexported-naming`](./RULES_DESCRIPTIONS.md#unexported-naming)          |  n/a   |  Warns on wrongly named un-exported symbols       |    no    |  no   |
-| [`function-length`](./RULES_DESCRIPTIONS.md#function-length)          |  n/a   |  Warns on functions exceeding the statements or lines max |    no    |  no   |
+| [`function-length`](./RULES_DESCRIPTIONS.md#function-length)          |  int, int (defaults to 50 statements, 75 lines)   |  Warns on functions exceeding the statements or lines max |    no    |  no   |
 | [`nested-structs`](./RULES_DESCRIPTIONS.md#nested-structs)          |  n/a   |  Warns on structs within structs |    no    |  no   |
 | [`useless-break`](./RULES_DESCRIPTIONS.md#useless-break)          |  n/a   |  Warns on useless `break` statements in case clauses |    no    |  no   |
-| [`banned-characters`](./RULES_DESCRIPTIONS.md#banned-characters)          |  n/a   |  Checks banned characters in identifiers |    no    |  no   |
+| [`banned-characters`](./RULES_DESCRIPTIONS.md#banned-characters)          |  []string (defaults to []string{})   |  Checks banned characters in identifiers |    no    |  no   |
 | [`optimize-operands-order`](./RULES_DESCRIPTIONS.md#optimize-operands-order)          |  n/a   |  Checks inefficient conditional expressions |    no    |  no   |
 | [`use-any`](./RULES_DESCRIPTIONS.md#use-any)          |  n/a   |  Proposes to replace `interface{}` with its alias `any` |    no    |  no   |
 | [`datarace`](./RULES_DESCRIPTIONS.md#datarace)          |  n/a   |  Spots potential dataraces |    no    |  no   |
