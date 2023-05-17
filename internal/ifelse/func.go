@@ -8,11 +8,11 @@ import (
 // Call contains the name of a function that deviates control flow.
 type Call struct {
 	Pkg  string // The package qualifier of the function, if not built-in.
-	Name string
+	Name string // The function name.
 }
 
-// DeviatingCalls lists known control flow deviating function calls.
-var DeviatingCalls = map[Call]Kind{
+// DeviatingFuncs lists known control flow deviating function calls.
+var DeviatingFuncs = map[Call]BranchKind{
 	{"os", "Exit"}:     Exit,
 	{"log", "Fatal"}:   Exit,
 	{"log", "Fatalf"}:  Exit,
@@ -40,6 +40,7 @@ func ExprCall(expr *ast.ExprStmt) (Call, bool) {
 	return Call{}, false
 }
 
+// String returns the function name with package qualifier (if any)
 func (f Call) String() string {
 	switch {
 	case f.Pkg != "":

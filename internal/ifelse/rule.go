@@ -7,12 +7,10 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-type (
-	Rule interface {
-		CheckIfElse(chain Chain) (failMsg string)
-	}
-	Target int
-)
+// Rule is an interface for linters operating on if-else chains
+type Rule interface {
+	CheckIfElse(chain Chain) (failMsg string)
+}
 
 // Apply evaluates the given Rule on if-else chains found within the given AST,
 // and returns the failures.
@@ -35,11 +33,6 @@ func Apply(rule Rule, node ast.Node, target Target) []lint.Failure {
 	ast.Walk(v, node)
 	return v.failures
 }
-
-const (
-	TargetIf   Target = iota // linter line-number will target the "if" statemenet
-	TargetElse               // linter lint-number will target the "else" statmenet
-)
 
 type visitor struct {
 	failures []lint.Failure
@@ -67,44 +60,33 @@ func (v *visitor) visitChain(ifStmt *ast.IfStmt, chain Chain) {
 	}
 
 	if as, ok := ifStmt.Init.(*ast.AssignStmt); ok && as.Tok == token.DEFINE {
-		chain.HasIfInitializer = true
+		chain.HasInitializer = true
 	}
-	chain.IfTerminator = BlockTerminator(ifStmt.Body)
+	chain.If = BlockBranch(ifStmt.Body)
 
 	switch elseBlock := ifStmt.Else.(type) {
 	case *ast.IfStmt:
-		if !chain.IfTerminator.DeviatesControlFlow() {
-			chain.HasPriorNonReturn = true
+		if !chain.If.Deviates() {
+			chain.HasPriorNonDeviating = true
 		}
 		v.visitChain(elseBlock, chain)
 	case *ast.BlockStmt:
 		// look for other if-else chains nested inside this else { } block
 		ast.Walk(v, elseBlock)
-		chain.ElseTerminator = BlockTerminator(elseBlock)
+		chain.Else = BlockBranch(elseBlock)
 		if failMsg := v.rule.CheckIfElse(chain); failMsg != "" {
-			if chain.HasIfInitializer {
+			if chain.HasInitializer {
 				// if statement has a := initializer, so we might need to move the assignment
 				// onto its own line in case the body references it
 				failMsg += " (move short variable declaration to its own line if necessary)"
 			}
 			v.failures = append(v.failures, lint.Failure{
 				Confidence: 1,
-				Node:       v.targetNode(ifStmt),
+				Node:       v.target.node(ifStmt),
 				Failure:    failMsg,
 			})
 		}
 	default:
 		panic("invalid node type for else")
-	}
-}
-
-func (v *visitor) targetNode(ifStmt *ast.IfStmt) ast.Node {
-	switch v.target {
-	case TargetIf:
-		return ifStmt
-	case TargetElse:
-		return ifStmt.Else
-	default:
-		panic("bad target")
 	}
 }

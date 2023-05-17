@@ -18,19 +18,20 @@ func (*IndentErrorFlowRule) Name() string {
 	return "indent-error-flow"
 }
 
+// CheckIfElse evaluates the rule against an ifelse.Chain.
 func (e *IndentErrorFlowRule) CheckIfElse(chain ifelse.Chain) (failMsg string) {
-	if !chain.IfTerminator.DeviatesControlFlow() {
+	if !chain.If.Deviates() {
 		// this rule only applies if the if-block deviates control flow
 		return
 	}
 
-	if chain.HasPriorNonReturn {
+	if chain.HasPriorNonDeviating {
 		// if we de-indent the "else" block then a previous branch
 		// might flow into it, affecting program behaviour
 		return
 	}
 
-	if !chain.IfTerminator.IsReturn() {
+	if !chain.If.Returns() {
 		// avoid overlapping with superfluous-else
 		return
 	}

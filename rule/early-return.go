@@ -21,26 +21,26 @@ func (*EarlyReturnRule) Name() string {
 	return "early-return"
 }
 
+// CheckIfElse evaluates the rule against an ifelse.Chain.
 func (e *EarlyReturnRule) CheckIfElse(chain ifelse.Chain) (failMsg string) {
-	if !chain.ElseTerminator.DeviatesControlFlow() {
+	if !chain.Else.Deviates() {
 		// this rule only applies if the else-block deviates control flow
 		return
 	}
 
-	if chain.HasPriorNonReturn && !chain.IfTerminator.IsEmpty() {
+	if chain.HasPriorNonDeviating && !chain.If.IsEmpty() {
 		// if we de-indent this block then a previous branch
 		// might flow into it, affecting program behaviour
 		return
 	}
 
-	if chain.IfTerminator.DeviatesControlFlow() {
+	if chain.If.Deviates() {
 		// avoid overlapping with superfluous-else
 		return
 	}
 
-	if chain.IfTerminator.IsEmpty() {
-		return fmt.Sprintf("if c { } else { %[1]v } can be simplified to if !c { %[1]v }", chain.ElseTerminator)
-	} else {
-		return fmt.Sprintf("if c { ... } else { %[1]v } can be simplified to if !c { %[1]v } ...", chain.ElseTerminator)
+	if chain.If.IsEmpty() {
+		return fmt.Sprintf("if c { } else { %[1]v } can be simplified to if !c { %[1]v }", chain.Else)
 	}
+	return fmt.Sprintf("if c { ... } else { %[1]v } can be simplified to if !c { %[1]v } ...", chain.Else)
 }
