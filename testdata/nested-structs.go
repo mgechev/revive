@@ -61,4 +61,7 @@ type mySetInterface interface {
 type test struct {
 	foo []chan struct{}     // Must not match
 	bar map[string]struct{} // Must not match
+	baz generic[struct{}]   // Must not match
 }
+
+type generic [T any] struct {}
