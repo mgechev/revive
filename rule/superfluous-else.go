@@ -10,8 +10,8 @@ import (
 type SuperfluousElseRule struct{}
 
 // Apply applies the rule to given file.
-func (e *SuperfluousElseRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
-	return ifelse.Apply(e, file.AST, ifelse.TargetElse)
+func (e *SuperfluousElseRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
+	return ifelse.Apply(e, file.AST, ifelse.TargetElse, args)
 }
 
 // Name returns the rule name.
@@ -20,7 +20,7 @@ func (*SuperfluousElseRule) Name() string {
 }
 
 // CheckIfElse evaluates the rule against an ifelse.Chain.
-func (e *SuperfluousElseRule) CheckIfElse(chain ifelse.Chain) (failMsg string) {
+func (e *SuperfluousElseRule) CheckIfElse(chain ifelse.Chain, args ifelse.Args) (failMsg string) {
 	if !chain.If.Deviates() {
 		// this rule only applies if the if-block deviates control flow
 		return
@@ -34,6 +34,11 @@ func (e *SuperfluousElseRule) CheckIfElse(chain ifelse.Chain) (failMsg string) {
 
 	if chain.If.Returns() {
 		// avoid overlapping with indent-error-flow
+		return
+	}
+
+	if args.PreserveScope && !chain.AtBlockEnd && (chain.HasInitializer || chain.Else.HasDecls) {
+		// avoid increasing variable scope
 		return
 	}
 

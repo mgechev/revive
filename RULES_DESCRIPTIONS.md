@@ -299,7 +299,7 @@ if cond {
 ```
 where the `if` condition may be inverted in order to reduce nesting:
 ```go
-if ! cond {
+if !cond {
   // do other thing
   return ...
 }
@@ -307,7 +307,16 @@ if ! cond {
 // do something
 ```
 
-_Configuration_: N/A
+_Configuration_: ([]string) rule flags. Available flags are:
+
+* _preserveScope_: do not suggest refactorings that would increase variable scope
+
+Example:
+
+```toml
+[rule.exported]
+  arguments =["preserveScope"]
+```
 
 ## empty-block
 
@@ -448,7 +457,16 @@ This rule highlights redundant _else-blocks_ that can be eliminated from the cod
 
 More information [here](https://github.com/golang/go/wiki/CodeReviewComments#indent-error-flow)
 
-_Configuration_: N/A
+_Configuration_: ([]string) rule flags. Available flags are:
+
+* _preserveScope_: do not suggest refactorings that would increase variable scope
+
+Example:
+
+```toml
+[rule.exported]
+  arguments =["preserveScope"]
+```
 
 ## imports-blacklist
 
@@ -624,7 +642,16 @@ To accept the `inline` option in JSON tags (and `outline` and `gnu` in BSON tags
 _Description_: To improve the readability of code, it is recommended to reduce the indentation as much as possible.
 This rule highlights redundant _else-blocks_ that can be eliminated from the code.
 
-_Configuration_: N/A
+_Configuration_: ([]string) rule flags. Available flags are:
+
+* _preserveScope_: do not suggest refactorings that would increase variable scope
+
+Example:
+
+```toml
+[rule.exported]
+  arguments =["preserveScope"]
+```
 
 ## time-equal
 

@@ -6,4 +6,5 @@ type Chain struct {
 	Else                 Branch // what happens at the end of the "else" block
 	HasInitializer       bool   // is there an "if"-initializer somewhere in the chain?
 	HasPriorNonDeviating bool   // is there a prior "if" block that does NOT deviate control flow?
+	AtBlockEnd           bool   // whether the chain is placed at the end of the surrounding block
 }
