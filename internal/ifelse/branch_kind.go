@@ -49,6 +49,9 @@ func (k BranchKind) Deviates() bool {
 	}
 }
 
+// Branch returns a Branch with the given kind
+func (k BranchKind) Branch() Branch { return Branch{BranchKind: k} }
+
 // String returns a brief string representation
 func (k BranchKind) String() string {
 	switch k {

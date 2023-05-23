@@ -9,7 +9,7 @@ import (
 
 // Rule is an interface for linters operating on if-else chains
 type Rule interface {
-	CheckIfElse(chain Chain) (failMsg string)
+	CheckIfElse(chain Chain, args Args) (failMsg string)
 }
 
 // Apply evaluates the given Rule on if-else chains found within the given AST,
@@ -28,8 +28,13 @@ type Rule interface {
 //
 // Only the block following "bar" is linted. This is because the rules that use this function
 // do not presently have anything to say about earlier blocks in the chain.
-func Apply(rule Rule, node ast.Node, target Target) []lint.Failure {
+func Apply(rule Rule, node ast.Node, target Target, args lint.Arguments) []lint.Failure {
 	v := &visitor{rule: rule, target: target}
+	for _, arg := range args {
+		if arg == PreserveScope {
+			v.args.PreserveScope = true
+		}
+	}
 	ast.Walk(v, node)
 	return v.failures
 }
@@ -38,15 +43,22 @@ type visitor struct {
 	failures []lint.Failure
 	target   Target
 	rule     Rule
+	args     Args
 }
 
 func (v *visitor) Visit(node ast.Node) ast.Visitor {
-	ifStmt, ok := node.(*ast.IfStmt)
+	block, ok := node.(*ast.BlockStmt)
 	if !ok {
 		return v
 	}
 
-	v.visitChain(ifStmt, Chain{})
+	for i, stmt := range block.List {
+		if ifStmt, ok := stmt.(*ast.IfStmt); ok {
+			v.visitChain(ifStmt, Chain{AtBlockEnd: i == len(block.List)-1})
+			continue
+		}
+		ast.Walk(v, stmt)
+	}
 	return nil
 }
 
@@ -73,8 +85,9 @@ func (v *visitor) visitChain(ifStmt *ast.IfStmt, chain Chain) {
 	case *ast.BlockStmt:
 		// look for other if-else chains nested inside this else { } block
 		ast.Walk(v, elseBlock)
+
 		chain.Else = BlockBranch(elseBlock)
-		if failMsg := v.rule.CheckIfElse(chain); failMsg != "" {
+		if failMsg := v.rule.CheckIfElse(chain, v.args); failMsg != "" {
 			if chain.HasInitializer {
 				// if statement has a := initializer, so we might need to move the assignment
 				// onto its own line in case the body references it

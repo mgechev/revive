@@ -12,8 +12,8 @@ import (
 type EarlyReturnRule struct{}
 
 // Apply applies the rule to given file.
-func (e *EarlyReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
-	return ifelse.Apply(e, file.AST, ifelse.TargetIf)
+func (e *EarlyReturnRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
+	return ifelse.Apply(e, file.AST, ifelse.TargetIf, args)
 }
 
 // Name returns the rule name.
@@ -22,7 +22,7 @@ func (*EarlyReturnRule) Name() string {
 }
 
 // CheckIfElse evaluates the rule against an ifelse.Chain.
-func (e *EarlyReturnRule) CheckIfElse(chain ifelse.Chain) (failMsg string) {
+func (e *EarlyReturnRule) CheckIfElse(chain ifelse.Chain, args ifelse.Args) (failMsg string) {
 	if !chain.Else.Deviates() {
 		// this rule only applies if the else-block deviates control flow
 		return
@@ -36,6 +36,11 @@ func (e *EarlyReturnRule) CheckIfElse(chain ifelse.Chain) (failMsg string) {
 
 	if chain.If.Deviates() {
 		// avoid overlapping with superfluous-else
+		return
+	}
+
+	if args.PreserveScope && !chain.AtBlockEnd && (chain.HasInitializer || chain.If.HasDecls) {
+		// avoid increasing variable scope
 		return
 	}
 

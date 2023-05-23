@@ -9,29 +9,37 @@ import (
 // Branch contains information about a branch within an if-else chain.
 type Branch struct {
 	BranchKind
-	Call // The function called at the end for kind Panic or Exit.
+	Call          // The function called at the end for kind Panic or Exit.
+	HasDecls bool // The branch has one or more declarations (at the top level block)
 }
 
 // BlockBranch gets the Branch of an ast.BlockStmt.
 func BlockBranch(block *ast.BlockStmt) Branch {
 	blockLen := len(block.List)
 	if blockLen == 0 {
-		return Branch{BranchKind: Empty}
+		return Empty.Branch()
 	}
 
-	switch stmt := block.List[blockLen-1].(type) {
+	branch := StmtBranch(block.List[blockLen-1])
+	branch.HasDecls = hasDecls(block)
+	return branch
+}
+
+// StmtBranch gets the Branch of an ast.Stmt.
+func StmtBranch(stmt ast.Stmt) Branch {
+	switch stmt := stmt.(type) {
 	case *ast.ReturnStmt:
-		return Branch{BranchKind: Return}
+		return Return.Branch()
 	case *ast.BlockStmt:
 		return BlockBranch(stmt)
 	case *ast.BranchStmt:
 		switch stmt.Tok {
 		case token.BREAK:
-			return Branch{BranchKind: Break}
+			return Break.Branch()
 		case token.CONTINUE:
-			return Branch{BranchKind: Continue}
+			return Continue.Branch()
 		case token.GOTO:
-			return Branch{BranchKind: Goto}
+			return Goto.Branch()
 		}
 	case *ast.ExprStmt:
 		fn, ok := ExprCall(stmt)
@@ -42,9 +50,12 @@ func BlockBranch(block *ast.BlockStmt) Branch {
 		if ok {
 			return Branch{BranchKind: kind, Call: fn}
 		}
+	case *ast.EmptyStmt:
+		return Empty.Branch()
+	case *ast.LabeledStmt:
+		return StmtBranch(stmt.Stmt)
 	}
-
-	return Branch{BranchKind: Regular}
+	return Regular.Branch()
 }
 
 // String returns a brief string representation
@@ -65,4 +76,18 @@ func (b Branch) LongString() string {
 	default:
 		return b.BranchKind.LongString()
 	}
+}
+
+func hasDecls(block *ast.BlockStmt) bool {
+	for _, stmt := range block.List {
+		switch stmt := stmt.(type) {
+		case *ast.DeclStmt:
+			return true
+		case *ast.AssignStmt:
+			if stmt.Tok == token.DEFINE {
+				return true
+			}
+		}
+	}
+	return false
 }
