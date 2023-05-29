@@ -314,7 +314,7 @@ _Configuration_: ([]string) rule flags. Available flags are:
 Example:
 
 ```toml
-[rule.exported]
+[rule.early-return]
   arguments =["preserveScope"]
 ```
 
