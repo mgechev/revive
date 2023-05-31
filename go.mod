@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/BurntSushi/toml v1.2.1
-	github.com/chavacava/garif v0.0.0-20230519080132-4752330f72df
+	github.com/chavacava/garif v0.0.0-20230531072157-8144c224b063
 	github.com/fatih/color v1.15.0
 	github.com/fatih/structtag v1.2.0
 	github.com/mgechev/dots v0.0.0-20210922191527-e955255bf517
