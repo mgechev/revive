@@ -185,13 +185,11 @@ func (w lintStringFormatRule) Visit(node ast.Node) ast.Visitor {
 	if !ok {
 		return w
 	}
-
 	// Get the name of the call expression to check against rule scope
 	callName, ok := w.getCallName(call)
 	if !ok {
 		return w
 	}
-
 	for _, rule := range w.rules {
 		if rule.scope.funcName == callName {
 			rule.Apply(call)
@@ -211,10 +209,15 @@ func (lintStringFormatRule) getCallName(call *ast.CallExpr) (callName string, ok
 	if selector, ok := call.Fun.(*ast.SelectorExpr); ok {
 		// Scoped function call
 		scope, ok := selector.X.(*ast.Ident)
-		if !ok {
-			return "", false
+		if ok {
+			return scope.Name + "." + selector.Sel.Name, true
 		}
-		return scope.Name + "." + selector.Sel.Name, true
+		// Scoped function call inside structure
+		recv, ok := selector.X.(*ast.SelectorExpr)
+		if ok {
+			return recv.Sel.Name + "." + selector.Sel.Name, true
+		}
+		return "", false
 	}
 
 	return "", false
