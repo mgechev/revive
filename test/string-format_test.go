@@ -21,7 +21,11 @@ func TestStringFormat(t *testing.T) {
 			[]interface{}{
 				"s.Method3[2]",
 				"!/^[Tt][Hh]/",
-				"must not start with 'th'"}}})
+				"must not start with 'th'"},
+			[]interface{}{
+				"s.Method4", // same as before, but called from a struct
+				"!/^[Ot][Tt]/",
+				"must not start with 'ot'"}}})
 }
 
 func TestStringFormatArgumentParsing(t *testing.T) {
