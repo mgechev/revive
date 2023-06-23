@@ -31,7 +31,6 @@ var defaultRules = []lint.Rule{
 	&rule.TimeNamingRule{},
 	&rule.ContextKeysType{},
 	&rule.ContextAsArgumentRule{},
-	&rule.IfReturnRule{},
 	&rule.EmptyBlockRule{},
 	&rule.SuperfluousElseRule{},
 	&rule.UnusedParamRule{},
@@ -87,6 +86,7 @@ var allRules = append([]lint.Rule{
 	&rule.UseAnyRule{},
 	&rule.DataRaceRule{},
 	&rule.CommentSpacingsRule{},
+	&rule.IfReturnRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
