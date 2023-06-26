@@ -7,6 +7,7 @@ import (
 	"github.com/mgechev/revive/config"
 	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/revivelib"
+	"github.com/mgechev/revive/rule"
 )
 
 func TestReviveLint(t *testing.T) {
@@ -45,7 +46,6 @@ func TestReviveFormat(t *testing.T) {
 
 	// ACT
 	failures, exitCode, err := revive.Format("stylish", failuresChan)
-
 	// ASSERT
 	if err != nil {
 		t.Fatal(err)
@@ -70,8 +70,7 @@ func TestReviveFormat(t *testing.T) {
 	}
 }
 
-type mockRule struct {
-}
+type mockRule struct{}
 
 func (r *mockRule) Name() string {
 	return "mock-rule"
@@ -93,6 +92,7 @@ func getMockRevive(t *testing.T) *revivelib.Revive {
 		conf,
 		true,
 		2048,
+		revivelib.NewExtraRule(&rule.IfReturnRule{}, lint.RuleConfig{}),
 		revivelib.NewExtraRule(&mockRule{}, lint.RuleConfig{}),
 	)
 	if err != nil {

@@ -407,7 +407,6 @@ warningCode = 0
 [rule.error-strings]
 [rule.error-naming]
 [rule.exported]
-[rule.if-return]
 [rule.increment-decrement]
 [rule.var-naming]
 [rule.var-declaration]
