@@ -13,4 +13,9 @@ func TestVarNaming(t *testing.T) {
 	})
 
 	testRule(t, "var-naming_test", &rule.VarNamingRule{}, &lint.RuleConfig{})
+
+	testRule(t, "var-naming_upperCaseConst-false", &rule.VarNamingRule{}, &lint.RuleConfig{})
+	testRule(t, "var-naming_upperCaseConst-true", &rule.VarNamingRule{}, &lint.RuleConfig{
+		Arguments: []interface{}{[]interface{}{}, []interface{}{}, map[string]interface{}{"upperCaseConst": true}},
+	})
 }
