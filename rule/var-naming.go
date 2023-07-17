@@ -36,15 +36,21 @@ func (r *VarNamingRule) configure(arguments lint.Arguments) {
 			r.blacklist = getList(arguments[1], "blacklist")
 		}
 
-		// try to find first  argument of type map - treat it as "other options" map
-		for _, a := range arguments {
-			args, ok := a.(map[string]interface{})
-			if ok {
-				r.upperCaseConst = fmt.Sprint(args["upperCaseConst"]) == "true"
-				break
+		if len(arguments) >= 3 {
+			// not pretty code because should keep compatibility with TOML (no mixed array types) and new map parameters
+			asSlice, ok := arguments[2].([]interface{})
+			if !ok {
+				panic(fmt.Sprintf("Invalid third argument to the var-naming rule. Expecting a %s of type slice, got %T", "options", arguments[2]))
 			}
+			if len(asSlice) != 1 {
+				panic(fmt.Sprintf("Invalid third argument to the var-naming rule. Expecting a %s of type slice, of len==1, but %d", "options", len(asSlice)))
+			}
+			args, ok := asSlice[0].(map[string]interface{})
+			if !ok {
+				panic(fmt.Sprintf("Invalid third argument to the var-naming rule. Expecting a %s of type slice, of len==1, with map, but %T", "options", asSlice[0]))
+			}
+			r.upperCaseConst = fmt.Sprint(args["upperCaseConst"]) == "true"
 		}
-
 		r.configured = true
 	}
 	r.Unlock()
