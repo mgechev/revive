@@ -38,7 +38,8 @@ func (r *VarNamingRule) configure(arguments lint.Arguments) {
 
 		if len(arguments) >= 3 {
 			// not pretty code because should keep compatibility with TOML (no mixed array types) and new map parameters
-			asSlice, ok := arguments[2].([]interface{})
+			thirdArgument := arguments[2]
+			asSlice, ok := thirdArgument.([]interface{})
 			if !ok {
 				panic(fmt.Sprintf("Invalid third argument to the var-naming rule. Expecting a %s of type slice, got %T", "options", arguments[2]))
 			}
@@ -124,7 +125,7 @@ func (w *lintNames) check(id *ast.Ident, thing string) {
 
 	// #851 upperCaseConst support
 	// if it's const
-	if thing == "const" && w.upperCaseConst && upperCaseConstRE.Match([]byte(id.Name)) {
+	if thing == token.CONST.String() && w.upperCaseConst && upperCaseConstRE.Match([]byte(id.Name)) {
 		return
 	}
 
@@ -218,15 +219,8 @@ func (w *lintNames) Visit(n ast.Node) ast.Visitor {
 		if v.Tok == token.IMPORT {
 			return w
 		}
-		var thing string
-		switch v.Tok {
-		case token.CONST:
-			thing = "const"
-		case token.TYPE:
-			thing = "type"
-		case token.VAR:
-			thing = "var"
-		}
+
+		thing := v.Tok.String()
 		for _, spec := range v.Specs {
 			switch s := spec.(type) {
 			case *ast.TypeSpec:
