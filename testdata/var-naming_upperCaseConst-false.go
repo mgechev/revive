@@ -6,4 +6,5 @@ const SOME_CONST_2 = 1 // MATCH /don't use ALL_CAPS in Go names; use CamelCase/
 
 const (
 	SOME_CONST_3 = 3 // MATCH /don't use ALL_CAPS in Go names; use CamelCase/
+	VER          = 0 // MATCH /don't use ALL_CAPS in Go names; use CamelCase/
 )
