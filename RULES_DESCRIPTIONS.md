@@ -75,6 +75,7 @@ List of all available rules.
   - [use-any](#use-any)
   - [useless-break](#useless-break)
   - [waitgroup-by-value](#waitgroup-by-value)
+  - [unused-import-alias](#unused-import-alias)
 
 ## add-constant
 
@@ -758,5 +759,11 @@ _Configuration_: N/A
 
 _Description_: Function parameters that are passed by value, are in fact a copy of the original argument. Passing a copy of a `sync.WaitGroup` is usually not what the developer wants to do.
 This rule warns when a `sync.WaitGroup` expected as a by-value parameter in a function or method.
+
+_Configuration_: N/A
+
+## unused-import-alias
+
+_Description_: This rule warns on redundant import aliases. This happens when the alias used on the import statement matches the imported package name.
 
 _Configuration_: N/A
