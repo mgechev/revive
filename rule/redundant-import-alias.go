@@ -8,11 +8,11 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// UnusedImportAlias lints given else constructs.
-type UnusedImportAlias struct{}
+// RedundantImportAlias lints given else constructs.
+type RedundantImportAlias struct{}
 
 // Apply applies the rule to given file.
-func (*UnusedImportAlias) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*RedundantImportAlias) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	for _, imp := range file.AST.Imports {
@@ -34,8 +34,8 @@ func (*UnusedImportAlias) Apply(file *lint.File, _ lint.Arguments) []lint.Failur
 }
 
 // Name returns the rule name.
-func (*UnusedImportAlias) Name() string {
-	return "unused-import-alias"
+func (*RedundantImportAlias) Name() string {
+	return "redundant-import-alias"
 }
 
 func getImportPackageName(imp *ast.ImportSpec) string {

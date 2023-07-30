@@ -75,7 +75,7 @@ List of all available rules.
   - [use-any](#use-any)
   - [useless-break](#useless-break)
   - [waitgroup-by-value](#waitgroup-by-value)
-  - [unused-import-alias](#unused-import-alias)
+  - [redundant-import-alias](#redundant-import-alias)
 
 ## add-constant
 
@@ -762,7 +762,7 @@ This rule warns when a `sync.WaitGroup` expected as a by-value parameter in a fu
 
 _Configuration_: N/A
 
-## unused-import-alias
+## redundant-import-alias
 
 _Description_: This rule warns on redundant import aliases. This happens when the alias used on the import statement matches the imported package name.
 
