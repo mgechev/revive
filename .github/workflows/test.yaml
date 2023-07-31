@@ -24,4 +24,4 @@ jobs:
           cache: true
           cache-dependency-path: '**/go.sum'
       - name: Run tests
-        run: go test -race ./...
+        run: go test -race ./... -v
