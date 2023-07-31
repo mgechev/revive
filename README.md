@@ -501,6 +501,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`use-any`](./RULES_DESCRIPTIONS.md#use-any)          |  n/a   |  Proposes to replace `interface{}` with its alias `any` |    no    |  no   |
 | [`datarace`](./RULES_DESCRIPTIONS.md#datarace)          |  n/a   |  Spots potential dataraces |    no    |  no   |
 | [`comment-spacings`](./RULES_DESCRIPTIONS.md#comment-spacings)          |  []string   |  Warns on malformed comments |    no    |  no   |
+| [`redundant-import-alias`](./RULES_DESCRIPTIONS.md#redundant-import-alias)          |  n/a   |  Warns on import aliases matching the imported package name |    no    |  no   |
 
 
 ## Configurable rules
