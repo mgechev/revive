@@ -81,6 +81,7 @@ func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, ru
 	failures := []lint.Failure{}
 	for f := range ps {
 		failures = append(failures, f)
+		fmt.Println("Failure:", f.Position.Start.Line, f.Position.End.Line, f.Failure, f.RuleName)
 	}
 
 	for _, in := range ins {
