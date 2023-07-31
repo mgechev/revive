@@ -22,7 +22,7 @@ func (*RedundantImportAlias) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 
 		if getImportPackageName(imp) == imp.Name.Name {
 			failures = append(failures, lint.Failure{
-				Confidence: 1,
+				Confidence: 0.95,
 				Failure:    fmt.Sprintf("Import alias \"%s\" is redundant", imp.Name.Name),
 				Node:       imp,
 				Category:   "imports",
