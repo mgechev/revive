@@ -61,6 +61,27 @@ func TestGetConfig(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("rule-level file filter excludes", func(t *testing.T) {
+		cfg, err := GetConfig("testdata/rule-level-exclude-850.toml")
+		if err != nil {
+			t.Fatal("should be valid config")
+		}
+		r1 := cfg.Rules["r1"]
+		if len(r1.Exclude) > 0 {
+			t.Fatal("r1 should have empty excludes")
+		}
+		r2 := cfg.Rules["r2"]
+		if len(r2.Exclude) != 1 {
+			t.Fatal("r2 should have execlude set")
+		}
+		if r2.Match(&lint.File{Name: "some/file.go"}) {
+			t.Fatal("r2 should be initialized and exclude some/file.go")
+		}
+		if !r2.Match(&lint.File{Name: "some/any-other.go"}) {
+			t.Fatal("r2 should not exclude some/any-other.go")
+		}
+	})
 }
 
 func TestGetLintingRules(t *testing.T) {
