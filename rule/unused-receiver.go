@@ -3,22 +3,63 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"regexp"
+	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
 
 // UnusedReceiverRule lints unused params in functions.
-type UnusedReceiverRule struct{}
+type UnusedReceiverRule struct {
+	configured bool
+	// regex to check if some name is valid for unused parameter, "^_$" by default
+	allowRegex *regexp.Regexp
+	sync.Mutex
+}
+
+func (r *UnusedReceiverRule) configure(args lint.Arguments) {
+	// optimistic pre-check
+	if r.configured {
+		return
+	}
+	r.Lock()
+	defer r.Unlock()
+	if r.configured {
+		return
+	}
+	r.configured = true
+	// while by default args is an array, i think it's good to provide structures inside it by default, not arrays or primitives
+	// it's more compatible to JSON nature of configurations
+	if len(args) == 0 {
+		return
+	}
+	// Arguments = [{}]
+	options := args[0].(map[string]interface{})
+	// Arguments = [{allowedRegex="^_"}]
+
+	if allowedRegexParam, ok := options["allowRegex"]; ok {
+		allowedRegexStr, ok := allowedRegexParam.(string)
+		if !ok {
+			panic(fmt.Errorf("error configuring [unused-receiver] rule: allowedRegex is not string but [%T]", allowedRegexParam))
+		}
+		var err error
+		r.allowRegex, err = regexp.Compile(allowedRegexStr)
+		if err != nil {
+			panic(fmt.Errorf("error configuring [unused-receiver] rule: allowedRegex is not valid regex [%s]: %v", allowedRegexStr, err))
+		}
+	}
+}
 
 // Apply applies the rule to given file.
-func (*UnusedReceiverRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *UnusedReceiverRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
+	r.configure(args)
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
 
-	w := lintUnusedReceiverRule{onFailure: onFailure}
+	w := lintUnusedReceiverRule{onFailure: onFailure, allowRegex: r.allowRegex}
 
 	ast.Walk(w, file.AST)
 
@@ -31,7 +72,8 @@ func (*UnusedReceiverRule) Name() string {
 }
 
 type lintUnusedReceiverRule struct {
-	onFailure func(lint.Failure)
+	onFailure  func(lint.Failure)
+	allowRegex *regexp.Regexp
 }
 
 func (w lintUnusedReceiverRule) Visit(node ast.Node) ast.Visitor {
@@ -49,6 +91,10 @@ func (w lintUnusedReceiverRule) Visit(node ast.Node) ast.Visitor {
 		recID := rec.Names[0]
 		if recID.Name == "_" {
 			return nil // the receiver is already named _
+		}
+
+		if w.allowRegex != nil && w.allowRegex.FindStringIndex(recID.Name) != nil {
+			return nil
 		}
 
 		// inspect the func body looking for references to the receiver id
