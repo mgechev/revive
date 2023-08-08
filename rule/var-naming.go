@@ -13,8 +13,8 @@ import (
 
 var anyCapsRE = regexp.MustCompile(`[A-Z]`)
 
-// regexp for constant names like `SOME_CONST`, `SOME_CONST_2`, `X123_3` (#851)
-var upperCaseConstRE = regexp.MustCompile(`^[A-Z][A-Z\d]*(_[A-Z\d]+)*$`)
+// regexp for constant names like `SOME_CONST`, `SOME_CONST_2`, `X123_3`, `_SOME_PRIVATE_CONST` (#851)
+var upperCaseConstRE = regexp.MustCompile(`^_?[A-Z][A-Z\d]*(_[A-Z\d]+)*$`)
 
 // VarNamingRule lints given else constructs.
 type VarNamingRule struct {
