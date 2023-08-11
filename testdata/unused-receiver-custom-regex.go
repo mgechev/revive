@@ -8,5 +8,5 @@ func (xxxParam *SomeObj) f0() {}
 
 func (_ *SomeObj) f1() {}
 
-func (yyyParam *SomeObj) f2() { // MATCH /method receiver 'yyyParam' is not referenced in method's body, consider removing or renaming it as _/
+func (yyyParam *SomeObj) f2() { // MATCH /method receiver 'yyyParam' is not referenced in method's body, consider removing or renaming it to match ^xxx/
 }
