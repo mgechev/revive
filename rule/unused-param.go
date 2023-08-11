@@ -14,39 +14,45 @@ type UnusedParamRule struct {
 	configured bool
 	// regex to check if some name is valid for unused parameter, "^_$" by default
 	allowRegex *regexp.Regexp
+	failureMsg string
 	sync.Mutex
 }
 
 func (r *UnusedParamRule) configure(args lint.Arguments) {
-	// optimistic pre-check
-	if r.configured {
-		return
-	}
 	r.Lock()
 	defer r.Unlock()
+
 	if r.configured {
 		return
 	}
 	r.configured = true
+
 	// while by default args is an array, i think it's good to provide structures inside it by default, not arrays or primitives
 	// it's more compatible to JSON nature of configurations
+	var allowedRegexStr string
 	if len(args) == 0 {
-		return
-	}
-	// Arguments = [{}]
-	options := args[0].(map[string]interface{})
-	// Arguments = [{allowedRegex="^_"}]
+		allowedRegexStr = "^_$"
+		r.failureMsg = "parameter '%s' seems to be unused, consider removing or renaming it as _"
+	} else {
+		// Arguments = [{}]
+		options := args[0].(map[string]interface{})
+		// Arguments = [{allowedRegex="^_"}]
 
-	if allowedRegexParam, ok := options["allowRegex"]; ok {
-		allowedRegexStr, ok := allowedRegexParam.(string)
-		if !ok {
-			panic(fmt.Errorf("error configuring [unused-parameter] rule: allowedRegex is not string but [%T]", allowedRegexParam))
+		if allowedRegexParam, ok := options["allowRegex"]; ok {
+			allowedRegexStr, ok = allowedRegexParam.(string)
+			if !ok {
+				panic(fmt.Errorf("error configuring %s rule: allowedRegex is not string but [%T]", r.Name(), allowedRegexParam))
+			}
 		}
-		var err error
-		r.allowRegex, err = regexp.Compile(allowedRegexStr)
-		if err != nil {
-			panic(fmt.Errorf("error configuring [unused-parameter] rule: allowedRegex is not valid regex [%s]: %v", allowedRegexStr, err))
-		}
+	}
+	var err error
+	r.allowRegex, err = regexp.Compile(allowedRegexStr)
+	if err != nil {
+		panic(fmt.Errorf("error configuring %s rule: allowedRegex is not valid regex [%s]: %v", r.Name(), allowedRegexStr, err))
+	}
+
+	if r.failureMsg == "" {
+		r.failureMsg = "parameter '%s' seems to be unused, consider removing or renaming it to match " + r.allowRegex.String()
 	}
 }
 
@@ -58,7 +64,11 @@ func (r *UnusedParamRule) Apply(file *lint.File, args lint.Arguments) []lint.Fai
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
-	w := lintUnusedParamRule{onFailure: onFailure, allowRegex: r.allowRegex}
+	w := lintUnusedParamRule{
+		onFailure:  onFailure,
+		allowRegex: r.allowRegex,
+		failureMsg: r.failureMsg,
+	}
 
 	ast.Walk(w, file.AST)
 
@@ -73,6 +83,7 @@ func (*UnusedParamRule) Name() string {
 type lintUnusedParamRule struct {
 	onFailure  func(lint.Failure)
 	allowRegex *regexp.Regexp
+	failureMsg string
 }
 
 func (w lintUnusedParamRule) Visit(node ast.Node) ast.Visitor {
@@ -106,8 +117,7 @@ func (w lintUnusedParamRule) Visit(node ast.Node) ast.Visitor {
 
 		for _, p := range n.Type.Params.List {
 			for _, n := range p.Names {
-				// проверка на соответствие паттерну допустимых не используемых параметров
-				if w.allowRegex != nil && w.allowRegex.FindStringIndex(n.Name) != nil {
+				if w.allowRegex.FindStringIndex(n.Name) != nil {
 					continue
 				}
 				if params[n.Obj] {
@@ -115,7 +125,7 @@ func (w lintUnusedParamRule) Visit(node ast.Node) ast.Visitor {
 						Confidence: 1,
 						Node:       n,
 						Category:   "bad practice",
-						Failure:    fmt.Sprintf("parameter '%s' seems to be unused, consider removing or renaming it as _", n.Name),
+						Failure:    fmt.Sprintf(w.failureMsg, n.Name),
 					})
 				}
 			}

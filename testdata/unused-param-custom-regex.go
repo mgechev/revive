@@ -8,5 +8,5 @@ func f0(xxxParam int) {}
 
 func f1(_ int) {}
 
-func f2(yyyParam int) { // MATCH /parameter 'yyyParam' seems to be unused, consider removing or renaming it as _/
+func f2(yyyParam int) { // MATCH /parameter 'yyyParam' seems to be unused, consider removing or renaming it to match ^xxx/
 }
