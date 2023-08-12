@@ -439,17 +439,20 @@ errorCode = 0
 warningCode = 0
 
 [rule.blank-imports]
-   exclude=["**/*.pb.go"]
+   Exclude=["**/*.pb.go"]
 [rule.context-as-argument]
-   exclude=["src/somepkg/*.go", "TEST"]
+   Exclude=["src/somepkg/*.go", "TEST"]
 ```
 
 You can use following exclude patterns
 
 1. full paths to files `src/pkg/mypkg/some.go`
 2. globs `src/**/*.pb.go`
-3. regexes (should have prefix ~, will be ignored) `~\.(pb|auto|generated)\.go$`
+3. regexes (should have prefix ~) `~\.(pb|auto|generated)\.go$`
 4. well-known `TEST` (same as `**/*_test.go`)
+5. special cases:
+  a. `*` and `~` patterns exclude all files (same effect than disabling the rule)
+  b. `""` (empty) pattern excludes nothing
 
 > NOTE: do not mess with `exclude` that can  be used at top level of TOML file, that mean "exclude package patterns", not "exclude file patterns"
 
