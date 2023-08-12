@@ -425,6 +425,37 @@ warningCode = 0
 [rule.redefines-builtin-id]
 ```
 
+### Rule-level file excludes
+
+You also can setup custom excludes for each rule.
+
+It's alternative for global `-exclude` program arg.
+
+```toml
+ignoreGeneratedHeader = false
+severity = "warning"
+confidence = 0.8
+errorCode = 0
+warningCode = 0
+
+[rule.blank-imports]
+   Exclude=["**/*.pb.go"]
+[rule.context-as-argument]
+   Exclude=["src/somepkg/*.go", "TEST"]
+```
+
+You can use following exclude patterns
+
+1. full paths to files `src/pkg/mypkg/some.go`
+2. globs `src/**/*.pb.go`
+3. regexes (should have prefix ~) `~\.(pb|auto|generated)\.go$`
+4. well-known `TEST` (same as `**/*_test.go`)
+5. special cases:
+  a. `*` and `~` patterns exclude all files (same effect than disabling the rule)
+  b. `""` (empty) pattern excludes nothing
+
+> NOTE: do not mess with `exclude` that can  be used at top level of TOML file, that mean "exclude package patterns", not "exclude file patterns"
+
 ## Available Rules
 
 List of all available rules. The rules ported from `golint` are left unchanged and indicated in the `golint` column.
