@@ -149,6 +149,14 @@ func parseConfig(path string, config *lint.Config) error {
 	if err != nil {
 		return fmt.Errorf("cannot parse the config file: %v", err)
 	}
+	for k, r := range config.Rules {
+		err := r.Initialize()
+		if err != nil {
+			return fmt.Errorf("error in config of rule [%s] : [%v]", k, err)
+		}
+		config.Rules[k] = r
+	}
+
 	return nil
 }
 
