@@ -13,8 +13,8 @@ import (
 
 var anyCapsRE = regexp.MustCompile(`[A-Z]`)
 
-// regexp for constant names like `SOME_CONST`, `SOME_CONST_2`, `X123_3` (#851)
-var upperCaseConstRE = regexp.MustCompile(`^[A-Z][A-Z\d]*(_[A-Z\d]+)*$`)
+// regexp for constant names like `SOME_CONST`, `SOME_CONST_2`, `X123_3`, `_SOME_PRIVATE_CONST` (#851, #865)
+var upperCaseConstRE = regexp.MustCompile(`^_?[A-Z][A-Z\d]*(_[A-Z\d]+)*$`)
 
 // VarNamingRule lints given else constructs.
 type VarNamingRule struct {
@@ -27,34 +27,36 @@ type VarNamingRule struct {
 
 func (r *VarNamingRule) configure(arguments lint.Arguments) {
 	r.Lock()
-	if !r.configured {
-		if len(arguments) >= 1 {
-			r.whitelist = getList(arguments[0], "whitelist")
-		}
-
-		if len(arguments) >= 2 {
-			r.blacklist = getList(arguments[1], "blacklist")
-		}
-
-		if len(arguments) >= 3 {
-			// not pretty code because should keep compatibility with TOML (no mixed array types) and new map parameters
-			thirdArgument := arguments[2]
-			asSlice, ok := thirdArgument.([]interface{})
-			if !ok {
-				panic(fmt.Sprintf("Invalid third argument to the var-naming rule. Expecting a %s of type slice, got %T", "options", arguments[2]))
-			}
-			if len(asSlice) != 1 {
-				panic(fmt.Sprintf("Invalid third argument to the var-naming rule. Expecting a %s of type slice, of len==1, but %d", "options", len(asSlice)))
-			}
-			args, ok := asSlice[0].(map[string]interface{})
-			if !ok {
-				panic(fmt.Sprintf("Invalid third argument to the var-naming rule. Expecting a %s of type slice, of len==1, with map, but %T", "options", asSlice[0]))
-			}
-			r.upperCaseConst = fmt.Sprint(args["upperCaseConst"]) == "true"
-		}
-		r.configured = true
+	defer r.Unlock()
+	if r.configured {
+		return
 	}
-	r.Unlock()
+
+	r.configured = true
+	if len(arguments) >= 1 {
+		r.whitelist = getList(arguments[0], "whitelist")
+	}
+
+	if len(arguments) >= 2 {
+		r.blacklist = getList(arguments[1], "blacklist")
+	}
+
+	if len(arguments) >= 3 {
+		// not pretty code because should keep compatibility with TOML (no mixed array types) and new map parameters
+		thirdArgument := arguments[2]
+		asSlice, ok := thirdArgument.([]interface{})
+		if !ok {
+			panic(fmt.Sprintf("Invalid third argument to the var-naming rule. Expecting a %s of type slice, got %T", "options", arguments[2]))
+		}
+		if len(asSlice) != 1 {
+			panic(fmt.Sprintf("Invalid third argument to the var-naming rule. Expecting a %s of type slice, of len==1, but %d", "options", len(asSlice)))
+		}
+		args, ok := asSlice[0].(map[string]interface{})
+		if !ok {
+			panic(fmt.Sprintf("Invalid third argument to the var-naming rule. Expecting a %s of type slice, of len==1, with map, but %T", "options", asSlice[0]))
+		}
+		r.upperCaseConst = fmt.Sprint(args["upperCaseConst"]) == "true"
+	}
 }
 
 // Apply applies the rule to given file.
