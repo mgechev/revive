@@ -73,12 +73,12 @@ func TestGetConfig(t *testing.T) {
 		}
 		r2 := cfg.Rules["r2"]
 		if len(r2.Exclude) != 1 {
-			t.Fatal("r2 should have execlude set")
+			t.Fatal("r2 should have exclude set")
 		}
-		if r2.Match(&lint.File{Name: "some/file.go"}) {
+		if !r2.MustExclude("some/file.go") {
 			t.Fatal("r2 should be initialized and exclude some/file.go")
 		}
-		if !r2.Match(&lint.File{Name: "some/any-other.go"}) {
+		if r2.MustExclude("some/any-other.go") {
 			t.Fatal("r2 should not exclude some/any-other.go")
 		}
 	})

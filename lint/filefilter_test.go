@@ -84,17 +84,45 @@ func TestFileFilter(t *testing.T) {
 		}
 	})
 
-	t.Run("just to cover Match", func(t *testing.T) {
-		ff, err := lint.ParseFileFilter("a/b/c.go")
+	t.Run("empty", func(t *testing.T) {
+		ff, err := lint.ParseFileFilter("")
 		if err != nil {
 			t.Fatal(err)
 		}
-		if !ff.Match(&lint.File{Name: "a/b/c.go"}) {
-			t.Fatal("should match")
+		fileNames := []string{"pb.go", "a/pb.go", "a/x/xxx.pb.go", "a/x/xxx.pb_test.go"}
+		for _, fn := range fileNames {
+			if ff.MatchFileName(fn) {
+				t.Fatalf("should not match %s", fn)
+			}
 		}
-		if ff.Match(&lint.File{Name: "a/b/d.go"}) {
-			t.Fatal("should not match")
-		}
+
 	})
 
+	t.Run("just *", func(t *testing.T) {
+		ff, err := lint.ParseFileFilter("*")
+		if err != nil {
+			t.Fatal(err)
+		}
+		fileNames := []string{"pb.go", "a/pb.go", "a/x/xxx.pb.go", "a/x/xxx.pb_test.go"}
+		for _, fn := range fileNames {
+			if !ff.MatchFileName(fn) {
+				t.Fatalf("should match %s", fn)
+			}
+		}
+
+	})
+
+	t.Run("just ~", func(t *testing.T) {
+		ff, err := lint.ParseFileFilter("~")
+		if err != nil {
+			t.Fatal(err)
+		}
+		fileNames := []string{"pb.go", "a/pb.go", "a/x/xxx.pb.go", "a/x/xxx.pb_test.go"}
+		for _, fn := range fileNames {
+			if !ff.MatchFileName(fn) {
+				t.Fatalf("should match %s", fn)
+			}
+		}
+
+	})
 }

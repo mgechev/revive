@@ -31,14 +31,14 @@ func (rc *RuleConfig) Initialize() error {
 // RulesConfig defines the config for all rules.
 type RulesConfig = map[string]RuleConfig
 
-// Match - checks if given [File] `f` should be covered with configured rule (not excluded)
-func (rcfg *RuleConfig) Match(f *File) bool {
+// MustExclude - checks if given filename `name` must be excluded
+func (rcfg *RuleConfig) MustExclude(name string) bool {
 	for _, exclude := range rcfg.excludeFilters {
-		if exclude.Match(f) {
-			return false
+		if exclude.MatchFileName(name) {
+			return true
 		}
 	}
-	return true
+	return false
 }
 
 // DirectiveConfig is type used for the linter directive configuration.

@@ -102,7 +102,7 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) {
 	disabledIntervals := f.disabledIntervals(rules, mustSpecifyDisableReason, failures)
 	for _, currentRule := range rules {
 		ruleConfig := rulesConfig[currentRule.Name()]
-		if !ruleConfig.Match(f) {
+		if ruleConfig.MustExclude(f.Name) {
 			continue
 		}
 		currentFailures := currentRule.Apply(f, ruleConfig.Arguments)

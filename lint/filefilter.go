@@ -17,19 +17,23 @@ type FileFilter struct {
 	raw string
 	// don't care what was at start, will use regexes inside
 	rx *regexp.Regexp
-	// marks that it was empty rule that matches everything
+	// marks filter as matching everything
 	matchesAll bool
+	// marks filter as matching nothing
+	matchesNothing bool
 }
 
 // ParseFileFilter - creates [FileFilter] for given raw filter
-// if empty string, or `*`, or `~` is used it means "always true"
+// if empty string, it matches nothing
+// if `*`, or `~`, it matches everything
 // while regexp could be invalid, it could return it's compilation error
-func ParseFileFilter(cfgFilter string) (*FileFilter, error) {
-	cfgFilter = strings.TrimSpace(cfgFilter)
+func ParseFileFilter(rawFilter string) (*FileFilter, error) {
+	rawFilter = strings.TrimSpace(rawFilter)
 	result := new(FileFilter)
-	result.raw = cfgFilter
-	result.matchesAll = len(result.raw) == 0 || result.raw == "*" || result.raw == "~"
-	if !result.matchesAll {
+	result.raw = rawFilter
+	result.matchesNothing = len(result.raw) == 0
+	result.matchesAll = result.raw == "*" || result.raw == "~"
+	if !result.matchesAll && !result.matchesNothing {
 		if err := result.prepareRegexp(); err != nil {
 			return nil, err
 		}
@@ -44,13 +48,11 @@ func (ff *FileFilter) MatchFileName(name string) bool {
 	if ff.matchesAll {
 		return true
 	}
+	if ff.matchesNothing {
+		return false
+	}
 	name = strings.ReplaceAll(name, "\\", "/")
 	return ff.rx.MatchString(name)
-}
-
-// Match - checks if given [File] matches filter
-func (ff *FileFilter) Match(f *File) bool {
-	return ff.MatchFileName(f.Name)
 }
 
 var fileFilterInvalidGlobRegexp = regexp.MustCompile(`[^/]\*\*[^/]`)
