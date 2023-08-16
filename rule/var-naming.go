@@ -141,15 +141,6 @@ func (w *lintNames) check(id *ast.Ident, thing string) {
 		})
 		return
 	}
-	if len(id.Name) > 2 && id.Name[0] == 'k' && id.Name[1] >= 'A' && id.Name[1] <= 'Z' {
-		should := string(id.Name[1]+'a'-'A') + id.Name[2:]
-		w.onFailure(lint.Failure{
-			Failure:    fmt.Sprintf("don't use leading k in Go names; %s %s should be %s", thing, id.Name, should),
-			Confidence: 0.8,
-			Node:       id,
-			Category:   "naming",
-		})
-	}
 
 	should := lint.Name(id.Name, w.whitelist, w.blacklist)
 	if id.Name == should {
