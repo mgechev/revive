@@ -57,8 +57,7 @@ func f_it() { // MATCH /don't use underscores in Go names; func f_it should be f
 
 // Common styles in other languages that don't belong in Go.
 const (
-	CPP_CONST   = 1 // MATCH /don't use ALL_CAPS in Go names; use CamelCase/
-	kLeadingKay = 2 // MATCH /don't use leading k in Go names; const kLeadingKay should be leadingKay/
+	CPP_CONST = 1 // MATCH /don't use ALL_CAPS in Go names; use CamelCase/
 
 	HTML  = 3 // okay; no underscore
 	X509B = 4 // ditto
