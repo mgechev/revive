@@ -33,3 +33,17 @@ func deferrer() {
 	// does not work, but not currently blocked.
 	defer helper(func() { recover() })
 }
+
+// Issue #863
+
+func verify(fn func() error) {
+	if err := fn(); err != nil {
+		panic(err)
+	}
+}
+
+func f() {
+	defer verify(func() error {
+		return nil
+	})
+}
