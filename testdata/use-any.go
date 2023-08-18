@@ -17,6 +17,10 @@ func any2(a int) interface{} {} // MATCH /since GO 1.18 'interface{}' can be rep
 
 var ni interface{ Close() }
 
+var ni interface {
+	// Close()
+}
+
 type nt interface{ Close() }
 type na = interface{ Close() }
 
