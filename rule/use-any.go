@@ -1,8 +1,9 @@
 package rule
 
 import (
-	"github.com/mgechev/revive/lint"
 	"go/ast"
+
+	"github.com/mgechev/revive/lint"
 )
 
 // UseAnyRule lints given else constructs.
@@ -13,7 +14,6 @@ func (*UseAnyRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	walker := lintUseAny{
-		commentPositions: getCommentsPositions(file.AST.Comments),
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
@@ -30,8 +30,7 @@ func (*UseAnyRule) Name() string {
 }
 
 type lintUseAny struct {
-	commentPositions []int
-	onFailure        func(lint.Failure)
+	onFailure func(lint.Failure)
 }
 
 func (w lintUseAny) Visit(n ast.Node) ast.Visitor {
@@ -41,13 +40,7 @@ func (w lintUseAny) Visit(n ast.Node) ast.Visitor {
 	}
 
 	if len(it.Methods.List) != 0 {
-		return w // it is not an empty interface
-	}
-
-	for _, pos := range w.commentPositions {
-		if pos > int(it.Pos()) && pos < int(it.End()) {
-			return w // it is a comment inside the interface
-		}
+		return w // it is not and empty interface
 	}
 
 	w.onFailure(lint.Failure{
@@ -58,15 +51,4 @@ func (w lintUseAny) Visit(n ast.Node) ast.Visitor {
 	})
 
 	return w
-}
-
-func getCommentsPositions(commentGroups []*ast.CommentGroup) []int {
-	result := []int{}
-	for _, commentGroup := range commentGroups {
-		for _, comment := range commentGroup.List {
-			result = append(result, int(comment.Pos()))
-		}
-	}
-
-	return result
 }
