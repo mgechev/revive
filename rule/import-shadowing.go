@@ -86,7 +86,6 @@ func (w importShadowing) Visit(n ast.Node) ast.Visitor {
 		if n.Recv != nil {
 			w.skipIdents[n.Name] = struct{}{}
 		}
-		return w
 	case *ast.Ident:
 		if n == w.packageNameIdent {
 			return nil // skip the ident corresponding to the package name of this file
