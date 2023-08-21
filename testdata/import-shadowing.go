@@ -23,6 +23,14 @@ type fmt interface {} // MATCH /The name 'fmt' shadows an import name/
 
 func (ast myAst) foo() {} // MATCH /The name 'ast' shadows an import name/
 
+func (a myAst) fmt() { // this should be skipped (method, not a pkg func)
+	var fmt string // MATCH /The name 'fmt' shadows an import name/
+}
+
+func (a myAst) md5() { // this should be skipped (method, not a pkg func)
+	strings := map[string]string{} // MATCH /The name 'strings' shadows an import name/
+}
+
 func md5() {} // MATCH /The name 'md5' shadows an import name/
 
 func bar(_ string) {}
