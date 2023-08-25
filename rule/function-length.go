@@ -19,7 +19,7 @@ type FunctionLength struct {
 
 func (r *FunctionLength) configure(arguments lint.Arguments) {
 	r.Lock()
-	r.Unlock()
+	defer r.Unlock()
 	if !r.configured {
 		maxStmt, maxLines := r.parseArguments(arguments)
 		r.maxStmt = int(maxStmt)
