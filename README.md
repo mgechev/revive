@@ -533,7 +533,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`datarace`](./RULES_DESCRIPTIONS.md#datarace)          |  n/a   |  Spots potential dataraces |    no    |  no   |
 | [`comment-spacings`](./RULES_DESCRIPTIONS.md#comment-spacings)          |  []string   |  Warns on malformed comments |    no    |  no   |
 | [`redundant-import-alias`](./RULES_DESCRIPTIONS.md#redundant-import-alias)          |  n/a   |  Warns on import aliases matching the imported package name |    no    |  no   |
-| [`import-naming`](./RULES_DESCRIPTIONS.md#import-naming)         | string (defaults to ^[a-z][a-z0-9]{0,}$) | Conventions around the naming of import aliases.                              |    no    |  no   |
+| [`import-alias-naming`](./RULES_DESCRIPTIONS.md#import-alias-naming)         | string (defaults to ^[a-z][a-z0-9]{0,}$) | Conventions around the naming of import aliases.                              |    no    |  no   |
 
 
 ## Configurable rules

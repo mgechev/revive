@@ -44,7 +44,7 @@ List of all available rules.
   - [indent-error-flow](#indent-error-flow)
   - [imports-blacklist](#imports-blacklist)
   - [import-shadowing](#import-shadowing)
-  - [import-naming](#import-naming)
+  - [import-alias-naming](#import-alias-naming)
   - [line-length-limit](#line-length-limit)
   - [max-public-structs](#max-public-structs)
   - [modifies-parameter](#modifies-parameter)
@@ -490,7 +490,7 @@ name of an imported package. This rule spots identifiers that shadow an import.
 
 _Configuration_: N/A
 
-## import-naming
+## import-alias-naming
 
 _Description_: Aligns with Go's naming conventions, as outlined in the official
 [blog post](https://go.dev/blog/package-names). It enforces clear and lowercase import alias names, echoing
@@ -502,7 +502,7 @@ _Configuration_: (string) regular expression to match the aliases (default: ^[a-
 Example:
 
 ```toml
-[rule.import-naming]
+[rule.import-alias-naming]
   arguments =["^[a-z][a-z0-9]{0,}$"]
 ```
 
