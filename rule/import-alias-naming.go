@@ -8,19 +8,18 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ImportNamingRule lints import naming.
-type ImportNamingRule struct {
+// ImportAliasNamingRule lints import alias naming.
+type ImportAliasNamingRule struct {
 	configured       bool
-	namingRule       string
 	namingRuleRegexp *regexp.Regexp
 	sync.Mutex
 }
 
-const defaultNamingRule = "^[a-z][a-z0-9]$"
+const defaultNamingRule = "^[a-z][a-z0-9]{0,}$"
 
 var defaultNamingRuleRegexp = regexp.MustCompile(defaultNamingRule)
 
-func (r *ImportNamingRule) configure(arguments lint.Arguments) {
+func (r *ImportAliasNamingRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	defer r.Unlock()
 	if r.configured {
@@ -28,26 +27,24 @@ func (r *ImportNamingRule) configure(arguments lint.Arguments) {
 	}
 
 	if len(arguments) < 1 {
-		r.namingRule = defaultNamingRule
 		r.namingRuleRegexp = defaultNamingRuleRegexp
 		return
 	}
 
-	var ok bool
-	r.namingRule, ok = arguments[0].(string) // Alt. non panicking version
+	namingRule, ok := arguments[0].(string) // Alt. non panicking version
 	if !ok {
-		panic(`invalid value passed as argument number to the "import-naming" rule`)
+		panic(fmt.Sprintf("Invalid argument '%v' for 'import-alias-naming' rule. Expecting string, got %T", arguments[0], arguments[0]))
 	}
 
 	var err error
-	r.namingRuleRegexp, err = regexp.Compile(r.namingRule)
+	r.namingRuleRegexp, err = regexp.Compile(namingRule)
 	if err != nil {
-		panic(fmt.Sprintf("Invalid argument to the import-naming rule. Expecting %q to be a valid regular expression, got: %v", r.namingRule, err))
+		panic(fmt.Sprintf("Invalid argument to the import-alias-naming rule. Expecting %q to be a valid regular expression, got: %v", namingRule, err))
 	}
 }
 
 // Apply applies the rule to given file.
-func (r *ImportNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ImportAliasNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	r.configure(arguments)
 
 	var failures []lint.Failure
@@ -66,7 +63,7 @@ func (r *ImportNamingRule) Apply(file *lint.File, arguments lint.Arguments) []li
 		if !r.namingRuleRegexp.MatchString(alias.Name) {
 			failures = append(failures, lint.Failure{
 				Confidence: 1,
-				Failure:    fmt.Sprintf("import name (%s) must match the regular expression: %s", alias.Name, r.namingRule),
+				Failure:    fmt.Sprintf("import name (%s) must match the regular expression: %s", alias.Name, r.namingRuleRegexp.String()),
 				Node:       alias,
 				Category:   "imports",
 			})
@@ -77,6 +74,6 @@ func (r *ImportNamingRule) Apply(file *lint.File, arguments lint.Arguments) []li
 }
 
 // Name returns the rule name.
-func (*ImportNamingRule) Name() string {
-	return "import-naming"
+func (*ImportAliasNamingRule) Name() string {
+	return "import-alias-naming"
 }

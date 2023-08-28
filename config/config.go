@@ -88,7 +88,7 @@ var allRules = append([]lint.Rule{
 	&rule.CommentSpacingsRule{},
 	&rule.IfReturnRule{},
 	&rule.RedundantImportAlias{},
-	&rule.ImportNamingRule{},
+	&rule.ImportAliasNamingRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
