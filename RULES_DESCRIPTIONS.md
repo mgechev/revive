@@ -62,6 +62,7 @@ List of all available rules.
   - [string-format](#string-format)
   - [superfluous-else](#superfluous-else)
   - [time-equal](#time-equal)
+  - [unchecked-type-assertion](#unchecked-type-assertion)
   - [time-naming](#time-naming)
   - [var-naming](#var-naming)
   - [var-declaration](#var-declaration)
@@ -170,8 +171,8 @@ Example:
 [rule.cognitive-complexity]
   arguments =[7]
 ```
-
 ## comment-spacings
+
 _Description_: Spots comments of the form:
 ```go
 //This is a malformed comment: no space between // and the start of the sentence
@@ -682,6 +683,26 @@ _Configuration_: N/A
 _Description_: Using unit-specific suffix like "Secs", "Mins", ... when naming variables of type `time.Duration` can be misleading, this rule highlights those cases.
 
 _Configuration_: N/A
+
+## unchecked-type-assertion
+
+_Description_: This rule checks whether a type assertion result is checked (the `ok` value), preventing unexpected `panic`s.
+
+_Configuration_: list of key-value-pair-map (`[]map[string]any`).
+
+- `acceptIgnoredAssertionResult` : (bool) default `false`, set it to `true` to accept ignored type assertion results like this:
+
+```go
+foo, _ := bar(.*Baz).
+//   ^
+```
+
+Example:
+
+```yaml
+[rule.unchecked-type-assertion]
+arguments = [{acceptIgnoredAssertionResult=true}]
+```
 
 ## var-naming
 
