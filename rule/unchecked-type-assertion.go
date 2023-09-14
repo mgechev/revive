@@ -160,6 +160,10 @@ func (w *lintUnchekedTypeAssertion) handleRange(n *ast.RangeStmt) {
 	w.requireNoTypeAssert(n.X)
 }
 
+func (w *lintUnchekedTypeAssertion) handleChannelSend(n *ast.SendStmt) {
+	w.requireNoTypeAssert(n.Value)
+}
+
 func (w *lintUnchekedTypeAssertion) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
 	case *ast.RangeStmt:
@@ -174,6 +178,8 @@ func (w *lintUnchekedTypeAssertion) Visit(node ast.Node) ast.Visitor {
 		w.handleIfStmt(n)
 	case *ast.CaseClause:
 		w.handleCaseClause(n)
+	case *ast.SendStmt:
+		w.handleChannelSend(n)
 	}
 
 	return w

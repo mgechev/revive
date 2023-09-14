@@ -59,7 +59,7 @@ func handleTypeComparison() {
 }
 
 func handleTypeComparisonReverse() {
-	if foo.(int) == 1 { // MATCH /type cast result is unchecked in foo.(int) - type assertion will panic if not matched/
+	if 1 == foo.(int) { // MATCH /type cast result is unchecked in foo.(int) - type assertion will panic if not matched/
 		return
 	}
 }
@@ -99,4 +99,10 @@ func handleInnerSwitchAssertionReverse() {
 	case 1 == foo.(int): // MATCH /type cast result is unchecked in foo.(int) - type assertion will panic if not matched/
 	case 1 == bar.(int): // MATCH /type cast result is unchecked in bar.(int) - type assertion will panic if not matched/
 	}
+}
+
+func handleChannelWrite() {
+	c := make(chan any)
+	var a any = "foo"
+	c <- a.(int) // MATCH /type cast result is unchecked in a.(int) - type assertion will panic if not matched/
 }
