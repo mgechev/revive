@@ -96,8 +96,34 @@ func (w *lintUnchekedTypeAssertion) requireNoTypeAssert(expr ast.Expr) {
 	}
 }
 
+func (w *lintUnchekedTypeAssertion) handleIfStmt(n *ast.IfStmt) {
+	ifCondition, ok := n.Cond.(*ast.BinaryExpr)
+	if !ok {
+		return
+	}
+
+	w.requireNoTypeAssert(ifCondition.X)
+	w.requireNoTypeAssert(ifCondition.Y)
+}
+
+func (w *lintUnchekedTypeAssertion) requireBinaryExpressionWithoutTypeAssertion(expr ast.Expr) {
+	binaryExpr, ok := expr.(*ast.BinaryExpr)
+	if ok {
+		w.requireNoTypeAssert(binaryExpr.X)
+		w.requireNoTypeAssert(binaryExpr.Y)
+	}
+}
+
+func (w *lintUnchekedTypeAssertion) handleCaseClause(n *ast.CaseClause) {
+	for _, expr := range n.List {
+		w.requireNoTypeAssert(expr)
+		w.requireBinaryExpressionWithoutTypeAssertion(expr)
+	}
+}
+
 func (w *lintUnchekedTypeAssertion) handleSwitch(n *ast.SwitchStmt) {
 	w.requireNoTypeAssert(n.Tag)
+	w.requireBinaryExpressionWithoutTypeAssertion(n.Tag)
 }
 
 func (w *lintUnchekedTypeAssertion) handleAssignment(n *ast.AssignStmt) {
@@ -144,6 +170,10 @@ func (w *lintUnchekedTypeAssertion) Visit(node ast.Node) ast.Visitor {
 		w.handleReturn(n)
 	case *ast.AssignStmt:
 		w.handleAssignment(n)
+	case *ast.IfStmt:
+		w.handleIfStmt(n)
+	case *ast.CaseClause:
+		w.handleCaseClause(n)
 	}
 
 	return w

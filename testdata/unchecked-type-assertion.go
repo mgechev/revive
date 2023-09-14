@@ -52,7 +52,51 @@ func handleTypeSwitchWithAssignment() {
 	}
 }
 
-func handleTypeSwitchReturn() {
-	// Should not be a lint
-	return foo.(type)
+func handleTypeComparison() {
+	if foo.(int) == 1 { // MATCH /type cast result is unchecked in foo.(int) - type assertion will panic if not matched/
+		return
+	}
+}
+
+func handleTypeComparisonReverse() {
+	if foo.(int) == 1 { // MATCH /type cast result is unchecked in foo.(int) - type assertion will panic if not matched/
+		return
+	}
+}
+
+func handleTypeAssignmentComparison() {
+	var value any
+	value = 42 // int
+
+	if v := value.(int); v == 42 { // MATCH /type cast result is unchecked in value.(int) - type assertion will panic if not matched/
+		fmt.Printf("Value is an integer: %d\n", v)
+	}
+}
+
+func handleSwitchComparison() {
+	switch foo.(int) == 1 { // MATCH /type cast result is unchecked in foo.(int) - type assertion will panic if not matched/
+	case true:
+	case false:
+	}
+}
+
+func handleSwitchComparisonReverse() {
+	switch 1 == foo.(int) { // MATCH /type cast result is unchecked in foo.(int) - type assertion will panic if not matched/
+	case true:
+	case false:
+	}
+}
+
+func handleInnerSwitchAssertion() {
+	switch {
+	case foo.(int) == 1: // MATCH /type cast result is unchecked in foo.(int) - type assertion will panic if not matched/
+	case bar.(int) == 1: // MATCH /type cast result is unchecked in bar.(int) - type assertion will panic if not matched/
+	}
+}
+
+func handleInnerSwitchAssertionReverse() {
+	switch {
+	case 1 == foo.(int): // MATCH /type cast result is unchecked in foo.(int) - type assertion will panic if not matched/
+	case 1 == bar.(int): // MATCH /type cast result is unchecked in bar.(int) - type assertion will panic if not matched/
+	}
 }
