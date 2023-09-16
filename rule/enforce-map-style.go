@@ -148,6 +148,9 @@ func (r *EnforceMapStyleRule) isMapType(v ast.Expr) bool {
 	case *ast.MapType:
 		return true
 	case *ast.Ident:
+		if t.Obj == nil {
+			return false
+		}
 		typeSpec, ok := t.Obj.Decl.(*ast.TypeSpec)
 		if !ok {
 			return false
