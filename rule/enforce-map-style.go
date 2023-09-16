@@ -11,14 +11,14 @@ import (
 type enforceMapStyleType string
 
 const (
-	enforceMapStyleTypeAny     enforceMapStyleType = ""
+	enforceMapStyleTypeAny     enforceMapStyleType = "any"
 	enforceMapStyleTypeMake    enforceMapStyleType = "make"
 	enforceMapStyleTypeLiteral enforceMapStyleType = "literal"
 )
 
 func mapStyleFromString(s string) (enforceMapStyleType, error) {
 	switch s {
-	case string(enforceMapStyleTypeAny):
+	case string(enforceMapStyleTypeAny), "":
 		return enforceMapStyleTypeAny, nil
 	case string(enforceMapStyleTypeMake):
 		return enforceMapStyleTypeMake, nil
