@@ -92,6 +92,11 @@ func (r *EnforceMapStyleRule) Apply(file *lint.File, arguments lint.Arguments) [
 				return true
 			}
 
+			if len(v.Elts) > 0 {
+				// not an empty map
+				return true
+			}
+
 			failures = append(failures, lint.Failure{
 				Confidence: 1,
 				Node:       v,
