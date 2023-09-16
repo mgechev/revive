@@ -89,6 +89,7 @@ var allRules = append([]lint.Rule{
 	&rule.IfReturnRule{},
 	&rule.RedundantImportAlias{},
 	&rule.ImportAliasNamingRule{},
+	&rule.EnforceMapStyleRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
