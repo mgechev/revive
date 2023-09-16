@@ -37,7 +37,7 @@ func mapStyleFromString(s string) (enforceMapStyleType, error) {
 	}
 }
 
-// EnforceMapStyleRule implements a rule to enforce `make(map[type]type)` over `map[type]type{}`
+// EnforceMapStyleRule implements a rule to enforce `make(map[type]type)` over `map[type]type{}`.
 type EnforceMapStyleRule struct {
 	configured      bool
 	enforceMapStyle enforceMapStyleType
