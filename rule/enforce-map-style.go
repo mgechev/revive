@@ -140,7 +140,7 @@ func (r *EnforceMapStyleRule) Apply(file *lint.File, arguments lint.Arguments) [
 
 // Name returns the rule name.
 func (r *EnforceMapStyleRule) Name() string {
-	return "enforce-make-style"
+	return "enforce-map-style"
 }
 
 func (r *EnforceMapStyleRule) isMapType(v ast.Expr) bool {
