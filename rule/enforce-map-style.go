@@ -47,16 +47,18 @@ type EnforceMapStyleRule struct {
 func (r *EnforceMapStyleRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	defer r.Unlock()
+	
 	if r.configured {
 		return
 	}
+	r.configured = true
 
 	if len(arguments) < 1 {
 		r.enforceMapStyle = enforceMapStyleTypeAny
 		return
 	}
 
-	enforceMapStyle, ok := arguments[0].(string) // Alt. non panicking version
+	enforceMapStyle, ok := arguments[0].(string) 
 	if !ok {
 		panic(fmt.Sprintf("Invalid argument '%v' for 'enforce-map-style' rule. Expecting string, got %T", arguments[0], arguments[0]))
 	}
