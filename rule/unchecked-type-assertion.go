@@ -17,15 +17,18 @@ const (
 type UncheckedTypeAssertionRule struct {
 	sync.Mutex
 	acceptIgnoredAssertionResult bool
+	configured                   bool
 }
 
 func (u *UncheckedTypeAssertionRule) configure(arguments lint.Arguments) {
 	u.Lock()
 	defer u.Unlock()
 
-	if len(arguments) == 0 {
+	if len(arguments) == 0 || u.configured {
 		return
 	}
+
+	u.configured = true
 
 	args, ok := arguments[0].(map[string]any)
 	if !ok {
@@ -52,14 +55,12 @@ func (u *UncheckedTypeAssertionRule) Apply(file *lint.File, args lint.Arguments)
 	var failures []lint.Failure
 
 	walker := &lintUnchekedTypeAssertion{
-		pkg: file.Pkg,
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
 		acceptIgnoredTypeAssertionResult: u.acceptIgnoredAssertionResult,
 	}
 
-	file.Pkg.TypeCheck()
 	ast.Walk(walker, file.AST)
 
 	return failures
@@ -71,7 +72,6 @@ func (*UncheckedTypeAssertionRule) Name() string {
 }
 
 type lintUnchekedTypeAssertion struct {
-	pkg                              *lint.Package
 	onFailure                        func(lint.Failure)
 	acceptIgnoredTypeAssertionResult bool
 }
@@ -98,12 +98,10 @@ func (w *lintUnchekedTypeAssertion) requireNoTypeAssert(expr ast.Expr) {
 
 func (w *lintUnchekedTypeAssertion) handleIfStmt(n *ast.IfStmt) {
 	ifCondition, ok := n.Cond.(*ast.BinaryExpr)
-	if !ok {
-		return
+	if ok {
+		w.requireNoTypeAssert(ifCondition.X)
+		w.requireNoTypeAssert(ifCondition.Y)
 	}
-
-	w.requireNoTypeAssert(ifCondition.X)
-	w.requireNoTypeAssert(ifCondition.Y)
 }
 
 func (w *lintUnchekedTypeAssertion) requireBinaryExpressionWithoutTypeAssertion(expr ast.Expr) {
