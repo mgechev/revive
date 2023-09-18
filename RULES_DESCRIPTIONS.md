@@ -318,7 +318,7 @@ Example:
 
 ```toml
 [rule.early-return]
-  arguments =["preserveScope"]
+  arguments = ["preserveScope"]
 ```
 
 ## empty-block
@@ -483,8 +483,8 @@ _Configuration_: ([]string) rule flags. Available flags are:
 Example:
 
 ```toml
-[rule.exported]
-  arguments =["preserveScope"]
+[rule.indent-error-flow]
+  arguments = ["preserveScope"]
 ```
 
 ## imports-blacklist
@@ -684,8 +684,8 @@ _Configuration_: ([]string) rule flags. Available flags are:
 Example:
 
 ```toml
-[rule.exported]
-  arguments =["preserveScope"]
+[rule.superfluous-else]
+  arguments = ["preserveScope"]
 ```
 
 ## time-equal
