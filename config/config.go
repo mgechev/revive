@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mgechev/revive/formatter"
-
 	"github.com/BurntSushi/toml"
+
+	"github.com/mgechev/revive/formatter"
 	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/rule"
 )
@@ -91,6 +91,7 @@ var allRules = append([]lint.Rule{
 	&rule.RedundantImportAlias{},
 	&rule.ImportAliasNamingRule{},
 	&rule.EnforceMapStyleRule{},
+	&rule.EnforceSliceStyleRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
