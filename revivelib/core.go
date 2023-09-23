@@ -1,3 +1,4 @@
+// Package revivelib provides revive's linting functionality as a lib.
 package revivelib
 
 import (

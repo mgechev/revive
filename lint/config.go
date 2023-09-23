@@ -3,6 +3,7 @@ package lint
 // Arguments is type used for the arguments of a rule.
 type Arguments = []interface{}
 
+// FileFilters is type used for modeling file filters to apply to rules.
 type FileFilters = []*FileFilter
 
 // RuleConfig is type used for the rule configuration.
