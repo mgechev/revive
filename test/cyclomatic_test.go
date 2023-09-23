@@ -9,9 +9,9 @@ import (
 
 func TestCyclomatic(t *testing.T) {
 	testRule(t, "cyclomatic", &rule.CyclomaticRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{int64(1)},
+		Arguments: []any{int64(1)},
 	})
 	testRule(t, "cyclomatic-2", &rule.CyclomaticRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{int64(3)},
+		Arguments: []any{int64(3)},
 	})
 }

@@ -9,6 +9,6 @@ import (
 
 func TestLineLengthLimit(t *testing.T) {
 	testRule(t, "line-length-limit", &rule.LineLengthLimitRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{int64(100)},
+		Arguments: []any{int64(100)},
 	})
 }

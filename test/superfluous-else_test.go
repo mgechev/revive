@@ -11,5 +11,5 @@ import (
 // TestSuperfluousElse rule.
 func TestSuperfluousElse(t *testing.T) {
 	testRule(t, "superfluous-else", &rule.SuperfluousElseRule{})
-	testRule(t, "superfluous-else-scope", &rule.SuperfluousElseRule{}, &lint.RuleConfig{Arguments: []interface{}{ifelse.PreserveScope}})
+	testRule(t, "superfluous-else-scope", &rule.SuperfluousElseRule{}, &lint.RuleConfig{Arguments: []any{ifelse.PreserveScope}})
 }

@@ -8,19 +8,19 @@ import (
 )
 
 func TestExportedWithDisableStutteringCheck(t *testing.T) {
-	args := []interface{}{"disableStutteringCheck"}
+	args := []any{"disableStutteringCheck"}
 
 	testRule(t, "exported-issue-555", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: args})
 }
 
 func TestExportedWithChecksOnMethodsOfPrivateTypes(t *testing.T) {
-	args := []interface{}{"checkPrivateReceivers"}
+	args := []any{"checkPrivateReceivers"}
 
 	testRule(t, "exported-issue-552", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: args})
 }
 
 func TestExportedReplacingStuttersByRepetitive(t *testing.T) {
-	args := []interface{}{"sayRepetitiveInsteadOfStutters"}
+	args := []any{"sayRepetitiveInsteadOfStutters"}
 
 	testRule(t, "exported-issue-519", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: args})
 }

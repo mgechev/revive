@@ -35,7 +35,7 @@ func (r *UnusedReceiverRule) configure(args lint.Arguments) {
 		r.failureMsg = "method receiver '%s' is not referenced in method's body, consider removing or renaming it as _"
 	} else {
 		// Arguments = [{}]
-		options := args[0].(map[string]interface{})
+		options := args[0].(map[string]any)
 		// Arguments = [{allowedRegex="^_"}]
 
 		if allowedRegexParam, ok := options["allowRegex"]; ok {

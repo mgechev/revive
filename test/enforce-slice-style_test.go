@@ -13,12 +13,12 @@ func TestEnforceSliceStyle_any(t *testing.T) {
 
 func TestEnforceSliceStyle_make(t *testing.T) {
 	testRule(t, "enforce-slice-style-make", &rule.EnforceSliceStyleRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{"make"},
+		Arguments: []any{"make"},
 	})
 }
 
 func TestEnforceSliceStyle_literal(t *testing.T) {
 	testRule(t, "enforce-slice-style-literal", &rule.EnforceSliceStyleRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{"literal"},
+		Arguments: []any{"literal"},
 	})
 }
