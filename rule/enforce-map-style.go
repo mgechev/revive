@@ -141,7 +141,7 @@ func (r *EnforceMapStyleRule) Apply(file *lint.File, arguments lint.Arguments) [
 }
 
 // Name returns the rule name.
-func (r *EnforceMapStyleRule) Name() string {
+func (_ *EnforceMapStyleRule) Name() string {
 	return "enforce-map-style"
 }
 

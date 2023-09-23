@@ -43,7 +43,7 @@ func (*mockRule) Name() string {
 	return "mock-rule"
 }
 
-func (*mockRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (*mockRule) Apply(_ *lint.File, _ lint.Arguments) []lint.Failure {
 	return nil
 }
 
