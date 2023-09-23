@@ -1,3 +1,4 @@
+// Package config implements revive's configuration data structures and related methods
 package config
 
 import (

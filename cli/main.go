@@ -1,3 +1,4 @@
+// Package cli implements the revive command line application.
 package cli
 
 import (
