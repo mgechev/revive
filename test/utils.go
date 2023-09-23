@@ -106,7 +106,7 @@ func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, ru
 				copy(failures[i:], failures[i+1:])
 				failures = failures[:len(failures)-1]
 
-				//t.Logf("/%v/ matched at %s:%d", in.Match, fi.Name(), in.Line)
+				// t.Logf("/%v/ matched at %s:%d", in.Match, fi.Name(), in.Line)
 				ok = true
 				break
 			}
