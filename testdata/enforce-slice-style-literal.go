@@ -41,10 +41,10 @@ func somefn2() {
 type SliceSlice Slice
 
 func somefn3() {
-	m2 := make(SliceSlice, 0)    // MATCH /use []type{} instead of make([]type, 0) (or declare nil slice)/
-	m3 := make(SliceSlice, 0, 0) // MATCH /use []type{} instead of make([]type, 0) (or declare nil slice)/
 	m0 := make(SliceSlice, 10)
 	m1 := make(SliceSlice, 0, 10)
+	m2 := make(SliceSlice, 0)    // MATCH /use []type{} instead of make([]type, 0) (or declare nil slice)/
+	m3 := make(SliceSlice, 0, 0) // MATCH /use []type{} instead of make([]type, 0) (or declare nil slice)/
 	m4 := SliceSlice{}
 	m5 := SliceSlice{"v1", "v2"}
 
