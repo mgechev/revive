@@ -144,8 +144,8 @@ func (w lintDeferRule) Visit(node ast.Node) ast.Visitor {
 					w.newFailure("be careful when deferring calls to methods without pointer receiver", fn, 0.8, "bad practice", "method-call")
 				}
 			}
-
 		}
+
 		return nil
 	}
 
