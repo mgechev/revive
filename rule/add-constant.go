@@ -105,7 +105,7 @@ func (w lintAddConstantRule) checkFunc(expr *ast.CallExpr) {
 	}
 }
 
-func (_ lintAddConstantRule) getFuncName(expr *ast.CallExpr) string {
+func (lintAddConstantRule) getFuncName(expr *ast.CallExpr) string {
 	switch f := expr.Fun.(type) {
 	case *ast.SelectorExpr:
 		switch prefix := f.X.(type) {
