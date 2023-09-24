@@ -8,7 +8,7 @@ import (
 )
 
 func TestErrorStringsWithCustomFunctions(t *testing.T) {
-	args := []interface{}{"pkgErrors.Wrap"}
+	args := []any{"pkgErrors.Wrap"}
 	testRule(t, "error-strings-with-custom-functions", &rule.ErrorStringsRule{}, &lint.RuleConfig{
 		Arguments: args,
 	})

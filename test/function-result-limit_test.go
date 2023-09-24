@@ -9,6 +9,6 @@ import (
 
 func TestFunctionResultsLimit(t *testing.T) {
 	testRule(t, "function-result-limit", &rule.FunctionResultsLimitRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{int64(3)},
+		Arguments: []any{int64(3)},
 	})
 }

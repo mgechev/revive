@@ -9,7 +9,7 @@ import (
 
 func TestUnusedReceiver(t *testing.T) {
 	testRule(t, "unused-receiver", &rule.UnusedReceiverRule{})
-	testRule(t, "unused-receiver-custom-regex", &rule.UnusedReceiverRule{}, &lint.RuleConfig{Arguments: []interface{}{
-		map[string]interface{}{"allowRegex": "^xxx"},
+	testRule(t, "unused-receiver-custom-regex", &rule.UnusedReceiverRule{}, &lint.RuleConfig{Arguments: []any{
+		map[string]any{"allowRegex": "^xxx"},
 	}})
 }

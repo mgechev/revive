@@ -9,6 +9,6 @@ import (
 
 func TestCognitiveComplexity(t *testing.T) {
 	testRule(t, "cognitive-complexity", &rule.CognitiveComplexityRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{int64(0)},
+		Arguments: []any{int64(0)},
 	})
 }

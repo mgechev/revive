@@ -8,7 +8,7 @@ import (
 )
 
 func TestAddConstant(t *testing.T) {
-	args := []interface{}{map[string]interface{}{
+	args := []any{map[string]any{
 		"maxLitCount": "2",
 		"allowStrs":   "\"\"",
 		"allowInts":   "0,1,2",

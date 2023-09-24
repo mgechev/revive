@@ -9,6 +9,6 @@ import (
 
 func TestArgumentLimit(t *testing.T) {
 	testRule(t, "argument-limit", &rule.ArgumentsLimitRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{int64(3)},
+		Arguments: []any{int64(3)},
 	})
 }

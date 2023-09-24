@@ -44,14 +44,14 @@ func (r *VarNamingRule) configure(arguments lint.Arguments) {
 	if len(arguments) >= 3 {
 		// not pretty code because should keep compatibility with TOML (no mixed array types) and new map parameters
 		thirdArgument := arguments[2]
-		asSlice, ok := thirdArgument.([]interface{})
+		asSlice, ok := thirdArgument.([]any)
 		if !ok {
 			panic(fmt.Sprintf("Invalid third argument to the var-naming rule. Expecting a %s of type slice, got %T", "options", arguments[2]))
 		}
 		if len(asSlice) != 1 {
 			panic(fmt.Sprintf("Invalid third argument to the var-naming rule. Expecting a %s of type slice, of len==1, but %d", "options", len(asSlice)))
 		}
-		args, ok := asSlice[0].(map[string]interface{})
+		args, ok := asSlice[0].(map[string]any)
 		if !ok {
 			panic(fmt.Sprintf("Invalid third argument to the var-naming rule. Expecting a %s of type slice, of len==1, with map, but %T", "options", asSlice[0]))
 		}
@@ -255,8 +255,8 @@ func (w *lintNames) Visit(n ast.Node) ast.Visitor {
 	return w
 }
 
-func getList(arg interface{}, argName string) []string {
-	temp, ok := arg.([]interface{})
+func getList(arg any, argName string) []string {
+	temp, ok := arg.([]any)
 	if !ok {
 		panic(fmt.Sprintf("Invalid argument to the var-naming rule. Expecting a %s of type slice with initialisms, got %T", argName, arg))
 	}
