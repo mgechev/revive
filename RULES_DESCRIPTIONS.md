@@ -7,15 +7,15 @@ List of all available rules.
   - [add-constant](#add-constant)
   - [argument-limit](#argument-limit)
   - [atomic](#atomic)
-  - [bare-return](#bare-return)
   - [banned-characters](#banned-characters)
+  - [bare-return](#bare-return)
   - [blank-imports](#blank-imports)
   - [bool-literal-in-expr](#bool-literal-in-expr)
   - [call-to-gc](#call-to-gc)
-  - [confusing-naming](#confusing-naming)
-  - [comment-spacings](#comment-spacings)
-  - [confusing-results](#confusing-results)
   - [cognitive-complexity](#cognitive-complexity)
+  - [comment-spacings](#comment-spacings)
+  - [confusing-naming](#confusing-naming)
+  - [confusing-results](#confusing-results)
   - [constant-logical-expr](#constant-logical-expr)
   - [context-as-argument](#context-as-argument)
   - [context-keys-type](#context-keys-type)
@@ -28,23 +28,25 @@ List of all available rules.
   - [early-return](#early-return)
   - [empty-block](#empty-block)
   - [empty-lines](#empty-lines)
+  - [enforce-map-style](#enforce-map-style)
+  - [enforce-slice-style](#enforce-slice-style)
   - [error-naming](#error-naming)
   - [error-return](#error-return)
   - [error-strings](#error-strings)
-  - [errorf](#errorf)
+  - [errorf](#errorf)  
   - [exported](#exported)
   - [file-header](#file-header)
   - [flag-parameter](#flag-parameter)
-  - [function-result-limit](#function-result-limit)
   - [function-length](#function-length)
+  - [function-result-limit](#function-result-limit)
   - [get-return](#get-return)
   - [identical-branches](#identical-branches)
   - [if-return](#if-return)
+  - [import-alias-naming](#import-alias-naming)
+  - [import-shadowing](#import-shadowing)
+  - [imports-blacklist](#imports-blacklist)
   - [increment-decrement](#increment-decrement)
   - [indent-error-flow](#indent-error-flow)
-  - [imports-blacklist](#imports-blacklist)
-  - [import-shadowing](#import-shadowing)
-  - [import-alias-naming](#import-alias-naming)
   - [line-length-limit](#line-length-limit)
   - [max-public-structs](#max-public-structs)
   - [modifies-parameter](#modifies-parameter)
@@ -52,20 +54,19 @@ List of all available rules.
   - [nested-structs](#nested-structs)
   - [optimize-operands-order](#optimize-operands-order)
   - [package-comments](#package-comments)
-  - [range](#range)
-  - [range-val-in-closure](#range-val-in-closure)
   - [range-val-address](#range-val-address)
+  - [range-val-in-closure](#range-val-in-closure)
+  - [range](#range)
   - [receiver-naming](#receiver-naming)
   - [redefines-builtin-id](#redefines-builtin-id)
+  - [redundant-import-alias](#redundant-import-alias)
+  - [string-format](#string-format)
   - [string-of-int](#string-of-int)
   - [struct-tag](#struct-tag)
-  - [string-format](#string-format)
   - [superfluous-else](#superfluous-else)
   - [time-equal](#time-equal)
-  - [unchecked-type-assertion](#unchecked-type-assertion)
   - [time-naming](#time-naming)
-  - [var-naming](#var-naming)
-  - [var-declaration](#var-declaration)
+  - [unchecked-type-assertion](#unchecked-type-assertion)
   - [unconditional-recursion](#unconditional-recursion)
   - [unexported-naming](#unexported-naming)
   - [unexported-return](#unexported-return)
@@ -76,8 +77,9 @@ List of all available rules.
   - [unused-receiver](#unused-receiver)
   - [use-any](#use-any)
   - [useless-break](#useless-break)
+  - [var-declaration](#var-declaration)
+  - [var-naming](#var-naming)
   - [waitgroup-by-value](#waitgroup-by-value)
-  - [redundant-import-alias](#redundant-import-alias)
 
 ## add-constant
 
@@ -118,12 +120,6 @@ _Description_: Check for commonly mistaken usages of the `sync/atomic` package
 
 _Configuration_: N/A
 
-## bare-return
-
-_Description_: Warns on bare (a.k.a. naked) returns
-
-_Configuration_: N/A
-
 ## banned-characters
 
 _Description_: Checks given banned characters in identifiers(func, var, const). Comments are not checked.
@@ -136,6 +132,11 @@ Example:
 [rule.banned-characters]
   arguments =["Ω","Σ","σ"]
 ```
+## bare-return
+
+_Description_: Warns on bare (a.k.a. naked) returns
+
+_Configuration_: N/A
 
 ## blank-imports
 
@@ -333,6 +334,32 @@ _Description_: Sometimes `gofmt` is not enough to enforce a common formatting of
 
 _Configuration_: N/A
 
+## error-naming
+
+_Description_: By convention, for the sake of readability, variables of type `error` must be named with the prefix `err`.
+
+_Configuration_: N/A
+
+## error-return
+
+_Description_: By convention, for the sake of readability, the errors should be last in the list of returned values by a function.
+
+_Configuration_: N/A
+
+## error-strings
+
+_Description_: By convention, for better readability, error messages should not be capitalized or end with punctuation or a newline.
+
+More information [here](https://github.com/golang/go/wiki/CodeReviewComments#error-strings)
+
+_Configuration_: N/A
+
+## errorf
+
+_Description_: It is possible to get a simpler program by replacing `errors.New(fmt.Sprintf())` with `fmt.Errorf()`. This rule spots that kind of simplification opportunities.
+
+_Configuration_: N/A
+
 ## enforce-map-style
 
 _Description_: This rule enforces consistent usage of `make(map[type]type)` or `map[type]type{}` for map initialization. It does not affect `make(map[type]type, size)` constructions as well as `map[type]type{k1: v1}`.
@@ -367,31 +394,6 @@ Example:
   arguments = ["make"]
 ```
 
-## error-naming
-
-_Description_: By convention, for the sake of readability, variables of type `error` must be named with the prefix `err`.
-
-_Configuration_: N/A
-
-## error-return
-
-_Description_: By convention, for the sake of readability, the errors should be last in the list of returned values by a function.
-
-_Configuration_: N/A
-
-## error-strings
-
-_Description_: By convention, for better readability, error messages should not be capitalized or end with punctuation or a newline.
-
-More information [here](https://github.com/golang/go/wiki/CodeReviewComments#error-strings)
-
-_Configuration_: N/A
-
-## errorf
-
-_Description_: It is possible to get a simpler program by replacing `errors.New(fmt.Sprintf())` with `fmt.Errorf()`. This rule spots that kind of simplification opportunities.
-
-_Configuration_: N/A
 
 ## exported
 
@@ -480,6 +482,43 @@ _Description_: Checking if an error is _nil_ to just after return the error or n
 
 _Configuration_: N/A
 
+## import-alias-naming
+
+_Description_: Aligns with Go's naming conventions, as outlined in the official
+[blog post](https://go.dev/blog/package-names). It enforces clear and lowercase import alias names, echoing
+the principles of good package naming. Users can follow these guidelines by default or define a custom regex rule.
+Importantly, aliases with underscores ("_") are always allowed.
+
+_Configuration_: (string) regular expression to match the aliases (default: ^[a-z][a-z0-9]{0,}$)
+
+Example:
+
+```toml
+[rule.import-alias-naming]
+  arguments =["^[a-z][a-z0-9]{0,}$"]
+```
+
+## import-shadowing
+
+_Description_: In GO it is possible to declare identifiers (packages, structs,
+interfaces, parameters, receivers, variables, constants...) that conflict with the
+name of an imported package. This rule spots identifiers that shadow an import.
+
+_Configuration_: N/A
+
+## imports-blacklist
+
+_Description_: Warns when importing black-listed packages.
+
+_Configuration_: black-list of package names (or regular expression package names).
+
+Example:
+
+```toml
+[imports-blacklist]
+  arguments =["crypto/md5", "crypto/sha1", "crypto/**/pkix"]
+```
+
 ## increment-decrement
 
 _Description_: By convention, for better readability, incrementing an integer variable by 1 is recommended to be done using the `++` operator.
@@ -503,42 +542,6 @@ Example:
 ```toml
 [rule.indent-error-flow]
   arguments = ["preserveScope"]
-```
-
-## imports-blacklist
-
-_Description_: Warns when importing black-listed packages.
-
-_Configuration_: black-list of package names (or regular expression package names).
-
-Example:
-
-```toml
-[imports-blacklist]
-  arguments =["crypto/md5", "crypto/sha1", "crypto/**/pkix"]
-```
-## import-shadowing
-
-_Description_: In GO it is possible to declare identifiers (packages, structs,
-interfaces, parameters, receivers, variables, constants...) that conflict with the
-name of an imported package. This rule spots identifiers that shadow an import.
-
-_Configuration_: N/A
-
-## import-alias-naming
-
-_Description_: Aligns with Go's naming conventions, as outlined in the official
-[blog post](https://go.dev/blog/package-names). It enforces clear and lowercase import alias names, echoing
-the principles of good package naming. Users can follow these guidelines by default or define a custom regex rule.
-Importantly, aliases with underscores ("_") are always allowed.
-
-_Configuration_: (string) regular expression to match the aliases (default: ^[a-z][a-z0-9]{0,}$)
-
-Example:
-
-```toml
-[rule.import-alias-naming]
-  arguments =["^[a-z][a-z0-9]{0,}$"]
 ```
 
 ## line-length-limit
@@ -611,9 +614,9 @@ More information [here](https://github.com/golang/go/wiki/CodeReviewComments#pac
 
 _Configuration_: N/A
 
-## range
+## range-val-address
 
-_Description_: This rule suggests a shorter way of writing ranges that do not use the second value.
+_Description_: Range variables in a loop are reused at each iteration. This rule warns when assigning the address of the variable, passing the address to append() or using it in a map.
 
 _Configuration_: N/A
 
@@ -624,9 +627,9 @@ This rule warns when a range value (or index) is used inside a closure
 
 _Configuration_: N/A
 
-## range-val-address
+## range
 
-_Description_: Range variables in a loop are reused at each iteration. This rule warns when assigning the address of the variable, passing the address to append() or using it in a map.
+_Description_: This rule suggests a shorter way of writing ranges that do not use the second value.
 
 _Configuration_: N/A
 
@@ -643,8 +646,9 @@ Even if possible, redefining these built in names can lead to bugs very difficul
 
 _Configuration_: N/A
 
-## string-of-int
-_Description_:  explicit type conversion `string(i)` where `i` has an integer type other than `rune` might behave not as expected by the developer (e.g. `string(42)` is not `"42"`). This rule spot that kind of suspicious conversions.
+## redundant-import-alias
+
+_Description_: This rule warns on redundant import aliases. This happens when the alias used on the import statement matches the imported package name.
 
 _Configuration_: N/A
 
@@ -674,6 +678,12 @@ Example:
     ["panic", "/^[^\\n]*$/", "must not contain line breaks"]]
 ```
 
+## string-of-int
+
+_Description_:  explicit type conversion `string(i)` where `i` has an integer type other than `rune` might behave not as expected by the developer (e.g. `string(42)` is not `"42"`). This rule spot that kind of suspicious conversions.
+
+_Configuration_: N/A
+
 ## struct-tag
 
 _Description_: Struct tags are not checked at compile time.
@@ -688,7 +698,6 @@ To accept the `inline` option in JSON tags (and `outline` and `gnu` in BSON tags
 [rule.struct-tag]
   arguments = ["json,inline","bson,outline,gnu"]
 ```
-
 
 ## superfluous-else
 
@@ -737,29 +746,6 @@ Example:
 [rule.unchecked-type-assertion]
 arguments = [{acceptIgnoredAssertionResult=true}]
 ```
-
-## var-naming
-
-_Description_: This rule warns when [initialism](https://github.com/golang/go/wiki/CodeReviewComments#initialisms), [variable](https://github.com/golang/go/wiki/CodeReviewComments#variable-names) or [package](https://github.com/golang/go/wiki/CodeReviewComments#package-names) naming conventions are not followed.
-
-_Configuration_: This rule accepts two slices of strings and one optional slice with single map with named parameters.
-(it's due to TOML hasn't "slice of any" and we keep backward compatibility with previous config version)
-First slice is a whitelist and second one is a blacklist of initialisms. 
-In map, you can add "upperCaseConst=true" parameter to allow `UPPER_CASE` for `const` 
-By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
-
-Example:
-
-```toml
-[rule.var-naming]
-  arguments = [["ID"], ["VM"], [{upperCaseConst=true}]]
-```
-
-## var-declaration
-
-_Description_: This rule proposes simplifications of variable declarations.
-
-_Configuration_: N/A
 
 ## unconditional-recursion
 
@@ -837,7 +823,6 @@ allows any names started with `_`, not just `_` itself:
 func (_my *MyStruct) SomeMethod() {} // matches rule
 ```
 
-
 ## use-any
 
 _Description_: Since GO 1.18, `interface{}` has an alias: `any`. This rule proposes to replace instances of `interface{}` with `any`.
@@ -854,6 +839,29 @@ The rule emits a specific warning for such cases.
 
 _Configuration_: N/A
 
+## var-declaration
+
+_Description_: This rule proposes simplifications of variable declarations.
+
+_Configuration_: N/A
+
+## var-naming
+
+_Description_: This rule warns when [initialism](https://github.com/golang/go/wiki/CodeReviewComments#initialisms), [variable](https://github.com/golang/go/wiki/CodeReviewComments#variable-names) or [package](https://github.com/golang/go/wiki/CodeReviewComments#package-names) naming conventions are not followed.
+
+_Configuration_: This rule accepts two slices of strings and one optional slice with single map with named parameters.
+(it's due to TOML hasn't "slice of any" and we keep backward compatibility with previous config version)
+First slice is a whitelist and second one is a blacklist of initialisms. 
+In map, you can add "upperCaseConst=true" parameter to allow `UPPER_CASE` for `const` 
+By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
+
+Example:
+
+```toml
+[rule.var-naming]
+  arguments = [["ID"], ["VM"], [{upperCaseConst=true}]]
+```
+
 ## waitgroup-by-value
 
 _Description_: Function parameters that are passed by value, are in fact a copy of the original argument. Passing a copy of a `sync.WaitGroup` is usually not what the developer wants to do.
@@ -861,8 +869,4 @@ This rule warns when a `sync.WaitGroup` expected as a by-value parameter in a fu
 
 _Configuration_: N/A
 
-## redundant-import-alias
 
-_Description_: This rule warns on redundant import aliases. This happens when the alias used on the import statement matches the imported package name.
-
-_Configuration_: N/A
