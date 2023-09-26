@@ -62,13 +62,11 @@ func (w lintUnconditionalRecursionRule) Visit(node ast.Node) ast.Visitor {
 		var rec *ast.Ident
 		switch {
 		case n.Recv == nil:
-			rec = nil
 		case n.Recv.NumFields() < 1 || len(n.Recv.List[0].Names) < 1:
-			rec = &ast.Ident{Name: "_"}
+			rec = nil
 		default:
 			rec = n.Recv.List[0].Names[0]
 		}
-
 		w.currentFunc = &funcStatus{&funcDesc{rec, n.Name}, false}
 	case *ast.CallExpr:
 		var funcID *ast.Ident
@@ -125,6 +123,8 @@ func (w lintUnconditionalRecursionRule) Visit(node ast.Node) ast.Visitor {
 		}
 		// unconditional loop
 		return w
+	case *ast.FuncLit:
+		return nil // literal call (closure) is not an issue
 	}
 
 	return w

@@ -187,3 +187,15 @@ func (*fooType) BarFunc() {
 func (_ *fooType) BazFunc() {
 	BazFunc()
 }
+
+// Tests for #902
+func falsePositiveFuncLiteral() {
+	_ = foo(func() {
+		falsePositiveFuncLiteral()
+	})
+}
+func nr902() {
+	go func() {
+		nr902() // MATCH /unconditional recursive call/
+	}()
+}
