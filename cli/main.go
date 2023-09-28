@@ -13,6 +13,7 @@ import (
 	"github.com/mgechev/revive/config"
 	"github.com/mgechev/revive/revivelib"
 	"github.com/mitchellh/go-homedir"
+	"github.com/spf13/afero"
 )
 
 var (
@@ -20,6 +21,7 @@ var (
 	commit  = "none"
 	date    = "unknown"
 	builtBy = "unknown"
+	AppFs   = afero.NewOsFs()
 )
 
 func fail(err string) {
@@ -29,7 +31,10 @@ func fail(err string) {
 
 // RunRevive runs the CLI for revive.
 func RunRevive(extraRules ...revivelib.ExtraRule) {
-	conf, err := config.GetConfig(configPath)
+	// move parsing flags outside of init() otherwise tests dont works properly
+	// more info: https://github.com/golang/go/issues/46869#issuecomment-865695953
+	initConfig()
+    conf, err := config.GetConfig(configPath)
 	if err != nil {
 		fail(err.Error())
 	}
@@ -105,17 +110,26 @@ Example:
 
 func buildDefaultConfigPath() string {
 	var result string
+	var homeDirFile string
+	configFileName := "revive.toml"
+	configDirFile := filepath.Join(os.Getenv("XDG_CONFIG_HOME"), configFileName)
+
 	if homeDir, err := homedir.Dir(); err == nil {
-		result = filepath.Join(homeDir, "revive.toml")
-		if _, err := os.Stat(result); err != nil {
-			result = ""
-		}
+		homeDirFile = filepath.Join(homeDir, configFileName)
+	}
+
+	if fileExist(configDirFile) {
+		result = configDirFile
+	} else if fileExist(homeDirFile) {
+		result = homeDirFile
+	} else {
+		result = ""
 	}
 
 	return result
 }
 
-func init() {
+func initConfig() {
 	// Force colorizing for no TTY environments
 	if os.Getenv("REVIVE_FORCE_COLOR") == "1" {
 		color.NoColor = false
@@ -128,7 +142,7 @@ func init() {
 
 	// command line help strings
 	const (
-		configUsage       = "path to the configuration TOML file, defaults to $HOME/revive.toml, if present (i.e. -config myconf.toml)"
+		configUsage       = "path to the configuration TOML file, defaults to $XDG_CONFIG_HOME/revive.toml or $HOME/revive.toml, if present (i.e. -config myconf.toml)"
 		excludeUsage      = "list of globs which specify files to be excluded (i.e. -exclude foo/...)"
 		formatterUsage    = "formatter to be used for the output (i.e. -formatter stylish)"
 		versionUsage      = "get revive version"
@@ -174,4 +188,13 @@ func init() {
 		fmt.Printf("Version:\t%s\n%s", version, buildInfo)
 		os.Exit(0)
 	}
+}
+
+func fileExist(path string) bool {
+	_, err := AppFs.Stat(path)
+	if err != nil {
+		return false
+	}
+
+	return true
 }
