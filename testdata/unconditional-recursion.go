@@ -134,8 +134,8 @@ func ur10() {
 	ur10()
 }
 
-func ur11() {
-	go ur11()
+func ur11() { // this pattern produces "infinite" number of goroutines
+	go ur11() // MATCH /unconditional recursive call/
 }
 
 func ur12() {

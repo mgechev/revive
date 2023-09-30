@@ -86,6 +86,10 @@ func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, ru
 	for _, in := range ins {
 		ok := false
 		for i, p := range failures {
+			if p.Position.Start.Line != in.Line {
+				continue
+			}
+
 			if in.Match == p.Failure {
 				// check replacement if we are expecting one
 				if in.Replacement != "" {
