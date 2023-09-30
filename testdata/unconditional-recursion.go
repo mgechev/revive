@@ -134,8 +134,8 @@ func ur10() {
 	ur10()
 }
 
-func ur11() {
-	go ur11()
+func ur11() { // this pattern produces "infinite" number of goroutines
+	go ur11() // MATCH /unconditional recursive call/
 }
 
 func ur12() {
@@ -186,4 +186,16 @@ func (*fooType) BarFunc() {
 
 func (_ *fooType) BazFunc() {
 	BazFunc()
+}
+
+// Tests for #902
+func falsePositiveFuncLiteral() {
+	_ = foo(func() {
+		falsePositiveFuncLiteral()
+	})
+}
+func nr902() {
+	go func() {
+		nr902() // MATCH /unconditional recursive call/
+	}()
 }
