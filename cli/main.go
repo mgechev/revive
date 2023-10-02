@@ -21,7 +21,8 @@ var (
 	commit  = "none"
 	date    = "unknown"
 	builtBy = "unknown"
-	AppFs   = afero.NewOsFs()
+	//AppFs is used to operations related with user config files
+	AppFs = afero.NewOsFs()
 )
 
 func fail(err string) {
@@ -34,7 +35,7 @@ func RunRevive(extraRules ...revivelib.ExtraRule) {
 	// move parsing flags outside of init() otherwise tests dont works properly
 	// more info: https://github.com/golang/go/issues/46869#issuecomment-865695953
 	initConfig()
-    conf, err := config.GetConfig(configPath)
+	conf, err := config.GetConfig(configPath)
 	if err != nil {
 		fail(err.Error())
 	}
