@@ -193,9 +193,5 @@ func initConfig() {
 
 func fileExist(path string) bool {
 	_, err := AppFs.Stat(path)
-	return err == nil 
-		return false
-	}
-
-	return true
+	return err == nil
 }
