@@ -35,7 +35,6 @@ func TestXDGConfigDirIsPrefferedFirst(t *testing.T) {
 
 	//reset fs after test
 	AppFs = afero.NewMemMapFs()
-
 }
 
 func TestHomeConfigDir(t *testing.T) {
@@ -52,11 +51,9 @@ func TestHomeConfigDir(t *testing.T) {
 	if got != want {
 		t.Errorf("got %q, wanted %q", got, want)
 	}
-
 }
 
 func TestXDGConfigDir(t *testing.T) {
-
 	xdgDirPath := "/tmp-iofs/xdg/config"
 	AppFs.MkdirAll(xdgDirPath, 0755)
 
@@ -69,11 +66,9 @@ func TestXDGConfigDir(t *testing.T) {
 	if got != want {
 		t.Errorf("got %q, wanted %q", got, want)
 	}
-
 }
 
 func TestXDGConfigDirNoFile(t *testing.T) {
-
 	xdgDirPath := "/tmp-iofs/xdg/config"
 	os.Setenv("XDG_CONFIG_HOME", xdgDirPath)
 
