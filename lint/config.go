@@ -33,8 +33,8 @@ func (rc *RuleConfig) Initialize() error {
 type RulesConfig = map[string]RuleConfig
 
 // MustExclude - checks if given filename `name` must be excluded
-func (rcfg *RuleConfig) MustExclude(name string) bool {
-	for _, exclude := range rcfg.excludeFilters {
+func (rc *RuleConfig) MustExclude(name string) bool {
+	for _, exclude := range rc.excludeFilters {
 		if exclude.MatchFileName(name) {
 			return true
 		}
