@@ -193,7 +193,7 @@ func initConfig() {
 
 func fileExist(path string) bool {
 	_, err := AppFs.Stat(path)
-	if err != nil {
+	return err == nil 
 		return false
 	}
 
