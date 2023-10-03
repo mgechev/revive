@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/mgechev/revive.svg?branch=master)](https://travis-ci.org/mgechev/revive)
+[![Build Status](https://github.com/mgechev/revive/actions/workflows/test.yaml/badge.svg)](https://github.com/mgechev/revive/actions/workflows/test.yaml)
 
 # revive
 
