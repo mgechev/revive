@@ -1,0 +1,10 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: end-of-file-fixer
+  - repo: https://github.com/mgechev/revive
+    #for start use dev tag, after development we switch to proper tags with versions 
+    rev: dev-pre-commit
+    hooks:
+    -   id: revive

@@ -1,0 +1,5 @@
+-   id: revive
+    name: revive
+    description: Beautiful Go linter
+    entry: revive
+    language: golang
