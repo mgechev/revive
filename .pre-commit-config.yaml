@@ -3,7 +3,7 @@ repos:
   #   rev: v4.4.0
   #   hooks:
   #     - id: end-of-file-fixer
-  - repo: https://github.com/mgechev/revive
+  - repo: https://github.com/mfederowicz/revive
     #for start use dev tag, after development we switch to proper tags with versions 
     rev: dev-pre-commit
     hooks:
