@@ -9,4 +9,4 @@ enableAllRules = true
 [rule.exported]
     disabled=true
 [rule.cyclomatic]
-    disabled=true    
+    disabled=true

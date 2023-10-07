@@ -33,7 +33,7 @@ List of all available rules.
   - [error-naming](#error-naming)
   - [error-return](#error-return)
   - [error-strings](#error-strings)
-  - [errorf](#errorf)  
+  - [errorf](#errorf)
   - [exported](#exported)
   - [file-header](#file-header)
   - [flag-parameter](#flag-parameter)
@@ -851,8 +851,8 @@ _Description_: This rule warns when [initialism](https://github.com/golang/go/wi
 
 _Configuration_: This rule accepts two slices of strings and one optional slice with single map with named parameters.
 (it's due to TOML hasn't "slice of any" and we keep backward compatibility with previous config version)
-First slice is a whitelist and second one is a blacklist of initialisms. 
-In map, you can add "upperCaseConst=true" parameter to allow `UPPER_CASE` for `const` 
+First slice is a whitelist and second one is a blacklist of initialisms.
+In map, you can add "upperCaseConst=true" parameter to allow `UPPER_CASE` for `const`
 By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
 
 Example:
