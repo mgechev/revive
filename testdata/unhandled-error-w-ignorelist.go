@@ -3,7 +3,6 @@ package fixtures
 import (
 	b "bytes"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 )
@@ -38,7 +37,7 @@ func testCase2() {
 	os.Chmod("test_file", os.ModeAppend)                          // ignore
 	os.WriteFile("test_file", []byte("some data"), os.ModeAppend) // ignore
 
-	ioutil.WriteFile("test_file", []byte("some data"), os.ModeAppend) // MATCH /Unhandled error in call to function ioutil.WriteFile/
+	os.WriteFile("test_file", []byte("some data"), os.ModeAppend) // ignore
 
 	_ = os.Chdir("..")
 	os.Chdir("..") // MATCH /Unhandled error in call to function os.Chdir/
