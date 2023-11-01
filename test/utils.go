@@ -3,6 +3,7 @@ package test
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"go/ast"
 	"go/parser"
@@ -89,6 +90,7 @@ func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, ru
 			if p.Position.Start.Line != in.Line {
 				continue
 			}
+
 			if in.Match == p.Failure {
 				// check replacement if we are expecting one
 				if in.Replacement != "" {
@@ -100,6 +102,14 @@ func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, ru
 					if r != in.Replacement {
 						t.Errorf("Lint failed at %s:%d; got replacement %q, want %q", fi.Name(), in.Line, r, in.Replacement)
 					}
+				}
+
+				if in.Confidence > 0 {
+
+					if in.Confidence != p.Confidence {
+						t.Errorf("Lint failed at %s:%d; got confidence %f, want %f", fi.Name(), in.Line, p.Confidence, in.Confidence)
+					}
+
 				}
 
 				// remove this problem from ps
@@ -122,9 +132,19 @@ func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, ru
 }
 
 type instruction struct {
-	Line        int    // the line number this applies to
-	Match       string // which pattern to match
-	Replacement string // what the suggested replacement line should be
+	Line        int     // the line number this applies to
+	Match       string  // which pattern to match
+	Replacement string  // what the suggested replacement line should be
+	RuleName    string  // what rule we use
+	Category    string  // which category
+	Confidence  float64 // confidence level
+}
+
+// JSONInstruction structure used when we parse json object insted of classic MATCH string
+type JSONInstruction struct {
+	Match      string  `json:"MATCH"`
+	Category   string  `json:"Category"`
+	Confidence float64 `json:"Confidence"`
 }
 
 // parseInstructions parses instructions from the comments in a Go source file.
@@ -140,7 +160,7 @@ func parseInstructions(t *testing.T, filename string, src []byte) []instruction 
 		ln := fset.Position(cg.Pos()).Line
 		raw := cg.Text()
 		for _, line := range strings.Split(raw, "\n") {
-			if line == "" || strings.HasPrefix(line, "#") {
+			if line == "" || strings.HasPrefix(line, "#") || strings.HasPrefix(line, "ignore") {
 				continue
 			}
 			if line == "OK" && ins == nil {
@@ -148,7 +168,15 @@ func parseInstructions(t *testing.T, filename string, src []byte) []instruction 
 				ins = make([]instruction, 0)
 				continue
 			}
-			if strings.Contains(line, "MATCH") {
+			switch extractDataMode(line) {
+			case "json":
+				jsonInst, err := extractInstructionFromJSON(strings.TrimPrefix(line, "json:"), ln)
+				if err != nil {
+					t.Fatalf("At %v:%d: %v", filename, ln, err)
+				}
+				ins = append(ins, jsonInst)
+				break
+			case "classic":
 				match, err := extractPattern(line)
 				if err != nil {
 					t.Fatalf("At %v:%d: %v", filename, ln, err)
@@ -172,10 +200,42 @@ func parseInstructions(t *testing.T, filename string, src []byte) []instruction 
 					Match:       match,
 					Replacement: repl,
 				})
+				break
 			}
+
 		}
 	}
 	return ins
+}
+
+func extractInstructionFromJSON(line string, lineNumber int) (instruction, error) {
+	// Use the json.Unmarshal function to parse the JSON into the struct
+	var jsonInst JSONInstruction
+	if err := json.Unmarshal([]byte(line), &jsonInst); err != nil {
+		fmt.Println("Error parsing JSON:", err)
+	}
+
+	ins := instruction{
+		Match:      jsonInst.Match,
+		Confidence: jsonInst.Confidence,
+		Category:   jsonInst.Category,
+		Line:       lineNumber,
+	}
+	return ins, nil
+
+}
+
+func extractDataMode(line string) string {
+
+	if strings.HasPrefix(line, "json") {
+		return "json"
+	}
+	if strings.Contains(line, "MATCH") {
+		return "classic"
+	}
+
+	return ""
+
 }
 
 func extractPattern(line string) (string, error) {
