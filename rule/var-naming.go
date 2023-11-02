@@ -127,7 +127,7 @@ func (w *lintNames) check(id *ast.Ident, thing string) {
 
 	// #851 upperCaseConst support
 	// if it's const
-	if thing == token.CONST.String() && w.upperCaseConst && upperCaseConstRE.Match([]byte(id.Name)) {
+	if thing == token.CONST.String() && w.upperCaseConst && upperCaseConstRE.MatchString(id.Name) {
 		return
 	}
 
