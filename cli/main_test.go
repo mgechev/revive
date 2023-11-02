@@ -7,13 +7,18 @@ import (
 	"github.com/spf13/afero"
 )
 
-func init() {
+func TestMain(m *testing.M) {
 	os.Unsetenv("HOME")
 	os.Unsetenv("XDG_CONFIG_HOME")
 	AppFs = afero.NewMemMapFs()
+	os.Exit(m.Run())
 }
 
 func TestXDGConfigDirIsPrefferedFirst(t *testing.T) {
+	t.Cleanup(func() {
+		// reset fs after test
+		AppFs = afero.NewMemMapFs()
+	})
 
 	xdgDirPath := "/tmp-iofs/xdg/config"
 	homeDirPath := "/tmp-iofs/home/tester"
@@ -21,10 +26,10 @@ func TestXDGConfigDirIsPrefferedFirst(t *testing.T) {
 	AppFs.MkdirAll(homeDirPath, 0755)
 
 	afero.WriteFile(AppFs, xdgDirPath+"/revive.toml", []byte("\n"), 0644)
-	os.Setenv("XDG_CONFIG_HOME", xdgDirPath)
+	t.Setenv("XDG_CONFIG_HOME", xdgDirPath)
 
 	afero.WriteFile(AppFs, homeDirPath+"/revive.toml", []byte("\n"), 0644)
-	os.Setenv("HOME", homeDirPath)
+	t.Setenv("HOME", homeDirPath)
 
 	got := buildDefaultConfigPath()
 	want := xdgDirPath + "/revive.toml"
@@ -32,9 +37,6 @@ func TestXDGConfigDirIsPrefferedFirst(t *testing.T) {
 	if got != want {
 		t.Errorf("got %q, wanted %q", got, want)
 	}
-
-	//reset fs after test
-	AppFs = afero.NewMemMapFs()
 }
 
 func TestHomeConfigDir(t *testing.T) {
@@ -43,7 +45,7 @@ func TestHomeConfigDir(t *testing.T) {
 	AppFs.MkdirAll(homeDirPath, 0755)
 
 	afero.WriteFile(AppFs, homeDirPath+"/revive.toml", []byte("\n"), 0644)
-	os.Setenv("HOME", homeDirPath)
+	t.Setenv("HOME", homeDirPath)
 
 	got := buildDefaultConfigPath()
 	want := homeDirPath + "/revive.toml"
@@ -58,7 +60,7 @@ func TestXDGConfigDir(t *testing.T) {
 	AppFs.MkdirAll(xdgDirPath, 0755)
 
 	afero.WriteFile(AppFs, xdgDirPath+"/revive.toml", []byte("\n"), 0644)
-	os.Setenv("XDG_CONFIG_HOME", xdgDirPath)
+	t.Setenv("XDG_CONFIG_HOME", xdgDirPath)
 
 	got := buildDefaultConfigPath()
 	want := xdgDirPath + "/revive.toml"
@@ -70,7 +72,7 @@ func TestXDGConfigDir(t *testing.T) {
 
 func TestXDGConfigDirNoFile(t *testing.T) {
 	xdgDirPath := "/tmp-iofs/xdg/config"
-	os.Setenv("XDG_CONFIG_HOME", xdgDirPath)
+	t.Setenv("XDG_CONFIG_HOME", xdgDirPath)
 
 	got := buildDefaultConfigPath()
 	want := xdgDirPath + "/revive.toml"
