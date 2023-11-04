@@ -113,7 +113,7 @@ func (w lintUnusedReceiverRule) Visit(node ast.Node) ast.Visitor {
 
 			return isAnID && ident.Obj == recID.Obj
 		}
-		refs2recID := pick(n.Body, fselect, nil)
+		refs2recID := pick(n.Body, fselect)
 
 		if len(refs2recID) > 0 {
 			return nil // the receiver is referenced in the func body

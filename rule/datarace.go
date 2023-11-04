@@ -111,7 +111,7 @@ func (w lintFunctionForDataRaces) Visit(node ast.Node) ast.Visitor {
 			return ok
 		}
 
-		ids := pick(funcLit.Body, selectIDs, nil)
+		ids := pick(funcLit.Body, selectIDs)
 		for _, id := range ids {
 			id := id.(*ast.Ident)
 			_, isRangeID := w.rangeIDs[id.Obj]
