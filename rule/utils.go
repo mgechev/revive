@@ -93,21 +93,15 @@ func srcLine(src []byte, p token.Position) string {
 
 // pick yields a list of nodes by picking them from a sub-ast with root node n.
 // Nodes are selected by applying the fselect function
-// f function is applied to each selected node before inserting it in the final result.
-// If f==nil then it defaults to the identity function (ie it returns the node itself)
-func pick(n ast.Node, fselect func(n ast.Node) bool, f func(n ast.Node) []ast.Node) []ast.Node {
+func pick(n ast.Node, fselect func(n ast.Node) bool) []ast.Node {
 	var result []ast.Node
 
 	if n == nil {
 		return result
 	}
 
-	if f == nil {
-		f = func(n ast.Node) []ast.Node { return []ast.Node{n} }
-	}
-
 	onSelect := func(n ast.Node) {
-		result = append(result, f(n)...)
+		result = append(result, n)
 	}
 	p := picker{fselect: fselect, onSelect: onSelect}
 	ast.Walk(p, n)

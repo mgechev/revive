@@ -113,7 +113,7 @@ func (w lintUnusedParamRule) Visit(node ast.Node) ast.Visitor {
 
 			return false
 		}
-		_ = pick(n.Body, fselect, nil)
+		_ = pick(n.Body, fselect)
 
 		for _, p := range n.Type.Params.List {
 			for _, n := range p.Names {
