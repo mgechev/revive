@@ -282,7 +282,17 @@ _Description_: Importing with `.` makes the programs much harder to understand b
 
 More information [here](https://github.com/golang/go/wiki/CodeReviewComments#import-dot)
 
-_Configuration_: N/A
+_Configuration_:
+
+* `allowedPackages`: (list of strings) comma-separated list of allowed dot import packages
+
+Example:
+
+```toml
+[rule.dot-imports]
+  arguments = [{ allowedPackages = ["github.com/onsi/ginkgo/v2","github.com/onsi/gomega"] }]
+```
+
 
 ## duplicated-imports
 
