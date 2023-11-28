@@ -12,7 +12,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/afero v1.10.0
-	golang.org/x/tools v0.15.0
+	golang.org/x/tools v0.16.0
 )
 
 replace github.com/spf13/afero => github.com/spf13/afero v1.10.0
