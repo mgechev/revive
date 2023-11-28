@@ -78,11 +78,6 @@ func (w lintModifiesValRecRule) Visit(node ast.Node) ast.Visitor {
 					if name == "" || name != receiverName {
 						continue
 					}
-
-					if w.skipType(ast.Expr(e.Sel)) {
-						continue
-					}
-
 				case *ast.Ident: // receiver := ...
 					if e.Name != receiverName {
 						continue
