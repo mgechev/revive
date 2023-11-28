@@ -78,7 +78,6 @@ func (w lintModifiesValRecRule) Visit(node ast.Node) ast.Visitor {
 					if name == "" || name != receiverName {
 						continue
 					}
-
 				case *ast.Ident: // receiver := ...
 					if e.Name != receiverName {
 						continue
