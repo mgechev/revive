@@ -19,8 +19,8 @@ var upperCaseConstRE = regexp.MustCompile(`^_?[A-Z][A-Z\d]*(_[A-Z\d]+)*$`)
 // VarNamingRule lints given else constructs.
 type VarNamingRule struct {
 	configured     bool
-	whitelist      []string
-	blacklist      []string
+	allowlist      []string
+	blocklist      []string
 	upperCaseConst bool // if true - allows to use UPPER_SOME_NAMES for constants
 	sync.Mutex
 }
@@ -34,11 +34,11 @@ func (r *VarNamingRule) configure(arguments lint.Arguments) {
 
 	r.configured = true
 	if len(arguments) >= 1 {
-		r.whitelist = getList(arguments[0], "whitelist")
+		r.allowlist = getList(arguments[0], "allowlist")
 	}
 
 	if len(arguments) >= 2 {
-		r.blacklist = getList(arguments[1], "blacklist")
+		r.blocklist = getList(arguments[1], "blocklist")
 	}
 
 	if len(arguments) >= 3 {
@@ -70,8 +70,8 @@ func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.
 	walker := lintNames{
 		file:      file,
 		fileAst:   fileAst,
-		whitelist: r.whitelist,
-		blacklist: r.blacklist,
+		allowlist: r.allowlist,
+		blocklist: r.blocklist,
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
@@ -142,7 +142,7 @@ func (w *lintNames) check(id *ast.Ident, thing string) {
 		return
 	}
 
-	should := lint.Name(id.Name, w.whitelist, w.blacklist)
+	should := lint.Name(id.Name, w.allowlist, w.blocklist)
 	if id.Name == should {
 		return
 	}
@@ -168,8 +168,8 @@ type lintNames struct {
 	file           *lint.File
 	fileAst        *ast.File
 	onFailure      func(lint.Failure)
-	whitelist      []string
-	blacklist      []string
+	allowlist      []string
+	blocklist      []string
 	upperCaseConst bool
 }
 
