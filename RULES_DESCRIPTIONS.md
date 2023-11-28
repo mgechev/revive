@@ -876,6 +876,16 @@ Example:
   arguments = [["ID"], ["VM"], [{upperCaseConst=true}]]
 ```
 
+You can also add "skipPackageNameChecks=true" to skip package name checks.
+
+Example:
+
+
+```toml
+[rule.var-naming]
+  arguments = [[], [], [{skipPackageNameChecks=true}]]
+```
+
 ## waitgroup-by-value
 
 _Description_: Function parameters that are passed by value, are in fact a copy of the original argument. Passing a copy of a `sync.WaitGroup` is usually not what the developer wants to do.

@@ -61,6 +61,27 @@ func (r *VarNamingRule) configure(arguments lint.Arguments) {
 	}
 }
 
+func (r *VarNamingRule) applyPackageCheckRules(walker *lintNames) {
+	// Package names need slightly different handling than other names.
+	if strings.Contains(walker.fileAst.Name.Name, "_") && !strings.HasSuffix(walker.fileAst.Name.Name, "_test") {
+		walker.onFailure(lint.Failure{
+			Failure:    "don't use an underscore in package name",
+			Confidence: 1,
+			Node:       walker.fileAst.Name,
+			Category:   "naming",
+		})
+	}
+	if anyCapsRE.MatchString(walker.fileAst.Name.Name) {
+		walker.onFailure(lint.Failure{
+			Failure:    fmt.Sprintf("don't use MixedCaps in package name; %s should be %s", walker.fileAst.Name.Name, strings.ToLower(walker.fileAst.Name.Name)),
+			Confidence: 1,
+			Node:       walker.fileAst.Name,
+			Category:   "naming",
+		})
+	}
+
+}
+
 // Apply applies the rule to given file.
 func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	r.configure(arguments)
@@ -81,23 +102,7 @@ func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.
 	}
 
 	if !r.skipPackageNameChecks {
-		// Package names need slightly different handling than other names.
-		if strings.Contains(walker.fileAst.Name.Name, "_") && !strings.HasSuffix(walker.fileAst.Name.Name, "_test") {
-			walker.onFailure(lint.Failure{
-				Failure:    "don't use an underscore in package name",
-				Confidence: 1,
-				Node:       walker.fileAst.Name,
-				Category:   "naming",
-			})
-		}
-		if anyCapsRE.MatchString(walker.fileAst.Name.Name) {
-			walker.onFailure(lint.Failure{
-				Failure:    fmt.Sprintf("don't use MixedCaps in package name; %s should be %s", walker.fileAst.Name.Name, strings.ToLower(walker.fileAst.Name.Name)),
-				Confidence: 1,
-				Node:       walker.fileAst.Name,
-				Category:   "naming",
-			})
-		}
+		r.applyPackageCheckRules(&walker)
 	}
 
 	ast.Walk(&walker, fileAst)
