@@ -18,10 +18,11 @@ var upperCaseConstRE = regexp.MustCompile(`^_?[A-Z][A-Z\d]*(_[A-Z\d]+)*$`)
 
 // VarNamingRule lints given else constructs.
 type VarNamingRule struct {
-	configured     bool
-	allowlist      []string
-	blocklist      []string
-	upperCaseConst bool // if true - allows to use UPPER_SOME_NAMES for constants
+	configured            bool
+	allowlist             []string
+	blocklist             []string
+	upperCaseConst        bool // if true - allows to use UPPER_SOME_NAMES for constants
+	skipPackageNameChecks bool
 	sync.Mutex
 }
 

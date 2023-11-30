@@ -14,7 +14,7 @@ type ImportsBlocklistRule struct {
 	sync.Mutex
 }
 
-var replaceRegexp = regexp.MustCompile(`/?\*\*/?`)
+var replaceImportRegexp = regexp.MustCompile(`/?\*\*/?`)
 
 func (r *ImportsBlocklistRule) configure(arguments lint.Arguments) {
 	r.Lock()
@@ -28,7 +28,7 @@ func (r *ImportsBlocklistRule) configure(arguments lint.Arguments) {
 			if !ok {
 				panic(fmt.Sprintf("Invalid argument to the imports-blocklist rule. Expecting a string, got %T", arg))
 			}
-			regStr, err := regexp.Compile(fmt.Sprintf(`(?m)"%s"$`, replaceRegexp.ReplaceAllString(argStr, `(\W|\w)*`)))
+			regStr, err := regexp.Compile(fmt.Sprintf(`(?m)"%s"$`, replaceImportRegexp.ReplaceAllString(argStr, `(\W|\w)*`)))
 			if err != nil {
 				panic(fmt.Sprintf("Invalid argument to the imports-blocklist rule. Expecting %q to be a valid regular expression, got: %v", argStr, err))
 			}
