@@ -95,6 +95,11 @@ var allRules = append([]lint.Rule{
 	&rule.EnforceSliceStyleRule{},
 }, defaultRules...)
 
+var deprecatedRules = []lint.Rule{
+
+	&rule.ImportsBlacklistRule{},
+}
+
 var allFormatters = []lint.Formatter{
 	&formatter.Stylish{},
 	&formatter.Friendly{},
@@ -154,6 +159,11 @@ func parseConfig(path string, config *lint.Config) error {
 	if err != nil {
 		return fmt.Errorf("cannot parse the config file: %v", err)
 	}
+
+	for _, r := range deprecatedRules {
+		delete(config.Rules, r.Name())
+	}
+
 	for k, r := range config.Rules {
 		err := r.Initialize()
 		if err != nil {
