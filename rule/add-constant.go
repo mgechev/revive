@@ -53,7 +53,7 @@ func (r *AddConstantRule) Apply(file *lint.File, arguments lint.Arguments) []lin
 		onFailure:       onFailure,
 		strLits:         make(map[string]int),
 		strLitLimit:     r.strLitLimit,
-		allowLst:        r.allowList,
+		allowList:        r.allowList,
 		ignoreFunctions: r.ignoreFunctions,
 	}
 
@@ -71,7 +71,7 @@ type lintAddConstantRule struct {
 	onFailure       func(lint.Failure)
 	strLits         map[string]int
 	strLitLimit     int
-	allowLst        allowList
+	allowList        allowList
 	ignoreFunctions []*regexp.Regexp
 }
 
@@ -139,7 +139,7 @@ func (w lintAddConstantRule) isIgnoredFunc(fName string) bool {
 }
 
 func (w lintAddConstantRule) checkStrLit(n *ast.BasicLit) {
-	if w.allowLst[kindSTRING][n.Value] {
+	if w.allowList[kindSTRING][n.Value] {
 		return
 	}
 
@@ -159,7 +159,7 @@ func (w lintAddConstantRule) checkStrLit(n *ast.BasicLit) {
 }
 
 func (w lintAddConstantRule) checkNumLit(kind string, n *ast.BasicLit) {
-	if w.allowLst[kind][n.Value] {
+	if w.allowList[kind][n.Value] {
 		return
 	}
 
