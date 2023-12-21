@@ -1,10 +1,8 @@
 package fixtures
 
 import (
-	runpb "cloud.google.com/go/run/apiv2/runpb" // MATCH /Import alias "runpb" is redundant/
-
-	md5 "crypto/md5" // MATCH /Import alias "md5" is redundant/
-
+	runpb "cloud.google.com/go/run/apiv2/runpb"
+	md5 "crypto/md5"
 	strings "strings" // MATCH /Import alias "strings" is redundant/
 
 	"crypto/md5"
