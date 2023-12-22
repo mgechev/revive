@@ -60,7 +60,7 @@ func (r *RedundantImportAlias) checkRedundantAliases(node ast.Node) map[string]s
 			return true
 		}
 
-		if imp.Name != nil && imp.Path != nil && imp.Name.Name != "_" && getImportPackageName(imp) == imp.Name.Name {
+		if imp.Name != nil && imp.Path != nil && imp.Name.Name != "_" && r.getImportPackageName(imp) == imp.Name.Name {
 			aliasedPackages[imp.Name.Name] = "redundant"	
 		}
 
@@ -123,7 +123,7 @@ func (r *RedundantImportAlias) configure(arguments lint.Arguments) {
 
 }
 
-func getImportPackageName(imp *ast.ImportSpec) string {
+func (r *RedundantImportAlias) getImportPackageName(imp *ast.ImportSpec) string {
 	path := strings.Trim(imp.Path.Value, `"`)
 	parts := strings.Split(path, "/")
 	packageName := parts[len(parts)-1]
