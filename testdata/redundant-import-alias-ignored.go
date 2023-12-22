@@ -5,7 +5,7 @@ import (
 	"crypto/md5"
 	md5 "crypto/md5"
 	"strings"
-	str "strings"     // MATCH /Import alias "str" is redundant/
+	str "strings" 
 	strings "strings" // MATCH /Import alias "strings" is redundant/
 )
 
