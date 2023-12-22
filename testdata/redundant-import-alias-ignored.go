@@ -2,15 +2,11 @@ package fixtures
 
 import (
 	runpb "cloud.google.com/go/run/apiv2/runpb"
-	md5 "crypto/md5"
-	strings "strings" // MATCH /Import alias "strings" is redundant/
-
 	"crypto/md5"
-	_ "crypto/md5" // MATCH /Import alias "_" is redundant/
-
+	md5 "crypto/md5"
 	"strings"
-	str "strings" // MATCH /Import alias "str" is redundant/
-
+	str "strings"     // MATCH /Import alias "str" is redundant/
+	strings "strings" // MATCH /Import alias "strings" is redundant/
 )
 
 func UseRunpb() {
