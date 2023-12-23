@@ -10,7 +10,7 @@ import (
 type BareReturnRule struct{}
 
 // Apply applies the rule to given file.
-func (*BareReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *BareReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -23,7 +23,7 @@ func (*BareReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 }
 
 // Name returns the rule name.
-func (*BareReturnRule) Name() string {
+func (r *BareReturnRule) Name() string {
 	return "bare-return"
 }
 
@@ -31,25 +31,25 @@ type lintBareReturnRule struct {
 	onFailure func(lint.Failure)
 }
 
-func (w lintBareReturnRule) Visit(node ast.Node) ast.Visitor {
+func (r lintBareReturnRule) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
 	case *ast.FuncDecl:
-		w.checkFunc(n.Type.Results, n.Body)
+		r.checkFunc(n.Type.Results, n.Body)
 	case *ast.FuncLit: // to cope with deferred functions and go-routines
-		w.checkFunc(n.Type.Results, n.Body)
+		r.checkFunc(n.Type.Results, n.Body)
 	}
 
-	return w
+	return r
 }
 
 // checkFunc will verify if the given function has named result and bare returns
-func (w lintBareReturnRule) checkFunc(results *ast.FieldList, body *ast.BlockStmt) {
+func (r lintBareReturnRule) checkFunc(results *ast.FieldList, body *ast.BlockStmt) {
 	hasNamedResults := results != nil && len(results.List) > 0 && results.List[0].Names != nil
 	if !hasNamedResults || body == nil {
 		return // nothing to do
 	}
 
-	brf := bareReturnFinder{w.onFailure}
+	brf := bareReturnFinder{r.onFailure}
 	ast.Walk(brf, body)
 }
 
@@ -57,7 +57,7 @@ type bareReturnFinder struct {
 	onFailure func(lint.Failure)
 }
 
-func (w bareReturnFinder) Visit(node ast.Node) ast.Visitor {
+func (r bareReturnFinder) Visit(node ast.Node) ast.Visitor {
 	_, ok := node.(*ast.FuncLit)
 	if ok {
 		// skip analysing function literals
@@ -67,18 +67,18 @@ func (w bareReturnFinder) Visit(node ast.Node) ast.Visitor {
 
 	rs, ok := node.(*ast.ReturnStmt)
 	if !ok {
-		return w
+		return r
 	}
 
 	if len(rs.Results) > 0 {
-		return w
+		return r
 	}
 
-	w.onFailure(lint.Failure{
+	r.onFailure(lint.Failure{
 		Confidence: 1,
 		Node:       rs,
 		Failure:    "avoid using bare returns, please add return expressions",
 	})
 
-	return w
+	return r
 }

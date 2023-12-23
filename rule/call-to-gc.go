@@ -10,7 +10,7 @@ import (
 type CallToGCRule struct{}
 
 // Apply applies the rule to given file.
-func (*CallToGCRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *CallToGCRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
@@ -27,7 +27,7 @@ func (*CallToGCRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 }
 
 // Name returns the rule name.
-func (*CallToGCRule) Name() string {
+func (r *CallToGCRule) Name() string {
 	return "call-to-gc"
 }
 
@@ -36,10 +36,10 @@ type lintCallToGC struct {
 	gcTriggeringFunctions map[string]map[string]bool
 }
 
-func (w lintCallToGC) Visit(node ast.Node) ast.Visitor {
+func (r lintCallToGC) Visit(node ast.Node) ast.Visitor {
 	ce, ok := node.(*ast.CallExpr)
 	if !ok {
-		return w // nothing to do, the node is not a call
+		return r // nothing to do, the node is not a call
 	}
 
 	fc, ok := ce.Fun.(*ast.SelectorExpr)
@@ -55,16 +55,16 @@ func (w lintCallToGC) Visit(node ast.Node) ast.Visitor {
 
 	fn := fc.Sel.Name
 	pkg := id.Name
-	if !w.gcTriggeringFunctions[pkg][fn] {
+	if !r.gcTriggeringFunctions[pkg][fn] {
 		return nil // it isn't a call to a GC triggering function
 	}
 
-	w.onFailure(lint.Failure{
+	r.onFailure(lint.Failure{
 		Confidence: 1,
 		Node:       node,
 		Category:   "bad practice",
 		Failure:    "explicit call to the garbage collector",
 	})
 
-	return w
+	return r
 }

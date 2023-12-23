@@ -10,7 +10,7 @@ import (
 type EmptyBlockRule struct{}
 
 // Apply applies the rule to given file.
-func (*EmptyBlockRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *EmptyBlockRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -23,7 +23,7 @@ func (*EmptyBlockRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 }
 
 // Name returns the rule name.
-func (*EmptyBlockRule) Name() string {
+func (r *EmptyBlockRule) Name() string {
 	return "empty-block"
 }
 

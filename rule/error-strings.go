@@ -78,7 +78,7 @@ func (r *ErrorStringsRule) Apply(file *lint.File, arguments lint.Arguments) []li
 }
 
 // Name returns the rule name.
-func (*ErrorStringsRule) Name() string {
+func (r *ErrorStringsRule) Name() string {
 	return "error-strings"
 }
 
@@ -165,7 +165,7 @@ func (w lintErrorStrings) getMessage(expr *ast.CallExpr) (s *ast.BasicLit, succe
 	return str, true
 }
 
-func (lintErrorStrings) checkArg(expr *ast.CallExpr, arg int) (s *ast.BasicLit, success bool) {
+func (w lintErrorStrings) checkArg(expr *ast.CallExpr, arg int) (s *ast.BasicLit, success bool) {
 	str, ok := expr.Args[arg].(*ast.BasicLit)
 	if !ok {
 		return s, false

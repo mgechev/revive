@@ -76,7 +76,7 @@ func (r *CommentSpacingsRule) Apply(file *lint.File, args lint.Arguments) []lint
 }
 
 // Name yields this rule name.
-func (*CommentSpacingsRule) Name() string {
+func (r *CommentSpacingsRule) Name() string {
 	return "comment-spacings"
 }
 

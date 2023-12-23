@@ -66,7 +66,7 @@ func (r *ExportedRule) Apply(file *lint.File, args lint.Arguments) []lint.Failur
 }
 
 // Name returns the rule name.
-func (*ExportedRule) Name() string {
+func (r *ExportedRule) Name() string {
 	return "exported"
 }
 

@@ -36,7 +36,7 @@ func (r *DotImportsRule) Apply(file *lint.File, arguments lint.Arguments) []lint
 }
 
 // Name returns the rule name.
-func (*DotImportsRule) Name() string {
+func (r *DotImportsRule) Name() string {
 	return "dot-imports"
 }
 

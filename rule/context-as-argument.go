@@ -39,7 +39,7 @@ func (r *ContextAsArgumentRule) Apply(file *lint.File, args lint.Arguments) []li
 }
 
 // Name returns the rule name.
-func (*ContextAsArgumentRule) Name() string {
+func (r *ContextAsArgumentRule) Name() string {
 	return "context-as-argument"
 }
 

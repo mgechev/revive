@@ -11,7 +11,7 @@ import (
 type ConstantLogicalExprRule struct{}
 
 // Apply applies the rule to given file.
-func (*ConstantLogicalExprRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *ConstantLogicalExprRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -25,7 +25,7 @@ func (*ConstantLogicalExprRule) Apply(file *lint.File, _ lint.Arguments) []lint.
 }
 
 // Name returns the rule name.
-func (*ConstantLogicalExprRule) Name() string {
+func (r *ConstantLogicalExprRule) Name() string {
 	return "constant-logical-expr"
 }
 
@@ -63,7 +63,7 @@ func (w *lintConstantLogicalExpr) Visit(node ast.Node) ast.Visitor {
 	return w
 }
 
-func (*lintConstantLogicalExpr) isOperatorWithLogicalResult(t token.Token) bool {
+func (l *lintConstantLogicalExpr) isOperatorWithLogicalResult(t token.Token) bool {
 	switch t {
 	case token.LAND, token.LOR, token.EQL, token.LSS, token.GTR, token.NEQ, token.LEQ, token.GEQ:
 		return true
@@ -72,7 +72,7 @@ func (*lintConstantLogicalExpr) isOperatorWithLogicalResult(t token.Token) bool 
 	return false
 }
 
-func (*lintConstantLogicalExpr) isEqualityOperator(t token.Token) bool {
+func (l *lintConstantLogicalExpr) isEqualityOperator(t token.Token) bool {
 	switch t {
 	case token.EQL, token.LEQ, token.GEQ:
 		return true
@@ -81,7 +81,7 @@ func (*lintConstantLogicalExpr) isEqualityOperator(t token.Token) bool {
 	return false
 }
 
-func (*lintConstantLogicalExpr) isInequalityOperator(t token.Token) bool {
+func (l *lintConstantLogicalExpr) isInequalityOperator(t token.Token) bool {
 	switch t {
 	case token.LSS, token.GTR, token.NEQ:
 		return true
@@ -90,8 +90,8 @@ func (*lintConstantLogicalExpr) isInequalityOperator(t token.Token) bool {
 	return false
 }
 
-func (w lintConstantLogicalExpr) newFailure(node ast.Node, msg string) {
-	w.onFailure(lint.Failure{
+func (l lintConstantLogicalExpr) newFailure(node ast.Node, msg string) {
+	l.onFailure(lint.Failure{
 		Confidence: 1,
 		Node:       node,
 		Category:   "logic",

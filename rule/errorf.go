@@ -13,7 +13,7 @@ import (
 type ErrorfRule struct{}
 
 // Apply applies the rule to given file.
-func (*ErrorfRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *ErrorfRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -32,7 +32,7 @@ func (*ErrorfRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 }
 
 // Name returns the rule name.
-func (*ErrorfRule) Name() string {
+func (r *ErrorfRule) Name() string {
 	return "errorf"
 }
 

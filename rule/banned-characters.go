@@ -45,7 +45,7 @@ func (r *BannedCharsRule) Apply(file *lint.File, arguments lint.Arguments) []lin
 }
 
 // Name returns the rule name
-func (*BannedCharsRule) Name() string {
+func (r *BannedCharsRule) Name() string {
 	return bannedCharsRuleName
 }
 
@@ -69,15 +69,15 @@ type lintBannedCharsRule struct {
 }
 
 // Visit checks for each node if an identifier contains banned characters
-func (w lintBannedCharsRule) Visit(node ast.Node) ast.Visitor {
+func (r lintBannedCharsRule) Visit(node ast.Node) ast.Visitor {
 	n, ok := node.(*ast.Ident)
 	if !ok {
-		return w
+		return r
 	}
-	for _, c := range w.bannedChars {
+	for _, c := range r.bannedChars {
 		ok := strings.Contains(n.Name, c)
 		if ok {
-			w.onFailure(lint.Failure{
+			r.onFailure(lint.Failure{
 				Confidence: 1,
 				Failure:    fmt.Sprintf("banned character found: %s", c),
 				RuleName:   bannedCharsRuleName,
@@ -86,5 +86,5 @@ func (w lintBannedCharsRule) Visit(node ast.Node) ast.Visitor {
 		}
 	}
 
-	return w
+	return r
 }

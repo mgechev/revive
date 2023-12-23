@@ -11,7 +11,7 @@ import (
 type BoolLiteralRule struct{}
 
 // Apply applies the rule to given file.
-func (*BoolLiteralRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *BoolLiteralRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -26,7 +26,7 @@ func (*BoolLiteralRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 }
 
 // Name returns the rule name.
-func (*BoolLiteralRule) Name() string {
+func (r *BoolLiteralRule) Name() string {
 	return "bool-literal-in-expr"
 }
 
@@ -35,11 +35,11 @@ type lintBoolLiteral struct {
 	onFailure func(lint.Failure)
 }
 
-func (w *lintBoolLiteral) Visit(node ast.Node) ast.Visitor {
+func (r *lintBoolLiteral) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
 	case *ast.BinaryExpr:
 		if !isBoolOp(n.Op) {
-			return w
+			return r
 		}
 
 		lexeme, ok := isExprABooleanLit(n.X)
@@ -47,24 +47,24 @@ func (w *lintBoolLiteral) Visit(node ast.Node) ast.Visitor {
 			lexeme, ok = isExprABooleanLit(n.Y)
 
 			if !ok {
-				return w
+				return r
 			}
 		}
 
 		isConstant := (n.Op == token.LAND && lexeme == "false") || (n.Op == token.LOR && lexeme == "true")
 
 		if isConstant {
-			w.addFailure(n, "Boolean expression seems to always evaluate to "+lexeme, "logic")
+			r.addFailure(n, "Boolean expression seems to always evaluate to "+lexeme, "logic")
 		} else {
-			w.addFailure(n, "omit Boolean literal in expression", "style")
+			r.addFailure(n, "omit Boolean literal in expression", "style")
 		}
 	}
 
-	return w
+	return r
 }
 
-func (w lintBoolLiteral) addFailure(node ast.Node, msg, cat string) {
-	w.onFailure(lint.Failure{
+func (r lintBoolLiteral) addFailure(node ast.Node, msg, cat string) {
+	r.onFailure(lint.Failure{
 		Confidence: 1,
 		Node:       node,
 		Category:   cat,

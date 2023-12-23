@@ -63,7 +63,7 @@ func (r *AddConstantRule) Apply(file *lint.File, arguments lint.Arguments) []lin
 }
 
 // Name returns the rule name.
-func (*AddConstantRule) Name() string {
+func (r *AddConstantRule) Name() string {
 	return "add-constant"
 }
 
@@ -75,37 +75,37 @@ type lintAddConstantRule struct {
 	ignoreFunctions []*regexp.Regexp
 }
 
-func (w lintAddConstantRule) Visit(node ast.Node) ast.Visitor {
+func (r lintAddConstantRule) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
 	case *ast.CallExpr:
-		w.checkFunc(n)
+		r.checkFunc(n)
 		return nil
 	case *ast.GenDecl:
 		return nil // skip declarations
 	case *ast.BasicLit:
-		w.checkLit(n)
+		r.checkLit(n)
 	}
 
-	return w
+	return r
 }
 
-func (w lintAddConstantRule) checkFunc(expr *ast.CallExpr) {
-	fName := w.getFuncName(expr)
+func (r lintAddConstantRule) checkFunc(expr *ast.CallExpr) {
+	fName := r.getFuncName(expr)
 
 	for _, arg := range expr.Args {
 		switch t := arg.(type) {
 		case *ast.CallExpr:
-			w.checkFunc(t)
+			r.checkFunc(t)
 		case *ast.BasicLit:
-			if w.isIgnoredFunc(fName) {
+			if r.isIgnoredFunc(fName) {
 				continue
 			}
-			w.checkLit(t)
+			r.checkLit(t)
 		}
 	}
 }
 
-func (lintAddConstantRule) getFuncName(expr *ast.CallExpr) string {
+func (r lintAddConstantRule) getFuncName(expr *ast.CallExpr) string {
 	switch f := expr.Fun.(type) {
 	case *ast.SelectorExpr:
 		switch prefix := f.X.(type) {
@@ -119,17 +119,17 @@ func (lintAddConstantRule) getFuncName(expr *ast.CallExpr) string {
 	return ""
 }
 
-func (w lintAddConstantRule) checkLit(n *ast.BasicLit) {
+func (r lintAddConstantRule) checkLit(n *ast.BasicLit) {
 	switch kind := n.Kind.String(); kind {
 	case kindFLOAT, kindINT:
-		w.checkNumLit(kind, n)
+		r.checkNumLit(kind, n)
 	case kindSTRING:
-		w.checkStrLit(n)
+		r.checkStrLit(n)
 	}
 }
 
-func (w lintAddConstantRule) isIgnoredFunc(fName string) bool {
-	for _, pattern := range w.ignoreFunctions {
+func (r lintAddConstantRule) isIgnoredFunc(fName string) bool {
+	for _, pattern := range r.ignoreFunctions {
 		if pattern.MatchString(fName) {
 			return true
 		}
@@ -138,32 +138,32 @@ func (w lintAddConstantRule) isIgnoredFunc(fName string) bool {
 	return false
 }
 
-func (w lintAddConstantRule) checkStrLit(n *ast.BasicLit) {
-	if w.whiteLst[kindSTRING][n.Value] {
+func (r lintAddConstantRule) checkStrLit(n *ast.BasicLit) {
+	if r.whiteLst[kindSTRING][n.Value] {
 		return
 	}
 
-	count := w.strLits[n.Value]
+	count := r.strLits[n.Value]
 	if count >= 0 {
-		w.strLits[n.Value] = count + 1
-		if w.strLits[n.Value] > w.strLitLimit {
-			w.onFailure(lint.Failure{
+		r.strLits[n.Value] = count + 1
+		if r.strLits[n.Value] > r.strLitLimit {
+			r.onFailure(lint.Failure{
 				Confidence: 1,
 				Node:       n,
 				Category:   "style",
-				Failure:    fmt.Sprintf("string literal %s appears, at least, %d times, create a named constant for it", n.Value, w.strLits[n.Value]),
+				Failure:    fmt.Sprintf("string literal %s appears, at least, %d times, create a named constant for it", n.Value, r.strLits[n.Value]),
 			})
-			w.strLits[n.Value] = -1 // mark it to avoid failing again on the same literal
+			r.strLits[n.Value] = -1 // mark it to avoid failing again on the same literal
 		}
 	}
 }
 
-func (w lintAddConstantRule) checkNumLit(kind string, n *ast.BasicLit) {
-	if w.whiteLst[kind][n.Value] {
+func (r lintAddConstantRule) checkNumLit(kind string, n *ast.BasicLit) {
+	if r.whiteLst[kind][n.Value] {
 		return
 	}
 
-	w.onFailure(lint.Failure{
+	r.onFailure(lint.Failure{
 		Confidence: 1,
 		Node:       n,
 		Category:   "style",

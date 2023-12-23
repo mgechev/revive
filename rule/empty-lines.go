@@ -24,7 +24,7 @@ func (r *EmptyLinesRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure
 }
 
 // Name returns the rule name.
-func (*EmptyLinesRule) Name() string {
+func (r *EmptyLinesRule) Name() string {
 	return "empty-lines"
 }
 
@@ -88,7 +88,7 @@ func (w lintEmptyLines) position(pos token.Pos) token.Position {
 	return w.file.ToPosition(pos)
 }
 
-func (*EmptyLinesRule) commentLines(cmap ast.CommentMap, file *lint.File) map[int]struct{} {
+func (r *EmptyLinesRule) commentLines(cmap ast.CommentMap, file *lint.File) map[int]struct{} {
 	result := map[int]struct{}{}
 
 	for _, comments := range cmap {

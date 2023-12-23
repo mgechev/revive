@@ -11,7 +11,7 @@ import (
 type DeepExitRule struct{}
 
 // Apply applies the rule to given file.
-func (*DeepExitRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *DeepExitRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
@@ -36,7 +36,7 @@ func (*DeepExitRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 }
 
 // Name returns the rule name.
-func (*DeepExitRule) Name() string {
+func (r *DeepExitRule) Name() string {
 	return "deep-exit"
 }
 

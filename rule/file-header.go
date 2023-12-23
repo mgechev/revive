@@ -82,6 +82,6 @@ func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) []lint
 }
 
 // Name returns the rule name.
-func (*FileHeaderRule) Name() string {
+func (r *FileHeaderRule) Name() string {
 	return "file-header"
 }

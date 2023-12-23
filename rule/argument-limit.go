@@ -53,7 +53,7 @@ func (r *ArgumentsLimitRule) Apply(file *lint.File, arguments lint.Arguments) []
 }
 
 // Name returns the rule name.
-func (*ArgumentsLimitRule) Name() string {
+func (r *ArgumentsLimitRule) Name() string {
 	return "argument-limit"
 }
 
@@ -62,7 +62,7 @@ type lintArgsNum struct {
 	onFailure func(lint.Failure)
 }
 
-func (w lintArgsNum) Visit(n ast.Node) ast.Visitor {
+func (r lintArgsNum) Visit(n ast.Node) ast.Visitor {
 	node, ok := n.(*ast.FuncDecl)
 	if ok {
 		num := 0
@@ -71,14 +71,14 @@ func (w lintArgsNum) Visit(n ast.Node) ast.Visitor {
 				num++
 			}
 		}
-		if num > w.total {
-			w.onFailure(lint.Failure{
+		if num > r.total {
+			r.onFailure(lint.Failure{
 				Confidence: 1,
-				Failure:    fmt.Sprintf("maximum number of arguments per function exceeded; max %d but got %d", w.total, num),
+				Failure:    fmt.Sprintf("maximum number of arguments per function exceeded; max %d but got %d", r.total, num),
 				Node:       node.Type,
 			})
-			return w
+			return r
 		}
 	}
-	return w
+	return r
 }
