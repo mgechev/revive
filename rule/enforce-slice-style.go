@@ -165,7 +165,7 @@ func (r *EnforceSliceStyleRule) Apply(file *lint.File, arguments lint.Arguments)
 }
 
 // Name returns the rule name.
-func (r *EnforceSliceStyleRule) Name() string {
+func (*EnforceSliceStyleRule) Name() string {
 	return "enforce-slice-style"
 }
 

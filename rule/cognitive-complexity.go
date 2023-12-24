@@ -56,7 +56,7 @@ func (r *CognitiveComplexityRule) Apply(file *lint.File, arguments lint.Argument
 }
 
 // Name returns the rule name.
-func (r *CognitiveComplexityRule) Name() string {
+func (*CognitiveComplexityRule) Name() string {
 	return "cognitive-complexity"
 }
 
@@ -66,17 +66,17 @@ type cognitiveComplexityLinter struct {
 	onFailure     func(lint.Failure)
 }
 
-func (r cognitiveComplexityLinter) lintCognitiveComplexity() {
-	f := r.file
+func (w cognitiveComplexityLinter) lintCognitiveComplexity() {
+	f := w.file
 	for _, decl := range f.AST.Decls {
 		if fn, ok := decl.(*ast.FuncDecl); ok && fn.Body != nil {
 			v := cognitiveComplexityVisitor{}
 			c := v.subTreeComplexity(fn.Body)
-			if c > r.maxComplexity {
-				r.onFailure(lint.Failure{
+			if c > w.maxComplexity {
+				w.onFailure(lint.Failure{
 					Confidence: 1,
 					Category:   "maintenance",
-					Failure:    fmt.Sprintf("function %s has cognitive complexity %d (> max enabled %d)", funcName(fn), c, r.maxComplexity),
+					Failure:    fmt.Sprintf("function %s has cognitive complexity %d (> max enabled %d)", funcName(fn), c, w.maxComplexity),
 					Node:       fn,
 				})
 			}
@@ -90,67 +90,67 @@ type cognitiveComplexityVisitor struct {
 }
 
 // subTreeComplexity calculates the cognitive complexity of an AST-subtree.
-func (r cognitiveComplexityVisitor) subTreeComplexity(n ast.Node) int {
-	ast.Walk(&r, n)
-	return r.complexity
+func (v cognitiveComplexityVisitor) subTreeComplexity(n ast.Node) int {
+	ast.Walk(&v, n)
+	return v.complexity
 }
 
 // Visit implements the ast.Visitor interface.
-func (r *cognitiveComplexityVisitor) Visit(n ast.Node) ast.Visitor {
+func (v *cognitiveComplexityVisitor) Visit(n ast.Node) ast.Visitor {
 	switch n := n.(type) {
 	case *ast.IfStmt:
 		targets := []ast.Node{n.Cond, n.Body, n.Else}
-		r.walk(1, targets...)
+		v.walk(1, targets...)
 		return nil
 	case *ast.ForStmt:
 		targets := []ast.Node{n.Cond, n.Body}
-		r.walk(1, targets...)
+		v.walk(1, targets...)
 		return nil
 	case *ast.RangeStmt:
-		r.walk(1, n.Body)
+		v.walk(1, n.Body)
 		return nil
 	case *ast.SelectStmt:
-		r.walk(1, n.Body)
+		v.walk(1, n.Body)
 		return nil
 	case *ast.SwitchStmt:
-		r.walk(1, n.Body)
+		v.walk(1, n.Body)
 		return nil
 	case *ast.TypeSwitchStmt:
-		r.walk(1, n.Body)
+		v.walk(1, n.Body)
 		return nil
 	case *ast.FuncLit:
-		r.walk(0, n.Body) // do not increment the complexity, just do the nesting
+		v.walk(0, n.Body) // do not increment the complexity, just do the nesting
 		return nil
 	case *ast.BinaryExpr:
-		r.complexity += r.binExpComplexity(n)
+		v.complexity += v.binExpComplexity(n)
 		return nil // skip visiting binexp sub-tree (already visited by binExpComplexity)
 	case *ast.BranchStmt:
 		if n.Label != nil {
-			r.complexity++
+			v.complexity++
 		}
 	}
 	// TODO handle (at least) direct recursion
 
-	return r
+	return v
 }
 
-func (r *cognitiveComplexityVisitor) walk(complexityIncrement int, targets ...ast.Node) {
-	r.complexity += complexityIncrement + r.nestingLevel
-	nesting := r.nestingLevel
-	r.nestingLevel++
+func (v *cognitiveComplexityVisitor) walk(complexityIncrement int, targets ...ast.Node) {
+	v.complexity += complexityIncrement + v.nestingLevel
+	nesting := v.nestingLevel
+	v.nestingLevel++
 
 	for _, t := range targets {
 		if t == nil {
 			continue
 		}
 
-		ast.Walk(r, t)
+		ast.Walk(v, t)
 	}
 
-	r.nestingLevel = nesting
+	v.nestingLevel = nesting
 }
 
-func (r cognitiveComplexityVisitor) binExpComplexity(n *ast.BinaryExpr) int {
+func (cognitiveComplexityVisitor) binExpComplexity(n *ast.BinaryExpr) int {
 	calculator := binExprComplexityCalculator{opsStack: []token.Token{}}
 
 	astutil.Apply(n, calculator.pre, calculator.post)
@@ -164,7 +164,7 @@ type binExprComplexityCalculator struct {
 	subexpStarted bool
 }
 
-func (r *binExprComplexityCalculator) pre(c *astutil.Cursor) bool {
+func (becc *binExprComplexityCalculator) pre(c *astutil.Cursor) bool {
 	switch n := c.Node().(type) {
 	case *ast.BinaryExpr:
 		isBoolOp := n.Op == token.LAND || n.Op == token.LOR
@@ -172,27 +172,27 @@ func (r *binExprComplexityCalculator) pre(c *astutil.Cursor) bool {
 			break
 		}
 
-		ops := len(r.opsStack)
+		ops := len(becc.opsStack)
 		// if
 		// 		is the first boolop in the expression OR
 		// 		is the first boolop inside a subexpression (...) OR
 		//		is not the same to the previous one
 		// then
 		//      increment complexity
-		if ops == 0 || r.subexpStarted || n.Op != r.opsStack[ops-1] {
-			r.complexity++
-			r.subexpStarted = false
+		if ops == 0 || becc.subexpStarted || n.Op != becc.opsStack[ops-1] {
+			becc.complexity++
+			becc.subexpStarted = false
 		}
 
-		r.opsStack = append(r.opsStack, n.Op)
+		becc.opsStack = append(becc.opsStack, n.Op)
 	case *ast.ParenExpr:
-		r.subexpStarted = true
+		becc.subexpStarted = true
 	}
 
 	return true
 }
 
-func (r *binExprComplexityCalculator) post(c *astutil.Cursor) bool {
+func (becc *binExprComplexityCalculator) post(c *astutil.Cursor) bool {
 	switch n := c.Node().(type) {
 	case *ast.BinaryExpr:
 		isBoolOp := n.Op == token.LAND || n.Op == token.LOR
@@ -200,12 +200,12 @@ func (r *binExprComplexityCalculator) post(c *astutil.Cursor) bool {
 			break
 		}
 
-		ops := len(r.opsStack)
+		ops := len(becc.opsStack)
 		if ops > 0 {
-			r.opsStack = r.opsStack[:ops-1]
+			becc.opsStack = becc.opsStack[:ops-1]
 		}
 	case *ast.ParenExpr:
-		r.subexpStarted = false
+		becc.subexpStarted = false
 	}
 
 	return true

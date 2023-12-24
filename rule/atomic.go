@@ -12,7 +12,7 @@ import (
 type AtomicRule struct{}
 
 // Apply applies the rule to given file.
-func (r *AtomicRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*AtomicRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	walker := atomic{
 		pkgTypesInfo: file.Pkg.TypesInfo(),
@@ -27,7 +27,7 @@ func (r *AtomicRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 }
 
 // Name returns the rule name.
-func (r *AtomicRule) Name() string {
+func (*AtomicRule) Name() string {
 	return "atomic"
 }
 
@@ -36,10 +36,10 @@ type atomic struct {
 	onFailure    func(lint.Failure)
 }
 
-func (r atomic) Visit(node ast.Node) ast.Visitor {
+func (w atomic) Visit(node ast.Node) ast.Visitor {
 	n, ok := node.(*ast.AssignStmt)
 	if !ok {
-		return r
+		return w
 	}
 
 	if len(n.Lhs) != len(n.Rhs) {
@@ -59,8 +59,8 @@ func (r atomic) Visit(node ast.Node) ast.Visitor {
 			continue
 		}
 		pkgIdent, _ := sel.X.(*ast.Ident)
-		if r.pkgTypesInfo != nil {
-			pkgName, ok := r.pkgTypesInfo.Uses[pkgIdent].(*types.PkgName)
+		if w.pkgTypesInfo != nil {
+			pkgName, ok := w.pkgTypesInfo.Uses[pkgIdent].(*types.PkgName)
 			if !ok || pkgName.Imported().Path() != "sync/atomic" {
 				continue
 			}
@@ -82,7 +82,7 @@ func (r atomic) Visit(node ast.Node) ast.Visitor {
 			}
 
 			if broken {
-				r.onFailure(lint.Failure{
+				w.onFailure(lint.Failure{
 					Confidence: 1,
 					Failure:    "direct assignment to atomic value",
 					Node:       n,
@@ -90,5 +90,5 @@ func (r atomic) Visit(node ast.Node) ast.Visitor {
 			}
 		}
 	}
-	return r
+	return w
 }

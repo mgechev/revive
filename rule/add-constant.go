@@ -63,7 +63,7 @@ func (r *AddConstantRule) Apply(file *lint.File, arguments lint.Arguments) []lin
 }
 
 // Name returns the rule name.
-func (r *AddConstantRule) Name() string {
+func (*AddConstantRule) Name() string {
 	return "add-constant"
 }
 
@@ -105,7 +105,7 @@ func (r lintAddConstantRule) checkFunc(expr *ast.CallExpr) {
 	}
 }
 
-func (r lintAddConstantRule) getFuncName(expr *ast.CallExpr) string {
+func (lintAddConstantRule) getFuncName(expr *ast.CallExpr) string {
 	switch f := expr.Fun.(type) {
 	case *ast.SelectorExpr:
 		switch prefix := f.X.(type) {

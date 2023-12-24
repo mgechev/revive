@@ -11,7 +11,7 @@ import (
 type DataRaceRule struct{}
 
 // Apply applies the rule to given file.
-func (r *DataRaceRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*DataRaceRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
@@ -24,7 +24,7 @@ func (r *DataRaceRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 }
 
 // Name returns the rule name.
-func (r *DataRaceRule) Name() string {
+func (*DataRaceRule) Name() string {
 	return "datarace"
 }
 
@@ -53,7 +53,7 @@ func (w lintDataRaces) Visit(n ast.Node) ast.Visitor {
 	return nil
 }
 
-func (w lintDataRaces) ExtractReturnIDs(fields []*ast.Field) map[*ast.Object]struct{} {
+func (lintDataRaces) ExtractReturnIDs(fields []*ast.Field) map[*ast.Object]struct{} {
 	r := map[*ast.Object]struct{}{}
 	for _, f := range fields {
 		for _, id := range f.Names {

@@ -17,12 +17,12 @@ func (e *EarlyReturnRule) Apply(file *lint.File, args lint.Arguments) []lint.Fai
 }
 
 // Name returns the rule name.
-func (e *EarlyReturnRule) Name() string {
+func (*EarlyReturnRule) Name() string {
 	return "early-return"
 }
 
 // CheckIfElse evaluates the rule against an ifelse.Chain.
-func (e *EarlyReturnRule) CheckIfElse(chain ifelse.Chain, args ifelse.Args) (failMsg string) {
+func (*EarlyReturnRule) CheckIfElse(chain ifelse.Chain, args ifelse.Args) (failMsg string) {
 	if !chain.Else.Deviates() {
 		// this rule only applies if the else-block deviates control flow
 		return
