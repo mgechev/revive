@@ -386,6 +386,44 @@ Example:
   arguments = ["make"]
 ```
 
+
+## enforce-repeated-arg-type-style
+
+**Description**: This rule is designed to maintain consistency in the declaration
+of repeated argument and return value types in Go functions. It supports three styles:
+'any', 'short', and 'full'. The 'any' style is lenient and allows any form of type
+declaration. The 'short' style encourages omitting repeated types for conciseness,
+whereas the 'full' style mandates explicitly stating the type for each argument
+and return value, even if they are repeated, promoting clarity.
+
+**Configuration (1)**: (string) as a single string, it configures both argument
+and return value styles. Accepts 'any', 'short', or 'full' (default: 'any').
+
+**Configuration (2)**: (map[string]any) as a map, allows separate configuration
+for function arguments and return values. Valid keys are "funcArgStyle" and
+"funcRetValStyle", each accepting 'any', 'short', or 'full'. If a key is not
+specified, the default value of 'any' is used.
+
+**Note**: The rule applies checks based on the specified styles. For 'full' style,
+it flags instances where types are omitted in repeated arguments or return values.
+For 'short' style, it highlights opportunities to omit repeated types for brevity.
+Incorrect or unknown configuration values will result in an error.
+
+**Example (1)**:
+
+```toml
+[rule.enforce-repeated-arg-type-style]
+arguments = ["short"]
+```
+
+**Example (2):**
+
+```toml
+[rule.enforce-repeated-arg-type-style]
+arguments = [ { funcArgStyle = "full", funcRetValStyle = "short" } ]
+```
+
+
 ## enforce-slice-style
 
 _Description_: This rule enforces consistent usage of `make([]type, 0)` or `[]type{}` for slice initialization.
@@ -499,7 +537,8 @@ _Description_: Aligns with Go's naming conventions, as outlined in the official
 the principles of good package naming. Users can follow these guidelines by default or define a custom regex rule.
 Importantly, aliases with underscores ("_") are always allowed.
 
-_Configuration_ (1): (string) as plain string accepts allow regexp pattern for aliases (default: ^[a-z][a-z0-9]{0,}$),
+_Configuration_ (1): (string) as plain string accepts allow regexp pattern for aliases (default: ^[a-z][a-z0-9]{0,}$).
+
 _Configuration_ (2): (map[string]string) as a map accepts two values:
 * for a key "allowRegex" accepts allow regexp pattern
 * for a key "denyRegex deny regexp pattern
