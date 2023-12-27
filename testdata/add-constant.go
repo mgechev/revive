@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func foo(a, b, c, d int) {
+func foo(a float32, b string, c any, d int) {
 	a = 1.0 // ignore
 	b = "ignore"
 	c = 2              // ignore
@@ -50,4 +50,40 @@ func ignoredFunc(num int) int {
 
 func notIgnoredFunc(num int) int {
 	return num
+}
+
+func tagsInStructLiteralsShouldBeOK() {
+	a := struct {
+		X int `json:"x"`
+	}{}
+
+	b := struct {
+		X int `json:"x"`
+	}{}
+
+	c := struct {
+		X int `json:"x"`
+	}{}
+
+	d := struct {
+		X int `json:"x"`
+		Y int `json:"y"`
+	}{}
+
+	e := struct {
+		X int `json:"x"`
+		Y int `json:"y"`
+	}{}
+
+	var f struct {
+		X int `json:"x"`
+		Y int `json:"y"`
+	}
+
+	var g struct {
+		X int `json:"x"`
+		Y int `json:"y"`
+	}
+
+	_, _, _, _, _, _, _ = a, b, c, d, e, f, g
 }
