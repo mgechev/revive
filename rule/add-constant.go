@@ -187,7 +187,6 @@ func (w *lintAddConstantRule) checkNumLit(kind string, n *ast.BasicLit) {
 	})
 }
 
-// isStructTag checks if the given BasicLit is part of a struct tag.
 func (w *lintAddConstantRule) isStructTag(n *ast.BasicLit) bool {
 	_, ok := w.structTags[n]
 	return ok
