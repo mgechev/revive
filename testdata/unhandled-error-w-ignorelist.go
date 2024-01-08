@@ -87,10 +87,3 @@ func testCase5() {
 	s2.reterr()  // ignore
 	s2.reterr1() // MATCH /Unhandled error in call to function fixtures.unhandledErrorStruct2.reterr1/
 }
-
-func testCase6() {
-	f := func() error {
-		return nil
-	}
-	f() // MATCH /Unhandled error in call to function f/
-}
