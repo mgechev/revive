@@ -49,7 +49,7 @@ func (r *AddConstantRule) Apply(file *lint.File, arguments lint.Arguments) []lin
 		failures = append(failures, failure)
 	}
 
-	w := lintAddConstantRule{
+	w := &lintAddConstantRule{
 		onFailure:       onFailure,
 		strLits:         make(map[string]int),
 		strLitLimit:     r.strLitLimit,
