@@ -154,7 +154,7 @@ func (w *lintAddConstantRule) isIgnoredFunc(fName string) bool {
 	return false
 }
 
-func (w lintAddConstantRule) checkStrLit(n *ast.BasicLit) {
+func (w *lintAddConstantRule) checkStrLit(n *ast.BasicLit) {
 	if w.allowList[kindSTRING][n.Value] {
 		return
 	}
