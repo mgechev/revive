@@ -18,13 +18,13 @@ const (
 	kindSTRING         = "STRING"
 )
 
-type whiteList map[string]map[string]bool
+type allowList map[string]map[string]bool
 
-func newWhiteList() whiteList {
+func newAllowList() allowList {
 	return map[string]map[string]bool{kindINT: {}, kindFLOAT: {}, kindSTRING: {}}
 }
 
-func (wl whiteList) add(kind, list string) {
+func (wl allowList) add(kind, list string) {
 	elems := strings.Split(list, ",")
 	for _, e := range elems {
 		wl[kind][e] = true
@@ -33,7 +33,7 @@ func (wl whiteList) add(kind, list string) {
 
 // AddConstantRule lints unused params in functions.
 type AddConstantRule struct {
-	whiteList       whiteList
+	allowList       allowList
 	ignoreFunctions []*regexp.Regexp
 	strLitLimit     int
 	sync.Mutex
@@ -53,7 +53,7 @@ func (r *AddConstantRule) Apply(file *lint.File, arguments lint.Arguments) []lin
 		onFailure:       onFailure,
 		strLits:         make(map[string]int),
 		strLitLimit:     r.strLitLimit,
-		whiteLst:        r.whiteList,
+		allowList:        r.allowList,
 		ignoreFunctions: r.ignoreFunctions,
 		structTags:      make(map[*ast.BasicLit]struct{}),
 	}
@@ -72,7 +72,7 @@ type lintAddConstantRule struct {
 	onFailure       func(lint.Failure)
 	strLits         map[string]int
 	strLitLimit     int
-	whiteLst        whiteList
+	allowList        allowList
 	ignoreFunctions []*regexp.Regexp
 	structTags      map[*ast.BasicLit]struct{}
 }
@@ -155,7 +155,7 @@ func (w *lintAddConstantRule) isIgnoredFunc(fName string) bool {
 }
 
 func (w *lintAddConstantRule) checkStrLit(n *ast.BasicLit) {
-	if w.whiteLst[kindSTRING][n.Value] {
+	if w.allowList[kindSTRING][n.Value] {
 		return
 	}
 
@@ -175,7 +175,7 @@ func (w *lintAddConstantRule) checkStrLit(n *ast.BasicLit) {
 }
 
 func (w *lintAddConstantRule) checkNumLit(kind string, n *ast.BasicLit) {
-	if w.whiteLst[kind][n.Value] {
+	if w.allowList[kind][n.Value] {
 		return
 	}
 
@@ -196,9 +196,9 @@ func (r *AddConstantRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	defer r.Unlock()
 
-	if r.whiteList == nil {
+	if r.allowList == nil {
 		r.strLitLimit = defaultStrLitLimit
-		r.whiteList = newWhiteList()
+		r.allowList = newAllowList()
 		if len(arguments) > 0 {
 			args, ok := arguments[0].(map[string]any)
 			if !ok {
@@ -223,7 +223,7 @@ func (r *AddConstantRule) configure(arguments lint.Arguments) {
 					if !ok {
 						panic(fmt.Sprintf("Invalid argument to the add-constant rule, string expected. Got '%v' (%T)", v, v))
 					}
-					r.whiteList.add(kind, list)
+					r.allowList.add(kind, list)
 				case "maxLitCount":
 					sl, ok := v.(string)
 					if !ok {

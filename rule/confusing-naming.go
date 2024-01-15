@@ -111,7 +111,7 @@ func checkMethodName(holder string, id *ast.Ident, w *lintConfusingNames) {
 		pkgm.methods[holder] = make(map[string]*referenceMethod, 1)
 	}
 
-	// update the black list
+	// update the block list
 	if pkgm.methods[holder] == nil {
 		println("no entry for '", holder, "'")
 	}
