@@ -71,6 +71,10 @@ func Name(name string, allowlist, blocklist []string) (should string) {
 			if w == 0 && unicode.IsLower(runes[w]) {
 				u = strings.ToLower(u)
 			}
+			// Keep lowercase s for IDs
+			if u == "IDS" {
+				u = "IDs"
+			}
 			// All the common initialisms are ASCII,
 			// so we can replace the bytes exactly.
 			copy(runes[w:], []rune(u))
@@ -99,6 +103,7 @@ var commonInitialisms = map[string]bool{
 	"HTTP":  true,
 	"HTTPS": true,
 	"ID":    true,
+	"IDS":   true,
 	"IP":    true,
 	"JSON":  true,
 	"LHS":   true,
