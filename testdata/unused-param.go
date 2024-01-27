@@ -166,3 +166,19 @@ func encodeFixed64Rpc(dAtA []byte, offset int, v uint64, i int) int {
 
 	return 8
 }
+
+func innerAnonymousFunctionWithoutUsage() {
+	innerFunc := func(a int) {} // MATCH /parameter 'a' seems to be unused, consider removing or renaming it as _/
+	innerFunc(1)
+}
+
+func innerAnonymousFunctionWithUsage() {
+	innerFunc := func(a int) {
+		a += 1
+	}
+	innerFunc(1)
+
+	return someFunc(func(values []int) float64 { // MATCH /parameter 'values' seems to be unused, consider removing or renaming it as _/
+		return 1.1
+	})
+}
