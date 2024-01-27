@@ -177,4 +177,8 @@ func innerAnonymousFunctionWithUsage() {
 		a += 1
 	}
 	innerFunc(1)
+
+	return someFunc(func(values []int) float64 { // MATCH /parameter 'values' seems to be unused, consider removing or renaming it as _/
+		return 1.1
+	})
 }
