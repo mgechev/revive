@@ -94,6 +94,7 @@ var allRules = append([]lint.Rule{
 	&rule.ImportAliasNamingRule{},
 	&rule.EnforceMapStyleRule{},
 	&rule.EnforceSliceStyleRule{},
+	&rule.MaxControlNestingRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{

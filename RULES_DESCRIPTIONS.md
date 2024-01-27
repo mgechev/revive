@@ -48,6 +48,7 @@ List of all available rules.
   - [increment-decrement](#increment-decrement)
   - [indent-error-flow](#indent-error-flow)
   - [line-length-limit](#line-length-limit)
+  - [max-control-nesting](#max-control-nesting)
   - [max-public-structs](#max-public-structs)
   - [modifies-parameter](#modifies-parameter)
   - [modifies-value-receiver](#modifies-value-receiver)
@@ -619,6 +620,19 @@ Example:
 [rule.line-length-limit]
   arguments =[80]
 ```
+
+## max-control-nesting
+_Description_: Warns if nesting level of control structures (`if-then-else`, `for`, `switch`) exceeds a given maximum.
+
+_Configuration_: (int) maximum accepted nesting level of control structures (defaults to 5)
+
+Example:
+
+```toml
+[max-control-nesting]
+  arguments =[3]
+```
+
 
 ## max-public-structs
 
