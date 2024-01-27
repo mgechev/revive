@@ -97,7 +97,7 @@ func (w lintUnusedParamRule) Visit(node ast.Node) ast.Visitor {
 		funcBody = n.Body
 	case *ast.FuncDecl:
 		if n.Body == nil {
-			return w // skip, is a function prototype
+			return nil // skip, is a function prototype
 		}
 
 		funcType = n.Type
