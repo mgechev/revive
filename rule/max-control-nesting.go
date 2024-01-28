@@ -109,18 +109,20 @@ func (w *lintMaxControlNesting) walkControlledBlock(b ast.Node) {
 func (r *MaxControlNestingRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	defer r.Unlock()
-	if r.max < 1 {
-		if len(arguments) < 1 {
-			r.max = defaultMaxControlNesting
-			return
-		}
-
-		checkNumberOfArguments(1, arguments, r.Name())
-
-		max, ok := arguments[0].(int64) // Alt. non panicking version
-		if !ok {
-			panic(`invalid value passed as argument number to the "max-control-nesting" rule`)
-		}
-		r.max = max
+	if !(r.max < 1) {
+		return // max already set
 	}
+
+	if len(arguments) < 1 {
+		r.max = defaultMaxControlNesting
+		return
+	}
+
+	checkNumberOfArguments(1, arguments, r.Name())
+
+	max, ok := arguments[0].(int64) // Alt. non panicking version
+	if !ok {
+		panic(`invalid value passed as argument number to the "max-control-nesting" rule`)
+	}
+	r.max = max
 }
