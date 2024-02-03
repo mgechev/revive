@@ -35,11 +35,11 @@ func (r *VarNamingRule) configure(arguments lint.Arguments) {
 
 	r.configured = true
 	if len(arguments) >= 1 {
-		r.allowlist = getList(arguments[0], "whitelist")
+		r.allowlist = getList(arguments[0], "allowlist")
 	}
 
 	if len(arguments) >= 2 {
-		r.blocklist = getList(arguments[1], "blacklist")
+		r.blocklist = getList(arguments[1], "blocklist")
 	}
 
 	if len(arguments) >= 3 {

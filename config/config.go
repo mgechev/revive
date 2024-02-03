@@ -55,7 +55,6 @@ var allRules = append([]lint.Rule{
 	&rule.ModifiesValRecRule{},
 	&rule.ConstantLogicalExprRule{},
 	&rule.BoolLiteralRule{},
-	&rule.ImportsBlacklistRule{},
 	&rule.ImportsBlocklistRule{},
 	&rule.FunctionResultsLimitRule{},
 	&rule.MaxPublicStructsRule{},
@@ -132,7 +131,8 @@ func GetLintingRules(config *lint.Config, extraRules []lint.Rule) ([]lint.Rule, 
 
 	var lintingRules []lint.Rule
 	for name, ruleConfig := range config.Rules {
-		r, ok := rulesMap[name]
+		actualName := actualRuleName(name)
+		r, ok := rulesMap[actualName]
 		if !ok {
 			return nil, fmt.Errorf("cannot find rule: %s", name)
 		}
@@ -145,6 +145,15 @@ func GetLintingRules(config *lint.Config, extraRules []lint.Rule) ([]lint.Rule, 
 	}
 
 	return lintingRules, nil
+}
+
+func actualRuleName(name string) string {
+	switch name {
+	case "imports-blacklist":
+		return "imports-blocklist"
+	default:
+		return name
+	}
 }
 
 func parseConfig(path string, config *lint.Config) error {
