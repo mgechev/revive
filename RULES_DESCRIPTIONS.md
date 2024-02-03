@@ -928,7 +928,7 @@ _Description_: This rule warns when [initialism](https://github.com/golang/go/wi
 
 _Configuration_: This rule accepts two slices of strings and one optional slice with single map with named parameters.
 (it's due to TOML hasn't "slice of any" and we keep backward compatibility with previous config version)
-First slice is an allow-list and second one is a blocklist of initialisms.
+First slice is an allowlist and second one is a blocklist of initialisms.
 In map, you can add "upperCaseConst=true" parameter to allow `UPPER_CASE` for `const`
 By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
 
