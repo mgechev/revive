@@ -44,7 +44,7 @@ List of all available rules.
   - [if-return](#if-return)
   - [import-alias-naming](#import-alias-naming)
   - [import-shadowing](#import-shadowing)
-  - [imports-blacklist](#imports-blacklist)
+  - [imports-blocklist](#imports-blocklist)
   - [increment-decrement](#increment-decrement)
   - [indent-error-flow](#indent-error-flow)
   - [line-length-limit](#line-length-limit)
@@ -570,16 +570,16 @@ name of an imported package. This rule spots identifiers that shadow an import.
 
 _Configuration_: N/A
 
-## imports-blacklist
+## imports-blocklist
 
-_Description_: Warns when importing black-listed packages.
+_Description_: Warns when importing block-listed packages.
 
-_Configuration_: black-list of package names (or regular expression package names).
+_Configuration_: block-list of package names (or regular expression package names).
 
 Example:
 
 ```toml
-[imports-blacklist]
+[imports-blocklist]
   arguments =["crypto/md5", "crypto/sha1", "crypto/**/pkix"]
 ```
 
@@ -928,7 +928,7 @@ _Description_: This rule warns when [initialism](https://github.com/golang/go/wi
 
 _Configuration_: This rule accepts two slices of strings and one optional slice with single map with named parameters.
 (it's due to TOML hasn't "slice of any" and we keep backward compatibility with previous config version)
-First slice is a whitelist and second one is a blacklist of initialisms.
+First slice is an allow-list and second one is a blocklist of initialisms.
 In map, you can add "upperCaseConst=true" parameter to allow `UPPER_CASE` for `const`
 By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
 
