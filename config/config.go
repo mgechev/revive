@@ -92,6 +92,7 @@ var allRules = append([]lint.Rule{
 	&rule.RedundantImportAlias{},
 	&rule.ImportAliasNamingRule{},
 	&rule.EnforceMapStyleRule{},
+	&rule.EnforceRepeatedArgTypeStyleRule{},
 	&rule.EnforceSliceStyleRule{},
 	&rule.MaxControlNestingRule{},
 }, defaultRules...)
