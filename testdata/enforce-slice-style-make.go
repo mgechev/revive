@@ -9,6 +9,7 @@ func somefn() {
 	m5 := []string{"v1", "v2"}
 	m6 := [8]string{}
 	m7 := [...]string{}
+	var m8 []string
 
 	_ = m0
 	_ = m1
@@ -18,6 +19,7 @@ func somefn() {
 	_ = m5
 	_ = m6
 	_ = m7
+	_ = m8
 }
 
 type Slice []string
@@ -29,6 +31,7 @@ func somefn2() {
 	m3 := make(Slice, 0, 0)
 	m4 := Slice{} // MATCH /use make([]type) instead of []type{} (or declare nil slice)/
 	m5 := Slice{"v1", "v2"}
+	var m6 Slice
 
 	_ = m0
 	_ = m1
@@ -36,6 +39,7 @@ func somefn2() {
 	_ = m3
 	_ = m4
 	_ = m5
+	_ = m6
 }
 
 type SliceSlice Slice
@@ -47,6 +51,7 @@ func somefn3() {
 	m3 := make(SliceSlice, 0, 0)
 	m4 := SliceSlice{} // MATCH /use make([]type) instead of []type{} (or declare nil slice)/
 	m5 := SliceSlice{"v1", "v2"}
+	var m6 SliceSlice
 
 	_ = m0
 	_ = m1
@@ -54,6 +59,7 @@ func somefn3() {
 	_ = m3
 	_ = m4
 	_ = m5
+	_ = m6
 }
 
 func somefn4() {
@@ -64,6 +70,7 @@ func somefn4() {
 	m1["el3"] = make([]string, 0, 0)
 	m1["el4"] = []string{} // MATCH /use make([]type) instead of []type{} (or declare nil slice)/
 	m1["el5"] = []string{"v1", "v2"}
+	m1["el6"] = nil
 
 	_ = m1
 }
