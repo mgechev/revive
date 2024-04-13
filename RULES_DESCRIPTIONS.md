@@ -14,6 +14,7 @@ List of all available rules.
   - [call-to-gc](#call-to-gc)
   - [cognitive-complexity](#cognitive-complexity)
   - [comment-spacings](#comment-spacings)
+  - [comments-density](#comment-spacings)
   - [confusing-naming](#confusing-naming)
   - [confusing-results](#confusing-results)
   - [constant-logical-expr](#constant-logical-expr)
@@ -192,6 +193,19 @@ Example:
 [rule.comment-spacings]
   arguments =["mypragma","otherpragma"]
 ```
+## comments-density
+
+_Description_: Spots files not respecting a minimum value for the [_comments lines density_](https://docs.sonarsource.com/sonarqube/latest/user-guide/metric-definitions/) metric = _comment lines / (lines of code + comment lines) * 100_
+
+_Configuration_: (int) the minimum expected comments lines density.
+
+Example:
+
+```toml
+[rule.comments-density]
+  arguments =[15]
+```
+
 ## confusing-naming
 
 _Description_: Methods or fields of `struct` that have names different only by capitalization could be confusing.
