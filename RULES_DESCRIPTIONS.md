@@ -182,15 +182,15 @@ _Description_: Spots comments of the form:
 
 _Configuration_: ([]string) list of exceptions. For example, to accept comments of the form
 ```go
-//mypragma: activate something
+//+optional
 ```
-You need to add `"mypragma"` in the configuration
+You need to add `"+optional"` in the configuration
 
 Example:
 
 ```toml
 [rule.comment-spacings]
-  arguments =["mypragma","otherpragma"]
+  arguments =["+optional", "foo:"]
 ```
 ## confusing-naming
 
