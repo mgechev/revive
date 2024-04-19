@@ -31,7 +31,7 @@ func (r *CommentSpacingsRule) configure(arguments lint.Arguments) {
 			if !ok {
 				panic(fmt.Sprintf("invalid argument %v for %s; expected string but got %T", arg, r.Name(), arg))
 			}
-			r.allowList = append(r.allowList, `//`+allow+`:`)
+			r.allowList = append(r.allowList, `//`+allow)
 		}
 	}
 }

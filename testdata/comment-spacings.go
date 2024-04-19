@@ -42,3 +42,8 @@ Should be valid
 
 //nolint:staticcheck // nolint should be in the default list of acceptable comments.
 var b string
+
+type c struct {
+	//+optional
+	d *int `json:"d,omitempty"`
+}
