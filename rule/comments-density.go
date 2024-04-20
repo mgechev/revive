@@ -22,18 +22,21 @@ func (r *CommentsDensityRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	defer r.Unlock()
 
-	if !r.configured {
-		r.configured = true
-		if len(arguments) < 1 {
-			r.minumumCommentsDensity = defaultMinimumCommentsPercentage
-			return
-		}
+	if r.configured {
+		return
+	}
 
-		var ok bool
-		r.minumumCommentsDensity, ok = arguments[0].(int64)
-		if !ok {
-			panic(fmt.Sprintf("invalid argument for %q rule: argument should be an int, got %T", r.Name(), arguments[0]))
-		}
+	r.configured = true
+
+	if len(arguments) < 1 {
+		r.minumumCommentsDensity = defaultMinimumCommentsPercentage
+		return
+	}
+
+	var ok bool
+	r.minumumCommentsDensity, ok = arguments[0].(int64)
+	if !ok {
+		panic(fmt.Sprintf("invalid argument for %q rule: argument should be an int, got %T", r.Name(), arguments[0]))
 	}
 }
 
