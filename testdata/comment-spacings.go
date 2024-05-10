@@ -48,8 +48,7 @@ type c struct {
 	d *int `json:"d,omitempty"`
 }
 
-//line
-//extern
-//export
+//extern open
+//export MyFunction
 
 //nolint:gochecknoglobals

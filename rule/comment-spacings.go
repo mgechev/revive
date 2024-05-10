@@ -22,7 +22,7 @@ func (r *CommentSpacingsRule) configure(arguments lint.Arguments) {
 	defer r.Unlock()
 
 	if r.allowRe == nil {
-		r.allowRe = regexp.MustCompile("//(line|extern|export|[a-z0-9]+:[a-z0-9])") // see https://go-review.googlesource.com/c/website/+/442516/1..2/_content/doc/comment.md#494
+		r.allowRe = regexp.MustCompile("//(line |extern |export |[a-z0-9]+:[a-z0-9])") // see https://go-review.googlesource.com/c/website/+/442516/1..2/_content/doc/comment.md#494
 		r.allowList = []string{}
 		for _, arg := range arguments {
 			allow, ok := arg.(string) // Alt. non panicking version
