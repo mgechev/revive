@@ -2,6 +2,7 @@ package rule
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -12,6 +13,7 @@ import (
 // the comment symbol( // ) and the start of the comment text
 type CommentSpacingsRule struct {
 	allowList []string
+	allowRe   *regexp.Regexp
 	sync.Mutex
 }
 
@@ -19,13 +21,9 @@ func (r *CommentSpacingsRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	defer r.Unlock()
 
-	if r.allowList == nil {
-		r.allowList = []string{
-			"//go:",
-			"//revive:",
-			"//nolint:",
-		}
-
+	if r.allowRe == nil {
+		r.allowRe = regexp.MustCompile("//(line|extern|export|[a-z0-9]+:[a-z0-9])") // see https://go-review.googlesource.com/c/website/+/442516/1..2/_content/doc/comment.md#494
+		r.allowList = []string{}
 		for _, arg := range arguments {
 			allow, ok := arg.(string) // Alt. non panicking version
 			if !ok {
@@ -87,5 +85,5 @@ func (r *CommentSpacingsRule) isAllowed(line string) bool {
 		}
 	}
 
-	return false
+	return r.allowRe.MatchString(line)
 }

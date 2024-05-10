@@ -47,3 +47,9 @@ type c struct {
 	//+optional
 	d *int `json:"d,omitempty"`
 }
+
+//line
+//extern
+//export
+
+//nolint:gochecknoglobals
