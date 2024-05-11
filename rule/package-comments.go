@@ -150,15 +150,7 @@ func (l *lintPackageComments) Visit(_ ast.Node) ast.Visitor {
 		return nil
 	}
 	s := l.fileAst.Doc.Text()
-	if ts := strings.TrimLeft(s, " \t"); ts != s {
-		l.onFailure(lint.Failure{
-			Category:   "comments",
-			Node:       l.fileAst.Doc,
-			Confidence: 1,
-			Failure:    "package comment should not have leading space",
-		})
-		s = ts
-	}
+
 	// Only non-main packages need to keep to this form.
 	if !l.file.Pkg.IsMain() && !strings.HasPrefix(s, prefix) {
 		l.onFailure(lint.Failure{
