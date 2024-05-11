@@ -52,3 +52,5 @@ type c struct {
 //export MyFunction
 
 //nolint:gochecknoglobals
+
+//this is a regular command that's incorrectly formatted //nolint:foobar // because one two three
