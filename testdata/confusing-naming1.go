@@ -70,3 +70,14 @@ type y[T any] struct{}
 
 func (y[T]) method() {
 }
+
+// issue #982
+type a[T any] struct{}
+
+func (x *a[T]) method() {
+}
+
+type b[T any] struct{}
+
+func (x *b[T]) method() {
+}
