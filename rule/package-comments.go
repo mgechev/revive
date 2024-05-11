@@ -152,7 +152,7 @@ func (l *lintPackageComments) Visit(_ ast.Node) ast.Visitor {
 	s := l.fileAst.Doc.Text()
 
 	// Only non-main packages need to keep to this form.
-	if !l.file.Pkg.IsMain() && !strings.HasPrefix(s, prefix) {
+	if !l.file.Pkg.IsMain() && !strings.HasPrefix(s, prefix) && !isDirectiveComment(s) {
 		l.onFailure(lint.Failure{
 			Category:   "comments",
 			Node:       l.fileAst.Doc,
