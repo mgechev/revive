@@ -7,13 +7,16 @@ import (
 	"go/types"
 	"sync"
 
+	goversion "github.com/hashicorp/go-version"
+
 	"github.com/mgechev/revive/internal/typeparams"
 )
 
 // Package represents a package in the project.
 type Package struct {
-	fset  *token.FileSet
-	files map[string]*File
+	fset      *token.FileSet
+	files     map[string]*File
+	goVersion *goversion.Version
 
 	typesPkg  *types.Package
 	typesInfo *types.Info
@@ -29,6 +32,8 @@ var (
 	trueValue  = 1
 	falseValue = 2
 	notSet     = 3
+
+	go122 = goversion.Must(goversion.NewVersion("1.22"))
 )
 
 // Files return package's files.
@@ -187,4 +192,8 @@ func (p *Package) lint(rules []Rule, config Config, failures chan Failure) {
 		})(file)
 	}
 	wg.Wait()
+}
+
+func (p *Package) IsAtLeastGo122() bool {
+	return p.goVersion.GreaterThanOrEqual(go122)
 }
