@@ -194,6 +194,7 @@ func (p *Package) lint(rules []Rule, config Config, failures chan Failure) {
 	wg.Wait()
 }
 
+// IsAtLeastGo122 returns true if the Go version for this package is 1.22 or higher, false otherwise
 func (p *Package) IsAtLeastGo122() bool {
 	return p.goVersion.GreaterThanOrEqual(go122)
 }
