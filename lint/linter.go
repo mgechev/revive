@@ -3,12 +3,18 @@ package lint
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"go/token"
 	"os"
+	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 	"sync"
+
+	goversion "github.com/hashicorp/go-version"
 )
 
 // ReadFile defines an abstraction for reading files.
@@ -78,9 +84,19 @@ func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-cha
 }
 
 func (l *Linter) lintPackage(filenames []string, ruleSet []Rule, config Config, failures chan Failure) error {
+	if len(filenames) == 0 {
+		return nil
+	}
+
+	goVersion, err := detectGoVersion(filepath.Dir(filenames[0]))
+	if err != nil {
+		return err
+	}
+
 	pkg := &Package{
-		fset:  token.NewFileSet(),
-		files: map[string]*File{},
+		fset:      token.NewFileSet(),
+		files:     map[string]*File{},
+		goVersion: goVersion,
 	}
 	for _, filename := range filenames {
 		content, err := l.readFile(filename)
@@ -106,6 +122,39 @@ func (l *Linter) lintPackage(filenames []string, ruleSet []Rule, config Config, 
 	pkg.lint(ruleSet, config, failures)
 
 	return nil
+}
+
+func detectGoVersion(dir string) (ver *goversion.Version, err error) {
+	// https://github.com/golang/go/issues/44753#issuecomment-790089020
+	cmd := exec.Command("go", "list", "-m", "-json")
+	cmd.Dir = dir
+
+	raw, err := cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("command go list: %w", err)
+	}
+
+	var v struct {
+		GoMod     string `json:"GoMod"`
+		GoVersion string `json:"GoVersion"`
+	}
+	if err = json.Unmarshal(raw, &v); err != nil {
+		return nil, fmt.Errorf("can't parse the output of go list: %w", err)
+	}
+
+	if v.GoMod == "" {
+		// this package is outside a module, so assume
+		// an old-style source directory
+
+		if v := os.Getenv("GOVERSION"); v != "" {
+			return goversion.NewVersion(strings.TrimPrefix(v, "go"))
+		}
+
+		// assume the last version that does not have generics
+		return goversion.Must(goversion.NewVersion("1.17")), nil
+	}
+
+	return goversion.NewVersion(strings.TrimPrefix(v.GoVersion, "go"))
 }
 
 // isGenerated reports whether the source file is generated code
