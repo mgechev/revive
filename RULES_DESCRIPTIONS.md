@@ -30,6 +30,7 @@ List of all available rules.
   - [empty-block](#empty-block)
   - [empty-lines](#empty-lines)
   - [enforce-map-style](#enforce-map-style)
+  - [enforce-repeated-arg-type-style](#enforce-repeated-arg-type-style)
   - [enforce-slice-style](#enforce-slice-style)
   - [error-naming](#error-naming)
   - [error-return](#error-return)
@@ -113,7 +114,7 @@ Example:
 
 ```toml
 [rule.argument-limit]
-  arguments =[4]
+  arguments = [4]
 ```
 
 ## atomic
@@ -132,7 +133,7 @@ Example:
 
 ```toml
 [rule.banned-characters]
-  arguments =["Ω","Σ","σ"]
+  arguments = ["Ω","Σ","σ"]
 ```
 ## bare-return
 
@@ -172,7 +173,7 @@ Example:
 
 ```toml
 [rule.cognitive-complexity]
-  arguments =[7]
+  arguments = [7]
 ```
 ## comment-spacings
 
@@ -192,7 +193,7 @@ Example:
 
 ```toml
 [rule.comment-spacings]
-  arguments =["mypragma:", "+optional"]
+  arguments = ["mypragma:", "+optional"]
 ```
 ## comments-density
 
@@ -204,7 +205,7 @@ Example:
 
 ```toml
 [rule.comments-density]
-  arguments =[15]
+  arguments = [15]
 ```
 
 ## confusing-naming
@@ -256,7 +257,7 @@ Example:
 
 ```toml
 [rule.cyclomatic]
-  arguments =[3]
+  arguments = [3]
 ```
 ## datarace
 
@@ -274,14 +275,14 @@ _Configuration_: N/A
 
 _Description_: This rule warns on some common mistakes when using `defer` statement. It currently alerts on the following situations:
 
-| name | description |
-|------|-------------|
-| call-chain| even if deferring call-chains of the form `foo()()` is valid, it does not helps code understanding (only the last call is deferred)|
-|loop  | deferring inside loops can be misleading (deferred functions are not executed at the end of the loop iteration but of the current function) and it could lead to exhausting the execution stack |
-| method-call| deferring a call to a method can lead to subtle bugs if the method does not have a pointer receiver|
-| recover | calling `recover` outside a deferred function has no effect|
-| immediate-recover | calling `recover` at the time a defer is registered, rather than as part of the deferred callback.  e.g. `defer recover()` or equivalent.|
-| return | returning values form a deferred function has no effect|
+| name              | description                                                                                                                                                                                     |
+|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| call-chain        | even if deferring call-chains of the form `foo()()` is valid, it does not helps code understanding (only the last call is deferred)                                                             |
+| loop              | deferring inside loops can be misleading (deferred functions are not executed at the end of the loop iteration but of the current function) and it could lead to exhausting the execution stack |
+| method-call       | deferring a call to a method can lead to subtle bugs if the method does not have a pointer receiver                                                                                             |
+| recover           | calling `recover` outside a deferred function has no effect                                                                                                                                     |
+| immediate-recover | calling `recover` at the time a defer is registered, rather than as part of the deferred callback.  e.g. `defer recover()` or equivalent.                                                       |
+| return            | returning values form a deferred function has no effect                                                                                                                                         |
 
 These gotchas are described [here](https://blog.learngoprogramming.com/gotchas-of-defer-in-go-1-8d070894cb01)
 
@@ -289,7 +290,7 @@ _Configuration_: by default all warnings are enabled but it is possible selectiv
 
 ```toml
 [rule.defer]
-  arguments=[["call-chain","loop"]]
+  arguments = [["call-chain","loop"]]
 ```
 
 ## dot-imports
@@ -402,43 +403,41 @@ Example:
   arguments = ["make"]
 ```
 
-
 ## enforce-repeated-arg-type-style
 
-**Description**: This rule is designed to maintain consistency in the declaration
+_Description_: This rule is designed to maintain consistency in the declaration
 of repeated argument and return value types in Go functions. It supports three styles:
 'any', 'short', and 'full'. The 'any' style is lenient and allows any form of type
 declaration. The 'short' style encourages omitting repeated types for conciseness,
 whereas the 'full' style mandates explicitly stating the type for each argument
 and return value, even if they are repeated, promoting clarity.
 
-**Configuration (1)**: (string) as a single string, it configures both argument
+_Configuration (1)_: (string) as a single string, it configures both argument
 and return value styles. Accepts 'any', 'short', or 'full' (default: 'any').
 
-**Configuration (2)**: (map[string]any) as a map, allows separate configuration
+_Configuration (2)_: (map[string]any) as a map, allows separate configuration
 for function arguments and return values. Valid keys are "funcArgStyle" and
 "funcRetValStyle", each accepting 'any', 'short', or 'full'. If a key is not
 specified, the default value of 'any' is used.
 
-**Note**: The rule applies checks based on the specified styles. For 'full' style,
+_Note_: The rule applies checks based on the specified styles. For 'full' style,
 it flags instances where types are omitted in repeated arguments or return values.
 For 'short' style, it highlights opportunities to omit repeated types for brevity.
 Incorrect or unknown configuration values will result in an error.
 
-**Example (1)**:
+Example (1):
 
 ```toml
 [rule.enforce-repeated-arg-type-style]
-arguments = ["short"]
+  arguments = ["short"]
 ```
 
-**Example (2):**
+Example (2):
 
 ```toml
 [rule.enforce-repeated-arg-type-style]
-arguments = [ { funcArgStyle = "full", funcRetValStyle = "short" } ]
+  arguments = [{ funcArgStyle = "full", funcRetValStyle = "short" }]
 ```
-
 
 ## enforce-slice-style
 
@@ -459,7 +458,6 @@ Example:
   arguments = ["make"]
 ```
 
-
 ## exported
 
 _Description_: Exported function and methods should have comments. This warns on undocumented exported functions and methods.
@@ -478,7 +476,7 @@ Example:
 
 ```toml
 [rule.exported]
-  arguments =["checkPrivateReceivers","disableStutteringCheck"]
+  arguments = ["checkPrivateReceivers", "disableStutteringCheck"]
 ```
 
 ## file-header
@@ -491,7 +489,7 @@ Example:
 
 ```toml
 [rule.file-header]
-  arguments =["This is the text that must appear at the top of source files."]
+  arguments = ["This is the text that must appear at the top of source files."]
 ```
 
 ## flag-parameter
@@ -512,7 +510,7 @@ Example:
 
 ```toml
 [rule.function-result-limit]
-  arguments =[3]
+  arguments = [3]
 ```
 
 ## function-length
@@ -525,7 +523,7 @@ Example:
 
 ```toml
 [rule.function-length]
-  arguments =[10,0]
+  arguments = [10, 0]
 ```
 Will check for functions exceeding 10 statements and will not check the number of lines of functions
 
@@ -554,14 +552,14 @@ _Description_: Aligns with Go's naming conventions, as outlined in the official
 the principles of good package naming. Users can follow these guidelines by default or define a custom regex rule.
 Importantly, aliases with underscores ("_") are always allowed.
 
-_Configuration_ (1): (string) as plain string accepts allow regexp pattern for aliases (default: ^[a-z][a-z0-9]{0,}$).
+_Configuration_ (1): (`string`) as plain string accepts allow regexp pattern for aliases (default: `^[a-z][a-z0-9]{0,}$`).
 
-_Configuration_ (2): (map[string]string) as a map accepts two values:
+_Configuration_ (2): (`map[string]string`) as a map accepts two values:
 * for a key "allowRegex" accepts allow regexp pattern
 * for a key "denyRegex deny regexp pattern
 
 _Note_: If both `allowRegex` and `denyRegex` are provided, the alias must comply with both of them.
-If none are given (i.e. an empty map), the default value ^[a-z][a-z0-9]{0,}$ for allowRegex is used.
+If none are given (i.e. an empty map), the default value `^[a-z][a-z0-9]{0,}$` for allowRegex is used.
 Unknown keys will result in an error.
 
 Example (1):
@@ -575,12 +573,12 @@ Example (2):
 
 ```toml
 [rule.import-alias-naming]
-  arguments = [ { allowRegex = "^[a-z][a-z0-9]{0,}$", denyRegex = '^v\d+$' } ]
+  arguments = [{ allowRegex = "^[a-z][a-z0-9]{0,}$", denyRegex = '^v\d+$' }]
 ```
 
 ## import-shadowing
 
-_Description_: In GO it is possible to declare identifiers (packages, structs,
+_Description_: In Go it is possible to declare identifiers (packages, structs,
 interfaces, parameters, receivers, variables, constants...) that conflict with the
 name of an imported package. This rule spots identifiers that shadow an import.
 
@@ -595,8 +593,8 @@ _Configuration_: block-list of package names (or regular expression package name
 Example:
 
 ```toml
-[imports-blocklist]
-  arguments =["crypto/md5", "crypto/sha1", "crypto/**/pkix"]
+[rule.imports-blocklist]
+  arguments = ["crypto/md5", "crypto/sha1", "crypto/**/pkix"]
 ```
 
 ## increment-decrement
@@ -634,10 +632,11 @@ Example:
 
 ```toml
 [rule.line-length-limit]
-  arguments =[80]
+  arguments = [80]
 ```
 
 ## max-control-nesting
+
 _Description_: Warns if nesting level of control structures (`if-then-else`, `for`, `switch`) exceeds a given maximum.
 
 _Configuration_: (int) maximum accepted nesting level of control structures (defaults to 5)
@@ -646,9 +645,8 @@ Example:
 
 ```toml
 [max-control-nesting]
-  arguments =[3]
+  arguments = [3]
 ```
-
 
 ## max-public-structs
 
@@ -663,7 +661,7 @@ Example:
 
 ```toml
 [rule.max-public-structs]
-  arguments =[3]
+  arguments = [3]
 ```
 
 ## modifies-parameter
@@ -694,10 +692,13 @@ _Configuration_: N/A
 
 Example:
 
-    if isGenerated(content) && !config.IgnoreGeneratedHeader {
+```go
+if isGenerated(content) && !config.IgnoreGeneratedHeader {
+```
 Swap left and right side :
-
-    if !config.IgnoreGeneratedHeader && isGenerated(content) {
+```go
+if !config.IgnoreGeneratedHeader && isGenerated(content) {
+```
 
 ## package-comments
 
@@ -768,7 +769,8 @@ Example:
   arguments = [
     ["core.WriteError[1].Message", "/^([^A-Z]|$)/", "must not start with a capital letter"],
     ["fmt.Errorf[0]", "/(^|[^\\.!?])$/", "must not end in punctuation"],
-    ["panic", "/^[^\\n]*$/", "must not contain line breaks"]]
+    ["panic", "/^[^\\n]*$/", "must not contain line breaks"],
+  ]
 ```
 
 ## string-of-int
@@ -789,7 +791,7 @@ To accept the `inline` option in JSON tags (and `outline` and `gnu` in BSON tags
 
 ```toml
 [rule.struct-tag]
-  arguments = ["json,inline","bson,outline,gnu"]
+  arguments = ["json,inline", "bson,outline,gnu"]
 ```
 
 ## superfluous-else
@@ -835,9 +837,9 @@ foo, _ := bar(.*Baz).
 
 Example:
 
-```yaml
+```toml
 [rule.unchecked-type-assertion]
-arguments = [{acceptIgnoredAssertionResult=true}]
+  arguments = [{acceptIgnoredAssertionResult=true}]
 ```
 
 ## unconditional-recursion
@@ -868,7 +870,7 @@ Example:
 
 ```toml
 [unhandled-error]
-  arguments =["os\.(Create|WriteFile|Chmod)", "fmt\.Print", "myFunction", "net\..*", "bytes\.Buffer\.Write"]
+  arguments = ["os\.(Create|WriteFile|Chmod)", "fmt\.Print", "myFunction", "net\..*", "bytes\.Buffer\.Write"]
 ```
 ## unnecessary-stmt
 
@@ -890,7 +892,7 @@ _Configuration_: Supports arguments with single of `map[string]any` with option 
 
 ```toml
 [rule.unused-parameter]
-    Arguments = [ { allowRegex = "^_" } ]
+    Arguments = [{ allowRegex = "^_" }]
 ```
 
 allows any names started with `_`, not just `_` itself:
@@ -907,7 +909,7 @@ _Configuration_: Supports arguments with single of `map[string]any` with option 
 
 ```toml
 [rule.unused-receiver]
-    Arguments = [ { allowRegex = "^_" } ]
+    Arguments = [{ allowRegex = "^_" }]
 ```
 
 allows any names started with `_`, not just `_` itself:
@@ -918,13 +920,13 @@ func (_my *MyStruct) SomeMethod() {} // matches rule
 
 ## use-any
 
-_Description_: Since GO 1.18, `interface{}` has an alias: `any`. This rule proposes to replace instances of `interface{}` with `any`.
+_Description_: Since Go 1.18, `interface{}` has an alias: `any`. This rule proposes to replace instances of `interface{}` with `any`.
 
 _Configuration_: N/A
 
 ## useless-break
 
-_Description_: This rule warns on useless `break` statements in case clauses of switch and select statements. GO, unlike other programming languages like C, only executes statements of the selected case while ignoring the subsequent case clauses.
+_Description_: This rule warns on useless `break` statements in case clauses of switch and select statements. Go, unlike other programming languages like C, only executes statements of the selected case while ignoring the subsequent case clauses.
 Therefore, inserting a `break` at the end of a case clause has no effect.
 
 Because `break` statements are rarely used in case clauses, when switch or select statements are inside a for-loop, the programmer might wrongly assume that a `break` in a case clause will take the control out of the loop.
