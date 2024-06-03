@@ -135,6 +135,7 @@ Example:
 [rule.banned-characters]
   arguments = ["Ω","Σ","σ"]
 ```
+
 ## bare-return
 
 _Description_: Warns on bare (a.k.a. naked) returns
@@ -175,6 +176,7 @@ Example:
 [rule.cognitive-complexity]
   arguments = [7]
 ```
+
 ## comment-spacings
 
 _Description_: Spots comments of the form:
@@ -195,6 +197,7 @@ Example:
 [rule.comment-spacings]
   arguments = ["mypragma:", "+optional"]
 ```
+
 ## comments-density
 
 _Description_: Spots files not respecting a minimum value for the [_comments lines density_](https://docs.sonarsource.com/sonarqube/latest/user-guide/metric-definitions/) metric = _comment lines / (lines of code + comment lines) * 100_
@@ -259,6 +262,7 @@ Example:
 [rule.cyclomatic]
   arguments = [3]
 ```
+
 ## datarace
 
 _Description_: This rule spots potential dataraces caused by go-routines capturing (by-reference) particular identifiers of the function from which go-routines are created. The rule is able to spot two of such cases: go-routines capturing named return values, and capturing `for-range` values.
@@ -310,7 +314,6 @@ Example:
   arguments = [{ allowedPackages = ["github.com/onsi/ginkgo/v2","github.com/onsi/gomega"] }]
 ```
 
-
 ## duplicated-imports
 
 _Description_: It is possible to unintentionally import the same package twice. This rule looks for packages that are imported two or more times.
@@ -358,32 +361,6 @@ _Configuration_: N/A
 ## empty-lines
 
 _Description_: Sometimes `gofmt` is not enough to enforce a common formatting of a code-base; this rule warns when there are heading or trailing newlines in code blocks.
-
-_Configuration_: N/A
-
-## error-naming
-
-_Description_: By convention, for the sake of readability, variables of type `error` must be named with the prefix `err`.
-
-_Configuration_: N/A
-
-## error-return
-
-_Description_: By convention, for the sake of readability, the errors should be last in the list of returned values by a function.
-
-_Configuration_: N/A
-
-## error-strings
-
-_Description_: By convention, for better readability, error messages should not be capitalized or end with punctuation or a newline.
-
-More information [here](https://github.com/golang/go/wiki/CodeReviewComments#error-strings)
-
-_Configuration_: N/A
-
-## errorf
-
-_Description_: It is possible to get a simpler program by replacing `errors.New(fmt.Sprintf())` with `fmt.Errorf()`. This rule spots that kind of simplification opportunities.
 
 _Configuration_: N/A
 
@@ -458,6 +435,32 @@ Example:
   arguments = ["make"]
 ```
 
+## error-naming
+
+_Description_: By convention, for the sake of readability, variables of type `error` must be named with the prefix `err`.
+
+_Configuration_: N/A
+
+## error-return
+
+_Description_: By convention, for the sake of readability, the errors should be last in the list of returned values by a function.
+
+_Configuration_: N/A
+
+## error-strings
+
+_Description_: By convention, for better readability, error messages should not be capitalized or end with punctuation or a newline.
+
+More information [here](https://github.com/golang/go/wiki/CodeReviewComments#error-strings)
+
+_Configuration_: N/A
+
+## errorf
+
+_Description_: It is possible to get a simpler program by replacing `errors.New(fmt.Sprintf())` with `fmt.Errorf()`. This rule spots that kind of simplification opportunities.
+
+_Configuration_: N/A
+
 ## exported
 
 _Description_: Exported function and methods should have comments. This warns on undocumented exported functions and methods.
@@ -500,19 +503,6 @@ This rule warns on boolean parameters that create a control coupling.
 
 _Configuration_: N/A
 
-## function-result-limit
-
-_Description_: Functions returning too many results can be hard to understand/use.
-
-_Configuration_: (int) the maximum allowed return values
-
-Example:
-
-```toml
-[rule.function-result-limit]
-  arguments = [3]
-```
-
 ## function-length
 
 _Description_: Functions too long (with many statements and/or lines) can be hard to understand.
@@ -526,6 +516,19 @@ Example:
   arguments = [10, 0]
 ```
 Will check for functions exceeding 10 statements and will not check the number of lines of functions
+
+## function-result-limit
+
+_Description_: Functions returning too many results can be hard to understand/use.
+
+_Configuration_: (int) the maximum allowed return values
+
+Example:
+
+```toml
+[rule.function-result-limit]
+  arguments = [3]
+```
 
 ## get-return
 
@@ -644,7 +647,7 @@ _Configuration_: (int) maximum accepted nesting level of control structures (def
 Example:
 
 ```toml
-[max-control-nesting]
+[rule.max-control-nesting]
   arguments = [3]
 ```
 
@@ -695,7 +698,9 @@ Example:
 ```go
 if isGenerated(content) && !config.IgnoreGeneratedHeader {
 ```
+
 Swap left and right side :
+
 ```go
 if !config.IgnoreGeneratedHeader && isGenerated(content) {
 ```
@@ -869,9 +874,10 @@ _Configuration_: function names regexp patterns to ignore
 Example:
 
 ```toml
-[unhandled-error]
+[rule.unhandled-error]
   arguments = ["os\.(Create|WriteFile|Chmod)", "fmt\.Print", "myFunction", "net\..*", "bytes\.Buffer\.Write"]
 ```
+
 ## unnecessary-stmt
 
 _Description_: This rule suggests to remove redundant statements like a `break` at the end of a case block, for improving the code's readability.
@@ -973,5 +979,3 @@ _Description_: Function parameters that are passed by value, are in fact a copy 
 This rule warns when a `sync.WaitGroup` expected as a by-value parameter in a function or method.
 
 _Configuration_: N/A
-
-
