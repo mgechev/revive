@@ -125,36 +125,40 @@ func (l *Linter) lintPackage(filenames []string, ruleSet []Rule, config Config, 
 }
 
 func detectGoVersion(dir string) (ver *goversion.Version, err error) {
+	dir, err = filepath.Abs(dir)
+	if err != nil {
+		return nil, err
+	}
+
 	// https://github.com/golang/go/issues/44753#issuecomment-790089020
 	cmd := exec.Command("go", "list", "-m", "-json")
 	cmd.Dir = dir
 
-	raw, err := cmd.Output()
+	out, err := cmd.Output()
 	if err != nil {
 		return nil, fmt.Errorf("command go list: %w", err)
 	}
 
-	var v struct {
-		GoMod     string `json:"GoMod"`
-		GoVersion string `json:"GoVersion"`
-	}
-	if err = json.Unmarshal(raw, &v); err != nil {
-		return nil, fmt.Errorf("can't parse the output of go list: %w", err)
-	}
-
-	if v.GoMod == "" {
-		// this package is outside a module, so assume
-		// an old-style source directory
-
-		if v := os.Getenv("GOVERSION"); v != "" {
-			return goversion.NewVersion(strings.TrimPrefix(v, "go"))
+	// NOTE: A package may be part of a go workspace. In this case `go list -m`
+	// lists all modules in the workspace, so we need to go through them all.
+	d := json.NewDecoder(bytes.NewBuffer(out))
+	for d.More() {
+		var v struct {
+			GoMod     string `json:"GoMod"`
+			GoVersion string `json:"GoVersion"`
+			Dir       string `json:"Dir"`
 		}
-
-		// assume the last version that does not have generics
-		return goversion.Must(goversion.NewVersion("1.17")), nil
+		if err = d.Decode(&v); err != nil {
+			return nil, err
+		}
+		if v.GoMod == "" {
+			return nil, fmt.Errorf("not part of a module: %q", dir)
+		}
+		if v.Dir != "" && strings.HasPrefix(dir, v.Dir) {
+			return goversion.NewVersion(strings.TrimPrefix(v.GoVersion, "go"))
+		}
 	}
-
-	return goversion.NewVersion(strings.TrimPrefix(v.GoVersion, "go"))
+	return nil, fmt.Errorf("not part of a module: %q", dir)
 }
 
 // isGenerated reports whether the source file is generated code
