@@ -69,6 +69,10 @@ func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-cha
 		if len(files) == 0 {
 			continue
 		}
+		if config.GoVersion != nil {
+			perPkgVersions[n] = config.GoVersion
+			continue
+		}
 
 		dir, err := filepath.Abs(filepath.Dir(files[0]))
 		if err != nil {
