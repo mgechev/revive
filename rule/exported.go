@@ -366,6 +366,9 @@ func (w *lintExported) Visit(n ast.Node) ast.Visitor {
 
 func (w *lintExported) doCheckPublicInterface(typeName string, iface *ast.InterfaceType) {
 	for _, m := range iface.Methods.List {
+		if _, ok := m.Type.(*ast.Ident); ok {
+			continue
+		}
 		if ast.IsExported(m.Names[0].Name) {
 			w.lintInterfaceMethod(typeName, m)
 		}
