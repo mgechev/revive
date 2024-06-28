@@ -18,6 +18,7 @@ type ExportedRule struct {
 	configured             bool
 	checkPrivateReceivers  bool
 	disableStutteringCheck bool
+	checkPublicInterface   bool
 	stuttersMsg            string
 	sync.Mutex
 }
@@ -26,7 +27,12 @@ func (r *ExportedRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	if !r.configured {
 		var sayRepetitiveInsteadOfStutters bool
-		r.checkPrivateReceivers, r.disableStutteringCheck, sayRepetitiveInsteadOfStutters = r.getConf(arguments)
+		
+		r.checkPrivateReceivers, 
+		r.disableStutteringCheck, 
+		sayRepetitiveInsteadOfStutters, 
+		r.checkPublicInterface = r.getConf(arguments)
+
 		r.stuttersMsg = "stutters"
 		if sayRepetitiveInsteadOfStutters {
 			r.stuttersMsg = "is repetitive"
@@ -57,7 +63,9 @@ func (r *ExportedRule) Apply(file *lint.File, args lint.Arguments) []lint.Failur
 		genDeclMissingComments: make(map[*ast.GenDecl]bool),
 		checkPrivateReceivers:  r.checkPrivateReceivers,
 		disableStutteringCheck: r.disableStutteringCheck,
+		checkPublicInterface: r.checkPublicInterface,
 		stuttersMsg:            r.stuttersMsg,
+
 	}
 
 	ast.Walk(&walker, fileAst)
@@ -70,7 +78,12 @@ func (*ExportedRule) Name() string {
 	return "exported"
 }
 
-func (r *ExportedRule) getConf(args lint.Arguments) (checkPrivateReceivers, disableStutteringCheck, sayRepetitiveInsteadOfStutters bool) {
+func (r *ExportedRule) getConf(args lint.Arguments) (
+	checkPrivateReceivers, 
+	disableStutteringCheck, 
+	sayRepetitiveInsteadOfStutters bool,
+	checkPublicInterface bool,
+) {
 	// if any, we expect a slice of strings as configuration
 	if len(args) < 1 {
 		return
@@ -88,6 +101,8 @@ func (r *ExportedRule) getConf(args lint.Arguments) (checkPrivateReceivers, disa
 			disableStutteringCheck = true
 		case "sayRepetitiveInsteadOfStutters":
 			sayRepetitiveInsteadOfStutters = true
+		case "checkPublicInterface":
+			checkPublicInterface = true
 		default:
 			panic(fmt.Sprintf("Unknown configuration flag %s for %s rule", flagStr, r.Name()))
 		}
@@ -104,6 +119,7 @@ type lintExported struct {
 	onFailure              func(lint.Failure)
 	checkPrivateReceivers  bool
 	disableStutteringCheck bool
+	checkPublicInterface  bool
 	stuttersMsg            string
 }
 
@@ -330,11 +346,51 @@ func (w *lintExported) Visit(n ast.Node) ast.Visitor {
 		}
 		w.lintTypeDoc(v, doc)
 		w.checkStutter(v.Name, "type")
-		// Don't proceed inside types.
+		
+		if w.checkPublicInterface {
+			if iface, ok := v.Type.(*ast.InterfaceType); ok {
+				if ast.IsExported(v.Name.Name) {
+					w.doCheckPublicInterface(v.Name.Name, iface)
+				}
+			}
+		}
+
 		return nil
 	case *ast.ValueSpec:
 		w.lintValueSpecDoc(v, w.lastGen, w.genDeclMissingComments)
 		return nil
 	}
 	return w
+}
+
+
+func (w *lintExported) doCheckPublicInterface(typeName string, iface *ast.InterfaceType) {
+	for _, m := range iface.Methods.List {
+		if ast.IsExported(m.Names[0].Name) {
+			w.lintInterfaceMethod(typeName, m)
+		}
+	}
+}
+
+func (w *lintExported) lintInterfaceMethod(typeName string, m *ast.Field) {
+	name := m.Names[0].Name
+	if m.Doc == nil {
+		w.onFailure(lint.Failure{
+			Node:       m,
+			Confidence: 1,
+			Category:   "comments",
+			Failure:    fmt.Sprintf("public interface method %s.%s should be commented", typeName, name),
+		})
+		return
+	}
+	s := normalizeText(m.Doc.Text())
+	prefix := m.Names[0].Name + " "
+	if !strings.HasPrefix(s, prefix) {
+		w.onFailure(lint.Failure{
+			Node:       m.Doc,
+			Confidence: 0.8,
+			Category:   "comments",
+			Failure:    fmt.Sprintf(`comment on exported interface method %s.%s should be of the form "%s..."`, typeName, name, prefix),
+		})
+	}
 }
