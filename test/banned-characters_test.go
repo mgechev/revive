@@ -12,6 +12,6 @@ import (
 // One banned character from the list is not present in the fixture file.
 func TestBannedCharacters(t *testing.T) {
 	testRule(t, "banned-characters", &rule.BannedCharsRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{"Ω", "Σ", "σ", "1"},
+		Arguments: []any{"Ω", "Σ", "σ", "1"},
 	})
 }

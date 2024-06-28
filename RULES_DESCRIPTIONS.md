@@ -7,15 +7,16 @@ List of all available rules.
   - [add-constant](#add-constant)
   - [argument-limit](#argument-limit)
   - [atomic](#atomic)
-  - [bare-return](#bare-return)
   - [banned-characters](#banned-characters)
+  - [bare-return](#bare-return)
   - [blank-imports](#blank-imports)
   - [bool-literal-in-expr](#bool-literal-in-expr)
   - [call-to-gc](#call-to-gc)
-  - [confusing-naming](#confusing-naming)
-  - [comment-spacings](#comment-spacings)
-  - [confusing-results](#confusing-results)
   - [cognitive-complexity](#cognitive-complexity)
+  - [comment-spacings](#comment-spacings)
+  - [comments-density](#comment-spacings)
+  - [confusing-naming](#confusing-naming)
+  - [confusing-results](#confusing-results)
   - [constant-logical-expr](#constant-logical-expr)
   - [context-as-argument](#context-as-argument)
   - [context-keys-type](#context-keys-type)
@@ -28,6 +29,9 @@ List of all available rules.
   - [early-return](#early-return)
   - [empty-block](#empty-block)
   - [empty-lines](#empty-lines)
+  - [enforce-map-style](#enforce-map-style)
+  - [enforce-repeated-arg-type-style](#enforce-repeated-arg-type-style)
+  - [enforce-slice-style](#enforce-slice-style)
   - [error-naming](#error-naming)
   - [error-return](#error-return)
   - [error-strings](#error-strings)
@@ -35,35 +39,37 @@ List of all available rules.
   - [exported](#exported)
   - [file-header](#file-header)
   - [flag-parameter](#flag-parameter)
-  - [function-result-limit](#function-result-limit)
   - [function-length](#function-length)
+  - [function-result-limit](#function-result-limit)
   - [get-return](#get-return)
   - [identical-branches](#identical-branches)
   - [if-return](#if-return)
+  - [import-alias-naming](#import-alias-naming)
+  - [import-shadowing](#import-shadowing)
+  - [imports-blocklist](#imports-blocklist)
   - [increment-decrement](#increment-decrement)
   - [indent-error-flow](#indent-error-flow)
-  - [imports-blacklist](#imports-blacklist)
-  - [import-shadowing](#import-shadowing)
   - [line-length-limit](#line-length-limit)
+  - [max-control-nesting](#max-control-nesting)
   - [max-public-structs](#max-public-structs)
   - [modifies-parameter](#modifies-parameter)
   - [modifies-value-receiver](#modifies-value-receiver)
   - [nested-structs](#nested-structs)
   - [optimize-operands-order](#optimize-operands-order)
   - [package-comments](#package-comments)
-  - [range](#range)
-  - [range-val-in-closure](#range-val-in-closure)
   - [range-val-address](#range-val-address)
+  - [range-val-in-closure](#range-val-in-closure)
+  - [range](#range)
   - [receiver-naming](#receiver-naming)
   - [redefines-builtin-id](#redefines-builtin-id)
+  - [redundant-import-alias](#redundant-import-alias)
+  - [string-format](#string-format)
   - [string-of-int](#string-of-int)
   - [struct-tag](#struct-tag)
-  - [string-format](#string-format)
   - [superfluous-else](#superfluous-else)
   - [time-equal](#time-equal)
   - [time-naming](#time-naming)
-  - [var-naming](#var-naming)
-  - [var-declaration](#var-declaration)
+  - [unchecked-type-assertion](#unchecked-type-assertion)
   - [unconditional-recursion](#unconditional-recursion)
   - [unexported-naming](#unexported-naming)
   - [unexported-return](#unexported-return)
@@ -74,8 +80,9 @@ List of all available rules.
   - [unused-receiver](#unused-receiver)
   - [use-any](#use-any)
   - [useless-break](#useless-break)
+  - [var-declaration](#var-declaration)
+  - [var-naming](#var-naming)
   - [waitgroup-by-value](#waitgroup-by-value)
-  - [redundant-import-alias](#redundant-import-alias)
 
 ## add-constant
 
@@ -107,18 +114,12 @@ Example:
 
 ```toml
 [rule.argument-limit]
-  arguments =[4]
+  arguments = [4]
 ```
 
 ## atomic
 
 _Description_: Check for commonly mistaken usages of the `sync/atomic` package
-
-_Configuration_: N/A
-
-## bare-return
-
-_Description_: Warns on bare (a.k.a. naked) returns
 
 _Configuration_: N/A
 
@@ -132,8 +133,14 @@ Example:
 
 ```toml
 [rule.banned-characters]
-  arguments =["Ω","Σ","σ"]
+  arguments = ["Ω","Σ","σ"]
 ```
+
+## bare-return
+
+_Description_: Warns on bare (a.k.a. naked) returns
+
+_Configuration_: N/A
 
 ## blank-imports
 
@@ -167,10 +174,11 @@ Example:
 
 ```toml
 [rule.cognitive-complexity]
-  arguments =[7]
+  arguments = [7]
 ```
 
 ## comment-spacings
+
 _Description_: Spots comments of the form:
 ```go
 //This is a malformed comment: no space between // and the start of the sentence
@@ -179,15 +187,30 @@ _Description_: Spots comments of the form:
 _Configuration_: ([]string) list of exceptions. For example, to accept comments of the form
 ```go
 //mypragma: activate something
+//+optional
 ```
-You need to add `"mypragma"` in the configuration
+You need to add both `"mypragma:"` and `"+optional"` in the configuration
 
 Example:
 
 ```toml
 [rule.comment-spacings]
-  arguments =["mypragma","otherpragma"]
+  arguments = ["mypragma:", "+optional"]
 ```
+
+## comments-density
+
+_Description_: Spots files not respecting a minimum value for the [_comments lines density_](https://docs.sonarsource.com/sonarqube/latest/user-guide/metric-definitions/) metric = _comment lines / (lines of code + comment lines) * 100_
+
+_Configuration_: (int) the minimum expected comments lines density.
+
+Example:
+
+```toml
+[rule.comments-density]
+  arguments = [15]
+```
+
 ## confusing-naming
 
 _Description_: Methods or fields of `struct` that have names different only by capitalization could be confusing.
@@ -237,8 +260,9 @@ Example:
 
 ```toml
 [rule.cyclomatic]
-  arguments =[3]
+  arguments = [3]
 ```
+
 ## datarace
 
 _Description_: This rule spots potential dataraces caused by go-routines capturing (by-reference) particular identifiers of the function from which go-routines are created. The rule is able to spot two of such cases: go-routines capturing named return values, and capturing `for-range` values.
@@ -255,14 +279,14 @@ _Configuration_: N/A
 
 _Description_: This rule warns on some common mistakes when using `defer` statement. It currently alerts on the following situations:
 
-| name | description |
-|------|-------------|
-| call-chain| even if deferring call-chains of the form `foo()()` is valid, it does not helps code understanding (only the last call is deferred)|
-|loop  | deferring inside loops can be misleading (deferred functions are not executed at the end of the loop iteration but of the current function) and it could lead to exhausting the execution stack |
-| method-call| deferring a call to a method can lead to subtle bugs if the method does not have a pointer receiver|
-| recover | calling `recover` outside a deferred function has no effect|
-| immediate-recover | calling `recover` at the time a defer is registered, rather than as part of the deferred callback.  e.g. `defer recover()` or equivalent.|
-| return | returning values form a deferred function has no effect|
+| name              | description                                                                                                                                                                                     |
+|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| call-chain        | even if deferring call-chains of the form `foo()()` is valid, it does not helps code understanding (only the last call is deferred)                                                             |
+| loop              | deferring inside loops can be misleading (deferred functions are not executed at the end of the loop iteration but of the current function) and it could lead to exhausting the execution stack |
+| method-call       | deferring a call to a method can lead to subtle bugs if the method does not have a pointer receiver                                                                                             |
+| recover           | calling `recover` outside a deferred function has no effect                                                                                                                                     |
+| immediate-recover | calling `recover` at the time a defer is registered, rather than as part of the deferred callback.  e.g. `defer recover()` or equivalent.                                                       |
+| return            | returning values form a deferred function has no effect                                                                                                                                         |
 
 These gotchas are described [here](https://blog.learngoprogramming.com/gotchas-of-defer-in-go-1-8d070894cb01)
 
@@ -270,7 +294,7 @@ _Configuration_: by default all warnings are enabled but it is possible selectiv
 
 ```toml
 [rule.defer]
-  arguments=[["call-chain","loop"]]
+  arguments = [["call-chain","loop"]]
 ```
 
 ## dot-imports
@@ -279,7 +303,16 @@ _Description_: Importing with `.` makes the programs much harder to understand b
 
 More information [here](https://github.com/golang/go/wiki/CodeReviewComments#import-dot)
 
-_Configuration_: N/A
+_Configuration_:
+
+* `allowedPackages`: (list of strings) comma-separated list of allowed dot import packages
+
+Example:
+
+```toml
+[rule.dot-imports]
+  arguments = [{ allowedPackages = ["github.com/onsi/ginkgo/v2","github.com/onsi/gomega"] }]
+```
 
 ## duplicated-imports
 
@@ -316,7 +349,7 @@ Example:
 
 ```toml
 [rule.early-return]
-  arguments =["preserveScope"]
+  arguments = ["preserveScope"]
 ```
 
 ## empty-block
@@ -330,6 +363,77 @@ _Configuration_: N/A
 _Description_: Sometimes `gofmt` is not enough to enforce a common formatting of a code-base; this rule warns when there are heading or trailing newlines in code blocks.
 
 _Configuration_: N/A
+
+## enforce-map-style
+
+_Description_: This rule enforces consistent usage of `make(map[type]type)` or `map[type]type{}` for map initialization. It does not affect `make(map[type]type, size)` constructions as well as `map[type]type{k1: v1}`.
+
+_Configuration_: (string) Specifies the enforced style for map initialization. The options are:
+- "any": No enforcement (default).
+- "make": Enforces the usage of `make(map[type]type)`.
+- "literal": Enforces the usage of `map[type]type{}`.
+
+Example:
+
+```toml
+[rule.enforce-map-style]
+  arguments = ["make"]
+```
+
+## enforce-repeated-arg-type-style
+
+_Description_: This rule is designed to maintain consistency in the declaration
+of repeated argument and return value types in Go functions. It supports three styles:
+'any', 'short', and 'full'. The 'any' style is lenient and allows any form of type
+declaration. The 'short' style encourages omitting repeated types for conciseness,
+whereas the 'full' style mandates explicitly stating the type for each argument
+and return value, even if they are repeated, promoting clarity.
+
+_Configuration (1)_: (string) as a single string, it configures both argument
+and return value styles. Accepts 'any', 'short', or 'full' (default: 'any').
+
+_Configuration (2)_: (map[string]any) as a map, allows separate configuration
+for function arguments and return values. Valid keys are "funcArgStyle" and
+"funcRetValStyle", each accepting 'any', 'short', or 'full'. If a key is not
+specified, the default value of 'any' is used.
+
+_Note_: The rule applies checks based on the specified styles. For 'full' style,
+it flags instances where types are omitted in repeated arguments or return values.
+For 'short' style, it highlights opportunities to omit repeated types for brevity.
+Incorrect or unknown configuration values will result in an error.
+
+Example (1):
+
+```toml
+[rule.enforce-repeated-arg-type-style]
+  arguments = ["short"]
+```
+
+Example (2):
+
+```toml
+[rule.enforce-repeated-arg-type-style]
+  arguments = [{ funcArgStyle = "full", funcRetValStyle = "short" }]
+```
+
+## enforce-slice-style
+
+_Description_: This rule enforces consistent usage of `make([]type, 0)`, `[]type{}`, or `var []type` for slice initialization.
+It does not affect `make([]type, non_zero_len, or_non_zero_cap)` constructions as well as `[]type{v1}`.
+Nil slices are always permitted.
+
+_Configuration_: (string) Specifies the enforced style for slice initialization. The options are:
+- "any": No enforcement (default).
+- "make": Enforces the usage of `make([]type, 0)`.
+- "literal": Enforces the usage of `[]type{}`.
+- "nil": Enforces the usage of `var []type`.
+
+Example:
+
+```toml
+[rule.enforce-slice-style]
+  arguments = ["make"]
+```
 
 ## error-naming
 
@@ -375,7 +479,7 @@ Example:
 
 ```toml
 [rule.exported]
-  arguments =["checkPrivateReceivers","disableStutteringCheck"]
+  arguments = ["checkPrivateReceivers", "disableStutteringCheck"]
 ```
 
 ## file-header
@@ -388,7 +492,7 @@ Example:
 
 ```toml
 [rule.file-header]
-  arguments =["This is the text that must appear at the top of source files."]
+  arguments = ["This is the text that must appear at the top of source files."]
 ```
 
 ## flag-parameter
@@ -398,19 +502,6 @@ Coupling among functions must be minimized for better maintainability of the cod
 This rule warns on boolean parameters that create a control coupling.
 
 _Configuration_: N/A
-
-## function-result-limit
-
-_Description_: Functions returning too many results can be hard to understand/use.
-
-_Configuration_: (int) the maximum allowed return values
-
-Example:
-
-```toml
-[rule.function-result-limit]
-  arguments =[3]
-```
 
 ## function-length
 
@@ -422,9 +513,22 @@ Example:
 
 ```toml
 [rule.function-length]
-  arguments =[10,0]
+  arguments = [10, 0]
 ```
 Will check for functions exceeding 10 statements and will not check the number of lines of functions
+
+## function-result-limit
+
+_Description_: Functions returning too many results can be hard to understand/use.
+
+_Configuration_: (int) the maximum allowed return values
+
+Example:
+
+```toml
+[rule.function-result-limit]
+  arguments = [3]
+```
 
 ## get-return
 
@@ -443,6 +547,58 @@ _Configuration_: N/A
 _Description_: Checking if an error is _nil_ to just after return the error or nil is redundant.
 
 _Configuration_: N/A
+
+## import-alias-naming
+
+_Description_: Aligns with Go's naming conventions, as outlined in the official
+[blog post](https://go.dev/blog/package-names). It enforces clear and lowercase import alias names, echoing
+the principles of good package naming. Users can follow these guidelines by default or define a custom regex rule.
+Importantly, aliases with underscores ("_") are always allowed.
+
+_Configuration_ (1): (`string`) as plain string accepts allow regexp pattern for aliases (default: `^[a-z][a-z0-9]{0,}$`).
+
+_Configuration_ (2): (`map[string]string`) as a map accepts two values:
+* for a key "allowRegex" accepts allow regexp pattern
+* for a key "denyRegex deny regexp pattern
+
+_Note_: If both `allowRegex` and `denyRegex` are provided, the alias must comply with both of them.
+If none are given (i.e. an empty map), the default value `^[a-z][a-z0-9]{0,}$` for allowRegex is used.
+Unknown keys will result in an error.
+
+Example (1):
+
+```toml
+[rule.import-alias-naming]
+  arguments = ["^[a-z][a-z0-9]{0,}$"]
+```
+
+Example (2):
+
+```toml
+[rule.import-alias-naming]
+  arguments = [{ allowRegex = "^[a-z][a-z0-9]{0,}$", denyRegex = '^v\d+$' }]
+```
+
+## import-shadowing
+
+_Description_: In Go it is possible to declare identifiers (packages, structs,
+interfaces, parameters, receivers, variables, constants...) that conflict with the
+name of an imported package. This rule spots identifiers that shadow an import.
+
+_Configuration_: N/A
+
+## imports-blocklist
+
+_Description_: Warns when importing block-listed packages.
+
+_Configuration_: block-list of package names (or regular expression package names).
+
+Example:
+
+```toml
+[rule.imports-blocklist]
+  arguments = ["crypto/md5", "crypto/sha1", "crypto/**/pkix"]
+```
 
 ## increment-decrement
 
@@ -465,29 +621,9 @@ _Configuration_: ([]string) rule flags. Available flags are:
 Example:
 
 ```toml
-[rule.exported]
-  arguments =["preserveScope"]
+[rule.indent-error-flow]
+  arguments = ["preserveScope"]
 ```
-
-## imports-blacklist
-
-_Description_: Warns when importing black-listed packages.
-
-_Configuration_: black-list of package names (or regular expression package names).
-
-Example:
-
-```toml
-[imports-blacklist]
-  arguments =["crypto/md5", "crypto/sha1", "crypto/**/pkix"]
-```
-## import-shadowing
-
-_Description_: In GO it is possible to declare identifiers (packages, structs,
-interfaces, parameters, receivers, variables, constants...) that conflict with the
-name of an imported package. This rule spots identifiers that shadow an import.
-
-_Configuration_: N/A
 
 ## line-length-limit
 
@@ -499,7 +635,20 @@ Example:
 
 ```toml
 [rule.line-length-limit]
-  arguments =[80]
+  arguments = [80]
+```
+
+## max-control-nesting
+
+_Description_: Warns if nesting level of control structures (`if-then-else`, `for`, `switch`) exceeds a given maximum.
+
+_Configuration_: (int) maximum accepted nesting level of control structures (defaults to 5)
+
+Example:
+
+```toml
+[rule.max-control-nesting]
+  arguments = [3]
 ```
 
 ## max-public-structs
@@ -515,7 +664,7 @@ Example:
 
 ```toml
 [rule.max-public-structs]
-  arguments =[3]
+  arguments = [3]
 ```
 
 ## modifies-parameter
@@ -546,10 +695,15 @@ _Configuration_: N/A
 
 Example:
 
-    if isGenerated(content) && !config.IgnoreGeneratedHeader {
+```go
+if isGenerated(content) && !config.IgnoreGeneratedHeader {
+```
+
 Swap left and right side :
 
-    if !config.IgnoreGeneratedHeader && isGenerated(content) {
+```go
+if !config.IgnoreGeneratedHeader && isGenerated(content) {
+```
 
 ## package-comments
 
@@ -559,9 +713,9 @@ More information [here](https://github.com/golang/go/wiki/CodeReviewComments#pac
 
 _Configuration_: N/A
 
-## range
+## range-val-address
 
-_Description_: This rule suggests a shorter way of writing ranges that do not use the second value.
+_Description_: Range variables in a loop are reused at each iteration. This rule warns when assigning the address of the variable, passing the address to append() or using it in a map.
 
 _Configuration_: N/A
 
@@ -572,9 +726,9 @@ This rule warns when a range value (or index) is used inside a closure
 
 _Configuration_: N/A
 
-## range-val-address
+## range
 
-_Description_: Range variables in a loop are reused at each iteration. This rule warns when assigning the address of the variable, passing the address to append() or using it in a map.
+_Description_: This rule suggests a shorter way of writing ranges that do not use the second value.
 
 _Configuration_: N/A
 
@@ -591,8 +745,9 @@ Even if possible, redefining these built in names can lead to bugs very difficul
 
 _Configuration_: N/A
 
-## string-of-int
-_Description_:  explicit type conversion `string(i)` where `i` has an integer type other than `rune` might behave not as expected by the developer (e.g. `string(42)` is not `"42"`). This rule spot that kind of suspicious conversions.
+## redundant-import-alias
+
+_Description_: This rule warns on redundant import aliases. This happens when the alias used on the import statement matches the imported package name.
 
 _Configuration_: N/A
 
@@ -619,8 +774,15 @@ Example:
   arguments = [
     ["core.WriteError[1].Message", "/^([^A-Z]|$)/", "must not start with a capital letter"],
     ["fmt.Errorf[0]", "/(^|[^\\.!?])$/", "must not end in punctuation"],
-    ["panic", "/^[^\\n]*$/", "must not contain line breaks"]]
+    ["panic", "/^[^\\n]*$/", "must not contain line breaks"],
+  ]
 ```
+
+## string-of-int
+
+_Description_:  explicit type conversion `string(i)` where `i` has an integer type other than `rune` might behave not as expected by the developer (e.g. `string(42)` is not `"42"`). This rule spot that kind of suspicious conversions.
+
+_Configuration_: N/A
 
 ## struct-tag
 
@@ -634,9 +796,8 @@ To accept the `inline` option in JSON tags (and `outline` and `gnu` in BSON tags
 
 ```toml
 [rule.struct-tag]
-  arguments = ["json,inline","bson,outline,gnu"]
+  arguments = ["json,inline", "bson,outline,gnu"]
 ```
-
 
 ## superfluous-else
 
@@ -650,8 +811,8 @@ _Configuration_: ([]string) rule flags. Available flags are:
 Example:
 
 ```toml
-[rule.exported]
-  arguments =["preserveScope"]
+[rule.superfluous-else]
+  arguments = ["preserveScope"]
 ```
 
 ## time-equal
@@ -666,28 +827,25 @@ _Description_: Using unit-specific suffix like "Secs", "Mins", ... when naming v
 
 _Configuration_: N/A
 
-## var-naming
+## unchecked-type-assertion
 
-_Description_: This rule warns when [initialism](https://github.com/golang/go/wiki/CodeReviewComments#initialisms), [variable](https://github.com/golang/go/wiki/CodeReviewComments#variable-names) or [package](https://github.com/golang/go/wiki/CodeReviewComments#package-names) naming conventions are not followed.
+_Description_: This rule checks whether a type assertion result is checked (the `ok` value), preventing unexpected `panic`s.
 
-_Configuration_: This rule accepts two slices of strings and one optional slice with single map with named parameters.
-(it's due to TOML hasn't "slice of any" and we keep backward compatibility with previous config version)
-First slice is a whitelist and second one is a blacklist of initialisms. 
-In map, you can add "upperCaseConst=true" parameter to allow `UPPER_CASE` for `const` 
-By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
+_Configuration_: list of key-value-pair-map (`[]map[string]any`).
+
+- `acceptIgnoredAssertionResult` : (bool) default `false`, set it to `true` to accept ignored type assertion results like this:
+
+```go
+foo, _ := bar(.*Baz).
+//   ^
+```
 
 Example:
 
 ```toml
-[rule.var-naming]
-  arguments = [["ID"], ["VM"], [{upperCaseConst=true}]]
+[rule.unchecked-type-assertion]
+  arguments = [{acceptIgnoredAssertionResult=true}]
 ```
-
-## var-declaration
-
-_Description_: This rule proposes simplifications of variable declarations.
-
-_Configuration_: N/A
 
 ## unconditional-recursion
 
@@ -716,9 +874,10 @@ _Configuration_: function names regexp patterns to ignore
 Example:
 
 ```toml
-[unhandled-error]
-  arguments =["os\.(Create|WriteFile|Chmod)", "fmt\.Print", "myFunction", "net\..*", "bytes\.Buffer\.Write"]
+[rule.unhandled-error]
+  arguments = ["os\.(Create|WriteFile|Chmod)", "fmt\.Print", "myFunction", "net\..*", "bytes\.Buffer\.Write"]
 ```
+
 ## unnecessary-stmt
 
 _Description_: This rule suggests to remove redundant statements like a `break` at the end of a case block, for improving the code's readability.
@@ -735,23 +894,45 @@ _Configuration_: N/A
 
 _Description_: This rule warns on unused parameters. Functions or methods with unused parameters can be a symptom of an unfinished refactoring or a bug.
 
-_Configuration_: N/A
+_Configuration_: Supports arguments with single of `map[string]any` with option `allowRegex` to provide additional to `_` mask to allowed unused parameter names, for example:
+
+```toml
+[rule.unused-parameter]
+    Arguments = [{ allowRegex = "^_" }]
+```
+
+allows any names started with `_`, not just `_` itself:
+
+```go
+func SomeFunc(_someObj *MyStruct) {} // matches rule
+```
 
 ## unused-receiver
 
 _Description_: This rule warns on unused method receivers. Methods with unused receivers can be a symptom of an unfinished refactoring or a bug.
 
-_Configuration_: N/A
+_Configuration_: Supports arguments with single of `map[string]any` with option `allowRegex` to provide additional to `_` mask to allowed unused receiver names, for example:
+
+```toml
+[rule.unused-receiver]
+    Arguments = [{ allowRegex = "^_" }]
+```
+
+allows any names started with `_`, not just `_` itself:
+
+```go
+func (_my *MyStruct) SomeMethod() {} // matches rule
+```
 
 ## use-any
 
-_Description_: Since GO 1.18, `interface{}` has an alias: `any`. This rule proposes to replace instances of `interface{}` with `any`.
+_Description_: Since Go 1.18, `interface{}` has an alias: `any`. This rule proposes to replace instances of `interface{}` with `any`.
 
 _Configuration_: N/A
 
 ## useless-break
 
-_Description_: This rule warns on useless `break` statements in case clauses of switch and select statements. GO, unlike other programming languages like C, only executes statements of the selected case while ignoring the subsequent case clauses.
+_Description_: This rule warns on useless `break` statements in case clauses of switch and select statements. Go, unlike other programming languages like C, only executes statements of the selected case while ignoring the subsequent case clauses.
 Therefore, inserting a `break` at the end of a case clause has no effect.
 
 Because `break` statements are rarely used in case clauses, when switch or select statements are inside a for-loop, the programmer might wrongly assume that a `break` in a case clause will take the control out of the loop.
@@ -759,15 +940,42 @@ The rule emits a specific warning for such cases.
 
 _Configuration_: N/A
 
+## var-declaration
+
+_Description_: This rule proposes simplifications of variable declarations.
+
+_Configuration_: N/A
+
+## var-naming
+
+_Description_: This rule warns when [initialism](https://github.com/golang/go/wiki/CodeReviewComments#initialisms), [variable](https://github.com/golang/go/wiki/CodeReviewComments#variable-names) or [package](https://github.com/golang/go/wiki/CodeReviewComments#package-names) naming conventions are not followed.
+
+_Configuration_: This rule accepts two slices of strings and one optional slice with single map with named parameters.
+(it's due to TOML hasn't "slice of any" and we keep backward compatibility with previous config version)
+First slice is an allowlist and second one is a blocklist of initialisms.
+In map, you can add "upperCaseConst=true" parameter to allow `UPPER_CASE` for `const`
+By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
+
+Example:
+
+```toml
+[rule.var-naming]
+  arguments = [["ID"], ["VM"], [{upperCaseConst=true}]]
+```
+
+You can also add "skipPackageNameChecks=true" to skip package name checks.
+
+Example:
+
+
+```toml
+[rule.var-naming]
+  arguments = [[], [], [{skipPackageNameChecks=true}]]
+```
+
 ## waitgroup-by-value
 
 _Description_: Function parameters that are passed by value, are in fact a copy of the original argument. Passing a copy of a `sync.WaitGroup` is usually not what the developer wants to do.
 This rule warns when a `sync.WaitGroup` expected as a by-value parameter in a function or method.
-
-_Configuration_: N/A
-
-## redundant-import-alias
-
-_Description_: This rule warns on redundant import aliases. This happens when the alias used on the import statement matches the imported package name.
 
 _Configuration_: N/A

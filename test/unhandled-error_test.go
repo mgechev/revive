@@ -12,7 +12,7 @@ func TestUnhandledError(t *testing.T) {
 }
 
 func TestUnhandledErrorWithIgnoreList(t *testing.T) {
-	args := []interface{}{
+	args := []any{
 		`unhandledError1`,
 		`fmt\.Print`,
 		`os\.(Create|WriteFile|Chmod)`,

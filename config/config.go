@@ -1,3 +1,4 @@
+// Package config implements revive's configuration data structures and related methods
 package config
 
 import (
@@ -5,9 +6,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mgechev/revive/formatter"
-
 	"github.com/BurntSushi/toml"
+
+	"github.com/mgechev/revive/formatter"
 	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/rule"
 )
@@ -54,7 +55,7 @@ var allRules = append([]lint.Rule{
 	&rule.ModifiesValRecRule{},
 	&rule.ConstantLogicalExprRule{},
 	&rule.BoolLiteralRule{},
-	&rule.ImportsBlacklistRule{},
+	&rule.ImportsBlocklistRule{},
 	&rule.FunctionResultsLimitRule{},
 	&rule.MaxPublicStructsRule{},
 	&rule.RangeValInClosureRule{},
@@ -80,6 +81,7 @@ var allRules = append([]lint.Rule{
 	&rule.FunctionLength{},
 	&rule.NestedStructs{},
 	&rule.UselessBreak{},
+	&rule.UncheckedTypeAssertionRule{},
 	&rule.TimeEqualRule{},
 	&rule.BannedCharsRule{},
 	&rule.OptimizeOperandsOrderRule{},
@@ -88,6 +90,12 @@ var allRules = append([]lint.Rule{
 	&rule.CommentSpacingsRule{},
 	&rule.IfReturnRule{},
 	&rule.RedundantImportAlias{},
+	&rule.ImportAliasNamingRule{},
+	&rule.EnforceMapStyleRule{},
+	&rule.EnforceRepeatedArgTypeStyleRule{},
+	&rule.EnforceSliceStyleRule{},
+	&rule.MaxControlNestingRule{},
+	&rule.CommentsDensityRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
@@ -125,7 +133,8 @@ func GetLintingRules(config *lint.Config, extraRules []lint.Rule) ([]lint.Rule, 
 
 	var lintingRules []lint.Rule
 	for name, ruleConfig := range config.Rules {
-		r, ok := rulesMap[name]
+		actualName := actualRuleName(name)
+		r, ok := rulesMap[actualName]
 		if !ok {
 			return nil, fmt.Errorf("cannot find rule: %s", name)
 		}
@@ -140,6 +149,15 @@ func GetLintingRules(config *lint.Config, extraRules []lint.Rule) ([]lint.Rule, 
 	return lintingRules, nil
 }
 
+func actualRuleName(name string) string {
+	switch name {
+	case "imports-blacklist":
+		return "imports-blocklist"
+	default:
+		return name
+	}
+}
+
 func parseConfig(path string, config *lint.Config) error {
 	file, err := os.ReadFile(path)
 	if err != nil {
@@ -149,6 +167,14 @@ func parseConfig(path string, config *lint.Config) error {
 	if err != nil {
 		return fmt.Errorf("cannot parse the config file: %v", err)
 	}
+	for k, r := range config.Rules {
+		err := r.Initialize()
+		if err != nil {
+			return fmt.Errorf("error in config of rule [%s] : [%v]", k, err)
+		}
+		config.Rules[k] = r
+	}
+
 	return nil
 }
 

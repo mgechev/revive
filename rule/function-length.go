@@ -19,7 +19,7 @@ type FunctionLength struct {
 
 func (r *FunctionLength) configure(arguments lint.Arguments) {
 	r.Lock()
-	r.Unlock()
+	defer r.Unlock()
 	if !r.configured {
 		maxStmt, maxLines := r.parseArguments(arguments)
 		r.maxStmt = int(maxStmt)
@@ -171,7 +171,7 @@ func (w lintFuncLength) countFuncLitStmts(stmt ast.Expr) int {
 	return 0
 }
 
-func (w lintFuncLength) countBodyListStmts(t interface{}) int {
+func (w lintFuncLength) countBodyListStmts(t any) int {
 	i := reflect.ValueOf(t).Elem().FieldByName(`Body`).Elem().FieldByName(`List`).Interface()
 	return w.countStmts(i.([]ast.Stmt))
 }

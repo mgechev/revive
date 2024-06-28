@@ -9,27 +9,27 @@ import (
 
 func TestLintFileHeader(t *testing.T) {
 	testRule(t, "lint-file-header1", &rule.FileHeaderRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{"foobar"},
+		Arguments: []any{"foobar"},
 	})
 
 	testRule(t, "lint-file-header2", &rule.FileHeaderRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{"foobar"},
+		Arguments: []any{"foobar"},
 	})
 
 	testRule(t, "lint-file-header3", &rule.FileHeaderRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{"foobar"},
+		Arguments: []any{"foobar"},
 	})
 
 	testRule(t, "lint-file-header4", &rule.FileHeaderRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{"^\\sfoobar$"},
+		Arguments: []any{"^\\sfoobar$"},
 	})
 
 	testRule(t, "lint-file-header5", &rule.FileHeaderRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{"^\\sfoo.*bar$"},
+		Arguments: []any{"^\\sfoo.*bar$"},
 	})
 
 	testRule(t, "lint-file-header6", &rule.FileHeaderRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{"foobar"},
+		Arguments: []any{"foobar"},
 	})
 }
 
@@ -37,7 +37,7 @@ func BenchmarkLintFileHeader(b *testing.B) {
 	var t *testing.T
 	for i := 0; i <= b.N; i++ {
 		testRule(t, "lint-file-header1", &rule.FileHeaderRule{}, &lint.RuleConfig{
-			Arguments: []interface{}{"foobar"},
+			Arguments: []any{"foobar"},
 		})
 	}
 }

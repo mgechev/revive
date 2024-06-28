@@ -2,13 +2,8 @@
 # Make sure to check the documentation at http://goreleaser.com
 ---
 archives:
-  -
-    replacements:
-      386: i386
-      amd64: x86_64
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
+  - id: revive
+    name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
 before:
   hooks:
     - "go mod download"

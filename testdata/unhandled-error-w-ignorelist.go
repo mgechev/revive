@@ -3,7 +3,6 @@ package fixtures
 import (
 	b "bytes"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 )
@@ -38,7 +37,7 @@ func testCase2() {
 	os.Chmod("test_file", os.ModeAppend)                          // ignore
 	os.WriteFile("test_file", []byte("some data"), os.ModeAppend) // ignore
 
-	ioutil.WriteFile("test_file", []byte("some data"), os.ModeAppend) // MATCH /Unhandled error in call to function ioutil.WriteFile/
+	os.WriteFile("test_file", []byte("some data"), os.ModeAppend) // ignore
 
 	_ = os.Chdir("..")
 	os.Chdir("..") // MATCH /Unhandled error in call to function os.Chdir/
@@ -57,7 +56,7 @@ func testCase4() {
 	b1.Write(nil) // ignore
 	b2.Write(nil) // ignore
 
-	b2.Read([]byte("bytes")) // MATCH /Unhandled error in call to function b2.Read/
+	b2.Read([]byte("bytes")) // MATCH /Unhandled error in call to function bytes.Buffer.Read/
 }
 
 type unhandledErrorStruct1 struct {
@@ -82,9 +81,9 @@ func testCase5() {
 	// fixtures\.unhandledErrorStruct2\.reterr
 	s1 := unhandledErrorStruct1{}
 	_ = s1.reterr()
-	s1.reterr() // MATCH /Unhandled error in call to function s1.reterr/
+	s1.reterr() // MATCH /Unhandled error in call to function fixtures.unhandledErrorStruct1.reterr/
 
 	s2 := unhandledErrorStruct2{}
 	s2.reterr()  // ignore
-	s2.reterr1() // MATCH /Unhandled error in call to function s2.reterr1/
+	s2.reterr1() // MATCH /Unhandled error in call to function fixtures.unhandledErrorStruct2.reterr1/
 }

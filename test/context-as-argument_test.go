@@ -9,8 +9,8 @@ import (
 
 func TestContextAsArgument(t *testing.T) {
 	testRule(t, "context-as-argument", &rule.ContextAsArgumentRule{}, &lint.RuleConfig{
-		Arguments: []interface{}{
-			map[string]interface{}{
+		Arguments: []any{
+			map[string]any{
 				"allowTypesBefore": "AllowedBeforeType,AllowedBeforeStruct,*AllowedBeforePtrStruct,*testing.T",
 			},
 		},
