@@ -27,11 +27,11 @@ func (r *ExportedRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	if !r.configured {
 		var sayRepetitiveInsteadOfStutters bool
-		
-		r.checkPrivateReceivers, 
-		r.disableStutteringCheck, 
-		sayRepetitiveInsteadOfStutters, 
-		r.checkPublicInterface = r.getConf(arguments)
+
+		r.checkPrivateReceivers,
+			r.disableStutteringCheck,
+			sayRepetitiveInsteadOfStutters,
+			r.checkPublicInterface = r.getConf(arguments)
 
 		r.stuttersMsg = "stutters"
 		if sayRepetitiveInsteadOfStutters {
@@ -63,9 +63,8 @@ func (r *ExportedRule) Apply(file *lint.File, args lint.Arguments) []lint.Failur
 		genDeclMissingComments: make(map[*ast.GenDecl]bool),
 		checkPrivateReceivers:  r.checkPrivateReceivers,
 		disableStutteringCheck: r.disableStutteringCheck,
-		checkPublicInterface: r.checkPublicInterface,
+		checkPublicInterface:   r.checkPublicInterface,
 		stuttersMsg:            r.stuttersMsg,
-
 	}
 
 	ast.Walk(&walker, fileAst)
@@ -79,8 +78,8 @@ func (*ExportedRule) Name() string {
 }
 
 func (r *ExportedRule) getConf(args lint.Arguments) (
-	checkPrivateReceivers, 
-	disableStutteringCheck, 
+	checkPrivateReceivers,
+	disableStutteringCheck,
 	sayRepetitiveInsteadOfStutters bool,
 	checkPublicInterface bool,
 ) {
@@ -119,7 +118,7 @@ type lintExported struct {
 	onFailure              func(lint.Failure)
 	checkPrivateReceivers  bool
 	disableStutteringCheck bool
-	checkPublicInterface  bool
+	checkPublicInterface   bool
 	stuttersMsg            string
 }
 
@@ -346,7 +345,7 @@ func (w *lintExported) Visit(n ast.Node) ast.Visitor {
 		}
 		w.lintTypeDoc(v, doc)
 		w.checkStutter(v.Name, "type")
-		
+
 		if w.checkPublicInterface {
 			if iface, ok := v.Type.(*ast.InterfaceType); ok {
 				if ast.IsExported(v.Name.Name) {
@@ -362,7 +361,6 @@ func (w *lintExported) Visit(n ast.Node) ast.Visitor {
 	}
 	return w
 }
-
 
 func (w *lintExported) doCheckPublicInterface(typeName string, iface *ast.InterfaceType) {
 	for _, m := range iface.Methods.List {
