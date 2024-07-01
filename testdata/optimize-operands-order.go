@@ -27,6 +27,20 @@ func conditionalExpr(x, y bool) bool {
 	return caller(x, y) && y                         // MATCH /for better performance 'caller(x, y) && y' might be rewritten as 'y && caller(x, y)'/
 }
 
+func conditionalExprSlice(s []string) bool {
+	if len(s) > 0 || s[0] == "" { // should not match, not safe
+		return false
+	}
+
+	f := func() bool {
+		len(s) > 1
+	}
+
+	if f() || s[0] == "test" { // MATCH /for better performance 'f() || s[0] == "test"' might be rewritten as 's[0] == "test" || f()'/
+		return true
+	}
+}
+
 func caller(x, y bool) bool {
 	return true
 }
