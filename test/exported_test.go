@@ -24,3 +24,9 @@ func TestExportedReplacingStuttersByRepetitive(t *testing.T) {
 
 	testRule(t, "exported-issue-519", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: args})
 }
+
+func TestCheckPublicInterfaceOption(t *testing.T) {
+	args := []any{"checkPublicInterface"}
+
+	testRule(t, "exported-issue-1002", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: args})
+}
