@@ -25,22 +25,29 @@ type ExportedRule struct {
 
 func (r *ExportedRule) configure(arguments lint.Arguments) {
 	r.Lock()
+	defer r.Unlock()
 	if !r.configured {
-		var sayRepetitiveInsteadOfStutters bool
-
-		r.checkPrivateReceivers,
-			r.disableStutteringCheck,
-			sayRepetitiveInsteadOfStutters,
-			r.checkPublicInterface = r.getConf(arguments)
-
-		r.stuttersMsg = "stutters"
-		if sayRepetitiveInsteadOfStutters {
-			r.stuttersMsg = "is repetitive"
+		for _, flag := range arguments {
+			flagStr, ok := flag.(string)
+			if !ok {
+				panic(fmt.Sprintf("Invalid argument for the %s rule: expecting a string, got %T", r.Name(), flag))
+			}
+			r.stuttersMsg = "stutters"
+			switch flagStr {
+			case "checkPrivateReceivers":
+				r.checkPrivateReceivers = true
+			case "disableStutteringCheck":
+				r.disableStutteringCheck = true
+			case "sayRepetitiveInsteadOfStutters":
+				r.stuttersMsg = "is repetitive"
+			case "checkPublicInterface":
+				r.checkPublicInterface = true
+			default:
+				panic(fmt.Sprintf("Unknown configuration flag %s for %s rule", flagStr, r.Name()))
+			}
 		}
-
 		r.configured = true
 	}
-	r.Unlock()
 }
 
 // Apply applies the rule to given file.
@@ -75,39 +82,6 @@ func (r *ExportedRule) Apply(file *lint.File, args lint.Arguments) []lint.Failur
 // Name returns the rule name.
 func (*ExportedRule) Name() string {
 	return "exported"
-}
-
-func (r *ExportedRule) getConf(args lint.Arguments) (
-	checkPrivateReceivers,
-	disableStutteringCheck,
-	sayRepetitiveInsteadOfStutters bool,
-	checkPublicInterface bool,
-) {
-	// if any, we expect a slice of strings as configuration
-	if len(args) < 1 {
-		return
-	}
-	for _, flag := range args {
-		flagStr, ok := flag.(string)
-		if !ok {
-			panic(fmt.Sprintf("Invalid argument for the %s rule: expecting a string, got %T", r.Name(), flag))
-		}
-
-		switch flagStr {
-		case "checkPrivateReceivers":
-			checkPrivateReceivers = true
-		case "disableStutteringCheck":
-			disableStutteringCheck = true
-		case "sayRepetitiveInsteadOfStutters":
-			sayRepetitiveInsteadOfStutters = true
-		case "checkPublicInterface":
-			checkPublicInterface = true
-		default:
-			panic(fmt.Sprintf("Unknown configuration flag %s for %s rule", flagStr, r.Name()))
-		}
-	}
-
-	return
 }
 
 type lintExported struct {
