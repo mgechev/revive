@@ -11,7 +11,7 @@ import (
 
 // CommentsDensityRule lints given else constructs.
 type CommentsDensityRule struct {
-	minumumCommentsDensity int64
+	minimumCommentsDensity int64
 	configured             bool
 	sync.Mutex
 }
@@ -29,12 +29,12 @@ func (r *CommentsDensityRule) configure(arguments lint.Arguments) {
 	r.configured = true
 
 	if len(arguments) < 1 {
-		r.minumumCommentsDensity = defaultMinimumCommentsPercentage
+		r.minimumCommentsDensity = defaultMinimumCommentsPercentage
 		return
 	}
 
 	var ok bool
-	r.minumumCommentsDensity, ok = arguments[0].(int64)
+	r.minimumCommentsDensity, ok = arguments[0].(int64)
 	if !ok {
 		panic(fmt.Sprintf("invalid argument for %q rule: argument should be an int, got %T", r.Name(), arguments[0]))
 	}
@@ -48,12 +48,12 @@ func (r *CommentsDensityRule) Apply(file *lint.File, arguments lint.Arguments) [
 	statementsCount := countStatements(file.AST)
 	density := (float32(commentsLines) / float32(statementsCount+commentsLines)) * 100
 
-	if density < float32(r.minumumCommentsDensity) {
+	if density < float32(r.minimumCommentsDensity) {
 		return []lint.Failure{
 			{
 				Node:       file.AST,
 				Confidence: 1,
-				Failure:    fmt.Sprintf("the file has a comment density of %2.f%% (%d comment lines for %d code lines) but expected a minimum of %d%%", density, commentsLines, statementsCount, r.minumumCommentsDensity),
+				Failure:    fmt.Sprintf("the file has a comment density of %2.f%% (%d comment lines for %d code lines) but expected a minimum of %d%%", density, commentsLines, statementsCount, r.minimumCommentsDensity),
 			},
 		}
 	}

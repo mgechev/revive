@@ -125,20 +125,20 @@ Since the default behavior of `revive` is compatible with `golint`, without prov
 `revive` supports a `-config` flag whose value should correspond to a TOML file describing which rules to use for `revive`'s linting. If not provided, `revive` will try to use a global config file (assumed to be located at `$HOME/revive.toml`). Otherwise, if no configuration TOML file is found then `revive` uses a built-in set of default linting rules.
 
 ### Docker
-A volume needs to be mounted to share the current repository with the container.
+A volume must be mounted to share the current repository with the container.
 Please refer to the [bind mounts Docker documentation](https://docs.docker.com/storage/bind-mounts/)
 
 ```bash
-docker run -v "$(pwd)":/var/<repository> ghcr.io/mgechev/revive:v1.1.2-next -config /var/<repository>/revive.toml -formatter stylish ./var/kidle/...
+docker run -v "$(pwd)":/var/<repository> ghcr.io/mgechev/revive:v1.3.7 -config /var/<repository>/revive.toml -formatter stylish ./var/kidle/...
 ```
 
 - `-v` is for the volume
-- `ghcr.io/mgechev/revive:v1.1.2-next ` is the image name and its version corresponding to `revive` command
+- `ghcr.io/mgechev/revive:v1.3.7 ` is the image name and its version corresponds to `revive` command
 - The provided flags are the same as the binary usage.
 
 ### Bazel
 
-If you want to use revive with Bazel, take a look at the [rules](https://github.com/atlassian/bazel-tools/tree/master/gorevive) that Atlassian maintains.
+If you want to use revive with Bazel, look at the [rules](https://github.com/atlassian/bazel-tools/tree/master/gorevive) that Atlassian maintains.
 
 ### Text Editors
 
@@ -208,14 +208,14 @@ Please notice that if no particular configuration is provided, `revive` will beh
 
 `revive` accepts the following command line parameters:
 
-- `-config [PATH]` - path to config file in TOML format, defaults to `$HOME/revive.toml` if present.
+- `-config [PATH]` - path to the config file in TOML format, defaults to `$HOME/revive.toml` if present.
 - `-exclude [PATTERN]` - pattern for files/directories/packages to be excluded for linting. You can specify the files you want to exclude for linting either as package name (i.e. `github.com/mgechev/revive`), list them as individual files (i.e. `file.go`), directories (i.e. `./foo/...`), or any combination of the three.
 - `-formatter [NAME]` - formatter to be used for the output. The currently available formatters are:
 
   - `default` - will output the failures the same way that `golint` does.
   - `json` - outputs the failures in JSON format.
-  - `ndjson` - outputs the failures as stream in newline delimited JSON (NDJSON) format.
-  - `friendly` - outputs the failures when found. Shows summary of all the failures.
+  - `ndjson` - outputs the failures as a stream in newline delimited JSON (NDJSON) format.
+  - `friendly` - outputs the failures when found. Shows the summary of all the failures.
   - `stylish` - formats the failures in a table. Keep in mind that it doesn't stream the output so it might be perceived as slower compared to others.
   - `checkstyle` - outputs the failures in XML format compatible with that of Java's [Checkstyle](https://checkstyle.org/).
 - `-max_open_files` -  maximum number of open files at the same time. Defaults to unlimited.
@@ -236,7 +236,7 @@ revive -config revive.toml -exclude file1.go -exclude file2.go -formatter friend
 
 ### Comment Directives
 
-Using comments, you can disable the linter for the entire file or only range of lines:
+Using comments, you can disable the linter for the entire file or only a range of lines:
 
 ```go
 //revive:disable
@@ -259,7 +259,7 @@ func Public() private {
 //revive:enable:unexported-return
 ```
 
-This way, `revive` will not warn you for that you're returning an object of an unexported type, from an exported function.
+This way, `revive` will not warn you that you're returning an object of an unexported type, from an exported function.
 
 You can document why you disable the linter by adding a trailing text in the directive, for example
 
@@ -285,7 +285,7 @@ in the configuration. You can set the severity (defaults to _warning_) of the vi
 
 ### Configuration
 
-`revive` can be configured with a TOML file. Here's a sample configuration with explanation for the individual properties:
+`revive` can be configured with a TOML file. Here's a sample configuration with an explanation of the individual properties:
 
 ```toml
 # When set to false, ignores files with "GENERATED" header, similar to golint
@@ -298,7 +298,7 @@ severity = "warning"
 # with less than 0.8 confidence will be ignored.
 confidence = 0.8
 
-# Sets the error code for failures with severity "error"
+# Sets the error code for failures with the "error" severity
 errorCode = 0
 
 # Sets the error code for failures with severity "warning"
@@ -323,7 +323,7 @@ To enable all available rules you need to add:
 enableAllRules = true
 ```
 
-This will enable all available rules no matter of what rules are named in the configuration file.
+This will enable all available rules no matter what rules are named in the configuration file.
 
 To disable a rule, you simply mark it as disabled in the configuration.
 For example:
@@ -333,7 +333,7 @@ For example:
     Disabled = true
 ```
 When enabling all rules you still need/can provide specific configurations for rules.
-The following files is an example configuration were all rules are enabled, with exception to those that are explicitly disabled, and some rules are configured with particular arguments:
+The following file is an example configuration where all rules are enabled, except for those that are explicitly disabled, and some rules are configured with particular arguments:
 
 ```toml
 severity = "warning"
@@ -429,7 +429,7 @@ warningCode = 0
 
 You also can setup custom excludes for each rule.
 
-It's alternative for global `-exclude` program arg.
+It's an alternative for the global `-exclude` program arg.
 
 ```toml
 ignoreGeneratedHeader = false
@@ -444,17 +444,17 @@ warningCode = 0
    Exclude=["src/somepkg/*.go", "TEST"]
 ```
 
-You can use following exclude patterns
+You can use the following exclude patterns
 
 1. full paths to files `src/pkg/mypkg/some.go`
 2. globs `src/**/*.pb.go`
 3. regexes (should have prefix ~) `~\.(pb|auto|generated)\.go$`
 4. well-known `TEST` (same as `**/*_test.go`)
 5. special cases:
-  a. `*` and `~` patterns exclude all files (same effect than disabling the rule)
+  a. `*` and `~` patterns exclude all files (same effect as disabling the rule)
   b. `""` (empty) pattern excludes nothing
 
-> NOTE: do not mess with `exclude` that can  be used at top level of TOML file, that mean "exclude package patterns", not "exclude file patterns"
+> NOTE: do not mess with `exclude` that can  be used at the top level of TOML file, that means "exclude package patterns", not "exclude file patterns"
 
 ## Available Rules
 
@@ -539,7 +539,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`enforce-slice-style`](./RULES_DESCRIPTIONS.md#enforce-slice-style) |  string (defaults to "any")  |  Enforces consistent usage of `make([]type, 0)` or `[]type{}` for slice initialization. Does not affect `make(map[type]type, non_zero_len, or_non_zero_cap)` constructions. |    no    |  no   |
 | [`enforce-repeated-arg-type-style`](./RULES_DESCRIPTIONS.md#enforce-repeated-arg-type-style) |  string (defaults to "any")  |  Enforces consistent style for repeated argument and/or return value types. |    no    |  no   |
 | [`max-control-nesting`](./RULES_DESCRIPTIONS.md#max-control-nesting) |  int (defaults to 5)  | Sets restriction for maximum nesting of control structures. |    no    |  no   |
-| [`comments-density`](./RULES_DESCRIPTIONS.md#comments-density) |  int (defaults to 0)  | Enforces a minumum comment / code relation |    no    |  no   |
+| [`comments-density`](./RULES_DESCRIPTIONS.md#comments-density) |  int (defaults to 0)  | Enforces a minimum comment / code relation |    no    |  no   |
 
 
 ## Configurable rules
@@ -555,7 +555,7 @@ This rule accepts two slices of strings, an allowlist and a blocklist of initial
   arguments = [["ID"], ["VM"]]
 ```
 
-This way, revive will not warn for identifier called `customId` but will warn that `customVm` should be called `customVM`.
+This way, revive will not warn for an identifier called `customId` but will warn that `customVm` should be called `customVM`.
 
 ## Available Formatters
 
@@ -577,7 +577,7 @@ The default formatter produces the same output as `golint`.
 
 ### Plain
 
-The plain formatter produces the same output as the default formatter and appends URL to the rule description.
+The plain formatter produces the same output as the default formatter and appends the URL to the rule description.
 
 ![Plain formatter](/assets/formatter-plain.png)
 
@@ -616,7 +616,7 @@ The `Arguments` type is an alias of the type `[]interface{}`. The arguments of t
 
 #### Example
 
-Let's suppose we have developed a rule called `BanStructNameRule` which disallow us to name a structure with given identifier. We can set the banned identifier by using the TOML configuration file:
+Let's suppose we have developed a rule called `BanStructNameRule` which disallow us to name a structure with a given identifier. We can set the banned identifier by using the TOML configuration file:
 
 ```toml
 [rule.ban-struct-name]
@@ -625,16 +625,16 @@ Let's suppose we have developed a rule called `BanStructNameRule` which disallow
 
 With the snippet above we:
 
-- Enable the rule with name `ban-struct-name`. The `Name()` method of our rule should return a string which matches `ban-struct-name`.
+- Enable the rule with the name `ban-struct-name`. The `Name()` method of our rule should return a string that matches `ban-struct-name`.
 - Configure the rule with the argument `Foo`. The list of arguments will be passed to `Apply(*File, Arguments)` together with the target file we're linting currently.
 
 A sample rule implementation can be found [here](/rule/argument-limit.go).
 
 #### Using `revive` as a library
 If a rule is specific to your use case
-(i.e. it is not a good candidate to be added to `revive`'s rule set) you can add it to your own linter using `revive` as linting engine.
+(i.e. it is not a good candidate to be added to `revive`'s rule set) you can add it to your linter using `revive` as a linting engine.
 
-The following code shows how to use `revive` in your own application.
+The following code shows how to use `revive` in your application.
 In the example only one rule is added (`myRule`), of course, you can add as many as you need to.
 Your rules can be configured programmatically or with the standard `revive` configuration file.
 The full rule set of `revive` is also actionable by your application.
@@ -661,7 +661,7 @@ func (f myRule) Name() string {
 func (f myRule) Apply(*lint.File, lint.Arguments) []lint.Failure { ... }
 ```
 
-You can still go further and use `revive` without its cli, as part of your library, or your own cli:
+You can still go further and use `revive` without its CLI, as part of your library, or your CLI:
 
 ```go
 package mylib
@@ -728,7 +728,7 @@ For a sample formatter, take a look at [this file](/formatter/json.go).
 
 ## Speed Comparison
 
-Compared to `golint`, `revive` performs better because it lints the files for each individual rule into a separate goroutine. Here's a basic performance benchmark on MacBook Pro Early 2013 run on kubernetes:
+Compared to `golint`, `revive` performs better because it lints the files for each individual rule into a separate goroutine. Here's a basic performance benchmark on MacBook Pro Early 2013 run on Kubernetes:
 
 ### golint
 
@@ -751,7 +751,7 @@ user    0m40.721s
 sys     0m3.262s
 ```
 
-Keep in mind that if you use rules which require type checking, the performance may drop to 2x faster than `golint`:
+Keep in mind that if you use rules that require type checking, the performance may drop to 2x faster than `golint`:
 
 ```shell
 # type checking enabled
@@ -762,7 +762,7 @@ user    2m6.708s
 sys     0m17.192s
 ```
 
-Currently, type checking is enabled by default. If you want to run the linter without type checking, remove all typed rules from the configuration file.
+Currently, type-checking is enabled by default. If you want to run the linter without type-checking, remove all typed rules from the configuration file.
 
 ## Overriding colorization detection
 
