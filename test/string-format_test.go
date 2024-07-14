@@ -106,6 +106,44 @@ func TestStringFormatArgumentParsing(t *testing.T) {
 					"fmt.Errorf[0],core.WriteError[1].Message",
 					"//"}}},
 		{
+			name: "', ' Delimiter",
+			config: lint.Arguments{
+				[]any{
+					"abc, mt.Errorf",
+					"//"}}},
+		{
+			name: "' ,' Delimiter",
+			config: lint.Arguments{
+				[]any{
+					"abc ,mt.Errorf",
+					"//"}}},
+		{
+			name: "',   ' Delimiter",
+			config: lint.Arguments{
+				[]any{
+					"abc,   mt.Errorf",
+					"//"}}},
+		{
+			name: "',   ' Delimiter",
+			config: lint.Arguments{
+				[]any{
+					"abc,   mt.Errorf",
+					"//"}}},
+		{
+			name: "Empty Middle Scope",
+			config: lint.Arguments{
+				[]any{
+					"abc, ,mt.Errorf",
+					"//"}},
+			expectedError: stringPtr("failed to parse configuration for string-format: empty scope in rule scopes: [argument 0, option 0, scope index 1]")},
+		{
+			name: "Empty First Scope",
+			config: lint.Arguments{
+				[]any{
+					",mt.Errorf",
+					"//"}},
+			expectedError: stringPtr("failed to parse configuration for string-format: empty scope in rule scopes: [argument 0, option 0, scope index 0]")},
+		{
 			name: "Bad First Scope",
 			config: lint.Arguments{
 				[]any{

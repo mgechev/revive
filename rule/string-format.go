@@ -133,6 +133,12 @@ func (w lintStringFormatRule) parseArgument(argument any, ruleNum int) (scopes s
 
 	scopes = make([]*stringFormatSubruleScope, 0, len(rawScopes))
 	for scopeNum, rawScope := range rawScopes {
+		rawScope = strings.TrimSpace(rawScope)
+
+		if len(rawScope) == 0 {
+			w.parseScopeError("empty scope in rule scopes:", ruleNum, 0, scopeNum)
+		}
+
 		scope := stringFormatSubruleScope{}
 		matches := parseStringFormatScope.FindStringSubmatch(rawScope)
 		if matches == nil {
