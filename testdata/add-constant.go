@@ -1,9 +1,24 @@
 package fixtures
 
 import (
+	"context"
 	"fmt"
 	"os"
 )
+
+type testLogger struct{}
+
+func (l *testLogger) Info(ctx context.Context, msg string) {}
+
+func getLogger() *testLogger {
+	return &testLogger{}
+}
+
+func test1007() {
+	getLogger().Info(context.Background(), "test1007")
+	getLogger().Info(context.Background(), "test1007")
+	getLogger().Info(context.Background(), "test1007")
+}
 
 func foo(a float32, b string, c any, d int) {
 	a = 1.0 // ignore
