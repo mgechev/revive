@@ -27,12 +27,12 @@ func (r *ExportedRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	defer r.Unlock()
 	if !r.configured {
+		r.stuttersMsg = "stutters"
 		for _, flag := range arguments {
 			flagStr, ok := flag.(string)
 			if !ok {
 				panic(fmt.Sprintf("Invalid argument for the %s rule: expecting a string, got %T", r.Name(), flag))
 			}
-			r.stuttersMsg = "stutters"
 			switch flagStr {
 			case "checkPrivateReceivers":
 				r.checkPrivateReceivers = true
@@ -203,14 +203,18 @@ func (w *lintExported) lintTypeDoc(t *ast.TypeSpec, doc *ast.CommentGroup) {
 			break
 		}
 	}
-	if !strings.HasPrefix(s, t.Name.Name+" ") {
-		w.onFailure(lint.Failure{
-			Node:       doc,
-			Confidence: 1,
-			Category:   "comments",
-			Failure:    fmt.Sprintf(`comment on exported type %v should be of the form "%v ..." (with optional leading article)`, t.Name, t.Name),
-		})
+	// if comment starts wih name of type and has some text after - it's ok
+	expectedPrefix := t.Name.Name+" "
+	if strings.HasPrefix(s, expectedPrefix){
+		return
 	}
+	w.onFailure(lint.Failure{
+		Node:       doc,
+		Confidence: 1,
+		Category:   "comments",
+		Failure:    fmt.Sprintf(`comment on exported type %v should be of the form "%s..." (with optional leading article)`, t.Name, expectedPrefix),
+	})
+
 }
 
 func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genDeclMissingComments map[*ast.GenDecl]bool) {
@@ -290,7 +294,7 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 //
 // This function is needed because ast.CommentGroup.Text() does not handle //-style and /*-style comments uniformly
 func normalizeText(t string) string {
-	return strings.TrimPrefix(t, " ")
+	return strings.TrimSpace(t)
 }
 
 func (w *lintExported) Visit(n ast.Node) ast.Visitor {
@@ -338,17 +342,17 @@ func (w *lintExported) Visit(n ast.Node) ast.Visitor {
 
 func (w *lintExported) doCheckPublicInterface(typeName string, iface *ast.InterfaceType) {
 	for _, m := range iface.Methods.List {
-		// case of ast.Ident and other implicit fields
-		if len(m.Names) == 0 {
-			continue
-		}
-		if ast.IsExported(m.Names[0].Name) {
-			w.lintInterfaceMethod(typeName, m)
-		}
+		w.lintInterfaceMethod(typeName, m)
 	}
 }
 
 func (w *lintExported) lintInterfaceMethod(typeName string, m *ast.Field) {
+	if len(m.Names) == 0 {
+		return 
+	}
+	if !ast.IsExported(m.Names[0].Name) {
+		return
+	}
 	name := m.Names[0].Name
 	if m.Doc == nil {
 		w.onFailure(lint.Failure{
@@ -360,13 +364,13 @@ func (w *lintExported) lintInterfaceMethod(typeName string, m *ast.Field) {
 		return
 	}
 	s := normalizeText(m.Doc.Text())
-	prefix := m.Names[0].Name + " "
-	if !strings.HasPrefix(s, prefix) {
+	expectedPrefix := m.Names[0].Name + " "
+	if !strings.HasPrefix(s, expectedPrefix) {
 		w.onFailure(lint.Failure{
 			Node:       m.Doc,
 			Confidence: 0.8,
 			Category:   "comments",
-			Failure:    fmt.Sprintf(`comment on exported interface method %s.%s should be of the form "%s..."`, typeName, name, prefix),
+			Failure:    fmt.Sprintf(`comment on exported interface method %s.%s should be of the form "%s..."`, typeName, name, expectedPrefix),
 		})
 	}
 }
