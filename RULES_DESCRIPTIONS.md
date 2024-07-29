@@ -14,7 +14,7 @@ List of all available rules.
   - [call-to-gc](#call-to-gc)
   - [cognitive-complexity](#cognitive-complexity)
   - [comment-spacings](#comment-spacings)
-  - [comments-density](#comment-spacings)
+  - [comments-density](#comments-density)
   - [confusing-naming](#confusing-naming)
   - [confusing-results](#confusing-results)
   - [constant-logical-expr](#constant-logical-expr)
