@@ -474,12 +474,13 @@ Available flags are:
 * _checkPrivateReceivers_ enables checking public methods of private types
 * _disableStutteringCheck_ disables checking for method names that stutter with the package name (i.e. avoid failure messages of the form _type name will be used as x.XY by other packages, and that stutters; consider calling this Y_)
 * _sayRepetitiveInsteadOfStutters_ replaces the use of the term _stutters_ by _repetitive_ in failure messages
+* _checkPublicInterface_ enabled checking public method definitions in public interface types
 
 Example:
 
 ```toml
 [rule.exported]
-  arguments = ["checkPrivateReceivers", "disableStutteringCheck"]
+  arguments = ["checkPrivateReceivers", "disableStutteringCheck", "checkPublicInterface"]
 ```
 
 ## file-header

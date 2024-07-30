@@ -33,6 +33,13 @@ const FirstLetter = "A"
 /*Bar2 something */
 type Bar2 struct{}
 
+
+/* Bar3 */  // MATCH /comment on exported type Bar3 should be of the form "Bar3 ..." (with optional leading article)/
+type Bar3 struct{}  
+
+/* BarXXX invalid */  // MATCH /comment on exported type Bar4 should be of the form "Bar4 ..." (with optional leading article)/ 
+type Bar4 struct{} 
+
 /*Toto2 something */
 func Toto2() {}
 
