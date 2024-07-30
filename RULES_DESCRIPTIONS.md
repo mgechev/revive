@@ -91,7 +91,7 @@ _Description_: Suggests using constant for [magic numbers](https://en.wikipedia.
 _Configuration_:
 
 * `maxLitCount` : (string) maximum number of instances of a string literal that are tolerated before warn.
-* `allowStr`: (string) comma-separated list of allowed string literals
+* `allowStrs`: (string) comma-separated list of allowed string literals
 * `allowInts`: (string) comma-separated list of allowed integers
 * `allowFloats`: (string) comma-separated list of allowed floats
 * `ignoreFuncs`: (string) comma-separated list of function names regexp patterns to exclude
