@@ -775,7 +775,7 @@ Example:
     ["core.WriteError[1].Message", "/^([^A-Z]|$)/", "must not start with a capital letter"],
     ["fmt.Errorf[0]", "/(^|[^\\.!?])$/", "must not end in punctuation"],
     ["panic", "/^[^\\n]*$/", "must not contain line breaks"],
-    ["fmt.Errorf[0],core.WriteError[1].Message", "/^.*%w.*$/", "must not contains '%w'"],
+    ["fmt.Errorf[0],core.WriteError[1].Message", "!/^.*%w.*$/", "must not contain '%w'"],
   ]
 ```
 
