@@ -76,7 +76,7 @@ func TestStringFormatArgumentParsing(t *testing.T) {
 				[]any{
 					"1.a",
 					"//"}},
-			expectedError: stringPtr("failed to parse configuration for string-format: unable to parse rule scope [argument 0, option 0]")},
+			expectedError: stringPtr("failed to parse configuration for string-format: unable to parse rule scope [argument 0, option 0, scope index 0]")},
 		{
 			name: "Bad Regex",
 			config: lint.Arguments{
@@ -98,7 +98,65 @@ func TestStringFormatArgumentParsing(t *testing.T) {
 			config: lint.Arguments{
 				[]any{
 					"some_pkg._some_function_name[5].some_member",
-					"//"}}}}
+					"//"}}},
+		{
+			name: "Underscores in Multiple Scopes",
+			config: lint.Arguments{
+				[]any{
+					"fmt.Errorf[0],core.WriteError[1].Message",
+					"//"}}},
+		{
+			name: "', ' Delimiter",
+			config: lint.Arguments{
+				[]any{
+					"abc, mt.Errorf",
+					"//"}}},
+		{
+			name: "' ,' Delimiter",
+			config: lint.Arguments{
+				[]any{
+					"abc ,mt.Errorf",
+					"//"}}},
+		{
+			name: "',   ' Delimiter",
+			config: lint.Arguments{
+				[]any{
+					"abc,   mt.Errorf",
+					"//"}}},
+		{
+			name: "',   ' Delimiter",
+			config: lint.Arguments{
+				[]any{
+					"abc,   mt.Errorf",
+					"//"}}},
+		{
+			name: "Empty Middle Scope",
+			config: lint.Arguments{
+				[]any{
+					"abc, ,mt.Errorf",
+					"//"}},
+			expectedError: stringPtr("failed to parse configuration for string-format: empty scope in rule scopes: [argument 0, option 0, scope index 1]")},
+		{
+			name: "Empty First Scope",
+			config: lint.Arguments{
+				[]any{
+					",mt.Errorf",
+					"//"}},
+			expectedError: stringPtr("failed to parse configuration for string-format: empty scope in rule scopes: [argument 0, option 0, scope index 0]")},
+		{
+			name: "Bad First Scope",
+			config: lint.Arguments{
+				[]any{
+					"1.a,fmt.Errorf[0]",
+					"//"}},
+			expectedError: stringPtr("failed to parse configuration for string-format: unable to parse rule scope [argument 0, option 0, scope index 0]")},
+		{
+			name: "Bad Second Scope",
+			config: lint.Arguments{
+				[]any{
+					"fmt.Errorf[0],1.a",
+					"//"}},
+			expectedError: stringPtr("failed to parse configuration for string-format: unable to parse rule scope [argument 0, option 0, scope index 1]")}}
 
 	for _, a := range tests {
 		t.Run(a.name, func(t *testing.T) {
