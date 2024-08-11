@@ -125,6 +125,29 @@ func (w *lintRedefinesBuiltinID) Visit(node ast.Node) ast.Visitor {
 		if ok, bt := w.isBuiltIn(id); ok {
 			w.addFailure(n, fmt.Sprintf("redefinition of the built-in %s %s", bt, id))
 		}
+	case *ast.FuncType:
+		var fields []*ast.Field
+		if n.TypeParams != nil {
+			fields = append(fields, n.TypeParams.List...)
+		}
+		if n.Params != nil {
+			fields = append(fields, n.Params.List...)
+		}
+		if n.Results != nil {
+			fields = append(fields, n.Results.List...)
+		}
+		for _, field := range fields {
+			for _, name := range field.Names {
+				if obj := name.Obj; obj != nil {
+					if obj.Kind == ast.Var || obj.Kind == ast.Typ {
+						id := obj.Name
+						if ok, bt := w.isBuiltIn(id); ok {
+							w.addFailure(name, fmt.Sprintf("redefinition of the built-in %s %s", bt, id))
+						}
+					}
+				}
+			}
+		}
 	case *ast.AssignStmt:
 		for _, e := range n.Lhs {
 			id, ok := e.(*ast.Ident)
