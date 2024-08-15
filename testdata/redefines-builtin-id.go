@@ -41,3 +41,14 @@ func foo() {
 	_ = max
 	_ = min
 }
+
+func foo1(new int) { // MATCH /redefinition of the built-in function new/
+	_ = new
+}
+
+func foo2() (new int) { // MATCH /redefinition of the built-in function new/
+	return
+}
+
+func foo3[new any]() { // MATCH /redefinition of the built-in function new/
+}
