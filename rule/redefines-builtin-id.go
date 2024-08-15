@@ -158,11 +158,15 @@ func (w *lintRedefinesBuiltinID) Visit(node ast.Node) ast.Visitor {
 		}
 		for _, field := range fields {
 			for _, name := range field.Names {
-				if obj := name.Obj; obj != nil && (obj.Kind == ast.Var || obj.Kind == ast.Typ) {
-					id := obj.Name
-					if ok, bt := w.isBuiltIn(id); ok {
-						w.addFailure(name, fmt.Sprintf("redefinition of the built-in %s %s", bt, id))
-					}
+				obj := name.Obj
+				isTypeOrName := obj != nil && (obj.Kind == ast.Var || obj.Kind == ast.Typ)
+				if !isTypeOrName {
+					continue
+				}
+				
+				id := obj.Name
+				if ok, bt := w.isBuiltIn(id); ok {
+					w.addFailure(name, fmt.Sprintf("redefinition of the built-in %s %s", bt, id))
 				}
 			}
 		}
