@@ -33,6 +33,15 @@ var i, copy int // MATCH /redefinition of the built-in function copy/
 // issue #792
 type ()
 
+func foo() {
+	clear := 0 // MATCH /redefinition of the built-in function clear/
+	max := 0   // MATCH /redefinition of the built-in function max/
+	min := 0   // MATCH /redefinition of the built-in function min/
+	_ = clear
+	_ = max
+	_ = min
+}
+
 func foo1(new int) { // MATCH /redefinition of the built-in function new/
 	_ = new
 }

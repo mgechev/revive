@@ -33,6 +33,7 @@ var (
 	falseValue = 2
 	notSet     = 3
 
+	go121 = goversion.Must(goversion.NewVersion("1.21"))
 	go122 = goversion.Must(goversion.NewVersion("1.22"))
 )
 
@@ -192,6 +193,11 @@ func (p *Package) lint(rules []Rule, config Config, failures chan Failure) {
 		})(file)
 	}
 	wg.Wait()
+}
+
+// IsAtLeastGo121 returns true if the Go version for this package is 1.21 or higher, false otherwise
+func (p *Package) IsAtLeastGo121() bool {
+	return p.goVersion.GreaterThanOrEqual(go121)
 }
 
 // IsAtLeastGo122 returns true if the Go version for this package is 1.22 or higher, false otherwise

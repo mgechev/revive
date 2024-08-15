@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
+	"maps"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -31,6 +32,12 @@ var builtFunctions = map[string]bool{
 	"println": true,
 	"real":    true,
 	"recover": true,
+}
+
+var builtFunctionsAfterGo121 = map[string]bool{
+	"clear": true,
+	"max":   true,
+	"min":   true,
 }
 
 var builtInTypes = map[string]bool{
@@ -69,7 +76,17 @@ func (*RedefinesBuiltinIDRule) Apply(file *lint.File, _ lint.Arguments) []lint.F
 	}
 
 	astFile := file.AST
-	w := &lintRedefinesBuiltinID{onFailure}
+
+	builtFuncs := maps.Clone(builtFunctions)
+	if file.Pkg.IsAtLeastGo121() {
+		maps.Copy(builtFuncs, builtFunctionsAfterGo121)
+	}
+	w := &lintRedefinesBuiltinID{
+		onFailure:           onFailure,
+		builtInConstAndVars: builtInConstAndVars,
+		builtFunctions:      builtFuncs,
+		builtInTypes:        builtInTypes,
+	}
 	ast.Walk(w, astFile)
 
 	return failures
@@ -81,7 +98,10 @@ func (*RedefinesBuiltinIDRule) Name() string {
 }
 
 type lintRedefinesBuiltinID struct {
-	onFailure func(lint.Failure)
+	onFailure           func(lint.Failure)
+	builtInConstAndVars map[string]bool
+	builtFunctions      map[string]bool
+	builtInTypes        map[string]bool
 }
 
 func (w *lintRedefinesBuiltinID) Visit(node ast.Node) ast.Visitor {
@@ -183,16 +203,16 @@ func (w lintRedefinesBuiltinID) addFailure(node ast.Node, msg string) {
 	})
 }
 
-func (lintRedefinesBuiltinID) isBuiltIn(id string) (r bool, builtInKind string) {
-	if builtFunctions[id] {
+func (w *lintRedefinesBuiltinID) isBuiltIn(id string) (r bool, builtInKind string) {
+	if w.builtFunctions[id] {
 		return true, "function"
 	}
 
-	if builtInConstAndVars[id] {
+	if w.builtInConstAndVars[id] {
 		return true, "constant or variable"
 	}
 
-	if builtInTypes[id] {
+	if w.builtInTypes[id] {
 		return true, "type"
 	}
 
