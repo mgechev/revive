@@ -172,7 +172,7 @@ func detectGoMod(dir string) (rootDir string, ver *goversion.Version, err error)
 	}
 
 	ver, err = goversion.NewVersion(modAst.Go.Version)
-	return dir, ver, err
+	return path.Dir(modFileName), ver, err
 }
 
 func retrieveModFile(dir string) (string, error) {
