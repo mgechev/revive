@@ -3,11 +3,10 @@ package lint
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"go/token"
 	"os"
-	"os/exec"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -15,6 +14,7 @@ import (
 	"sync"
 
 	goversion "github.com/hashicorp/go-version"
+	"golang.org/x/mod/modfile"
 )
 
 // ReadFile defines an abstraction for reading files.
@@ -156,37 +156,42 @@ func (l *Linter) lintPackage(filenames []string, gover *goversion.Version, ruleS
 }
 
 func detectGoMod(dir string) (rootDir string, ver *goversion.Version, err error) {
-	// https://github.com/golang/go/issues/44753#issuecomment-790089020
-	cmd := exec.Command("go", "list", "-m", "-json")
-	cmd.Dir = dir
-
-	out, err := cmd.Output()
+	modFileName, err := retrieveModFile(dir)
 	if err != nil {
-		return "", nil, fmt.Errorf("command go list: %w", err)
+		return "", nil, fmt.Errorf("%q doesn't seem to be part of a Go module", dir)
 	}
 
-	// NOTE: A package may be part of a go workspace. In this case `go list -m`
-	// lists all modules in the workspace, so we need to go through them all.
-	d := json.NewDecoder(bytes.NewBuffer(out))
-	for d.More() {
-		var v struct {
-			GoMod     string `json:"GoMod"`
-			GoVersion string `json:"GoVersion"`
-			Dir       string `json:"Dir"`
-		}
-		if err = d.Decode(&v); err != nil {
-			return "", nil, err
-		}
-		if v.GoMod == "" {
-			return "", nil, fmt.Errorf("not part of a module: %q", dir)
-		}
-		if v.Dir != "" && strings.HasPrefix(dir, v.Dir) {
-			rootDir = v.Dir
-			ver, err = goversion.NewVersion(strings.TrimPrefix(v.GoVersion, "go"))
-			return rootDir, ver, err
-		}
+	mod, err := os.ReadFile(modFileName)
+	if err != nil {
+		return "", nil, fmt.Errorf("failed to read %q, got %v", modFileName, err)
 	}
-	return "", nil, fmt.Errorf("not part of a module: %q", dir)
+
+	modAst, err := modfile.ParseLax(modFileName, mod, nil)
+	if err != nil {
+		return "", nil, fmt.Errorf("failed to parse %q, got %v", modFileName, err)
+	}
+
+	ver, err = goversion.NewVersion(modAst.Go.Version)
+	return dir, ver, err
+}
+
+func retrieveModFile(dir string) (string, error) {
+	const lookingForFile = "go.mod"
+	for {
+		if dir == "." || dir == "/" {
+			return "", fmt.Errorf("did not found %q file", lookingForFile)
+		}
+
+		lookingForFilePath := path.Join(dir, lookingForFile)
+		info, err := os.Stat(lookingForFilePath)
+		if err != nil || info.IsDir() {
+			// lets check the parent dir
+			dir = path.Dir(dir)
+			continue
+		}
+
+		return lookingForFilePath, nil
+	}
 }
 
 // isGenerated reports whether the source file is generated code
