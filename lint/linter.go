@@ -55,8 +55,9 @@ func (l Linter) readFile(path string) (result []byte, err error) {
 }
 
 var (
-	genHdr = []byte("// Code generated ")
-	genFtr = []byte(" DO NOT EDIT.")
+	genHdr           = []byte("// Code generated ")
+	genFtr           = []byte(" DO NOT EDIT.")
+	defaultGoVersion = goversion.Must(goversion.NewVersion("1.0"))
 )
 
 // Lint lints a set of files with the specified rule.
@@ -93,7 +94,9 @@ func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-cha
 
 		d, v, err := detectGoMod(dir)
 		if err != nil {
-			return nil, err
+			// No luck finding the go.mod file thus set the default Go version
+			v = defaultGoVersion
+			d = dir
 		}
 		perModVersions[d] = v
 		perPkgVersions[n] = v
