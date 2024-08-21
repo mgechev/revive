@@ -47,3 +47,20 @@ func f() {
 		return nil
 	})
 }
+
+// Issue #1029
+func verify2(a any) func() {
+	return func() {
+		fn := a.(func() error)
+		if err := fn(); err != nil {
+			panic(err)
+		}
+	}
+
+}
+
+func mainf() {
+	defer verify2(func() error { // MATCH /prefer not to defer chains of function calls/
+		return nil
+	})()
+}
