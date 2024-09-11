@@ -1,6 +1,8 @@
 module github.com/mgechev/revive
 
-go 1.21
+go 1.22.0
+
+toolchain go1.23.1
 
 require (
 	github.com/BurntSushi/toml v1.4.0
@@ -13,7 +15,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/afero v1.11.0
-	golang.org/x/mod v0.20.0
+	golang.org/x/mod v0.21.0
 	golang.org/x/tools v0.24.0
 )
 
