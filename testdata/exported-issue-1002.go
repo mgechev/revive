@@ -1,7 +1,7 @@
 // Package golint comment
 package golint
 
-// by default code bellow is valid,
+// by default code below is valid,
 // but if checkPublicInterface is switched on - it should check documentation in interfaces
 
 // Some - some interface

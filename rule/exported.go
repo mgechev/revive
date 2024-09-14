@@ -203,7 +203,7 @@ func (w *lintExported) lintTypeDoc(t *ast.TypeSpec, doc *ast.CommentGroup) {
 			break
 		}
 	}
-	// if comment starts wih name of type and has some text after - it's ok
+	// if comment starts with name of type and has some text after - it's ok
 	expectedPrefix := t.Name.Name+" "
 	if strings.HasPrefix(s, expectedPrefix){
 		return
