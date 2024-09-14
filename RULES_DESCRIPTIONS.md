@@ -231,7 +231,7 @@ _Configuration_: N/A
 
 ## context-as-argument
 
-_Description_: By [convention](https://github.com/golang/go/wiki/CodeReviewComments#contexts), `context.Context` should be the first parameter of a function. This rule spots function declarations that do not follow the convention.
+_Description_: By [convention](https://go.dev/wiki/CodeReviewComments#contexts), `context.Context` should be the first parameter of a function. This rule spots function declarations that do not follow the convention.
 
 _Configuration_:
 
@@ -301,7 +301,7 @@ _Configuration_: by default all warnings are enabled but it is possible selectiv
 
 _Description_: Importing with `.` makes the programs much harder to understand because it is unclear whether names belong to the current package or to an imported package.
 
-More information [here](https://github.com/golang/go/wiki/CodeReviewComments#import-dot)
+More information [here](https://go.dev/wiki/CodeReviewComments#import-dot)
 
 _Configuration_:
 
@@ -451,7 +451,7 @@ _Configuration_: N/A
 
 _Description_: By convention, for better readability, error messages should not be capitalized or end with punctuation or a newline.
 
-More information [here](https://github.com/golang/go/wiki/CodeReviewComments#error-strings)
+More information [here](https://go.dev/wiki/CodeReviewComments#error-strings)
 
 _Configuration_: N/A
 
@@ -465,7 +465,7 @@ _Configuration_: N/A
 
 _Description_: Exported function and methods should have comments. This warns on undocumented exported functions and methods.
 
-More information [here](https://github.com/golang/go/wiki/CodeReviewComments#doc-comments)
+More information [here](https://go.dev/wiki/CodeReviewComments#doc-comments)
 
 _Configuration_: ([]string) rule flags.
 Please notice that without configuration, the default behavior of the rule is that of its `golint` counterpart.
@@ -613,7 +613,7 @@ _Configuration_: N/A
 _Description_: To improve the readability of code, it is recommended to reduce the indentation as much as possible.
 This rule highlights redundant _else-blocks_ that can be eliminated from the code.
 
-More information [here](https://github.com/golang/go/wiki/CodeReviewComments#indent-error-flow)
+More information [here](https://go.dev/wiki/CodeReviewComments#indent-error-flow)
 
 _Configuration_: ([]string) rule flags. Available flags are:
 
@@ -710,7 +710,7 @@ if !config.IgnoreGeneratedHeader && isGenerated(content) {
 
 _Description_: Packages should have comments. This rule warns on undocumented packages and when packages comments are detached to the `package` keyword.
 
-More information [here](https://github.com/golang/go/wiki/CodeReviewComments#package-comments)
+More information [here](https://go.dev/wiki/CodeReviewComments#package-comments)
 
 _Configuration_: N/A
 
@@ -950,7 +950,7 @@ _Configuration_: N/A
 
 ## var-naming
 
-_Description_: This rule warns when [initialism](https://github.com/golang/go/wiki/CodeReviewComments#initialisms), [variable](https://github.com/golang/go/wiki/CodeReviewComments#variable-names) or [package](https://github.com/golang/go/wiki/CodeReviewComments#package-names) naming conventions are not followed.
+_Description_: This rule warns when [initialism](https://go.dev/wiki/CodeReviewComments#initialisms), [variable](https://go.dev/wiki/CodeReviewComments#variable-names) or [package](https://go.dev/wiki/CodeReviewComments#package-names) naming conventions are not followed.
 
 _Configuration_: This rule accepts two slices of strings and one optional slice with single map with named parameters.
 (it's due to TOML hasn't "slice of any" and we keep backward compatibility with previous config version)
