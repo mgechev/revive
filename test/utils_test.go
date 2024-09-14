@@ -140,7 +140,7 @@ type instruction struct {
 	Confidence  float64 // confidence level
 }
 
-// JSONInstruction structure used when we parse json object insted of classic MATCH string
+// JSONInstruction structure used when we parse json object instead of classic MATCH string
 type JSONInstruction struct {
 	Match      string  `json:"MATCH"`
 	Category   string  `json:"Category"`

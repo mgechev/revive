@@ -13,7 +13,7 @@ const (
 	ruleUTAMessageIgnored = "type assertion result ignored"
 )
 
-// UncheckedTypeAssertionRule lints missing or ignored `ok`-value in danymic type casts.
+// UncheckedTypeAssertionRule lints missing or ignored `ok`-value in dynamic type casts.
 type UncheckedTypeAssertionRule struct {
 	sync.Mutex
 	acceptIgnoredAssertionResult bool

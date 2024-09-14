@@ -3,7 +3,7 @@ package fixtures
 var foo any = "foo"
 
 func handleIgnoredIsOKByConfig() {
-	// No lint here bacuse `acceptIgnoredAssertionResult` is set to `true`
+	// No lint here because `acceptIgnoredAssertionResult` is set to `true`
 	r, _ := foo.(int)
 }
 
