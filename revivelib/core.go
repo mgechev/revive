@@ -2,6 +2,7 @@
 package revivelib
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -10,7 +11,6 @@ import (
 	"github.com/mgechev/revive/config"
 	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/logging"
-	"github.com/pkg/errors"
 )
 
 // Revive is responsible for running linters and formatters
@@ -31,7 +31,7 @@ func New(
 ) (*Revive, error) {
 	logger, err := logging.GetLogger()
 	if err != nil {
-		return nil, errors.Wrap(err, "initializing revive - getting logger")
+		return nil, fmt.Errorf("initializing revive - getting logger: %w", err)
 	}
 
 	if setExitStatus {
@@ -53,7 +53,7 @@ func New(
 
 	lintingRules, err := config.GetLintingRules(conf, extraRuleInstances)
 	if err != nil {
-		return nil, errors.Wrap(err, "initializing revive - getting lint rules")
+		return nil, fmt.Errorf("initializing revive - getting lint rules: %w", err)
 	}
 
 	logger.Println("Config loaded")
@@ -85,14 +85,14 @@ func (r *Revive) Lint(patterns ...*LintPattern) (<-chan lint.Failure, error) {
 
 	packages, err := getPackages(includePatterns, excludePatterns)
 	if err != nil {
-		return nil, errors.Wrap(err, "linting - getting packages")
+		return nil, fmt.Errorf("linting - getting packages: %w", err)
 	}
 
 	revive := lint.New(func(file string) ([]byte, error) {
 		contents, err := os.ReadFile(file)
 
 		if err != nil {
-			return nil, errors.Wrap(err, "reading file "+file)
+			return nil, fmt.Errorf("reading file %v: %w", file, err)
 		}
 
 		return contents, nil
@@ -100,7 +100,7 @@ func (r *Revive) Lint(patterns ...*LintPattern) (<-chan lint.Failure, error) {
 
 	failures, err := revive.Lint(packages, r.lintingRules, *r.config)
 	if err != nil {
-		return nil, errors.Wrap(err, "linting - retrieving failures channel")
+		return nil, fmt.Errorf("linting - retrieving failures channel: %w", err)
 	}
 
 	return failures, nil
@@ -117,7 +117,7 @@ func (r *Revive) Format(
 
 	formatter, err := config.GetFormatter(formatterName)
 	if err != nil {
-		return "", 0, errors.Wrap(err, "formatting - getting formatter")
+		return "", 0, fmt.Errorf("formatting - getting formatter: %w", err)
 	}
 
 	var (
@@ -157,7 +157,7 @@ func (r *Revive) Format(
 	<-exitChan
 
 	if formatErr != nil {
-		return "", exitCode, errors.Wrap(err, "formatting")
+		return "", exitCode, fmt.Errorf("formatting: %w", err)
 	}
 
 	return output, exitCode, nil
@@ -171,7 +171,7 @@ func getPackages(includePatterns []string, excludePatterns ArrayFlags) ([][]stri
 
 	packages, err := dots.ResolvePackages(globs, normalizeSplit(excludePatterns))
 	if err != nil {
-		return nil, errors.Wrap(err, "getting packages - resolving packages in dots")
+		return nil, fmt.Errorf("getting packages - resolving packages in dots: %w", err)
 	}
 
 	return packages, nil
