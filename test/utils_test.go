@@ -15,7 +15,6 @@ import (
 	"testing"
 
 	"github.com/mgechev/revive/lint"
-	"github.com/pkg/errors"
 )
 
 func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.RuleConfig) {
@@ -69,7 +68,7 @@ func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, ru
 
 	ins := parseInstructions(t, fi.Name(), src)
 	if ins == nil {
-		return errors.Errorf("Test file %v does not have instructions", fi.Name())
+		return fmt.Errorf("Test file %v does not have instructions", fi.Name())
 	}
 
 	ps, err := l.Lint([][]string{{fi.Name()}}, rules, lint.Config{
