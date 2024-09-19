@@ -34,9 +34,9 @@ var i, copy int // MATCH /redefinition of the built-in function copy/
 type ()
 
 func foo() {
-	clear := 0 // Shall not match /redefinition of the built-in function clear/
-	max := 0   // Shall not match /redefinition of the built-in function max/
-	min := 0   // Shall not match /redefinition of the built-in function min/
+	clear := 0 // MATCH /redefinition of the built-in function clear/
+	max := 0   // MATCH /redefinition of the built-in function max/
+	min := 0   // MATCH /redefinition of the built-in function min/
 	_ = clear
 	_ = max
 	_ = min

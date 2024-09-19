@@ -64,7 +64,7 @@ func TestAll(t *testing.T) {
 				t.Fatalf("Failed reading %s: %v", fi.Name(), err)
 			}
 
-			if err := assertFailures(t, baseDir, fileInfo, src, rules, map[string]lint.RuleConfig{}); err != nil {
+			if err := assertFailures(t, path.Dir(baseDir), fileInfo, src, rules, map[string]lint.RuleConfig{}); err != nil {
 				t.Errorf("Linting %s: %v", fi.Name(), err)
 			}
 		})
