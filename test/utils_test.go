@@ -10,6 +10,7 @@ import (
 	"go/token"
 	"go/types"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 	"testing"
@@ -18,13 +19,14 @@ import (
 )
 
 func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.RuleConfig) {
-	baseDir := "../testdata/"
-	filename = filename + ".go"
-	src, err := os.ReadFile(baseDir + filename)
+	baseDir := path.Join("../testdata/" + path.Dir(filename))
+	filename = path.Base(filename) + ".go"
+	fullFilePath := path.Join(baseDir, filename)
+	src, err := os.ReadFile(fullFilePath)
 	if err != nil {
 		t.Fatalf("Bad filename path in test for %s: %v", rule.Name(), err)
 	}
-	stat, err := os.Stat(baseDir + filename)
+	stat, err := os.Stat(fullFilePath)
 	if err != nil {
 		t.Fatalf("Cannot get file info for %s: %v", rule.Name(), err)
 	}
@@ -32,7 +34,7 @@ func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.Rul
 	if config != nil {
 		c[rule.Name()] = *config[0]
 	}
-	if parseInstructions(t, filename, src) == nil {
+	if parseInstructions(t, fullFilePath, src) == nil {
 		assertSuccess(t, baseDir, stat, []lint.Rule{rule}, c)
 		return
 	}
@@ -41,10 +43,11 @@ func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.Rul
 
 func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, rules []lint.Rule, config map[string]lint.RuleConfig) error {
 	l := lint.New(func(file string) ([]byte, error) {
-		return os.ReadFile(baseDir + file)
+		return os.ReadFile(file)
 	}, 0)
 
-	ps, err := l.Lint([][]string{{fi.Name()}}, rules, lint.Config{
+	filePath := path.Join(baseDir, fi.Name())
+	ps, err := l.Lint([][]string{{filePath}}, rules, lint.Config{
 		Rules: config,
 	})
 	if err != nil {
@@ -63,15 +66,15 @@ func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, rules []lint.Ru
 
 func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, rules []lint.Rule, config map[string]lint.RuleConfig) error {
 	l := lint.New(func(file string) ([]byte, error) {
-		return os.ReadFile(baseDir + file)
+		return os.ReadFile(file)
 	}, 0)
 
-	ins := parseInstructions(t, fi.Name(), src)
+	ins := parseInstructions(t, path.Join(baseDir, fi.Name()), src)
 	if ins == nil {
 		return fmt.Errorf("Test file %v does not have instructions", fi.Name())
 	}
 
-	ps, err := l.Lint([][]string{{fi.Name()}}, rules, lint.Config{
+	ps, err := l.Lint([][]string{{path.Join(baseDir, fi.Name())}}, rules, lint.Config{
 		Rules: config,
 	})
 	if err != nil {

@@ -38,7 +38,7 @@ func TestFileExcludeFilterAtRuleLevel(t *testing.T) {
 
 	t.Run("not called if exclude not match", func(t *testing.T) {
 		rule := &TestFileFilterRule{}
-		cfg := &lint.RuleConfig{Exclude: []string{"file-to-exclude.go"}}
+		cfg := &lint.RuleConfig{Exclude: []string{"../testdata/file-to-exclude.go"}}
 		cfg.Initialize()
 		testRule(t, "file-to-exclude", rule, cfg)
 		if rule.WasApplyed {
