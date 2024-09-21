@@ -135,12 +135,8 @@ func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, arguments lint.
 				var prevType ast.Expr
 				if fn.Type.Params != nil {
 					for _, field := range fn.Type.Params.List {
-						if r.isInvalidType(typesInfo.Types[field.Type].Type) {
-							// TODO: In theory, we could have compared raw import names (import package alias + selector), but will it work properly in all the cases?
-							continue
-						}
-
-						if types.Identical(typesInfo.Types[field.Type].Type, typesInfo.Types[prevType].Type) {
+						// TODO: For invalid types we could have compared raw import names (import package alias + selector), but will it work properly in all the cases?
+						if !r.isInvalidType(typesInfo.Types[field.Type].Type) && types.Identical(typesInfo.Types[field.Type].Type, typesInfo.Types[prevType].Type) {
 							failures = append(failures, lint.Failure{
 								Confidence: 1,
 								Node:       field,
@@ -172,12 +168,8 @@ func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, arguments lint.
 				var prevType ast.Expr
 				if fn.Type.Results != nil {
 					for _, field := range fn.Type.Results.List {
-						if r.isInvalidType(typesInfo.Types[field.Type].Type) {
-							// TODO: In theory, we could have compared raw import names (import package alias + selector), but will it work properly in all the cases?
-							continue
-						}
-
-						if field.Names != nil && types.Identical(typesInfo.Types[field.Type].Type, typesInfo.Types[prevType].Type) {
+						// TODO: For invalid types we could have compared raw import names (import package alias + selector), but will it work properly in all the cases?
+						if !r.isInvalidType(typesInfo.Types[field.Type].Type) && field.Names != nil && types.Identical(typesInfo.Types[field.Type].Type, typesInfo.Types[prevType].Type) {
 							failures = append(failures, lint.Failure{
 								Confidence: 1,
 								Node:       field,
