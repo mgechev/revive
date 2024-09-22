@@ -3,16 +3,60 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"strconv"
+	"strings"
+	"sync"
 
 	"github.com/mgechev/revive/internal/typeparams"
 	"github.com/mgechev/revive/lint"
 )
 
 // ReceiverNamingRule lints given else constructs.
-type ReceiverNamingRule struct{}
+type ReceiverNamingRule struct {
+	receiverNameMaxLength int
+	sync.Mutex
+}
+
+const defaultReceiverNameMaxLength = -1 // thus will not check
+
+func (r *ReceiverNamingRule) configure(arguments lint.Arguments) {
+	r.Lock()
+	defer r.Unlock()
+	if r.receiverNameMaxLength == 0 {
+		if len(arguments) < 1 {
+			r.receiverNameMaxLength = defaultReceiverNameMaxLength
+			return
+		}
+		arg := arguments[0]
+		argStr, ok := arg.(string)
+		if !ok {
+			panic(fmt.Sprintf("Invalid argument for %s rule. Expecting an string, got %T", r.Name(), arg))
+		}
+
+		parts := strings.Split(argStr, "=")
+		if len(parts) != 2 {
+			panic(fmt.Sprintf("Invalid argument for %s rule. Expecting an string of the form 'key=value', got %s", r.Name(), argStr))
+		}
+
+		key := strings.TrimSpace(parts[0])
+		value := strings.TrimSpace(parts[1])
+		switch key {
+		case "max-length":
+			var err error
+			r.receiverNameMaxLength, err = strconv.Atoi(value)
+			if err != nil {
+				panic(fmt.Sprintf("Invalid value %s for the configuration key max-length, expected integer value: %v", value, err))
+			}
+		default:
+			panic(fmt.Sprintf("Unknown configuration key %s for %s rule.", key, r.Name()))
+		}
+	}
+}
 
 // Apply applies the rule to given file.
-func (*ReceiverNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *ReceiverNamingRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
+	r.configure(args)
+
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -20,7 +64,8 @@ func (*ReceiverNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failu
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
-		typeReceiver: map[string]string{},
+		typeReceiver:          map[string]string{},
+		receiverNameMaxLength: r.receiverNameMaxLength,
 	}
 
 	ast.Walk(walker, fileAst)
@@ -34,8 +79,9 @@ func (*ReceiverNamingRule) Name() string {
 }
 
 type lintReceiverName struct {
-	onFailure    func(lint.Failure)
-	typeReceiver map[string]string
+	onFailure             func(lint.Failure)
+	typeReceiver          map[string]string
+	receiverNameMaxLength int
 }
 
 func (w lintReceiverName) Visit(n ast.Node) ast.Visitor {
@@ -66,6 +112,17 @@ func (w lintReceiverName) Visit(n ast.Node) ast.Visitor {
 		})
 		return w
 	}
+
+	if w.receiverNameMaxLength > 0 && len(name) > w.receiverNameMaxLength {
+		w.onFailure(lint.Failure{
+			Node:       n,
+			Confidence: 1,
+			Category:   "naming",
+			Failure:    fmt.Sprintf("receiver name %s is longer than %d characters", name, w.receiverNameMaxLength),
+		})
+		return w
+	}
+
 	recv := typeparams.ReceiverType(fn)
 	if prev, ok := w.typeReceiver[recv]; ok && prev != name {
 		w.onFailure(lint.Failure{
