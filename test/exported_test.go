@@ -30,3 +30,10 @@ func TestCheckPublicInterfaceOption(t *testing.T) {
 
 	testRule(t, "exported-issue-1002", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: args})
 }
+
+func TestExportedDisableKindWarnings(t *testing.T) {
+
+	args := []any{[]interface{}{"const", "function", "method", "type"}}
+	testRule(t, "exported-issue-1045", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: args})
+
+}
