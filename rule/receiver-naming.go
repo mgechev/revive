@@ -108,7 +108,7 @@ func (w lintReceiverName) Visit(n ast.Node) ast.Visitor {
 		return w
 	}
 
-	if w.receiverNameMaxLength > 0 && len(name) > w.receiverNameMaxLength {
+	if w.receiverNameMaxLength > 0 && len([]rune(name)) > w.receiverNameMaxLength {
 		w.onFailure(lint.Failure{
 			Node:       n,
 			Confidence: 1,
