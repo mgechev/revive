@@ -3,8 +3,6 @@ package rule
 import (
 	"fmt"
 	"go/ast"
-	"strconv"
-	"strings"
 	"sync"
 
 	"github.com/mgechev/revive/internal/typeparams"
@@ -22,33 +20,30 @@ const defaultReceiverNameMaxLength = -1 // thus will not check
 func (r *ReceiverNamingRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	defer r.Unlock()
-	if r.receiverNameMaxLength == 0 {
-		if len(arguments) < 1 {
-			r.receiverNameMaxLength = defaultReceiverNameMaxLength
-			return
-		}
-		arg := arguments[0]
-		argStr, ok := arg.(string)
-		if !ok {
-			panic(fmt.Sprintf("Invalid argument for %s rule. Expecting an string, got %T", r.Name(), arg))
-		}
+	if r.receiverNameMaxLength != 0 {
+		return
+	}
 
-		parts := strings.Split(argStr, "=")
-		if len(parts) != 2 {
-			panic(fmt.Sprintf("Invalid argument for %s rule. Expecting an string of the form 'key=value', got %s", r.Name(), argStr))
-		}
+	r.receiverNameMaxLength = defaultReceiverNameMaxLength
+	if len(arguments) < 1 {
+		return
+	}
 
-		key := strings.TrimSpace(parts[0])
-		value := strings.TrimSpace(parts[1])
-		switch key {
-		case "max-length":
-			var err error
-			r.receiverNameMaxLength, err = strconv.Atoi(value)
-			if err != nil {
-				panic(fmt.Sprintf("Invalid value %s for the configuration key max-length, expected integer value: %v", value, err))
+	args, ok := arguments[0].(map[string]any)
+	if !ok {
+		panic(fmt.Sprintf("Unable to get arguments for rule %s. Expected object of key-value-pairs.", r.Name()))
+	}
+
+	for k, v := range args {
+		switch k {
+		case "maxLength":
+			value, ok := v.(int64)
+			if !ok {
+				panic(fmt.Sprintf("Invalid value %v for argument %s of rule %s, expected integer value got %T", v, k, r.Name(), v))
 			}
+			r.receiverNameMaxLength = int(value)
 		default:
-			panic(fmt.Sprintf("Unknown configuration key %s for %s rule.", key, r.Name()))
+			panic(fmt.Sprintf("Unknown argument %s for %s rule.", k, r.Name()))
 		}
 	}
 }
