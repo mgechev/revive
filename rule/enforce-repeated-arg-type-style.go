@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/types"
+	"strings"
 	"sync"
 
 	"github.com/mgechev/revive/lint"
@@ -134,7 +135,8 @@ func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, arguments lint.
 				var prevType ast.Expr
 				if fn.Type.Params != nil {
 					for _, field := range fn.Type.Params.List {
-						if types.Identical(typesInfo.Types[field.Type].Type, typesInfo.Types[prevType].Type) {
+						// TODO: For invalid types we could have compared raw import names (import package alias + selector), but will it work properly in all the cases?
+						if !r.isInvalidType(typesInfo.Types[field.Type].Type) && types.Identical(typesInfo.Types[field.Type].Type, typesInfo.Types[prevType].Type) {
 							failures = append(failures, lint.Failure{
 								Confidence: 1,
 								Node:       field,
@@ -166,7 +168,8 @@ func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, arguments lint.
 				var prevType ast.Expr
 				if fn.Type.Results != nil {
 					for _, field := range fn.Type.Results.List {
-						if field.Names != nil && types.Identical(typesInfo.Types[field.Type].Type, typesInfo.Types[prevType].Type) {
+						// TODO: For invalid types we could have compared raw import names (import package alias + selector), but will it work properly in all the cases?
+						if !r.isInvalidType(typesInfo.Types[field.Type].Type) && field.Names != nil && types.Identical(typesInfo.Types[field.Type].Type, typesInfo.Types[prevType].Type) {
 							failures = append(failures, lint.Failure{
 								Confidence: 1,
 								Node:       field,
@@ -188,4 +191,11 @@ func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, arguments lint.
 // Name returns the name of the linter rule.
 func (*EnforceRepeatedArgTypeStyleRule) Name() string {
 	return "enforce-repeated-arg-type-style"
+}
+
+// Invalid types are imported from other packages, and we can't compare them.
+// Note, we check the string suffix to cover all the cases: non-pointer, pointer, double pointer, etc.
+// See: https://github.com/mgechev/revive/issues/1032
+func (*EnforceRepeatedArgTypeStyleRule) isInvalidType(t types.Type) bool {
+	return strings.HasSuffix(t.String(), "invalid type")
 }

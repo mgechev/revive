@@ -389,6 +389,9 @@ declaration. The 'short' style encourages omitting repeated types for concisenes
 whereas the 'full' style mandates explicitly stating the type for each argument
 and return value, even if they are repeated, promoting clarity.
 
+_IMPORTANT_: When `short` style is used, the rule will not flag the arguments that use
+imported types. This is because the rule cannot efficiently determine the imported type.
+
 _Configuration (1)_: (string) as a single string, it configures both argument
 and return value styles. Accepts 'any', 'short', or 'full' (default: 'any').
 
