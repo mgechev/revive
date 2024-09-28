@@ -204,8 +204,8 @@ func (w *lintExported) lintTypeDoc(t *ast.TypeSpec, doc *ast.CommentGroup) {
 		}
 	}
 	// if comment starts with name of type and has some text after - it's ok
-	expectedPrefix := t.Name.Name+" "
-	if strings.HasPrefix(s, expectedPrefix){
+	expectedPrefix := t.Name.Name + " "
+	if strings.HasPrefix(s, expectedPrefix) {
 		return
 	}
 	w.onFailure(lint.Failure{
@@ -244,7 +244,7 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 		return
 	}
 
-	if vs.Doc == nil && vs.Comment == nil && gd.Doc == nil {
+	if vs.Doc == nil && gd.Doc == nil {
 		if genDeclMissingComments[gd] {
 			return
 		}
@@ -348,7 +348,7 @@ func (w *lintExported) doCheckPublicInterface(typeName string, iface *ast.Interf
 
 func (w *lintExported) lintInterfaceMethod(typeName string, m *ast.Field) {
 	if len(m.Names) == 0 {
-		return 
+		return
 	}
 	if !ast.IsExported(m.Names[0].Name) {
 		return
