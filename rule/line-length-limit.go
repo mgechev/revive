@@ -29,12 +29,12 @@ func (r *LineLengthLimitRule) configure(arguments lint.Arguments) {
 			return
 		}
 
-		max, ok := arguments[0].(int64) // Alt. non panicking version
-		if !ok || max < 0 {
+		maxLength, ok := arguments[0].(int64) // Alt. non panicking version
+		if !ok || maxLength < 0 {
 			panic(`invalid value passed as argument number to the "line-length-limit" rule`)
 		}
 
-		r.max = int(max)
+		r.max = int(maxLength)
 	}
 }
 

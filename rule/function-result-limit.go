@@ -24,14 +24,14 @@ func (r *FunctionResultsLimitRule) configure(arguments lint.Arguments) {
 			r.max = defaultResultsLimit
 			return
 		}
-		max, ok := arguments[0].(int64) // Alt. non panicking version
+		maxResults, ok := arguments[0].(int64) // Alt. non panicking version
 		if !ok {
 			panic(fmt.Sprintf(`invalid value passed as return results number to the "function-result-limit" rule; need int64 but got %T`, arguments[0]))
 		}
-		if max < 0 {
+		if maxResults < 0 {
 			panic(`the value passed as return results number to the "function-result-limit" rule cannot be negative`)
 		}
-		r.max = int(max)
+		r.max = int(maxResults)
 	}
 }
 
