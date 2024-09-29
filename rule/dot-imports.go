@@ -81,12 +81,13 @@ type lintImports struct {
 }
 
 func (w lintImports) Visit(_ ast.Node) ast.Visitor {
-	for _, is := range w.fileAst.Imports {
-		if is.Name != nil && is.Name.Name == "." && !w.allowPackages.isAllowedPackage(is.Path.Value) {
+	for _, importSpec := range w.fileAst.Imports {
+		isDotImport := importSpec.Name != nil && importSpec.Name.Name == "."
+		if isDotImport && !w.allowPackages.isAllowedPackage(importSpec.Path.Value) {
 			w.onFailure(lint.Failure{
 				Confidence: 1,
 				Failure:    "should not use dot imports",
-				Node:       is,
+				Node:       importSpec,
 				Category:   "imports",
 			})
 		}

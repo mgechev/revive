@@ -16,10 +16,12 @@ type DeferRule struct {
 
 func (r *DeferRule) configure(arguments lint.Arguments) {
 	r.Lock()
-	if r.allow == nil {
-		r.allow = r.allowFromArgs(arguments)
+	defer r.Unlock()
+	if r.allow != nil {
+		return // already configured
 	}
-	r.Unlock()
+
+	r.allow = r.allowFromArgs(arguments)
 }
 
 // Apply applies the rule to given file.
