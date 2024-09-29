@@ -4,16 +4,16 @@
 package foo
 
 const (
-	InlineComment = "ShouldBeOK" // InlineComment is a valid comment
+	InlineComment = "ShouldBeOK" // InlineComment is not a valid documentation
+	// MATCH:7 /exported const InlineComment should have comment (or a comment on this block) or be unexported/
 
-	// Prefix for something.
 	// MATCH /comment on exported const InlineWhatever should be of the form "InlineWhatever ..."/
 	InlineWhatever = "blah"
 
 	Whatsit = "missing_comment"
-	// MATCH:13 /exported const Whatsit should have comment (or a comment on this block) or be unexported/
 
 	// We should only warn once per block for missing comments,
+	// thus do not warn on:13 /exported const Whatsit should have comment (or a comment on this block) or be unexported/
 	// but always complain about malformed comments.
 
 	WhosYourDaddy = "another_missing_one"
