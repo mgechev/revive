@@ -14,8 +14,8 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// IgnoredWarnings store ignored warnings types
-type IgnoredWarnings struct {
+// ignoredWarnings store ignored warnings types
+type ignoredWarnings struct {
 	Const    bool
 	Function bool
 	Method   bool
@@ -23,10 +23,9 @@ type IgnoredWarnings struct {
 	Var      bool
 }
 
-// Name returns the rule name.
-func (i *IgnoredWarnings) isDisabled(t string) bool {
-
-	switch t {
+// isDisabled checks if kind is known and return bool if it matched
+func (i *ignoredWarnings) isDisabled(kind string) bool {
+	switch kind {
 	case "var":
 		return i.Var
 	case "const":
@@ -36,11 +35,10 @@ func (i *IgnoredWarnings) isDisabled(t string) bool {
 	case "method":
 		return i.Method
 	case "type":
-		return i.Type
-	default:
-		panic(fmt.Sprintf("Unknown ignore warning flag %s", t))
+		return i.Type	
 	}
 
+	return false
 }
 
 // ExportedRule lints given else constructs.
@@ -50,63 +48,62 @@ type ExportedRule struct {
 	disableStutteringCheck bool
 	checkPublicInterface   bool
 	stuttersMsg            string
-	disabledWarningsTypes  IgnoredWarnings
+	disabledWarningsTypes  ignoredWarnings
 	sync.Mutex
 }
 
 func (r *ExportedRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	defer r.Unlock()
-	if !r.configured {
-		r.disabledWarningsTypes = IgnoredWarnings{}
-		r.stuttersMsg = "stutters"
-		for _, flag := range arguments {
-
-			switch flag.(type) {
-			case string:
-				flagStr, ok := flag.(string)
-				if !ok {
-					panic(fmt.Sprintf("Invalid argument for the %s rule: expecting a string, got %T", r.Name(), flag))
-				}
-				switch flagStr {
-				case "checkPrivateReceivers":
-					r.checkPrivateReceivers = true
-				case "disableStutteringCheck":
-					r.disableStutteringCheck = true
-				case "sayRepetitiveInsteadOfStutters":
-					r.stuttersMsg = "is repetitive"
-				case "checkPublicInterface":
-					r.checkPublicInterface = true
-				default:
-					panic(fmt.Sprintf("Unknown configuration flag %s for %s rule", flagStr, r.Name()))
-				}
-			case []interface{}:
-				flagSlice, ok := flag.([]interface{})
-				if !ok {
-					panic(fmt.Sprintf("Invalid argument for the %s rule: expecting a []string, got %T", r.Name(), flag))
-				}
-				for _, val := range flagSlice {
-					switch val {
-					case "const":
-						r.disabledWarningsTypes.Const = true
-					case "function":
-						r.disabledWarningsTypes.Function = true
-					case "method":
-						r.disabledWarningsTypes.Method = true
-					case "type":
-						r.disabledWarningsTypes.Type = true
-					case "var":
-						r.disabledWarningsTypes.Var = true
-					}
-				}
-
-			default:
-				panic(fmt.Sprintf("Unknown configuration flag type %s for %s rule", reflect.TypeOf(flag), r.Name()))
-			}
-
-		}
-		r.configured = true
+	if r.configured {
+		return
 	}
+
+	r.disabledWarningsTypes = ignoredWarnings{}
+	r.stuttersMsg = "stutters"
+	for _, flag := range arguments {
+		switch flag.(type) {
+		case string:
+			flagStr, ok := flag.(string)
+			if !ok {
+				panic(fmt.Sprintf("Invalid argument for the %s rule: expecting a string, got %T", r.Name(), flag))
+			}
+			switch flagStr {
+			case "checkPrivateReceivers":
+				r.checkPrivateReceivers = true
+			case "disableStutteringCheck":
+				r.disableStutteringCheck = true
+			case "sayRepetitiveInsteadOfStutters":
+				r.stuttersMsg = "is repetitive"
+			case "checkPublicInterface":
+				r.checkPublicInterface = true
+			default:
+				panic(fmt.Sprintf("Unknown configuration flag %s for %s rule", flagStr, r.Name()))
+			}
+		case []interface{}:
+			flagSlice, ok := flag.([]interface{})
+			if !ok {
+				panic(fmt.Sprintf("Invalid argument for the %s rule: expecting a []string, got %T", r.Name(), flag))
+			}
+			for _, val := range flagSlice {
+				switch val {
+				case "const":
+					r.disabledWarningsTypes.Const = true
+				case "function":
+					r.disabledWarningsTypes.Function = true
+				case "method":
+					r.disabledWarningsTypes.Method = true
+				case "type":
+					r.disabledWarningsTypes.Type = true
+				case "var":
+					r.disabledWarningsTypes.Var = true
+				}
+			}
+		default:
+			panic(fmt.Sprintf("Unknown configuration flag type %s for %s rule", reflect.TypeOf(flag), r.Name()))
+		}
+	}
+	r.configured = true
 }
 
 // Apply applies the rule to given file.
@@ -154,7 +151,7 @@ type lintExported struct {
 	disableStutteringCheck bool
 	checkPublicInterface   bool
 	stuttersMsg            string
-	disabledWarningsTypes  IgnoredWarnings
+	disabledWarningsTypes  ignoredWarnings
 }
 
 func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
