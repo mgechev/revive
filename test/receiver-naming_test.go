@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/mgechev/revive/internal/typeparams"
+	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/rule"
 )
 
@@ -12,4 +13,12 @@ func TestReceiverNamingTypeParams(t *testing.T) {
 		t.Skip("type parameters are not enabled in the current build environment")
 	}
 	testRule(t, "receiver-naming-issue-669", &rule.ReceiverNamingRule{})
+}
+
+func TestReceiverNamingMaxLength(t *testing.T) {
+	args := []any{map[string]any{
+		"maxLength": int64(2),
+	}}
+	testRule(t, "receiver-naming-issue-1040", &rule.ReceiverNamingRule{},
+		&lint.RuleConfig{Arguments: args})
 }

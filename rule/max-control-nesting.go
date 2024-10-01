@@ -120,9 +120,9 @@ func (r *MaxControlNestingRule) configure(arguments lint.Arguments) {
 
 	checkNumberOfArguments(1, arguments, r.Name())
 
-	max, ok := arguments[0].(int64) // Alt. non panicking version
+	maxNesting, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok {
 		panic(`invalid value passed as argument number to the "max-control-nesting" rule`)
 	}
-	r.max = max
+	r.max = maxNesting
 }

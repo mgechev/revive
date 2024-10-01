@@ -79,7 +79,7 @@ func (r *ExportedRule) configure(arguments lint.Arguments) {
 					r.checkPublicInterface = true
 				default:
 					panic(fmt.Sprintf("Unknown configuration flag %s for %s rule", flagStr, r.Name()))
-				}	
+				}
 			case []interface{}:
 				flagSlice, ok := flag.([]interface{})
 				if !ok {
@@ -305,7 +305,7 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 		return
 	}
 
-	if vs.Doc == nil && vs.Comment == nil && gd.Doc == nil {
+	if vs.Doc == nil && gd.Doc == nil {
 		if genDeclMissingComments[gd] {
 			return
 		}
