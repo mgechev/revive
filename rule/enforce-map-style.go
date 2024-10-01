@@ -94,8 +94,8 @@ func (r *EnforceMapStyleRule) Apply(file *lint.File, arguments lint.Arguments) [
 				return true
 			}
 
-			if len(v.Elts) > 0 {
-				// not an empty map
+			isEmptyMap := len(v.Elts) > 0
+			if isEmptyMap {
 				return true
 			}
 

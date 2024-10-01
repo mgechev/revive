@@ -110,7 +110,7 @@ func (r *MaxControlNestingRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	defer r.Unlock()
 	if !(r.max < 1) {
-		return // max already set
+		return // max already configured
 	}
 
 	if len(arguments) < 1 {
