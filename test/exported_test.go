@@ -31,3 +31,8 @@ func TestCheckPublicInterfaceOption(t *testing.T) {
 	testRule(t, "exported-issue-1002", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: args})
 }
 
+func TestCheckDisablingOnDeclarationTypes(t *testing.T) {
+	args := []any{"disableChecksOnConstants", "disableChecksOnFunctions", "disableChecksOnMethods", "disableChecksOnTypes", "disableChecksOnVariables"}
+
+	testRule(t, "exported-issue-1045", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: args})
+}
