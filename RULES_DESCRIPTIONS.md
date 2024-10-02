@@ -475,13 +475,17 @@ Available flags are:
 * _disableStutteringCheck_ disables checking for method names that stutter with the package name (i.e. avoid failure messages of the form _type name will be used as x.XY by other packages, and that stutters; consider calling this Y_)
 * _sayRepetitiveInsteadOfStutters_ replaces the use of the term _stutters_ by _repetitive_ in failure messages
 * _checkPublicInterface_ enabled checking public method definitions in public interface types
-* []string list of code types to ignore warnings, avaliable options: function, method, type and var
+* _disableChecksOnConstants_ disable all checks on constant declarations
+* _disableChecksOnFunctions_ disable all checks on function declarations
+* _disableChecksOnMethods_ disable all checks on method declarations
+* _disableChecksOnTypes_ disable all checks on type declarations
+* _disableChecksOnVariables_ disable all checks on variable declarations
 
 Example:
 
 ```toml
 [rule.exported]
-  arguments = ["checkPrivateReceivers", "disableStutteringCheck", "checkPublicInterface", ["function","method","type","var"]]
+  arguments = ["checkPrivateReceivers", "disableStutteringCheck", "checkPublicInterface", "disableChecksOnFunctions"]
 ```
 
 ## file-header
