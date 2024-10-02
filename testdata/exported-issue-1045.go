@@ -17,6 +17,8 @@ func (t *Tags) Keys() []string {}
 // A value which may be passed to the which parameter for Getitimer and
 type ItimerWhich int
 
+// toolchain var incorrect
+var ToolchainRE = "toolchain"
 
 /*
 // PropertyBag 
