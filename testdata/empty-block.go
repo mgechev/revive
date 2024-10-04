@@ -16,7 +16,12 @@ func h() {
 	select {} // Must not match
 }
 
-func g(f func() bool) {
+var (
+	pkgDeclChan chan int
+	pkgDefChan  = make(chan int)
+)
+
+func g(f func() bool, paramChan chan int) {
 	{ // MATCH /this block is empty, you can remove it/
 	}
 
@@ -48,7 +53,41 @@ func g(f func() bool) {
 
 	// issue 386, then overwritten by issue 416
 	var c = make(chan int)
-	for range c { // MATCH /this block is empty, you can remove it/
+	for range c { // Must not match
+	}
+
+	assignChan := make(chan int)
+	for range assignChan { // Must not match
+	}
+
+	_, reAssignChan, _ := "foo", assignChan, "bar"
+	for range reAssignChan { // Must not match
+	}
+
+	_, secondChan := twoValues()
+	for range secondChan { // Must not match
+	}
+
+	for range paramChan { // Must not match
+	}
+
+	reAssignParamChan := paramChan
+	for range reAssignParamChan { // Must not match
+	}
+
+	for range callChan() { // Must not match
+	}
+
+	for range func() <-chan int {
+		c := make(chan int)
+		return c
+	}() { // Must not match
+	}
+
+	for range pkgDeclChan { // Must not match
+	}
+
+	for range pkgDefChan { // Must not match
 	}
 
 	var s = "a string"
@@ -90,4 +129,12 @@ type iterator struct{}
 
 func (it *iterator) next() bool {
 	return false
+}
+
+func callChan() <-chan int {
+	return make(chan int)
+}
+
+func twoValues() (interface{}, <-chan int) {
+	return "test", make(chan int)
 }
