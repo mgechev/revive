@@ -82,6 +82,11 @@ func (r *Revive) Lint(patterns ...*LintPattern) (<-chan lint.Failure, error) {
 	if len(excludePatterns) == 0 { // if no excludes were set
 		excludePatterns = r.config.Exclude // use those from the configuration
 	}
+	
+	// by default if no excludes exclude vendor
+	if len(excludePatterns) == 0 {
+		excludePatterns = []string{"vendor/..."}
+	}
 
 	packages, err := getPackages(includePatterns, excludePatterns)
 	if err != nil {
