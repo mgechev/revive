@@ -5,7 +5,7 @@ go 1.22.1
 require (
 	github.com/BurntSushi/toml v1.4.0
 	github.com/chavacava/garif v0.1.0
-	github.com/fatih/color v1.17.0
+	github.com/fatih/color v1.18.0
 	github.com/fatih/structtag v1.2.0
 	github.com/hashicorp/go-version v1.7.0
 	github.com/mgechev/dots v0.0.0-20210922191527-e955255bf517
