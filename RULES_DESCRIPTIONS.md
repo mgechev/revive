@@ -38,6 +38,7 @@ List of all available rules.
   - [errorf](#errorf)
   - [exported](#exported)
   - [file-header](#file-header)
+  - [file-length-limit](#file-length-limit)
   - [flag-parameter](#flag-parameter)
   - [function-length](#function-length)
   - [function-result-limit](#function-result-limit)
@@ -499,6 +500,23 @@ Example:
 ```toml
 [rule.file-header]
   arguments = ["This is the text that must appear at the top of source files."]
+```
+
+## file-length-limit
+
+_Description_: This rule enforces a maximum number of lines per file, in order to aid in maintainability and reduce complexity.
+
+_Configuration_:
+
+* `max` (int) a maximum number of lines in a file (default 1000)
+* `skipComments` (bool) ignore lines containing just comments
+* `skipBlankLines` (bool) ignore lines made up purely of whitespace
+
+Example:
+
+```toml
+[rule.file-length-limit]
+  arguments = [{max=100,skipComments=true,skipBlankLines=true}]
 ```
 
 ## flag-parameter
