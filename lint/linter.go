@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"go/token"
 	"os"
-	"path"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -175,7 +174,7 @@ func detectGoMod(dir string) (rootDir string, ver *goversion.Version, err error)
 	}
 
 	ver, err = goversion.NewVersion(modAst.Go.Version)
-	return path.Dir(modFileName), ver, err
+	return filepath.Dir(modFileName), ver, err
 }
 
 func retrieveModFile(dir string) (string, error) {
@@ -185,11 +184,11 @@ func retrieveModFile(dir string) (string, error) {
 			return "", fmt.Errorf("did not found %q file", lookingForFile)
 		}
 
-		lookingForFilePath := path.Join(dir, lookingForFile)
+		lookingForFilePath := filepath.Join(dir, lookingForFile)
 		info, err := os.Stat(lookingForFilePath)
 		if err != nil || info.IsDir() {
 			// lets check the parent dir
-			dir = path.Dir(dir)
+			dir = filepath.Dir(dir)
 			continue
 		}
 
