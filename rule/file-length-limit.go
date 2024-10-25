@@ -31,7 +31,7 @@ func (r *FileLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) [
 	scanner := bufio.NewScanner(bytes.NewReader(file.Content()))
 	for scanner.Scan() {
 		all++
-		if len(scanner.Bytes()) == 0 {
+		if len(bytes.TrimSpace(scanner.Bytes())) == 0 {
 			blank++
 		}
 	}
@@ -113,6 +113,9 @@ func countCommentLines(comments []*ast.CommentGroup) int {
 	count := 0
 	for _, cg := range comments {
 		for _, comment := range cg.List {
+			if len(comment.Text) < 2 {
+				continue
+			}
 			switch comment.Text[1] {
 			case '/': // single-line comment
 				count++

@@ -508,9 +508,9 @@ _Description_: This rule enforces a maximum number of lines per file, in order t
 
 _Configuration_:
 
-* `max` (int) a maximum number of lines in a file (default 1000)
-* `skipComments` (bool) ignore lines containing just comments
-* `skipBlankLines` (bool) ignore lines made up purely of whitespace
+* `max` (int) a maximum number of lines in a file (default `1000`)
+* `skipComments` (bool) if true ignore and do not count lines containing just comments (default `false`)
+* `skipBlankLines` (bool) if true ignore and do not count lines made up purely of whitespace (default `false`)
 
 Example:
 
