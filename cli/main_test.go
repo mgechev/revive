@@ -22,13 +22,13 @@ func TestXDGConfigDirIsPrefferedFirst(t *testing.T) {
 
 	xdgDirPath := "/tmp-iofs/xdg/config"
 	homeDirPath := "/tmp-iofs/home/tester"
-	AppFs.MkdirAll(xdgDirPath, 0755)
-	AppFs.MkdirAll(homeDirPath, 0755)
+	AppFs.MkdirAll(xdgDirPath, 0o755)
+	AppFs.MkdirAll(homeDirPath, 0o755)
 
-	afero.WriteFile(AppFs, xdgDirPath+"/revive.toml", []byte("\n"), 0644)
+	afero.WriteFile(AppFs, xdgDirPath+"/revive.toml", []byte("\n"), 0o644)
 	t.Setenv("XDG_CONFIG_HOME", xdgDirPath)
 
-	afero.WriteFile(AppFs, homeDirPath+"/revive.toml", []byte("\n"), 0644)
+	afero.WriteFile(AppFs, homeDirPath+"/revive.toml", []byte("\n"), 0o644)
 	t.Setenv("HOME", homeDirPath)
 
 	got := buildDefaultConfigPath()
@@ -40,11 +40,10 @@ func TestXDGConfigDirIsPrefferedFirst(t *testing.T) {
 }
 
 func TestHomeConfigDir(t *testing.T) {
-
 	homeDirPath := "/tmp-iofs/home/tester"
-	AppFs.MkdirAll(homeDirPath, 0755)
+	AppFs.MkdirAll(homeDirPath, 0o755)
 
-	afero.WriteFile(AppFs, homeDirPath+"/revive.toml", []byte("\n"), 0644)
+	afero.WriteFile(AppFs, homeDirPath+"/revive.toml", []byte("\n"), 0o644)
 	t.Setenv("HOME", homeDirPath)
 
 	got := buildDefaultConfigPath()
@@ -57,9 +56,9 @@ func TestHomeConfigDir(t *testing.T) {
 
 func TestXDGConfigDir(t *testing.T) {
 	xdgDirPath := "/tmp-iofs/xdg/config"
-	AppFs.MkdirAll(xdgDirPath, 0755)
+	AppFs.MkdirAll(xdgDirPath, 0o755)
 
-	afero.WriteFile(AppFs, xdgDirPath+"/revive.toml", []byte("\n"), 0644)
+	afero.WriteFile(AppFs, xdgDirPath+"/revive.toml", []byte("\n"), 0o644)
 	t.Setenv("XDG_CONFIG_HOME", xdgDirPath)
 
 	got := buildDefaultConfigPath()

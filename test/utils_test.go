@@ -107,11 +107,9 @@ func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, ru
 				}
 
 				if in.Confidence > 0 {
-
 					if in.Confidence != p.Confidence {
 						t.Errorf("Lint failed at %s:%d; got confidence %f, want %f", fi.Name(), in.Line, p.Confidence, in.Confidence)
 					}
-
 				}
 
 				// remove this problem from ps
@@ -224,11 +222,9 @@ func extractInstructionFromJSON(line string, lineNumber int) (instruction, error
 		Line:       lineNumber,
 	}
 	return ins, nil
-
 }
 
 func extractDataMode(line string) string {
-
 	if strings.HasPrefix(line, "json") {
 		return "json"
 	}
@@ -237,7 +233,6 @@ func extractDataMode(line string) string {
 	}
 
 	return ""
-
 }
 
 func extractPattern(line string) (string, error) {

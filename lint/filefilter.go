@@ -55,12 +55,14 @@ func (ff *FileFilter) MatchFileName(name string) bool {
 	return ff.rx.MatchString(name)
 }
 
-var fileFilterInvalidGlobRegexp = regexp.MustCompile(`[^/]\*\*[^/]`)
-var escapeRegexSymbols = ".+{}()[]^$"
+var (
+	fileFilterInvalidGlobRegexp = regexp.MustCompile(`[^/]\*\*[^/]`)
+	escapeRegexSymbols          = ".+{}()[]^$"
+)
 
 func (ff *FileFilter) prepareRegexp() error {
 	var err error
-	var src = ff.raw
+	src := ff.raw
 	if src == "TEST" {
 		src = "~_test\\.go"
 	}

@@ -55,8 +55,10 @@ func (*FunctionLength) Name() string {
 	return "function-length"
 }
 
-const defaultFuncStmtsLimit = 50
-const defaultFuncLinesLimit = 75
+const (
+	defaultFuncStmtsLimit = 50
+	defaultFuncLinesLimit = 75
+)
 
 func (*FunctionLength) parseArguments(arguments lint.Arguments) (maxStmt, maxLines int64) {
 	if len(arguments) == 0 {

@@ -38,7 +38,6 @@ func (r *LineLengthLimitRule) configure(arguments lint.Arguments) {
 	}
 
 	r.max = int(maxLength)
-
 }
 
 // Apply applies the rule to given file.

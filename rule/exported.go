@@ -25,9 +25,11 @@ type disabledChecks struct {
 	Var              bool
 }
 
-const checkNamePrivateReceivers = "privateReceivers"
-const checkNamePublicInterfaces = "publicInterfaces"
-const checkNameStuttering = "stuttering"
+const (
+	checkNamePrivateReceivers = "privateReceivers"
+	checkNamePublicInterfaces = "publicInterfaces"
+	checkNameStuttering       = "stuttering"
+)
 
 // isDisabled returns true if the given check is disabled, false otherwise
 func (dc *disabledChecks) isDisabled(checkName string) bool {

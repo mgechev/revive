@@ -35,7 +35,6 @@ func (r *MaxPublicStructsRule) configure(arguments lint.Arguments) {
 		panic(`invalid value passed as argument number to the "max-public-structs" rule`)
 	}
 	r.max = maxStructs
-
 }
 
 // Apply applies the rule to given file.

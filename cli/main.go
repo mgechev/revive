@@ -21,7 +21,7 @@ var (
 	commit  = "none"
 	date    = "unknown"
 	builtBy = "unknown"
-	//AppFs is used to operations related with user config files
+	// AppFs is used to operations related with user config files
 	AppFs = afero.NewOsFs()
 )
 

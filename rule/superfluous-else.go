@@ -2,6 +2,7 @@ package rule
 
 import (
 	"fmt"
+
 	"github.com/mgechev/revive/internal/ifelse"
 	"github.com/mgechev/revive/lint"
 )

@@ -96,14 +96,16 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 	return w
 }
 
-const keyASN1 = "asn1"
-const keyBSON = "bson"
-const keyDefault = "default"
-const keyJSON = "json"
-const keyProtobuf = "protobuf"
-const keyRequired = "required"
-const keyXML = "xml"
-const keyYAML = "yaml"
+const (
+	keyASN1     = "asn1"
+	keyBSON     = "bson"
+	keyDefault  = "default"
+	keyJSON     = "json"
+	keyProtobuf = "protobuf"
+	keyRequired = "required"
+	keyXML      = "xml"
+	keyYAML     = "yaml"
+)
 
 func (w lintStructTagRule) checkTagNameIfNeed(tag *structtag.Tag) (string, bool) {
 	isUnnamedTag := tag.Name == "" || tag.Name == "-"

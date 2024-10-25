@@ -79,7 +79,6 @@ func (r *VarNamingRule) applyPackageCheckRules(walker *lintNames) {
 			Category:   "naming",
 		})
 	}
-
 }
 
 // Apply applies the rule to given file.
