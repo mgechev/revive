@@ -3,7 +3,7 @@ package test
 import (
 	"flag"
 	"os"
-	"path"
+	"path/filepath"
 	"regexp"
 	"testing"
 
@@ -53,7 +53,7 @@ func TestAll(t *testing.T) {
 			continue
 		}
 		t.Run(fi.Name(), func(t *testing.T) {
-			filePath := path.Join(baseDir, fi.Name())
+			filePath := filepath.Join(baseDir, fi.Name())
 			src, err := os.ReadFile(filePath)
 			if err != nil {
 				t.Fatalf("Failed reading %s: %v", fi.Name(), err)
@@ -64,7 +64,7 @@ func TestAll(t *testing.T) {
 				t.Fatalf("Failed reading %s: %v", fi.Name(), err)
 			}
 
-			if err := assertFailures(t, path.Dir(baseDir), fileInfo, src, rules, map[string]lint.RuleConfig{}); err != nil {
+			if err := assertFailures(t, filepath.Dir(baseDir), fileInfo, src, rules, map[string]lint.RuleConfig{}); err != nil {
 				t.Errorf("Linting %s: %v", fi.Name(), err)
 			}
 		})
