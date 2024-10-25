@@ -66,6 +66,7 @@ Here's how `revive` is different from `golint`:
 <!-- TOC -->
 
 - [revive](#revive)
+  - [Who uses Revive](#who-uses-revive)
   - [Installation](#installation)
   - [Usage](#usage)
     - [Docker](#docker)
@@ -73,7 +74,7 @@ Here's how `revive` is different from `golint`:
     - [Text Editors](#text-editors)
     - [GitHub Actions](#github-actions)
     - [Continuous Integration](#continuous-integration)
-    - [Linter Aggregators](#linter-aggregators)
+    - [Linter aggregators](#linter-aggregators)
       - [golangci-lint](#golangci-lint)
     - [Command Line Flags](#command-line-flags)
     - [Sample Invocations](#sample-invocations)
@@ -82,6 +83,7 @@ Here's how `revive` is different from `golint`:
     - [Default Configuration](#default-configuration)
     - [Custom Configuration](#custom-configuration)
     - [Recommended Configuration](#recommended-configuration)
+    - [Rule-level file excludes](#rule-level-file-excludes)
   - [Available Rules](#available-rules)
   - [Configurable rules](#configurable-rules)
     - [`var-naming`](#var-naming)
@@ -93,12 +95,13 @@ Here's how `revive` is different from `golint`:
     - [Unix](#unix)
     - [SARIF](#sarif)
   - [Extensibility](#extensibility)
-    - [Custom Rule](#writing-a-custom-rule)
+    - [Writing a Custom Rule](#writing-a-custom-rule)
       - [Example](#example)
+      - [Using `revive` as a library](#using-revive-as-a-library)
     - [Custom Formatter](#custom-formatter)
   - [Speed Comparison](#speed-comparison)
     - [golint](#golint)
-    - [revive](#revive)
+    - [revive's speed](#revives-speed)
   - [Overriding colorization detection](#overriding-colorization-detection)
   - [Contributors](#contributors)
   - [License](#license)
@@ -125,6 +128,7 @@ Since the default behavior of `revive` is compatible with `golint`, without prov
 `revive` supports a `-config` flag whose value should correspond to a TOML file describing which rules to use for `revive`'s linting. If not provided, `revive` will try to use a global config file (assumed to be located at `$HOME/revive.toml`). Otherwise, if no configuration TOML file is found then `revive` uses a built-in set of default linting rules.
 
 ### Docker
+
 A volume must be mounted to share the current repository with the container.
 Please refer to the [bind mounts Docker documentation](https://docs.docker.com/storage/bind-mounts/)
 
@@ -174,6 +178,7 @@ If you want to use revive with Bazel, look at the [rules](https://github.com/atl
 ### Linter aggregators
 
 #### golangci-lint
+
 To enable `revive` in `golangci-lint` you need to add `revive` to the list of enabled linters:
 
 ```yaml
@@ -266,6 +271,7 @@ You can document why you disable the linter by adding a trailing text in the dir
 ```go
 //revive:disable Until the code is stable
 ```
+
 ```go
 //revive:disable:cyclomatic High complexity score but easy to understand
 ```
@@ -332,6 +338,7 @@ For example:
 [rule.line-length-limit]
     Disabled = true
 ```
+
 When enabling all rules you still need/can provide specific configurations for rules.
 The following file is an example configuration where all rules are enabled, except for those that are explicitly disabled, and some rules are configured with particular arguments:
 
@@ -541,7 +548,6 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`max-control-nesting`](./RULES_DESCRIPTIONS.md#max-control-nesting) |  int (defaults to 5)  | Sets restriction for maximum nesting of control structures. |    no    |  no   |
 | [`comments-density`](./RULES_DESCRIPTIONS.md#comments-density) |  int (defaults to 0)  | Enforces a minimum comment / code relation |    no    |  no   |
 
-
 ## Configurable rules
 
 Here you can find how you can configure some existing rules:
@@ -588,6 +594,7 @@ The unix formatter produces the same output as the default formatter but surroun
 ![Unix formatter](/assets/formatter-unix.png)
 
 ### SARIF
+
 The `sarif`  formatter produces outputs in SARIF, for _Static Analysis Results Interchange Format_, a standard JSON-based format for the output of static analysis tools defined and promoted by [OASIS](https://www.oasis-open.org/).
 
 Current supported version of the standard is [SARIF-v2.1.0](https://docs.oasis-open.org/sarif/sarif/v2.1.0/csprd01/sarif-v2.1.0-csprd01.html
@@ -631,6 +638,7 @@ With the snippet above we:
 A sample rule implementation can be found [here](/rule/argument-limit.go).
 
 #### Using `revive` as a library
+
 If a rule is specific to your use case
 (i.e. it is not a good candidate to be added to `revive`'s rule set) you can add it to your linter using `revive` as a linting engine.
 
@@ -740,7 +748,7 @@ user    0m57.844s
 sys     0m9.146s
 ```
 
-### revive
+### revive's speed
 
 ```shell
 # no type checking
