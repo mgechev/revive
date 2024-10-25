@@ -6,7 +6,7 @@
 <!-- Please, describe in details what's your motivation for this PR -->
 <!-- Did you add tests? -->
 <!-- Does your code follow the coding style of the rest of the repository? -->
-<!-- Does the Travis build passes? -->
+<!-- Does the GitHub Action build passes? -->
 
 <!-- ### FOOTER (OPTIONAL) ### -->
 <!-- If you're closing an issue, add "Closes #XXXX" in your comment. This way, the PR will be linked to the issue automatically. -->
