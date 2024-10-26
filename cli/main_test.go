@@ -40,7 +40,6 @@ func TestXDGConfigDirIsPrefferedFirst(t *testing.T) {
 }
 
 func TestHomeConfigDir(t *testing.T) {
-
 	homeDirPath := "/tmp-iofs/home/tester"
 	AppFs.MkdirAll(homeDirPath, 0755)
 

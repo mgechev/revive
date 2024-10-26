@@ -82,7 +82,7 @@ func (r *Revive) Lint(patterns ...*LintPattern) (<-chan lint.Failure, error) {
 	if len(excludePatterns) == 0 { // if no excludes were set
 		excludePatterns = r.config.Exclude // use those from the configuration
 	}
-	
+
 	// by default if no excludes exclude vendor
 	if len(excludePatterns) == 0 {
 		excludePatterns = []string{"vendor/..."}
@@ -95,7 +95,6 @@ func (r *Revive) Lint(patterns ...*LintPattern) (<-chan lint.Failure, error) {
 
 	revive := lint.New(func(file string) ([]byte, error) {
 		contents, err := os.ReadFile(file)
-
 		if err != nil {
 			return nil, fmt.Errorf("reading file %v: %w", file, err)
 		}

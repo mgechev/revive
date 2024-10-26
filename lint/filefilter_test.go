@@ -95,7 +95,6 @@ func TestFileFilter(t *testing.T) {
 				t.Fatalf("should not match %s", fn)
 			}
 		}
-
 	})
 
 	t.Run("just *", func(t *testing.T) {
@@ -109,7 +108,6 @@ func TestFileFilter(t *testing.T) {
 				t.Fatalf("should match %s", fn)
 			}
 		}
-
 	})
 
 	t.Run("just ~", func(t *testing.T) {
@@ -123,6 +121,5 @@ func TestFileFilter(t *testing.T) {
 				t.Fatalf("should match %s", fn)
 			}
 		}
-
 	})
 }
