@@ -69,7 +69,6 @@ func (r *EnforceSliceStyleRule) configure(arguments lint.Arguments) {
 
 	var err error
 	r.enforceSliceStyle, err = sliceStyleFromString(enforceSliceStyle)
-
 	if err != nil {
 		panic(fmt.Sprintf("Invalid argument to the enforce-slice-style rule: %v", err))
 	}

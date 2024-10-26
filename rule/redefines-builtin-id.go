@@ -163,7 +163,7 @@ func (w *lintRedefinesBuiltinID) Visit(node ast.Node) ast.Visitor {
 				if !isTypeOrName {
 					continue
 				}
-				
+
 				id := obj.Name
 				if ok, bt := w.isBuiltIn(id); ok {
 					w.addFailure(name, fmt.Sprintf("redefinition of the built-in %s %s", bt, id))
