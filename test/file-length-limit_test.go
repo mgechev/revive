@@ -8,8 +8,14 @@ import (
 )
 
 func TestFileLengthLimit(t *testing.T) {
-	testRule(t, "file-length-limit-default", &rule.FileLengthLimitRule{}, &lint.RuleConfig{
+	testRule(t, "file-length-limit-disabled", &rule.FileLengthLimitRule{}, &lint.RuleConfig{
 		Arguments: []any{},
+	})
+	testRule(t, "file-length-limit-disabled", &rule.FileLengthLimitRule{}, &lint.RuleConfig{
+		Arguments: []any{map[string]any{"max": int64(0)}},
+	})
+	testRule(t, "file-length-limit-disabled", &rule.FileLengthLimitRule{}, &lint.RuleConfig{
+		Arguments: []any{map[string]any{"skipComments": true, "skipBlankLines": true}},
 	})
 	testRule(t, "file-length-limit-9", &rule.FileLengthLimitRule{}, &lint.RuleConfig{
 		Arguments: []any{map[string]any{"max": int64(9)}},

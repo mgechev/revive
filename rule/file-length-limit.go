@@ -12,12 +12,13 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-const defaultFileLengthLimitMax = 1000
-
 // FileLengthLimitRule lints the number of lines in a file.
 type FileLengthLimitRule struct {
-	max            int
-	skipComments   bool
+	// max is the maximum number of lines allowed in a file. 0 means the rule is disabled.
+	max int
+	// skipComments indicates whether to skip comment lines when counting lines.
+	skipComments bool
+	// skipBlankLines indicates whether to skip blank lines when counting lines.
 	skipBlankLines bool
 	sync.Mutex
 }
@@ -25,6 +26,11 @@ type FileLengthLimitRule struct {
 // Apply applies the rule to given file.
 func (r *FileLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	r.configure(arguments)
+
+	if r.max <= 0 {
+		// when max is negative or 0 the rule is disabled
+		return nil
+	}
 
 	all := 0
 	blank := 0
@@ -72,9 +78,12 @@ func (r *FileLengthLimitRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	defer r.Unlock()
 
-	if len(arguments) == 0 {
-		r.max = defaultFileLengthLimitMax
-		return
+	if r.max != 0 {
+		return // already configured
+	}
+
+	if len(arguments) < 1 {
+		return // use default
 	}
 
 	argKV, ok := arguments[0].(map[string]any)
@@ -85,8 +94,8 @@ func (r *FileLengthLimitRule) configure(arguments lint.Arguments) {
 		switch k {
 		case "max":
 			maxLines, ok := v.(int64)
-			if !ok || maxLines < 1 {
-				panic(fmt.Sprintf(`invalid configuration value for max lines in "file-length-limit" rule; need int64 but got %T`, arguments[0]))
+			if !ok || maxLines < 0 {
+				panic(fmt.Sprintf(`invalid configuration value for max lines in "file-length-limit" rule; need positive int64 but got %T`, arguments[0]))
 			}
 			r.max = int(maxLines)
 		case "skipComments":
@@ -105,6 +114,7 @@ func (r *FileLengthLimitRule) configure(arguments lint.Arguments) {
 	}
 }
 
+// Name returns the rule name.
 func (*FileLengthLimitRule) Name() string {
 	return "file-length-limit"
 }
