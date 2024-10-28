@@ -98,7 +98,7 @@ func getMockRevive(t *testing.T) *revivelib.Revive {
 		revivelib.NewExtraRule(&mockRule{}, lint.RuleConfig{}),
 	)
 	if err != nil {
-		t.Fatal(err.Error())
+		t.Fatal(err)
 	}
 
 	return revive
