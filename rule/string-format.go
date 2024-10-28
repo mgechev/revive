@@ -216,7 +216,7 @@ func (w lintStringFormatRule) Visit(node ast.Node) ast.Visitor {
 	for _, rule := range w.rules {
 		for _, scope := range rule.scopes {
 			if scope.funcName == callName {
-				rule.Apply(call)
+				rule.apply(call,scope)
 			}
 		}
 	}
@@ -251,81 +251,73 @@ func (lintStringFormatRule) getCallName(call *ast.CallExpr) (callName string, ok
 
 // #region Linting logic
 
-// Apply a single format rule to a call expression (should be done after verifying the that the call expression matches the rule's scope)
-func (r *stringFormatSubrule) Apply(call *ast.CallExpr) {
-	for _, scope := range r.scopes {
-		if len(call.Args) <= scope.argument {
+// apply a single format rule to a call expression (should be done after verifying the that the call expression matches the rule's scope)
+func (r *stringFormatSubrule) apply(call *ast.CallExpr, scope *stringFormatSubruleScope) {
+	if len(call.Args) <= scope.argument {
+		return
+	}
+
+	arg := call.Args[scope.argument]
+	var lit *ast.BasicLit
+	if len(scope.field) > 0 {
+		// Try finding the scope's Field, treating arg as a composite literal
+		composite, ok := arg.(*ast.CompositeLit)
+		if !ok {
 			return
 		}
-
-		arg := call.Args[scope.argument]
-		var lit *ast.BasicLit
-		if len(scope.field) > 0 {
-			// Try finding the scope's Field, treating arg as a composite literal
-			composite, ok := arg.(*ast.CompositeLit)
+		for _, el := range composite.Elts {
+			kv, ok := el.(*ast.KeyValueExpr)
 			if !ok {
-				return
+				continue
 			}
-			for _, el := range composite.Elts {
-				kv, ok := el.(*ast.KeyValueExpr)
-				if !ok {
-					continue
-				}
-				key, ok := kv.Key.(*ast.Ident)
-				if !ok || key.Name != scope.field {
-					continue
-				}
+			key, ok := kv.Key.(*ast.Ident)
+			if !ok || key.Name != scope.field {
+				continue
+			}
 
-				// We're now dealing with the exact field in the rule's scope, so if anything fails, we can safely return instead of continuing the loop
-				lit, ok = kv.Value.(*ast.BasicLit)
-				if !ok || lit.Kind != token.STRING {
-					return
-				}
-			}
-		} else {
-			var ok bool
-			// Treat arg as a string literal
-			lit, ok = arg.(*ast.BasicLit)
+			// We're now dealing with the exact field in the rule's scope, so if anything fails, we can safely return instead of continuing the loop
+			lit, ok = kv.Value.(*ast.BasicLit)
 			if !ok || lit.Kind != token.STRING {
 				return
 			}
 		}
-		// Unquote the string literal before linting
-		unquoted := lit.Value[1 : len(lit.Value)-1]
-		r.lintMessage(unquoted, lit)
-	}
-}
-
-func (r *stringFormatSubrule) lintMessage(s string, node ast.Node) {
-	if r.negated {
-		if !r.regexp.MatchString(s) {
+	} else {
+		var ok bool
+		// Treat arg as a string literal
+		lit, ok = arg.(*ast.BasicLit)
+		if !ok || lit.Kind != token.STRING {
 			return
 		}
-		// Fail if the string does match the user's regex
-		var failure string
-		if len(r.errorMessage) > 0 {
-			failure = r.errorMessage
-		} else {
-			failure = fmt.Sprintf("string literal matches user defined regex /%s/", r.regexp.String())
-		}
-		r.parent.onFailure(lint.Failure{
-			Confidence: 1,
-			Failure:    failure,
-			Node:       node,
-		})
+	}
+	// Unquote the string literal before linting
+	unquoted := lit.Value[1 : len(lit.Value)-1]
+	if r.stringIsOK(unquoted) {
 		return
 	}
 
-	// Fail if the string does NOT match the user's regex
-	if r.regexp.MatchString(s) {
-		return
+	r.generateFailure(unquoted, lit)
+}
+
+func (r *stringFormatSubrule) stringIsOK(s string) bool {
+	matches := r.regexp.MatchString(s)
+	if r.negated {
+		return !matches
 	}
+	
+	return matches
+}
+
+func (r *stringFormatSubrule) generateFailure(s string, node ast.Node) {
 	var failure string
-	if len(r.errorMessage) > 0 {
+	switch {
+	case len(r.errorMessage) > 0:
 		failure = r.errorMessage
-	} else {
+	case r.negated:
+		failure = fmt.Sprintf("string literal matches user defined regex /%s/", r.regexp.String())
+	case !r.negated:
 		failure = fmt.Sprintf("string literal doesn't match user defined regex /%s/", r.regexp.String())
 	}
+
 	r.parent.onFailure(lint.Failure{
 		Confidence: 1,
 		Failure:    failure,
