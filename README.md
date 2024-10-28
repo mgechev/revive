@@ -214,7 +214,7 @@ Please notice that if no particular configuration is provided, `revive` will beh
 `revive` accepts the following command line parameters:
 
 - `-config [PATH]` - path to the config file in TOML format, defaults to `$HOME/revive.toml` if present.
-- `-exclude [PATTERN]` - pattern for files/directories/packages to be excluded for linting. You can specify the files you want to exclude for linting either as package name (i.e. `github.com/mgechev/revive`), list them as individual files (i.e. `file.go`), directories (i.e. `./foo/...`), or any combination of the three.
+- `-exclude [PATTERN]` - pattern for files/directories/packages to be excluded for linting. You can specify the files you want to exclude for linting either as package name (i.e. `github.com/mgechev/revive`), list them as individual files (i.e. `file.go`), directories (i.e. `./foo/...`), or any combination of the three. If no exclusion patterns are specified, `vendor/...` will be excluded by default.
 - `-formatter [NAME]` - formatter to be used for the output. The currently available formatters are:
 
   - `default` - will output the failures the same way that `golint` does.
