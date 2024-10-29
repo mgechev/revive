@@ -18,7 +18,7 @@ func TestReviveCreateInstance(t *testing.T) {
 		t.Fatal("Expected MaxOpenFiles to be 2048")
 	}
 
-	if revive.lintingRules == nil || len(revive.lintingRules) == 0 {
+	if len(revive.lintingRules) == 0 {
 		t.Fatal("Linting rules not loaded.")
 	}
 
