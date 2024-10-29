@@ -264,17 +264,17 @@ func (w *lintNames) Visit(n ast.Node) ast.Visitor {
 }
 
 func getList(arg any, argName string) []string {
-	temp, ok := arg.([]any)
+	args, ok := arg.([]any)
 	if !ok {
 		panic(fmt.Sprintf("Invalid argument to the var-naming rule. Expecting a %s of type slice with initialisms, got %T", argName, arg))
 	}
 	var list []string
-	for _, v := range temp {
-		if val, ok := v.(string); ok {
-			list = append(list, val)
-		} else {
+	for _, v := range args {
+		val, ok := v.(string)
+		if !ok {
 			panic(fmt.Sprintf("Invalid %s values of the var-naming rule. Expecting slice of strings but got element of type %T", val, arg))
 		}
+		list = append(list, val)
 	}
 	return list
 }

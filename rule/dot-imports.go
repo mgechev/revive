@@ -59,16 +59,16 @@ func (r *DotImportsRule) configure(arguments lint.Arguments) {
 	}
 
 	if allowedPkgArg, ok := args["allowedPackages"]; ok {
-		if pkgs, ok := allowedPkgArg.([]any); ok {
-			for _, p := range pkgs {
-				if pkg, ok := p.(string); ok {
-					r.allowedPackages.add(pkg)
-				} else {
-					panic(fmt.Sprintf("Invalid argument to the dot-imports rule, string expected. Got '%v' (%T)", p, p))
-				}
-			}
-		} else {
+		pkgs, ok := allowedPkgArg.([]any)
+		if !ok {
 			panic(fmt.Sprintf("Invalid argument to the dot-imports rule, []string expected. Got '%v' (%T)", allowedPkgArg, allowedPkgArg))
+		}
+		for _, p := range pkgs {
+			pkg, ok := p.(string)
+			if !ok {
+				panic(fmt.Sprintf("Invalid argument to the dot-imports rule, string expected. Got '%v' (%T)", p, p))
+			}
+			r.allowedPackages.add(pkg)
 		}
 	}
 }
