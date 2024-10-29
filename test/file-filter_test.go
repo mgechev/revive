@@ -7,14 +7,14 @@ import (
 )
 
 type TestFileFilterRule struct {
-	WasApplyed bool
+	WasApplied bool
 }
 
 var _ lint.Rule = (*TestFileFilterRule)(nil)
 
 func (*TestFileFilterRule) Name() string { return "test-file-filter" }
 func (tfr *TestFileFilterRule) Apply(*lint.File, lint.Arguments) []lint.Failure {
-	tfr.WasApplyed = true
+	tfr.WasApplied = true
 	return nil
 }
 
@@ -22,7 +22,7 @@ func TestFileExcludeFilterAtRuleLevel(t *testing.T) {
 	t.Run("is called if no excludes", func(t *testing.T) {
 		rule := &TestFileFilterRule{}
 		testRule(t, "file-to-exclude", rule, &lint.RuleConfig{})
-		if !rule.WasApplyed {
+		if !rule.WasApplied {
 			t.Fatal("should call rule if no excludes")
 		}
 	})
@@ -31,7 +31,7 @@ func TestFileExcludeFilterAtRuleLevel(t *testing.T) {
 		cfg := &lint.RuleConfig{Exclude: []string{"no-matched.go"}}
 		cfg.Initialize()
 		testRule(t, "file-to-exclude", rule, cfg)
-		if !rule.WasApplyed {
+		if !rule.WasApplied {
 			t.Fatal("should call rule if no excludes")
 		}
 	})
@@ -41,7 +41,7 @@ func TestFileExcludeFilterAtRuleLevel(t *testing.T) {
 		cfg := &lint.RuleConfig{Exclude: []string{"../testdata/file-to-exclude.go"}}
 		cfg.Initialize()
 		testRule(t, "file-to-exclude", rule, cfg)
-		if rule.WasApplyed {
+		if rule.WasApplied {
 			t.Fatal("should not call rule if excluded")
 		}
 	})
