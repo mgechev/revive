@@ -210,7 +210,7 @@ func extractInstructionFromJSON(line string, lineNumber int) (instruction, error
 	// Use the json.Unmarshal function to parse the JSON into the struct
 	var jsonInst JSONInstruction
 	if err := json.Unmarshal([]byte(line), &jsonInst); err != nil {
-		fmt.Println("Error parsing JSON:", err)
+		return instruction{}, fmt.Errorf("parsing json instruction: %w", err)
 	}
 
 	ins := instruction{
