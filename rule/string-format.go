@@ -216,7 +216,7 @@ func (w lintStringFormatRule) Visit(node ast.Node) ast.Visitor {
 	for _, rule := range w.rules {
 		for _, scope := range rule.scopes {
 			if scope.funcName == callName {
-				rule.apply(call,scope)
+				rule.apply(call, scope)
 			}
 		}
 	}
@@ -303,7 +303,7 @@ func (r *stringFormatSubrule) stringIsOK(s string) bool {
 	if r.negated {
 		return !matches
 	}
-	
+
 	return matches
 }
 
