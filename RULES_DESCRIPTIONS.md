@@ -126,7 +126,7 @@ _Configuration_: N/A
 
 ## banned-characters
 
-_Description_: Checks given banned characters in identifiers(func, var, const). Comments are not checked.
+_Description_: Checks given banned characters in identifiers (func, var, const). Comments are not checked. The rule also warns on filenames with non-ASCII characters; this helps preventing attacks like the one described [here](https://www.arp242.net/jia-tan-go.html).
 
 _Configuration_: This rule requires a slice of strings, the characters to ban.
 

@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"strings"
 	"sync"
+	"unicode"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -35,6 +36,8 @@ func (r *BannedCharsRule) Apply(file *lint.File, arguments lint.Arguments) []lin
 		failures = append(failures, failure)
 	}
 
+	r.lintFilename(file.Name, onFailure, file.AST.Name)
+
 	w := lintBannedCharsRule{
 		bannedChars: r.bannedCharList,
 		onFailure:   onFailure,
@@ -42,6 +45,21 @@ func (r *BannedCharsRule) Apply(file *lint.File, arguments lint.Arguments) []lin
 
 	ast.Walk(w, file.AST)
 	return failures
+}
+
+func (r *BannedCharsRule) lintFilename(filename string, onFailure func(failure lint.Failure), node ast.Node) {
+	for _, c := range filename {
+		if c <= unicode.MaxASCII {
+			continue
+		}
+
+		onFailure(lint.Failure{
+			Confidence: 1,
+			Failure:    fmt.Sprintf("Non ASCII character %c (%U) found in filename %q", c, c, filename),
+			RuleName:   bannedCharsRuleName,
+			Node:       node,
+		})
+	}
 }
 
 // Name returns the rule name

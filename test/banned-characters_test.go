@@ -15,3 +15,7 @@ func TestBannedCharacters(t *testing.T) {
 		Arguments: []any{"Ω", "Σ", "σ", "1"},
 	})
 }
+
+func TestBannedCharactersInFilename(t *testing.T) {
+	testRule(t, "banned-character_tеѕt", &rule.BannedCharsRule{}, &lint.RuleConfig{})
+}
