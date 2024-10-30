@@ -39,6 +39,7 @@ List of all available rules.
   - [exported](#exported)
   - [file-header](#file-header)
   - [file-length-limit](#file-length-limit)
+  - [filename-format](#filename-format)
   - [flag-parameter](#flag-parameter)
   - [function-length](#function-length)
   - [function-result-limit](#function-result-limit)
@@ -517,6 +518,18 @@ Example:
 ```toml
 [rule.file-length-limit]
   arguments = [{max=100,skipComments=true,skipBlankLines=true}]
+```
+
+## filename-format
+_Description_: enforces conventions on source file names. By default, the rule enforces filenames of the form `^[_A-Za-z][_A-Za-z0-9-]*.go$`: Optionally, the rule can be configured to enforce other forms.
+
+_Configuration_: (string) regular expression for source filenames.
+
+Example:
+
+```toml
+[rule.filename-format]
+    arguments=["^[_a-z][_a-z0-9]*.go$"]
 ```
 
 ## flag-parameter
