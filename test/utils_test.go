@@ -173,7 +173,6 @@ func parseInstructions(t *testing.T, filename string, src []byte) []instruction 
 					t.Fatalf("At %v:%d: %v", filename, ln, err)
 				}
 				ins = append(ins, jsonInst)
-				break
 			case "classic":
 				match, err := extractPattern(line)
 				if err != nil {
@@ -198,9 +197,7 @@ func parseInstructions(t *testing.T, filename string, src []byte) []instruction 
 					Match:       match,
 					Replacement: repl,
 				})
-				break
 			}
-
 		}
 	}
 	return ins

@@ -16,3 +16,5 @@ jobs:
 
     - name: Run Revive Action
       uses: morphy2k/revive-action@v2
+      with:
+        config: revive.toml
