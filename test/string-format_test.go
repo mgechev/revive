@@ -171,3 +171,13 @@ func TestStringFormatArgumentParsing(t *testing.T) {
 		})
 	}
 }
+
+func TestStringFormatDuplicatedStrings(t *testing.T) {
+	testRule(t, "string-format-issue-1063", &rule.StringFormatRule{}, &lint.RuleConfig{
+		Arguments: lint.Arguments{[]any{
+			"fmt.Errorf[0],errors.New[0]",
+			"/^([^A-Z]|$)/",
+			"must not start with a capital letter",
+		}},
+	})
+}
