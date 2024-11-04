@@ -14,7 +14,7 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestXDGConfigDirIsPrefferedFirst(t *testing.T) {
+func TestXDGConfigDirIsPreferredFirst(t *testing.T) {
 	t.Cleanup(func() {
 		// reset fs after test
 		AppFs = afero.NewMemMapFs()
