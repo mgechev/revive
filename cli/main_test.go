@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/afero"
 )
 
@@ -11,10 +12,11 @@ func TestMain(m *testing.M) {
 	os.Unsetenv("HOME")
 	os.Unsetenv("XDG_CONFIG_HOME")
 	AppFs = afero.NewMemMapFs()
+	homedir.DisableCache = true
 	os.Exit(m.Run())
 }
 
-func TestXDGConfigDirIsPrefferedFirst(t *testing.T) {
+func TestXDGConfigDirIsPreferredFirst(t *testing.T) {
 	t.Cleanup(func() {
 		// reset fs after test
 		AppFs = afero.NewMemMapFs()
@@ -40,6 +42,7 @@ func TestXDGConfigDirIsPrefferedFirst(t *testing.T) {
 }
 
 func TestHomeConfigDir(t *testing.T) {
+	t.Cleanup(func() { AppFs = afero.NewMemMapFs() })
 	homeDirPath := "/tmp-iofs/home/tester"
 	AppFs.MkdirAll(homeDirPath, 0755)
 
@@ -55,6 +58,7 @@ func TestHomeConfigDir(t *testing.T) {
 }
 
 func TestXDGConfigDir(t *testing.T) {
+	t.Cleanup(func() { AppFs = afero.NewMemMapFs() })
 	xdgDirPath := "/tmp-iofs/xdg/config"
 	AppFs.MkdirAll(xdgDirPath, 0755)
 
@@ -70,11 +74,12 @@ func TestXDGConfigDir(t *testing.T) {
 }
 
 func TestXDGConfigDirNoFile(t *testing.T) {
+	t.Cleanup(func() { AppFs = afero.NewMemMapFs() })
 	xdgDirPath := "/tmp-iofs/xdg/config"
 	t.Setenv("XDG_CONFIG_HOME", xdgDirPath)
 
 	got := buildDefaultConfigPath()
-	want := xdgDirPath + "/revive.toml"
+	want := ""
 
 	if got != want {
 		t.Errorf("got %q, wanted %q", got, want)
