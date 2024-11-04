@@ -40,9 +40,7 @@ func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.Rul
 }
 
 func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, rules []lint.Rule, config map[string]lint.RuleConfig) error {
-	l := lint.New(func(file string) ([]byte, error) {
-		return os.ReadFile(file)
-	}, 0)
+	l := lint.New(os.ReadFile, 0)
 
 	filePath := filepath.Join(baseDir, fi.Name())
 	ps, err := l.Lint([][]string{{filePath}}, rules, lint.Config{
@@ -63,9 +61,7 @@ func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, rules []lint.Ru
 }
 
 func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, rules []lint.Rule, config map[string]lint.RuleConfig) error {
-	l := lint.New(func(file string) ([]byte, error) {
-		return os.ReadFile(file)
-	}, 0)
+	l := lint.New(os.ReadFile, 0)
 
 	ins := parseInstructions(t, filepath.Join(baseDir, fi.Name()), src)
 	if ins == nil {
