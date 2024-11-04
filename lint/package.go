@@ -166,17 +166,17 @@ func (p *Package) scanSortable() {
 
 	// bitfield for which methods exist on each type.
 	const (
-		Len = 1 << iota
-		Less
-		Swap
+		bfLen = 1 << iota
+		bfLess
+		bfSwap
 	)
-	nmap := map[string]int{"Len": Len, "Less": Less, "Swap": Swap}
+	nmap := map[string]int{"Len": bfLen, "Less": bfLess, "Swap": bfSwap}
 	has := make(map[string]int)
 	for _, f := range p.files {
 		ast.Walk(&walker{nmap, has}, f.AST)
 	}
 	for typ, ms := range has {
-		if ms == Len|Less|Swap {
+		if ms == bfLen|bfLess|bfSwap {
 			p.sortable[typ] = true
 		}
 	}

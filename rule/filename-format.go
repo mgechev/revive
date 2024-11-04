@@ -25,7 +25,7 @@ func (r *FilenameFormatRule) Apply(file *lint.File, arguments lint.Arguments) []
 		return nil
 	}
 
-	failureMsg := fmt.Sprintf("Filename %s is not of the format %s.%s", filename, r.format.String(), r.getMsgForNonAsciiChars(filename))
+	failureMsg := fmt.Sprintf("Filename %s is not of the format %s.%s", filename, r.format.String(), r.getMsgForNonASCIIChars(filename))
 	return []lint.Failure{{
 		Confidence: 1,
 		Failure:    failureMsg,
@@ -34,7 +34,7 @@ func (r *FilenameFormatRule) Apply(file *lint.File, arguments lint.Arguments) []
 	}}
 }
 
-func (r *FilenameFormatRule) getMsgForNonAsciiChars(str string) string {
+func (r *FilenameFormatRule) getMsgForNonASCIIChars(str string) string {
 	result := ""
 	for _, c := range str {
 		if c <= unicode.MaxASCII {

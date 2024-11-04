@@ -160,14 +160,14 @@ func (w *lintAddConstantRule) isIgnoredFunc(fName string) bool {
 }
 
 func (w *lintAddConstantRule) checkStrLit(n *ast.BasicLit) {
-	const IgnoreMarker = -1
+	const ignoreMarker = -1
 
 	if w.allowList[kindSTRING][n.Value] {
 		return
 	}
 
 	count := w.strLits[n.Value]
-	mustCheck := count > IgnoreMarker
+	mustCheck := count > ignoreMarker
 	if mustCheck {
 		w.strLits[n.Value] = count + 1
 		if w.strLits[n.Value] > w.strLitLimit {
