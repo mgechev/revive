@@ -295,7 +295,7 @@ func (r *stringFormatSubrule) apply(call *ast.CallExpr, scope *stringFormatSubru
 		return
 	}
 
-	r.generateFailure(unquoted, lit)
+	r.generateFailure(lit)
 }
 
 func (r *stringFormatSubrule) stringIsOK(s string) bool {
@@ -307,7 +307,7 @@ func (r *stringFormatSubrule) stringIsOK(s string) bool {
 	return matches
 }
 
-func (r *stringFormatSubrule) generateFailure(s string, node ast.Node) {
+func (r *stringFormatSubrule) generateFailure(node ast.Node) {
 	var failure string
 	switch {
 	case len(r.errorMessage) > 0:
