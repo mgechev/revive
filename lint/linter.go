@@ -173,6 +173,10 @@ func detectGoMod(dir string) (rootDir string, ver *goversion.Version, err error)
 		return "", nil, fmt.Errorf("failed to parse %q, got %v", modFileName, err)
 	}
 
+	if modAst.Go == nil {
+		return "", nil, fmt.Errorf("%q does not specify a Go version", modFileName)
+	}
+
 	ver, err = goversion.NewVersion(modAst.Go.Version)
 	return filepath.Dir(modFileName), ver, err
 }
