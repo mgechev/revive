@@ -19,7 +19,7 @@ const defaultMaxPublicStructs = 5
 func (r *MaxPublicStructsRule) configure(arguments lint.Arguments) {
 	r.Lock()
 	defer r.Unlock()
-	if r.max == 0 {
+	if r.max != 0 {
 		return // already configured
 	}
 
