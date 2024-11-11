@@ -11,7 +11,7 @@ func TestCyclomatic(t *testing.T) {
 	testRule(t, "cyclomatic", &rule.CyclomaticRule{}, &lint.RuleConfig{
 		Arguments: []any{int64(1)},
 	})
-	testRule(t, "cyclomatic-2", &rule.CyclomaticRule{}, &lint.RuleConfig{
+	testRule(t, "cyclomatic_2", &rule.CyclomaticRule{}, &lint.RuleConfig{
 		Arguments: []any{int64(3)},
 	})
 }

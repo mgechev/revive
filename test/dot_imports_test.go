@@ -12,7 +12,7 @@ func TestDotImports(t *testing.T) {
 		"allowedPackages": []any{"errors", "context", "github.com/BurntSushi/toml"},
 	}}
 
-	testRule(t, "import-dot", &rule.DotImportsRule{}, &lint.RuleConfig{
+	testRule(t, "import_dot", &rule.DotImportsRule{}, &lint.RuleConfig{
 		Arguments: args,
 	})
 }

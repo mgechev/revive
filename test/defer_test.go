@@ -13,13 +13,13 @@ func TestDefer(t *testing.T) {
 }
 
 func TestDeferLoopDisabled(t *testing.T) {
-	testRule(t, "defer-loop-disabled", &rule.DeferRule{}, &lint.RuleConfig{
+	testRule(t, "defer_loop_disabled", &rule.DeferRule{}, &lint.RuleConfig{
 		Arguments: []any{[]any{"return", "recover", "call-chain", "method-call"}},
 	})
 }
 
 func TestDeferOthersDisabled(t *testing.T) {
-	testRule(t, "defer-only-loop-enabled", &rule.DeferRule{}, &lint.RuleConfig{
+	testRule(t, "defer_only_loop_enabled", &rule.DeferRule{}, &lint.RuleConfig{
 		Arguments: []any{[]any{"loop"}},
 	})
 }
