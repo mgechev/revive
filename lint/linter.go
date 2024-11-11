@@ -109,7 +109,7 @@ func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-cha
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
 			}
-			defer wg.Done()
+			wg.Done()
 		}(packages[n], perPkgVersions[n])
 	}
 
