@@ -12,18 +12,13 @@ import (
 // MaxPublicStructsRule lints given else constructs.
 type MaxPublicStructsRule struct {
 	max int64
-	sync.Mutex
+
+	configureOnce sync.Once
 }
 
 const defaultMaxPublicStructs = 5
 
 func (r *MaxPublicStructsRule) configure(arguments lint.Arguments) {
-	r.Lock()
-	defer r.Unlock()
-	if r.max != 0 {
-		return // already configured
-	}
-
 	if len(arguments) < 1 {
 		r.max = defaultMaxPublicStructs
 		return
@@ -40,7 +35,7 @@ func (r *MaxPublicStructsRule) configure(arguments lint.Arguments) {
 
 // Apply applies the rule to given file.
 func (r *MaxPublicStructsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configure(arguments)
+	r.configureOnce.Do(func() { r.configure(arguments) })
 
 	var failures []lint.Failure
 
