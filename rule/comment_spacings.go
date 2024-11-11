@@ -11,17 +11,12 @@ import (
 // CommentSpacingsRule check the whether there is a space between
 // the comment symbol( // ) and the start of the comment text
 type CommentSpacingsRule struct {
-	allowList []string
-	sync.Mutex
+	allowList     []string
+
+	configureOnce sync.Once
 }
 
 func (r *CommentSpacingsRule) configure(arguments lint.Arguments) {
-	r.Lock()
-	defer r.Unlock()
-	if r.allowList != nil {
-		return // already configured
-	}
-
 	r.allowList = []string{}
 	for _, arg := range arguments {
 		allow, ok := arg.(string) // Alt. non panicking version
