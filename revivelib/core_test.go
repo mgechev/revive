@@ -16,7 +16,7 @@ func TestReviveLint(t *testing.T) {
 	revive := getMockRevive(t)
 
 	// ACT
-	failures, err := revive.Lint(revivelib.Include("../testdata/if-return.go"))
+	failures, err := revive.Lint(revivelib.Include("../testdata/if_return.go"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -40,7 +40,7 @@ func TestReviveFormat(t *testing.T) {
 	// ARRANGE
 	revive := getMockRevive(t)
 
-	failuresChan, err := revive.Lint(revivelib.Include("../testdata/if-return.go"))
+	failuresChan, err := revive.Lint(revivelib.Include("../testdata/if_return.go"))
 	if err != nil {
 		t.Fatal(err)
 	}
