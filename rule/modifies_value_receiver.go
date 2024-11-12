@@ -94,59 +94,20 @@ func (w lintModifiesValRecRule) Visit(node ast.Node) ast.Visitor {
 		}
 
 		assignmentsToReceiver := pick(n.Body, fselect)
-
 		if len(assignmentsToReceiver) == 0 {
-			return nil
+			return nil // receiver is not modified
 		}
 
-		fselect = func(n ast.Node) bool {
-			// look for returns with the receiver as value
-			returnStatement, ok := n.(*ast.ReturnStmt)
-			if !ok {
-				return false
-			}
-
-			for _, exp := range returnStatement.Results {
-				switch e := exp.(type) {
-				case *ast.SelectorExpr: // receiver.field = ...
-					name := w.getNameFromExpr(e.X)
-					if name == "" || name != receiverName {
-						continue
-					}
-				case *ast.Ident: // receiver := ...
-					if e.Name != receiverName {
-						continue
-					}
-				case *ast.UnaryExpr:
-					if e.Op != token.AND {
-						continue
-					}
-					name := w.getNameFromExpr(e.X)
-					if name == "" || name != receiverName {
-						continue
-					}
-
-				default:
-					continue
-				}
-
-				return true
-			}
-
-			return false
+		returnReceiverStmts := w.findReturnReceiver(receiverName, n.Body)
+		if len(returnReceiverStmts) > 0 {
+			return nil // modification seems legit (see issue #1066)
 		}
-
-		returnReceiver := pick(n.Body, fselect)
 
 		for _, assignment := range assignmentsToReceiver {
-			warn := ""
-			if len(returnReceiver) > 0 {
-				warn = " (false positive?)"
-			}
 			w.onFailure(lint.Failure{
 				Node:       assignment,
 				Confidence: 1,
-				Failure:    "suspicious assignment to a by-value method receiver" + warn,
+				Failure:    "suspicious assignment to a by-value method receiver",
 			})
 		}
 	}
@@ -174,4 +135,45 @@ func (lintModifiesValRecRule) getNameFromExpr(ie ast.Expr) string {
 	}
 
 	return ident.Name
+}
+
+func (w lintModifiesValRecRule) findReturnReceiver(receiverName string, target ast.Node) []ast.Node {
+	finder := func(n ast.Node) bool {
+		// look for returns with the receiver as value
+		returnStatement, ok := n.(*ast.ReturnStmt)
+		if !ok {
+			return false
+		}
+
+		for _, exp := range returnStatement.Results {
+			switch e := exp.(type) {
+			case *ast.SelectorExpr: // receiver.field = ...
+				name := w.getNameFromExpr(e.X)
+				if name == "" || name != receiverName {
+					continue
+				}
+			case *ast.Ident: // receiver := ...
+				if e.Name != receiverName {
+					continue
+				}
+			case *ast.UnaryExpr:
+				if e.Op != token.AND {
+					continue
+				}
+				name := w.getNameFromExpr(e.X)
+				if name == "" || name != receiverName {
+					continue
+				}
+
+			default:
+				continue
+			}
+
+			return true
+		}
+
+		return false
+	}
+
+	return pick(target, finder)
 }
