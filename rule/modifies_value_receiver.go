@@ -61,14 +61,14 @@ func (w lintModifiesValRecRule) Visit(node ast.Node) ast.Visitor {
 			return nil // skip, anonymous receiver
 		}
 
-		fselect := func(n ast.Node) bool {
+		receiverAssignmentFinder := func(n ast.Node) bool {
 			// look for assignments with the receiver in the right hand
-			asgmt, ok := n.(*ast.AssignStmt)
+			assignment, ok := n.(*ast.AssignStmt)
 			if !ok {
 				return false
 			}
 
-			for _, exp := range asgmt.Lhs {
+			for _, exp := range assignment.Lhs {
 				switch e := exp.(type) {
 				case *ast.IndexExpr: // receiver...[] = ...
 					continue
@@ -93,13 +93,13 @@ func (w lintModifiesValRecRule) Visit(node ast.Node) ast.Visitor {
 			return false
 		}
 
-		assignmentsToReceiver := pick(n.Body, fselect)
+		assignmentsToReceiver := pick(n.Body, receiverAssignmentFinder)
 		if len(assignmentsToReceiver) == 0 {
 			return nil // receiver is not modified
 		}
 
-		returnReceiverStmts := w.findReturnReceiver(receiverName, n.Body)
-		if len(returnReceiverStmts) > 0 {
+		methodReturnsReceiver := len(w.findReturnReceiverStatements(receiverName, n.Body)) > 0
+		if methodReturnsReceiver {
 			return nil // modification seems legit (see issue #1066)
 		}
 
@@ -137,7 +137,7 @@ func (lintModifiesValRecRule) getNameFromExpr(ie ast.Expr) string {
 	return ident.Name
 }
 
-func (w lintModifiesValRecRule) findReturnReceiver(receiverName string, target ast.Node) []ast.Node {
+func (w lintModifiesValRecRule) findReturnReceiverStatements(receiverName string, target ast.Node) []ast.Node {
 	finder := func(n ast.Node) bool {
 		// look for returns with the receiver as value
 		returnStatement, ok := n.(*ast.ReturnStmt)
