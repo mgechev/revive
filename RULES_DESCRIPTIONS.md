@@ -947,7 +947,7 @@ _Configuration_: Supports arguments with single of `map[string]any` with option 
 
 ```toml
 [rule.unused-parameter]
-    Arguments = [{ allowRegex = "^_" }]
+    arguments = [{ allowRegex = "^_" }]
 ```
 
 allows any names started with `_`, not just `_` itself:
@@ -964,7 +964,7 @@ _Configuration_: Supports arguments with single of `map[string]any` with option 
 
 ```toml
 [rule.unused-receiver]
-    Arguments = [{ allowRegex = "^_" }]
+    arguments = [{ allowRegex = "^_" }]
 ```
 
 allows any names started with `_`, not just `_` itself:
