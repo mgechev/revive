@@ -5,8 +5,8 @@ on:
     types: [opened, edited, synchronize, reopened]
 
 jobs:
-  test:
-    name: Test
+  tests-on-unix:
+    name: Tests on Unix
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -21,5 +21,18 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
+      - name: Run tests
+        run: go test -race -shuffle=on ./...
+
+  tests-on-windows:
+    name: Tests on Windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
       - name: Run tests
         run: go test -race -shuffle=on ./...
