@@ -1,6 +1,44 @@
 package lint
 
-import "testing"
+import (
+	"os"
+	"path/filepath"
+	"testing"
+)
+
+func TestRetrieveModFile(t *testing.T) {
+	t.Run("go.mod file exists", func(t *testing.T) {
+		nestedDir := filepath.Join(t.TempDir(), "nested", "dir", "structure")
+		err := os.MkdirAll(nestedDir, 0o755)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		modFilePath := filepath.Join(nestedDir, "go.mod")
+		err = os.WriteFile(modFilePath, []byte("module example.com/test"), 0o644)
+		if err != nil {
+			t.Fatal(err)
+		}
+		foundPath, err := retrieveModFile(nestedDir)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if foundPath != modFilePath {
+			t.Fatalf("expected %q, got %q", modFilePath, foundPath)
+		}
+	})
+
+	t.Run("go.mod file does not exist", func(t *testing.T) {
+		_, err := retrieveModFile(t.TempDir())
+		if err == nil {
+			t.Fatalf("expected error, got nil")
+		}
+		expectedErrMsg := `did not found "go.mod" file`
+		if err.Error() != expectedErrMsg {
+			t.Fatalf("expected error message %q, got %q", expectedErrMsg, err.Error())
+		}
+	})
+}
 
 // TestIsGenerated tests isGenerated function.
 func TestIsGenerated(t *testing.T) { //revive:disable-line:exported
