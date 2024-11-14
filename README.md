@@ -702,7 +702,7 @@ func LintMyFile(file string) {
  		// You can use as many revivelib.Include or revivelib.Exclude as required
  	)
   	if err != nil {
-  	 	panic("Shouldn't have failed: " + err.Error)
+  	 	panic("Shouldn't have failed: " + err.Error())
   	}
 
   	// Now let's return the formatted errors
