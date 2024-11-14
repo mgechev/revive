@@ -184,7 +184,9 @@ func detectGoMod(dir string) (rootDir string, ver *goversion.Version, err error)
 func retrieveModFile(dir string) (string, error) {
 	const lookingForFile = "go.mod"
 	for {
-		if dir == "." || dir == "/" {
+		// filepath.Dir returns 'C:\' on Windows, and '/' on Unix
+		isRootDir := (dir == filepath.VolumeName(dir)+string(filepath.Separator))
+		if dir == "." || isRootDir {
 			return "", fmt.Errorf("did not found %q file", lookingForFile)
 		}
 
