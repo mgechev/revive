@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -18,12 +19,12 @@ type UnusedParamRule struct {
 	sync.Mutex
 }
 
-func (r *UnusedParamRule) configure(args lint.Arguments) {
+func (r *UnusedParamRule) configure(args lint.Arguments) error {
 	r.Lock()
 	defer r.Unlock()
 
 	if r.configured {
-		return
+		return nil
 	}
 	r.configured = true
 
@@ -41,23 +42,24 @@ func (r *UnusedParamRule) configure(args lint.Arguments) {
 		if allowedRegexParam, ok := options["allowRegex"]; ok {
 			allowedRegexStr, ok = allowedRegexParam.(string)
 			if !ok {
-				panic(fmt.Errorf("error configuring %s rule: allowedRegex is not string but [%T]", r.Name(), allowedRegexParam))
+				return fmt.Errorf("error configuring %s rule: allowedRegex is not string but [%T]", r.Name(), allowedRegexParam)
 			}
 		}
 	}
 	var err error
 	r.allowRegex, err = regexp.Compile(allowedRegexStr)
 	if err != nil {
-		panic(fmt.Errorf("error configuring %s rule: allowedRegex is not valid regex [%s]: %v", r.Name(), allowedRegexStr, err))
+		return fmt.Errorf("error configuring %s rule: allowedRegex is not valid regex [%s]: %v", r.Name(), allowedRegexStr, err)
 	}
 
 	if r.failureMsg == "" {
 		r.failureMsg = "parameter '%s' seems to be unused, consider removing or renaming it to match " + r.allowRegex.String()
 	}
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *UnusedParamRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
+func (r *UnusedParamRule) Apply(file *lint.File, args lint.Arguments) ([]lint.Failure, error) {
 	r.configure(args)
 	var failures []lint.Failure
 
@@ -72,7 +74,7 @@ func (r *UnusedParamRule) Apply(file *lint.File, args lint.Arguments) []lint.Fai
 
 	ast.Walk(w, file.AST)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

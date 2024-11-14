@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -10,7 +11,7 @@ import (
 type CallToGCRule struct{}
 
 // Apply applies the rule to given file.
-func (*CallToGCRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*CallToGCRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
@@ -23,7 +24,7 @@ func (*CallToGCRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	w := lintCallToGC{onFailure, gcTriggeringFunctions}
 	ast.Walk(w, file.AST)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

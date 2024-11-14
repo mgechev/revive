@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -15,7 +16,7 @@ type DotImportsRule struct {
 }
 
 // Apply applies the rule to given file.
-func (r *DotImportsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *DotImportsRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	r.configure(arguments)
 
 	var failures []lint.Failure
@@ -32,7 +33,7 @@ func (r *DotImportsRule) Apply(file *lint.File, arguments lint.Arguments) []lint
 
 	ast.Walk(walker, fileAst)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.
@@ -40,37 +41,38 @@ func (*DotImportsRule) Name() string {
 	return "dot-imports"
 }
 
-func (r *DotImportsRule) configure(arguments lint.Arguments) {
+func (r *DotImportsRule) configure(arguments lint.Arguments) error {
 	r.Lock()
 	defer r.Unlock()
 
 	if r.allowedPackages != nil {
-		return
+		return nil
 	}
 
 	r.allowedPackages = make(allowPackages)
 	if len(arguments) == 0 {
-		return
+		return nil
 	}
 
 	args, ok := arguments[0].(map[string]any)
 	if !ok {
-		panic(fmt.Sprintf("Invalid argument to the dot-imports rule. Expecting a k,v map, got %T", arguments[0]))
+		return fmt.Errorf("Invalid argument to the dot-imports rule. Expecting a k,v map, got %T", arguments[0])
 	}
 
 	if allowedPkgArg, ok := args["allowedPackages"]; ok {
 		pkgs, ok := allowedPkgArg.([]any)
 		if !ok {
-			panic(fmt.Sprintf("Invalid argument to the dot-imports rule, []string expected. Got '%v' (%T)", allowedPkgArg, allowedPkgArg))
+			return fmt.Errorf("Invalid argument to the dot-imports rule, []string expected. Got '%v' (%T)", allowedPkgArg, allowedPkgArg)
 		}
 		for _, p := range pkgs {
 			pkg, ok := p.(string)
 			if !ok {
-				panic(fmt.Sprintf("Invalid argument to the dot-imports rule, string expected. Got '%v' (%T)", p, p))
+				return fmt.Errorf("Invalid argument to the dot-imports rule, string expected. Got '%v' (%T)", p, p)
 			}
 			r.allowedPackages.add(pkg)
 		}
 	}
+	return nil
 }
 
 type lintImports struct {

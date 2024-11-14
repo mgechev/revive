@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -16,27 +17,28 @@ type ArgumentsLimitRule struct {
 
 const defaultArgumentsLimit = 8
 
-func (r *ArgumentsLimitRule) configure(arguments lint.Arguments) {
+func (r *ArgumentsLimitRule) configure(arguments lint.Arguments) error {
 	r.Lock()
 	defer r.Unlock()
 	if r.max != 0 {
-		return
+		return nil
 	}
 
 	if len(arguments) < 1 {
 		r.max = defaultArgumentsLimit
-		return
+		return nil
 	}
 
 	maxArguments, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok {
-		panic(`invalid value passed as argument number to the "argument-limit" rule`)
+		return fmt.Errorf(`invalid value passed as argument number to the "argument-limit" rule`)
 	}
 	r.max = int(maxArguments)
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *ArgumentsLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ArgumentsLimitRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	r.configure(arguments)
 
 	var failures []lint.Failure
@@ -51,7 +53,7 @@ func (r *ArgumentsLimitRule) Apply(file *lint.File, arguments lint.Arguments) []
 
 	ast.Walk(walker, file.AST)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

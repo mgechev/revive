@@ -1,6 +1,8 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
+	"fmt"
 	"go/ast"
 	"go/token"
 	"strconv"
@@ -18,12 +20,12 @@ type ErrorStringsRule struct {
 	sync.Mutex
 }
 
-func (r *ErrorStringsRule) configure(arguments lint.Arguments) {
+func (r *ErrorStringsRule) configure(arguments lint.Arguments) error {
 	r.Lock()
 	defer r.Unlock()
 
 	if r.errorFunctions != nil {
-		return
+		return nil
 	}
 
 	r.errorFunctions = map[string]map[string]struct{}{
@@ -52,12 +54,13 @@ func (r *ErrorStringsRule) configure(arguments lint.Arguments) {
 		}
 	}
 	if len(invalidCustomFunctions) != 0 {
-		panic("found invalid custom function: " + strings.Join(invalidCustomFunctions, ","))
+		return fmt.Errorf("found invalid custom function: " + strings.Join(invalidCustomFunctions, ","))
 	}
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *ErrorStringsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ErrorStringsRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 
 	r.configure(arguments)
@@ -74,7 +77,7 @@ func (r *ErrorStringsRule) Apply(file *lint.File, arguments lint.Arguments) []li
 
 	ast.Walk(walker, fileAst)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

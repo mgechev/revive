@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -11,11 +12,11 @@ import (
 type RangeValInClosureRule struct{}
 
 // Apply applies the rule to given file.
-func (*RangeValInClosureRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*RangeValInClosureRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 
 	if file.Pkg.IsAtLeastGo122() {
-		return failures
+		return failures, nil
 	}
 
 	walker := rangeValInClosure{
@@ -26,7 +27,7 @@ func (*RangeValInClosureRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 
 	ast.Walk(walker, file.AST)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -11,7 +12,7 @@ import (
 type BoolLiteralRule struct{}
 
 // Apply applies the rule to given file.
-func (*BoolLiteralRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*BoolLiteralRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -22,7 +23,7 @@ func (*BoolLiteralRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 	w := &lintBoolLiteral{astFile, onFailure}
 	ast.Walk(w, astFile)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

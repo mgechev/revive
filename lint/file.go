@@ -96,7 +96,7 @@ func (f *File) isMain() bool {
 
 const directiveSpecifyDisableReason = "specify-disable-reason"
 
-func (f *File) lint(rules []Rule, config Config, failures chan Failure) {
+func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 	rulesConfig := config.Rules
 	_, mustSpecifyDisableReason := config.Directives[directiveSpecifyDisableReason]
 	disabledIntervals := f.disabledIntervals(rules, mustSpecifyDisableReason, failures)
@@ -105,7 +105,10 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) {
 		if ruleConfig.MustExclude(f.Name) {
 			continue
 		}
-		currentFailures := currentRule.Apply(f, ruleConfig.Arguments)
+		currentFailures, err := currentRule.Apply(f, ruleConfig.Arguments)
+		if err != nil {
+			return err
+		}
 		for idx, failure := range currentFailures {
 			if failure.RuleName == "" {
 				failure.RuleName = currentRule.Name()
@@ -122,6 +125,7 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) {
 			}
 		}
 	}
+	return nil
 }
 
 type enableDisableConfig struct {

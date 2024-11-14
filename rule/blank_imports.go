@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -16,9 +17,9 @@ func (*BlankImportsRule) Name() string {
 }
 
 // Apply applies the rule to given file.
-func (r *BlankImportsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *BlankImportsRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
 	if file.Pkg.IsMain() || file.IsTest() {
-		return nil
+		return nil, nil
 	}
 
 	const (
@@ -59,7 +60,7 @@ func (r *BlankImportsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failu
 		}
 	}
 
-	return failures
+	return failures, nil
 }
 
 func (*BlankImportsRule) fileHasValidEmbedComment(fileAst *ast.File) bool {

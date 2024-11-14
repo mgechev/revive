@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -20,11 +21,11 @@ type PackageCommentsRule struct {
 }
 
 // Apply applies the rule to given file.
-func (r *PackageCommentsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *PackageCommentsRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 
 	if file.IsTest() {
-		return failures
+		return failures, nil
 	}
 
 	onFailure := func(failure lint.Failure) {
@@ -34,7 +35,7 @@ func (r *PackageCommentsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 	fileAst := file.AST
 	w := &lintPackageComments{fileAst, file, onFailure, r}
 	ast.Walk(w, fileAst)
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

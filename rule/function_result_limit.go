@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -16,31 +17,32 @@ type FunctionResultsLimitRule struct {
 
 const defaultResultsLimit = 3
 
-func (r *FunctionResultsLimitRule) configure(arguments lint.Arguments) {
+func (r *FunctionResultsLimitRule) configure(arguments lint.Arguments) error {
 	r.Lock()
 	defer r.Unlock()
 	if r.max != 0 {
-		return // already configured
+		return nil // already configured
 	}
 
 	if len(arguments) < 1 {
 		r.max = defaultResultsLimit
-		return
+		return nil
 	}
 
 	maxResults, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok {
-		panic(fmt.Sprintf(`invalid value passed as return results number to the "function-result-limit" rule; need int64 but got %T`, arguments[0]))
+		return fmt.Errorf(`invalid value passed as return results number to the "function-result-limit" rule; need int64 but got %T`, arguments[0])
 	}
 	if maxResults < 0 {
-		panic(`the value passed as return results number to the "function-result-limit" rule cannot be negative`)
+		return fmt.Errorf(`the value passed as return results number to the "function-result-limit" rule cannot be negative`)
 	}
 
 	r.max = int(maxResults)
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	r.configure(arguments)
 
 	var failures []lint.Failure
@@ -54,7 +56,7 @@ func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Argumen
 
 	ast.Walk(walker, file.AST)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

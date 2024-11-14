@@ -1,6 +1,8 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
+	"fmt"
 	"go/ast"
 	"strings"
 	"sync"
@@ -16,29 +18,30 @@ type MaxPublicStructsRule struct {
 
 const defaultMaxPublicStructs = 5
 
-func (r *MaxPublicStructsRule) configure(arguments lint.Arguments) {
+func (r *MaxPublicStructsRule) configure(arguments lint.Arguments) error {
 	r.Lock()
 	defer r.Unlock()
 	if r.max == 0 {
-		return // already configured
+		return nil // already configured
 	}
 
 	if len(arguments) < 1 {
 		r.max = defaultMaxPublicStructs
-		return
+		return nil
 	}
 
 	checkNumberOfArguments(1, arguments, r.Name())
 
 	maxStructs, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok {
-		panic(`invalid value passed as argument number to the "max-public-structs" rule`)
+		return fmt.Errorf(`invalid value passed as argument number to the "max-public-structs" rule`)
 	}
 	r.max = maxStructs
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *MaxPublicStructsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *MaxPublicStructsRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	r.configure(arguments)
 
 	var failures []lint.Failure
@@ -63,7 +66,7 @@ func (r *MaxPublicStructsRule) Apply(file *lint.File, arguments lint.Arguments) 
 		})
 	}
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

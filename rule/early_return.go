@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -12,8 +13,8 @@ import (
 type EarlyReturnRule struct{}
 
 // Apply applies the rule to given file.
-func (e *EarlyReturnRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
-	return ifelse.Apply(e, file.AST, ifelse.TargetIf, args)
+func (e *EarlyReturnRule) Apply(file *lint.File, args lint.Arguments) ([]lint.Failure, error) {
+	return ifelse.Apply(e, file.AST, ifelse.TargetIf, args), nil
 }
 
 // Name returns the rule name.

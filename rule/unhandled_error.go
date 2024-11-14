@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -17,36 +18,37 @@ type UnhandledErrorRule struct {
 	sync.Mutex
 }
 
-func (r *UnhandledErrorRule) configure(arguments lint.Arguments) {
+func (r *UnhandledErrorRule) configure(arguments lint.Arguments) error {
 	r.Lock()
 	defer r.Unlock()
 
 	if r.ignoreList != nil {
-		return // already configured
+		return nil // already configured
 	}
 
 	for _, arg := range arguments {
 		argStr, ok := arg.(string)
 		if !ok {
-			panic(fmt.Sprintf("Invalid argument to the unhandled-error rule. Expecting a string, got %T", arg))
+			return fmt.Errorf("Invalid argument to the unhandled-error rule. Expecting a string, got %T", arg)
 		}
 
 		argStr = strings.Trim(argStr, " ")
 		if argStr == "" {
-			panic("Invalid argument to the unhandled-error rule, expected regular expression must not be empty.")
+			return fmt.Errorf("Invalid argument to the unhandled-error rule, expected regular expression must not be empty")
 		}
 
 		exp, err := regexp.Compile(argStr)
 		if err != nil {
-			panic(fmt.Sprintf("Invalid argument to the unhandled-error rule: regexp %q does not compile: %v", argStr, err))
+			return fmt.Errorf("Invalid argument to the unhandled-error rule: regexp %q does not compile: %v", argStr, err)
 		}
 
 		r.ignoreList = append(r.ignoreList, exp)
 	}
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *UnhandledErrorRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
+func (r *UnhandledErrorRule) Apply(file *lint.File, args lint.Arguments) ([]lint.Failure, error) {
 	r.configure(args)
 
 	var failures []lint.Failure
@@ -62,7 +64,7 @@ func (r *UnhandledErrorRule) Apply(file *lint.File, args lint.Arguments) []lint.
 	file.Pkg.TypeCheck()
 	ast.Walk(walker, file.AST)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

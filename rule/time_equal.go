@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -12,7 +13,7 @@ import (
 type TimeEqualRule struct{}
 
 // Apply applies the rule to given file.
-func (*TimeEqualRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*TimeEqualRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -21,11 +22,11 @@ func (*TimeEqualRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 
 	w := &lintTimeEqual{file, onFailure}
 	if w.file.Pkg.TypeCheck() != nil {
-		return nil
+		return nil, nil
 	}
 
 	ast.Walk(w, file.AST)
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

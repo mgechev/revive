@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -11,7 +12,7 @@ import (
 type DeepExitRule struct{}
 
 // Apply applies the rule to given file.
-func (*DeepExitRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*DeepExitRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
@@ -32,7 +33,7 @@ func (*DeepExitRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 
 	w := lintDeepExit{onFailure, exitFunctions, file.IsTest()}
 	ast.Walk(w, file.AST)
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -18,30 +19,31 @@ type CommentsDensityRule struct {
 
 const defaultMinimumCommentsPercentage = 0
 
-func (r *CommentsDensityRule) configure(arguments lint.Arguments) {
+func (r *CommentsDensityRule) configure(arguments lint.Arguments) error {
 	r.Lock()
 	defer r.Unlock()
 
 	if r.configured {
-		return
+		return nil
 	}
 
 	r.configured = true
 
 	if len(arguments) < 1 {
 		r.minimumCommentsDensity = defaultMinimumCommentsPercentage
-		return
+		return nil
 	}
 
 	var ok bool
 	r.minimumCommentsDensity, ok = arguments[0].(int64)
 	if !ok {
-		panic(fmt.Sprintf("invalid argument for %q rule: argument should be an int, got %T", r.Name(), arguments[0]))
+		return fmt.Errorf("invalid argument for %q rule: argument should be an int, got %T", r.Name(), arguments[0])
 	}
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *CommentsDensityRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *CommentsDensityRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	r.configure(arguments)
 
 	commentsLines := countDocLines(file.AST.Comments)
@@ -56,10 +58,10 @@ func (r *CommentsDensityRule) Apply(file *lint.File, arguments lint.Arguments) [
 				Failure: fmt.Sprintf("the file has a comment density of %2.f%% (%d comment lines for %d code lines) but expected a minimum of %d%%",
 					density, commentsLines, statementsCount, r.minimumCommentsDensity),
 			},
-		}
+		}, nil
 	}
 
-	return nil
+	return nil, nil
 }
 
 // Name returns the rule name.

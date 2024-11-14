@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -13,7 +14,7 @@ import (
 type ImportShadowingRule struct{}
 
 // Apply applies the rule to given file.
-func (*ImportShadowingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*ImportShadowingRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 
 	importNames := map[string]struct{}{}
@@ -34,7 +35,7 @@ func (*ImportShadowingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 
 	ast.Walk(walker, fileAst)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

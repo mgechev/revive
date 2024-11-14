@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -10,7 +11,7 @@ import (
 type IdenticalBranchesRule struct{}
 
 // Apply applies the rule to given file.
-func (*IdenticalBranchesRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*IdenticalBranchesRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -20,7 +21,7 @@ func (*IdenticalBranchesRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 	astFile := file.AST
 	w := &lintIdenticalBranches{astFile, onFailure}
 	ast.Walk(w, astFile)
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -12,7 +13,7 @@ import (
 type ContextKeysType struct{}
 
 // Apply applies the rule to given file.
-func (*ContextKeysType) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*ContextKeysType) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -27,7 +28,7 @@ func (*ContextKeysType) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 	file.Pkg.TypeCheck()
 	ast.Walk(walker, fileAst)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

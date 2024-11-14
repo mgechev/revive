@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -28,7 +29,7 @@ func sliceStyleFromString(s string) (enforceSliceStyleType, error) {
 	case string(enforceSliceStyleTypeNil):
 		return enforceSliceStyleTypeNil, nil
 	default:
-		return enforceSliceStyleTypeAny, fmt.Errorf(
+		return "", fmt.Errorf(
 			"invalid slice style: %s (expecting one of %v)",
 			s,
 			[]enforceSliceStyleType{
@@ -48,39 +49,40 @@ type EnforceSliceStyleRule struct {
 	sync.Mutex
 }
 
-func (r *EnforceSliceStyleRule) configure(arguments lint.Arguments) {
+func (r *EnforceSliceStyleRule) configure(arguments lint.Arguments) error {
 	r.Lock()
 	defer r.Unlock()
 
 	if r.configured {
-		return
+		return nil
 	}
 	r.configured = true
 
 	if len(arguments) < 1 {
 		r.enforceSliceStyle = enforceSliceStyleTypeAny
-		return
+		return nil
 	}
 
 	enforceSliceStyle, ok := arguments[0].(string)
 	if !ok {
-		panic(fmt.Sprintf("Invalid argument '%v' for 'enforce-slice-style' rule. Expecting string, got %T", arguments[0], arguments[0]))
+		return fmt.Errorf("Invalid argument '%v' for 'enforce-slice-style' rule. Expecting string, got %T", arguments[0], arguments[0])
 	}
 
 	var err error
 	r.enforceSliceStyle, err = sliceStyleFromString(enforceSliceStyle)
 	if err != nil {
-		panic(fmt.Sprintf("Invalid argument to the enforce-slice-style rule: %v", err))
+		return fmt.Errorf("Invalid argument to the enforce-slice-style rule: %v", err)
 	}
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *EnforceSliceStyleRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *EnforceSliceStyleRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	r.configure(arguments)
 
 	if r.enforceSliceStyle == enforceSliceStyleTypeAny {
 		// this linter is not configured
-		return nil
+		return nil, nil
 	}
 
 	var failures []lint.Failure
@@ -181,7 +183,7 @@ func (r *EnforceSliceStyleRule) Apply(file *lint.File, arguments lint.Arguments)
 		return true
 	})
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

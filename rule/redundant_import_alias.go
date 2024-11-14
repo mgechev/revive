@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -12,7 +13,7 @@ import (
 type RedundantImportAlias struct{}
 
 // Apply applies the rule to given file.
-func (*RedundantImportAlias) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*RedundantImportAlias) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 
 	for _, imp := range file.AST.Imports {
@@ -30,7 +31,7 @@ func (*RedundantImportAlias) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 		}
 	}
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

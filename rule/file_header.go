@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -19,30 +20,31 @@ var (
 	singleRegexp = regexp.MustCompile("^//")
 )
 
-func (r *FileHeaderRule) configure(arguments lint.Arguments) {
+func (r *FileHeaderRule) configure(arguments lint.Arguments) error {
 	r.Lock()
 	defer r.Unlock()
 	if r.header != "" {
-		return // already configured
+		return nil // already configured
 	}
 
 	if len(arguments) < 1 {
-		return
+		return nil
 	}
 
 	var ok bool
 	r.header, ok = arguments[0].(string)
 	if !ok {
-		panic(fmt.Sprintf("invalid argument for \"file-header\" rule: argument should be a string, got %T", arguments[0]))
+		return fmt.Errorf("invalid argument for \"file-header\" rule: argument should be a string, got %T", arguments[0])
 	}
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	r.configure(arguments)
 
 	if r.header == "" {
-		return nil
+		return nil, nil
 	}
 
 	failure := []lint.Failure{
@@ -54,12 +56,12 @@ func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) []lint
 	}
 
 	if len(file.AST.Comments) == 0 {
-		return failure
+		return failure, nil
 	}
 
 	g := file.AST.Comments[0]
 	if g == nil {
-		return failure
+		return failure, nil
 	}
 	comment := ""
 	for _, c := range g.List {
@@ -74,13 +76,13 @@ func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) []lint
 
 	regex, err := regexp.Compile(r.header)
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
 	if !regex.MatchString(comment) {
-		return failure
+		return failure, nil
 	}
-	return nil
+	return nil, nil
 }
 
 // Name returns the rule name.

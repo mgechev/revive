@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -11,7 +12,7 @@ import (
 type ConstantLogicalExprRule struct{}
 
 // Apply applies the rule to given file.
-func (*ConstantLogicalExprRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*ConstantLogicalExprRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -21,7 +22,7 @@ func (*ConstantLogicalExprRule) Apply(file *lint.File, _ lint.Arguments) []lint.
 	astFile := file.AST
 	w := &lintConstantLogicalExpr{astFile, onFailure}
 	ast.Walk(w, astFile)
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

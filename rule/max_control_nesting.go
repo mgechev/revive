@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -17,7 +18,7 @@ type MaxControlNestingRule struct {
 const defaultMaxControlNesting = 5
 
 // Apply applies the rule to given file.
-func (r *MaxControlNestingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *MaxControlNestingRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	r.configure(arguments)
 
 	var failures []lint.Failure
@@ -33,7 +34,7 @@ func (r *MaxControlNestingRule) Apply(file *lint.File, arguments lint.Arguments)
 
 	ast.Walk(walker, fileAst)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.
@@ -106,23 +107,24 @@ func (w *lintMaxControlNesting) walkControlledBlock(b ast.Node) {
 	w.nestingLevelAcc = oldNestingLevel
 }
 
-func (r *MaxControlNestingRule) configure(arguments lint.Arguments) {
+func (r *MaxControlNestingRule) configure(arguments lint.Arguments) error {
 	r.Lock()
 	defer r.Unlock()
 	if !(r.max < 1) {
-		return // max already configured
+		return nil // max already configured
 	}
 
 	if len(arguments) < 1 {
 		r.max = defaultMaxControlNesting
-		return
+		return nil
 	}
 
 	checkNumberOfArguments(1, arguments, r.Name())
 
 	maxNesting, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok {
-		panic(`invalid value passed as argument number to the "max-control-nesting" rule`)
+		return fmt.Errorf(`invalid value passed as argument number to the "max-control-nesting" rule`)
 	}
 	r.max = maxNesting
+	return nil
 }

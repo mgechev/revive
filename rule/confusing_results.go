@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -10,7 +11,7 @@ import (
 type ConfusingResultsRule struct{}
 
 // Apply applies the rule to given file.
-func (*ConfusingResultsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*ConfusingResultsRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -22,7 +23,7 @@ func (*ConfusingResultsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 
 	ast.Walk(walker, fileAst)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

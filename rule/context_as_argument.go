@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -16,10 +17,14 @@ type ContextAsArgumentRule struct {
 }
 
 // Apply applies the rule to given file.
-func (r *ContextAsArgumentRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
+func (r *ContextAsArgumentRule) Apply(file *lint.File, args lint.Arguments) ([]lint.Failure, error) {
 	r.Lock()
 	if r.allowTypesLUT == nil {
-		r.allowTypesLUT = getAllowTypesFromArguments(args)
+		types, err := getAllowTypesFromArguments(args)
+		if err != nil {
+			return nil, err
+		}
+		r.allowTypesLUT = types
 	}
 	r.Unlock()
 
@@ -35,7 +40,7 @@ func (r *ContextAsArgumentRule) Apply(file *lint.File, args lint.Arguments) []li
 
 	ast.Walk(walker, file.AST)
 
-	return failures
+	return failures,nil
 }
 
 // Name returns the rule name.
@@ -79,23 +84,23 @@ func (w lintContextArguments) Visit(n ast.Node) ast.Visitor {
 	return nil // avoid visiting the function body
 }
 
-func getAllowTypesFromArguments(args lint.Arguments) map[string]struct{} {
+func getAllowTypesFromArguments(args lint.Arguments) (map[string]struct{}, error) {
 	allowTypesBefore := []string{}
 	if len(args) >= 1 {
 		argKV, ok := args[0].(map[string]any)
 		if !ok {
-			panic(fmt.Sprintf("Invalid argument to the context-as-argument rule. Expecting a k,v map, got %T", args[0]))
+			return nil, fmt.Errorf("Invalid argument to the context-as-argument rule. Expecting a k,v map, got %T", args[0])
 		}
 		for k, v := range argKV {
 			switch k {
 			case "allowTypesBefore":
 				typesBefore, ok := v.(string)
 				if !ok {
-					panic(fmt.Sprintf("Invalid argument to the context-as-argument.allowTypesBefore rule. Expecting a string, got %T", v))
+					return nil, fmt.Errorf("Invalid argument to the context-as-argument.allowTypesBefore rule. Expecting a string, got %T", v)
 				}
 				allowTypesBefore = append(allowTypesBefore, strings.Split(typesBefore, ",")...)
 			default:
-				panic(fmt.Sprintf("Invalid argument to the context-as-argument rule. Unrecognized key %s", k))
+				return nil, fmt.Errorf("Invalid argument to the context-as-argument rule. Unrecognized key %s", k)
 			}
 		}
 	}
@@ -106,5 +111,5 @@ func getAllowTypesFromArguments(args lint.Arguments) map[string]struct{} {
 	}
 
 	result["context.Context"] = struct{}{} // context.Context is always allowed before another context.Context
-	return result
+	return result, nil
 }

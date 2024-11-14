@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -61,11 +62,11 @@ type ExportedRule struct {
 	sync.Mutex
 }
 
-func (r *ExportedRule) configure(arguments lint.Arguments) {
+func (r *ExportedRule) configure(arguments lint.Arguments) error {
 	r.Lock()
 	defer r.Unlock()
 	if r.configured {
-		return
+		return nil
 	}
 	r.configured = true
 
@@ -94,21 +95,23 @@ func (r *ExportedRule) configure(arguments lint.Arguments) {
 			case "disableChecksOnVariables":
 				r.disabledChecks.Var = true
 			default:
-				panic(fmt.Sprintf("Unknown configuration flag %s for %s rule", flag, r.Name()))
+				return fmt.Errorf("Unknown configuration flag %s for %s rule", flag, r.Name())
 			}
 		default:
-			panic(fmt.Sprintf("Invalid argument for the %s rule: expecting a string, got %T", r.Name(), flag))
+			return fmt.Errorf("Invalid argument for the %s rule: expecting a string, got %T", r.Name(), flag)
 		}
 	}
+
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *ExportedRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
+func (r *ExportedRule) Apply(file *lint.File, args lint.Arguments) ([]lint.Failure, error) {
 	r.configure(args)
 
 	var failures []lint.Failure
 	if file.IsTest() {
-		return failures
+		return failures, nil
 	}
 
 	fileAst := file.AST
@@ -126,7 +129,7 @@ func (r *ExportedRule) Apply(file *lint.File, args lint.Arguments) []lint.Failur
 
 	ast.Walk(&walker, fileAst)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

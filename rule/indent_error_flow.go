@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -9,8 +10,8 @@ import (
 type IndentErrorFlowRule struct{}
 
 // Apply applies the rule to given file.
-func (e *IndentErrorFlowRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
-	return ifelse.Apply(e, file.AST, ifelse.TargetElse, args)
+func (e *IndentErrorFlowRule) Apply(file *lint.File, args lint.Arguments) ([]lint.Failure, error) {
+	return ifelse.Apply(e, file.AST, ifelse.TargetElse, args), nil
 }
 
 // Name returns the rule name.

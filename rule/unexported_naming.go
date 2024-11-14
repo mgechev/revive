@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -12,7 +13,7 @@ import (
 type UnexportedNamingRule struct{}
 
 // Apply applies the rule to given file.
-func (*UnexportedNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*UnexportedNamingRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
@@ -21,7 +22,7 @@ func (*UnexportedNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 	ba := &unexportablenamingLinter{onFailure}
 	ast.Walk(ba, file.AST)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

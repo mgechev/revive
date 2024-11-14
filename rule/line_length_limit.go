@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -20,28 +21,29 @@ type LineLengthLimitRule struct {
 
 const defaultLineLengthLimit = 80
 
-func (r *LineLengthLimitRule) configure(arguments lint.Arguments) {
+func (r *LineLengthLimitRule) configure(arguments lint.Arguments) error {
 	r.Lock()
 	defer r.Unlock()
 	if r.max != 0 {
-		return // already configured
+		return nil // already configured
 	}
 
 	if len(arguments) < 1 {
 		r.max = defaultLineLengthLimit
-		return
+		return nil
 	}
 
 	maxLength, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok || maxLength < 0 {
-		panic(`invalid value passed as argument number to the "line-length-limit" rule`)
+		return fmt.Errorf(`invalid value passed as argument number to the "line-length-limit" rule`)
 	}
 
 	r.max = int(maxLength)
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *LineLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *LineLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	r.configure(arguments)
 
 	var failures []lint.Failure
@@ -56,7 +58,7 @@ func (r *LineLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) [
 
 	checker.check()
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

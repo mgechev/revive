@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -13,7 +14,7 @@ import (
 type UnexportedReturnRule struct{}
 
 // Apply applies the rule to given file.
-func (*UnexportedReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*UnexportedReturnRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -28,7 +29,7 @@ func (*UnexportedReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 	file.Pkg.TypeCheck()
 	ast.Walk(walker, fileAst)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

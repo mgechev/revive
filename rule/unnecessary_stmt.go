@@ -11,7 +11,7 @@ import (
 type UnnecessaryStmtRule struct{}
 
 // Apply applies the rule to given file.
-func (*UnnecessaryStmtRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*UnnecessaryStmtRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
@@ -19,7 +19,7 @@ func (*UnnecessaryStmtRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 
 	w := lintUnnecessaryStmtRule{onFailure}
 	ast.Walk(w, file.AST)
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

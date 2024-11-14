@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -20,19 +21,19 @@ type UncheckedTypeAssertionRule struct {
 	configured                   bool
 }
 
-func (u *UncheckedTypeAssertionRule) configure(arguments lint.Arguments) {
+func (u *UncheckedTypeAssertionRule) configure(arguments lint.Arguments) error {
 	u.Lock()
 	defer u.Unlock()
 
 	if len(arguments) == 0 || u.configured {
-		return
+		return nil
 	}
 
 	u.configured = true
 
 	args, ok := arguments[0].(map[string]any)
 	if !ok {
-		panic("Unable to get arguments. Expected object of key-value-pairs.")
+		return fmt.Errorf("Unable to get arguments. Expected object of key-value-pairs")
 	}
 
 	for k, v := range args {
@@ -40,16 +41,17 @@ func (u *UncheckedTypeAssertionRule) configure(arguments lint.Arguments) {
 		case "acceptIgnoredAssertionResult":
 			u.acceptIgnoredAssertionResult, ok = v.(bool)
 			if !ok {
-				panic(fmt.Sprintf("Unable to parse argument '%s'. Expected boolean.", k))
+				return fmt.Errorf("Unable to parse argument '%s'. Expected boolean", k)
 			}
 		default:
-			panic(fmt.Sprintf("Unknown argument: %s", k))
+			return fmt.Errorf("Unknown argument: %s", k)
 		}
 	}
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (u *UncheckedTypeAssertionRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
+func (u *UncheckedTypeAssertionRule) Apply(file *lint.File, args lint.Arguments) ([]lint.Failure, error) {
 	u.configure(args)
 
 	var failures []lint.Failure
@@ -63,7 +65,7 @@ func (u *UncheckedTypeAssertionRule) Apply(file *lint.File, args lint.Arguments)
 
 	ast.Walk(walker, file.AST)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

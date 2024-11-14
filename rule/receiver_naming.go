@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -17,21 +18,21 @@ type ReceiverNamingRule struct {
 
 const defaultReceiverNameMaxLength = -1 // thus will not check
 
-func (r *ReceiverNamingRule) configure(arguments lint.Arguments) {
+func (r *ReceiverNamingRule) configure(arguments lint.Arguments) error {
 	r.Lock()
 	defer r.Unlock()
 	if r.receiverNameMaxLength != 0 {
-		return
+		return nil
 	}
 
 	r.receiverNameMaxLength = defaultReceiverNameMaxLength
 	if len(arguments) < 1 {
-		return
+		return nil
 	}
 
 	args, ok := arguments[0].(map[string]any)
 	if !ok {
-		panic(fmt.Sprintf("Unable to get arguments for rule %s. Expected object of key-value-pairs.", r.Name()))
+		return fmt.Errorf("Unable to get arguments for rule %s. Expected object of key-value-pairs", r.Name())
 	}
 
 	for k, v := range args {
@@ -39,17 +40,18 @@ func (r *ReceiverNamingRule) configure(arguments lint.Arguments) {
 		case "maxLength":
 			value, ok := v.(int64)
 			if !ok {
-				panic(fmt.Sprintf("Invalid value %v for argument %s of rule %s, expected integer value got %T", v, k, r.Name(), v))
+				return fmt.Errorf("Invalid value %v for argument %s of rule %s, expected integer value got %T", v, k, r.Name(), v)
 			}
 			r.receiverNameMaxLength = int(value)
 		default:
-			panic(fmt.Sprintf("Unknown argument %s for %s rule.", k, r.Name()))
+			return fmt.Errorf("Unknown argument %s for %s rule", k, r.Name())
 		}
 	}
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *ReceiverNamingRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
+func (r *ReceiverNamingRule) Apply(file *lint.File, args lint.Arguments) ([]lint.Failure, error) {
 	r.configure(args)
 
 	var failures []lint.Failure
@@ -65,7 +67,7 @@ func (r *ReceiverNamingRule) Apply(file *lint.File, args lint.Arguments) []lint.
 
 	ast.Walk(walker, fileAst)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

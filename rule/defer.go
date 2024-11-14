@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -14,18 +15,23 @@ type DeferRule struct {
 	sync.Mutex
 }
 
-func (r *DeferRule) configure(arguments lint.Arguments) {
+func (r *DeferRule) configure(arguments lint.Arguments) error {
 	r.Lock()
 	defer r.Unlock()
 	if r.allow != nil {
-		return // already configured
+		return nil // already configured
 	}
 
-	r.allow = r.allowFromArgs(arguments)
+	list, err := r.allowFromArgs(arguments)
+	if err != nil {
+		return err
+	}
+	r.allow = list
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *DeferRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *DeferRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	r.configure(arguments)
 
 	var failures []lint.Failure
@@ -36,7 +42,7 @@ func (r *DeferRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Fail
 
 	ast.Walk(w, file.AST)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.
@@ -44,7 +50,7 @@ func (*DeferRule) Name() string {
 	return "defer"
 }
 
-func (*DeferRule) allowFromArgs(args lint.Arguments) map[string]bool {
+func (*DeferRule) allowFromArgs(args lint.Arguments) (map[string]bool, error) {
 	if len(args) < 1 {
 		allow := map[string]bool{
 			"loop":              true,
@@ -55,24 +61,24 @@ func (*DeferRule) allowFromArgs(args lint.Arguments) map[string]bool {
 			"immediate-recover": true,
 		}
 
-		return allow
+		return allow, nil
 	}
 
 	aa, ok := args[0].([]any)
 	if !ok {
-		panic(fmt.Sprintf("Invalid argument '%v' for 'defer' rule. Expecting []string, got %T", args[0], args[0]))
+		return nil, fmt.Errorf("Invalid argument '%v' for 'defer' rule. Expecting []string, got %T", args[0], args[0])
 	}
 
 	allow := make(map[string]bool, len(aa))
 	for _, subcase := range aa {
 		sc, ok := subcase.(string)
 		if !ok {
-			panic(fmt.Sprintf("Invalid argument '%v' for 'defer' rule. Expecting string, got %T", subcase, subcase))
+			return nil, fmt.Errorf("Invalid argument '%v' for 'defer' rule. Expecting string, got %T", subcase, subcase)
 		}
 		allow[sc] = true
 	}
 
-	return allow
+	return allow, nil
 }
 
 type lintDeferRule struct {

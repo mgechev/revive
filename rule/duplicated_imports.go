@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -10,7 +11,7 @@ import (
 type DuplicatedImportsRule struct{}
 
 // Apply applies the rule to given file.
-func (*DuplicatedImportsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*DuplicatedImportsRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 
 	impPaths := map[string]struct{}{}
@@ -30,7 +31,7 @@ func (*DuplicatedImportsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 		impPaths[path] = struct{}{}
 	}
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -16,7 +17,7 @@ type ImportsBlocklistRule struct {
 
 var replaceImportRegexp = regexp.MustCompile(`/?\*\*/?`)
 
-func (r *ImportsBlocklistRule) configure(arguments lint.Arguments) {
+func (r *ImportsBlocklistRule) configure(arguments lint.Arguments) error {
 	r.Lock()
 	defer r.Unlock()
 
@@ -26,15 +27,16 @@ func (r *ImportsBlocklistRule) configure(arguments lint.Arguments) {
 		for _, arg := range arguments {
 			argStr, ok := arg.(string)
 			if !ok {
-				panic(fmt.Sprintf("Invalid argument to the imports-blocklist rule. Expecting a string, got %T", arg))
+				return fmt.Errorf("Invalid argument to the imports-blocklist rule. Expecting a string, got %T", arg)
 			}
 			regStr, err := regexp.Compile(fmt.Sprintf(`(?m)"%s"$`, replaceImportRegexp.ReplaceAllString(argStr, `(\W|\w)*`)))
 			if err != nil {
-				panic(fmt.Sprintf("Invalid argument to the imports-blocklist rule. Expecting %q to be a valid regular expression, got: %v", argStr, err))
+				return fmt.Errorf("Invalid argument to the imports-blocklist rule. Expecting %q to be a valid regular expression, got: %v", argStr, err)
 			}
 			r.blocklist = append(r.blocklist, regStr)
 		}
 	}
+	return nil
 }
 
 func (r *ImportsBlocklistRule) isBlocklisted(path string) bool {
@@ -47,7 +49,7 @@ func (r *ImportsBlocklistRule) isBlocklisted(path string) bool {
 }
 
 // Apply applies the rule to given file.
-func (r *ImportsBlocklistRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *ImportsBlocklistRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	r.configure(arguments)
 
 	var failures []lint.Failure
@@ -64,7 +66,7 @@ func (r *ImportsBlocklistRule) Apply(file *lint.File, arguments lint.Arguments) 
 		}
 	}
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

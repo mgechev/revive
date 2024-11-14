@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -18,12 +19,12 @@ type UnusedReceiverRule struct {
 	sync.Mutex
 }
 
-func (r *UnusedReceiverRule) configure(args lint.Arguments) {
+func (r *UnusedReceiverRule) configure(args lint.Arguments) error {
 	r.Lock()
 	defer r.Unlock()
 
 	if r.configured {
-		return
+		return nil
 	}
 	r.configured = true
 
@@ -41,22 +42,23 @@ func (r *UnusedReceiverRule) configure(args lint.Arguments) {
 		if allowedRegexParam, ok := options["allowRegex"]; ok {
 			allowedRegexStr, ok = allowedRegexParam.(string)
 			if !ok {
-				panic(fmt.Errorf("error configuring [unused-receiver] rule: allowedRegex is not string but [%T]", allowedRegexParam))
+				return fmt.Errorf("error configuring [unused-receiver] rule: allowedRegex is not string but [%T]", allowedRegexParam)
 			}
 		}
 	}
 	var err error
 	r.allowRegex, err = regexp.Compile(allowedRegexStr)
 	if err != nil {
-		panic(fmt.Errorf("error configuring [unused-receiver] rule: allowedRegex is not valid regex [%s]: %v", allowedRegexStr, err))
+		return fmt.Errorf("error configuring [unused-receiver] rule: allowedRegex is not valid regex [%s]: %v", allowedRegexStr, err)
 	}
 	if r.failureMsg == "" {
 		r.failureMsg = "method receiver '%s' is not referenced in method's body, consider removing or renaming it to match " + r.allowRegex.String()
 	}
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *UnusedReceiverRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
+func (r *UnusedReceiverRule) Apply(file *lint.File, args lint.Arguments) ([]lint.Failure, error) {
 	r.configure(args)
 	var failures []lint.Failure
 
@@ -72,7 +74,7 @@ func (r *UnusedReceiverRule) Apply(file *lint.File, args lint.Arguments) []lint.
 
 	ast.Walk(w, file.AST)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

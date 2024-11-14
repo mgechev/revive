@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -12,7 +13,7 @@ import (
 type IncrementDecrementRule struct{}
 
 // Apply applies the rule to given file.
-func (*IncrementDecrementRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*IncrementDecrementRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -25,7 +26,7 @@ func (*IncrementDecrementRule) Apply(file *lint.File, _ lint.Arguments) []lint.F
 
 	ast.Walk(walker, fileAst)
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

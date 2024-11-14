@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -15,25 +16,26 @@ type CommentSpacingsRule struct {
 	sync.Mutex
 }
 
-func (r *CommentSpacingsRule) configure(arguments lint.Arguments) {
+func (r *CommentSpacingsRule) configure(arguments lint.Arguments) error {
 	r.Lock()
 	defer r.Unlock()
 	if r.allowList != nil {
-		return // already configured
+		return nil // already configured
 	}
 
 	r.allowList = []string{}
 	for _, arg := range arguments {
 		allow, ok := arg.(string) // Alt. non panicking version
 		if !ok {
-			panic(fmt.Sprintf("invalid argument %v for %s; expected string but got %T", arg, r.Name(), arg))
+			return fmt.Errorf("invalid argument %v for %s; expected string but got %T", arg, r.Name(), arg)
 		}
 		r.allowList = append(r.allowList, `//`+allow)
 	}
+	return nil
 }
 
 // Apply the rule.
-func (r *CommentSpacingsRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
+func (r *CommentSpacingsRule) Apply(file *lint.File, args lint.Arguments) ([]lint.Failure, error) {
 	r.configure(args)
 
 	var failures []lint.Failure
@@ -68,7 +70,7 @@ func (r *CommentSpacingsRule) Apply(file *lint.File, args lint.Arguments) []lint
 			})
 		}
 	}
-	return failures
+	return failures, nil
 }
 
 // Name yields this rule name.

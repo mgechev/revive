@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -44,39 +45,41 @@ type EnforceMapStyleRule struct {
 	sync.Mutex
 }
 
-func (r *EnforceMapStyleRule) configure(arguments lint.Arguments) {
+func (r *EnforceMapStyleRule) configure(arguments lint.Arguments) error {
 	r.Lock()
 	defer r.Unlock()
 
 	if r.configured {
-		return
+		return nil
 	}
 	r.configured = true
 
 	if len(arguments) < 1 {
 		r.enforceMapStyle = enforceMapStyleTypeAny
-		return
+		return nil
 	}
 
 	enforceMapStyle, ok := arguments[0].(string)
 	if !ok {
-		panic(fmt.Sprintf("Invalid argument '%v' for 'enforce-map-style' rule. Expecting string, got %T", arguments[0], arguments[0]))
+		return fmt.Errorf("Invalid argument '%v' for 'enforce-map-style' rule. Expecting string, got %T", arguments[0], arguments[0])
 	}
 
 	var err error
 	r.enforceMapStyle, err = mapStyleFromString(enforceMapStyle)
 	if err != nil {
-		panic(fmt.Sprintf("Invalid argument to the enforce-map-style rule: %v", err))
+		return fmt.Errorf("Invalid argument to the enforce-map-style rule: %v", err)
 	}
+
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *EnforceMapStyleRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *EnforceMapStyleRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	r.configure(arguments)
 
 	if r.enforceMapStyle == enforceMapStyleTypeAny {
 		// this linter is not configured
-		return nil
+		return nil, nil
 	}
 
 	var failures []lint.Failure
@@ -136,7 +139,7 @@ func (r *EnforceMapStyleRule) Apply(file *lint.File, arguments lint.Arguments) [
 		return true
 	})
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

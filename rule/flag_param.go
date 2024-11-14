@@ -1,3 +1,4 @@
+// Package rule implements revive's linting rules.
 package rule
 
 import (
@@ -11,7 +12,7 @@ import (
 type FlagParamRule struct{}
 
 // Apply applies the rule to given file.
-func (*FlagParamRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*FlagParamRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -20,7 +21,7 @@ func (*FlagParamRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 
 	w := lintFlagParamRule{onFailure: onFailure}
 	ast.Walk(w, file.AST)
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.
