@@ -44,6 +44,10 @@ func (r *MaxPublicStructsRule) Apply(file *lint.File, arguments lint.Arguments) 
 
 	var failures []lint.Failure
 
+	if r.max < 1 {
+		return failures
+	}
+
 	fileAst := file.AST
 
 	walker := &lintMaxPublicStructs{
