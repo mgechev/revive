@@ -165,7 +165,7 @@ func parseConfig(path string, config *lint.Config) error {
 	if err != nil {
 		return errors.New("cannot read the config file")
 	}
-	_, err = toml.Decode(string(file), config)
+	err = toml.Unmarshal(file, config)
 	if err != nil {
 		return fmt.Errorf("cannot parse the config file: %v", err)
 	}
