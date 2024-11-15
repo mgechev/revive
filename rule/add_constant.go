@@ -202,65 +202,64 @@ func (w *lintAddConstantRule) isStructTag(n *ast.BasicLit) bool {
 }
 
 func (r *AddConstantRule) configure(arguments lint.Arguments) {
-	if r.allowList == nil {
-		r.strLitLimit = defaultStrLitLimit
-		r.allowList = newAllowList()
-		if len(arguments) > 0 {
-			args, ok := arguments[0].(map[string]any)
-			if !ok {
-				panic(fmt.Sprintf("Invalid argument to the add-constant rule. Expecting a k,v map, got %T", arguments[0]))
+	r.strLitLimit = defaultStrLitLimit
+	r.allowList = newAllowList()
+	if len(arguments) == 0 {
+		return
+	}
+	args, ok := arguments[0].(map[string]any)
+	if !ok {
+		panic(fmt.Sprintf("Invalid argument to the add-constant rule, expecting a k,v map. Got %T", arguments[0]))
+	}
+	for k, v := range args {
+		kind := ""
+		switch k {
+		case "allowFloats":
+			kind = kindFLOAT
+			fallthrough
+		case "allowInts":
+			if kind == "" {
+				kind = kindINT
 			}
-			for k, v := range args {
-				kind := ""
-				switch k {
-				case "allowFloats":
-					kind = kindFLOAT
-					fallthrough
-				case "allowInts":
-					if kind == "" {
-						kind = kindINT
-					}
-					fallthrough
-				case "allowStrs":
-					if kind == "" {
-						kind = kindSTRING
-					}
-					list, ok := v.(string)
-					if !ok {
-						panic(fmt.Sprintf("Invalid argument to the add-constant rule, string expected. Got '%v' (%T)", v, v))
-					}
-					r.allowList.add(kind, list)
-				case "maxLitCount":
-					sl, ok := v.(string)
-					if !ok {
-						panic(fmt.Sprintf("Invalid argument to the add-constant rule, expecting string representation of an integer. Got '%v' (%T)", v, v))
-					}
+			fallthrough
+		case "allowStrs":
+			if kind == "" {
+				kind = kindSTRING
+			}
+			list, ok := v.(string)
+			if !ok {
+				panic(fmt.Sprintf("Invalid argument to the add-constant rule, string expected. Got '%v' (%T)", v, v))
+			}
+			r.allowList.add(kind, list)
+		case "maxLitCount":
+			sl, ok := v.(string)
+			if !ok {
+				panic(fmt.Sprintf("Invalid argument to the add-constant rule, expecting string representation of an integer. Got '%v' (%T)", v, v))
+			}
 
-					limit, err := strconv.Atoi(sl)
-					if err != nil {
-						panic(fmt.Sprintf("Invalid argument to the add-constant rule, expecting string representation of an integer. Got '%v'", v))
-					}
-					r.strLitLimit = limit
-				case "ignoreFuncs":
-					excludes, ok := v.(string)
-					if !ok {
-						panic(fmt.Sprintf("Invalid argument to the ignoreFuncs parameter of add-constant rule, string expected. Got '%v' (%T)", v, v))
-					}
+			limit, err := strconv.Atoi(sl)
+			if err != nil {
+				panic(fmt.Sprintf("Invalid argument to the add-constant rule, expecting string representation of an integer. Got '%v'", v))
+			}
+			r.strLitLimit = limit
+		case "ignoreFuncs":
+			excludes, ok := v.(string)
+			if !ok {
+				panic(fmt.Sprintf("Invalid argument to the ignoreFuncs parameter of add-constant rule, string expected. Got '%v' (%T)", v, v))
+			}
 
-					for _, exclude := range strings.Split(excludes, ",") {
-						exclude = strings.Trim(exclude, " ")
-						if exclude == "" {
-							panic("Invalid argument to the ignoreFuncs parameter of add-constant rule, expected regular expression must not be empty.")
-						}
-
-						exp, err := regexp.Compile(exclude)
-						if err != nil {
-							panic(fmt.Sprintf("Invalid argument to the ignoreFuncs parameter of add-constant rule: regexp %q does not compile: %v", exclude, err))
-						}
-
-						r.ignoreFunctions = append(r.ignoreFunctions, exp)
-					}
+			for _, exclude := range strings.Split(excludes, ",") {
+				exclude = strings.Trim(exclude, " ")
+				if exclude == "" {
+					panic("Invalid argument to the ignoreFuncs parameter of add-constant rule, expected regular expression must not be empty.")
 				}
+
+				exp, err := regexp.Compile(exclude)
+				if err != nil {
+					panic(fmt.Sprintf("Invalid argument to the ignoreFuncs parameter of add-constant rule: regexp %q does not compile: %v", exclude, err))
+				}
+
+				r.ignoreFunctions = append(r.ignoreFunctions, exp)
 			}
 		}
 	}
