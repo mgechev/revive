@@ -50,7 +50,7 @@ func (*Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string
 		ps = "problem"
 	}
 
-	fileReport := make(map[string][][]string)
+	fileReport := map[string][][]string{}
 
 	for _, row := range result {
 		if _, ok := fileReport[row[0]]; !ok {

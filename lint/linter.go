@@ -63,7 +63,7 @@ var (
 func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-chan Failure, error) {
 	failures := make(chan Failure)
 
-	perModVersions := make(map[string]*goversion.Version)
+	perModVersions := map[string]*goversion.Version{}
 	perPkgVersions := make([]*goversion.Version, len(packages))
 	for n, files := range packages {
 		if len(files) == 0 {

@@ -159,7 +159,7 @@ func parseInstructions(t *testing.T, filename string, src []byte) []instruction 
 			}
 			if line == "OK" && ins == nil {
 				// so our return value will be non-nil
-				ins = make([]instruction, 0)
+				ins = []instruction{}
 				continue
 			}
 			switch extractDataMode(line) {

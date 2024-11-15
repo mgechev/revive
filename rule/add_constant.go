@@ -52,11 +52,11 @@ func (r *AddConstantRule) Apply(file *lint.File, arguments lint.Arguments) []lin
 
 	w := &lintAddConstantRule{
 		onFailure:       onFailure,
-		strLits:         make(map[string]int),
+		strLits:         map[string]int{},
 		strLitLimit:     r.strLitLimit,
 		allowList:       r.allowList,
 		ignoreFunctions: r.ignoreFunctions,
-		structTags:      make(map[*ast.BasicLit]struct{}),
+		structTags:      map[*ast.BasicLit]struct{}{},
 	}
 
 	ast.Walk(w, file.AST)

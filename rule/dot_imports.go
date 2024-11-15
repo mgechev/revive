@@ -42,7 +42,7 @@ func (*DotImportsRule) Name() string {
 }
 
 func (r *DotImportsRule) configure(arguments lint.Arguments) {
-	r.allowedPackages = make(allowPackages)
+	r.allowedPackages = allowPackages{}
 	if len(arguments) == 0 {
 		return
 	}
