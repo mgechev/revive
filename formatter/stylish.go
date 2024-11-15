@@ -22,11 +22,12 @@ func (*Stylish) Name() string {
 
 func formatFailure(failure lint.Failure, severity lint.Severity) []string {
 	fString := color.CyanString(failure.Failure)
-	fName := color.RedString("https://revive.run/r#" + failure.RuleName)
+	fURL := ruleDescriptionURL(failure.RuleName)
+	fName := color.RedString(fURL)
 	lineColumn := failure.Position
 	pos := fmt.Sprintf("(%d, %d)", lineColumn.Start.Line, lineColumn.Start.Column)
 	if severity == lint.SeverityWarning {
-		fName = color.YellowString("https://revive.run/r#" + failure.RuleName)
+		fName = color.YellowString(fURL)
 	}
 	return []string{failure.GetFilename(), pos, fName, fString}
 }
