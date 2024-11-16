@@ -53,7 +53,7 @@ func (*FilenameFormatRule) Name() string {
 	return "filename-format"
 }
 
-var defaultFormat = regexp.MustCompile("^[_A-Za-z0-9][_A-Za-z0-9-]*.go$")
+var defaultFormat = regexp.MustCompile(`^[_A-Za-z0-9][_A-Za-z0-9-]*\.go$`)
 
 func (r *FilenameFormatRule) configure(arguments lint.Arguments) {
 	argsCount := len(arguments)
