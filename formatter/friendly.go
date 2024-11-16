@@ -67,7 +67,7 @@ func (f *Friendly) printHeaderRow(w io.Writer, failure lint.Failure, severity li
 	if severity == lint.SeverityError {
 		emoji = getErrorEmoji()
 	}
-	fmt.Fprint(w, f.table([][]string{{emoji, "https://revive.run/r#" + failure.RuleName, color.GreenString(failure.Failure)}}))
+	fmt.Fprint(w, f.table([][]string{{emoji, ruleDescriptionURL(failure.RuleName), color.GreenString(failure.Failure)}}))
 }
 
 func (*Friendly) printFilePosition(w io.Writer, failure lint.Failure) {

@@ -20,7 +20,7 @@ func (*Sarif) Name() string {
 	return "sarif"
 }
 
-const reviveSite = "https://revive.run"
+const reviveSite = "https://github.com/mgechev/revive"
 
 // Format formats the failures gotten from the lint.
 func (*Sarif) Format(failures <-chan lint.Failure, cfg lint.Config) (string, error) {
