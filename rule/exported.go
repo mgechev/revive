@@ -112,7 +112,7 @@ func (r *ExportedRule) Apply(file *lint.File, args lint.Arguments) []lint.Failur
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
-		genDeclMissingComments: make(map[*ast.GenDecl]bool),
+		genDeclMissingComments: map[*ast.GenDecl]bool{},
 		stuttersMsg:            r.stuttersMsg,
 		disabledChecks:         r.disabledChecks,
 	}
