@@ -42,22 +42,13 @@ func repeatedArgTypeStyleFromString(s string) (enforceRepeatedArgTypeStyleType, 
 
 // EnforceRepeatedArgTypeStyleRule implements a rule to enforce repeated argument type style.
 type EnforceRepeatedArgTypeStyleRule struct {
-	configured      bool
 	funcArgStyle    enforceRepeatedArgTypeStyleType
 	funcRetValStyle enforceRepeatedArgTypeStyleType
 
-	sync.Mutex
+	configureOnce sync.Once
 }
 
 func (r *EnforceRepeatedArgTypeStyleRule) configure(arguments lint.Arguments) error {
-	r.Lock()
-	defer r.Unlock()
-
-	if r.configured {
-		return nil
-	}
-	r.configured = true
-
 	r.funcArgStyle = enforceRepeatedArgTypeStyleTypeAny
 	r.funcRetValStyle = enforceRepeatedArgTypeStyleTypeAny
 
@@ -112,16 +103,14 @@ func (r *EnforceRepeatedArgTypeStyleRule) configure(arguments lint.Arguments) er
 
 // Apply applies the rule to a given file.
 func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	var failures []lint.Failure
-	err := r.configure(arguments)
-	if err != nil {
-		return failures, err
-	}
+	r.configureOnce.Do(func() { r.configure(arguments) })
 
 	if r.funcArgStyle == enforceRepeatedArgTypeStyleTypeAny && r.funcRetValStyle == enforceRepeatedArgTypeStyleTypeAny {
 		// This linter is not configured, return no failures.
 		return nil, nil
 	}
+
+    var failures []lint.Failure
 
 	astFile := file.AST
 	ast.Inspect(astFile, func(n ast.Node) bool {

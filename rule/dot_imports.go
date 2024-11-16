@@ -11,17 +11,16 @@ import (
 
 // DotImportsRule lints given else constructs.
 type DotImportsRule struct {
-	sync.Mutex
 	allowedPackages allowPackages
+
+	configureOnce sync.Once
 }
 
 // Apply applies the rule to given file.
 func (r *DotImportsRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+	r.configureOnce.Do(func() { r.configure(arguments) })
+
 	var failures []lint.Failure
-	err := r.configure(arguments)
-	if err != nil {
-		return failures, err
-	}
 
 	fileAst := file.AST
 	walker := lintImports{
@@ -43,15 +42,8 @@ func (*DotImportsRule) Name() string {
 	return "dot-imports"
 }
 
-func (r *DotImportsRule) configure(arguments lint.Arguments) error {
-	r.Lock()
-	defer r.Unlock()
-
-	if r.allowedPackages != nil {
-		return nil
-	}
-
-	r.allowedPackages = make(allowPackages)
+func (r *DotImportsRule) configure(arguments lint.Arguments) {
+	r.allowedPackages = allowPackages{}
 	if len(arguments) == 0 {
 		return nil
 	}

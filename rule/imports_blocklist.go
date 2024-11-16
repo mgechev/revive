@@ -12,29 +12,24 @@ import (
 // ImportsBlocklistRule lints given else constructs.
 type ImportsBlocklistRule struct {
 	blocklist []*regexp.Regexp
-	sync.Mutex
+
+	configureOnce sync.Once
 }
 
 var replaceImportRegexp = regexp.MustCompile(`/?\*\*/?`)
 
 func (r *ImportsBlocklistRule) configure(arguments lint.Arguments) error {
-	r.Lock()
-	defer r.Unlock()
-
-	if r.blocklist == nil {
-		r.blocklist = make([]*regexp.Regexp, 0)
-
-		for _, arg := range arguments {
-			argStr, ok := arg.(string)
-			if !ok {
-				return fmt.Errorf("Invalid argument to the imports-blocklist rule. Expecting a string, got %T", arg)
-			}
-			regStr, err := regexp.Compile(fmt.Sprintf(`(?m)"%s"$`, replaceImportRegexp.ReplaceAllString(argStr, `(\W|\w)*`)))
-			if err != nil {
-				return fmt.Errorf("Invalid argument to the imports-blocklist rule. Expecting %q to be a valid regular expression, got: %w", argStr, err)
-			}
-			r.blocklist = append(r.blocklist, regStr)
+	r.blocklist = []*regexp.Regexp{}
+	for _, arg := range arguments {
+		argStr, ok := arg.(string)
+		if !ok {
+			return fmt.Errorf("Invalid argument to the imports-blocklist rule. Expecting a string, got %T", arg)
 		}
+		regStr, err := regexp.Compile(fmt.Sprintf(`(?m)"%s"$`, replaceImportRegexp.ReplaceAllString(argStr, `(\W|\w)*`)))
+		if err != nil {
+			return fmt.Errorf("Invalid argument to the imports-blocklist rule. Expecting %q to be a valid regular expression, got: %w", argStr, err)
+		}
+		r.blocklist = append(r.blocklist, regStr)
 	}
 	return nil
 }
@@ -50,11 +45,9 @@ func (r *ImportsBlocklistRule) isBlocklisted(path string) bool {
 
 // Apply applies the rule to given file.
 func (r *ImportsBlocklistRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+	r.configureOnce.Do(func() { r.configure(arguments) })
+
 	var failures []lint.Failure
-	err := r.configure(arguments)
-	if err != nil {
-		return failures, err
-	}
 
 	for _, is := range file.AST.Imports {
 		path := is.Path

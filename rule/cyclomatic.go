@@ -15,18 +15,13 @@ import (
 // CyclomaticRule lints given else constructs.
 type CyclomaticRule struct {
 	maxComplexity int
-	sync.Mutex
+
+	configureOnce sync.Once
 }
 
 const defaultMaxCyclomaticComplexity = 10
 
 func (r *CyclomaticRule) configure(arguments lint.Arguments) error {
-	r.Lock()
-	defer r.Unlock()
-	if r.maxComplexity != 0 {
-		return nil // already configured
-	}
-
 	if len(arguments) < 1 {
 		r.maxComplexity = defaultMaxCyclomaticComplexity
 		return nil
@@ -42,12 +37,9 @@ func (r *CyclomaticRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *CyclomaticRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	var failures []lint.Failure
-	err := r.configure(arguments)
-	if err != nil {
-		return failures, err
-	}
+	r.configureOnce.Do(func() { r.configure(arguments) })
 
+	var failures []lint.Failure
 	fileAst := file.AST
 
 	walker := lintCyclomatic{

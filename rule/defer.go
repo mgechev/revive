@@ -12,32 +12,24 @@ import (
 // DeferRule lints unused params in functions.
 type DeferRule struct {
 	allow map[string]bool
-	sync.Mutex
+
+	configureOnce sync.Once
 }
 
-func (r *DeferRule) configure(arguments lint.Arguments) error {
-	r.Lock()
-	defer r.Unlock()
-	if r.allow != nil {
-		return nil // already configured
-	}
-
+func (r *DeferRule) configure(arguments lint.Arguments) {
 	list, err := r.allowFromArgs(arguments)
-	if err != nil {
-		return err
-	}
-	r.allow = list
-	return nil
+    if err != nil {
+        return err
+    }
+    r.allow = list
+    return nil
 }
 
 // Apply applies the rule to given file.
 func (r *DeferRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	var failures []lint.Failure
-	err := r.configure(arguments)
-	if err != nil {
-		return failures, err
-	}
+	r.configureOnce.Do(func() { r.configure(arguments) })
 
+	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}

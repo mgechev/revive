@@ -12,24 +12,17 @@ import (
 
 // FunctionLength lint.
 type FunctionLength struct {
-	maxStmt    int
-	maxLines   int
-	configured bool
-	sync.Mutex
+	maxStmt  int
+	maxLines int
+
+	configureOnce sync.Once
 }
 
 func (r *FunctionLength) configure(arguments lint.Arguments) error {
-	r.Lock()
-	defer r.Unlock()
-	if r.configured {
-		return nil
-	}
-
-	r.configured = true
 	maxStmt, maxLines, err := r.parseArguments(arguments)
-	if err != nil {
-		return err
-	}
+    if err != nil {
+        return err
+    }
 	r.maxStmt = int(maxStmt)
 	r.maxLines = int(maxLines)
 	return nil
@@ -37,11 +30,9 @@ func (r *FunctionLength) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+	r.configureOnce.Do(func() { r.configure(arguments) })
+
 	var failures []lint.Failure
-	err := r.configure(arguments)
-	if err != nil {
-		return failures, err
-	}
 
 	walker := lintFuncLength{
 		file:     file,

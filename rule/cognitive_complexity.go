@@ -14,18 +14,13 @@ import (
 // CognitiveComplexityRule lints given else constructs.
 type CognitiveComplexityRule struct {
 	maxComplexity int
-	sync.Mutex
+
+	configureOnce sync.Once
 }
 
 const defaultMaxCognitiveComplexity = 7
 
 func (r *CognitiveComplexityRule) configure(arguments lint.Arguments) error {
-	r.Lock()
-	defer r.Unlock()
-	if r.maxComplexity != 0 {
-		return nil // already configured
-	}
-
 	if len(arguments) < 1 {
 		r.maxComplexity = defaultMaxCognitiveComplexity
 		return nil
@@ -42,11 +37,9 @@ func (r *CognitiveComplexityRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *CognitiveComplexityRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+	r.configureOnce.Do(func() { r.configure(arguments) })
+
 	var failures []lint.Failure
-	err := r.configure(arguments)
-	if err != nil {
-		return failures, err
-	}
 
 	linter := cognitiveComplexityLinter{
 		file:          file,

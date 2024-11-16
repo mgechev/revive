@@ -26,3 +26,7 @@ func (*Default) Format(failures <-chan lint.Failure, _ lint.Config) (string, err
 	}
 	return buf.String(), nil
 }
+
+func ruleDescriptionURL(ruleName string) string {
+	return "https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#" + ruleName
+}

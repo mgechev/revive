@@ -15,15 +15,12 @@ import (
 // StructTagRule lints struct tags.
 type StructTagRule struct {
 	userDefined map[string][]string // map: key -> []option
-	sync.Mutex
+
+	configureOnce sync.Once
 }
 
 func (r *StructTagRule) configure(arguments lint.Arguments) error {
-	r.Lock()
-	defer r.Unlock()
-
-	mustConfigure := r.userDefined == nil && len(arguments) > 0
-	if !mustConfigure {
+	if len(arguments) == 0 {
 		return nil
 	}
 
@@ -52,12 +49,9 @@ func (r *StructTagRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *StructTagRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	var failures []lint.Failure
-	err := r.configure(arguments)
-	if err != nil {
-		return failures, err
-	}
+	r.configureOnce.Do(func() { r.configure(arguments) })
 
+	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}

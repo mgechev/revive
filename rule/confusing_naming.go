@@ -36,7 +36,7 @@ func (ps *packages) methodNames(lp *lint.Package) pkgMethods {
 		}
 	}
 
-	pkgm := pkgMethods{pkg: lp, methods: make(map[string]map[string]*referenceMethod), mu: &sync.Mutex{}}
+	pkgm := pkgMethods{pkg: lp, methods: map[string]map[string]*referenceMethod{}, mu: &sync.Mutex{}}
 	ps.pkgs = append(ps.pkgs, pkgm)
 
 	return pkgm

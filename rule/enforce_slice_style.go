@@ -44,20 +44,12 @@ func sliceStyleFromString(s string) (enforceSliceStyleType, error) {
 
 // EnforceSliceStyleRule implements a rule to enforce `make([]type)` over `[]type{}`.
 type EnforceSliceStyleRule struct {
-	configured        bool
 	enforceSliceStyle enforceSliceStyleType
-	sync.Mutex
+
+	configureOnce sync.Once
 }
 
 func (r *EnforceSliceStyleRule) configure(arguments lint.Arguments) error {
-	r.Lock()
-	defer r.Unlock()
-
-	if r.configured {
-		return nil
-	}
-	r.configured = true
-
 	if len(arguments) < 1 {
 		r.enforceSliceStyle = enforceSliceStyleTypeAny
 		return nil
@@ -78,16 +70,14 @@ func (r *EnforceSliceStyleRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *EnforceSliceStyleRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	var failures []lint.Failure
-	err := r.configure(arguments)
-	if err != nil {
-		return failures, err
-	}
+	r.configureOnce.Do(func() { r.configure(arguments) })
 
 	if r.enforceSliceStyle == enforceSliceStyleTypeAny {
 		// this linter is not configured
 		return nil, nil
 	}
+
+	var failures []lint.Failure
 
 	astFile := file.AST
 	ast.Inspect(astFile, func(n ast.Node) bool {

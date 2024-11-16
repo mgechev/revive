@@ -144,10 +144,10 @@ const (
 var re = regexp.MustCompile(directiveRE)
 
 func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, failures chan Failure) disabledIntervalsMap {
-	enabledDisabledRulesMap := make(map[string][]enableDisableConfig)
+	enabledDisabledRulesMap := map[string][]enableDisableConfig{}
 
 	getEnabledDisabledIntervals := func() disabledIntervalsMap {
-		result := make(disabledIntervalsMap)
+		result := disabledIntervalsMap{}
 
 		for ruleName, disabledArr := range enabledDisabledRulesMap {
 			ruleResult := []DisabledInterval{}

@@ -11,10 +11,10 @@ import (
 
 // ImportAliasNamingRule lints import alias naming.
 type ImportAliasNamingRule struct {
-	configured  bool
 	allowRegexp *regexp.Regexp
 	denyRegexp  *regexp.Regexp
-	sync.Mutex
+
+	configureOnce sync.Once
 }
 
 const defaultImportAliasNamingAllowRule = "^[a-z][a-z0-9]{0,}$"
@@ -22,12 +22,6 @@ const defaultImportAliasNamingAllowRule = "^[a-z][a-z0-9]{0,}$"
 var defaultImportAliasNamingAllowRegexp = regexp.MustCompile(defaultImportAliasNamingAllowRule)
 
 func (r *ImportAliasNamingRule) configure(arguments lint.Arguments) error {
-	r.Lock()
-	defer r.Unlock()
-	if r.configured {
-		return nil
-	}
-
 	if len(arguments) == 0 {
 		r.allowRegexp = defaultImportAliasNamingAllowRegexp
 		return nil
@@ -69,11 +63,9 @@ func (r *ImportAliasNamingRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *ImportAliasNamingRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+	r.configureOnce.Do(func() { r.configure(arguments) })
+
 	var failures []lint.Failure
-	err := r.configure(arguments)
-	if err != nil {
-		return failures, err
-	}
 
 	for _, is := range file.AST.Imports {
 		path := is.Path

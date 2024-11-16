@@ -16,17 +16,11 @@ import (
 // UnhandledErrorRule lints given else constructs.
 type UnhandledErrorRule struct {
 	ignoreList []*regexp.Regexp
-	sync.Mutex
+
+	configureOnce sync.Once
 }
 
 func (r *UnhandledErrorRule) configure(arguments lint.Arguments) error {
-	r.Lock()
-	defer r.Unlock()
-
-	if r.ignoreList != nil {
-		return nil // already configured
-	}
-
 	for _, arg := range arguments {
 		argStr, ok := arg.(string)
 		if !ok {
@@ -50,11 +44,9 @@ func (r *UnhandledErrorRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *UnhandledErrorRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+	r.configureOnce.Do(func() { r.configure(arguments) })
+
 	var failures []lint.Failure
-	err := r.configure(arguments)
-	if err != nil {
-		return failures, err
-	}
 
 	walker := &lintUnhandledErrors{
 		ignoreList: r.ignoreList,

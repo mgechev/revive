@@ -13,37 +13,33 @@ import (
 // BannedCharsRule checks if a file contains banned characters.
 type BannedCharsRule struct {
 	bannedCharList []string
-	sync.Mutex
+
+	configureOnce sync.Once
 }
 
 const bannedCharsRuleName = "banned-characters"
 
 func (r *BannedCharsRule) configure(arguments lint.Arguments) error {
-	r.Lock()
-	defer r.Unlock()
-	if r.bannedCharList == nil && len(arguments) > 0 {
+	if len(arguments) > 0 {
 		check := checkNumberOfArguments(1, arguments, bannedCharsRuleName)
-		if check != nil {
-			return fmt.Errorf("error:%s", check)
-		}
-		list, err := r.getBannedCharsList(arguments)
-		if err != nil {
-			return err
-		}
+        if check != nil {
+            return check
+        }
+        list, err := r.getBannedCharsList(arguments)
+        if err != nil {
+            return err
+        }
 
-		r.bannedCharList = list
+        r.bannedCharList = list
 	}
 	return nil
 }
 
 // Apply applied the rule to the given file.
 func (r *BannedCharsRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	var failures []lint.Failure
-	err := r.configure(arguments)
-	if err != nil {
-		return failures, err
-	}
+	r.configureOnce.Do(func() { r.configure(arguments) })
 
+	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}

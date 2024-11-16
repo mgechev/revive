@@ -22,7 +22,7 @@ func (*Plain) Name() string {
 func (*Plain) Format(failures <-chan lint.Failure, _ lint.Config) (string, error) {
 	var buf bytes.Buffer
 	for failure := range failures {
-		fmt.Fprintf(&buf, "%v: %s %s\n", failure.Position.Start, failure.Failure, "https://revive.run/r#"+failure.RuleName)
+		fmt.Fprintf(&buf, "%v: %s %s\n", failure.Position.Start, failure.Failure, ruleDescriptionURL(failure.RuleName))
 	}
 	return buf.String(), nil
 }

@@ -56,20 +56,13 @@ func (dc *disabledChecks) isDisabled(checkName string) bool {
 
 // ExportedRule lints given else constructs.
 type ExportedRule struct {
-	configured     bool
 	stuttersMsg    string
 	disabledChecks disabledChecks
-	sync.Mutex
+
+	configureOnce sync.Once
 }
 
 func (r *ExportedRule) configure(arguments lint.Arguments) error {
-	r.Lock()
-	defer r.Unlock()
-	if r.configured {
-		return nil
-	}
-	r.configured = true
-
 	r.disabledChecks = disabledChecks{PrivateReceivers: true, PublicInterfaces: true}
 	r.stuttersMsg = "stutters"
 	for _, flag := range arguments {
@@ -107,12 +100,9 @@ func (r *ExportedRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *ExportedRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	var failures []lint.Failure
-	err := r.configure(arguments)
-	if err != nil {
-		return failures, err
-	}
+	r.configureOnce.Do(func() { r.configure(arguments) })
 
+	var failures []lint.Failure
 	if file.IsTest() {
 		return failures, nil
 	}
@@ -125,7 +115,7 @@ func (r *ExportedRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
-		genDeclMissingComments: make(map[*ast.GenDecl]bool),
+		genDeclMissingComments: map[*ast.GenDecl]bool{},
 		stuttersMsg:            r.stuttersMsg,
 		disabledChecks:         r.disabledChecks,
 	}

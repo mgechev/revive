@@ -13,18 +13,13 @@ import (
 // ReceiverNamingRule lints given else constructs.
 type ReceiverNamingRule struct {
 	receiverNameMaxLength int
-	sync.Mutex
+
+	configureOnce sync.Once
 }
 
 const defaultReceiverNameMaxLength = -1 // thus will not check
 
 func (r *ReceiverNamingRule) configure(arguments lint.Arguments) error {
-	r.Lock()
-	defer r.Unlock()
-	if r.receiverNameMaxLength != 0 {
-		return nil
-	}
-
 	r.receiverNameMaxLength = defaultReceiverNameMaxLength
 	if len(arguments) < 1 {
 		return nil
@@ -52,11 +47,9 @@ func (r *ReceiverNamingRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *ReceiverNamingRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+	r.configureOnce.Do(func() { r.configure(args) })
+
 	var failures []lint.Failure
-	err := r.configure(arguments)
-	if err != nil {
-		return failures, err
-	}
 
 	fileAst := file.AST
 	walker := lintReceiverName{

@@ -38,16 +38,15 @@ type AddConstantRule struct {
 	allowList       allowList
 	ignoreFunctions []*regexp.Regexp
 	strLitLimit     int
-	sync.Mutex
+
+	configureOnce sync.Once
 }
 
 // Apply applies the rule to given file.
 func (r *AddConstantRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+	r.configureOnce.Do(func() { r.configure(arguments) })
+
 	var failures []lint.Failure
-	err := r.configure(arguments)
-	if err != nil {
-		return failures, err
-	}
 
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
@@ -55,11 +54,11 @@ func (r *AddConstantRule) Apply(file *lint.File, arguments lint.Arguments) ([]li
 
 	w := &lintAddConstantRule{
 		onFailure:       onFailure,
-		strLits:         make(map[string]int),
+		strLits:         map[string]int{},
 		strLitLimit:     r.strLitLimit,
 		allowList:       r.allowList,
 		ignoreFunctions: r.ignoreFunctions,
-		structTags:      make(map[*ast.BasicLit]struct{}),
+		structTags:      map[*ast.BasicLit]struct{}{},
 	}
 
 	ast.Walk(w, file.AST)
@@ -205,9 +204,6 @@ func (w *lintAddConstantRule) isStructTag(n *ast.BasicLit) bool {
 }
 
 func (r *AddConstantRule) configure(arguments lint.Arguments) error {
-	r.Lock()
-	defer r.Unlock()
-
 	if r.allowList == nil {
 		r.strLitLimit = defaultStrLitLimit
 		r.allowList = newAllowList()

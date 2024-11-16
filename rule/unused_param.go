@@ -12,22 +12,14 @@ import (
 
 // UnusedParamRule lints unused params in functions.
 type UnusedParamRule struct {
-	configured bool
 	// regex to check if some name is valid for unused parameter, "^_$" by default
 	allowRegex *regexp.Regexp
 	failureMsg string
-	sync.Mutex
+
+	configureOnce sync.Once
 }
 
 func (r *UnusedParamRule) configure(args lint.Arguments) error {
-	r.Lock()
-	defer r.Unlock()
-
-	if r.configured {
-		return nil
-	}
-	r.configured = true
-
 	// while by default args is an array, i think it's good to provide structures inside it by default, not arrays or primitives
 	// it's more compatible to JSON nature of configurations
 	var allowedRegexStr string
@@ -60,11 +52,8 @@ func (r *UnusedParamRule) configure(args lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *UnusedParamRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+	r.configureOnce.Do(func() { r.configure(arguments) })
 	var failures []lint.Failure
-	err := r.configure(arguments)
-	if err != nil {
-		return failures, err
-	}
 
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)

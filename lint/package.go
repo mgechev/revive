@@ -99,10 +99,10 @@ func (p *Package) TypeCheck() error {
 		Importer: importer.Default(),
 	}
 	info := &types.Info{
-		Types:  make(map[ast.Expr]types.TypeAndValue),
-		Defs:   make(map[*ast.Ident]types.Object),
-		Uses:   make(map[*ast.Ident]types.Object),
-		Scopes: make(map[ast.Node]*types.Scope),
+		Types:  map[ast.Expr]types.TypeAndValue{},
+		Defs:   map[*ast.Ident]types.Object{},
+		Uses:   map[*ast.Ident]types.Object{},
+		Scopes: map[ast.Node]*types.Scope{},
 	}
 	var anyFile *File
 	var astFiles []*ast.File
@@ -162,7 +162,7 @@ func (w *walker) Visit(n ast.Node) ast.Visitor {
 }
 
 func (p *Package) scanSortable() {
-	p.sortable = make(map[string]bool)
+	p.sortable = map[string]bool{}
 
 	// bitfield for which methods exist on each type.
 	const (
@@ -171,7 +171,7 @@ func (p *Package) scanSortable() {
 		bfSwap
 	)
 	nmap := map[string]int{"Len": bfLen, "Less": bfLess, "Swap": bfSwap}
-	has := make(map[string]int)
+	has := map[string]int{}
 	for _, f := range p.files {
 		ast.Walk(&walker{nmap, has}, f.AST)
 	}
