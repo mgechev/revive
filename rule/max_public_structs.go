@@ -30,7 +30,10 @@ func (r *MaxPublicStructsRule) configure(arguments lint.Arguments) error {
 		return nil
 	}
 
-	checkNumberOfArguments(1, arguments, r.Name())
+	check := checkNumberOfArguments(1, arguments, r.Name())
+	if check != nil {
+		return check
+	}
 
 	maxStructs, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok {
