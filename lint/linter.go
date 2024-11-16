@@ -152,7 +152,11 @@ func (l *Linter) lintPackage(filenames []string, gover *goversion.Version, ruleS
 		return nil
 	}
 
-	pkg.lint(ruleSet, config, failures)
+	err := pkg.lint(ruleSet, config, failures)
+
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

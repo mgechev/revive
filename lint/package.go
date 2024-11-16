@@ -1,6 +1,7 @@
 package lint
 
 import (
+	"context"
 	"go/ast"
 	"go/importer"
 	"go/token"
@@ -182,17 +183,41 @@ func (p *Package) scanSortable() {
 	}
 }
 
-func (p *Package) lint(rules []Rule, config Config, failures chan Failure) {
+func (p *Package) lint(rules []Rule, config Config, failures chan Failure) error {
 	p.scanSortable()
 	var wg sync.WaitGroup
+	errCh := make(chan error, 1) // Buffered channel to signal the first error
+    _, cancel := context.WithCancel(context.Background())
+
+    defer cancel() // Ensure the context is canceled at the end
+
 	for _, file := range p.files {
 		wg.Add(1)
 		go (func(file *File) {
-			file.lint(rules, config, failures)
-			wg.Done()
+			defer wg.Done()
+			if err := file.lint(rules, config, failures); err != nil {
+                select {
+                case errCh <- err: // Send the error to the channel if it's empty
+                    cancel() // Signal other goroutines to stop
+                default:
+                    // If an error is already sent, do nothing
+                }
+            }	
 		})(file)
 	}
-	wg.Wait()
+
+	// Wait for all goroutines to complete
+    go func() {
+        wg.Wait()
+        close(errCh)
+    }()
+
+	// Return the first error if any
+    if err, ok := <-errCh; ok {
+        return err
+    }
+
+	return nil
 }
 
 // IsAtLeastGo121 returns true if the Go version for this package is 1.21 or higher, false otherwise
