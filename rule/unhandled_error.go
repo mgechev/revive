@@ -2,6 +2,7 @@
 package rule
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"go/types"
@@ -34,12 +35,12 @@ func (r *UnhandledErrorRule) configure(arguments lint.Arguments) error {
 
 		argStr = strings.Trim(argStr, " ")
 		if argStr == "" {
-			return fmt.Errorf("Invalid argument to the unhandled-error rule, expected regular expression must not be empty")
+			return errors.New("Invalid argument to the unhandled-error rule, expected regular expression must not be empty")
 		}
 
 		exp, err := regexp.Compile(argStr)
 		if err != nil {
-			return fmt.Errorf("Invalid argument to the unhandled-error rule: regexp %q does not compile: %v", argStr, err)
+			return fmt.Errorf("Invalid argument to the unhandled-error rule: regexp %q does not compile: %w", argStr, err)
 		}
 
 		r.ignoreList = append(r.ignoreList, exp)

@@ -2,6 +2,7 @@
 package rule
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"regexp"
@@ -255,12 +256,12 @@ func (r *AddConstantRule) configure(arguments lint.Arguments) error {
 					for _, exclude := range strings.Split(excludes, ",") {
 						exclude = strings.Trim(exclude, " ")
 						if exclude == "" {
-							return fmt.Errorf("Invalid argument to the ignoreFuncs parameter of add-constant rule, expected regular expression must not be empty")
+							return errors.New("Invalid argument to the ignoreFuncs parameter of add-constant rule, expected regular expression must not be empty")
 						}
 
 						exp, err := regexp.Compile(exclude)
 						if err != nil {
-							return fmt.Errorf(fmt.Sprintf("Invalid argument to the ignoreFuncs parameter of add-constant rule: regexp %q does not compile: %v", exclude, err))
+							return fmt.Errorf("Invalid argument to the ignoreFuncs parameter of add-constant rule: regexp %q does not compile: %w", exclude, err)
 						}
 
 						r.ignoreFunctions = append(r.ignoreFunctions, exp)

@@ -29,7 +29,7 @@ func sliceStyleFromString(s string) (enforceSliceStyleType, error) {
 	case string(enforceSliceStyleTypeNil):
 		return enforceSliceStyleTypeNil, nil
 	default:
-		return "", fmt.Errorf(
+		return enforceSliceStyleTypeAny, fmt.Errorf(
 			"invalid slice style: %s (expecting one of %v)",
 			s,
 			[]enforceSliceStyleType{

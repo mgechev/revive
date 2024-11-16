@@ -49,7 +49,7 @@ func (r *UnusedReceiverRule) configure(args lint.Arguments) error {
 	var err error
 	r.allowRegex, err = regexp.Compile(allowedRegexStr)
 	if err != nil {
-		return fmt.Errorf("error configuring [unused-receiver] rule: allowedRegex is not valid regex [%s]: %v", allowedRegexStr, err)
+		return fmt.Errorf("error configuring [unused-receiver] rule: allowedRegex is not valid regex [%s]: %w", allowedRegexStr, err)
 	}
 	if r.failureMsg == "" {
 		r.failureMsg = "method receiver '%s' is not referenced in method's body, consider removing or renaming it to match " + r.allowRegex.String()

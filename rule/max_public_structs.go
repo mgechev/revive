@@ -2,6 +2,7 @@
 package rule
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"strings"
@@ -37,7 +38,7 @@ func (r *MaxPublicStructsRule) configure(arguments lint.Arguments) error {
 
 	maxStructs, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok {
-		return fmt.Errorf(`invalid value passed as argument number to the "max-public-structs" rule`)
+		return errors.New(`invalid value passed as argument number to the "max-public-structs" rule`)
 	}
 	r.max = maxStructs
 	return nil

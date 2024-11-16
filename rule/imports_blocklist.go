@@ -31,7 +31,7 @@ func (r *ImportsBlocklistRule) configure(arguments lint.Arguments) error {
 			}
 			regStr, err := regexp.Compile(fmt.Sprintf(`(?m)"%s"$`, replaceImportRegexp.ReplaceAllString(argStr, `(\W|\w)*`)))
 			if err != nil {
-				return fmt.Errorf("Invalid argument to the imports-blocklist rule. Expecting %q to be a valid regular expression, got: %v", argStr, err)
+				return fmt.Errorf("Invalid argument to the imports-blocklist rule. Expecting %q to be a valid regular expression, got: %w", argStr, err)
 			}
 			r.blocklist = append(r.blocklist, regStr)
 		}

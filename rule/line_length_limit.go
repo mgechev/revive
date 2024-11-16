@@ -4,6 +4,7 @@ package rule
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"go/token"
 	"strings"
@@ -35,7 +36,7 @@ func (r *LineLengthLimitRule) configure(arguments lint.Arguments) error {
 
 	maxLength, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok || maxLength < 0 {
-		return fmt.Errorf(`invalid value passed as argument number to the "line-length-limit" rule`)
+		return errors.New(`invalid value passed as argument number to the "line-length-limit" rule`)
 	}
 
 	r.max = int(maxLength)

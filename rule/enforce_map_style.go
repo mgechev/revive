@@ -67,7 +67,7 @@ func (r *EnforceMapStyleRule) configure(arguments lint.Arguments) error {
 	var err error
 	r.enforceMapStyle, err = mapStyleFromString(enforceMapStyle)
 	if err != nil {
-		return fmt.Errorf("Invalid argument to the enforce-map-style rule: %v", err)
+		return fmt.Errorf("Invalid argument to the enforce-map-style rule: %w", err)
 	}
 
 	return nil

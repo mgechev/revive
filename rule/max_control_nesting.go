@@ -2,6 +2,7 @@
 package rule
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"sync"
@@ -128,7 +129,7 @@ func (r *MaxControlNestingRule) configure(arguments lint.Arguments) error {
 
 	maxNesting, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok {
-		return fmt.Errorf(`invalid value passed as argument number to the "max-control-nesting" rule`)
+		return errors.New(`invalid value passed as argument number to the "max-control-nesting" rule`)
 	}
 	r.max = maxNesting
 	return nil

@@ -34,7 +34,7 @@ func (r *FileHeaderRule) configure(arguments lint.Arguments) error {
 	var ok bool
 	r.header, ok = arguments[0].(string)
 	if !ok {
-		return fmt.Errorf("invalid argument for \"file-header\" rule: argument should be a string, got %T", arguments[0])
+		return fmt.Errorf(`invalid argument for "file-header" rule: argument should be a string, got %T`, arguments[0])
 	}
 	return nil
 }

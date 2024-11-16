@@ -2,6 +2,7 @@
 package rule
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"sync"
@@ -31,7 +32,7 @@ func (r *ArgumentsLimitRule) configure(arguments lint.Arguments) error {
 
 	maxArguments, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok {
-		return fmt.Errorf(`invalid value passed as argument number to the "argument-limit" rule`)
+		return errors.New(`invalid value passed as argument number to the "argument-limit" rule`)
 	}
 	r.max = int(maxArguments)
 	return nil

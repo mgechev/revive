@@ -36,7 +36,7 @@ func repeatedArgTypeStyleFromString(s string) (enforceRepeatedArgTypeStyleType, 
 			},
 		)
 
-		return "", fmt.Errorf("Invalid argument to the enforce-repeated-arg-type-style rule: %v", err)
+		return "", fmt.Errorf("Invalid argument to the enforce-repeated-arg-type-style rule: %w", err)
 	}
 }
 

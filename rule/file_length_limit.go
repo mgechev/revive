@@ -48,7 +48,7 @@ func (r *FileLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) (
 	}
 
 	if err := scanner.Err(); err != nil {
-		return nil, fmt.Errorf(err.Error())
+		return nil, err
 	}
 
 	lines := all

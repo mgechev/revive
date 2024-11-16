@@ -2,6 +2,7 @@
 package rule
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"sync"
@@ -34,7 +35,7 @@ func (r *FunctionResultsLimitRule) configure(arguments lint.Arguments) error {
 		return fmt.Errorf(`invalid value passed as return results number to the "function-result-limit" rule; need int64 but got %T`, arguments[0])
 	}
 	if maxResults < 0 {
-		return fmt.Errorf(`the value passed as return results number to the "function-result-limit" rule cannot be negative`)
+		return errors.New(`the value passed as return results number to the "function-result-limit" rule cannot be negative`)
 	}
 
 	r.max = int(maxResults)

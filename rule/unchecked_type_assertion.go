@@ -2,6 +2,7 @@
 package rule
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"sync"
@@ -33,7 +34,7 @@ func (u *UncheckedTypeAssertionRule) configure(arguments lint.Arguments) error {
 
 	args, ok := arguments[0].(map[string]any)
 	if !ok {
-		return fmt.Errorf("Unable to get arguments. Expected object of key-value-pairs")
+		return errors.New("Unable to get arguments. Expected object of key-value-pairs")
 	}
 
 	for k, v := range args {
