@@ -58,8 +58,7 @@ func (f *Friendly) Format(failures <-chan lint.Failure, config lint.Config) (str
 func (f *Friendly) printFriendlyFailure(w io.Writer, failure lint.Failure, severity lint.Severity) {
 	f.printHeaderRow(w, failure, severity)
 	f.printFilePosition(w, failure)
-	fmt.Fprintln(w)
-	fmt.Fprintln(w)
+	fmt.Fprintf(w, "\n\n")
 }
 
 func (f *Friendly) printHeaderRow(w io.Writer, failure lint.Failure, severity lint.Severity) {
@@ -98,13 +97,11 @@ func (*Friendly) printSummary(w io.Writer, errors, warnings int) {
 	}
 	str := fmt.Sprintf("%d %s (%d %s, %d %s)", errors+warnings, problemsLabel, errors, errorsLabel, warnings, warningsLabel)
 	if errors > 0 {
-		fmt.Fprintf(w, "%s %s\n", emoji, color.RedString(str))
-		fmt.Fprintln(w)
+		fmt.Fprintf(w, "%s %s\n\n", emoji, color.RedString(str))
 		return
 	}
 	if warnings > 0 {
-		fmt.Fprintf(w, "%s %s\n", emoji, color.YellowString(str))
-		fmt.Fprintln(w)
+		fmt.Fprintf(w, "%s %s\n\n", emoji, color.YellowString(str))
 		return
 	}
 }
