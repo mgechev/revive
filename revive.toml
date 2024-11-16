@@ -21,7 +21,7 @@ warningCode = 1
 [rule.exported]
 [rule.filename-format]
     # Override the default pattern to forbid .go files with uppercase letters and dashes.
-    arguments=["^[_a-z][_a-z0-9]*.go$"]
+    arguments=["^[_a-z][_a-z0-9]*\\.go$"]
 [rule.increment-decrement]
 [rule.indent-error-flow]
 [rule.line-length-limit]
