@@ -51,10 +51,12 @@ func (r *ReceiverNamingRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *ReceiverNamingRule) Apply(file *lint.File, args lint.Arguments) ([]lint.Failure, error) {
-	r.configure(args)
-
+func (r *ReceiverNamingRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
+	err := r.configure(arguments)
+	if err != nil {
+		return failures, err
+	}
 
 	fileAst := file.AST
 	walker := lintReceiverName{

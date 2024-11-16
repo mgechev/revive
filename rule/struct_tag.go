@@ -48,10 +48,13 @@ func (r *StructTagRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *StructTagRule) Apply(file *lint.File, args lint.Arguments) ([]lint.Failure, error) {
-	r.configure(args)
-
+func (r *StructTagRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
+	err := r.configure(arguments)
+	if err != nil {
+		return failures, err
+	}
+
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}

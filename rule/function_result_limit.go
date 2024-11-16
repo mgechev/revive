@@ -43,9 +43,11 @@ func (r *FunctionResultsLimitRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configure(arguments)
-
 	var failures []lint.Failure
+	err := r.configure(arguments)
+	if err != nil {
+		return failures, err
+	}
 
 	walker := lintFunctionResultsNum{
 		max: r.max,

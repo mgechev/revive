@@ -42,9 +42,12 @@ func (r *CyclomaticRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *CyclomaticRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configure(arguments)
-
 	var failures []lint.Failure
+	err := r.configure(arguments)
+	if err != nil {
+		return failures, err
+	}
+
 	fileAst := file.AST
 
 	walker := lintCyclomatic{

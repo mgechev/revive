@@ -112,14 +112,16 @@ func (r *EnforceRepeatedArgTypeStyleRule) configure(arguments lint.Arguments) er
 
 // Apply applies the rule to a given file.
 func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configure(arguments)
+	var failures []lint.Failure
+	err := r.configure(arguments)
+	if err != nil {
+		return failures, err
+	}
 
 	if r.funcArgStyle == enforceRepeatedArgTypeStyleTypeAny && r.funcRetValStyle == enforceRepeatedArgTypeStyleTypeAny {
 		// This linter is not configured, return no failures.
 		return nil, nil
 	}
-
-	var failures []lint.Failure
 
 	astFile := file.AST
 	ast.Inspect(astFile, func(n ast.Node) bool {

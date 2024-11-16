@@ -19,7 +19,11 @@ type FilenameFormatRule struct {
 
 // Apply applies the rule to the given file.
 func (r *FilenameFormatRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configure(arguments)
+	var failures []lint.Failure
+	err := r.configure(arguments)
+	if err != nil {
+		return failures, err
+	}
 
 	filename := filepath.Base(file.Name)
 	if r.format.MatchString(filename) {

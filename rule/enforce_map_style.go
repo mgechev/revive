@@ -75,14 +75,16 @@ func (r *EnforceMapStyleRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *EnforceMapStyleRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configure(arguments)
+	var failures []lint.Failure
+	err := r.configure(arguments)
+	if err != nil {
+		return failures, err
+	}
 
 	if r.enforceMapStyle == enforceMapStyleTypeAny {
 		// this linter is not configured
 		return nil, nil
 	}
-
-	var failures []lint.Failure
 
 	astFile := file.AST
 	ast.Inspect(astFile, func(n ast.Node) bool {

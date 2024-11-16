@@ -50,9 +50,11 @@ func (r *ImportsBlocklistRule) isBlocklisted(path string) bool {
 
 // Apply applies the rule to given file.
 func (r *ImportsBlocklistRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configure(arguments)
-
 	var failures []lint.Failure
+	err := r.configure(arguments)
+	if err != nil {
+		return failures, err
+	}
 
 	for _, is := range file.AST.Imports {
 		path := is.Path

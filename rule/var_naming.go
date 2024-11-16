@@ -93,9 +93,11 @@ func (r *VarNamingRule) applyPackageCheckRules(walker *lintNames) {
 
 // Apply applies the rule to given file.
 func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configure(arguments)
-
 	var failures []lint.Failure
+	err := r.configure(arguments)
+	if err != nil {
+		return failures, err
+	}
 
 	fileAst := file.AST
 

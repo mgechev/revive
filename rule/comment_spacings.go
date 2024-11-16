@@ -35,10 +35,12 @@ func (r *CommentSpacingsRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply the rule.
-func (r *CommentSpacingsRule) Apply(file *lint.File, args lint.Arguments) ([]lint.Failure, error) {
-	r.configure(args)
-
+func (r *CommentSpacingsRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
+	err := r.configure(arguments)
+	if err != nil {
+		return failures, err
+	}
 
 	for _, cg := range file.AST.Comments {
 		for _, comment := range cg.List {

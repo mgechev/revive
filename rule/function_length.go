@@ -37,9 +37,11 @@ func (r *FunctionLength) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configure(arguments)
-
 	var failures []lint.Failure
+	err := r.configure(arguments)
+	if err != nil {
+		return failures, err
+	}
 
 	walker := lintFuncLength{
 		file:     file,

@@ -26,7 +26,11 @@ type FileLengthLimitRule struct {
 
 // Apply applies the rule to given file.
 func (r *FileLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configure(arguments)
+	var failures []lint.Failure
+	err := r.configure(arguments)
+	if err != nil {
+		return failures, err
+	}
 
 	if r.max <= 0 {
 		// when max is negative or 0 the rule is disabled

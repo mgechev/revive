@@ -51,10 +51,12 @@ func (u *UncheckedTypeAssertionRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (u *UncheckedTypeAssertionRule) Apply(file *lint.File, args lint.Arguments) ([]lint.Failure, error) {
-	u.configure(args)
-
+func (u *UncheckedTypeAssertionRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
+	err := u.configure(arguments)
+	if err != nil {
+		return failures, err
+	}
 
 	walker := &lintUncheckedTypeAssertion{
 		onFailure: func(failure lint.Failure) {

@@ -19,9 +19,11 @@ const defaultMaxControlNesting = 5
 
 // Apply applies the rule to given file.
 func (r *MaxControlNestingRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configure(arguments)
-
 	var failures []lint.Failure
+	err := r.configure(arguments)
+	if err != nil {
+		return failures, err
+	}
 
 	fileAst := file.AST
 

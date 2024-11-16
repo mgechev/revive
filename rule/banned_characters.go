@@ -38,9 +38,12 @@ func (r *BannedCharsRule) configure(arguments lint.Arguments) error {
 
 // Apply applied the rule to the given file.
 func (r *BannedCharsRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configure(arguments)
-
 	var failures []lint.Failure
+	err := r.configure(arguments)
+	if err != nil {
+		return failures, err
+	}
+
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}

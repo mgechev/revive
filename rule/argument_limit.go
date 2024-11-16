@@ -39,9 +39,12 @@ func (r *ArgumentsLimitRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *ArgumentsLimitRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configure(arguments)
-
 	var failures []lint.Failure
+	err := r.configure(arguments)
+	if err != nil {
+		return failures, err
+	}
+
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
