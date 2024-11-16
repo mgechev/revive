@@ -98,10 +98,10 @@ func TestGetVersion(t *testing.T) {
 	}{
 		{
 			name:    "Development version",
-			version: default_version,
-			commit:  default_commit,
-			date:    default_date,
-			builtBy: default_builder,
+			version: defaultVersion,
+			commit:  defaultCommit,
+			date:    defaultDate,
+			builtBy: defaultBuilder,
 			want:    "version \n",
 		},
 		{

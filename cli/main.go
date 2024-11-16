@@ -17,17 +17,17 @@ import (
 )
 
 const (
-	default_version = "dev"
-	default_commit  = "none"
-	default_date    = "unknown"
-	default_builder = "unknown"
+	defaultVersion = "dev"
+	defaultCommit  = "none"
+	defaultDate    = "unknown"
+	defaultBuilder = "unknown"
 )
 
 var (
-	version = default_version
-	commit  = default_commit
-	date    = default_date
-	builtBy = default_builder
+	version = defaultVersion
+	commit  = defaultCommit
+	date    = defaultDate
+	builtBy = defaultBuilder
 	//AppFs is used to operations related with user config files
 	AppFs = afero.NewOsFs()
 )
@@ -178,15 +178,15 @@ func initConfig() {
 // getVersion returns build info (version, commit, date and builtBy)
 func getVersion(builtBy, date, commit, version string) string {
 	var buildInfo string
-	if date != default_date && builtBy != default_builder {
+	if date != defaultDate && builtBy != defaultBuilder {
 		buildInfo = fmt.Sprintf("Built\t\t%s by %s\n", date, builtBy)
 	}
 
-	if commit != default_commit {
+	if commit != defaultCommit {
 		buildInfo = fmt.Sprintf("Commit:\t\t%s\n%s", commit, buildInfo)
 	}
 
-	if version == default_version {
+	if version == defaultVersion {
 		bi, ok := debug.ReadBuildInfo()
 		if ok {
 			version = bi.Main.Version
