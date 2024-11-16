@@ -16,11 +16,18 @@ import (
 	"github.com/spf13/afero"
 )
 
+const (
+	default_version = "dev"
+	default_commit  = "none"
+	default_date    = "unknown"
+	default_builder = "unknown"
+)
+
 var (
-	version = "dev"
-	commit  = "none"
-	date    = "unknown"
-	builtBy = "unknown"
+	version = default_version
+	commit  = default_commit
+	date    = default_date
+	builtBy = default_builder
 	//AppFs is used to operations related with user config files
 	AppFs = afero.NewOsFs()
 )
@@ -37,7 +44,7 @@ func RunRevive(extraRules ...revivelib.ExtraRule) {
 	initConfig()
 
 	if versionFlag {
-		fmt.Print(getVersion())
+		fmt.Print(getVersion(builtBy, date, commit, version))
 		os.Exit(0)
 	}
 
@@ -169,17 +176,17 @@ func initConfig() {
 }
 
 // getVersion returns build info (version, commit, date and builtBy)
-func getVersion() string {
+func getVersion(builtBy, date, commit, version string) string {
 	var buildInfo string
-	if date != "unknown" && builtBy != "unknown" {
+	if date != default_date && builtBy != default_builder {
 		buildInfo = fmt.Sprintf("Built\t\t%s by %s\n", date, builtBy)
 	}
 
-	if commit != "none" {
+	if commit != default_commit {
 		buildInfo = fmt.Sprintf("Commit:\t\t%s\n%s", commit, buildInfo)
 	}
 
-	if version == "dev" {
+	if version == default_version {
 		bi, ok := debug.ReadBuildInfo()
 		if ok {
 			version = bi.Main.Version

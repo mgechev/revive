@@ -98,10 +98,10 @@ func TestGetVersion(t *testing.T) {
 	}{
 		{
 			name:    "Development version",
-			version: "dev",
-			commit:  "none",
-			date:    "unknown",
-			builtBy: "unknown",
+			version: default_version,
+			commit:  default_commit,
+			date:    default_date,
+			builtBy: default_builder,
 			want:    "version \n",
 		},
 		{
@@ -119,23 +119,7 @@ Built		2024-11-15 10:52 UTC by builder
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			oldVersion := version
-			oldCommit := commit
-			oldDate := date
-			oldBuiltBy := builtBy
-			t.Cleanup(func() {
-				version = oldVersion
-				commit = oldCommit
-				date = oldDate
-				builtBy = oldBuiltBy
-			})
-
-			version = tt.version
-			commit = tt.commit
-			date = tt.date
-			builtBy = tt.builtBy
-
-			got := getVersion()
+			got := getVersion(tt.builtBy, tt.date, tt.commit, tt.version)
 
 			if got != tt.want {
 				t.Errorf("getVersion() = %q, want %q", got, tt.want)
