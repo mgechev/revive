@@ -34,7 +34,7 @@ func (r *CommentsDensityRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *CommentsDensityRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *CommentsDensityRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	r.configureOnce.Do(func() { r.configure(arguments) })
 
 	commentsLines := countDocLines(file.AST.Comments)

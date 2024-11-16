@@ -22,7 +22,7 @@ type UncheckedTypeAssertionRule struct {
 	configureOnce sync.Once
 }
 
-func (r *UncheckedTypeAssertionRule) configure(arguments lint.Arguments) {
+func (r *UncheckedTypeAssertionRule) configure(arguments lint.Arguments) error {
 	if len(arguments) == 0 {
 		return nil
 	}
@@ -48,7 +48,7 @@ func (r *UncheckedTypeAssertionRule) configure(arguments lint.Arguments) {
 
 // Apply applies the rule to given file.
 func (r *UncheckedTypeAssertionRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configureOnce.Do(func() { r.configure(args) })
+	r.configureOnce.Do(func() { r.configure(arguments) })
 
 	var failures []lint.Failure
 

@@ -16,13 +16,13 @@ type DeferRule struct {
 	configureOnce sync.Once
 }
 
-func (r *DeferRule) configure(arguments lint.Arguments) {
+func (r *DeferRule) configure(arguments lint.Arguments) error {
 	list, err := r.allowFromArgs(arguments)
-    if err != nil {
-        return err
-    }
-    r.allow = list
-    return nil
+	if err != nil {
+		return err
+	}
+	r.allow = list
+	return nil
 }
 
 // Apply applies the rule to given file.

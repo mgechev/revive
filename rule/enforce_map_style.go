@@ -73,7 +73,7 @@ func (r *EnforceMapStyleRule) Apply(file *lint.File, arguments lint.Arguments) (
 		// this linter is not configured
 		return nil, nil
 	}
-
+	var failures []lint.Failure
 	astFile := file.AST
 	ast.Inspect(astFile, func(n ast.Node) bool {
 		switch v := n.(type) {

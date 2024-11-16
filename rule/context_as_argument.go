@@ -31,11 +31,16 @@ func (r *ContextAsArgumentRule) Apply(file *lint.File, args lint.Arguments) ([]l
 
 	ast.Walk(walker, file.AST)
 
-	return failures,nil
+	return failures, nil
 }
 
-func (r *ContextAsArgumentRule) configure(arguments lint.Arguments) {
-	r.allowTypesLUT = getAllowTypesFromArguments(arguments)
+func (r *ContextAsArgumentRule) configure(arguments lint.Arguments) error {
+	types, err := getAllowTypesFromArguments(arguments)
+	if err != nil {
+		return err
+	}
+	r.allowTypesLUT = types
+	return nil
 }
 
 // Name returns the rule name.
