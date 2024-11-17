@@ -13,10 +13,8 @@ import (
 // UnusedReceiverRule lints unused params in functions.
 type UnusedReceiverRule struct {
 	// regex to check if some name is valid for unused parameter, "^_$" by default
-	allowRegex *regexp.Regexp
-	failureMsg string
-
-	configureErr  error
+	allowRegex    *regexp.Regexp
+	failureMsg    string
 	configureOnce sync.Once
 }
 
@@ -52,10 +50,10 @@ func (r *UnusedReceiverRule) configure(args lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *UnusedReceiverRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
-
-	if r.configureErr != nil {
-		return nil, r.configureErr
+	var configErr error
+	r.configureOnce.Do(func() { configErr = r.configure(arguments) })
+	if configErr != nil {
+		return nil, configErr
 	}
 
 	var failures []lint.Failure

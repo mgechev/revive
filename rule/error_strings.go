@@ -17,8 +17,6 @@ import (
 // ErrorStringsRule lints given else constructs.
 type ErrorStringsRule struct {
 	errorFunctions map[string]map[string]struct{}
-
-	configureErr  error
 	configureOnce sync.Once
 }
 
@@ -57,11 +55,10 @@ func (r *ErrorStringsRule) configure(arguments lint.Arguments) error {
 // Apply applies the rule to given file.
 func (r *ErrorStringsRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
-
-	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
-
-	if r.configureErr != nil {
-		return nil, r.configureErr
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+	if configureErr != nil {
+		return nil, configureErr
 	}
 
 	fileAst := file.AST

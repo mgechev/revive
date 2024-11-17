@@ -13,17 +13,15 @@ import (
 // ContextAsArgumentRule lints given else constructs.
 type ContextAsArgumentRule struct {
 	allowTypesLUT map[string]struct{}
-
-	configureErr  error
 	configureOnce sync.Once
 }
 
 // Apply applies the rule to given file.
 func (r *ContextAsArgumentRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
-
-	if r.configureErr != nil {
-		return nil, r.configureErr
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+	if configureErr != nil {
+		return nil, configureErr
 	}
 
 	var failures []lint.Failure

@@ -12,9 +12,7 @@ import (
 // CommentSpacingsRule check the whether there is a space between
 // the comment symbol( // ) and the start of the comment text
 type CommentSpacingsRule struct {
-	allowList []string
-
-	configureErr  error
+	allowList     []string
 	configureOnce sync.Once
 }
 
@@ -32,10 +30,10 @@ func (r *CommentSpacingsRule) configure(arguments lint.Arguments) error {
 
 // Apply the rule.
 func (r *CommentSpacingsRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
-
-	if r.configureErr != nil {
-		return nil, r.configureErr
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+	if configureErr != nil {
+		return nil, configureErr
 	}
 
 	var failures []lint.Failure

@@ -11,9 +11,7 @@ import (
 
 // ImportsBlocklistRule lints given else constructs.
 type ImportsBlocklistRule struct {
-	blocklist []*regexp.Regexp
-
-	configureErr  error
+	blocklist     []*regexp.Regexp
 	configureOnce sync.Once
 }
 
@@ -46,10 +44,10 @@ func (r *ImportsBlocklistRule) isBlocklisted(path string) bool {
 
 // Apply applies the rule to given file.
 func (r *ImportsBlocklistRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
-
-	if r.configureErr != nil {
-		return nil, r.configureErr
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+	if configureErr != nil {
+		return nil, configureErr
 	}
 
 	var failures []lint.Failure

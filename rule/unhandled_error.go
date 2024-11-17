@@ -15,9 +15,7 @@ import (
 
 // UnhandledErrorRule lints given else constructs.
 type UnhandledErrorRule struct {
-	ignoreList []*regexp.Regexp
-
-	configureErr  error
+	ignoreList    []*regexp.Regexp
 	configureOnce sync.Once
 }
 
@@ -45,10 +43,10 @@ func (r *UnhandledErrorRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *UnhandledErrorRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
-
-	if r.configureErr != nil {
-		return nil, r.configureErr
+	var configErr error
+	r.configureOnce.Do(func() { configErr = r.configure(arguments) })
+	if configErr != nil {
+		return nil, configErr
 	}
 
 	var failures []lint.Failure

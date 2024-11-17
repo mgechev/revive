@@ -14,9 +14,7 @@ import (
 
 // StructTagRule lints struct tags.
 type StructTagRule struct {
-	userDefined map[string][]string // map: key -> []option
-
-	configureErr  error
+	userDefined   map[string][]string // map: key -> []option
 	configureOnce sync.Once
 }
 
@@ -50,10 +48,10 @@ func (r *StructTagRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *StructTagRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
-
-	if r.configureErr != nil {
-		return nil, r.configureErr
+	var configErr error
+	r.configureOnce.Do(func() { configErr = r.configure(arguments) })
+	if configErr != nil {
+		return nil, configErr
 	}
 
 	var failures []lint.Failure
