@@ -16,6 +16,7 @@ type UnusedReceiverRule struct {
 	allowRegex *regexp.Regexp
 	failureMsg string
 
+	configureErr  error
 	configureOnce sync.Once
 }
 
@@ -51,7 +52,12 @@ func (r *UnusedReceiverRule) configure(args lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *UnusedReceiverRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
+
+	if r.configureErr != nil {
+		return nil, r.configureErr
+	}
+
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {

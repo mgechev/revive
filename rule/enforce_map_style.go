@@ -42,6 +42,7 @@ func mapStyleFromString(s string) (enforceMapStyleType, error) {
 type EnforceMapStyleRule struct {
 	enforceMapStyle enforceMapStyleType
 
+	configureErr  error
 	configureOnce sync.Once
 }
 
@@ -67,7 +68,11 @@ func (r *EnforceMapStyleRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *EnforceMapStyleRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
+
+	if r.configureErr != nil {
+		return nil, r.configureErr
+	}
 
 	if r.enforceMapStyle == enforceMapStyleTypeAny {
 		// this linter is not configured

@@ -16,6 +16,7 @@ import (
 type CyclomaticRule struct {
 	maxComplexity int
 
+	configureErr  error
 	configureOnce sync.Once
 }
 
@@ -37,7 +38,11 @@ func (r *CyclomaticRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *CyclomaticRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
+
+	if r.configureErr != nil {
+		return nil, r.configureErr
+	}
 
 	var failures []lint.Failure
 	fileAst := file.AST

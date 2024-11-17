@@ -15,12 +15,17 @@ import (
 type FilenameFormatRule struct {
 	format *regexp.Regexp
 
+	configureErr  error
 	configureOnce sync.Once
 }
 
 // Apply applies the rule to the given file.
 func (r *FilenameFormatRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
+
+	if r.configureErr != nil {
+		return nil, r.configureErr
+	}
 
 	filename := filepath.Base(file.Name)
 	if r.format.MatchString(filename) {

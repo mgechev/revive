@@ -14,6 +14,7 @@ import (
 type ReceiverNamingRule struct {
 	receiverNameMaxLength int
 
+	configureErr  error
 	configureOnce sync.Once
 }
 
@@ -47,7 +48,11 @@ func (r *ReceiverNamingRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *ReceiverNamingRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
+
+	if r.configureErr != nil {
+		return nil, r.configureErr
+	}
 
 	var failures []lint.Failure
 

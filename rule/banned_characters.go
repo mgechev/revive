@@ -14,6 +14,7 @@ import (
 type BannedCharsRule struct {
 	bannedCharList []string
 
+	configureErr  error
 	configureOnce sync.Once
 }
 
@@ -22,22 +23,26 @@ const bannedCharsRuleName = "banned-characters"
 func (r *BannedCharsRule) configure(arguments lint.Arguments) error {
 	if len(arguments) > 0 {
 		check := checkNumberOfArguments(1, arguments, bannedCharsRuleName)
-        if check != nil {
-            return check
-        }
-        list, err := r.getBannedCharsList(arguments)
-        if err != nil {
-            return err
-        }
+		if check != nil {
+			return check
+		}
+		list, err := r.getBannedCharsList(arguments)
+		if err != nil {
+			return err
+		}
 
-        r.bannedCharList = list
+		r.bannedCharList = list
 	}
 	return nil
 }
 
 // Apply applied the rule to the given file.
 func (r *BannedCharsRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
+
+	if r.configureErr != nil {
+		return nil, r.configureErr
+	}
 
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {

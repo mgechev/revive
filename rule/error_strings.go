@@ -18,6 +18,7 @@ import (
 type ErrorStringsRule struct {
 	errorFunctions map[string]map[string]struct{}
 
+	configureErr  error
 	configureOnce sync.Once
 }
 
@@ -57,7 +58,11 @@ func (r *ErrorStringsRule) configure(arguments lint.Arguments) error {
 func (r *ErrorStringsRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	var failures []lint.Failure
 
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
+
+	if r.configureErr != nil {
+		return nil, r.configureErr
+	}
 
 	fileAst := file.AST
 	walker := lintErrorStrings{

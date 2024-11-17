@@ -16,6 +16,7 @@ import (
 type StructTagRule struct {
 	userDefined map[string][]string // map: key -> []option
 
+	configureErr  error
 	configureOnce sync.Once
 }
 
@@ -49,7 +50,11 @@ func (r *StructTagRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *StructTagRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
+
+	if r.configureErr != nil {
+		return nil, r.configureErr
+	}
 
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {

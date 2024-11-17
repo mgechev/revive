@@ -15,14 +15,15 @@ type FunctionLength struct {
 	maxStmt  int
 	maxLines int
 
+	configureErr  error
 	configureOnce sync.Once
 }
 
 func (r *FunctionLength) configure(arguments lint.Arguments) error {
 	maxStmt, maxLines, err := r.parseArguments(arguments)
-    if err != nil {
-        return err
-    }
+	if err != nil {
+		return err
+	}
 	r.maxStmt = int(maxStmt)
 	r.maxLines = int(maxLines)
 	return nil
@@ -30,7 +31,11 @@ func (r *FunctionLength) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
+
+	if r.configureErr != nil {
+		return nil, r.configureErr
+	}
 
 	var failures []lint.Failure
 
