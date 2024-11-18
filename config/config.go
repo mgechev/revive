@@ -100,6 +100,7 @@ var allRules = append([]lint.Rule{
 	&rule.FilenameFormatRule{},
 	&rule.UseErrorsNewRule{},
 	&rule.RedundantBuildTagRule{},
+	&rule.UseErrorsNewRule{},
 }, defaultRules...)
 
 var allFormatters = []lint.Formatter{
