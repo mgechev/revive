@@ -11,7 +11,8 @@ import (
 
 // MaxControlNestingRule lints given else constructs.
 type MaxControlNestingRule struct {
-	max           int64
+	max int64
+
 	configureOnce sync.Once
 }
 

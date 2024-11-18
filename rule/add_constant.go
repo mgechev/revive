@@ -210,7 +210,7 @@ func (r *AddConstantRule) configure(arguments lint.Arguments) error {
 	r.strLitLimit = defaultStrLitLimit
 	r.allowList = newAllowList()
 	if len(arguments) == 0 {
-		return
+		return nil
 	}
 	args, ok := arguments[0].(map[string]any)
 	if !ok {

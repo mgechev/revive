@@ -10,8 +10,9 @@ import (
 
 // ImportAliasNamingRule lints import alias naming.
 type ImportAliasNamingRule struct {
-	allowRegexp   *regexp.Regexp
-	denyRegexp    *regexp.Regexp
+	allowRegexp *regexp.Regexp
+	denyRegexp  *regexp.Regexp
+
 	configureOnce sync.Once
 }
 

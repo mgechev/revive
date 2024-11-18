@@ -10,7 +10,8 @@ import (
 
 // FileHeaderRule lints given else constructs.
 type FileHeaderRule struct {
-	header        string
+	header string
+
 	configureOnce sync.Once
 }
 

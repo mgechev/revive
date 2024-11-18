@@ -13,6 +13,7 @@ import (
 // CognitiveComplexityRule lints given else constructs.
 type CognitiveComplexityRule struct {
 	maxComplexity int
+
 	configureOnce sync.Once
 }
 

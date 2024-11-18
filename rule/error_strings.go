@@ -16,6 +16,7 @@ import (
 // ErrorStringsRule lints given else constructs.
 type ErrorStringsRule struct {
 	errorFunctions map[string]map[string]struct{}
+	
 	configureOnce sync.Once
 }
 

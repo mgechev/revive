@@ -11,8 +11,9 @@ import (
 
 // FunctionLength lint.
 type FunctionLength struct {
-	maxStmt       int
-	maxLines      int
+	maxStmt  int
+	maxLines int
+
 	configureOnce sync.Once
 }
 

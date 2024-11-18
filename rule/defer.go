@@ -11,6 +11,7 @@ import (
 // DeferRule lints unused params in functions.
 type DeferRule struct {
 	allow map[string]bool
+	
 	configureOnce sync.Once
 }
 

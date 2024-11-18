@@ -11,6 +11,7 @@ import (
 // DotImportsRule lints given else constructs.
 type DotImportsRule struct {
 	allowedPackages allowPackages
+
 	configureOnce sync.Once
 }
 

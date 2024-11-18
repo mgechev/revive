@@ -14,6 +14,7 @@ import (
 // CyclomaticRule lints given else constructs.
 type CyclomaticRule struct {
 	maxComplexity int
+	
 	configureOnce sync.Once
 }
 

@@ -11,7 +11,8 @@ import (
 
 // FunctionResultsLimitRule lints given else constructs.
 type FunctionResultsLimitRule struct {
-	max           int
+	max int
+
 	configureOnce sync.Once
 }
 

@@ -11,7 +11,8 @@ import (
 // CommentSpacingsRule check the whether there is a space between
 // the comment symbol( // ) and the start of the comment text
 type CommentSpacingsRule struct {
-	allowList     []string
+	allowList []string
+
 	configureOnce sync.Once
 }
 

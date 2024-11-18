@@ -12,6 +12,7 @@ import (
 // ContextAsArgumentRule lints given else constructs.
 type ContextAsArgumentRule struct {
 	allowTypesLUT map[string]struct{}
+
 	configureOnce sync.Once
 }
 

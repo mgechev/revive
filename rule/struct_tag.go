@@ -14,6 +14,7 @@ import (
 // StructTagRule lints struct tags.
 type StructTagRule struct {
 	userDefined   map[string][]string // map: key -> []option
+	
 	configureOnce sync.Once
 }
 

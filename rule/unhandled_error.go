@@ -15,6 +15,7 @@ import (
 // UnhandledErrorRule lints given else constructs.
 type UnhandledErrorRule struct {
 	ignoreList    []*regexp.Regexp
+	
 	configureOnce sync.Once
 }
 

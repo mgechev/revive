@@ -11,7 +11,8 @@ import (
 
 // ArgumentsLimitRule lints given else constructs.
 type ArgumentsLimitRule struct {
-	max           int
+	max int
+
 	configureOnce sync.Once
 }
 

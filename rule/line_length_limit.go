@@ -15,7 +15,8 @@ import (
 
 // LineLengthLimitRule lints given else constructs.
 type LineLengthLimitRule struct {
-	max           int
+	max int
+
 	configureOnce sync.Once
 }
 

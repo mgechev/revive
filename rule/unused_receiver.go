@@ -12,8 +12,9 @@ import (
 // UnusedReceiverRule lints unused params in functions.
 type UnusedReceiverRule struct {
 	// regex to check if some name is valid for unused parameter, "^_$" by default
-	allowRegex    *regexp.Regexp
-	failureMsg    string
+	allowRegex *regexp.Regexp
+	failureMsg string
+
 	configureOnce sync.Once
 }
 

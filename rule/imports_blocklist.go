@@ -11,6 +11,7 @@ import (
 // ImportsBlocklistRule lints given else constructs.
 type ImportsBlocklistRule struct {
 	blocklist     []*regexp.Regexp
+	
 	configureOnce sync.Once
 }
 

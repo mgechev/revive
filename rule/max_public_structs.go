@@ -12,7 +12,8 @@ import (
 
 // MaxPublicStructsRule lints given else constructs.
 type MaxPublicStructsRule struct {
-	max           int64
+	max int64
+
 	configureOnce sync.Once
 }
 
