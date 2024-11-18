@@ -997,7 +997,7 @@ _Configuration_: N/A
 
 ## var-naming
 
-_Description_: This rule warns when [initialism](https://go.dev/wiki/CodeReviewComments#initialisms), [variable](https://go.dev/wiki/CodeReviewComments#variable-names) or [package](https://go.dev/wiki/CodeReviewComments#package-names) naming conventions are not followed.
+_Description_: This rule warns when [initialism](https://go.dev/wiki/CodeReviewComments#initialisms), [variable](https://go.dev/wiki/CodeReviewComments#variable-names) or [package](https://go.dev/wiki/CodeReviewComments#package-names) naming conventions are not followed. It ignores functions starting with `Example`, `Test`, `Benchmark`, and `Fuzz` in test files, preserving `golint` original behavior.
 
 _Configuration_: This rule accepts two slices of strings and one optional slice with single map with named parameters.
 (it's due to TOML hasn't "slice of any" and we keep backward compatibility with previous config version)
