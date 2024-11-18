@@ -191,7 +191,7 @@ func getVersion(builtBy, date, commit, version string) string {
 		if ok {
 			version = bi.Main.Version
 			if strings.HasPrefix(version, "v") {
-				version = bi.Main.Version[1:]
+				version = strings.TrimLeft(bi.Main.Version, "v")
 			}
 			if len(buildInfo) == 0 {
 				return fmt.Sprintf("version %s\n", version)
