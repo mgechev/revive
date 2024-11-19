@@ -13,8 +13,15 @@ import (
 
 var anyCapsRE = regexp.MustCompile(`[A-Z]`)
 
+var allCapsRE = regexp.MustCompile(`^[A-Z0-9_]+$`)
+
 // regexp for constant names like `SOME_CONST`, `SOME_CONST_2`, `X123_3`, `_SOME_PRIVATE_CONST` (#851, #865)
 var upperCaseConstRE = regexp.MustCompile(`^_?[A-Z][A-Z\d]*(_[A-Z\d]+)*$`)
+
+var knownNameExceptions = map[string]bool{
+	"LastInsertId": true, // must match database/sql
+	"kWh":          true,
+}
 
 // VarNamingRule lints given else constructs.
 type VarNamingRule struct {

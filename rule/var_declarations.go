@@ -5,9 +5,25 @@ import (
 	"go/ast"
 	"go/token"
 	"go/types"
+	"strings"
 
 	"github.com/mgechev/revive/lint"
 )
+
+var zeroLiteral = map[string]bool{
+	"false": true, // bool
+	// runes
+	`'\x00'`: true,
+	`'\000'`: true,
+	// strings
+	`""`: true,
+	"``": true,
+	// numerics
+	"0":   true,
+	"0.":  true,
+	"0.0": true,
+	"0i":  true,
+}
 
 // VarDeclarationsRule lints given else constructs.
 type VarDeclarationsRule struct{}
@@ -119,4 +135,10 @@ func (w *lintVarDeclarations) Visit(node ast.Node) ast.Visitor {
 		return nil
 	}
 	return w
+}
+
+func validType(t types.Type) bool {
+	return t != nil &&
+		t != types.Typ[types.Invalid] &&
+		!strings.Contains(t.String(), "invalid type") // good but not foolproof
 }
