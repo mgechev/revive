@@ -252,8 +252,8 @@ func (w *lintExported) lintTypeDoc(t *ast.TypeSpec, doc *ast.CommentGroup) {
 		if t.Name.Name == a {
 			continue
 		}
-		if strings.HasPrefix(s, a+" ") {
-			s = s[len(a)+1:]
+		var found bool
+		if s, found = strings.CutPrefix(s, a+" "); found {
 			break
 		}
 	}
