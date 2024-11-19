@@ -31,8 +31,11 @@ type Rule interface {
 func Apply(rule Rule, node ast.Node, target Target, args lint.Arguments) []lint.Failure {
 	v := &visitor{rule: rule, target: target}
 	for _, arg := range args {
-		if arg == PreserveScope {
+		switch arg {
+		case PreserveScope:
 			v.args.PreserveScope = true
+		case AllowJump:
+			v.args.AllowJump = true
 		}
 	}
 	ast.Walk(v, node)
@@ -47,59 +50,90 @@ type visitor struct {
 }
 
 func (v *visitor) Visit(node ast.Node) ast.Visitor {
-	block, ok := node.(*ast.BlockStmt)
-	if !ok {
-		return v
-	}
-
-	for i, stmt := range block.List {
-		if ifStmt, ok := stmt.(*ast.IfStmt); ok {
-			v.visitChain(ifStmt, Chain{AtBlockEnd: i == len(block.List)-1})
-			continue
+	switch stmt := node.(type) {
+	case *ast.FuncDecl:
+		if stmt.Body != nil {
+			v.visitBlock(stmt.Body.List, Return)
 		}
-		ast.Walk(v, stmt)
+	case *ast.FuncLit:
+		v.visitBlock(stmt.Body.List, Return)
+	case *ast.ForStmt:
+		v.visitBlock(stmt.Body.List, Continue)
+	case *ast.RangeStmt:
+		v.visitBlock(stmt.Body.List, Continue)
+	case *ast.CaseClause:
+		v.visitBlock(stmt.Body, Break)
+	case *ast.BlockStmt:
+		v.visitBlock(stmt.List, Regular)
+	default:
+		return v
 	}
 	return nil
 }
 
-func (v *visitor) visitChain(ifStmt *ast.IfStmt, chain Chain) {
-	// look for other if-else chains nested inside this if { } block
-	ast.Walk(v, ifStmt.Body)
-
-	if ifStmt.Else == nil {
-		// no else branch
-		return
+func (v *visitor) visitBlock(stmts []ast.Stmt, endKind BranchKind) {
+	for i, stmt := range stmts {
+		ifStmt, ok := stmt.(*ast.IfStmt)
+		if !ok {
+			ast.Walk(v, stmt)
+			continue
+		}
+		var chain Chain
+		if i == len(stmts)-1 {
+			chain.AtBlockEnd = true
+			chain.BlockEndKind = endKind
+		}
+		v.visitIf(ifStmt, chain)
 	}
+}
+
+func (v *visitor) visitIf(ifStmt *ast.IfStmt, chain Chain) {
+	// look for other if-else chains nested inside this if { } block
+	v.visitBlock(ifStmt.Body.List, chain.BlockEndKind)
 
 	if as, ok := ifStmt.Init.(*ast.AssignStmt); ok && as.Tok == token.DEFINE {
 		chain.HasInitializer = true
 	}
 	chain.If = BlockBranch(ifStmt.Body)
 
+	if ifStmt.Else == nil {
+		if v.args.AllowJump {
+			v.checkRule(ifStmt, chain)
+		}
+		return
+	}
+
 	switch elseBlock := ifStmt.Else.(type) {
 	case *ast.IfStmt:
 		if !chain.If.Deviates() {
 			chain.HasPriorNonDeviating = true
 		}
-		v.visitChain(elseBlock, chain)
+		v.visitIf(elseBlock, chain)
 	case *ast.BlockStmt:
 		// look for other if-else chains nested inside this else { } block
-		ast.Walk(v, elseBlock)
+		v.visitBlock(elseBlock.List, chain.BlockEndKind)
 
+		chain.HasElse = true
 		chain.Else = BlockBranch(elseBlock)
-		if failMsg := v.rule.CheckIfElse(chain, v.args); failMsg != "" {
-			if chain.HasInitializer {
-				// if statement has a := initializer, so we might need to move the assignment
-				// onto its own line in case the body references it
-				failMsg += " (move short variable declaration to its own line if necessary)"
-			}
-			v.failures = append(v.failures, lint.Failure{
-				Confidence: 1,
-				Node:       v.target.node(ifStmt),
-				Failure:    failMsg,
-			})
-		}
+		v.checkRule(ifStmt, chain)
 	default:
-		panic("invalid node type for else")
+		panic("unexpected node type for else")
 	}
+}
+
+func (v *visitor) checkRule(ifStmt *ast.IfStmt, chain Chain) {
+	failMsg := v.rule.CheckIfElse(chain, v.args)
+	if failMsg == "" {
+		return
+	}
+	if chain.HasInitializer {
+		// if statement has a := initializer, so we might need to move the assignment
+		// onto its own line in case the body references it
+		failMsg += " (move short variable declaration to its own line if necessary)"
+	}
+	v.failures = append(v.failures, lint.Failure{
+		Confidence: 1,
+		Node:       v.target.node(ifStmt),
+		Failure:    failMsg,
+	})
 }

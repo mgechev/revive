@@ -20,6 +20,10 @@ func (*IndentErrorFlowRule) Name() string {
 
 // CheckIfElse evaluates the rule against an ifelse.Chain and returns a failure message if applicable.
 func (*IndentErrorFlowRule) CheckIfElse(chain ifelse.Chain, args ifelse.Args) string {
+	if !chain.HasElse {
+		return ""
+	}
+
 	if !chain.If.Deviates() {
 		// this rule only applies if the if-block deviates control flow
 		return ""
@@ -36,7 +40,7 @@ func (*IndentErrorFlowRule) CheckIfElse(chain ifelse.Chain, args ifelse.Args) st
 		return ""
 	}
 
-	if args.PreserveScope && !chain.AtBlockEnd && (chain.HasInitializer || chain.Else.HasDecls) {
+	if args.PreserveScope && !chain.AtBlockEnd && (chain.HasInitializer || chain.Else.HasDecls()) {
 		// avoid increasing variable scope
 		return ""
 	}

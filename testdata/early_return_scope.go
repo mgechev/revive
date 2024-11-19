@@ -4,7 +4,7 @@ package fixtures
 
 func fn1() {
 	// No initializer, match as normal
-	if cond { //   MATCH /if c { ... } else { ... return } can be simplified to if !c { ... return } .../
+	if cond { //   MATCH /if c { ... } else { return } can be simplified to if !c { return } .../
 		fn2()
 	} else {
 		return
@@ -13,7 +13,7 @@ func fn1() {
 
 func fn2() {
 	// Moving the declaration of x here is fine since it goes out of scope either way
-	if x := fn1(); x != nil { //   MATCH /if c { ... } else { ... return } can be simplified to if !c { ... return } ... (move short variable declaration to its own line if necessary)/
+	if x := fn1(); x != nil { //   MATCH /if c { ... } else { return } can be simplified to if !c { return } ... (move short variable declaration to its own line if necessary)/
 		fn2()
 	} else {
 		return
@@ -56,7 +56,7 @@ func fn5() {
 }
 
 func fn6() {
-	if cond { //   MATCH /if c { ... } else { ... return } can be simplified to if !c { ... return } .../
+	if cond { //   MATCH /if c { ... } else { return } can be simplified to if !c { return } .../
 		x := fn2()
 		fn3(x)
 	} else {

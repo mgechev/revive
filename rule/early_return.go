@@ -23,8 +23,14 @@ func (*EarlyReturnRule) Name() string {
 
 // CheckIfElse evaluates the rule against an ifelse.Chain and returns a failure message if applicable.
 func (*EarlyReturnRule) CheckIfElse(chain ifelse.Chain, args ifelse.Args) string {
-	if !chain.Else.Deviates() {
-		// this rule only applies if the else-block deviates control flow
+	if chain.HasElse {
+		if !chain.Else.BranchKind.Deviates() {
+			// this rule only applies if the else-block deviates control flow
+			return ""
+		}
+	} else if !args.AllowJump || !chain.AtBlockEnd || !chain.BlockEndKind.Deviates() || chain.If.IsShort() {
+		// this kind of refactor requires introducing a new indented "return", "continue" or "break" statement,
+		// so ignore unless we are able to outdent multiple statements in exchange.
 		return ""
 	}
 
@@ -34,18 +40,22 @@ func (*EarlyReturnRule) CheckIfElse(chain ifelse.Chain, args ifelse.Args) string
 		return ""
 	}
 
-	if chain.If.Deviates() {
+	if chain.HasElse && chain.If.Deviates() {
 		// avoid overlapping with superfluous-else
 		return ""
 	}
 
-	if args.PreserveScope && !chain.AtBlockEnd && (chain.HasInitializer || chain.If.HasDecls) {
+	if args.PreserveScope && !chain.AtBlockEnd && (chain.HasInitializer || chain.If.HasDecls()) {
 		// avoid increasing variable scope
 		return ""
 	}
 
-	if chain.If.IsEmpty() {
-		return fmt.Sprintf("if c { } else { %[1]v } can be simplified to if !c { %[1]v }", chain.Else)
+	if !chain.HasElse {
+		return fmt.Sprintf("if c { ... } can be rewritten if !c { %v } ... to reduce nesting", chain.BlockEndKind)
 	}
-	return fmt.Sprintf("if c { ... } else { %[1]v } can be simplified to if !c { %[1]v } ...", chain.Else)
+
+	if chain.If.IsEmpty() {
+		return fmt.Sprintf("if c { } else %[1]v can be simplified to if !c %[1]v", chain.Else)
+	}
+	return fmt.Sprintf("if c { ... } else %[1]v can be simplified to if !c %[1]v ...", chain.Else)
 }

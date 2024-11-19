@@ -58,19 +58,19 @@ func (k BranchKind) String() string {
 	case Empty:
 		return ""
 	case Regular:
-		return "..."
+		return ""
 	case Return:
-		return "... return"
+		return "return"
 	case Continue:
-		return "... continue"
+		return "continue"
 	case Break:
-		return "... break"
+		return "break"
 	case Goto:
-		return "... goto"
+		return "goto"
 	case Panic:
-		return "... panic()"
+		return "panic()"
 	case Exit:
-		return "... os.Exit()"
+		return "os.Exit()"
 	default:
 		panic("invalid kind")
 	}
