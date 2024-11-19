@@ -192,7 +192,7 @@ func (p *Package) lint(rules []Rule, config Config, failures chan Failure) error
 		go (func(file *File) {
 			err := file.lint(rules, config, failures)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
+				fmt.Fprintln(os.Stderr, "Error during linting:", err)
 				os.Exit(1)
 			} 
 			wg.Done()
