@@ -53,6 +53,15 @@ func (dc *disabledChecks) isDisabled(checkName string) bool {
 	}
 }
 
+var commonMethods = map[string]bool{
+	"Error":     true,
+	"Read":      true,
+	"ServeHTTP": true,
+	"String":    true,
+	"Write":     true,
+	"Unwrap":    true,
+}
+
 // ExportedRule lints given else constructs.
 type ExportedRule struct {
 	stuttersMsg    string
