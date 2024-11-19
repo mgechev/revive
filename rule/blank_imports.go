@@ -73,3 +73,7 @@ func (*BlankImportsRule) fileHasValidEmbedComment(fileAst *ast.File) bool {
 
 	return false
 }
+
+// isBlank returns whether id is the blank identifier "_".
+// If id == nil, the answer is false.
+func isBlank(id *ast.Ident) bool { return id != nil && id.Name == "_" }

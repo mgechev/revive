@@ -6,30 +6,10 @@ import (
 	"go/ast"
 	"go/printer"
 	"go/token"
-	"go/types"
 	"regexp"
-	"strings"
 
 	"github.com/mgechev/revive/lint"
 )
-
-// isBlank returns whether id is the blank identifier "_".
-// If id == nil, the answer is false.
-func isBlank(id *ast.Ident) bool { return id != nil && id.Name == "_" }
-
-var commonMethods = map[string]bool{
-	"Error":     true,
-	"Read":      true,
-	"ServeHTTP": true,
-	"String":    true,
-	"Write":     true,
-	"Unwrap":    true,
-}
-
-var knownNameExceptions = map[string]bool{
-	"LastInsertId": true, // must match database/sql
-	"kWh":          true,
-}
 
 func isCgoExported(f *ast.FuncDecl) bool {
 	if f.Recv != nil || f.Doc == nil {
@@ -45,32 +25,9 @@ func isCgoExported(f *ast.FuncDecl) bool {
 	return false
 }
 
-var allCapsRE = regexp.MustCompile(`^[A-Z0-9_]+$`)
-
 func isIdent(expr ast.Expr, ident string) bool {
 	id, ok := expr.(*ast.Ident)
 	return ok && id.Name == ident
-}
-
-var zeroLiteral = map[string]bool{
-	"false": true, // bool
-	// runes
-	`'\x00'`: true,
-	`'\000'`: true,
-	// strings
-	`""`: true,
-	"``": true,
-	// numerics
-	"0":   true,
-	"0.":  true,
-	"0.0": true,
-	"0i":  true,
-}
-
-func validType(t types.Type) bool {
-	return t != nil &&
-		t != types.Typ[types.Invalid] &&
-		!strings.Contains(t.String(), "invalid type") // good but not foolproof
 }
 
 // isPkgDot checks if the expression is <pkg>.<name>
@@ -123,32 +80,6 @@ func (p picker) Visit(node ast.Node) ast.Visitor {
 	}
 
 	return p
-}
-
-// isBoolOp returns true if the given token corresponds to
-// a bool operator
-func isBoolOp(t token.Token) bool {
-	switch t {
-	case token.LAND, token.LOR, token.EQL, token.NEQ:
-		return true
-	}
-
-	return false
-}
-
-const (
-	trueName  = "true"
-	falseName = "false"
-)
-
-func isExprABooleanLit(n ast.Node) (lexeme string, ok bool) {
-	oper, ok := n.(*ast.Ident)
-
-	if !ok {
-		return "", false
-	}
-
-	return oper.Name, (oper.Name == trueName || oper.Name == falseName)
 }
 
 // gofmt returns a string representation of an AST subtree.

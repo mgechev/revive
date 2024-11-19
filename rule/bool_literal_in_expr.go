@@ -70,3 +70,23 @@ func (w lintBoolLiteral) addFailure(node ast.Node, msg, cat string) {
 		Failure:    msg,
 	})
 }
+
+// isBoolOp returns true if the given token corresponds to a bool operator.
+func isBoolOp(t token.Token) bool {
+	switch t {
+	case token.LAND, token.LOR, token.EQL, token.NEQ:
+		return true
+	}
+
+	return false
+}
+
+func isExprABooleanLit(n ast.Node) (lexeme string, ok bool) {
+	oper, ok := n.(*ast.Ident)
+
+	if !ok {
+		return "", false
+	}
+
+	return oper.Name, (oper.Name == "true" || oper.Name == "false")
+}
