@@ -184,7 +184,7 @@ func (p *Package) scanSortable() {
 	}
 }
 
-func (p *Package) lint(rules []Rule, config Config, failures chan Failure) error {
+func (p *Package) lint(rules []Rule, config Config, failures chan Failure) {
 	p.scanSortable()
 	var wg sync.WaitGroup
 	for _, file := range p.files {
@@ -199,7 +199,6 @@ func (p *Package) lint(rules []Rule, config Config, failures chan Failure) error
 		})(file)
 	}
 	wg.Wait()
-	return nil
 }
 
 // IsAtLeastGo121 returns true if the Go version for this package is 1.21 or higher, false otherwise

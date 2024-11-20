@@ -152,7 +152,9 @@ func (l *Linter) lintPackage(filenames []string, gover *goversion.Version, ruleS
 		return nil
 	}
 
-	return pkg.lint(ruleSet, config, failures)
+	pkg.lint(ruleSet, config, failures)
+	
+	return nil
 }
 
 func detectGoMod(dir string) (rootDir string, ver *goversion.Version, err error) {
