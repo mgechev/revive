@@ -12,8 +12,6 @@ import (
 // the comment symbol( // ) and the start of the comment text
 type CommentSpacingsRule struct {
 	allowList []string
-
-	configureOnce sync.Once
 }
 
 func (r *CommentSpacingsRule) configure(arguments lint.Arguments) error {
@@ -30,10 +28,9 @@ func (r *CommentSpacingsRule) configure(arguments lint.Arguments) error {
 
 // Apply the rule.
 func (r *CommentSpacingsRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-	if configureErr != nil {
-		return nil, configureErr
+	check := sync.OnceValue(func() error { return r.configure(arguments) })
+	if err := check(); err != nil {
+		return nil, err
 	}
 
 	var failures []lint.Failure

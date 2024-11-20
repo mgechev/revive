@@ -13,8 +13,6 @@ import (
 // MaxPublicStructsRule lints given else constructs.
 type MaxPublicStructsRule struct {
 	max int64
-
-	configureOnce sync.Once
 }
 
 const defaultMaxPublicStructs = 5
@@ -40,10 +38,9 @@ func (r *MaxPublicStructsRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *MaxPublicStructsRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	var configErr error
-	r.configureOnce.Do(func() { configErr = r.configure(arguments) })
-	if configErr != nil {
-		return nil, configErr
+	check := sync.OnceValue(func() error { return r.configure(arguments) })
+	if err := check(); err != nil {
+		return nil, err
 	}
 
 	var failures []lint.Failure

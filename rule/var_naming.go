@@ -22,7 +22,6 @@ type VarNamingRule struct {
 	blockList             []string
 	allowUpperCaseConst   bool // if true - allows to use UPPER_SOME_NAMES for constants
 	skipPackageNameChecks bool
-	configureOnce         sync.Once
 }
 
 func (r *VarNamingRule) configure(arguments lint.Arguments) error {
@@ -84,10 +83,9 @@ func (r *VarNamingRule) applyPackageCheckRules(walker *lintNames) {
 
 // Apply applies the rule to given file.
 func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	var configErr error
-	r.configureOnce.Do(func() { configErr = r.configure(arguments) })
-	if configErr != nil {
-		return nil, configErr
+	check := sync.OnceValue(func() error { return r.configure(arguments) })
+	if err := check(); err != nil {
+		return nil, err
 	}
 
 	var failures []lint.Failure

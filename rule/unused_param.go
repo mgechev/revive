@@ -12,10 +12,8 @@ import (
 // UnusedParamRule lints unused params in functions.
 type UnusedParamRule struct {
 	// regex to check if some name is valid for unused parameter, "^_$" by default
-	allowRegex        *regexp.Regexp
+	allowRegex *regexp.Regexp
 	failureMsg string
-
-	configureOnce sync.Once
 }
 
 func (r *UnusedParamRule) configure(args lint.Arguments) error {
@@ -51,10 +49,9 @@ func (r *UnusedParamRule) configure(args lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *UnusedParamRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	var configErr error
-	r.configureOnce.Do(func() { configErr = r.configure(arguments) })
-	if configErr != nil {
-		return nil, configErr
+	check := sync.OnceValue(func() error { return r.configure(arguments) })
+	if err := check(); err != nil {
+		return nil, err
 	}
 
 	var failures []lint.Failure

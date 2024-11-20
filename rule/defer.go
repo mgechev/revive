@@ -11,8 +11,6 @@ import (
 // DeferRule lints unused params in functions.
 type DeferRule struct {
 	allow map[string]bool
-	
-	configureOnce sync.Once
 }
 
 func (r *DeferRule) configure(arguments lint.Arguments) error {
@@ -26,11 +24,11 @@ func (r *DeferRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *DeferRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-	if configureErr != nil {
-		return nil, configureErr
+	check := sync.OnceValue(func() error { return r.configure(arguments) })
+	if err := check(); err != nil {
+		return nil, err
 	}
+
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)

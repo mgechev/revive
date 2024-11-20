@@ -37,16 +37,13 @@ type AddConstantRule struct {
 	allowList       allowList
 	ignoreFunctions []*regexp.Regexp
 	strLitLimit     int
-
-	configureOnce sync.Once
 }
 
 // Apply applies the rule to given file.
 func (r *AddConstantRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-	if configureErr != nil {
-		return nil, configureErr
+	check := sync.OnceValue(func() error {return r.configure(arguments)})
+	if err := check(); err != nil {
+		return nil, err
 	}
 
 	var failures []lint.Failure

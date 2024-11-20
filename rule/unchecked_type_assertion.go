@@ -17,7 +17,6 @@ const (
 // UncheckedTypeAssertionRule lints missing or ignored `ok`-value in dynamic type casts.
 type UncheckedTypeAssertionRule struct {
 	acceptIgnoredAssertionResult bool
-	configureOnce                sync.Once
 }
 
 func (r *UncheckedTypeAssertionRule) configure(arguments lint.Arguments) error {
@@ -46,10 +45,9 @@ func (r *UncheckedTypeAssertionRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *UncheckedTypeAssertionRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	var configErr error
-	r.configureOnce.Do(func() { configErr = r.configure(arguments) })
-	if configErr != nil {
-		return nil, configErr
+	check := sync.OnceValue(func() error { return r.configure(arguments) })
+	if err := check(); err != nil {
+		return nil, err
 	}
 
 	var failures []lint.Failure
