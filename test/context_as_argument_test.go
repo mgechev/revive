@@ -7,6 +7,10 @@ import (
 	"github.com/mgechev/revive/rule"
 )
 
+func TestContextAsArgumentDefault(t *testing.T) {
+	testRule(t, "context_as_argument_default", &rule.ContextAsArgumentRule{}, &lint.RuleConfig{})
+}
+
 func TestContextAsArgument(t *testing.T) {
 	testRule(t, "context_as_argument", &rule.ContextAsArgumentRule{}, &lint.RuleConfig{
 		Arguments: []any{

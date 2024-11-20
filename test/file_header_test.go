@@ -7,6 +7,10 @@ import (
 	"github.com/mgechev/revive/rule"
 )
 
+func TestLintFileHeaderDefault(t *testing.T) {
+	testRule(t, "lint_file_header_default", &rule.FileHeaderRule{}, &lint.RuleConfig{})
+}
+
 func TestLintFileHeader(t *testing.T) {
 	testRule(t, "lint_file_header1", &rule.FileHeaderRule{}, &lint.RuleConfig{
 		Arguments: []any{"foobar"},
