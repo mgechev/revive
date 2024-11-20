@@ -6,7 +6,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// UseErrorsNewRule lints given else constructs.
+// UseErrorsNewRule spots calls to fmt.Errorf that can be replaced by errors.New.
 type UseErrorsNewRule struct{}
 
 // Apply applies the rule to given file.
@@ -53,7 +53,7 @@ func (w lintFmtErrorf) Visit(n ast.Node) ast.Visitor {
 		Category:   "errors",
 		Node:       n,
 		Confidence: 1,
-		Failure:    "replace fmt.Errorf by errors.New ",
+		Failure:    "replace fmt.Errorf by errors.New",
 	})
 
 	return w
