@@ -13,8 +13,6 @@ type RedundantBuildTagRule struct{}
 // `//go:build` comments are automatically added by gofmt when Go 1.17+ is used.
 // See https://pkg.go.dev/cmd/go#hdr-Build_constraints
 func (*RedundantBuildTagRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var failures []lint.Failure
-
 	for _, group := range file.AST.Comments {
 		hasGoBuild := false
 		for _, comment := range group.List {
@@ -22,19 +20,19 @@ func (*RedundantBuildTagRule) Apply(file *lint.File, arguments lint.Arguments) [
 				hasGoBuild = true
 				continue
 			}
-			if hasGoBuild && strings.HasPrefix(comment.Text, "// +build ") {
-				failures = append(failures, lint.Failure{
+
+      if hasGoBuild && strings.HasPrefix(comment.Text, "// +build ") {
+				return []lint.Failure{{
 					Category:   "style",
 					Confidence: 1,
 					Node:       comment,
 					Failure:    `The build tag "// +build" is redundant since Go 1.17 and can be removed`,
-				})
-				return failures
+				}}
 			}
 		}
 	}
 
-	return failures
+	return []lint.Failure{}
 }
 
 // Name returns the rule name.

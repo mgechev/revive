@@ -98,7 +98,6 @@ var allRules = append([]lint.Rule{
 	&rule.CommentsDensityRule{},
 	&rule.FileLengthLimitRule{},
 	&rule.FilenameFormatRule{},
-	&rule.UseErrorsNewRule{},
 	&rule.RedundantBuildTagRule{},
 	&rule.UseErrorsNewRule{},
 }, defaultRules...)
