@@ -7,10 +7,10 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// Rule is an interface for linters operating on if-else chains
-type Rule interface {
-	CheckIfElse(chain Chain, args Args) (failMsg string)
-}
+// CheckFunc evaluates a rule against the given if-else chain and returns a message
+// describing the proposed refactor, along with a indicator of whether such a refactor
+// could be found.
+type CheckFunc func(Chain, Args) (string, bool)
 
 // Apply evaluates the given Rule on if-else chains found within the given AST,
 // and returns the failures.
@@ -28,8 +28,8 @@ type Rule interface {
 //
 // Only the block following "bar" is linted. This is because the rules that use this function
 // do not presently have anything to say about earlier blocks in the chain.
-func Apply(rule Rule, node ast.Node, target Target, args lint.Arguments) []lint.Failure {
-	v := &visitor{rule: rule, target: target}
+func Apply(check CheckFunc, node ast.Node, target Target, args lint.Arguments) []lint.Failure {
+	v := &visitor{check: check, target: target}
 	for _, arg := range args {
 		switch arg {
 		case PreserveScope:
@@ -45,22 +45,20 @@ func Apply(rule Rule, node ast.Node, target Target, args lint.Arguments) []lint.
 type visitor struct {
 	failures []lint.Failure
 	target   Target
-	rule     Rule
+	check    CheckFunc
 	args     Args
 }
 
 func (v *visitor) Visit(node ast.Node) ast.Visitor {
 	switch stmt := node.(type) {
 	case *ast.FuncDecl:
-		if stmt.Body != nil {
-			v.visitBlock(stmt.Body.List, Return)
-		}
+		v.visitBody(stmt.Body, Return)
 	case *ast.FuncLit:
-		v.visitBlock(stmt.Body.List, Return)
+		v.visitBody(stmt.Body, Return)
 	case *ast.ForStmt:
-		v.visitBlock(stmt.Body.List, Continue)
+		v.visitBody(stmt.Body, Continue)
 	case *ast.RangeStmt:
-		v.visitBlock(stmt.Body.List, Continue)
+		v.visitBody(stmt.Body, Continue)
 	case *ast.CaseClause:
 		v.visitBlock(stmt.Body, Break)
 	case *ast.BlockStmt:
@@ -69,6 +67,12 @@ func (v *visitor) Visit(node ast.Node) ast.Visitor {
 		return v
 	}
 	return nil
+}
+
+func (v *visitor) visitBody(body *ast.BlockStmt, endKind BranchKind) {
+	if body != nil {
+		v.visitBlock(body.List, endKind)
+	}
 }
 
 func (v *visitor) visitBlock(stmts []ast.Stmt, endKind BranchKind) {
@@ -122,18 +126,18 @@ func (v *visitor) visitIf(ifStmt *ast.IfStmt, chain Chain) {
 }
 
 func (v *visitor) checkRule(ifStmt *ast.IfStmt, chain Chain) {
-	failMsg := v.rule.CheckIfElse(chain, v.args)
-	if failMsg == "" {
-		return
+	msg, found := v.check(chain, v.args)
+	if !found {
+		return // passed the check
 	}
 	if chain.HasInitializer {
 		// if statement has a := initializer, so we might need to move the assignment
 		// onto its own line in case the body references it
-		failMsg += " (move short variable declaration to its own line if necessary)"
+		msg += " (move short variable declaration to its own line if necessary)"
 	}
 	v.failures = append(v.failures, lint.Failure{
 		Confidence: 1,
 		Node:       v.target.node(ifStmt),
-		Failure:    failMsg,
+		Failure:    msg,
 	})
 }

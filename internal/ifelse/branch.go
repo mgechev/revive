@@ -68,16 +68,13 @@ func (b Branch) String() string {
 	case Panic, Exit:
 		if b.IsShort() {
 			return fmt.Sprintf("{ %v() }", b.Call)
-		} else {
-			return fmt.Sprintf("{ ... %v() }", b.Call)
 		}
-	default:
-		if b.IsShort() {
-			return fmt.Sprintf("{ %v }", b.BranchKind)
-		} else {
-			return fmt.Sprintf("{ ... %v }", b.BranchKind)
-		}
+		return fmt.Sprintf("{ ... %v() }", b.Call)
 	}
+	if b.IsShort() {
+		return fmt.Sprintf("{ %v }", b.BranchKind)
+	}
+	return fmt.Sprintf("{ ... %v }", b.BranchKind)
 }
 
 // LongString returns a longer form string representation
@@ -85,9 +82,8 @@ func (b Branch) LongString() string {
 	switch b.BranchKind {
 	case Panic, Exit:
 		return fmt.Sprintf("call to %v function", b.Call)
-	default:
-		return b.BranchKind.LongString()
 	}
+	return b.BranchKind.LongString()
 }
 
 // HasDecls returns whether the branch has any top-level declarations
@@ -111,25 +107,15 @@ func (b Branch) IsShort() bool {
 	case 0:
 		return true
 	case 1:
-	default:
+		return isShortStmt(b.block[0])
+	}
+	return false
+}
+
+func isShortStmt(stmt ast.Stmt) bool {
+	switch stmt.(type) {
+	case *ast.BlockStmt, *ast.IfStmt, *ast.SwitchStmt, *ast.TypeSwitchStmt, *ast.SelectStmt, *ast.ForStmt, *ast.RangeStmt:
 		return false
 	}
-	switch b.block[0].(type) {
-	case *ast.BlockStmt:
-		return false
-	case *ast.IfStmt:
-		return false
-	case *ast.SwitchStmt:
-		return false
-	case *ast.TypeSwitchStmt:
-		return false
-	case *ast.SelectStmt:
-		return false
-	case *ast.ForStmt:
-		return false
-	case *ast.RangeStmt:
-		return false
-	default:
-		return true
-	}
+	return true
 }

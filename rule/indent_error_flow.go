@@ -10,7 +10,7 @@ type IndentErrorFlowRule struct{}
 
 // Apply applies the rule to given file.
 func (e *IndentErrorFlowRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
-	return ifelse.Apply(e, file.AST, ifelse.TargetElse, args)
+	return ifelse.Apply(e.checkIfElse, file.AST, ifelse.TargetElse, args)
 }
 
 // Name returns the rule name.
@@ -18,32 +18,31 @@ func (*IndentErrorFlowRule) Name() string {
 	return "indent-error-flow"
 }
 
-// CheckIfElse evaluates the rule against an ifelse.Chain and returns a failure message if applicable.
-func (*IndentErrorFlowRule) CheckIfElse(chain ifelse.Chain, args ifelse.Args) string {
+func (*IndentErrorFlowRule) checkIfElse(chain ifelse.Chain, args ifelse.Args) (string, bool) {
 	if !chain.HasElse {
-		return ""
+		return "", false
 	}
 
 	if !chain.If.Deviates() {
 		// this rule only applies if the if-block deviates control flow
-		return ""
+		return "", false
 	}
 
 	if chain.HasPriorNonDeviating {
 		// if we de-indent the "else" block then a previous branch
 		// might flow into it, affecting program behaviour
-		return ""
+		return "", false
 	}
 
 	if !chain.If.Returns() {
 		// avoid overlapping with superfluous-else
-		return ""
+		return "", false
 	}
 
 	if args.PreserveScope && !chain.AtBlockEnd && (chain.HasInitializer || chain.Else.HasDecls()) {
 		// avoid increasing variable scope
-		return ""
+		return "", false
 	}
 
-	return "if block ends with a return statement, so drop this else and outdent its block"
+	return "if block ends with a return statement, so drop this else and outdent its block", true
 }
