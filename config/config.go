@@ -101,16 +101,18 @@ var allRules = append([]lint.Rule{
 	&rule.RedundantBuildTagRule{},
 }, defaultRules...)
 
+// allFormatters is a list of all available formatters to output the linting results.
+// Keep the list sorted and in sync with available formatters in README.md.
 var allFormatters = []lint.Formatter{
-	&formatter.Stylish{},
+	&formatter.Checkstyle{},
+	&formatter.Default{},
 	&formatter.Friendly{},
 	&formatter.JSON{},
 	&formatter.NDJSON{},
-	&formatter.Default{},
-	&formatter.Unix{},
-	&formatter.Checkstyle{},
 	&formatter.Plain{},
 	&formatter.Sarif{},
+	&formatter.Stylish{},
+	&formatter.Unix{},
 }
 
 func getFormatters() map[string]lint.Formatter {
