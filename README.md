@@ -94,6 +94,9 @@ Here's how `revive` is different from `golint`:
     - [Default](#default)
     - [Plain](#plain)
     - [Unix](#unix)
+    - [JSON](#json)
+    - [NDJSON](#ndjson)
+    - [Checkstyle](#checkstyle)
     - [SARIF](#sarif)
   - [Extensibility](#extensibility)
     - [Writing a Custom Rule](#writing-a-custom-rule)
@@ -597,9 +600,21 @@ The unix formatter produces the same output as the default formatter but surroun
 
 ![Unix formatter](/assets/formatter-unix.png)
 
+### JSON
+
+The `json` formatter produces output in JSON format.
+
+### NDJSON
+
+The `ndjson` formatter produces output in [`Newline Delimited JSON`](https://github.com/ndjson/ndjson-spec) format.
+
+### Checkstyle
+
+The `checkstyle` formatter produces output in a [Checkstyle-like](https://checkstyle.sourceforge.io/) format.
+
 ### SARIF
 
-The `sarif`  formatter produces outputs in SARIF, for _Static Analysis Results Interchange Format_, a standard JSON-based format for the output of static analysis tools defined and promoted by [OASIS](https://www.oasis-open.org/).
+The `sarif`  formatter produces output in SARIF, for _Static Analysis Results Interchange Format_, a standard JSON-based format for the output of static analysis tools defined and promoted by [OASIS](https://www.oasis-open.org/).
 
 Current supported version of the standard is [SARIF-v2.1.0](https://docs.oasis-open.org/sarif/sarif/v2.1.0/csprd01/sarif-v2.1.0-csprd01.html
 ).
