@@ -82,6 +82,7 @@ List of all available rules.
   - [unused-parameter](#unused-parameter)
   - [unused-receiver](#unused-receiver)
   - [use-any](#use-any)
+  - [use-errors-new](#use-errors-new)
   - [useless-break](#useless-break)
   - [var-declaration](#var-declaration)
   - [var-naming](#var-naming)
@@ -986,6 +987,13 @@ func (_my *MyStruct) SomeMethod() {} // matches rule
 _Description_: Since Go 1.18, `interface{}` has an alias: `any`. This rule proposes to replace instances of `interface{}` with `any`.
 
 _Configuration_: N/A
+
+## use-errors-new
+
+_Description_: This rules identifies calls to `fmt.Errorf` that can be safely replaced by, the more efficient, `errors.New`.
+
+_Configuration_: N/A
+
 
 ## useless-break
 
