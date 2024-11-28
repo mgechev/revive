@@ -17,20 +17,7 @@ func (*DeepExitRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 		failures = append(failures, failure)
 	}
 
-	exitFunctions := map[string]map[string]bool{
-		"os":      {"Exit": true},
-		"syscall": {"Exit": true},
-		"log": {
-			"Fatal":   true,
-			"Fatalf":  true,
-			"Fatalln": true,
-			"Panic":   true,
-			"Panicf":  true,
-			"Panicln": true,
-		},
-	}
-
-	w := lintDeepExit{onFailure, exitFunctions, file.IsTest()}
+	w := lintDeepExit{onFailure: onFailure, isTestFile: file.IsTest()}
 	ast.Walk(w, file.AST)
 	return failures
 }
@@ -41,9 +28,8 @@ func (*DeepExitRule) Name() string {
 }
 
 type lintDeepExit struct {
-	onFailure     func(lint.Failure)
-	exitFunctions map[string]map[string]bool
-	isTestFile    bool
+	onFailure  func(lint.Failure)
+	isTestFile bool
 }
 
 func (w lintDeepExit) Visit(node ast.Node) ast.Visitor {
@@ -75,8 +61,7 @@ func (w lintDeepExit) Visit(node ast.Node) ast.Visitor {
 
 	pkg := id.Name
 	fn := fc.Sel.Name
-	isACallToExitFunction := w.exitFunctions[pkg] != nil && w.exitFunctions[pkg][fn]
-	if isACallToExitFunction {
+	if isCallToExitFunction(pkg, fn) {
 		w.onFailure(lint.Failure{
 			Confidence: 1,
 			Node:       ce,

@@ -11,6 +11,20 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
+// exitFunctions is a map of std packages and functions that are considered as exit functions.
+var exitFunctions = map[string]map[string]bool{
+	"os":      {"Exit": true},
+	"syscall": {"Exit": true},
+	"log": {
+		"Fatal":   true,
+		"Fatalf":  true,
+		"Fatalln": true,
+		"Panic":   true,
+		"Panicf":  true,
+		"Panicln": true,
+	},
+}
+
 func isCgoExported(f *ast.FuncDecl) bool {
 	if f.Recv != nil || f.Doc == nil {
 		return false
@@ -101,4 +115,9 @@ var directiveCommentRE = regexp.MustCompile("^//(line |extern |export |[a-z0-9]+
 
 func isDirectiveComment(line string) bool {
 	return directiveCommentRE.MatchString(line)
+}
+
+// isCallToExitFunction checks if the function call is a call to an exit function.
+func isCallToExitFunction(pkgName, functionName string) bool {
+	return exitFunctions[pkgName] != nil && exitFunctions[pkgName][functionName]
 }
