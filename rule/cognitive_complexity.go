@@ -10,7 +10,7 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
-// CognitiveComplexityRule lints given else constructs.
+// CognitiveComplexityRule sets restriction for maximum cognitive complexity.
 type CognitiveComplexityRule struct {
 	maxComplexity int
 

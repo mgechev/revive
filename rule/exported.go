@@ -62,7 +62,7 @@ var commonMethods = map[string]bool{
 	"Unwrap":    true,
 }
 
-// ExportedRule lints given else constructs.
+// ExportedRule lints naming and commenting conventions on exported symbols.
 type ExportedRule struct {
 	stuttersMsg    string
 	disabledChecks disabledChecks

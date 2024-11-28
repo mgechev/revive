@@ -9,7 +9,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// UnexportedReturnRule lints given else constructs.
+// UnexportedReturnRule warns when a public return is from unexported type.
 type UnexportedReturnRule struct{}
 
 // Apply applies the rule to given file.

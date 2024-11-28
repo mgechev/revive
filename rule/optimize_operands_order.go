@@ -8,7 +8,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// OptimizeOperandsOrderRule lints given else constructs.
+// OptimizeOperandsOrderRule checks inefficient conditional expressions.
 type OptimizeOperandsOrderRule struct{}
 
 // Apply applies the rule to given file.

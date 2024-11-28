@@ -12,7 +12,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ErrorStringsRule lints given else constructs.
+// ErrorStringsRule lints error strings.
 type ErrorStringsRule struct {
 	errorFunctions map[string]map[string]struct{}
 

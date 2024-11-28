@@ -8,7 +8,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// IfReturnRule lints given else constructs.
+// IfReturnRule searches for redundant `if` when returning an error.
 type IfReturnRule struct{}
 
 // Apply applies the rule to given file.

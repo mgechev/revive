@@ -9,7 +9,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// UnusedReceiverRule lints unused params in functions.
+// UnusedReceiverRule lints unused receivers in functions.
 type UnusedReceiverRule struct {
 	// regex to check if some name is valid for unused parameter, "^_$" by default
 	allowRegex *regexp.Regexp

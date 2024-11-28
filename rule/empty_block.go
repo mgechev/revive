@@ -6,7 +6,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// EmptyBlockRule lints given else constructs.
+// EmptyBlockRule warns on empty code blocks.
 type EmptyBlockRule struct{}
 
 // Apply applies the rule to given file.

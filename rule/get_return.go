@@ -8,7 +8,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// GetReturnRule lints given else constructs.
+// GetReturnRule warns on getters that do not yield any result.
 type GetReturnRule struct{}
 
 // Apply applies the rule to given file.

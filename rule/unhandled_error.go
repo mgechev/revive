@@ -11,7 +11,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// UnhandledErrorRule lints given else constructs.
+// UnhandledErrorRule warns on unhandled errors returned by function calls.
 type UnhandledErrorRule struct {
 	ignoreList []*regexp.Regexp
 

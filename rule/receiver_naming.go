@@ -9,7 +9,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ReceiverNamingRule lints given else constructs.
+// ReceiverNamingRule lints a receiver name.
 type ReceiverNamingRule struct {
 	receiverNameMaxLength int
 

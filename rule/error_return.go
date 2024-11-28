@@ -6,7 +6,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ErrorReturnRule lints given else constructs.
+// ErrorReturnRule ensures that the error return parameter is the last parameter.
 type ErrorReturnRule struct{}
 
 // Apply applies the rule to given file.
