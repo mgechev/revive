@@ -66,13 +66,7 @@ func (b Branch) String() string {
 	case Regular:
 		return "{ ... }"
 	case Panic, Exit:
-		if b.IsShort() {
-			return fmt.Sprintf("{ %v() }", b.Call)
-		}
 		return fmt.Sprintf("{ ... %v() }", b.Call)
-	}
-	if b.IsShort() {
-		return fmt.Sprintf("{ %v }", b.BranchKind)
 	}
 	return fmt.Sprintf("{ ... %v }", b.BranchKind)
 }
