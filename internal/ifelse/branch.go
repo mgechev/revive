@@ -9,8 +9,8 @@ import (
 // Branch contains information about a branch within an if-else chain.
 type Branch struct {
 	BranchKind
-	Call          // The function called at the end for kind Panic or Exit.
-	HasDecls bool // The branch has one or more declarations (at the top level block)
+	Call  // The function called at the end for kind Panic or Exit.
+	block []ast.Stmt
 }
 
 // BlockBranch gets the Branch of an ast.BlockStmt.
@@ -21,7 +21,7 @@ func BlockBranch(block *ast.BlockStmt) Branch {
 	}
 
 	branch := StmtBranch(block.List[blockLen-1])
-	branch.HasDecls = hasDecls(block)
+	branch.block = block.List
 	return branch
 }
 
@@ -61,11 +61,14 @@ func StmtBranch(stmt ast.Stmt) Branch {
 // String returns a brief string representation
 func (b Branch) String() string {
 	switch b.BranchKind {
+	case Empty:
+		return "{ }"
+	case Regular:
+		return "{ ... }"
 	case Panic, Exit:
-		return fmt.Sprintf("... %v()", b.Call)
-	default:
-		return b.BranchKind.String()
+		return fmt.Sprintf("{ ... %v() }", b.Call)
 	}
+	return fmt.Sprintf("{ ... %v }", b.BranchKind)
 }
 
 // LongString returns a longer form string representation
@@ -73,13 +76,13 @@ func (b Branch) LongString() string {
 	switch b.BranchKind {
 	case Panic, Exit:
 		return fmt.Sprintf("call to %v function", b.Call)
-	default:
-		return b.BranchKind.LongString()
 	}
+	return b.BranchKind.LongString()
 }
 
-func hasDecls(block *ast.BlockStmt) bool {
-	for _, stmt := range block.List {
+// HasDecls returns whether the branch has any top-level declarations
+func (b Branch) HasDecls() bool {
+	for _, stmt := range b.block {
 		switch stmt := stmt.(type) {
 		case *ast.DeclStmt:
 			return true
@@ -90,4 +93,23 @@ func hasDecls(block *ast.BlockStmt) bool {
 		}
 	}
 	return false
+}
+
+// IsShort returns whether the branch is empty or consists of a single statement
+func (b Branch) IsShort() bool {
+	switch len(b.block) {
+	case 0:
+		return true
+	case 1:
+		return isShortStmt(b.block[0])
+	}
+	return false
+}
+
+func isShortStmt(stmt ast.Stmt) bool {
+	switch stmt.(type) {
+	case *ast.BlockStmt, *ast.IfStmt, *ast.SwitchStmt, *ast.TypeSwitchStmt, *ast.SelectStmt, *ast.ForStmt, *ast.RangeStmt:
+		return false
+	}
+	return true
 }

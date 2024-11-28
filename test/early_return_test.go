@@ -12,4 +12,5 @@ import (
 func TestEarlyReturn(t *testing.T) {
 	testRule(t, "early_return", &rule.EarlyReturnRule{})
 	testRule(t, "early_return_scope", &rule.EarlyReturnRule{}, &lint.RuleConfig{Arguments: []any{ifelse.PreserveScope}})
+	testRule(t, "early_return_jump", &rule.EarlyReturnRule{}, &lint.RuleConfig{Arguments: []any{ifelse.AllowJump}})
 }

@@ -348,12 +348,13 @@ if !cond {
 _Configuration_: ([]string) rule flags. Available flags are:
 
 * _preserveScope_: do not suggest refactorings that would increase variable scope
+* _allowJump_: suggest a new jump (`return`, `continue` or `break` statement) if it could unnest multiple statements. By default, only relocation of _existing_ jumps (i.e. from the `else` clause) are suggested.
 
 Example:
 
 ```toml
 [rule.early-return]
-  arguments = ["preserveScope"]
+  arguments = ["preserveScope", "allowJump"]
 ```
 
 ## empty-block

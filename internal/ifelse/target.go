@@ -19,7 +19,6 @@ func (t Target) node(ifStmt *ast.IfStmt) ast.Node {
 		return ifStmt
 	case TargetElse:
 		return ifStmt.Else
-	default:
-		panic("bad target")
 	}
+	panic("bad target")
 }
