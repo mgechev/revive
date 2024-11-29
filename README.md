@@ -655,7 +655,7 @@ With the snippet above we:
 - Enable the rule with the name `ban-struct-name`. The `Name()` method of our rule should return a string that matches `ban-struct-name`.
 - Configure the rule with the argument `Foo`. The list of arguments will be passed to `Apply(*File, Arguments)` together with the target file we're linting currently.
 
-A sample rule implementation can be found [here](/rule/argument-limit.go).
+A sample rule implementation can be found [here](/rule/argument_limit.go).
 
 #### Using `revive` as a library
 
