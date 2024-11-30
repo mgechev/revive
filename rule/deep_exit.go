@@ -17,7 +17,7 @@ func (*DeepExitRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 		failures = append(failures, failure)
 	}
 
-	w := lintDeepExit{onFailure: onFailure, isTestFile: file.IsTest()}
+	w := &lintDeepExit{onFailure: onFailure, isTestFile: file.IsTest()}
 	ast.Walk(w, file.AST)
 	return failures
 }
@@ -32,7 +32,7 @@ type lintDeepExit struct {
 	isTestFile bool
 }
 
-func (w lintDeepExit) Visit(node ast.Node) ast.Visitor {
+func (w *lintDeepExit) Visit(node ast.Node) ast.Visitor {
 	if fd, ok := node.(*ast.FuncDecl); ok {
 		if w.mustIgnore(fd) {
 			return nil // skip analysis of this function
