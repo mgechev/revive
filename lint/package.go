@@ -148,14 +148,14 @@ func (p *Package) TypeOf(expr ast.Expr) types.Type {
 	return p.typesInfo.TypeOf(expr)
 }
 
+type sortableMethodsFlags int
 type walker struct {
-	nmap map[string]int
-	has  map[string]int
+	sortableMethodFlagsByTypeName map[string]sortableMethodsFlags
 }
 
-// bitfield for which methods exist on each type.
+// flags for sortable interface methods.
 const (
-	bfLen = 1 << iota
+	bfLen sortableMethodsFlags = 1 << iota
 	bfLess
 	bfSwap
 )
@@ -167,9 +167,7 @@ func (w *walker) Visit(n ast.Node) ast.Visitor {
 	}
 
 	recvType := typeparams.ReceiverType(fn)
-	bf := getBitfieldForFunction(fn)
-
-	w.has[recvType] |= bf
+	w.sortableMethodFlagsByTypeName[recvType] |= getSortableMethodFlagForFunction(fn)
 
 	return w
 }
@@ -177,12 +175,11 @@ func (w *walker) Visit(n ast.Node) ast.Visitor {
 func (p *Package) scanSortable() {
 	p.sortable = map[string]bool{}
 
-	nmap := map[string]int{"Len": bfLen, "Less": bfLess, "Swap": bfSwap}
-	has := map[string]int{}
+	sortableFlags := map[string]sortableMethodsFlags{}
 	for _, f := range p.files {
-		ast.Walk(&walker{nmap: nmap, has: has}, f.AST)
+		ast.Walk(&walker{sortableMethodFlagsByTypeName: sortableFlags}, f.AST)
 	}
-	for typ, ms := range has {
+	for typ, ms := range sortableFlags {
 		if ms == bfLen|bfLess|bfSwap {
 			p.sortable[typ] = true
 		}
@@ -212,7 +209,7 @@ func (p *Package) IsAtLeastGo122() bool {
 	return p.goVersion.GreaterThanOrEqual(go122)
 }
 
-func getBitfieldForFunction(fn *ast.FuncDecl) int {
+func getSortableMethodFlagForFunction(fn *ast.FuncDecl) sortableMethodsFlags {
 	switch {
 	case funcSignatureIs(fn, "Len", []string{}, []string{"int"}):
 		return bfLen
