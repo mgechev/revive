@@ -7,7 +7,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// FlagParamRule lints given else constructs.
+// FlagParamRule warns on boolean parameters that create a control coupling.
 type FlagParamRule struct{}
 
 // Apply applies the rule to given file.

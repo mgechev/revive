@@ -8,7 +8,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// FunctionResultsLimitRule lints given else constructs.
+// FunctionResultsLimitRule limits the maximum number of results a function can return.
 type FunctionResultsLimitRule struct {
 	max int
 

@@ -9,7 +9,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// TimeNamingRule lints given else constructs.
+// TimeNamingRule lints the name of a time variable.
 type TimeNamingRule struct{}
 
 // Apply applies the rule to given file.

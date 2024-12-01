@@ -6,7 +6,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// UnconditionalRecursionRule lints given else constructs.
+// UnconditionalRecursionRule warns on function calls that will lead to infinite recursion.
 type UnconditionalRecursionRule struct{}
 
 // Apply applies the rule to given file.

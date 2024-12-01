@@ -11,7 +11,7 @@ import (
 
 // Based on https://github.com/fzipp/gocyclo
 
-// CyclomaticRule lints given else constructs.
+// CyclomaticRule sets restriction for maximum cyclomatic complexity.
 type CyclomaticRule struct {
 	maxComplexity int
 

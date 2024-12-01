@@ -7,7 +7,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// BlankImportsRule lints given else constructs.
+// BlankImportsRule lints blank imports.
 type BlankImportsRule struct{}
 
 // Name returns the rule name.

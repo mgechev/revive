@@ -5,7 +5,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// IndentErrorFlowRule lints given else constructs.
+// IndentErrorFlowRule prevents redundant else statements.
 type IndentErrorFlowRule struct{}
 
 // Apply applies the rule to given file.

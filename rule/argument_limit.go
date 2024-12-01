@@ -8,7 +8,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ArgumentsLimitRule lints given else constructs.
+// ArgumentsLimitRule lints the number of arguments a function can receive.
 type ArgumentsLimitRule struct {
 	max int
 

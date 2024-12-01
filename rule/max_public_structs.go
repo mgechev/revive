@@ -9,7 +9,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// MaxPublicStructsRule lints given else constructs.
+// MaxPublicStructsRule lints the number of public structs in a file.
 type MaxPublicStructsRule struct {
 	max int64
 

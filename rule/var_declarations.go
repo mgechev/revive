@@ -25,7 +25,7 @@ var zeroLiteral = map[string]bool{
 	"0i":  true,
 }
 
-// VarDeclarationsRule lints given else constructs.
+// VarDeclarationsRule reduces redundancies around variable declaration.
 type VarDeclarationsRule struct{}
 
 // Apply applies the rule to given file.

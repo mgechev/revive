@@ -23,7 +23,7 @@ var knownNameExceptions = map[string]bool{
 	"kWh":          true,
 }
 
-// VarNamingRule lints given else constructs.
+// VarNamingRule lints the name of a variable.
 type VarNamingRule struct {
 	allowList             []string
 	blockList             []string

@@ -7,7 +7,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ModifiesParamRule lints given else constructs.
+// ModifiesParamRule warns on assignments to function parameters.
 type ModifiesParamRule struct{}
 
 // Apply applies the rule to given file.

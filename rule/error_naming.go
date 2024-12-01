@@ -9,7 +9,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ErrorNamingRule lints given else constructs.
+// ErrorNamingRule lints naming of error variables.
 type ErrorNamingRule struct{}
 
 // Apply applies the rule to given file.

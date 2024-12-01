@@ -9,7 +9,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ContextAsArgumentRule lints given else constructs.
+// ContextAsArgumentRule suggests that `context.Context` should be the first argument of a function.
 type ContextAsArgumentRule struct {
 	allowTypesLUT map[string]struct{}
 
