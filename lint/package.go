@@ -10,6 +10,7 @@ import (
 
 	goversion "github.com/hashicorp/go-version"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/internal/typeparams"
 )
 
@@ -211,67 +212,13 @@ func (p *Package) IsAtLeastGo122() bool {
 
 func getSortableMethodFlagForFunction(fn *ast.FuncDecl) sortableMethodsFlags {
 	switch {
-	case funcSignatureIs(fn, "Len", []string{}, []string{"int"}):
+	case astutils.FuncSignatureIs(fn, "Len", []string{}, []string{"int"}):
 		return bfLen
-	case funcSignatureIs(fn, "Less", []string{"int", "int"}, []string{"bool"}):
+	case astutils.FuncSignatureIs(fn, "Less", []string{"int", "int"}, []string{"bool"}):
 		return bfLess
-	case funcSignatureIs(fn, "Swap", []string{"int", "int"}, []string{}):
+	case astutils.FuncSignatureIs(fn, "Swap", []string{"int", "int"}, []string{}):
 		return bfSwap
 	default:
 		return 0
 	}
-}
-
-// funcSignatureIs returns true if the given func decl satisfies has a signature characterized
-// by the given name, parameters types and return types; false otherwise
-func funcSignatureIs(funcDecl *ast.FuncDecl, wantName string, wantParametersTypes, wantResultsTypes []string) bool {
-	if wantName != funcDecl.Name.String() {
-		return false // func name doesn't match expected one
-	}
-
-	funcParametersTypes := getTypeNames(funcDecl.Type.Params)
-	if len(wantParametersTypes) != len(funcParametersTypes) {
-		return false // func has not the expected number of parameters
-	}
-
-	funcResultsTypes := getTypeNames(funcDecl.Type.Results)
-	if len(wantResultsTypes) != len(funcResultsTypes) {
-		return false // func has not the expected number of return values
-	}
-
-	for i, wantType := range wantParametersTypes {
-		if wantType != funcParametersTypes[i] {
-			return false // type of a func's parameter does not match the type of the corresponding expected parameter
-		}
-	}
-
-	for i, wantType := range wantResultsTypes {
-		if wantType != funcResultsTypes[i] {
-			return false // type of a func's return value does not match the type of the corresponding expected return value
-		}
-	}
-
-	return true
-}
-
-func getTypeNames(fields *ast.FieldList) []string {
-	result := []string{}
-
-	if fields == nil {
-		return result
-	}
-
-	for _, field := range fields.List {
-		typeName := field.Type.(*ast.Ident).Name
-		if field.Names == nil { // unnamed field
-			result = append(result, typeName)
-			continue
-		}
-
-		for range field.Names { // add one type name for each field name
-			result = append(result, typeName)
-		}
-	}
-
-	return result
 }
