@@ -7,8 +7,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"nosuchpkg" // export data unavailable
 	"os"
+
+	"nosuchpkg" // export data unavailable
 )
 
 // Q is a test type.
@@ -84,3 +85,9 @@ var y string = q(1).String() // MATCH /should omit type string from declaration 
 type q int
 
 func (q) String() string { return "I'm a q" }
+
+// The only true zero value for any/interface{} is nil. Others will be considered non-zero.
+var z1 any = 0           // No warning, zero value for any is nil
+var z2 any = nil         // MATCH /should drop = nil from declaration of var z2; it is the zero value/
+var z3 interface{} = 0   // No warning, zero value for any is nil
+var z4 interface{} = nil // MATCH /should drop = nil from declaration of var z4; it is the zero value/
