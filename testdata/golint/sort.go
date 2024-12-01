@@ -17,4 +17,8 @@ func (u U) Len() int           { return len(u) }
 func (u U) Less(i, j int) bool { return u[i] < u[j] }
 func (u U) Swap(i, j int)      { u[i], u[j] = u[j], u[i] }
 
+func (u U) Len() (result int)               { return len(u) }
+func (u U) Less(i int, j int) (result bool) { return u[i] < u[j] }
+func (u U) Swap(i int, j int)               { u[i], u[j] = u[j], u[i] }
+
 func (u U) Other() {} // MATCH /exported method U.Other should have comment or be unexported/
