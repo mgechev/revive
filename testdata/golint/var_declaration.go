@@ -7,9 +7,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
-
 	"nosuchpkg" // export data unavailable
+	"os"
 )
 
 // Q is a test type.
