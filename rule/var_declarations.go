@@ -146,7 +146,9 @@ func validType(t types.Type) bool {
 func isZeroValue(litValue string, typ ast.Expr) bool {
 	switch val := typ.(type) {
 	case *ast.Ident:
-		return val.Name == "any" && litValue == "nil"
+		if val.Name == "any" {
+			return litValue == "nil"
+		}
 	case *ast.InterfaceType:
 		return litValue == "nil"
 	}
