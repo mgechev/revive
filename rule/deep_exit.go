@@ -3,6 +3,9 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -76,5 +79,32 @@ func (w *lintDeepExit) Visit(node ast.Node) ast.Visitor {
 func (w *lintDeepExit) mustIgnore(fd *ast.FuncDecl) bool {
 	fn := fd.Name.Name
 
-	return fn == "init" || fn == "main" || (w.isTestFile && fn == "TestMain")
+	return fn == "init" || fn == "main" || w.isTestMain(fd) || w.isTestExample(fd)
+}
+
+func (w *lintDeepExit) isTestMain(fd *ast.FuncDecl) bool {
+	return w.isTestFile && fd.Name.Name == "TestMain"
+}
+
+// isTestExample returns true if the function is a testable example function.
+// See https://go.dev/blog/examples#examples-are-tests for more information.
+//
+// Inspired by https://github.com/golang/go/blob/go1.23.0/src/go/doc/example.go#L72-L77
+func (w *lintDeepExit) isTestExample(fd *ast.FuncDecl) bool {
+	if !w.isTestFile {
+		return false
+	}
+	name := fd.Name.Name
+	const prefix = "Example"
+	if !strings.HasPrefix(name, prefix) {
+		return false
+	}
+	if len(name) == len(prefix) { // "Example" is a package level example
+		return len(fd.Type.Params.List) == 0
+	}
+	r, _ := utf8.DecodeRuneInString(name[len(prefix):])
+	if unicode.IsLower(r) {
+		return false
+	}
+	return len(fd.Type.Params.List) == 0
 }
