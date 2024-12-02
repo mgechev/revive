@@ -150,9 +150,6 @@ func (p *Package) TypeOf(expr ast.Expr) types.Type {
 }
 
 type sortableMethodsFlags int
-type walker struct {
-	sortableMethodFlagsByTypeName map[string]sortableMethodsFlags
-}
 
 // flags for sortable interface methods.
 const (
@@ -161,25 +158,22 @@ const (
 	bfSwap
 )
 
-func (w *walker) Visit(n ast.Node) ast.Visitor {
-	fn, ok := n.(*ast.FuncDecl)
-	if !ok || fn.Recv == nil || len(fn.Recv.List) == 0 {
-		return w
-	}
-
-	recvType := typeparams.ReceiverType(fn)
-	w.sortableMethodFlagsByTypeName[recvType] |= getSortableMethodFlagForFunction(fn)
-
-	return w
-}
-
 func (p *Package) scanSortable() {
-	p.sortable = map[string]bool{}
-
 	sortableFlags := map[string]sortableMethodsFlags{}
 	for _, f := range p.files {
-		ast.Walk(&walker{sortableMethodFlagsByTypeName: sortableFlags}, f.AST)
+		for _, decl := range f.AST.Decls {
+			fn, ok := decl.(*ast.FuncDecl)
+			isAMethodDeclaration := ok && fn.Recv != nil && len(fn.Recv.List) != 0
+			if !isAMethodDeclaration {
+				continue
+			}
+
+			recvType := typeparams.ReceiverType(fn)
+			sortableFlags[recvType] |= getSortableMethodFlagForFunction(fn)
+		}
 	}
+
+	p.sortable = make(map[string]bool, len(sortableFlags))
 	for typ, ms := range sortableFlags {
 		if ms == bfLen|bfLess|bfSwap {
 			p.sortable[typ] = true
