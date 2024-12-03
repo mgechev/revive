@@ -9,6 +9,8 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
+var allowBlankIdentifierRegex = regexp.MustCompile("^_$")
+
 // UnusedParamRule lints unused params in functions.
 type UnusedParamRule struct {
 	// regex to check if some name is valid for unused parameter, "^_$" by default
@@ -21,30 +23,29 @@ type UnusedParamRule struct {
 func (r *UnusedParamRule) configure(args lint.Arguments) {
 	// while by default args is an array, i think it's good to provide structures inside it by default, not arrays or primitives
 	// it's more compatible to JSON nature of configurations
-	var allowRegexStr string
+	r.allowRegex = allowBlankIdentifierRegex
+	r.failureMsg = "parameter '%s' seems to be unused, consider removing or renaming it as _"
 	if len(args) == 0 {
-		allowRegexStr = "^_$"
-		r.failureMsg = "parameter '%s' seems to be unused, consider removing or renaming it as _"
-	} else {
-		// Arguments = [{}]
-		options := args[0].(map[string]any)
-		// Arguments = [{allowRegex="^_"}]
+		return
+	}
+	// Arguments = [{}]
+	options := args[0].(map[string]any)
 
-		if allowRegexParam, ok := options["allowRegex"]; ok {
-			allowRegexStr, ok = allowRegexParam.(string)
-			if !ok {
-				panic(fmt.Errorf("error configuring %s rule: allowRegex is not string but [%T]", r.Name(), allowRegexParam))
-			}
-		}
+	allowRegexParam, ok := options["allowRegex"]
+	if !ok {
+		return
+	}
+	// Arguments = [{allowRegex="^_"}]
+	allowRegexStr, ok := allowRegexParam.(string)
+	if !ok {
+		panic(fmt.Errorf("error configuring %s rule: allowRegex is not string but [%T]", r.Name(), allowRegexParam))
 	}
 	var err error
 	r.allowRegex, err = regexp.Compile(allowRegexStr)
 	if err != nil {
 		panic(fmt.Errorf("error configuring %s rule: allowRegex is not valid regex [%s]: %v", r.Name(), allowRegexStr, err))
 	}
-	if r.failureMsg == "" {
-		r.failureMsg = "parameter '%s' seems to be unused, consider removing or renaming it to match " + r.allowRegex.String()
-	}
+	r.failureMsg = "parameter '%s' seems to be unused, consider removing or renaming it to match " + r.allowRegex.String()
 }
 
 // Apply applies the rule to given file.
