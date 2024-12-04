@@ -32,13 +32,15 @@ func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Argumen
 			num = funcDecl.Type.Results.NumFields()
 		}
 
-		if num > r.max {
-			failures = append(failures, lint.Failure{
-				Confidence: 1,
-				Failure:    fmt.Sprintf("maximum number of return results per function exceeded; max %d but got %d", r.max, num),
-				Node:       funcDecl.Type,
-			})
+		if num <= r.max {
+			continue
 		}
+
+		failures = append(failures, lint.Failure{
+			Confidence: 1,
+			Failure:    fmt.Sprintf("maximum number of return results per function exceeded; max %d but got %d", r.max, num),
+			Node:       funcDecl.Type,
+		})
 	}
 
 	return failures
