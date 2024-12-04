@@ -51,17 +51,46 @@ func (r *UnusedReceiverRule) Apply(file *lint.File, args lint.Arguments) []lint.
 	r.configureOnce.Do(func() { r.configure(args) })
 	var failures []lint.Failure
 
-	onFailure := func(failure lint.Failure) {
-		failures = append(failures, failure)
-	}
+	for _, decl := range file.AST.Decls {
+		funcDecl, ok := decl.(*ast.FuncDecl)
+		isMethod := ok && funcDecl.Recv != nil
+		if !isMethod {
+			continue
+		}
 
-	w := lintUnusedReceiverRule{
-		onFailure:  onFailure,
-		allowRegex: r.allowRegex,
-		failureMsg: r.failureMsg,
-	}
+		rec := funcDecl.Recv.List[0] // safe to access only the first (unique) element of the list
+		if len(rec.Names) < 1 {
+			continue // the receiver is anonymous: func (aType) Foo(...) ...
+		}
 
-	ast.Walk(w, file.AST)
+		recID := rec.Names[0]
+		if recID.Name == "_" {
+			continue // the receiver is already named _
+		}
+
+		if r.allowRegex != nil && r.allowRegex.FindStringIndex(recID.Name) != nil {
+			continue
+		}
+
+		// inspect the func body looking for references to the receiver id
+		selectReceiverUses := func(n ast.Node) bool {
+			ident, isAnID := n.(*ast.Ident)
+
+			return isAnID && ident.Obj == recID.Obj
+		}
+		receiverUses := pick(funcDecl.Body, selectReceiverUses)
+
+		if len(receiverUses) > 0 {
+			continue // the receiver is referenced in the func body
+		}
+
+		failures = append(failures, lint.Failure{
+			Confidence: 1,
+			Node:       recID,
+			Category:   "bad practice",
+			Failure:    fmt.Sprintf(r.failureMsg, recID.Name),
+		})
+	}
 
 	return failures
 }
@@ -69,56 +98,4 @@ func (r *UnusedReceiverRule) Apply(file *lint.File, args lint.Arguments) []lint.
 // Name returns the rule name.
 func (*UnusedReceiverRule) Name() string {
 	return "unused-receiver"
-}
-
-type lintUnusedReceiverRule struct {
-	onFailure  func(lint.Failure)
-	allowRegex *regexp.Regexp
-	failureMsg string
-}
-
-func (w lintUnusedReceiverRule) Visit(node ast.Node) ast.Visitor {
-	switch n := node.(type) {
-	case *ast.FuncDecl:
-		if n.Recv == nil {
-			return nil // skip this func decl, not a method
-		}
-
-		rec := n.Recv.List[0] // safe to access only the first (unique) element of the list
-		if len(rec.Names) < 1 {
-			return nil // the receiver is anonymous: func (aType) Foo(...) ...
-		}
-
-		recID := rec.Names[0]
-		if recID.Name == "_" {
-			return nil // the receiver is already named _
-		}
-
-		if w.allowRegex != nil && w.allowRegex.FindStringIndex(recID.Name) != nil {
-			return nil
-		}
-
-		// inspect the func body looking for references to the receiver id
-		fselect := func(n ast.Node) bool {
-			ident, isAnID := n.(*ast.Ident)
-
-			return isAnID && ident.Obj == recID.Obj
-		}
-		refs2recID := pick(n.Body, fselect)
-
-		if len(refs2recID) > 0 {
-			return nil // the receiver is referenced in the func body
-		}
-
-		w.onFailure(lint.Failure{
-			Confidence: 1,
-			Node:       recID,
-			Category:   "bad practice",
-			Failure:    fmt.Sprintf(w.failureMsg, recID.Name),
-		})
-
-		return nil // full method body already inspected
-	}
-
-	return w
 }
