@@ -15,22 +15,32 @@ type GetReturnRule struct{}
 func (*GetReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
-	onFailure := func(failure lint.Failure) {
-		failures = append(failures, failure)
+	for _, decl := range file.AST.Decls {
+		fd, ok := decl.(*ast.FuncDecl)
+		if !ok {
+			continue
+		}
+
+		if !isGetter(fd.Name.Name) {
+			continue
+		}
+
+		if !hasResults(fd.Type.Results) {
+			failures = append(failures, lint.Failure{
+				Confidence: 0.8,
+				Node:       fd,
+				Category:   "logic",
+				Failure:    fmt.Sprintf("function '%s' seems to be a getter but it does not return any result", fd.Name.Name),
+			})
+		}
 	}
 
-	w := lintReturnRule{onFailure}
-	ast.Walk(w, file.AST)
 	return failures
 }
 
 // Name returns the rule name.
 func (*GetReturnRule) Name() string {
 	return "get-return"
-}
-
-type lintReturnRule struct {
-	onFailure func(lint.Failure)
 }
 
 const getterPrefix = "GET"
@@ -56,25 +66,4 @@ func isGetter(name string) bool {
 
 func hasResults(rs *ast.FieldList) bool {
 	return rs != nil && len(rs.List) > 0
-}
-
-func (w lintReturnRule) Visit(node ast.Node) ast.Visitor {
-	fd, ok := node.(*ast.FuncDecl)
-	if !ok {
-		return w
-	}
-
-	if !isGetter(fd.Name.Name) {
-		return w
-	}
-	if !hasResults(fd.Type.Results) {
-		w.onFailure(lint.Failure{
-			Confidence: 0.8,
-			Node:       fd,
-			Category:   "logic",
-			Failure:    fmt.Sprintf("function '%s' seems to be a getter but it does not return any result", fd.Name.Name),
-		})
-	}
-
-	return w
 }
