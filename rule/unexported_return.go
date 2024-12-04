@@ -16,17 +16,47 @@ type UnexportedReturnRule struct{}
 func (*UnexportedReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
-	fileAst := file.AST
-	walker := lintUnexportedReturn{
-		file:    file,
-		fileAst: fileAst,
-		onFailure: func(failure lint.Failure) {
-			failures = append(failures, failure)
-		},
-	}
+	for _, decl := range file.AST.Decls {
+		fn, ok := decl.(*ast.FuncDecl)
+		if !ok {
+			continue
+		}
 
-	file.Pkg.TypeCheck()
-	ast.Walk(walker, fileAst)
+		if fn.Type.Results == nil {
+			continue
+		}
+
+		if !fn.Name.IsExported() {
+			continue
+		}
+
+		thing := "func"
+		if fn.Recv != nil && len(fn.Recv.List) > 0 {
+			thing = "method"
+			if !ast.IsExported(typeparams.ReceiverType(fn)) {
+				// Don't report exported methods of unexported types,
+				// such as private implementations of sort.Interface.
+				continue
+			}
+		}
+
+		for _, ret := range fn.Type.Results.List {
+			typ := file.Pkg.TypeOf(ret.Type)
+			if exportedType(typ) {
+				continue
+			}
+
+			failures = append(failures, lint.Failure{
+				Category:   "unexported-type-in-api",
+				Node:       ret.Type,
+				Confidence: 0.8,
+				Failure: fmt.Sprintf("exported %s %s returns unexported type %s, which can be annoying to use",
+					thing, fn.Name.Name, typ),
+			})
+
+			break // only flag one
+		}
+	}
 
 	return failures
 }
@@ -34,49 +64,6 @@ func (*UnexportedReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 // Name returns the rule name.
 func (*UnexportedReturnRule) Name() string {
 	return "unexported-return"
-}
-
-type lintUnexportedReturn struct {
-	file      *lint.File
-	fileAst   *ast.File
-	onFailure func(lint.Failure)
-}
-
-func (w lintUnexportedReturn) Visit(n ast.Node) ast.Visitor {
-	fn, ok := n.(*ast.FuncDecl)
-	if !ok {
-		return w
-	}
-	if fn.Type.Results == nil {
-		return nil
-	}
-	if !fn.Name.IsExported() {
-		return nil
-	}
-	thing := "func"
-	if fn.Recv != nil && len(fn.Recv.List) > 0 {
-		thing = "method"
-		if !ast.IsExported(typeparams.ReceiverType(fn)) {
-			// Don't report exported methods of unexported types,
-			// such as private implementations of sort.Interface.
-			return nil
-		}
-	}
-	for _, ret := range fn.Type.Results.List {
-		typ := w.file.Pkg.TypeOf(ret.Type)
-		if exportedType(typ) {
-			continue
-		}
-		w.onFailure(lint.Failure{
-			Category:   "unexported-type-in-api",
-			Node:       ret.Type,
-			Confidence: 0.8,
-			Failure: fmt.Sprintf("exported %s %s returns unexported type %s, which can be annoying to use",
-				thing, fn.Name.Name, typ),
-		})
-		break // only flag one
-	}
-	return nil
 }
 
 // exportedType reports whether typ is an exported type.
