@@ -41,7 +41,7 @@ func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) []lint
 		}
 
 		if r.maxStmt > 0 {
-			stmtCount := r.countStmts(funcDecl.Body.List)
+			stmtCount := r.countStmts(body.List)
 			if stmtCount > r.maxStmt {
 				failures = append(failures, lint.Failure{
 					Confidence: 1,
@@ -52,7 +52,7 @@ func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) []lint
 		}
 
 		if r.maxLines > 0 {
-			lineCount := r.countLines(funcDecl.Body, file)
+			lineCount := r.countLines(body, file)
 			if lineCount > r.maxLines {
 				failures = append(failures, lint.Failure{
 					Confidence: 1,
