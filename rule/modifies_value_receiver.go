@@ -56,7 +56,7 @@ func (*ModifiesValRecRule) Name() string {
 	return "modifies-value-receiver"
 }
 
-func (r ModifiesValRecRule) skipType(t ast.Expr, pkg *lint.Package) bool {
+func (r *ModifiesValRecRule) skipType(t ast.Expr, pkg *lint.Package) bool {
 	rt := pkg.TypeOf(t)
 	if rt == nil {
 		return false
@@ -69,7 +69,7 @@ func (r ModifiesValRecRule) skipType(t ast.Expr, pkg *lint.Package) bool {
 	return strings.HasPrefix(rtName, "[]") || strings.HasPrefix(rtName, "map[")
 }
 
-func (ModifiesValRecRule) getNameFromExpr(ie ast.Expr) string {
+func (*ModifiesValRecRule) getNameFromExpr(ie ast.Expr) string {
 	ident, ok := ie.(*ast.Ident)
 	if !ok {
 		return ""
@@ -78,7 +78,7 @@ func (ModifiesValRecRule) getNameFromExpr(ie ast.Expr) string {
 	return ident.Name
 }
 
-func (r ModifiesValRecRule) findReturnReceiverStatements(receiverName string, target ast.Node) []ast.Node {
+func (r *ModifiesValRecRule) findReturnReceiverStatements(receiverName string, target ast.Node) []ast.Node {
 	finder := func(n ast.Node) bool {
 		// look for returns with the receiver as value
 		returnStatement, ok := n.(*ast.ReturnStmt)
@@ -119,7 +119,7 @@ func (r ModifiesValRecRule) findReturnReceiverStatements(receiverName string, ta
 	return pick(target, finder)
 }
 
-func (r ModifiesValRecRule) mustSkip(receiver *ast.Field, pkg *lint.Package) bool {
+func (r *ModifiesValRecRule) mustSkip(receiver *ast.Field, pkg *lint.Package) bool {
 	if _, ok := receiver.Type.(*ast.StarExpr); ok {
 		return true // skip, method with pointer receiver
 	}
