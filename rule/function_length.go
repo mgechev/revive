@@ -28,17 +28,40 @@ func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) []lint
 	r.configureOnce.Do(func() { r.configure(arguments) })
 
 	var failures []lint.Failure
+	for _, decl := range file.AST.Decls {
+		funcDecl, ok := decl.(*ast.FuncDecl)
+		if !ok {
+			continue
+		}
 
-	walker := lintFuncLength{
-		file:     file,
-		maxStmt:  r.maxStmt,
-		maxLines: r.maxLines,
-		onFailure: func(failure lint.Failure) {
-			failures = append(failures, failure)
-		},
+		body := funcDecl.Body
+		emptyBody := body == nil || len(body.List) == 0
+		if emptyBody {
+			return nil
+		}
+
+		if r.maxStmt > 0 {
+			stmtCount := r.countStmts(body.List)
+			if stmtCount > r.maxStmt {
+				failures = append(failures, lint.Failure{
+					Confidence: 1,
+					Failure:    fmt.Sprintf("maximum number of statements per function exceeded; max %d but got %d", r.maxStmt, stmtCount),
+					Node:       funcDecl,
+				})
+			}
+		}
+
+		if r.maxLines > 0 {
+			lineCount := r.countLines(body, file)
+			if lineCount > r.maxLines {
+				failures = append(failures, lint.Failure{
+					Confidence: 1,
+					Failure:    fmt.Sprintf("maximum number of lines per function exceeded; max %d but got %d", r.maxLines, lineCount),
+					Node:       funcDecl,
+				})
+			}
+		}
 	}
-
-	ast.Walk(walker, file.AST)
 
 	return failures
 }
@@ -80,79 +103,35 @@ func (*FunctionLength) parseArguments(arguments lint.Arguments) (maxStmt, maxLin
 	return maxStmt, maxLines
 }
 
-type lintFuncLength struct {
-	file      *lint.File
-	maxStmt   int
-	maxLines  int
-	onFailure func(lint.Failure)
+func (*FunctionLength) countLines(b *ast.BlockStmt, file *lint.File) int {
+	return file.ToPosition(b.End()).Line - file.ToPosition(b.Pos()).Line - 1
 }
 
-func (w lintFuncLength) Visit(n ast.Node) ast.Visitor {
-	node, ok := n.(*ast.FuncDecl)
-	if !ok {
-		return w
-	}
-
-	body := node.Body
-	emptyBody := body == nil || len(node.Body.List) == 0
-	if emptyBody {
-		return nil
-	}
-
-	if w.maxStmt > 0 {
-		stmtCount := w.countStmts(node.Body.List)
-		if stmtCount > w.maxStmt {
-			w.onFailure(lint.Failure{
-				Confidence: 1,
-				Failure:    fmt.Sprintf("maximum number of statements per function exceeded; max %d but got %d", w.maxStmt, stmtCount),
-				Node:       node,
-			})
-		}
-	}
-
-	if w.maxLines > 0 {
-		lineCount := w.countLines(node.Body)
-		if lineCount > w.maxLines {
-			w.onFailure(lint.Failure{
-				Confidence: 1,
-				Failure:    fmt.Sprintf("maximum number of lines per function exceeded; max %d but got %d", w.maxLines, lineCount),
-				Node:       node,
-			})
-		}
-	}
-
-	return nil
-}
-
-func (w lintFuncLength) countLines(b *ast.BlockStmt) int {
-	return w.file.ToPosition(b.End()).Line - w.file.ToPosition(b.Pos()).Line - 1
-}
-
-func (w lintFuncLength) countStmts(b []ast.Stmt) int {
+func (r *FunctionLength) countStmts(b []ast.Stmt) int {
 	count := 0
 	for _, s := range b {
 		switch stmt := s.(type) {
 		case *ast.BlockStmt:
-			count += w.countStmts(stmt.List)
+			count += r.countStmts(stmt.List)
 		case *ast.IfStmt:
-			count += 1 + w.countBodyListStmts(stmt)
+			count += 1 + r.countBodyListStmts(stmt)
 			if stmt.Else != nil {
 				elseBody, ok := stmt.Else.(*ast.BlockStmt)
 				if ok {
-					count += w.countStmts(elseBody.List)
+					count += r.countStmts(elseBody.List)
 				}
 			}
 		case *ast.ForStmt, *ast.RangeStmt,
 			*ast.SwitchStmt, *ast.TypeSwitchStmt, *ast.SelectStmt:
-			count += 1 + w.countBodyListStmts(stmt)
+			count += 1 + r.countBodyListStmts(stmt)
 		case *ast.CaseClause:
-			count += w.countStmts(stmt.Body)
+			count += r.countStmts(stmt.Body)
 		case *ast.AssignStmt:
-			count += 1 + w.countFuncLitStmts(stmt.Rhs[0])
+			count += 1 + r.countFuncLitStmts(stmt.Rhs[0])
 		case *ast.GoStmt:
-			count += 1 + w.countFuncLitStmts(stmt.Call.Fun)
+			count += 1 + r.countFuncLitStmts(stmt.Call.Fun)
 		case *ast.DeferStmt:
-			count += 1 + w.countFuncLitStmts(stmt.Call.Fun)
+			count += 1 + r.countFuncLitStmts(stmt.Call.Fun)
 		default:
 			count++
 		}
@@ -161,14 +140,15 @@ func (w lintFuncLength) countStmts(b []ast.Stmt) int {
 	return count
 }
 
-func (w lintFuncLength) countFuncLitStmts(stmt ast.Expr) int {
+func (r *FunctionLength) countFuncLitStmts(stmt ast.Expr) int {
 	if block, ok := stmt.(*ast.FuncLit); ok {
-		return w.countStmts(block.Body.List)
+		return r.countStmts(block.Body.List)
 	}
+
 	return 0
 }
 
-func (w lintFuncLength) countBodyListStmts(t any) int {
+func (r *FunctionLength) countBodyListStmts(t any) int {
 	i := reflect.ValueOf(t).Elem().FieldByName(`Body`).Elem().FieldByName(`List`).Interface()
-	return w.countStmts(i.([]ast.Stmt))
+	return r.countStmts(i.([]ast.Stmt))
 }
