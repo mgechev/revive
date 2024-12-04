@@ -15,6 +15,14 @@ func GetTaz(a string, b int) string {
 
 }
 
-func (t *t) GetTaz(a int, b int)  {
+func (t *t) GetTaz(a int, b int) {
 
+}
+
+func namedResults() (a string, b string) {
+	return "nil", "nil"
+}
+
+func pointerResults() (*string, *string) { // MATCH /unnamed results of the same type may be confusing, consider using named results/
+	return nil, nil
 }
