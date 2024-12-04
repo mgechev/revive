@@ -11,7 +11,7 @@ import (
 
 // ContextAsArgumentRule suggests that `context.Context` should be the first argument of a function.
 type ContextAsArgumentRule struct {
-	allowTypesLUT map[string]struct{}
+	allowTypes map[string]struct{}
 
 	configureOnce sync.Once
 }
@@ -46,8 +46,8 @@ func (r *ContextAsArgumentRule) Apply(file *lint.File, args lint.Arguments) []li
 			}
 
 			typeName := gofmt(arg.Type)
-			// a parameter of type context.Context is still allowed if the current arg type is in the LUT
-			_, isCtxStillAllowed = r.allowTypesLUT[typeName]
+			// a parameter of type context.Context is still allowed if the current arg type is in the allow types LookUpTable
+			_, isCtxStillAllowed = r.allowTypes[typeName]
 		}
 	}
 
@@ -60,7 +60,7 @@ func (*ContextAsArgumentRule) Name() string {
 }
 
 func (r *ContextAsArgumentRule) configure(arguments lint.Arguments) {
-	r.allowTypesLUT = r.getAllowTypesFromArguments(arguments)
+	r.allowTypes = r.getAllowTypesFromArguments(arguments)
 }
 
 func (r *ContextAsArgumentRule) getAllowTypesFromArguments(args lint.Arguments) map[string]struct{} {
