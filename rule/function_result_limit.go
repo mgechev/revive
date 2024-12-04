@@ -39,15 +39,26 @@ func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Argumen
 	r.configureOnce.Do(func() { r.configure(arguments) })
 
 	var failures []lint.Failure
+	for _, decl := range file.AST.Decls {
+		funcDecl, ok := decl.(*ast.FuncDecl)
+		if !ok {
+			continue
+		}
 
-	walker := lintFunctionResultsNum{
-		max: r.max,
-		onFailure: func(failure lint.Failure) {
-			failures = append(failures, failure)
-		},
+		num := 0
+		hasResults := funcDecl.Type.Results != nil
+		if hasResults {
+			num = funcDecl.Type.Results.NumFields()
+		}
+
+		if num > r.max {
+			failures = append(failures, lint.Failure{
+				Confidence: 1,
+				Failure:    fmt.Sprintf("maximum number of return results per function exceeded; max %d but got %d", r.max, num),
+				Node:       funcDecl.Type,
+			})
+		}
 	}
-
-	ast.Walk(walker, file.AST)
 
 	return failures
 }
@@ -55,31 +66,4 @@ func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Argumen
 // Name returns the rule name.
 func (*FunctionResultsLimitRule) Name() string {
 	return "function-result-limit"
-}
-
-type lintFunctionResultsNum struct {
-	max       int
-	onFailure func(lint.Failure)
-}
-
-func (w lintFunctionResultsNum) Visit(n ast.Node) ast.Visitor {
-	node, ok := n.(*ast.FuncDecl)
-	if ok {
-		num := 0
-		hasResults := node.Type.Results != nil
-		if hasResults {
-			num = node.Type.Results.NumFields()
-		}
-		if num > w.max {
-			w.onFailure(lint.Failure{
-				Confidence: 1,
-				Failure:    fmt.Sprintf("maximum number of return results per function exceeded; max %d but got %d", w.max, num),
-				Node:       node.Type,
-			})
-		}
-
-		return nil // skip visiting function's body
-	}
-
-	return w
 }
