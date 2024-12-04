@@ -30,8 +30,8 @@ func (*FlagParamRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 				continue
 			}
 
-			for _, paramId := range param.Names {
-				boolParams[paramId.Name] = struct{}{}
+			for _, paramIdent := range param.Names {
+				boolParams[paramIdent.Name] = struct{}{}
 			}
 		}
 
@@ -52,7 +52,7 @@ func (*FlagParamRule) Name() string {
 }
 
 type conditionVisitor struct {
-	ids       map[string]struct{}
+	idents    map[string]struct{}
 	fd        *ast.FuncDecl
 	onFailure func(lint.Failure)
 }
@@ -63,16 +63,16 @@ func (w conditionVisitor) Visit(node ast.Node) ast.Visitor {
 		return w
 	}
 
-	findUsesOfIds := func(n ast.Node) bool {
+	findUsesOfIdents := func(n ast.Node) bool {
 		ident, ok := n.(*ast.Ident)
 		if !ok {
 			return false
 		}
 
-		return w.ids[ident.Name] == struct{}{}
+		return w.idents[ident.Name] == struct{}{}
 	}
 
-	uses := pick(ifStmt.Cond, findUsesOfIds)
+	uses := pick(ifStmt.Cond, findUsesOfIdents)
 
 	if len(uses) < 1 {
 		return w
