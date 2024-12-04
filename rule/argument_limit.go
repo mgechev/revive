@@ -47,13 +47,15 @@ func (r *ArgumentsLimitRule) Apply(file *lint.File, arguments lint.Arguments) []
 			numParams += len(l.Names)
 		}
 
-		if numParams > r.max {
-			failures = append(failures, lint.Failure{
-				Confidence: 1,
-				Failure:    fmt.Sprintf("maximum number of arguments per function exceeded; max %d but got %d", r.max, numParams),
-				Node:       funcDecl.Type,
-			})
+		if numParams <= r.max {
+			continue
 		}
+
+		failures = append(failures, lint.Failure{
+			Confidence: 1,
+			Failure:    fmt.Sprintf("maximum number of arguments per function exceeded; max %d but got %d", r.max, numParams),
+			Node:       funcDecl.Type,
+		})
 	}
 
 	return failures
