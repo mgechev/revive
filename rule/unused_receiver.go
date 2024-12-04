@@ -21,30 +21,29 @@ type UnusedReceiverRule struct {
 func (r *UnusedReceiverRule) configure(args lint.Arguments) {
 	// while by default args is an array, i think it's good to provide structures inside it by default, not arrays or primitives
 	// it's more compatible to JSON nature of configurations
-	var allowRegexStr string
+	r.allowRegex = allowBlankIdentifierRegex
+	r.failureMsg = "method receiver '%s' is not referenced in method's body, consider removing or renaming it as _"
 	if len(args) == 0 {
-		allowRegexStr = "^_$"
-		r.failureMsg = "method receiver '%s' is not referenced in method's body, consider removing or renaming it as _"
-	} else {
-		// Arguments = [{}]
-		options := args[0].(map[string]any)
-		// Arguments = [{allowRegex="^_"}]
+		return
+	}
+	// Arguments = [{}]
+	options := args[0].(map[string]any)
 
-		if allowRegexParam, ok := options["allowRegex"]; ok {
-			allowRegexStr, ok = allowRegexParam.(string)
-			if !ok {
-				panic(fmt.Errorf("error configuring [unused-receiver] rule: allowRegex is not string but [%T]", allowRegexParam))
-			}
-		}
+	allowRegexParam, ok := options["allowRegex"]
+	if !ok {
+		return
+	}
+	// Arguments = [{allowRegex="^_"}]
+	allowRegexStr, ok := allowRegexParam.(string)
+	if !ok {
+		panic(fmt.Errorf("error configuring [unused-receiver] rule: allowRegex is not string but [%T]", allowRegexParam))
 	}
 	var err error
 	r.allowRegex, err = regexp.Compile(allowRegexStr)
 	if err != nil {
 		panic(fmt.Errorf("error configuring [unused-receiver] rule: allowRegex is not valid regex [%s]: %v", allowRegexStr, err))
 	}
-	if r.failureMsg == "" {
-		r.failureMsg = "method receiver '%s' is not referenced in method's body, consider removing or renaming it to match " + r.allowRegex.String()
-	}
+	r.failureMsg = "method receiver '%s' is not referenced in method's body, consider removing or renaming it to match " + r.allowRegex.String()
 }
 
 // Apply applies the rule to given file.

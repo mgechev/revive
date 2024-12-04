@@ -9,6 +9,10 @@ import (
 
 func TestUnusedParam(t *testing.T) {
 	testRule(t, "unused_param", &rule.UnusedParamRule{})
+	testRule(t, "unused_param", &rule.UnusedParamRule{}, &lint.RuleConfig{Arguments: []any{}})
+	testRule(t, "unused_param", &rule.UnusedParamRule{}, &lint.RuleConfig{Arguments: []any{
+		map[string]any{"a": "^xxx"},
+	}})
 	testRule(t, "unused_param_custom_regex", &rule.UnusedParamRule{}, &lint.RuleConfig{Arguments: []any{
 		map[string]any{"allowRegex": "^xxx"},
 	}})
