@@ -7,7 +7,6 @@ import (
 	"github.com/mgechev/revive/rule"
 )
 
-// TestStructTag tests struct-tag rule
 func TestStructTag(t *testing.T) {
 	testRule(t, "struct_tag", &rule.StructTagRule{})
 }

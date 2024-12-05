@@ -6,7 +6,6 @@ import (
 	"github.com/mgechev/revive/rule"
 )
 
-// TestTimeNamingRule rule.
 func TestTimeNaming(t *testing.T) {
 	testRule(t, "time_naming", &rule.TimeNamingRule{})
 }
