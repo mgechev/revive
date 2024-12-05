@@ -6,7 +6,6 @@ import (
 	"github.com/mgechev/revive/rule"
 )
 
-// TestModifiesParam rule.
 func TestModifiesParam(t *testing.T) {
 	testRule(t, "modifies_param", &rule.ModifiesParamRule{})
 }
