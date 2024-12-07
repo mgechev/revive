@@ -25,14 +25,16 @@ func (*GetReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 			continue
 		}
 
-		if !hasResults(fd.Type.Results) {
-			failures = append(failures, lint.Failure{
-				Confidence: 0.8,
-				Node:       fd,
-				Category:   "logic",
-				Failure:    fmt.Sprintf("function '%s' seems to be a getter but it does not return any result", fd.Name.Name),
-			})
+		if hasResults(fd.Type.Results) {
+			continue
 		}
+
+		failures = append(failures, lint.Failure{
+			Confidence: 0.8,
+			Node:       fd,
+			Category:   "logic",
+			Failure:    fmt.Sprintf("function '%s' seems to be a getter but it does not return any result", fd.Name.Name),
+		})
 	}
 
 	return failures
