@@ -29,7 +29,7 @@ func (r *ModifiesValRecRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Fa
 		}
 
 		receiverName := receiver.Names[0].Name
-		assignmentsToReceiver := r.getAssignmentsToReceiver(receiverName, funcDecl.Body)
+		assignmentsToReceiver := r.getReceiverModifications(receiverName, funcDecl.Body)
 		if len(assignmentsToReceiver) == 0 {
 			continue // receiver is not modified
 		}
@@ -140,38 +140,44 @@ func (r *ModifiesValRecRule) mustSkip(receiver *ast.Field, pkg *lint.Package) bo
 	return false
 }
 
-func (r *ModifiesValRecRule) getAssignmentsToReceiver(receiverName string, funcBody *ast.BlockStmt) []ast.Node {
-	receiverAssignmentFinder := func(n ast.Node) bool {
-		// look for assignments with the receiver in the right hand
-		assignment, ok := n.(*ast.AssignStmt)
-		if !ok {
-			return false
-		}
-
-		for _, exp := range assignment.Lhs {
-			switch e := exp.(type) {
-			case *ast.IndexExpr: // receiver...[] = ...
-				continue
-			case *ast.StarExpr: // *receiver = ...
-				continue
-			case *ast.SelectorExpr: // receiver.field = ...
-				name := r.getNameFromExpr(e.X)
-				if name == "" || name != receiverName {
-					continue
-				}
-			case *ast.Ident: // receiver := ...
-				if e.Name != receiverName {
-					continue
-				}
-			default:
-				continue
+func (r *ModifiesValRecRule) getReceiverModifications(receiverName string, funcBody *ast.BlockStmt) []ast.Node {
+	receiverModificationFinder := func(n ast.Node) bool {
+		switch node := n.(type) {
+		case *ast.IncDecStmt:
+			se, ok := node.X.(*ast.SelectorExpr)
+			if !ok {
+				return false
 			}
 
-			return true
+			name := r.getNameFromExpr(se.X)
+			return name == receiverName
+		case *ast.AssignStmt:
+			// look for assignments with the receiver in the right hand
+			for _, exp := range node.Lhs {
+				switch e := exp.(type) {
+				case *ast.IndexExpr: // receiver...[] = ...
+					continue
+				case *ast.StarExpr: // *receiver = ...
+					continue
+				case *ast.SelectorExpr: // receiver.field = ...
+					name := r.getNameFromExpr(e.X)
+					if name == "" || name != receiverName {
+						continue
+					}
+				case *ast.Ident: // receiver := ...
+					if e.Name != receiverName {
+						continue
+					}
+				default:
+					continue
+				}
+
+				return true
+			}
 		}
 
 		return false
 	}
 
-	return pick(funcBody, receiverAssignmentFinder)
+	return pick(funcBody, receiverModificationFinder)
 }

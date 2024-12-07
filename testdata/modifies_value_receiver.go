@@ -28,3 +28,22 @@ func (b JailerCommandBuilder) WithBin(bin string) JailerCommandBuilder {
 	b.bin = bin
 	return b
 }
+
+func (this data) incrementDecrement() {
+	this.num++ // MATCH /suspicious assignment to a by-value method receiver/
+	this.num-- // MATCH /suspicious assignment to a by-value method receiver/
+	other++
+}
+
+func (this data) assignmentOperators() {
+	this.num += 1  // MATCH /suspicious assignment to a by-value method receiver/
+	this.num -= 1  // MATCH /suspicious assignment to a by-value method receiver/
+	this.num *= 1  // MATCH /suspicious assignment to a by-value method receiver/
+	this.num /= 1  // MATCH /suspicious assignment to a by-value method receiver/
+	this.num %= 1  // MATCH /suspicious assignment to a by-value method receiver/
+	this.num &= 1  // MATCH /suspicious assignment to a by-value method receiver/
+	this.num ^= 1  // MATCH /suspicious assignment to a by-value method receiver/
+	this.num |= 1  // MATCH /suspicious assignment to a by-value method receiver/
+	this.num >>= 1 // MATCH /suspicious assignment to a by-value method receiver/
+	this.num <<= 1 // MATCH /suspicious assignment to a by-value method receiver/
+}
