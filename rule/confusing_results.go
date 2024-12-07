@@ -28,7 +28,6 @@ func (*ConfusingResultsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 
 		lastType := ""
 		for _, result := range funcDecl.Type.Results.List {
-
 			resultTypeName := gofmt(result.Type)
 
 			if resultTypeName == lastType {
