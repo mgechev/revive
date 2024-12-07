@@ -1,3 +1,4 @@
+// Package astutils provides utility functions for working with AST nodes
 package astutils
 
 import "go/ast"
