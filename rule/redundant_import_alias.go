@@ -8,7 +8,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// RedundantImportAlias lints given else constructs.
+// RedundantImportAlias warns on import aliases matching the imported package name.
 type RedundantImportAlias struct{}
 
 // Apply applies the rule to given file.

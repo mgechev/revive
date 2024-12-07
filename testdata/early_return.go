@@ -132,4 +132,13 @@ func earlyRet() bool {
 	} else {
 		os.Exit(0)
 	}
+
+	for {
+		// inversion is not suggested here without allowJump option enabled
+		if cond {
+			println()
+			println()
+			println()
+		}
+	}
 }

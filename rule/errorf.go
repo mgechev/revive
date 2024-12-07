@@ -9,7 +9,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ErrorfRule lints given else constructs.
+// ErrorfRule suggests using `fmt.Errorf` instead of `errors.New(fmt.Sprintf())`.
 type ErrorfRule struct{}
 
 // Apply applies the rule to given file.

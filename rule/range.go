@@ -8,7 +8,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// RangeRule lints given else constructs.
+// RangeRule prevents redundant variables when iterating over a collection.
 type RangeRule struct{}
 
 // Apply applies the rule to given file.

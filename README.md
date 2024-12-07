@@ -94,6 +94,9 @@ Here's how `revive` is different from `golint`:
     - [Default](#default)
     - [Plain](#plain)
     - [Unix](#unix)
+    - [JSON](#json)
+    - [NDJSON](#ndjson)
+    - [Checkstyle](#checkstyle)
     - [SARIF](#sarif)
   - [Extensibility](#extensibility)
     - [Writing a Custom Rule](#writing-a-custom-rule)
@@ -550,6 +553,8 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`comments-density`](./RULES_DESCRIPTIONS.md#comments-density) |  int (defaults to 0)  | Enforces a minimum comment / code relation |    no    |  no   |
 | [`file-length-limit`](./RULES_DESCRIPTIONS.md#file-length-limit) | map (optional)| Enforces a maximum number of lines per file |    no    |  no   |
 | [`filename-format`](./RULES_DESCRIPTIONS.md#filename-format) | regular expression (optional) | Enforces the formatting of filenames |   no    |  no   |
+| [`redundant-build-tag`](./RULES_DESCRIPTIONS.md#redundant-build-tag) | n/a   | Warns about redundant `// +build` comment lines |   no    |  no   |
+| [`use-errors-new`](./RULES_DESCRIPTIONS.md#use-errors-new) | n/a   | Spots calls to `fmt.Errorf` that can be replaced by `errors.New` |   no    |  no   |
 
 ## Configurable rules
 
@@ -596,9 +601,21 @@ The unix formatter produces the same output as the default formatter but surroun
 
 ![Unix formatter](/assets/formatter-unix.png)
 
+### JSON
+
+The `json` formatter produces output in JSON format.
+
+### NDJSON
+
+The `ndjson` formatter produces output in [`Newline Delimited JSON`](https://github.com/ndjson/ndjson-spec) format.
+
+### Checkstyle
+
+The `checkstyle` formatter produces output in a [Checkstyle-like](https://checkstyle.sourceforge.io/) format.
+
 ### SARIF
 
-The `sarif`  formatter produces outputs in SARIF, for _Static Analysis Results Interchange Format_, a standard JSON-based format for the output of static analysis tools defined and promoted by [OASIS](https://www.oasis-open.org/).
+The `sarif`  formatter produces output in SARIF, for _Static Analysis Results Interchange Format_, a standard JSON-based format for the output of static analysis tools defined and promoted by [OASIS](https://www.oasis-open.org/).
 
 Current supported version of the standard is [SARIF-v2.1.0](https://docs.oasis-open.org/sarif/sarif/v2.1.0/csprd01/sarif-v2.1.0-csprd01.html
 ).
@@ -638,7 +655,7 @@ With the snippet above we:
 - Enable the rule with the name `ban-struct-name`. The `Name()` method of our rule should return a string that matches `ban-struct-name`.
 - Configure the rule with the argument `Foo`. The list of arguments will be passed to `Apply(*File, Arguments)` together with the target file we're linting currently.
 
-A sample rule implementation can be found [here](/rule/argument-limit.go).
+A sample rule implementation can be found [here](/rule/argument_limit.go).
 
 #### Using `revive` as a library
 

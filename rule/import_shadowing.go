@@ -9,7 +9,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ImportShadowingRule lints given else constructs.
+// ImportShadowingRule spots identifiers that shadow an import.
 type ImportShadowingRule struct{}
 
 // Apply applies the rule to given file.

@@ -9,7 +9,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// MaxControlNestingRule lints given else constructs.
+// MaxControlNestingRule sets restriction for maximum nesting of control structures.
 type MaxControlNestingRule struct {
 	max int64
 

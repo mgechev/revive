@@ -8,7 +8,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// IncrementDecrementRule lints given else constructs.
+// IncrementDecrementRule lints `i += 1` and `i -= 1` constructs.
 type IncrementDecrementRule struct{}
 
 // Apply applies the rule to given file.

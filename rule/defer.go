@@ -8,7 +8,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// DeferRule lints unused params in functions.
+// DeferRule lints gotchas in defer statements.
 type DeferRule struct {
 	allow map[string]bool
 

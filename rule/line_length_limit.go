@@ -13,7 +13,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// LineLengthLimitRule lints given else constructs.
+// LineLengthLimitRule lints number of characters in a line.
 type LineLengthLimitRule struct {
 	max int
 

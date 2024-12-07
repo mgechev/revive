@@ -11,7 +11,7 @@ import (
 
 // Based on https://github.com/fzipp/gocyclo
 
-// CyclomaticRule lints given else constructs.
+// CyclomaticRule sets restriction for maximum cyclomatic complexity.
 type CyclomaticRule struct {
 	maxComplexity int
 
@@ -44,53 +44,30 @@ func (r *CyclomaticRule) Apply(file *lint.File, arguments lint.Arguments) ([]lin
 	}
 
 	var failures []lint.Failure
-	fileAst := file.AST
-
-	walker := lintCyclomatic{
-		file:       file,
-		complexity: r.maxComplexity,
-		onFailure: func(failure lint.Failure) {
-			failures = append(failures, failure)
-		},
-	}
-
-	ast.Walk(walker, fileAst)
-
-	return failures, nil
-}
-
-// Name returns the rule name.
-func (*CyclomaticRule) Name() string {
-	return "cyclomatic"
-}
-
-type lintCyclomatic struct {
-	file       *lint.File
-	complexity int
-	onFailure  func(lint.Failure)
-}
-
-func (w lintCyclomatic) Visit(_ ast.Node) ast.Visitor {
-	f := w.file
-	for _, decl := range f.AST.Decls {
+	for _, decl := range file.AST.Decls {
 		fn, ok := decl.(*ast.FuncDecl)
 		if !ok {
 			continue
 		}
 
 		c := complexity(fn)
-		if c > w.complexity {
-			w.onFailure(lint.Failure{
+		if c > r.maxComplexity {
+			failures = append(failures, lint.Failure{
 				Confidence: 1,
 				Category:   "maintenance",
 				Failure: fmt.Sprintf("function %s has cyclomatic complexity %d (> max enabled %d)",
-					funcName(fn), c, w.complexity),
+					funcName(fn), c, r.maxComplexity),
 				Node: fn,
 			})
 		}
 	}
 
-	return nil
+	return failures
+}
+
+// Name returns the rule name.
+func (*CyclomaticRule) Name() string {
+	return "cyclomatic"
 }
 
 // funcName returns the name representation of a function or method:

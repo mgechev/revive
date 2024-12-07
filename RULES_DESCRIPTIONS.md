@@ -65,6 +65,7 @@ List of all available rules.
   - [receiver-naming](#receiver-naming)
   - [redefines-builtin-id](#redefines-builtin-id)
   - [redundant-import-alias](#redundant-import-alias)
+  - [redundant-build-tag](#redundant-build-tag)
   - [string-format](#string-format)
   - [string-of-int](#string-of-int)
   - [struct-tag](#struct-tag)
@@ -81,6 +82,7 @@ List of all available rules.
   - [unused-parameter](#unused-parameter)
   - [unused-receiver](#unused-receiver)
   - [use-any](#use-any)
+  - [use-errors-new](#use-errors-new)
   - [useless-break](#useless-break)
   - [var-declaration](#var-declaration)
   - [var-naming](#var-naming)
@@ -346,12 +348,13 @@ if !cond {
 _Configuration_: ([]string) rule flags. Available flags are:
 
 * _preserveScope_: do not suggest refactorings that would increase variable scope
+* _allowJump_: suggest a new jump (`return`, `continue` or `break` statement) if it could unnest multiple statements. By default, only relocation of _existing_ jumps (i.e. from the `else` clause) are suggested.
 
 Example:
 
 ```toml
 [rule.early-return]
-  arguments = ["preserveScope"]
+  arguments = ["preserveScope", "allowJump"]
 ```
 
 ## empty-block
@@ -799,6 +802,13 @@ _Description_: This rule warns on redundant import aliases. This happens when th
 
 _Configuration_: N/A
 
+## redundant-build-tag
+
+_Description_: This rule warns about redundant build tag comments `// +build` when `//go:build` is present.
+`gofmt` in Go 1.17+ automatically adds the `//go:build` constraint, making the `// +build` comment unnecessary.
+
+_Configuration_: N/A
+
 ## string-format
 
 _Description_: This rule allows you to configure a list of regular expressions that string literals in certain function calls are checked against.
@@ -978,6 +988,13 @@ func (_my *MyStruct) SomeMethod() {} // matches rule
 _Description_: Since Go 1.18, `interface{}` has an alias: `any`. This rule proposes to replace instances of `interface{}` with `any`.
 
 _Configuration_: N/A
+
+## use-errors-new
+
+_Description_: This rules identifies calls to `fmt.Errorf` that can be safely replaced by, the more efficient, `errors.New`.
+
+_Configuration_: N/A
+
 
 ## useless-break
 

@@ -6,7 +6,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// DuplicatedImportsRule lints given else constructs.
+// DuplicatedImportsRule looks for packages that are imported two or more times.
 type DuplicatedImportsRule struct{}
 
 // Apply applies the rule to given file.

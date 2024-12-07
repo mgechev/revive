@@ -2,6 +2,7 @@ package lint
 
 import (
 	"fmt"
+	"errors"
 	"go/ast"
 	"go/importer"
 	"go/token"
@@ -11,6 +12,7 @@ import (
 
 	goversion "github.com/hashicorp/go-version"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/internal/typeparams"
 )
 
@@ -33,7 +35,6 @@ type Package struct {
 var (
 	trueValue  = 1
 	falseValue = 2
-	notSet     = 3
 
 	go121 = goversion.Must(goversion.NewVersion("1.21"))
 	go122 = goversion.Must(goversion.NewVersion("1.22"))
@@ -113,6 +114,11 @@ func (p *Package) TypeCheck() error {
 		astFiles = append(astFiles, f.AST)
 	}
 
+	if anyFile == nil {
+		// this is unlikely to happen, but technically guarantees anyFile to not be nil
+		return errors.New("no ast.File found")
+	}
+
 	typesPkg, err := check(config, anyFile.AST.Name.Name, p.fset, astFiles, info)
 
 	// Remember the typechecking info, even if config.Check failed,
@@ -137,7 +143,7 @@ func check(config *types.Config, n string, fset *token.FileSet, astFiles []*ast.
 	return config.Check(n, fset, astFiles, info)
 }
 
-// TypeOf returns the type of an expression.
+// TypeOf returns the type of expression.
 func (p *Package) TypeOf(expr ast.Expr) types.Type {
 	if p.typesInfo == nil {
 		return nil
@@ -145,39 +151,32 @@ func (p *Package) TypeOf(expr ast.Expr) types.Type {
 	return p.typesInfo.TypeOf(expr)
 }
 
-type walker struct {
-	nmap map[string]int
-	has  map[string]int
-}
+type sortableMethodsFlags int
 
-func (w *walker) Visit(n ast.Node) ast.Visitor {
-	fn, ok := n.(*ast.FuncDecl)
-	if !ok || fn.Recv == nil || len(fn.Recv.List) == 0 {
-		return w
-	}
-	// TODO(dsymonds): We could check the signature to be more precise.
-	recv := typeparams.ReceiverType(fn)
-	if i, ok := w.nmap[fn.Name.Name]; ok {
-		w.has[recv] |= i
-	}
-	return w
-}
+// flags for sortable interface methods.
+const (
+	bfLen sortableMethodsFlags = 1 << iota
+	bfLess
+	bfSwap
+)
 
 func (p *Package) scanSortable() {
-	p.sortable = map[string]bool{}
-
-	// bitfield for which methods exist on each type.
-	const (
-		bfLen = 1 << iota
-		bfLess
-		bfSwap
-	)
-	nmap := map[string]int{"Len": bfLen, "Less": bfLess, "Swap": bfSwap}
-	has := map[string]int{}
+	sortableFlags := map[string]sortableMethodsFlags{}
 	for _, f := range p.files {
-		ast.Walk(&walker{nmap, has}, f.AST)
+		for _, decl := range f.AST.Decls {
+			fn, ok := decl.(*ast.FuncDecl)
+			isAMethodDeclaration := ok && fn.Recv != nil && len(fn.Recv.List) != 0
+			if !isAMethodDeclaration {
+				continue
+			}
+
+			recvType := typeparams.ReceiverType(fn)
+			sortableFlags[recvType] |= getSortableMethodFlagForFunction(fn)
+		}
 	}
-	for typ, ms := range has {
+
+	p.sortable = make(map[string]bool, len(sortableFlags))
+	for typ, ms := range sortableFlags {
 		if ms == bfLen|bfLess|bfSwap {
 			p.sortable[typ] = true
 		}
@@ -194,7 +193,7 @@ func (p *Package) lint(rules []Rule, config Config, failures chan Failure) error
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "Error during linting:", err)
 				os.Exit(1)
-			} 
+			}
 			wg.Done()
 		})(file)
 	}
@@ -210,4 +209,17 @@ func (p *Package) IsAtLeastGo121() bool {
 // IsAtLeastGo122 returns true if the Go version for this package is 1.22 or higher, false otherwise
 func (p *Package) IsAtLeastGo122() bool {
 	return p.goVersion.GreaterThanOrEqual(go122)
+}
+
+func getSortableMethodFlagForFunction(fn *ast.FuncDecl) sortableMethodsFlags {
+	switch {
+	case astutils.FuncSignatureIs(fn, "Len", []string{}, []string{"int"}):
+		return bfLen
+	case astutils.FuncSignatureIs(fn, "Less", []string{"int", "int"}, []string{"bool"}):
+		return bfLess
+	case astutils.FuncSignatureIs(fn, "Swap", []string{"int", "int"}, []string{}):
+		return bfSwap
+	default:
+		return 0
+	}
 }

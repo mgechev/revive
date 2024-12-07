@@ -5,11 +5,27 @@ import (
 	"go/ast"
 	"go/token"
 	"go/types"
+	"strings"
 
 	"github.com/mgechev/revive/lint"
 )
 
-// VarDeclarationsRule lints given else constructs.
+var zeroLiteral = map[string]bool{
+	"false": true, // bool
+	// runes
+	`'\x00'`: true,
+	`'\000'`: true,
+	// strings
+	`""`: true,
+	"``": true,
+	// numerics
+	"0":   true,
+	"0.":  true,
+	"0.0": true,
+	"0i":  true,
+}
+
+// VarDeclarationsRule reduces redundancies around variable declaration.
 type VarDeclarationsRule struct{}
 
 // Apply applies the rule to given file.
@@ -69,7 +85,7 @@ func (w *lintVarDeclarations) Visit(node ast.Node) ast.Visitor {
 		// If the RHS is a isZero value, suggest dropping it.
 		isZero := false
 		if lit, ok := rhs.(*ast.BasicLit); ok {
-			isZero = zeroLiteral[lit.Value]
+			isZero = isZeroValue(lit.Value, v.Type)
 		} else if isIdent(rhs, "nil") {
 			isZero = true
 		}
@@ -119,4 +135,23 @@ func (w *lintVarDeclarations) Visit(node ast.Node) ast.Visitor {
 		return nil
 	}
 	return w
+}
+
+func validType(t types.Type) bool {
+	return t != nil &&
+		t != types.Typ[types.Invalid] &&
+		!strings.Contains(t.String(), "invalid type") // good but not foolproof
+}
+
+func isZeroValue(litValue string, typ ast.Expr) bool {
+	switch val := typ.(type) {
+	case *ast.Ident:
+		if val.Name == "any" {
+			return litValue == "nil"
+		}
+	case *ast.InterfaceType:
+		return litValue == "nil"
+	}
+
+	return zeroLiteral[litValue]
 }

@@ -7,6 +7,10 @@ import (
 	"github.com/mgechev/revive/rule"
 )
 
+func TestEnforceRepeatedArgTypeStyleDefault(t *testing.T) {
+	testRule(t, "enforce_repeated_arg_type_style_default", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{})
+}
+
 func TestEnforceRepeatedArgTypeStyleShort(t *testing.T) {
 	testRule(t, "enforce_repeated_arg_type_style_short_args", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
 		Arguments: []any{"short"},

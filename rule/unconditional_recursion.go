@@ -6,7 +6,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// UnconditionalRecursionRule lints given else constructs.
+// UnconditionalRecursionRule warns on function calls that will lead to infinite recursion.
 type UnconditionalRecursionRule struct{}
 
 // Apply applies the rule to given file.
@@ -152,19 +152,6 @@ func (w *lintUnconditionalRecursionRule) updateFuncStatus(node ast.Node) {
 	w.currentFunc.seenConditionalExit = w.hasControlExit(node)
 }
 
-var exitFunctions = map[string]map[string]bool{
-	"os":      {"Exit": true},
-	"syscall": {"Exit": true},
-	"log": {
-		"Fatal":   true,
-		"Fatalf":  true,
-		"Fatalln": true,
-		"Panic":   true,
-		"Panicf":  true,
-		"Panicln": true,
-	},
-}
-
 func (lintUnconditionalRecursionRule) hasControlExit(node ast.Node) bool {
 	// isExit returns true if the given node makes control exit the function
 	isExit := func(node ast.Node) bool {
@@ -187,8 +174,7 @@ func (lintUnconditionalRecursionRule) hasControlExit(node ast.Node) bool {
 
 			functionName := se.Sel.Name
 			pkgName := id.Name
-			isCallToExitFunction := exitFunctions[pkgName] != nil && exitFunctions[pkgName][functionName]
-			if isCallToExitFunction {
+			if isCallToExitFunction(pkgName, functionName) {
 				return true
 			}
 		}

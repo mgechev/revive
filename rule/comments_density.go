@@ -9,7 +9,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// CommentsDensityRule lints given else constructs.
+// CommentsDensityRule enforces a minimum comment / code relation.
 type CommentsDensityRule struct {
 	minimumCommentsDensity int64
 

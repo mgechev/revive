@@ -6,7 +6,6 @@ import (
 	"github.com/mgechev/revive/rule"
 )
 
-// Tests RedefinesBuiltinID rule.
 func TestRedefinesBuiltinID(t *testing.T) {
 	testRule(t, "redefines_builtin_id", &rule.RedefinesBuiltinIDRule{})
 }

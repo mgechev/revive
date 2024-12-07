@@ -6,7 +6,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// UseAnyRule lints given else constructs.
+// UseAnyRule proposes to replace `interface{}` with its alias `any`.
 type UseAnyRule struct{}
 
 // Apply applies the rule to given file.

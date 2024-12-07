@@ -8,7 +8,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ImportsBlocklistRule lints given else constructs.
+// ImportsBlocklistRule disallows importing the specified packages.
 type ImportsBlocklistRule struct {
 	blocklist []*regexp.Regexp
 

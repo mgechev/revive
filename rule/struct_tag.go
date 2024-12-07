@@ -148,8 +148,8 @@ func (lintStructTagRule) getTagName(tag *structtag.Tag) string {
 	switch tag.Key {
 	case keyProtobuf:
 		for _, option := range tag.Options {
-			if strings.HasPrefix(option, "name=") {
-				return strings.TrimPrefix(option, "name=")
+			if tagName, found := strings.CutPrefix(option, "name="); found {
+				return tagName
 			}
 		}
 		return "" // protobuf tag lacks 'name' option

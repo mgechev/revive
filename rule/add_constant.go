@@ -32,7 +32,7 @@ func (wl allowList) add(kind, list string) {
 	}
 }
 
-// AddConstantRule lints unused params in functions.
+// AddConstantRule suggests using constants instead of magic numbers and string literals.
 type AddConstantRule struct {
 	allowList       allowList
 	ignoreFunctions []*regexp.Regexp

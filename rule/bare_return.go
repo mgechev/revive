@@ -6,7 +6,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// BareReturnRule lints given else constructs.
+// BareReturnRule lints bare returns.
 type BareReturnRule struct{}
 
 // Apply applies the rule to given file.

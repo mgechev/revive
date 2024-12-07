@@ -7,7 +7,6 @@ import (
 	"github.com/mgechev/revive/rule"
 )
 
-// Defer rule.
 func TestDefer(t *testing.T) {
 	testRule(t, "defer", &rule.DeferRule{})
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// FileHeaderRule lints given else constructs.
+// FileHeaderRule lints the header that each file should have.
 type FileHeaderRule struct {
 	header string
 

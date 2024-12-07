@@ -281,3 +281,13 @@ func (m *Migrator) MigrateIfNeeded(target *EtcdVersionPair) error { // MATCH /fu
 
 // no regression test for issue #451
 func myFunc()
+
+// Recursive functions
+func Walk(t *Tree, ch chan int) { // MATCH /function Walk has cognitive complexity 3 (> max enabled 0)/
+	if t == nil { // +1
+		return
+	}
+	Walk(t.Left, ch) // +1
+	ch <- t.Value
+	Walk(t.Right, ch) // +1
+}

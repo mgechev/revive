@@ -10,7 +10,7 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
-// CognitiveComplexityRule lints given else constructs.
+// CognitiveComplexityRule sets restriction for maximum cognitive complexity.
 type CognitiveComplexityRule struct {
 	maxComplexity int
 
@@ -73,7 +73,9 @@ func (w cognitiveComplexityLinter) lintCognitiveComplexity() {
 	f := w.file
 	for _, decl := range f.AST.Decls {
 		if fn, ok := decl.(*ast.FuncDecl); ok && fn.Body != nil {
-			v := cognitiveComplexityVisitor{}
+			v := cognitiveComplexityVisitor{
+				name: fn.Name,
+			}
 			c := v.subTreeComplexity(fn.Body)
 			if c > w.maxComplexity {
 				w.onFailure(lint.Failure{
@@ -88,6 +90,7 @@ func (w cognitiveComplexityLinter) lintCognitiveComplexity() {
 }
 
 type cognitiveComplexityVisitor struct {
+	name         *ast.Ident
 	complexity   int
 	nestingLevel int
 }
@@ -131,8 +134,15 @@ func (v *cognitiveComplexityVisitor) Visit(n ast.Node) ast.Visitor {
 		if n.Label != nil {
 			v.complexity++
 		}
+	case *ast.CallExpr:
+		if ident, ok := n.Fun.(*ast.Ident); ok {
+			if ident.Obj == v.name.Obj && ident.Name == v.name.Name {
+				// called by same function directly (direct recursion)
+				v.complexity++
+				return nil
+			}
+		}
 	}
-	// TODO handle (at least) direct recursion
 
 	return v
 }
