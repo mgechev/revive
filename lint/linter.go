@@ -106,7 +106,7 @@ func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-cha
 		wg.Add(1)
 		go func(pkg []string, gover *goversion.Version) {
 			if err := l.lintPackage(pkg, gover, ruleSet, config, failures); err != nil {
-				fmt.Fprintln(os.Stderr, err)
+				fmt.Fprintln(os.Stderr, "Error during linting:"+err.Error())
 				os.Exit(1)
 			}
 			wg.Done()
@@ -153,7 +153,6 @@ func (l *Linter) lintPackage(filenames []string, gover *goversion.Version, ruleS
 	}
 
 	return pkg.lint(ruleSet, config, failures)
-	
 }
 
 func detectGoMod(dir string) (rootDir string, ver *goversion.Version, err error) {

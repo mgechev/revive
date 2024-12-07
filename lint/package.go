@@ -1,16 +1,15 @@
 package lint
 
 import (
-	"fmt"
 	"errors"
 	"go/ast"
 	"go/importer"
 	"go/token"
 	"go/types"
-	"os"
 	"sync"
 
 	goversion "github.com/hashicorp/go-version"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/internal/typeparams"
@@ -185,19 +184,20 @@ func (p *Package) scanSortable() {
 
 func (p *Package) lint(rules []Rule, config Config, failures chan Failure) error {
 	p.scanSortable()
-	var wg sync.WaitGroup
+	var eg errgroup.Group
 	for _, file := range p.files {
-		wg.Add(1)
-		go (func(file *File) {
+		eg.Go(func() error {
 			err := file.lint(rules, config, failures)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "Error during linting:", err)
-				os.Exit(1)
+				return err
 			}
-			wg.Done()
-		})(file)
+			return nil
+		})
 	}
-	wg.Wait()
+	if err := eg.Wait(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
