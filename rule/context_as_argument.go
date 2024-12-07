@@ -56,7 +56,7 @@ func (r *ContextAsArgumentRule) Apply(file *lint.File, arguments lint.Arguments)
 		}
 	}
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.
@@ -64,8 +64,13 @@ func (*ContextAsArgumentRule) Name() string {
 	return "context-as-argument"
 }
 
-func (r *ContextAsArgumentRule) configure(arguments lint.Arguments) {
-	r.allowTypes = r.getAllowTypesFromArguments(arguments)
+func (r *ContextAsArgumentRule) configure(arguments lint.Arguments) error {
+	types, err := r.getAllowTypesFromArguments(arguments)
+	if err != nil {
+		return err
+	}
+	r.allowTypes = types
+	return nil
 }
 
 func (r *ContextAsArgumentRule) getAllowTypesFromArguments(args lint.Arguments) (map[string]struct{}, error) {

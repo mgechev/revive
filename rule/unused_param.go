@@ -26,14 +26,14 @@ func (r *UnusedParamRule) configure(args lint.Arguments) error {
 	r.allowRegex = allowBlankIdentifierRegex
 	r.failureMsg = "parameter '%s' seems to be unused, consider removing or renaming it as _"
 	if len(args) == 0 {
-		return
+		return nil
 	}
 	// Arguments = [{}]
 	options := args[0].(map[string]any)
 
 	allowRegexParam, ok := options["allowRegex"]
 	if !ok {
-		return
+		return nil
 	}
 	// Arguments = [{allowRegex="^_"}]
 	allowRegexStr, ok := allowRegexParam.(string)
@@ -46,6 +46,7 @@ func (r *UnusedParamRule) configure(args lint.Arguments) error {
 		return fmt.Errorf("error configuring %s rule: allowRegex is not valid regex [%s]: %w", r.Name(), allowRegexStr, err)
 	}
 	r.failureMsg = "parameter '%s' seems to be unused, consider removing or renaming it to match " + r.allowRegex.String()
+	return nil
 }
 
 // Apply applies the rule to given file.

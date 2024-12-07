@@ -17,7 +17,7 @@ type FunctionResultsLimitRule struct {
 }
 
 // Apply applies the rule to given file.
-func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
 	r.configureOnce.Do(func() { r.configure(arguments) })
 
 	var failures []lint.Failure
@@ -44,7 +44,7 @@ func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Argumen
 		})
 	}
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

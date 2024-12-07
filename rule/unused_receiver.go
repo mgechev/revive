@@ -24,14 +24,14 @@ func (r *UnusedReceiverRule) configure(args lint.Arguments) error {
 	r.allowRegex = allowBlankIdentifierRegex
 	r.failureMsg = "method receiver '%s' is not referenced in method's body, consider removing or renaming it as _"
 	if len(args) == 0 {
-		return
+		return nil
 	}
 	// Arguments = [{}]
 	options := args[0].(map[string]any)
 
 	allowRegexParam, ok := options["allowRegex"]
 	if !ok {
-		return
+		return nil
 	}
 	// Arguments = [{allowRegex="^_"}]
 	allowRegexStr, ok := allowRegexParam.(string)
@@ -44,6 +44,7 @@ func (r *UnusedReceiverRule) configure(args lint.Arguments) error {
 		return fmt.Errorf("error configuring [unused-receiver] rule: allowRegex is not valid regex [%s]: %w", allowRegexStr, err)
 	}
 	r.failureMsg = "method receiver '%s' is not referenced in method's body, consider removing or renaming it to match " + r.allowRegex.String()
+	return nil
 }
 
 // Apply applies the rule to given file.
@@ -98,7 +99,7 @@ func (r *UnusedReceiverRule) Apply(file *lint.File, arguments lint.Arguments) ([
 		})
 	}
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

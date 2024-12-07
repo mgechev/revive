@@ -48,7 +48,7 @@ func (r *ModifiesValRecRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Fa
 		}
 	}
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

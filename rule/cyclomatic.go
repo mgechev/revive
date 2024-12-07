@@ -62,7 +62,7 @@ func (r *CyclomaticRule) Apply(file *lint.File, arguments lint.Arguments) ([]lin
 		}
 	}
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.

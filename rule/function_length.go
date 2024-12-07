@@ -46,7 +46,7 @@ func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) ([]lin
 		body := funcDecl.Body
 		emptyBody := body == nil || len(body.List) == 0
 		if emptyBody {
-			return nil
+			return nil, nil
 		}
 
 		if r.maxStmt > 0 {
