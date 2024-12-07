@@ -57,7 +57,7 @@ func (f *Friendly) Format(failures <-chan lint.Failure, config lint.Config) (str
 	return buf.String(), nil
 }
 
-func (f *Friendly) printFrisendlyFailure(sb *strings.Builder, failure lint.Failure, severity lint.Severity) {
+func (f *Friendly) printFriendlyFailure(sb *strings.Builder, failure lint.Failure, severity lint.Severity) {
 	f.printHeaderRow(sb, failure, severity)
 	f.printFilePosition(sb, failure)
 	sb.WriteString("\n\n")
