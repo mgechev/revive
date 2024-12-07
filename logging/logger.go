@@ -19,15 +19,13 @@ func GetLogger() (*log.Logger, error) {
 	var writer io.Writer
 	var err error
 
+	writer = io.Discard // by default, suppress all logging output
 	debugModeEnabled := os.Getenv("DEBUG") == "1"
 	if debugModeEnabled {
 		writer, err = os.Create("revive.log")
 		if err != nil {
 			return nil, err
 		}
-	} else {
-		// Suppress all logging output if debug mode is disabled
-		writer = io.Discard
 	}
 
 	logger = log.New(writer, "", log.LstdFlags)
@@ -38,7 +36,7 @@ func GetLogger() (*log.Logger, error) {
 		logger.SetFlags(0)
 	}
 
-	logger.Println("Logger initialised")
+	logger.Println("Logger initialized")
 
 	return logger, nil
 }

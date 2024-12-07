@@ -132,11 +132,12 @@ func buildDefaultConfigPath() string {
 		homeDirFile = filepath.Join(homeDir, configFileName)
 	}
 
-	if fileExist(configDirFile) {
+	switch {
+	case fileExist(configDirFile):
 		result = configDirFile
-	} else if fileExist(homeDirFile) {
+	case fileExist(homeDirFile):
 		result = homeDirFile
-	} else {
+	default:
 		result = ""
 	}
 

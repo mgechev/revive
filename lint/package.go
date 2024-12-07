@@ -89,11 +89,11 @@ func (p *Package) TypeCheck() error {
 	p.Lock()
 	defer p.Unlock()
 
-	// If type checking has already been performed
-	// skip it.
-	if p.typesInfo != nil || p.typesPkg != nil {
+	alreadyTypeChecked := p.typesInfo != nil || p.typesPkg != nil
+	if alreadyTypeChecked {
 		return nil
 	}
+
 	config := &types.Config{
 		// By setting a no-op error reporter, the type checker does as much work as possible.
 		Error:    func(error) {},

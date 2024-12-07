@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"sort"
+	"strings"
 
 	"github.com/fatih/color"
 	"github.com/mgechev/revive/lint"
@@ -32,7 +33,7 @@ func (*Friendly) Name() string {
 
 // Format formats the failures gotten from the lint.
 func (f *Friendly) Format(failures <-chan lint.Failure, config lint.Config) (string, error) {
-	var buf bytes.Buffer
+	var buf strings.Builder
 	errorMap := map[string]int{}
 	warningMap := map[string]int{}
 	totalErrors := 0
@@ -40,37 +41,38 @@ func (f *Friendly) Format(failures <-chan lint.Failure, config lint.Config) (str
 	for failure := range failures {
 		sev := severity(config, failure)
 		f.printFriendlyFailure(&buf, failure, sev)
-		if sev == lint.SeverityWarning {
+		switch sev {
+		case lint.SeverityWarning:
 			warningMap[failure.RuleName]++
 			totalWarnings++
-		}
-		if sev == lint.SeverityError {
+		case lint.SeverityError:
 			errorMap[failure.RuleName]++
 			totalErrors++
 		}
 	}
+
 	f.printSummary(&buf, totalErrors, totalWarnings)
 	f.printStatistics(&buf, color.RedString("Errors:"), errorMap)
 	f.printStatistics(&buf, color.YellowString("Warnings:"), warningMap)
 	return buf.String(), nil
 }
 
-func (f *Friendly) printFriendlyFailure(w io.Writer, failure lint.Failure, severity lint.Severity) {
-	f.printHeaderRow(w, failure, severity)
-	f.printFilePosition(w, failure)
-	fmt.Fprintf(w, "\n\n")
+func (f *Friendly) printFrisendlyFailure(sb *strings.Builder, failure lint.Failure, severity lint.Severity) {
+	f.printHeaderRow(sb, failure, severity)
+	f.printFilePosition(sb, failure)
+	sb.WriteString("\n\n")
 }
 
-func (f *Friendly) printHeaderRow(w io.Writer, failure lint.Failure, severity lint.Severity) {
+func (f *Friendly) printHeaderRow(sb *strings.Builder, failure lint.Failure, severity lint.Severity) {
 	emoji := getWarningEmoji()
 	if severity == lint.SeverityError {
 		emoji = getErrorEmoji()
 	}
-	fmt.Fprint(w, f.table([][]string{{emoji, ruleDescriptionURL(failure.RuleName), color.GreenString(failure.Failure)}}))
+	sb.WriteString(f.table([][]string{{emoji, ruleDescriptionURL(failure.RuleName), color.GreenString(failure.Failure)}}))
 }
 
-func (*Friendly) printFilePosition(w io.Writer, failure lint.Failure) {
-	fmt.Fprintf(w, "  %s:%d:%d", failure.GetFilename(), failure.Position.Start.Line, failure.Position.Start.Column)
+func (*Friendly) printFilePosition(sb *strings.Builder, failure lint.Failure) {
+	sb.WriteString(fmt.Sprintf("  %s:%d:%d", failure.GetFilename(), failure.Position.Start.Line, failure.Position.Start.Column))
 }
 
 type statEntry struct {
