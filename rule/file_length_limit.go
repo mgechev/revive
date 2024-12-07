@@ -20,13 +20,17 @@ type FileLengthLimitRule struct {
 	skipComments bool
 	// skipBlankLines indicates whether to skip blank lines when counting lines.
 	skipBlankLines bool
+
+	configureOnce sync.Once
 }
 
 // Apply applies the rule to given file.
 func (r *FileLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	check := sync.OnceValue(func() error { return r.configure(arguments) })
-	if err := check(); err != nil {
-		return nil, err
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return nil, configureErr
 	}
 
 	if r.max <= 0 {

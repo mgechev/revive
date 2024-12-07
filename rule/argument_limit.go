@@ -12,6 +12,8 @@ import (
 // ArgumentsLimitRule lints given else constructs.
 type ArgumentsLimitRule struct {
 	max int
+
+	configureOnce sync.Once
 }
 
 const defaultArgumentsLimit = 8
@@ -32,9 +34,11 @@ func (r *ArgumentsLimitRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *ArgumentsLimitRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	check := sync.OnceValue(func() error { return r.configure(arguments) })
-	if err := check(); err != nil {
-		return nil, err
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return nil, configureErr
 	}
 
 	var failures []lint.Failure

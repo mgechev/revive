@@ -12,6 +12,8 @@ import (
 // CommentsDensityRule lints given else constructs.
 type CommentsDensityRule struct {
 	minimumCommentsDensity int64
+
+	configureOnce sync.Once
 }
 
 const defaultMinimumCommentsPercentage = 0
@@ -32,9 +34,11 @@ func (r *CommentsDensityRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *CommentsDensityRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	check := sync.OnceValue(func() error { return r.configure(arguments) })
-	if err := check(); err != nil {
-		return nil, err
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return nil, configureErr
 	}
 	
 	commentsLines := countDocLines(file.AST.Comments)
