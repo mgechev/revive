@@ -34,16 +34,16 @@ func (r *FileHeaderRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var configureErr error
 	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
 
 	if configureErr != nil {
-		return nil, configureErr
+		return []lint.Failure{lint.NewInternalFailure(configureErr.Error())}
 	}
 
 	if r.header == "" {
-		return nil, nil
+		return nil
 	}
 
 	failure := []lint.Failure{
@@ -55,12 +55,12 @@ func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) ([]lin
 	}
 
 	if len(file.AST.Comments) == 0 {
-		return failure, nil
+		return failure
 	}
 
 	g := file.AST.Comments[0]
 	if g == nil {
-		return failure, nil
+		return failure
 	}
 	comment := ""
 	for _, c := range g.List {
@@ -75,13 +75,13 @@ func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) ([]lin
 
 	regex, err := regexp.Compile(r.header)
 	if err != nil {
-		return nil, err
+		return []lint.Failure{lint.NewInternalFailure(err.Error())}
 	}
 
 	if !regex.MatchString(comment) {
-		return failure, nil
+		return failure
 	}
-	return nil, nil
+	return nil
 }
 
 // Name returns the rule name.

@@ -68,7 +68,7 @@ var builtInTypes = map[string]bool{
 type RedefinesBuiltinIDRule struct{}
 
 // Apply applies the rule to given file.
-func (*RedefinesBuiltinIDRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*RedefinesBuiltinIDRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -89,7 +89,7 @@ func (*RedefinesBuiltinIDRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.
 	}
 	ast.Walk(w, astFile)
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

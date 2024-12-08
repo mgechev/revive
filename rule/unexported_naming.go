@@ -12,7 +12,7 @@ import (
 type UnexportedNamingRule struct{}
 
 // Apply applies the rule to given file.
-func (*UnexportedNamingRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*UnexportedNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
@@ -21,7 +21,7 @@ func (*UnexportedNamingRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Fa
 	ba := &unexportablenamingLinter{onFailure}
 	ast.Walk(ba, file.AST)
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

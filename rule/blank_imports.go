@@ -16,9 +16,9 @@ func (*BlankImportsRule) Name() string {
 }
 
 // Apply applies the rule to given file.
-func (r *BlankImportsRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (r *BlankImportsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	if file.Pkg.IsMain() || file.IsTest() {
-		return nil, nil
+		return nil
 	}
 
 	const (
@@ -59,7 +59,7 @@ func (r *BlankImportsRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Fail
 		}
 	}
 
-	return failures, nil
+	return failures
 }
 
 func (*BlankImportsRule) fileHasValidEmbedComment(fileAst *ast.File) bool {

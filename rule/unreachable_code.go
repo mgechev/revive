@@ -10,7 +10,7 @@ import (
 type UnreachableCodeRule struct{}
 
 // Apply applies the rule to given file.
-func (*UnreachableCodeRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*UnreachableCodeRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
@@ -38,7 +38,7 @@ func (*UnreachableCodeRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Fai
 
 	w := lintUnreachableCode{onFailure, branchingFunctions}
 	ast.Walk(w, file.AST)
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

@@ -20,11 +20,11 @@ type PackageCommentsRule struct {
 }
 
 // Apply applies the rule to given file.
-func (r *PackageCommentsRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (r *PackageCommentsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	if file.IsTest() {
-		return failures, nil
+		return failures
 	}
 
 	onFailure := func(failure lint.Failure) {
@@ -34,7 +34,7 @@ func (r *PackageCommentsRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.F
 	fileAst := file.AST
 	w := &lintPackageComments{fileAst, file, onFailure, r}
 	ast.Walk(w, fileAst)
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

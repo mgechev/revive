@@ -106,10 +106,8 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 		if ruleConfig.MustExclude(f.Name) {
 			continue
 		}
-		currentFailures, err := currentRule.Apply(f, ruleConfig.Arguments)
-		if err != nil {
-			return err
-		}
+		currentFailures := currentRule.Apply(f, ruleConfig.Arguments)
+
 		for idx, failure := range currentFailures {
 			if failure.IsInternal() {
 				return errors.New(failure.Failure)

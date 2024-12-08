@@ -11,8 +11,8 @@ import (
 type SuperfluousElseRule struct{}
 
 // Apply applies the rule to given file.
-func (e *SuperfluousElseRule) Apply(file *lint.File, args lint.Arguments) ([]lint.Failure, error) {
-	return ifelse.Apply(e.checkIfElse, file.AST, ifelse.TargetElse, args), nil
+func (e *SuperfluousElseRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
+	return ifelse.Apply(e.checkIfElse, file.AST, ifelse.TargetElse, args)
 }
 
 // Name returns the rule name.

@@ -78,8 +78,8 @@ func (r *mockRule) Name() string {
 	return "mock-rule"
 }
 
-func (r *mockRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	return nil, nil
+func (r *mockRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	return nil
 }
 
 func getMockRevive(t *testing.T) *revivelib.Revive {

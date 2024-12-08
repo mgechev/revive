@@ -10,7 +10,7 @@ import (
 type ConfusingResultsRule struct{}
 
 // Apply applies the rule to given file.
-func (*ConfusingResultsRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*ConfusingResultsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	for _, decl := range file.AST.Decls {
@@ -45,7 +45,7 @@ func (*ConfusingResultsRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Fa
 		}
 	}
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

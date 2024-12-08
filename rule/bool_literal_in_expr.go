@@ -11,7 +11,7 @@ import (
 type BoolLiteralRule struct{}
 
 // Apply applies the rule to given file.
-func (*BoolLiteralRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*BoolLiteralRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -22,7 +22,7 @@ func (*BoolLiteralRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure
 	w := &lintBoolLiteral{astFile, onFailure}
 	ast.Walk(w, astFile)
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

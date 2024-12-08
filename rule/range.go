@@ -12,7 +12,7 @@ import (
 type RangeRule struct{}
 
 // Apply applies the rule to given file.
-func (*RangeRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*RangeRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -21,7 +21,7 @@ func (*RangeRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, erro
 
 	w := &lintRanges{file, onFailure}
 	ast.Walk(w, file.AST)
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

@@ -12,8 +12,8 @@ import (
 type EarlyReturnRule struct{}
 
 // Apply applies the rule to given file.
-func (e *EarlyReturnRule) Apply(file *lint.File, args lint.Arguments) ([]lint.Failure, error) {
-	return ifelse.Apply(e.checkIfElse, file.AST, ifelse.TargetIf, args), nil
+func (e *EarlyReturnRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
+	return ifelse.Apply(e.checkIfElse, file.AST, ifelse.TargetIf, args)
 }
 
 // Name returns the rule name.

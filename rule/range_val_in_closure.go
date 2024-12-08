@@ -11,11 +11,11 @@ import (
 type RangeValInClosureRule struct{}
 
 // Apply applies the rule to given file.
-func (*RangeValInClosureRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*RangeValInClosureRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	if file.Pkg.IsAtLeastGo122() {
-		return failures, nil
+		return failures
 	}
 
 	walker := rangeValInClosure{
@@ -26,7 +26,7 @@ func (*RangeValInClosureRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.F
 
 	ast.Walk(walker, file.AST)
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

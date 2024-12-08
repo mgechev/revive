@@ -33,12 +33,12 @@ func (r *CommentsDensityRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *CommentsDensityRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+func (r *CommentsDensityRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var configureErr error
 	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
 
 	if configureErr != nil {
-		return nil, configureErr
+		return []lint.Failure{lint.NewInternalFailure(configureErr.Error())}
 	}
 	
 	commentsLines := countDocLines(file.AST.Comments)
@@ -53,10 +53,10 @@ func (r *CommentsDensityRule) Apply(file *lint.File, arguments lint.Arguments) (
 				Failure: fmt.Sprintf("the file has a comment density of %2.f%% (%d comment lines for %d code lines) but expected a minimum of %d%%",
 					density, commentsLines, statementsCount, r.minimumCommentsDensity),
 			},
-		}, nil
+		}
 	}
 
-	return nil, nil
+	return nil
 }
 
 // Name returns the rule name.

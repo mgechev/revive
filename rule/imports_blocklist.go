@@ -43,12 +43,12 @@ func (r *ImportsBlocklistRule) isBlocklisted(path string) bool {
 }
 
 // Apply applies the rule to given file.
-func (r *ImportsBlocklistRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+func (r *ImportsBlocklistRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var configureErr error
 	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
 
 	if configureErr != nil {
-		return nil, configureErr
+		return []lint.Failure{lint.NewInternalFailure(configureErr.Error())}
 	}
 
 	var failures []lint.Failure
@@ -65,7 +65,7 @@ func (r *ImportsBlocklistRule) Apply(file *lint.File, arguments lint.Arguments) 
 		}
 	}
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

@@ -11,7 +11,7 @@ import (
 type StringOfIntRule struct{}
 
 // Apply applies the rule to given file.
-func (*StringOfIntRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*StringOfIntRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -24,7 +24,7 @@ func (*StringOfIntRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure
 	w := &lintStringInt{file, onFailure}
 	ast.Walk(w, astFile)
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

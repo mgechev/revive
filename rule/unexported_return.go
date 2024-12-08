@@ -13,7 +13,7 @@ import (
 type UnexportedReturnRule struct{}
 
 // Apply applies the rule to given file.
-func (*UnexportedReturnRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*UnexportedReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	for _, decl := range file.AST.Decls {
@@ -58,7 +58,7 @@ func (*UnexportedReturnRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Fa
 		}
 	}
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

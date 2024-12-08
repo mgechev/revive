@@ -28,12 +28,12 @@ func (r *FunctionLength) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var configureErr error
 	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
 
 	if configureErr != nil {
-		return nil, configureErr
+		return []lint.Failure{lint.NewInternalFailure(configureErr.Error())}
 	}
 
 	var failures []lint.Failure
@@ -46,7 +46,7 @@ func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) ([]lin
 		body := funcDecl.Body
 		emptyBody := body == nil || len(body.List) == 0
 		if emptyBody {
-			return nil, nil
+			return nil
 		}
 
 		if r.maxStmt > 0 {
@@ -72,7 +72,7 @@ func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) ([]lin
 		}
 	}
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

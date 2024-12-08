@@ -19,12 +19,12 @@ type MaxControlNestingRule struct {
 const defaultMaxControlNesting = 5
 
 // Apply applies the rule to given file.
-func (r *MaxControlNestingRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+func (r *MaxControlNestingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var configureErr error
 	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
 
 	if configureErr != nil {
-		return nil, configureErr
+		return []lint.Failure{lint.NewInternalFailure(configureErr.Error())}
 	}
 
 	var failures []lint.Failure
@@ -40,7 +40,7 @@ func (r *MaxControlNestingRule) Apply(file *lint.File, arguments lint.Arguments)
 
 	ast.Walk(walker, fileAst)
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

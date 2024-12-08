@@ -10,7 +10,7 @@ import (
 type DuplicatedImportsRule struct{}
 
 // Apply applies the rule to given file.
-func (*DuplicatedImportsRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*DuplicatedImportsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	impPaths := map[string]struct{}{}
@@ -30,7 +30,7 @@ func (*DuplicatedImportsRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.F
 		impPaths[path] = struct{}{}
 	}
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

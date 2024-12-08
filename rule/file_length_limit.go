@@ -25,17 +25,17 @@ type FileLengthLimitRule struct {
 }
 
 // Apply applies the rule to given file.
-func (r *FileLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+func (r *FileLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var configureErr error
 	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
 
 	if configureErr != nil {
-		return nil, configureErr
+		return []lint.Failure{lint.NewInternalFailure(configureErr.Error())}
 	}
 
 	if r.max <= 0 {
 		// when max is negative or 0 the rule is disabled
-		return nil, nil
+		return nil
 	}
 
 	all := 0
@@ -49,7 +49,7 @@ func (r *FileLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) (
 	}
 
 	if err := scanner.Err(); err != nil {
-		return nil, err
+		return []lint.Failure{lint.NewInternalFailure(err.Error())}
 	}
 
 	lines := all
@@ -62,7 +62,7 @@ func (r *FileLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) (
 	}
 
 	if lines <= r.max {
-		return nil, nil
+		return nil
 	}
 
 	return []lint.Failure{
@@ -77,7 +77,7 @@ func (r *FileLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) (
 			},
 			Failure: fmt.Sprintf("file length is %d lines, which exceeds the limit of %d", lines, r.max),
 		},
-	}, nil
+	}
 }
 
 func (r *FileLengthLimitRule) configure(arguments lint.Arguments) error {

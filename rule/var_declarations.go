@@ -29,7 +29,7 @@ var zeroLiteral = map[string]bool{
 type VarDeclarationsRule struct{}
 
 // Apply applies the rule to given file.
-func (*VarDeclarationsRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*VarDeclarationsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -44,7 +44,7 @@ func (*VarDeclarationsRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Fai
 	file.Pkg.TypeCheck()
 	ast.Walk(walker, fileAst)
 
-	return failures,nil
+	return failures
 }
 
 // Name returns the rule name.

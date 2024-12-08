@@ -68,17 +68,17 @@ func (r *EnforceSliceStyleRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *EnforceSliceStyleRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+func (r *EnforceSliceStyleRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var configureErr error
 	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
 
 	if configureErr != nil {
-		return nil, configureErr
+		return []lint.Failure{lint.NewInternalFailure(configureErr.Error())}
 	}
 
 	if r.enforceSliceStyle == enforceSliceStyleTypeAny {
 		// this linter is not configured
-		return nil, nil
+		return nil
 	}
 
 	var failures []lint.Failure
@@ -179,7 +179,7 @@ func (r *EnforceSliceStyleRule) Apply(file *lint.File, arguments lint.Arguments)
 		return true
 	})
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

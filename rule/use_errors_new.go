@@ -10,7 +10,7 @@ import (
 type UseErrorsNewRule struct{}
 
 // Apply applies the rule to given file.
-func (*UseErrorsNewRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*UseErrorsNewRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	walker := lintFmtErrorf{
@@ -21,7 +21,7 @@ func (*UseErrorsNewRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failur
 
 	ast.Walk(walker, file.AST)
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

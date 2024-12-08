@@ -12,7 +12,7 @@ import (
 type RedundantImportAlias struct{}
 
 // Apply applies the rule to given file.
-func (*RedundantImportAlias) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*RedundantImportAlias) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	for _, imp := range file.AST.Imports {
@@ -30,7 +30,7 @@ func (*RedundantImportAlias) Apply(file *lint.File, _ lint.Arguments) ([]lint.Fa
 		}
 	}
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

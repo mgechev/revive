@@ -18,17 +18,17 @@ type FilenameFormatRule struct {
 }
 
 // Apply applies the rule to the given file.
-func (r *FilenameFormatRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+func (r *FilenameFormatRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var configureErr error
 	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
 
 	if configureErr != nil {
-		return nil, configureErr
+		return []lint.Failure{lint.NewInternalFailure(configureErr.Error())}
 	}
 
 	filename := filepath.Base(file.Name)
 	if r.format.MatchString(filename) {
-		return nil, nil
+		return nil
 	}
 
 	failureMsg := fmt.Sprintf("Filename %s is not of the format %s.%s", filename, r.format.String(), r.getMsgForNonASCIIChars(filename))
@@ -37,7 +37,7 @@ func (r *FilenameFormatRule) Apply(file *lint.File, arguments lint.Arguments) ([
 		Failure:    failureMsg,
 		RuleName:   r.Name(),
 		Node:       file.AST.Name,
-	}}, nil
+	}}
 }
 
 func (r *FilenameFormatRule) getMsgForNonASCIIChars(str string) string {

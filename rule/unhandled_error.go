@@ -42,12 +42,12 @@ func (r *UnhandledErrorRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *UnhandledErrorRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+func (r *UnhandledErrorRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var configureErr error
 	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
 
 	if configureErr != nil {
-		return nil, configureErr
+		return []lint.Failure{lint.NewInternalFailure(configureErr.Error())}
 	}
 
 	var failures []lint.Failure
@@ -63,7 +63,7 @@ func (r *UnhandledErrorRule) Apply(file *lint.File, arguments lint.Arguments) ([
 	file.Pkg.TypeCheck()
 	ast.Walk(walker, file.AST)
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

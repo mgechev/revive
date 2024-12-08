@@ -10,7 +10,7 @@ import (
 type UseAnyRule struct{}
 
 // Apply applies the rule to given file.
-func (*UseAnyRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*UseAnyRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	walker := lintUseAny{
@@ -21,7 +21,7 @@ func (*UseAnyRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, err
 	fileAst := file.AST
 	ast.Walk(walker, fileAst)
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

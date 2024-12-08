@@ -11,7 +11,7 @@ import (
 type FlagParamRule struct{}
 
 // Apply applies the rule to given file.
-func (*FlagParamRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*FlagParamRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
@@ -43,7 +43,7 @@ func (*FlagParamRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, 
 		ast.Walk(cv, fd.Body)
 	}
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

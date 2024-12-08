@@ -45,12 +45,12 @@ func (r *ReceiverNamingRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *ReceiverNamingRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+func (r *ReceiverNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var configureErr error
 	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
 
 	if configureErr != nil {
-		return nil, configureErr
+		return []lint.Failure{lint.NewInternalFailure(configureErr.Error())}
 	}
 
 	typeReceiver := map[string]string{}
@@ -111,7 +111,7 @@ func (r *ReceiverNamingRule) Apply(file *lint.File, arguments lint.Arguments) ([
 		typeReceiver[recv] = name
 	}
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

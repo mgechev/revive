@@ -14,7 +14,7 @@ type DisabledInterval struct {
 // Rule defines an abstract rule interface
 type Rule interface {
 	Name() string
-	Apply(*File, Arguments) ([]Failure, error)
+	Apply(*File, Arguments) ([]Failure)
 }
 
 // ToFailurePosition returns the failure position.

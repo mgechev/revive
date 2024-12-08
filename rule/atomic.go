@@ -12,7 +12,7 @@ import (
 type AtomicRule struct{}
 
 // Apply applies the rule to given file.
-func (*AtomicRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*AtomicRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	walker := atomic{
 		pkgTypesInfo: file.Pkg.TypesInfo(),
@@ -23,7 +23,7 @@ func (*AtomicRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, err
 
 	ast.Walk(walker, file.AST)
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

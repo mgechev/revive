@@ -13,7 +13,7 @@ import (
 type TimeNamingRule struct{}
 
 // Apply applies the rule to given file.
-func (*TimeNamingRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*TimeNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -24,7 +24,7 @@ func (*TimeNamingRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure,
 
 	file.Pkg.TypeCheck()
 	ast.Walk(w, file.AST)
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

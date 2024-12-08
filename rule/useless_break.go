@@ -11,7 +11,7 @@ import (
 type UselessBreak struct{}
 
 // Apply applies the rule to given file.
-func (*UselessBreak) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*UselessBreak) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -21,7 +21,7 @@ func (*UselessBreak) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, e
 	astFile := file.AST
 	w := &lintUselessBreak{onFailure, false}
 	ast.Walk(w, astFile)
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

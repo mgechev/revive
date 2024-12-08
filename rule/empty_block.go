@@ -10,7 +10,7 @@ import (
 type EmptyBlockRule struct{}
 
 // Apply applies the rule to given file.
-func (*EmptyBlockRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*EmptyBlockRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -19,7 +19,7 @@ func (*EmptyBlockRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure,
 
 	w := lintEmptyBlock{map[*ast.BlockStmt]bool{}, onFailure}
 	ast.Walk(w, file.AST)
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

@@ -17,7 +17,7 @@ import (
 type StringFormatRule struct{}
 
 // Apply applies the rule to the given file.
-func (*StringFormatRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+func (*StringFormatRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -27,12 +27,12 @@ func (*StringFormatRule) Apply(file *lint.File, arguments lint.Arguments) ([]lin
 	w := lintStringFormatRule{onFailure: onFailure}
 	err := w.parseArguments(arguments)
 	if err != nil {
-		return failures, err
+		return []lint.Failure{lint.NewInternalFailure(err.Error())}
 	}
 
 	ast.Walk(w, file.AST)
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.
@@ -49,7 +49,7 @@ func (StringFormatRule) ParseArgumentsTest(arguments lint.Arguments) *string {
 		defer func() {
 			err := w.parseArguments(arguments)
 			c <- err
-		}()	
+		}()
 	}()
 	err := <-c
 	if err != nil {

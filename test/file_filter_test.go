@@ -13,9 +13,9 @@ type TestFileFilterRule struct {
 var _ lint.Rule = (*TestFileFilterRule)(nil)
 
 func (*TestFileFilterRule) Name() string { return "test-file-filter" }
-func (tfr *TestFileFilterRule) Apply(*lint.File, lint.Arguments) ([]lint.Failure, error) {
+func (tfr *TestFileFilterRule) Apply(*lint.File, lint.Arguments) []lint.Failure {
 	tfr.WasApplied = true
-	return nil, nil
+	return nil
 }
 
 func TestFileExcludeFilterAtRuleLevel(t *testing.T) {

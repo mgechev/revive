@@ -10,7 +10,7 @@ import (
 type WaitGroupByValueRule struct{}
 
 // Apply applies the rule to given file.
-func (*WaitGroupByValueRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*WaitGroupByValueRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -19,7 +19,7 @@ func (*WaitGroupByValueRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Fa
 
 	w := lintWaitGroupByValueRule{onFailure: onFailure}
 	ast.Walk(w, file.AST)
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

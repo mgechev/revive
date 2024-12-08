@@ -12,7 +12,7 @@ import (
 type IncrementDecrementRule struct{}
 
 // Apply applies the rule to given file.
-func (*IncrementDecrementRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*IncrementDecrementRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -25,7 +25,7 @@ func (*IncrementDecrementRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.
 
 	ast.Walk(walker, fileAst)
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

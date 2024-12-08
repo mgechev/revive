@@ -12,7 +12,7 @@ import (
 type ModifiesValRecRule struct{}
 
 // Apply applies the rule to given file.
-func (r *ModifiesValRecRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (r *ModifiesValRecRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	file.Pkg.TypeCheck()
@@ -48,7 +48,7 @@ func (r *ModifiesValRecRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Fa
 		}
 	}
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

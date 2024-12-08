@@ -10,7 +10,7 @@ import (
 type CallToGCRule struct{}
 
 // Apply applies the rule to given file.
-func (*CallToGCRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*CallToGCRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
@@ -23,7 +23,7 @@ func (*CallToGCRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, e
 	w := lintCallToGC{onFailure, gcTriggeringFunctions}
 	ast.Walk(w, file.AST)
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

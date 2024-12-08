@@ -25,12 +25,12 @@ func (r *DeferRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *DeferRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+func (r *DeferRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var configureErr error
 	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
 
 	if configureErr != nil {
-		return nil, configureErr
+		return []lint.Failure{lint.NewInternalFailure(configureErr.Error())}
 	}
 
 	var failures []lint.Failure
@@ -41,7 +41,7 @@ func (r *DeferRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Fai
 
 	ast.Walk(w, file.AST)
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

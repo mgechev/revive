@@ -10,7 +10,7 @@ import (
 type NestedStructs struct{}
 
 // Apply applies the rule to given file.
-func (*NestedStructs) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, error) {
+func (*NestedStructs) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	walker := &lintNestedStructs{
@@ -21,7 +21,7 @@ func (*NestedStructs) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure, 
 
 	ast.Walk(walker, file.AST)
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.

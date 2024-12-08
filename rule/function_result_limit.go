@@ -17,8 +17,13 @@ type FunctionResultsLimitRule struct {
 }
 
 // Apply applies the rule to given file.
-func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return []lint.Failure{lint.NewInternalFailure(configureErr.Error())}
+	}
 
 	var failures []lint.Failure
 	for _, decl := range file.AST.Decls {
@@ -44,7 +49,7 @@ func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Argumen
 		})
 	}
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.
