@@ -52,13 +52,13 @@ func (r *EnforceMapStyleRule) configure(arguments lint.Arguments) error {
 
 	enforceMapStyle, ok := arguments[0].(string)
 	if !ok {
-		return fmt.Errorf("Invalid argument '%v' for 'enforce-map-style' rule. Expecting string, got %T", arguments[0], arguments[0])
+		return fmt.Errorf("invalid argument '%v' for 'enforce-map-style' rule. Expecting string, got %T", arguments[0], arguments[0])
 	}
 
 	var err error
 	r.enforceMapStyle, err = mapStyleFromString(enforceMapStyle)
 	if err != nil {
-		return fmt.Errorf("Invalid argument to the enforce-map-style rule: %w", err)
+		return fmt.Errorf("invalid argument to the enforce-map-style rule: %w", err)
 	}
 
 	return nil

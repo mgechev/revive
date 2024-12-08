@@ -65,14 +65,14 @@ func (*DeferRule) allowFromArgs(args lint.Arguments) (map[string]bool, error) {
 
 	aa, ok := args[0].([]any)
 	if !ok {
-		return nil, fmt.Errorf("Invalid argument '%v' for 'defer' rule. Expecting []string, got %T", args[0], args[0])
+		return nil, fmt.Errorf("invalid argument '%v' for 'defer' rule. Expecting []string, got %T", args[0], args[0])
 	}
 
 	allow := make(map[string]bool, len(aa))
 	for _, subcase := range aa {
 		sc, ok := subcase.(string)
 		if !ok {
-			return nil, fmt.Errorf("Invalid argument '%v' for 'defer' rule. Expecting string, got %T", subcase, subcase)
+			return nil, fmt.Errorf("invalid argument '%v' for 'defer' rule. Expecting string, got %T", subcase, subcase)
 		}
 		allow[sc] = true
 	}

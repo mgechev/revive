@@ -35,7 +35,7 @@ func repeatedArgTypeStyleFromString(s string) (enforceRepeatedArgTypeStyleType, 
 			},
 		)
 
-		return "", fmt.Errorf("Invalid argument to the enforce-repeated-arg-type-style rule: %w", err)
+		return "", fmt.Errorf("invalid argument to the enforce-repeated-arg-type-style rule: %w", err)
 	}
 }
 
@@ -95,7 +95,7 @@ func (r *EnforceRepeatedArgTypeStyleRule) configure(arguments lint.Arguments) er
 			}
 		}
 	default:
-		return fmt.Errorf("Invalid argument '%v' for 'import-alias-naming' rule. Expecting string or map[string]string, got %T", arguments[0], arguments[0])
+		return fmt.Errorf("invalid argument '%v' for 'import-alias-naming' rule. Expecting string or map[string]string, got %T", arguments[0], arguments[0])
 	}
 	return nil
 }

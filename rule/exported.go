@@ -99,7 +99,7 @@ func (r *ExportedRule) configure(arguments lint.Arguments) error {
 				return fmt.Errorf("Unknown configuration flag %s for %s rule", flag, r.Name())
 			}
 		default:
-			return fmt.Errorf("Invalid argument for the %s rule: expecting a string, got %T", r.Name(), flag)
+			return fmt.Errorf("invalid argument for the %s rule: expecting a string, got %T", r.Name(), flag)
 		}
 	}
 

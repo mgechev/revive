@@ -68,7 +68,7 @@ func (r *BannedCharsRule) getBannedCharsList(args lint.Arguments) ([]string, err
 	for _, char := range args {
 		charStr, ok := char.(string)
 		if !ok {
-			return nil, fmt.Errorf("Invalid argument for the %s rule: expecting a string, got %T", r.Name(), char)
+			return nil, fmt.Errorf("invalid argument for the %s rule: expecting a string, got %T", r.Name(), char)
 		}
 		bannedChars = append(bannedChars, charStr)
 	}

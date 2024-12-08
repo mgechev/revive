@@ -54,18 +54,18 @@ func (r *DotImportsRule) configure(arguments lint.Arguments) error {
 
 	args, ok := arguments[0].(map[string]any)
 	if !ok {
-		return fmt.Errorf("Invalid argument to the dot-imports rule. Expecting a k,v map, got %T", arguments[0])
+		return fmt.Errorf("invalid argument to the dot-imports rule. Expecting a k,v map, got %T", arguments[0])
 	}
 
 	if allowedPkgArg, ok := args["allowedPackages"]; ok {
 		pkgs, ok := allowedPkgArg.([]any)
 		if !ok {
-			return fmt.Errorf("Invalid argument to the dot-imports rule, []string expected. Got '%v' (%T)", allowedPkgArg, allowedPkgArg)
+			return fmt.Errorf("invalid argument to the dot-imports rule, []string expected. Got '%v' (%T)", allowedPkgArg, allowedPkgArg)
 		}
 		for _, p := range pkgs {
 			pkg, ok := p.(string)
 			if !ok {
-				return fmt.Errorf("Invalid argument to the dot-imports rule, string expected. Got '%v' (%T)", p, p)
+				return fmt.Errorf("invalid argument to the dot-imports rule, string expected. Got '%v' (%T)", p, p)
 			}
 			r.allowedPackages.add(pkg)
 		}

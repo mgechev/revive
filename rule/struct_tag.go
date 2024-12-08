@@ -31,11 +31,11 @@ func (r *StructTagRule) configure(arguments lint.Arguments) error {
 	for _, arg := range arguments {
 		item, ok := arg.(string)
 		if !ok {
-			return fmt.Errorf("Invalid argument to the %s rule. Expecting a string, got %v (of type %T)", r.Name(), arg, arg)
+			return fmt.Errorf("invalid argument to the %s rule. Expecting a string, got %v (of type %T)", r.Name(), arg, arg)
 		}
 		parts := strings.Split(item, ",")
 		if len(parts) < 2 {
-			return fmt.Errorf("Invalid argument to the %s rule. Expecting a string of the form key[,option]+, got %s", r.Name(), item)
+			return fmt.Errorf("invalid argument to the %s rule. Expecting a string of the form key[,option]+, got %s", r.Name(), item)
 		}
 		key := strings.TrimSpace(parts[0])
 		for i := 1; i < len(parts); i++ {

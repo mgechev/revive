@@ -51,7 +51,7 @@ func (r *ImportAliasNamingRule) configure(arguments lint.Arguments) error {
 			}
 		}
 	default:
-		return fmt.Errorf("Invalid argument '%v' for 'import-alias-naming' rule. Expecting string or map[string]string, got %T", arguments[0], arguments[0])
+		return fmt.Errorf("invalid argument '%v' for 'import-alias-naming' rule. Expecting string or map[string]string, got %T", arguments[0], arguments[0])
 	}
 
 	if r.allowRegexp == nil && r.denyRegexp == nil {
@@ -112,12 +112,12 @@ func (*ImportAliasNamingRule) Name() string {
 func (r *ImportAliasNamingRule) setAllowRule(value any) error {
 	namingRule, ok := value.(string)
 	if !ok {
-		return fmt.Errorf("Invalid argument '%v' for import-alias-naming allowRegexp rule. Expecting string, got %T", value, value)
+		return fmt.Errorf("invalid argument '%v' for import-alias-naming allowRegexp rule. Expecting string, got %T", value, value)
 	}
 
 	namingRuleRegexp, err := regexp.Compile(namingRule)
 	if err != nil {
-		return fmt.Errorf("Invalid argument to the import-alias-naming allowRegexp rule. Expecting %q to be a valid regular expression, got: %v", namingRule, err)
+		return fmt.Errorf("invalid argument to the import-alias-naming allowRegexp rule. Expecting %q to be a valid regular expression, got: %v", namingRule, err)
 	}
 	r.allowRegexp = namingRuleRegexp
 	return nil
@@ -126,12 +126,12 @@ func (r *ImportAliasNamingRule) setAllowRule(value any) error {
 func (r *ImportAliasNamingRule) setDenyRule(value any) error {
 	namingRule, ok := value.(string)
 	if !ok {
-		return fmt.Errorf("Invalid argument '%v' for import-alias-naming denyRegexp rule. Expecting string, got %T", value, value)
+		return fmt.Errorf("invalid argument '%v' for import-alias-naming denyRegexp rule. Expecting string, got %T", value, value)
 	}
 
 	namingRuleRegexp, err := regexp.Compile(namingRule)
 	if err != nil {
-		return fmt.Errorf("Invalid argument to the import-alias-naming denyRegexp rule. Expecting %q to be a valid regular expression, got: %v", namingRule, err)
+		return fmt.Errorf("invalid argument to the import-alias-naming denyRegexp rule. Expecting %q to be a valid regular expression, got: %v", namingRule, err)
 	}
 	r.denyRegexp = namingRuleRegexp
 	return nil

@@ -22,11 +22,11 @@ func (r *ImportsBlocklistRule) configure(arguments lint.Arguments) error {
 	for _, arg := range arguments {
 		argStr, ok := arg.(string)
 		if !ok {
-			return fmt.Errorf("Invalid argument to the imports-blocklist rule. Expecting a string, got %T", arg)
+			return fmt.Errorf("invalid argument to the imports-blocklist rule. Expecting a string, got %T", arg)
 		}
 		regStr, err := regexp.Compile(fmt.Sprintf(`(?m)"%s"$`, replaceImportRegexp.ReplaceAllString(argStr, `(\W|\w)*`)))
 		if err != nil {
-			return fmt.Errorf("Invalid argument to the imports-blocklist rule. Expecting %q to be a valid regular expression, got: %w", argStr, err)
+			return fmt.Errorf("invalid argument to the imports-blocklist rule. Expecting %q to be a valid regular expression, got: %w", argStr, err)
 		}
 		r.blocklist = append(r.blocklist, regStr)
 	}

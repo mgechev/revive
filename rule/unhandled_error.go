@@ -23,17 +23,17 @@ func (r *UnhandledErrorRule) configure(arguments lint.Arguments) error {
 	for _, arg := range arguments {
 		argStr, ok := arg.(string)
 		if !ok {
-			return fmt.Errorf("Invalid argument to the unhandled-error rule. Expecting a string, got %T", arg)
+			return fmt.Errorf("invalid argument to the unhandled-error rule. Expecting a string, got %T", arg)
 		}
 
 		argStr = strings.Trim(argStr, " ")
 		if argStr == "" {
-			return errors.New("Invalid argument to the unhandled-error rule, expected regular expression must not be empty")
+			return errors.New("invalid argument to the unhandled-error rule, expected regular expression must not be empty")
 		}
 
 		exp, err := regexp.Compile(argStr)
 		if err != nil {
-			return fmt.Errorf("Invalid argument to the unhandled-error rule: regexp %q does not compile: %w", argStr, err)
+			return fmt.Errorf("invalid argument to the unhandled-error rule: regexp %q does not compile: %w", argStr, err)
 		}
 
 		r.ignoreList = append(r.ignoreList, exp)

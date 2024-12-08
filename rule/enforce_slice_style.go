@@ -56,13 +56,13 @@ func (r *EnforceSliceStyleRule) configure(arguments lint.Arguments) error {
 
 	enforceSliceStyle, ok := arguments[0].(string)
 	if !ok {
-		return fmt.Errorf("Invalid argument '%v' for 'enforce-slice-style' rule. Expecting string, got %T", arguments[0], arguments[0])
+		return fmt.Errorf("invalid argument '%v' for 'enforce-slice-style' rule. Expecting string, got %T", arguments[0], arguments[0])
 	}
 
 	var err error
 	r.enforceSliceStyle, err = sliceStyleFromString(enforceSliceStyle)
 	if err != nil {
-		return fmt.Errorf("Invalid argument to the enforce-slice-style rule: %v", err)
+		return fmt.Errorf("invalid argument to the enforce-slice-style rule: %v", err)
 	}
 	return nil
 }

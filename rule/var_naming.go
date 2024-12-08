@@ -280,7 +280,7 @@ func (w *lintNames) Visit(n ast.Node) ast.Visitor {
 func getList(arg any, argName string) ([]string, error) {
 	args, ok := arg.([]any)
 	if !ok {
-		return nil, fmt.Errorf("Invalid argument to the var-naming rule. Expecting a %s of type slice with initialisms, got %T", argName, arg)
+		return nil, fmt.Errorf("invalid argument to the var-naming rule. Expecting a %s of type slice with initialisms, got %T", argName, arg)
 	}
 	var list []string
 	for _, v := range args {
