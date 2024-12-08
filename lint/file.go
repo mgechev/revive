@@ -111,6 +111,7 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 			if failure.IsInternal() {
 				return errors.New(failure.Failure)
 			}
+
 			if failure.RuleName == "" {
 				failure.RuleName = currentRule.Name()
 			}

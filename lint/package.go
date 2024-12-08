@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	goversion "github.com/hashicorp/go-version"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/internal/typeparams"
@@ -183,32 +184,14 @@ func (p *Package) scanSortable() {
 
 func (p *Package) lint(rules []Rule, config Config, failures chan Failure) error {
 	p.scanSortable()
-	var wg sync.WaitGroup
-	errChan := make(chan error)
-	doneChan := make(chan struct{})
-
-	wg.Add(len(p.files))
-	go func() { // This goroutine will signal when all files where linted
-		wg.Wait()
-		doneChan <- struct{}{}
-	}()
-
+	var eg errgroup.Group
 	for _, file := range p.files {
-		go (func(file *File) {
-			err := file.lint(rules, config, failures)
-			if err != nil {
-				errChan <- err // signal the error
-			}
-			wg.Done()
-		})(file)
+		eg.Go(func() error {
+			return file.lint(rules, config, failures)
+		})
 	}
 
-	select { // We block until...
-	case <-doneChan: //...all files were linted
-		return nil
-	case err := <-errChan: //...or there is an error
-		return err
-	}
+	return eg.Wait()
 }
 
 // IsAtLeastGo121 returns true if the Go version for this package is 1.21 or higher, false otherwise

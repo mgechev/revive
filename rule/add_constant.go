@@ -206,7 +206,6 @@ func (w *lintAddConstantRule) isStructTag(n *ast.BasicLit) bool {
 }
 
 func (r *AddConstantRule) configure(arguments lint.Arguments) error {
-	println(">>>> configuring")
 	r.strLitLimit = defaultStrLitLimit
 	r.allowList = newAllowList()
 	if len(arguments) == 0 {
