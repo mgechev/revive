@@ -233,35 +233,35 @@ func (r *AddConstantRule) configure(arguments lint.Arguments) error {
 			}
 			list, ok := v.(string)
 			if !ok {
-				return fmt.Errorf("Invalid argument to the add-constant rule, string expected. Got '%v' (%T)", v, v)
+				return fmt.Errorf("invalid argument to the add-constant rule, string expected. Got '%v' (%T)", v, v)
 			}
 			r.allowList.add(kind, list)
 		case "maxLitCount":
 			sl, ok := v.(string)
 			if !ok {
-				return fmt.Errorf("Invalid argument to the add-constant rule, expecting string representation of an integer. Got '%v' (%T)", v, v)
+				return fmt.Errorf("invalid argument to the add-constant rule, expecting string representation of an integer. Got '%v' (%T)", v, v)
 			}
 
 			limit, err := strconv.Atoi(sl)
 			if err != nil {
-				return fmt.Errorf("Invalid argument to the add-constant rule, expecting string representation of an integer. Got '%v'", v)
+				return fmt.Errorf("invalid argument to the add-constant rule, expecting string representation of an integer. Got '%v'", v)
 			}
 			r.strLitLimit = limit
 		case "ignoreFuncs":
 			excludes, ok := v.(string)
 			if !ok {
-				return fmt.Errorf("Invalid argument to the ignoreFuncs parameter of add-constant rule, string expected. Got '%v' (%T)", v, v)
+				return fmt.Errorf("invalid argument to the ignoreFuncs parameter of add-constant rule, string expected. Got '%v' (%T)", v, v)
 			}
 
 			for _, exclude := range strings.Split(excludes, ",") {
 				exclude = strings.Trim(exclude, " ")
 				if exclude == "" {
-					return errors.New("Invalid argument to the ignoreFuncs parameter of add-constant rule, expected regular expression must not be empty")
+					return errors.New("invalid argument to the ignoreFuncs parameter of add-constant rule, expected regular expression must not be empty")
 				}
 
 				exp, err := regexp.Compile(exclude)
 				if err != nil {
-					return fmt.Errorf("Invalid argument to the ignoreFuncs parameter of add-constant rule: regexp %q does not compile: %w", exclude, err)
+					return fmt.Errorf("invalid argument to the ignoreFuncs parameter of add-constant rule: regexp %q does not compile: %w", exclude, err)
 				}
 
 				r.ignoreFunctions = append(r.ignoreFunctions, exp)
