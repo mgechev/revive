@@ -181,17 +181,34 @@ func (p *Package) scanSortable() {
 	}
 }
 
-func (p *Package) lint(rules []Rule, config Config, failures chan Failure) {
+func (p *Package) lint(rules []Rule, config Config, failures chan Failure) error {
 	p.scanSortable()
 	var wg sync.WaitGroup
+	errChan := make(chan error)
+	doneChan := make(chan struct{})
+
+	wg.Add(len(p.files))
+	go func() { // This goroutine will signal when all files where linted
+		wg.Wait()
+		doneChan <- struct{}{}
+	}()
+
 	for _, file := range p.files {
-		wg.Add(1)
 		go (func(file *File) {
-			file.lint(rules, config, failures)
+			err := file.lint(rules, config, failures)
+			if err != nil {
+				errChan <- err // signal the error
+			}
 			wg.Done()
 		})(file)
 	}
-	wg.Wait()
+
+	select { // We block until...
+	case <-doneChan: //...all files were linted
+		return nil
+	case err := <-errChan: //...or there is an error
+		return err
+	}
 }
 
 // IsAtLeastGo121 returns true if the Go version for this package is 1.21 or higher, false otherwise

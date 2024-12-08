@@ -37,3 +37,18 @@ type Failure struct {
 func (f *Failure) GetFilename() string {
 	return f.Position.Start.Filename
 }
+
+const internalFailure = "REVIVE_INTERNAL"
+
+// IsInternal returns true if this failure is internal, false otherwise.
+func (f *Failure) IsInternal() bool {
+	return f.Category == internalFailure
+}
+
+// NewInternalFailure yields an internal failure with the given message as failure message.
+func NewInternalFailure(message string) Failure {
+	return Failure{
+		Category: internalFailure,
+		Failure:  message,
+	}
+}
