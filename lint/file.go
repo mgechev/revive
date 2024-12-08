@@ -191,13 +191,14 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, fa
 	handleRules := func(_, modifier string, isEnabled bool, line int, ruleNames []string) []DisabledInterval {
 		var result []DisabledInterval
 		for _, name := range ruleNames {
-			if modifier == "line" {
+			switch modifier {
+			case "line":
 				handleConfig(isEnabled, line, name)
 				handleConfig(!isEnabled, line, name)
-			} else if modifier == "next-line" {
+			case "next-line":
 				handleConfig(isEnabled, line+1, name)
 				handleConfig(!isEnabled, line+1, name)
-			} else {
+			default:
 				handleConfig(isEnabled, line, name)
 			}
 		}
@@ -260,20 +261,21 @@ func (File) filterFailures(failures []Failure, disabledIntervals disabledInterva
 		intervals, ok := disabledIntervals[failure.RuleName]
 		if !ok {
 			result = append(result, failure)
-		} else {
-			include := true
-			for _, interval := range intervals {
-				intStart := interval.From.Line
-				intEnd := interval.To.Line
-				if (fStart >= intStart && fStart <= intEnd) ||
-					(fEnd >= intStart && fEnd <= intEnd) {
-					include = false
-					break
-				}
+			continue
+		}
+
+		include := true
+		for _, interval := range intervals {
+			intStart := interval.From.Line
+			intEnd := interval.To.Line
+			if (fStart >= intStart && fStart <= intEnd) ||
+				(fEnd >= intStart && fEnd <= intEnd) {
+				include = false
+				break
 			}
-			if include {
-				result = append(result, failure)
-			}
+		}
+		if include {
+			result = append(result, failure)
 		}
 	}
 	return result

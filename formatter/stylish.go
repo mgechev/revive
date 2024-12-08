@@ -78,11 +78,12 @@ func (*Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string
 
 	suffix := fmt.Sprintf(" %d %s (%d errors) (%d warnings)", total, ps, totalErrors, total-totalErrors)
 
-	if total > 0 && totalErrors > 0 {
+	switch {
+	case total > 0 && totalErrors > 0:
 		suffix = color.RedString("\n ✖" + suffix)
-	} else if total > 0 && totalErrors == 0 {
+	case total > 0 && totalErrors == 0:
 		suffix = color.YellowString("\n ✖" + suffix)
-	} else {
+	default:
 		suffix, output = "", ""
 	}
 

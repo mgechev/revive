@@ -242,15 +242,15 @@ func GetConfig(configPath string) (*lint.Config, error) {
 // GetFormatter yields the formatter for lint failures
 func GetFormatter(formatterName string) (lint.Formatter, error) {
 	formatters := getFormatters()
-	fmtr := formatters["default"]
+	result := formatters["default"]
 	if formatterName != "" {
 		f, ok := formatters[formatterName]
 		if !ok {
 			return nil, fmt.Errorf("unknown formatter %v", formatterName)
 		}
-		fmtr = f
+		result = f
 	}
-	return fmtr, nil
+	return result, nil
 }
 
 func defaultConfig() *lint.Config {

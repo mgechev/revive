@@ -54,8 +54,8 @@ func (l Linter) readFile(path string) (result []byte, err error) {
 }
 
 var (
-	genHdr           = []byte("// Code generated ")
-	genFtr           = []byte(" DO NOT EDIT.")
+	generatedPrefix  = []byte("// Code generated ")
+	generatedSuffix  = []byte(" DO NOT EDIT.")
 	defaultGoVersion = goversion.Must(goversion.NewVersion("1.0"))
 )
 
@@ -209,7 +209,7 @@ func isGenerated(src []byte) bool {
 	sc := bufio.NewScanner(bytes.NewReader(src))
 	for sc.Scan() {
 		b := sc.Bytes()
-		if bytes.HasPrefix(b, genHdr) && bytes.HasSuffix(b, genFtr) && len(b) >= len(genHdr)+len(genFtr) {
+		if bytes.HasPrefix(b, generatedPrefix) && bytes.HasSuffix(b, generatedSuffix) && len(b) >= len(generatedPrefix)+len(generatedSuffix) {
 			return true
 		}
 	}

@@ -17,11 +17,6 @@ type Rule interface {
 	Apply(*File, Arguments) []Failure
 }
 
-// AbstractRule defines an abstract rule.
-type AbstractRule struct {
-	Failures []Failure
-}
-
 // ToFailurePosition returns the failure position.
 func ToFailurePosition(start, end token.Pos, file *File) FailurePosition {
 	return FailurePosition{
