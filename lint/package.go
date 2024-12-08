@@ -187,18 +187,10 @@ func (p *Package) lint(rules []Rule, config Config, failures chan Failure) error
 	var eg errgroup.Group
 	for _, file := range p.files {
 		eg.Go(func() error {
-			err := file.lint(rules, config, failures)
-			if err != nil {
-				return err
-			}
-			return nil
+			return file.lint(rules, config, failures)
 		})
 	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-
-	return nil
+	return eg.Wait()
 }
 
 // IsAtLeastGo121 returns true if the Go version for this package is 1.21 or higher, false otherwise

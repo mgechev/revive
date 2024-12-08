@@ -272,9 +272,3 @@ func (r *AddConstantRule) configure(arguments lint.Arguments) error {
 
 	return nil
 }
-
-func configOnce(r *AddConstantRule, arguments lint.Arguments) func() error {
-	return sync.OnceValue(func() error {
-		return r.configure(arguments)
-	})
-}

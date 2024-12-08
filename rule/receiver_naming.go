@@ -111,7 +111,7 @@ func (r *ReceiverNamingRule) Apply(file *lint.File, arguments lint.Arguments) ([
 		typeReceiver[recv] = name
 	}
 
-	return failures
+	return failures, nil
 }
 
 // Name returns the rule name.
