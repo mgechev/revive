@@ -55,14 +55,14 @@ func (r *VarNamingRule) configure(arguments lint.Arguments) error {
 		thirdArgument := arguments[2]
 		asSlice, ok := thirdArgument.([]any)
 		if !ok {
-			return fmt.Errorf("Invalid third argument to the var-naming rule. Expecting a %s of type slice, got %T", "options", arguments[2])
+			return fmt.Errorf("invalid third argument to the var-naming rule. Expecting a %s of type slice, got %T", "options", arguments[2])
 		}
 		if len(asSlice) != 1 {
-			return fmt.Errorf("Invalid third argument to the var-naming rule. Expecting a %s of type slice, of len==1, but %d", "options", len(asSlice))
+			return fmt.Errorf("invalid third argument to the var-naming rule. Expecting a %s of type slice, of len==1, but %d", "options", len(asSlice))
 		}
 		args, ok := asSlice[0].(map[string]any)
 		if !ok {
-			return fmt.Errorf("Invalid third argument to the var-naming rule. Expecting a %s of type slice, of len==1, with map, but %T", "options", asSlice[0])
+			return fmt.Errorf("invalid third argument to the var-naming rule. Expecting a %s of type slice, of len==1, with map, but %T", "options", asSlice[0])
 		}
 		r.allowUpperCaseConst = fmt.Sprint(args["upperCaseConst"]) == "true"
 		r.skipPackageNameChecks = fmt.Sprint(args["skipPackageNameChecks"]) == "true"
@@ -286,7 +286,7 @@ func getList(arg any, argName string) ([]string, error) {
 	for _, v := range args {
 		val, ok := v.(string)
 		if !ok {
-			return nil, fmt.Errorf("Invalid %s values of the var-naming rule. Expecting slice of strings but got element of type %T", val, arg)
+			return nil, fmt.Errorf("invalid %s values of the var-naming rule. Expecting slice of strings but got element of type %T", val, arg)
 		}
 		list = append(list, val)
 	}

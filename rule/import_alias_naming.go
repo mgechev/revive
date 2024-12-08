@@ -47,7 +47,7 @@ func (r *ImportAliasNamingRule) configure(arguments lint.Arguments) error {
 				}
 
 			default:
-				return fmt.Errorf("Invalid map key for 'import-alias-naming' rule. Expecting 'allowRegex' or 'denyRegex', got %v", k)
+				return fmt.Errorf("invalid map key for 'import-alias-naming' rule. Expecting 'allowRegex' or 'denyRegex', got %v", k)
 			}
 		}
 	default:

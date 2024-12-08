@@ -96,7 +96,7 @@ func (r *ExportedRule) configure(arguments lint.Arguments) error {
 			case "disableChecksOnVariables":
 				r.disabledChecks.Var = true
 			default:
-				return fmt.Errorf("Unknown configuration flag %s for %s rule", flag, r.Name())
+				return fmt.Errorf("unknown configuration flag %s for %s rule", flag, r.Name())
 			}
 		default:
 			return fmt.Errorf("invalid argument for the %s rule: expecting a string, got %T", r.Name(), flag)

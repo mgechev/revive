@@ -26,7 +26,7 @@ func (r *ReceiverNamingRule) configure(arguments lint.Arguments) error {
 
 	args, ok := arguments[0].(map[string]any)
 	if !ok {
-		return fmt.Errorf("Unable to get arguments for rule %s. Expected object of key-value-pairs", r.Name())
+		return fmt.Errorf("unable to get arguments for rule %s. Expected object of key-value-pairs", r.Name())
 	}
 
 	for k, v := range args {
@@ -34,11 +34,11 @@ func (r *ReceiverNamingRule) configure(arguments lint.Arguments) error {
 		case "maxLength":
 			value, ok := v.(int64)
 			if !ok {
-				return fmt.Errorf("Invalid value %v for argument %s of rule %s, expected integer value got %T", v, k, r.Name(), v)
+				return fmt.Errorf("invalid value %v for argument %s of rule %s, expected integer value got %T", v, k, r.Name(), v)
 			}
 			r.receiverNameMaxLength = int(value)
 		default:
-			return fmt.Errorf("Unknown argument %s for %s rule", k, r.Name())
+			return fmt.Errorf("unknown argument %s for %s rule", k, r.Name())
 		}
 	}
 	return nil

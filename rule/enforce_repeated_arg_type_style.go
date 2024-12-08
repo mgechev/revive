@@ -73,7 +73,7 @@ func (r *EnforceRepeatedArgTypeStyleRule) configure(arguments lint.Arguments) er
 			case "funcArgStyle":
 				val, ok := v.(string)
 				if !ok {
-					return fmt.Errorf("Invalid map value type for 'enforce-repeated-arg-type-style' rule. Expecting string, got %T", v)
+					return fmt.Errorf("invalid map value type for 'enforce-repeated-arg-type-style' rule. Expecting string, got %T", v)
 				}
 				valstyle, err := repeatedArgTypeStyleFromString(val)
 				if err != nil {
@@ -83,7 +83,7 @@ func (r *EnforceRepeatedArgTypeStyleRule) configure(arguments lint.Arguments) er
 			case "funcRetValStyle":
 				val, ok := v.(string)
 				if !ok {
-					return fmt.Errorf("Invalid map value '%v' for 'enforce-repeated-arg-type-style' rule. Expecting string, got %T", v, v)
+					return fmt.Errorf("invalid map value '%v' for 'enforce-repeated-arg-type-style' rule. Expecting string, got %T", v, v)
 				}
 				argstyle, err := repeatedArgTypeStyleFromString(val)
 				if err != nil {
@@ -91,7 +91,7 @@ func (r *EnforceRepeatedArgTypeStyleRule) configure(arguments lint.Arguments) er
 				}
 				r.funcRetValStyle = argstyle
 			default:
-				return fmt.Errorf("Invalid map key for 'enforce-repeated-arg-type-style' rule. Expecting 'funcArgStyle' or 'funcRetValStyle', got %v", k)
+				return fmt.Errorf("invalid map key for 'enforce-repeated-arg-type-style' rule. Expecting 'funcArgStyle' or 'funcRetValStyle', got %v", k)
 			}
 		}
 	default:
