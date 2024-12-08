@@ -42,12 +42,11 @@ type AddConstantRule struct {
 }
 
 // Apply applies the rule to given file.
-func (r *AddConstantRule) Apply(file *lint.File, arguments lint.Arguments) ([]lint.Failure, error) {
+func (r *AddConstantRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	var configureErr error
 	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
 	if configureErr != nil {
-		return nil, configureErr
+		return []lint.Failure{lint.NewInternalFailure(configureErr.Error())}
 	}
 
 	var failures []lint.Failure
@@ -67,7 +66,7 @@ func (r *AddConstantRule) Apply(file *lint.File, arguments lint.Arguments) ([]li
 
 	ast.Walk(w, file.AST)
 
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.
@@ -215,7 +214,7 @@ func (r *AddConstantRule) configure(arguments lint.Arguments) error {
 	}
 	args, ok := arguments[0].(map[string]any)
 	if !ok {
-		return fmt.Errorf("Invalid argument to the add-constant rule, expecting a k,v map. Got %T", arguments[0])
+		return fmt.Errorf("invalid argument to the add-constant rule, expecting a k,v map. Got %T", arguments[0])
 	}
 	for k, v := range args {
 		kind := ""

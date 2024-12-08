@@ -1,8 +1,8 @@
 package formatter
 
 import (
-	"bytes"
 	"fmt"
+	"strings"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -22,9 +22,9 @@ func (*Unix) Name() string {
 
 // Format formats the failures gotten from the lint.
 func (*Unix) Format(failures <-chan lint.Failure, _ lint.Config) (string, error) {
-	var buf bytes.Buffer
+	var sb strings.Builder
 	for failure := range failures {
-		fmt.Fprintf(&buf, "%v: [%s] %s\n", failure.Position.Start, failure.RuleName, failure.Failure)
+		sb.WriteString(fmt.Sprintf("%v: [%s] %s\n", failure.Position.Start, failure.RuleName, failure.Failure))
 	}
-	return buf.String(), nil
+	return sb.String(), nil
 }
