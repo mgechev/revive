@@ -2,6 +2,7 @@ package lint
 
 import (
 	"bytes"
+	"errors"
 	"go/ast"
 	"go/parser"
 	"go/printer"
@@ -96,7 +97,7 @@ func (f *File) isMain() bool {
 
 const directiveSpecifyDisableReason = "specify-disable-reason"
 
-func (f *File) lint(rules []Rule, config Config, failures chan Failure) {
+func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 	rulesConfig := config.Rules
 	_, mustSpecifyDisableReason := config.Directives[directiveSpecifyDisableReason]
 	disabledIntervals := f.disabledIntervals(rules, mustSpecifyDisableReason, failures)
@@ -107,6 +108,10 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) {
 		}
 		currentFailures := currentRule.Apply(f, ruleConfig.Arguments)
 		for idx, failure := range currentFailures {
+			if failure.IsInternal() {
+				return errors.New(failure.Failure)
+			}
+
 			if failure.RuleName == "" {
 				failure.RuleName = currentRule.Name()
 			}
@@ -122,6 +127,7 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) {
 			}
 		}
 	}
+	return nil
 }
 
 type enableDisableConfig struct {

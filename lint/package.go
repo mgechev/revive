@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	goversion "github.com/hashicorp/go-version"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/internal/typeparams"
@@ -181,17 +182,16 @@ func (p *Package) scanSortable() {
 	}
 }
 
-func (p *Package) lint(rules []Rule, config Config, failures chan Failure) {
+func (p *Package) lint(rules []Rule, config Config, failures chan Failure) error {
 	p.scanSortable()
-	var wg sync.WaitGroup
+	var eg errgroup.Group
 	for _, file := range p.files {
-		wg.Add(1)
-		go (func(file *File) {
-			file.lint(rules, config, failures)
-			wg.Done()
-		})(file)
+		eg.Go(func() error {
+			return file.lint(rules, config, failures)
+		})
 	}
-	wg.Wait()
+
+	return eg.Wait()
 }
 
 // IsAtLeastGo121 returns true if the Go version for this package is 1.21 or higher, false otherwise
