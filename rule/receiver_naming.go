@@ -53,82 +53,68 @@ func (r *ReceiverNamingRule) Apply(file *lint.File, arguments lint.Arguments) ([
 		return nil, configureErr
 	}
 
+	typeReceiver := map[string]string{}
 	var failures []lint.Failure
+	for _, decl := range file.AST.Decls {
+		fn, ok := decl.(*ast.FuncDecl)
+		if !ok || fn.Recv == nil || len(fn.Recv.List) == 0 {
+			continue
+		}
 
-	fileAst := file.AST
-	walker := lintReceiverName{
-		onFailure: func(failure lint.Failure) {
-			failures = append(failures, failure)
-		},
-		typeReceiver:          map[string]string{},
-		receiverNameMaxLength: r.receiverNameMaxLength,
+		names := fn.Recv.List[0].Names
+		if len(names) < 1 {
+			continue
+		}
+		name := names[0].Name
+
+		if name == "_" {
+			failures = append(failures, lint.Failure{
+				Node:       decl,
+				Confidence: 1,
+				Category:   "naming",
+				Failure:    "receiver name should not be an underscore, omit the name if it is unused",
+			})
+			continue
+		}
+
+		if name == "this" || name == "self" {
+			failures = append(failures, lint.Failure{
+				Node:       decl,
+				Confidence: 1,
+				Category:   "naming",
+				Failure:    `receiver name should be a reflection of its identity; don't use generic names such as "this" or "self"`,
+			})
+			continue
+		}
+
+		if r.receiverNameMaxLength > 0 && len([]rune(name)) > r.receiverNameMaxLength {
+			failures = append(failures, lint.Failure{
+				Node:       decl,
+				Confidence: 1,
+				Category:   "naming",
+				Failure:    fmt.Sprintf("receiver name %s is longer than %d characters", name, r.receiverNameMaxLength),
+			})
+			continue
+		}
+
+		recv := typeparams.ReceiverType(fn)
+		if prev, ok := typeReceiver[recv]; ok && prev != name {
+			failures = append(failures, lint.Failure{
+				Node:       decl,
+				Confidence: 1,
+				Category:   "naming",
+				Failure:    fmt.Sprintf("receiver name %s should be consistent with previous receiver name %s for %s", name, prev, recv),
+			})
+			continue
+		}
+
+		typeReceiver[recv] = name
 	}
 
-	ast.Walk(walker, fileAst)
-
-	return failures, nil
+	return failures
 }
 
 // Name returns the rule name.
 func (*ReceiverNamingRule) Name() string {
 	return "receiver-naming"
-}
-
-type lintReceiverName struct {
-	onFailure             func(lint.Failure)
-	typeReceiver          map[string]string
-	receiverNameMaxLength int
-}
-
-func (w lintReceiverName) Visit(n ast.Node) ast.Visitor {
-	fn, ok := n.(*ast.FuncDecl)
-	if !ok || fn.Recv == nil || len(fn.Recv.List) == 0 {
-		return w
-	}
-	names := fn.Recv.List[0].Names
-	if len(names) < 1 {
-		return w
-	}
-	name := names[0].Name
-	if name == "_" {
-		w.onFailure(lint.Failure{
-			Node:       n,
-			Confidence: 1,
-			Category:   "naming",
-			Failure:    "receiver name should not be an underscore, omit the name if it is unused",
-		})
-		return w
-	}
-	if name == "this" || name == "self" {
-		w.onFailure(lint.Failure{
-			Node:       n,
-			Confidence: 1,
-			Category:   "naming",
-			Failure:    `receiver name should be a reflection of its identity; don't use generic names such as "this" or "self"`,
-		})
-		return w
-	}
-
-	if w.receiverNameMaxLength > 0 && len([]rune(name)) > w.receiverNameMaxLength {
-		w.onFailure(lint.Failure{
-			Node:       n,
-			Confidence: 1,
-			Category:   "naming",
-			Failure:    fmt.Sprintf("receiver name %s is longer than %d characters", name, w.receiverNameMaxLength),
-		})
-		return w
-	}
-
-	recv := typeparams.ReceiverType(fn)
-	if prev, ok := w.typeReceiver[recv]; ok && prev != name {
-		w.onFailure(lint.Failure{
-			Node:       n,
-			Confidence: 1,
-			Category:   "naming",
-			Failure:    fmt.Sprintf("receiver name %s should be consistent with previous receiver name %s for %s", name, prev, recv),
-		})
-		return w
-	}
-	w.typeReceiver[recv] = name
-	return w
 }

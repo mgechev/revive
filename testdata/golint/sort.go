@@ -36,3 +36,8 @@ type Vv []int
 
 func (vv Vv) Len() (result int)               { return len(w) }      // MATCH /exported method Vv.Len should have comment or be unexported/
 func (vv Vv) Less(i int, j int) (result bool) { return w[i] < w[j] } // MATCH /exported method Vv.Less should have comment or be unexported/
+
+// X is ...
+type X []int
+
+func (x X) Less(i *pkg.tip) (result bool) { return len(x) } // MATCH /exported method X.Less should have comment or be unexported/

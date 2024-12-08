@@ -24,7 +24,7 @@ func (r *DataRaceRule) Apply(file *lint.File, _ lint.Arguments) ([]lint.Failure,
 
 		returnIDs := map[*ast.Object]struct{}{}
 		if funcResults != nil {
-			returnIDs = r.ExtractReturnIDs(funcResults.List)
+			returnIDs = r.extractReturnIDs(funcResults.List)
 		}
 
 		onFailure := func(failure lint.Failure) {
@@ -49,7 +49,7 @@ func (*DataRaceRule) Name() string {
 	return "datarace"
 }
 
-func (*DataRaceRule) ExtractReturnIDs(fields []*ast.Field) map[*ast.Object]struct{} {
+func (*DataRaceRule) extractReturnIDs(fields []*ast.Field) map[*ast.Object]struct{} {
 	r := map[*ast.Object]struct{}{}
 	for _, f := range fields {
 		for _, id := range f.Names {

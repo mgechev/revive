@@ -1,6 +1,10 @@
+// Package astutils provides utility functions for working with AST nodes
 package astutils
 
-import "go/ast"
+import (
+	"fmt"
+	"go/ast"
+)
 
 // FuncSignatureIs returns true if the given func decl satisfies a signature characterized
 // by the given name, parameters types and return types; false otherwise.
@@ -45,7 +49,7 @@ func getTypeNames(fields *ast.FieldList) []string {
 	}
 
 	for _, field := range fields.List {
-		typeName := field.Type.(*ast.Ident).Name
+		typeName := getFieldTypeName(field.Type)
 		if field.Names == nil { // unnamed field
 			result = append(result, typeName)
 			continue
@@ -57,4 +61,17 @@ func getTypeNames(fields *ast.FieldList) []string {
 	}
 
 	return result
+}
+
+func getFieldTypeName(typ ast.Expr) string {
+	switch f := typ.(type) {
+	case *ast.Ident:
+		return f.Name
+	case *ast.SelectorExpr:
+		return f.Sel.Name + "." + getFieldTypeName(f.X)
+	case *ast.StarExpr:
+		return "*" + getFieldTypeName(f.X)
+	default:
+		panic(fmt.Sprintf("not supported type %T", typ))
+	}
 }
