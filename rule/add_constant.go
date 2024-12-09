@@ -46,7 +46,7 @@ func (r *AddConstantRule) Apply(file *lint.File, arguments lint.Arguments) []lin
 	var configureErr error
 	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
 	if configureErr != nil {
-		return []lint.Failure{lint.NewInternalFailure(configureErr.Error())}
+		return newInternalFailureError(configureErr)
 	}
 
 	var failures []lint.Failure
@@ -68,6 +68,7 @@ func (r *AddConstantRule) Apply(file *lint.File, arguments lint.Arguments) []lin
 
 	return failures
 }
+
 
 // Name returns the rule name.
 func (*AddConstantRule) Name() string {

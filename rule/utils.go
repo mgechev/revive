@@ -122,3 +122,8 @@ func isDirectiveComment(line string) bool {
 func isCallToExitFunction(pkgName, functionName string) bool {
 	return exitFunctions[pkgName] != nil && exitFunctions[pkgName][functionName]
 }
+// newInternalFailureError returns single internal failure
+func newInternalFailureError(e error) []lint.Failure {
+	return []lint.Failure{lint.NewInternalFailure(e.Error())}
+}
+

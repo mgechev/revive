@@ -106,7 +106,7 @@ func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, arguments lint.
 	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
 
 	if configureErr != nil {
-		return []lint.Failure{lint.NewInternalFailure(configureErr.Error())}
+		return newInternalFailureError(configureErr)
 	}
 
 	if r.funcArgStyle == enforceRepeatedArgTypeStyleTypeAny && r.funcRetValStyle == enforceRepeatedArgTypeStyleTypeAny {

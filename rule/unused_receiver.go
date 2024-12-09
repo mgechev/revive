@@ -53,7 +53,7 @@ func (r *UnusedReceiverRule) Apply(file *lint.File, arguments lint.Arguments) []
 	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
 
 	if configureErr != nil {
-		return []lint.Failure{lint.NewInternalFailure(configureErr.Error())}
+		return newInternalFailureError(configureErr)
 	}
 
 	var failures []lint.Failure
