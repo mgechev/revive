@@ -11,8 +11,6 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// #region Revive API
-
 // StringFormatRule lints strings and/or comments according to a set of regular expressions given as Arguments
 type StringFormatRule struct{}
 
@@ -56,10 +54,6 @@ func (StringFormatRule) ParseArgumentsTest(arguments lint.Arguments) *string {
 	return nil
 }
 
-// #endregion
-
-// #region Internal structure
-
 type lintStringFormatRule struct {
 	onFailure func(lint.Failure)
 	rules     []stringFormatSubrule
@@ -86,10 +80,6 @@ const identRegex = "[_A-Za-z][_A-Za-z0-9]*"
 
 var parseStringFormatScope = regexp.MustCompile(
 	fmt.Sprintf("^(%s(?:\\.%s)?)(?:\\[([0-9]+)\\](?:\\.(%s))?)?$", identRegex, identRegex, identRegex))
-
-// #endregion
-
-// #region Argument parsing
 
 func (w *lintStringFormatRule) parseArguments(arguments lint.Arguments) {
 	for i, argument := range arguments {
@@ -196,10 +186,6 @@ func (lintStringFormatRule) parseScopeError(msg string, ruleNum, option, scopeNu
 	panic(fmt.Sprintf("failed to parse configuration for string-format: %s [argument %d, option %d, scope index %d]", msg, ruleNum, option, scopeNum))
 }
 
-// #endregion
-
-// #region Node traversal
-
 func (w lintStringFormatRule) Visit(node ast.Node) ast.Visitor {
 	// First, check if node is a call expression
 	call, ok := node.(*ast.CallExpr)
@@ -246,10 +232,6 @@ func (lintStringFormatRule) getCallName(call *ast.CallExpr) (callName string, ok
 
 	return "", false
 }
-
-// #endregion
-
-// #region Linting logic
 
 // apply a single format rule to a call expression (should be done after verifying the that the call expression matches the rule's scope)
 func (r *stringFormatSubrule) apply(call *ast.CallExpr, scope *stringFormatSubruleScope) {
@@ -324,5 +306,3 @@ func (r *stringFormatSubrule) generateFailure(node ast.Node) {
 		Node:       node,
 	})
 }
-
-// #endregion
