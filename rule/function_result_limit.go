@@ -1,6 +1,7 @@
 package rule
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"sync"
@@ -17,7 +18,12 @@ type FunctionResultsLimitRule struct {
 
 // Apply applies the rule to given file.
 func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
 
 	var failures []lint.Failure
 	for _, decl := range file.AST.Decls {
@@ -53,19 +59,20 @@ func (*FunctionResultsLimitRule) Name() string {
 
 const defaultResultsLimit = 3
 
-func (r *FunctionResultsLimitRule) configure(arguments lint.Arguments) {
+func (r *FunctionResultsLimitRule) configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		r.max = defaultResultsLimit
-		return
+		return nil
 	}
 
 	maxResults, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok {
-		panic(fmt.Sprintf(`invalid value passed as return results number to the "function-result-limit" rule; need int64 but got %T`, arguments[0]))
+		return fmt.Errorf(`invalid value passed as return results number to the "function-result-limit" rule; need int64 but got %T`, arguments[0])
 	}
 	if maxResults < 0 {
-		panic(`the value passed as return results number to the "function-result-limit" rule cannot be negative`)
+		return errors.New(`the value passed as return results number to the "function-result-limit" rule cannot be negative`)
 	}
 
 	r.max = int(maxResults)
+	return nil
 }

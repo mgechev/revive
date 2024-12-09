@@ -1,6 +1,7 @@
 package rule
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"go/types"
@@ -18,30 +19,36 @@ type UnhandledErrorRule struct {
 	configureOnce sync.Once
 }
 
-func (r *UnhandledErrorRule) configure(arguments lint.Arguments) {
+func (r *UnhandledErrorRule) configure(arguments lint.Arguments) error {
 	for _, arg := range arguments {
 		argStr, ok := arg.(string)
 		if !ok {
-			panic(fmt.Sprintf("Invalid argument to the unhandled-error rule. Expecting a string, got %T", arg))
+			return fmt.Errorf("invalid argument to the unhandled-error rule. Expecting a string, got %T", arg)
 		}
 
 		argStr = strings.Trim(argStr, " ")
 		if argStr == "" {
-			panic("Invalid argument to the unhandled-error rule, expected regular expression must not be empty.")
+			return errors.New("invalid argument to the unhandled-error rule, expected regular expression must not be empty")
 		}
 
 		exp, err := regexp.Compile(argStr)
 		if err != nil {
-			panic(fmt.Sprintf("Invalid argument to the unhandled-error rule: regexp %q does not compile: %v", argStr, err))
+			return fmt.Errorf("invalid argument to the unhandled-error rule: regexp %q does not compile: %w", argStr, err)
 		}
 
 		r.ignoreList = append(r.ignoreList, exp)
 	}
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *UnhandledErrorRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(args) })
+func (r *UnhandledErrorRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
 
 	var failures []lint.Failure
 

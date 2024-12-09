@@ -20,20 +20,20 @@ type UnusedParamRule struct {
 	configureOnce sync.Once
 }
 
-func (r *UnusedParamRule) configure(args lint.Arguments) {
+func (r *UnusedParamRule) configure(args lint.Arguments) error {
 	// while by default args is an array, i think it's good to provide structures inside it by default, not arrays or primitives
 	// it's more compatible to JSON nature of configurations
 	r.allowRegex = allowBlankIdentifierRegex
 	r.failureMsg = "parameter '%s' seems to be unused, consider removing or renaming it as _"
 	if len(args) == 0 {
-		return
+		return nil
 	}
 	// Arguments = [{}]
 	options := args[0].(map[string]any)
 
 	allowRegexParam, ok := options["allowRegex"]
 	if !ok {
-		return
+		return nil
 	}
 	// Arguments = [{allowRegex="^_"}]
 	allowRegexStr, ok := allowRegexParam.(string)
@@ -43,14 +43,21 @@ func (r *UnusedParamRule) configure(args lint.Arguments) {
 	var err error
 	r.allowRegex, err = regexp.Compile(allowRegexStr)
 	if err != nil {
-		panic(fmt.Errorf("error configuring %s rule: allowRegex is not valid regex [%s]: %v", r.Name(), allowRegexStr, err))
+		return fmt.Errorf("error configuring %s rule: allowRegex is not valid regex [%s]: %w", r.Name(), allowRegexStr, err)
 	}
 	r.failureMsg = "parameter '%s' seems to be unused, consider removing or renaming it to match " + r.allowRegex.String()
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *UnusedParamRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(args) })
+func (r *UnusedParamRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
+
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {

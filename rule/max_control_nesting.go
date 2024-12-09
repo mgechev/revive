@@ -1,6 +1,7 @@
 package rule
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"sync"
@@ -19,7 +20,12 @@ const defaultMaxControlNesting = 5
 
 // Apply applies the rule to given file.
 func (r *MaxControlNestingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
 
 	var failures []lint.Failure
 
@@ -107,17 +113,21 @@ func (w *lintMaxControlNesting) walkControlledBlock(b ast.Node) {
 	w.nestingLevelAcc = oldNestingLevel
 }
 
-func (r *MaxControlNestingRule) configure(arguments lint.Arguments) {
+func (r *MaxControlNestingRule) configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		r.max = defaultMaxControlNesting
-		return
+		return nil
 	}
 
-	checkNumberOfArguments(1, arguments, r.Name())
+	check := checkNumberOfArguments(1, arguments, r.Name())
+	if check != nil {
+		return check
+	}
 
 	maxNesting, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok {
-		panic(`invalid value passed as argument number to the "max-control-nesting" rule`)
+		return errors.New(`invalid value passed as argument number to the "max-control-nesting" rule`)
 	}
 	r.max = maxNesting
+	return nil
 }

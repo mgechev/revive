@@ -3,6 +3,7 @@ package rule
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"go/token"
 	"strings"
@@ -21,23 +22,29 @@ type LineLengthLimitRule struct {
 
 const defaultLineLengthLimit = 80
 
-func (r *LineLengthLimitRule) configure(arguments lint.Arguments) {
+func (r *LineLengthLimitRule) configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		r.max = defaultLineLengthLimit
-		return
+		return nil
 	}
 
 	maxLength, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok || maxLength < 0 {
-		panic(`invalid value passed as argument number to the "line-length-limit" rule`)
+		return errors.New(`invalid value passed as argument number to the "line-length-limit" rule`)
 	}
 
 	r.max = int(maxLength)
+	return nil
 }
 
 // Apply applies the rule to given file.
 func (r *LineLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
 
 	var failures []lint.Failure
 

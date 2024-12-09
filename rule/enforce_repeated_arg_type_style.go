@@ -16,14 +16,14 @@ const (
 	enforceRepeatedArgTypeStyleTypeFull  enforceRepeatedArgTypeStyleType = "full"
 )
 
-func repeatedArgTypeStyleFromString(s string) enforceRepeatedArgTypeStyleType {
+func repeatedArgTypeStyleFromString(s string) (enforceRepeatedArgTypeStyleType, error) {
 	switch s {
 	case string(enforceRepeatedArgTypeStyleTypeAny), "":
-		return enforceRepeatedArgTypeStyleTypeAny
+		return enforceRepeatedArgTypeStyleTypeAny, nil
 	case string(enforceRepeatedArgTypeStyleTypeShort):
-		return enforceRepeatedArgTypeStyleTypeShort
+		return enforceRepeatedArgTypeStyleTypeShort, nil
 	case string(enforceRepeatedArgTypeStyleTypeFull):
-		return enforceRepeatedArgTypeStyleTypeFull
+		return enforceRepeatedArgTypeStyleTypeFull, nil
 	default:
 		err := fmt.Errorf(
 			"invalid repeated arg type style: %s (expecting one of %v)",
@@ -35,7 +35,7 @@ func repeatedArgTypeStyleFromString(s string) enforceRepeatedArgTypeStyleType {
 			},
 		)
 
-		panic(fmt.Sprintf("Invalid argument to the enforce-repeated-arg-type-style rule: %v", err))
+		return "", fmt.Errorf("invalid argument to the enforce-repeated-arg-type-style rule: %w", err)
 	}
 }
 
@@ -47,45 +47,67 @@ type EnforceRepeatedArgTypeStyleRule struct {
 	configureOnce sync.Once
 }
 
-func (r *EnforceRepeatedArgTypeStyleRule) configure(arguments lint.Arguments) {
+func (r *EnforceRepeatedArgTypeStyleRule) configure(arguments lint.Arguments) error {
 	r.funcArgStyle = enforceRepeatedArgTypeStyleTypeAny
 	r.funcRetValStyle = enforceRepeatedArgTypeStyleTypeAny
 
 	if len(arguments) == 0 {
-		return
+		return nil
 	}
 
 	switch funcArgStyle := arguments[0].(type) {
 	case string:
-		r.funcArgStyle = repeatedArgTypeStyleFromString(funcArgStyle)
-		r.funcRetValStyle = repeatedArgTypeStyleFromString(funcArgStyle)
+		argstyle, err := repeatedArgTypeStyleFromString(funcArgStyle)
+		if err != nil {
+			return err
+		}
+		r.funcArgStyle = argstyle
+		valstyle, err := repeatedArgTypeStyleFromString(funcArgStyle)
+		if err != nil {
+			return err
+		}
+		r.funcRetValStyle = valstyle
 	case map[string]any: // expecting map[string]string
 		for k, v := range funcArgStyle {
 			switch k {
 			case "funcArgStyle":
 				val, ok := v.(string)
 				if !ok {
-					panic(fmt.Sprintf("Invalid map value type for 'enforce-repeated-arg-type-style' rule. Expecting string, got %T", v))
+					return fmt.Errorf("invalid map value type for 'enforce-repeated-arg-type-style' rule. Expecting string, got %T", v)
 				}
-				r.funcArgStyle = repeatedArgTypeStyleFromString(val)
+				valstyle, err := repeatedArgTypeStyleFromString(val)
+				if err != nil {
+					return err
+				}
+				r.funcArgStyle = valstyle
 			case "funcRetValStyle":
 				val, ok := v.(string)
 				if !ok {
-					panic(fmt.Sprintf("Invalid map value '%v' for 'enforce-repeated-arg-type-style' rule. Expecting string, got %T", v, v))
+					return fmt.Errorf("invalid map value '%v' for 'enforce-repeated-arg-type-style' rule. Expecting string, got %T", v, v)
 				}
-				r.funcRetValStyle = repeatedArgTypeStyleFromString(val)
+				argstyle, err := repeatedArgTypeStyleFromString(val)
+				if err != nil {
+					return err
+				}
+				r.funcRetValStyle = argstyle
 			default:
-				panic(fmt.Sprintf("Invalid map key for 'enforce-repeated-arg-type-style' rule. Expecting 'funcArgStyle' or 'funcRetValStyle', got %v", k))
+				return fmt.Errorf("invalid map key for 'enforce-repeated-arg-type-style' rule. Expecting 'funcArgStyle' or 'funcRetValStyle', got %v", k)
 			}
 		}
 	default:
-		panic(fmt.Sprintf("Invalid argument '%v' for 'import-alias-naming' rule. Expecting string or map[string]string, got %T", arguments[0], arguments[0]))
+		return fmt.Errorf("invalid argument '%v' for 'import-alias-naming' rule. Expecting string or map[string]string, got %T", arguments[0], arguments[0])
 	}
+	return nil
 }
 
 // Apply applies the rule to a given file.
 func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
 
 	if r.funcArgStyle == enforceRepeatedArgTypeStyleTypeAny && r.funcRetValStyle == enforceRepeatedArgTypeStyleTypeAny {
 		// This linter is not configured, return no failures.

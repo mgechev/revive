@@ -1,6 +1,7 @@
 package rule
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"sync"
@@ -17,22 +18,28 @@ type ArgumentsLimitRule struct {
 
 const defaultArgumentsLimit = 8
 
-func (r *ArgumentsLimitRule) configure(arguments lint.Arguments) {
+func (r *ArgumentsLimitRule) configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		r.max = defaultArgumentsLimit
-		return
+		return nil
 	}
 
 	maxArguments, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok {
-		panic(`invalid value passed as argument number to the "argument-limit" rule`)
+		return errors.New(`invalid value passed as argument number to the "argument-limit" rule`)
 	}
 	r.max = int(maxArguments)
+	return nil
 }
 
 // Apply applies the rule to given file.
 func (r *ArgumentsLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
 
 	var failures []lint.Failure
 
