@@ -1,6 +1,7 @@
 package rule
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"sync"
@@ -20,14 +21,14 @@ type UncheckedTypeAssertionRule struct {
 	configureOnce sync.Once
 }
 
-func (r *UncheckedTypeAssertionRule) configure(arguments lint.Arguments) {
+func (r *UncheckedTypeAssertionRule) configure(arguments lint.Arguments) error {
 	if len(arguments) == 0 {
-		return
+		return nil
 	}
 
 	args, ok := arguments[0].(map[string]any)
 	if !ok {
-		panic("Unable to get arguments. Expected object of key-value-pairs.")
+		return errors.New("unable to get arguments. Expected object of key-value-pairs")
 	}
 
 	for k, v := range args {
@@ -35,17 +36,23 @@ func (r *UncheckedTypeAssertionRule) configure(arguments lint.Arguments) {
 		case "acceptIgnoredAssertionResult":
 			r.acceptIgnoredAssertionResult, ok = v.(bool)
 			if !ok {
-				panic(fmt.Sprintf("Unable to parse argument '%s'. Expected boolean.", k))
+				return fmt.Errorf("unable to parse argument '%s'. Expected boolean", k)
 			}
 		default:
-			panic(fmt.Sprintf("Unknown argument: %s", k))
+			return fmt.Errorf("unknown argument: %s", k)
 		}
 	}
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *UncheckedTypeAssertionRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(args) })
+func (r *UncheckedTypeAssertionRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
 
 	var failures []lint.Failure
 

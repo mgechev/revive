@@ -18,20 +18,20 @@ type UnusedReceiverRule struct {
 	configureOnce sync.Once
 }
 
-func (r *UnusedReceiverRule) configure(args lint.Arguments) {
+func (r *UnusedReceiverRule) configure(args lint.Arguments) error {
 	// while by default args is an array, i think it's good to provide structures inside it by default, not arrays or primitives
 	// it's more compatible to JSON nature of configurations
 	r.allowRegex = allowBlankIdentifierRegex
 	r.failureMsg = "method receiver '%s' is not referenced in method's body, consider removing or renaming it as _"
 	if len(args) == 0 {
-		return
+		return nil
 	}
 	// Arguments = [{}]
 	options := args[0].(map[string]any)
 
 	allowRegexParam, ok := options["allowRegex"]
 	if !ok {
-		return
+		return nil
 	}
 	// Arguments = [{allowRegex="^_"}]
 	allowRegexStr, ok := allowRegexParam.(string)
@@ -41,14 +41,21 @@ func (r *UnusedReceiverRule) configure(args lint.Arguments) {
 	var err error
 	r.allowRegex, err = regexp.Compile(allowRegexStr)
 	if err != nil {
-		panic(fmt.Errorf("error configuring [unused-receiver] rule: allowRegex is not valid regex [%s]: %v", allowRegexStr, err))
+		return fmt.Errorf("error configuring [unused-receiver] rule: allowRegex is not valid regex [%s]: %w", allowRegexStr, err)
 	}
 	r.failureMsg = "method receiver '%s' is not referenced in method's body, consider removing or renaming it to match " + r.allowRegex.String()
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *UnusedReceiverRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(args) })
+func (r *UnusedReceiverRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
+
 	var failures []lint.Failure
 
 	for _, decl := range file.AST.Decls {

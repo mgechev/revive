@@ -18,23 +18,29 @@ type CommentsDensityRule struct {
 
 const defaultMinimumCommentsPercentage = 0
 
-func (r *CommentsDensityRule) configure(arguments lint.Arguments) {
+func (r *CommentsDensityRule) configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		r.minimumCommentsDensity = defaultMinimumCommentsPercentage
-		return
+		return nil
 	}
 
 	var ok bool
 	r.minimumCommentsDensity, ok = arguments[0].(int64)
 	if !ok {
-		panic(fmt.Sprintf("invalid argument for %q rule: argument should be an int, got %T", r.Name(), arguments[0]))
+		return fmt.Errorf("invalid argument for %q rule: argument should be an int, got %T", r.Name(), arguments[0])
 	}
+	return nil
 }
 
 // Apply applies the rule to given file.
 func (r *CommentsDensityRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
 
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
+	
 	commentsLines := countDocLines(file.AST.Comments)
 	statementsCount := countStatements(file.AST)
 	density := (float32(commentsLines) / float32(statementsCount+commentsLines)) * 100

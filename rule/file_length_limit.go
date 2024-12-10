@@ -26,7 +26,12 @@ type FileLengthLimitRule struct {
 
 // Apply applies the rule to given file.
 func (r *FileLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
 
 	if r.max <= 0 {
 		// when max is negative or 0 the rule is disabled
@@ -44,7 +49,7 @@ func (r *FileLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) [
 	}
 
 	if err := scanner.Err(); err != nil {
-		panic(err.Error())
+		return newInternalFailureError(err)
 	}
 
 	lines := all
@@ -75,37 +80,38 @@ func (r *FileLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) [
 	}
 }
 
-func (r *FileLengthLimitRule) configure(arguments lint.Arguments) {
+func (r *FileLengthLimitRule) configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
-		return // use default
+		return nil // use default
 	}
 
 	argKV, ok := arguments[0].(map[string]any)
 	if !ok {
-		panic(fmt.Sprintf(`invalid argument to the "file-length-limit" rule. Expecting a k,v map, got %T`, arguments[0]))
+		return fmt.Errorf(`invalid argument to the "file-length-limit" rule. Expecting a k,v map, got %T`, arguments[0])
 	}
 	for k, v := range argKV {
 		switch k {
 		case "max":
 			maxLines, ok := v.(int64)
 			if !ok || maxLines < 0 {
-				panic(fmt.Sprintf(`invalid configuration value for max lines in "file-length-limit" rule; need positive int64 but got %T`, arguments[0]))
+				return fmt.Errorf(`invalid configuration value for max lines in "file-length-limit" rule; need positive int64 but got %T`, arguments[0])
 			}
 			r.max = int(maxLines)
 		case "skipComments":
 			skipComments, ok := v.(bool)
 			if !ok {
-				panic(fmt.Sprintf(`invalid configuration value for skip comments in "file-length-limit" rule; need bool but got %T`, arguments[1]))
+				return fmt.Errorf(`invalid configuration value for skip comments in "file-length-limit" rule; need bool but got %T`, arguments[1])
 			}
 			r.skipComments = skipComments
 		case "skipBlankLines":
 			skipBlankLines, ok := v.(bool)
 			if !ok {
-				panic(fmt.Sprintf(`invalid configuration value for skip blank lines in "file-length-limit" rule; need bool but got %T`, arguments[2]))
+				return fmt.Errorf(`invalid configuration value for skip blank lines in "file-length-limit" rule; need bool but got %T`, arguments[2])
 			}
 			r.skipBlankLines = skipBlankLines
 		}
 	}
+	return nil
 }
 
 // Name returns the rule name.

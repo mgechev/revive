@@ -20,21 +20,27 @@ var (
 	singleRegexp = regexp.MustCompile("^//")
 )
 
-func (r *FileHeaderRule) configure(arguments lint.Arguments) {
+func (r *FileHeaderRule) configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
-		return
+		return nil
 	}
 
 	var ok bool
 	r.header, ok = arguments[0].(string)
 	if !ok {
-		panic(fmt.Sprintf("invalid argument for \"file-header\" rule: argument should be a string, got %T", arguments[0]))
+		return fmt.Errorf(`invalid argument for "file-header" rule: argument should be a string, got %T`, arguments[0])
 	}
+	return nil
 }
 
 // Apply applies the rule to given file.
 func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
 
 	if r.header == "" {
 		return nil
@@ -69,7 +75,7 @@ func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) []lint
 
 	regex, err := regexp.Compile(r.header)
 	if err != nil {
-		panic(err.Error())
+		return newInternalFailureError(err)
 	}
 
 	if !regex.MatchString(comment) {

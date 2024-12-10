@@ -48,27 +48,33 @@ type EnforceSliceStyleRule struct {
 	configureOnce sync.Once
 }
 
-func (r *EnforceSliceStyleRule) configure(arguments lint.Arguments) {
+func (r *EnforceSliceStyleRule) configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		r.enforceSliceStyle = enforceSliceStyleTypeAny
-		return
+		return nil
 	}
 
 	enforceSliceStyle, ok := arguments[0].(string)
 	if !ok {
-		panic(fmt.Sprintf("Invalid argument '%v' for 'enforce-slice-style' rule. Expecting string, got %T", arguments[0], arguments[0]))
+		return fmt.Errorf("invalid argument '%v' for 'enforce-slice-style' rule. Expecting string, got %T", arguments[0], arguments[0])
 	}
 
 	var err error
 	r.enforceSliceStyle, err = sliceStyleFromString(enforceSliceStyle)
 	if err != nil {
-		panic(fmt.Sprintf("Invalid argument to the enforce-slice-style rule: %v", err))
+		return fmt.Errorf("invalid argument to the enforce-slice-style rule: %w", err)
 	}
+	return nil
 }
 
 // Apply applies the rule to given file.
 func (r *EnforceSliceStyleRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
 
 	if r.enforceSliceStyle == enforceSliceStyleTypeAny {
 		// this linter is not configured

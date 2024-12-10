@@ -18,21 +18,24 @@ type StructTagRule struct {
 	configureOnce sync.Once
 }
 
-func (r *StructTagRule) configure(arguments lint.Arguments) {
+func (r *StructTagRule) configure(arguments lint.Arguments) error {
 	if len(arguments) == 0 {
-		return
+		return nil
 	}
 
-	checkNumberOfArguments(1, arguments, r.Name())
+	err := checkNumberOfArguments(1, arguments, r.Name())
+	if err != nil {
+		return err
+	}
 	r.userDefined = make(map[string][]string, len(arguments))
 	for _, arg := range arguments {
 		item, ok := arg.(string)
 		if !ok {
-			panic(fmt.Sprintf("Invalid argument to the %s rule. Expecting a string, got %v (of type %T)", r.Name(), arg, arg))
+			return fmt.Errorf("invalid argument to the %s rule. Expecting a string, got %v (of type %T)", r.Name(), arg, arg)
 		}
 		parts := strings.Split(item, ",")
 		if len(parts) < 2 {
-			panic(fmt.Sprintf("Invalid argument to the %s rule. Expecting a string of the form key[,option]+, got %s", r.Name(), item))
+			return fmt.Errorf("invalid argument to the %s rule. Expecting a string of the form key[,option]+, got %s", r.Name(), item)
 		}
 		key := strings.TrimSpace(parts[0])
 		for i := 1; i < len(parts); i++ {
@@ -40,11 +43,17 @@ func (r *StructTagRule) configure(arguments lint.Arguments) {
 			r.userDefined[key] = append(r.userDefined[key], option)
 		}
 	}
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *StructTagRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(args) })
+func (r *StructTagRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
 
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
