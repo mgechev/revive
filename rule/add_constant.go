@@ -69,7 +69,6 @@ func (r *AddConstantRule) Apply(file *lint.File, arguments lint.Arguments) []lin
 	return failures
 }
 
-
 // Name returns the rule name.
 func (*AddConstantRule) Name() string {
 	return "add-constant"

@@ -23,9 +23,9 @@ func (r *StructTagRule) configure(arguments lint.Arguments) error {
 		return nil
 	}
 
-	check := checkNumberOfArguments(1, arguments, r.Name())
-	if check != nil {
-		return check
+	err := checkNumberOfArguments(1, arguments, r.Name())
+	if err != nil {
+		return err
 	}
 	r.userDefined = make(map[string][]string, len(arguments))
 	for _, arg := range arguments {

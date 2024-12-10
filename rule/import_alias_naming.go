@@ -117,7 +117,7 @@ func (r *ImportAliasNamingRule) setAllowRule(value any) error {
 
 	namingRuleRegexp, err := regexp.Compile(namingRule)
 	if err != nil {
-		return fmt.Errorf("invalid argument to the import-alias-naming allowRegexp rule. Expecting %q to be a valid regular expression, got: %v", namingRule, err)
+		return fmt.Errorf("invalid argument to the import-alias-naming allowRegexp rule. Expecting %q to be a valid regular expression, got: %w", namingRule, err)
 	}
 	r.allowRegexp = namingRuleRegexp
 	return nil
@@ -131,7 +131,7 @@ func (r *ImportAliasNamingRule) setDenyRule(value any) error {
 
 	namingRuleRegexp, err := regexp.Compile(namingRule)
 	if err != nil {
-		return fmt.Errorf("invalid argument to the import-alias-naming denyRegexp rule. Expecting %q to be a valid regular expression, got: %v", namingRule, err)
+		return fmt.Errorf("invalid argument to the import-alias-naming denyRegexp rule. Expecting %q to be a valid regular expression, got: %w", namingRule, err)
 	}
 	r.denyRegexp = namingRuleRegexp
 	return nil

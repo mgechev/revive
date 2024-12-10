@@ -49,7 +49,7 @@ func (r *FileLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) [
 	}
 
 	if err := scanner.Err(); err != nil {
-		return []lint.Failure{lint.NewInternalFailure(err.Error())}
+		return newInternalFailureError(err)
 	}
 
 	lines := all

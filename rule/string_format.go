@@ -27,7 +27,7 @@ func (*StringFormatRule) Apply(file *lint.File, arguments lint.Arguments) []lint
 	w := lintStringFormatRule{onFailure: onFailure}
 	err := w.parseArguments(arguments)
 	if err != nil {
-		return []lint.Failure{lint.NewInternalFailure(err.Error())}
+		return newInternalFailureError(err)
 	}
 
 	ast.Walk(w, file.AST)

@@ -25,9 +25,9 @@ func (r *MaxPublicStructsRule) configure(arguments lint.Arguments) error {
 		return nil
 	}
 
-	check := checkNumberOfArguments(1, arguments, r.Name())
-	if check != nil {
-		return check
+	err := checkNumberOfArguments(1, arguments, r.Name())
+	if err != nil {
+		return err
 	}
 
 	maxStructs, ok := arguments[0].(int64) // Alt. non panicking version

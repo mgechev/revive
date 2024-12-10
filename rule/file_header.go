@@ -39,7 +39,7 @@ func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) []lint
 	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
 
 	if configureErr != nil {
-		return newInternalFailureError(configureErr)
+		return []lint.Failure{lint.NewInternalFailure(configureErr.Error())}
 	}
 
 	if r.header == "" {
@@ -75,7 +75,7 @@ func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) []lint
 
 	regex, err := regexp.Compile(r.header)
 	if err != nil {
-		return []lint.Failure{lint.NewInternalFailure(err.Error())}
+		return newInternalFailureError(err)
 	}
 
 	if !regex.MatchString(comment) {
