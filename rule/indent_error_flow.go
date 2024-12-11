@@ -30,7 +30,7 @@ func (*IndentErrorFlowRule) checkIfElse(chain ifelse.Chain, args ifelse.Args) (s
 
 	if chain.HasPriorNonDeviating {
 		// if we de-indent the "else" block then a previous branch
-		// might flow into it, affecting program behaviour
+		// might flow into it, affecting program behavior
 		return "", false
 	}
 

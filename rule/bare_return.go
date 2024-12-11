@@ -60,8 +60,8 @@ type bareReturnFinder struct {
 func (w bareReturnFinder) Visit(node ast.Node) ast.Visitor {
 	_, ok := node.(*ast.FuncLit)
 	if ok {
-		// skip analysing function literals
-		// they will be analysed by the lintBareReturnRule.Visit method
+		// skip analyzing function literals
+		// they will be analyzed by the lintBareReturnRule.Visit method
 		return nil
 	}
 
