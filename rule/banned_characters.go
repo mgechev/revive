@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go/ast"
 	"strings"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -12,14 +11,14 @@ import (
 // BannedCharsRule checks if a file contains banned characters.
 type BannedCharsRule struct {
 	bannedCharList []string
-
-	configureOnce sync.Once
-	configureErr  error
 }
 
 const bannedCharsRuleName = "banned-characters"
 
-func (r *BannedCharsRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *BannedCharsRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) > 0 {
 		err := checkNumberOfArguments(1, arguments, bannedCharsRuleName)
 		if err != nil {
@@ -36,12 +35,7 @@ func (r *BannedCharsRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applied the rule to the given file.
-func (r *BannedCharsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
-	if r.configureErr != nil {
-		return newInternalFailureError(r.configureErr)
-	}
-
+func (r *BannedCharsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)

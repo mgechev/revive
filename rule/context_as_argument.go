@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go/ast"
 	"strings"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -12,18 +11,10 @@ import (
 // ContextAsArgumentRule suggests that `context.Context` should be the first argument of a function.
 type ContextAsArgumentRule struct {
 	allowTypes map[string]struct{}
-
-	configureOnce sync.Once
-	configureErr  error
 }
 
 // Apply applies the rule to given file.
-func (r *ContextAsArgumentRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
-	if r.configureErr != nil {
-		return newInternalFailureError(r.configureErr)
-	}
-
+func (r *ContextAsArgumentRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	for _, decl := range file.AST.Decls {
 		fn, ok := decl.(*ast.FuncDecl)
@@ -63,7 +54,10 @@ func (*ContextAsArgumentRule) Name() string {
 	return "context-as-argument"
 }
 
-func (r *ContextAsArgumentRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *ContextAsArgumentRule) Configure(arguments lint.Arguments) error {
 	types, err := r.getAllowTypesFromArguments(arguments)
 	if err != nil {
 		return err

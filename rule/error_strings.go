@@ -6,7 +6,6 @@ import (
 	"go/token"
 	"strconv"
 	"strings"
-	"sync"
 	"unicode"
 	"unicode/utf8"
 
@@ -16,12 +15,12 @@ import (
 // ErrorStringsRule lints error strings.
 type ErrorStringsRule struct {
 	errorFunctions map[string]map[string]struct{}
-
-	configureOnce sync.Once
-	configureErr  error
 }
 
-func (r *ErrorStringsRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *ErrorStringsRule) Configure(arguments lint.Arguments) error {
 	r.errorFunctions = map[string]map[string]struct{}{
 		"fmt": {
 			"Errorf": {},
@@ -54,12 +53,7 @@ func (r *ErrorStringsRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *ErrorStringsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
-	if r.configureErr != nil {
-		return newInternalFailureError(r.configureErr)
-	}
-
+func (r *ErrorStringsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST

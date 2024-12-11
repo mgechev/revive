@@ -3,7 +3,6 @@ package rule
 import (
 	"fmt"
 	"regexp"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -12,16 +11,16 @@ import (
 type ImportAliasNamingRule struct {
 	allowRegexp *regexp.Regexp
 	denyRegexp  *regexp.Regexp
-
-	configureOnce sync.Once
-	configureErr  error
 }
 
 const defaultImportAliasNamingAllowRule = "^[a-z][a-z0-9]{0,}$"
 
 var defaultImportAliasNamingAllowRegexp = regexp.MustCompile(defaultImportAliasNamingAllowRule)
 
-func (r *ImportAliasNamingRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *ImportAliasNamingRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) == 0 {
 		r.allowRegexp = defaultImportAliasNamingAllowRegexp
 		return nil
@@ -62,12 +61,7 @@ func (r *ImportAliasNamingRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *ImportAliasNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
-	if r.configureErr != nil {
-		return newInternalFailureError(r.configureErr)
-	}
-
+func (r *ImportAliasNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	for _, is := range file.AST.Imports {

@@ -16,6 +16,22 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
+// configureRule configures the given rule with the given configuration
+// if the rule implements the ConfigurableRule interface
+func configureRule(t *testing.T, rule lint.Rule, arguments lint.Arguments) {
+	t.Helper()
+
+	cr, ok := rule.(lint.ConfigurableRule)
+	if !ok {
+		return
+	}
+
+	err := cr.Configure(arguments)
+	if err != nil {
+		t.Fatalf("Cannot configure rule %s: %v", rule.Name(), err)
+	}
+}
+
 func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.RuleConfig) {
 	t.Helper()
 
@@ -30,10 +46,14 @@ func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.Rul
 	if err != nil {
 		t.Fatalf("Cannot get file info for %s: %v", rule.Name(), err)
 	}
+	var ruleConfig lint.RuleConfig
 	c := map[string]lint.RuleConfig{}
-	if config != nil {
-		c[rule.Name()] = *config[0]
+	if len(config) > 0 {
+		ruleConfig = *config[0]
+		c[rule.Name()] = ruleConfig
 	}
+	configureRule(t, rule, ruleConfig.Arguments)
+
 	if parseInstructions(t, fullFilePath, src) == nil {
 		assertSuccess(t, baseDir, stat, []lint.Rule{rule}, c)
 		return

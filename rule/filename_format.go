@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"regexp"
-	"sync"
 	"unicode"
 
 	"github.com/mgechev/revive/lint"
@@ -13,18 +12,10 @@ import (
 // FilenameFormatRule lints source filenames according to a set of regular expressions given as arguments
 type FilenameFormatRule struct {
 	format *regexp.Regexp
-
-	configureOnce sync.Once
-	configureErr  error
 }
 
 // Apply applies the rule to the given file.
-func (r *FilenameFormatRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
-	if r.configureErr != nil {
-		return newInternalFailureError(r.configureErr)
-	}
-
+func (r *FilenameFormatRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	filename := filepath.Base(file.Name)
 	if r.format.MatchString(filename) {
 		return nil
@@ -59,7 +50,10 @@ func (*FilenameFormatRule) Name() string {
 
 var defaultFormat = regexp.MustCompile(`^[_A-Za-z0-9][_A-Za-z0-9-]*\.go$`)
 
-func (r *FilenameFormatRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *FilenameFormatRule) Configure(arguments lint.Arguments) error {
 	argsCount := len(arguments)
 	if argsCount == 0 {
 		r.format = defaultFormat

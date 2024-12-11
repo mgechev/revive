@@ -7,7 +7,6 @@ import (
 	"go/ast"
 	"go/token"
 	"strings"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -20,18 +19,10 @@ type FileLengthLimitRule struct {
 	skipComments bool
 	// skipBlankLines indicates whether to skip blank lines when counting lines.
 	skipBlankLines bool
-
-	configureOnce sync.Once
-	configureErr  error
 }
 
 // Apply applies the rule to given file.
-func (r *FileLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
-	if r.configureErr != nil {
-		return newInternalFailureError(r.configureErr)
-	}
-
+func (r *FileLengthLimitRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	if r.max <= 0 {
 		// when max is negative or 0 the rule is disabled
 		return nil
@@ -79,7 +70,10 @@ func (r *FileLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) [
 	}
 }
 
-func (r *FileLengthLimitRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *FileLengthLimitRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		return nil // use default
 	}

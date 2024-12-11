@@ -6,7 +6,6 @@ import (
 	"go/token"
 	"regexp"
 	"strings"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -29,12 +28,12 @@ type VarNamingRule struct {
 	blockList             []string
 	allowUpperCaseConst   bool // if true - allows to use UPPER_SOME_NAMES for constants
 	skipPackageNameChecks bool
-
-	configureOnce sync.Once
-	configureErr  error
 }
 
-func (r *VarNamingRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) >= 1 {
 		list, err := getList(arguments[0], "allowlist")
 		if err != nil {
@@ -92,12 +91,7 @@ func (*VarNamingRule) applyPackageCheckRules(walker *lintNames) {
 }
 
 // Apply applies the rule to given file.
-func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
-	if r.configureErr != nil {
-		return newInternalFailureError(r.configureErr)
-	}
-
+func (r *VarNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST

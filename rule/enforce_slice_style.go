@@ -3,7 +3,6 @@ package rule
 import (
 	"fmt"
 	"go/ast"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -44,12 +43,12 @@ func sliceStyleFromString(s string) (enforceSliceStyleType, error) {
 // EnforceSliceStyleRule implements a rule to enforce `make([]type)` over `[]type{}`.
 type EnforceSliceStyleRule struct {
 	enforceSliceStyle enforceSliceStyleType
-
-	configureOnce sync.Once
-	configureErr  error
 }
 
-func (r *EnforceSliceStyleRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *EnforceSliceStyleRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		r.enforceSliceStyle = enforceSliceStyleTypeAny
 		return nil
@@ -69,12 +68,7 @@ func (r *EnforceSliceStyleRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *EnforceSliceStyleRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
-	if r.configureErr != nil {
-		return newInternalFailureError(r.configureErr)
-	}
-
+func (r *EnforceSliceStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	if r.enforceSliceStyle == enforceSliceStyleTypeAny {
 		// this linter is not configured
 		return nil

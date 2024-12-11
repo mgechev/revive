@@ -5,7 +5,6 @@ import (
 	"go/ast"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/fatih/structtag"
 	"github.com/mgechev/revive/lint"
@@ -14,12 +13,12 @@ import (
 // StructTagRule lints struct tags.
 type StructTagRule struct {
 	userDefined map[string][]string // map: key -> []option
-
-	configureOnce sync.Once
-	configureErr  error
 }
 
-func (r *StructTagRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *StructTagRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) == 0 {
 		return nil
 	}
@@ -48,12 +47,7 @@ func (r *StructTagRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *StructTagRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
-	if r.configureErr != nil {
-		return newInternalFailureError(r.configureErr)
-	}
-
+func (r *StructTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
@@ -101,14 +95,16 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 	return w
 }
 
-const keyASN1 = "asn1"
-const keyBSON = "bson"
-const keyDefault = "default"
-const keyJSON = "json"
-const keyProtobuf = "protobuf"
-const keyRequired = "required"
-const keyXML = "xml"
-const keyYAML = "yaml"
+const (
+	keyASN1     = "asn1"
+	keyBSON     = "bson"
+	keyDefault  = "default"
+	keyJSON     = "json"
+	keyProtobuf = "protobuf"
+	keyRequired = "required"
+	keyXML      = "xml"
+	keyYAML     = "yaml"
+)
 
 func (w lintStructTagRule) checkTagNameIfNeed(tag *structtag.Tag) (string, bool) {
 	isUnnamedTag := tag.Name == "" || tag.Name == "-"

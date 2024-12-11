@@ -17,6 +17,11 @@ type Rule interface {
 	Apply(*File, Arguments) []Failure
 }
 
+// ConfigurableRule defines an abstract configurable rule interface.
+type ConfigurableRule interface {
+	Configure(Arguments) error
+}
+
 // ToFailurePosition returns the failure position.
 func ToFailurePosition(start, end token.Pos, file *File) FailurePosition {
 	return FailurePosition{

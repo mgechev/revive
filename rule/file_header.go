@@ -3,7 +3,6 @@ package rule
 import (
 	"fmt"
 	"regexp"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -11,9 +10,6 @@ import (
 // FileHeaderRule lints the header that each file should have.
 type FileHeaderRule struct {
 	header string
-
-	configureOnce sync.Once
-	configureErr  error
 }
 
 var (
@@ -21,7 +17,10 @@ var (
 	singleRegexp = regexp.MustCompile("^//")
 )
 
-func (r *FileHeaderRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *FileHeaderRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		return nil
 	}
@@ -35,12 +34,7 @@ func (r *FileHeaderRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
-	if r.configureErr != nil {
-		return newInternalFailureError(r.configureErr)
-	}
-
+func (r *FileHeaderRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	if r.header == "" {
 		return nil
 	}

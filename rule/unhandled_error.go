@@ -7,7 +7,6 @@ import (
 	"go/types"
 	"regexp"
 	"strings"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -15,12 +14,12 @@ import (
 // UnhandledErrorRule warns on unhandled errors returned by function calls.
 type UnhandledErrorRule struct {
 	ignoreList []*regexp.Regexp
-
-	configureOnce sync.Once
-	configureErr  error
 }
 
-func (r *UnhandledErrorRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *UnhandledErrorRule) Configure(arguments lint.Arguments) error {
 	for _, arg := range arguments {
 		argStr, ok := arg.(string)
 		if !ok {
@@ -43,12 +42,7 @@ func (r *UnhandledErrorRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *UnhandledErrorRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
-	if r.configureErr != nil {
-		return newInternalFailureError(r.configureErr)
-	}
-
+func (r *UnhandledErrorRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	walker := &lintUnhandledErrors{

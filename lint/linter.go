@@ -10,10 +10,10 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"sync"
 
 	goversion "github.com/hashicorp/go-version"
 	"golang.org/x/mod/modfile"
+	"golang.org/x/sync/errgroup"
 )
 
 // ReadFile defines an abstraction for reading files.
@@ -101,20 +101,23 @@ func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-cha
 		perPkgVersions[n] = v
 	}
 
-	var wg sync.WaitGroup
-	wg.Add(len(packages))
+	var wg errgroup.Group
 	for n := range packages {
-		go func(pkg []string, gover *goversion.Version) {
+		wg.Go(func() error {
+			pkg := packages[n]
+			gover := perPkgVersions[n]
 			if err := l.lintPackage(pkg, gover, ruleSet, config, failures); err != nil {
-				fmt.Fprintln(os.Stderr, "error during linting: "+err.Error())
-				os.Exit(1)
+				return fmt.Errorf("error during linting: %w", err)
 			}
-			wg.Done()
-		}(packages[n], perPkgVersions[n])
+			return nil
+		})
 	}
 
 	go func() {
-		wg.Wait()
+		err := wg.Wait()
+		if err != nil {
+			failures <- NewInternalFailure(err.Error())
+		}
 		close(failures)
 	}()
 
