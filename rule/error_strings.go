@@ -47,7 +47,7 @@ func (r *ErrorStringsRule) configure(arguments lint.Arguments) error {
 		}
 	}
 	if len(invalidCustomFunctions) != 0 {
-		return fmt.Errorf("found invalid custom function: " + strings.Join(invalidCustomFunctions, ","))
+		return fmt.Errorf("found invalid custom function: %s", strings.Join(invalidCustomFunctions, ","))
 	}
 	return nil
 }
