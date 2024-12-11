@@ -56,7 +56,7 @@ func (*ModifiesValRecRule) Name() string {
 	return "modifies-value-receiver"
 }
 
-func (r *ModifiesValRecRule) skipType(t ast.Expr, pkg *lint.Package) bool {
+func (*ModifiesValRecRule) skipType(t ast.Expr, pkg *lint.Package) bool {
 	rt := pkg.TypeOf(t)
 	if rt == nil {
 		return false

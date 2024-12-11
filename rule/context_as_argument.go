@@ -73,7 +73,7 @@ func (r *ContextAsArgumentRule) configure(arguments lint.Arguments) error {
 	return nil
 }
 
-func (r *ContextAsArgumentRule) getAllowTypesFromArguments(args lint.Arguments) (map[string]struct{}, error) {
+func (*ContextAsArgumentRule) getAllowTypesFromArguments(args lint.Arguments) (map[string]struct{}, error) {
 	allowTypesBefore := []string{}
 	if len(args) >= 1 {
 		argKV, ok := args[0].(map[string]any)
