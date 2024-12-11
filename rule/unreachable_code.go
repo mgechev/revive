@@ -62,7 +62,6 @@ func (w lintUnreachableCode) Visit(node ast.Node) ast.Visitor {
 	}
 loop:
 	for i, stmt := range blk.List[:len(blk.List)-1] {
-		// println("iterating ", len(blk.List))
 		next := blk.List[i+1]
 		if _, ok := next.(*ast.LabeledStmt); ok {
 			continue // skip if next statement is labeled
