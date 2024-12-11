@@ -106,7 +106,7 @@ func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-cha
 	for n := range packages {
 		go func(pkg []string, gover *goversion.Version) {
 			if err := l.lintPackage(pkg, gover, ruleSet, config, failures); err != nil {
-				fmt.Fprintln(os.Stderr, err)
+				fmt.Fprintln(os.Stderr, "error during linting: "+err.Error())
 				os.Exit(1)
 			}
 			wg.Done()

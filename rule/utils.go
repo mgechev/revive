@@ -105,10 +105,11 @@ func gofmt(x any) string {
 }
 
 // checkNumberOfArguments fails if the given number of arguments is not, at least, the expected one
-func checkNumberOfArguments(expected int, args lint.Arguments, ruleName string) {
+func checkNumberOfArguments(expected int, args lint.Arguments, ruleName string) error {
 	if len(args) < expected {
-		panic(fmt.Sprintf("not enough arguments for %s rule, expected %d, got %d. Please check the rule's documentation", ruleName, expected, len(args)))
+		return fmt.Errorf("not enough arguments for %s rule, expected %d, got %d. Please check the rule's documentation", ruleName, expected, len(args))
 	}
+	return nil
 }
 
 var directiveCommentRE = regexp.MustCompile("^//(line |extern |export |[a-z0-9]+:[a-z0-9])") // see https://go-review.googlesource.com/c/website/+/442516/1..2/_content/doc/comment.md#494
@@ -120,4 +121,9 @@ func isDirectiveComment(line string) bool {
 // isCallToExitFunction checks if the function call is a call to an exit function.
 func isCallToExitFunction(pkgName, functionName string) bool {
 	return exitFunctions[pkgName] != nil && exitFunctions[pkgName][functionName]
+}
+
+// newInternalFailureError returns an slice of Failure with a single internal failure in it
+func newInternalFailureError(e error) []lint.Failure {
+	return []lint.Failure{lint.NewInternalFailure(e.Error())}
 }

@@ -18,16 +18,30 @@ type BannedCharsRule struct {
 
 const bannedCharsRuleName = "banned-characters"
 
-func (r *BannedCharsRule) configure(arguments lint.Arguments) {
+func (r *BannedCharsRule) configure(arguments lint.Arguments) error {
 	if len(arguments) > 0 {
-		checkNumberOfArguments(1, arguments, bannedCharsRuleName)
-		r.bannedCharList = r.getBannedCharsList(arguments)
+		err := checkNumberOfArguments(1, arguments, bannedCharsRuleName)
+		if err != nil {
+			return err
+		}
+		list, err := r.getBannedCharsList(arguments)
+		if err != nil {
+			return err
+		}
+
+		r.bannedCharList = list
 	}
+	return nil
 }
 
 // Apply applied the rule to the given file.
 func (r *BannedCharsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
 
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
@@ -49,17 +63,17 @@ func (*BannedCharsRule) Name() string {
 }
 
 // getBannedCharsList converts arguments into the banned characters list
-func (r *BannedCharsRule) getBannedCharsList(args lint.Arguments) []string {
+func (r *BannedCharsRule) getBannedCharsList(args lint.Arguments) ([]string, error) {
 	var bannedChars []string
 	for _, char := range args {
 		charStr, ok := char.(string)
 		if !ok {
-			panic(fmt.Sprintf("Invalid argument for the %s rule: expecting a string, got %T", r.Name(), char))
+			return nil, fmt.Errorf("invalid argument for the %s rule: expecting a string, got %T", r.Name(), char)
 		}
 		bannedChars = append(bannedChars, charStr)
 	}
 
-	return bannedChars
+	return bannedChars, nil
 }
 
 type lintBannedCharsRule struct {

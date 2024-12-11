@@ -16,20 +16,26 @@ type CommentSpacingsRule struct {
 	configureOnce sync.Once
 }
 
-func (r *CommentSpacingsRule) configure(arguments lint.Arguments) {
+func (r *CommentSpacingsRule) configure(arguments lint.Arguments) error {
 	r.allowList = []string{}
 	for _, arg := range arguments {
 		allow, ok := arg.(string) // Alt. non panicking version
 		if !ok {
-			panic(fmt.Sprintf("invalid argument %v for %s; expected string but got %T", arg, r.Name(), arg))
+			return fmt.Errorf("invalid argument %v for %s; expected string but got %T", arg, r.Name(), arg)
 		}
 		r.allowList = append(r.allowList, `//`+allow)
 	}
+	return nil
 }
 
 // Apply the rule.
-func (r *CommentSpacingsRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(args) })
+func (r *CommentSpacingsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
 
 	var failures []lint.Failure
 

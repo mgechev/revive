@@ -19,7 +19,12 @@ type FilenameFormatRule struct {
 
 // Apply applies the rule to the given file.
 func (r *FilenameFormatRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
 
 	filename := filepath.Base(file.Name)
 	if r.format.MatchString(filename) {
@@ -55,27 +60,29 @@ func (*FilenameFormatRule) Name() string {
 
 var defaultFormat = regexp.MustCompile(`^[_A-Za-z0-9][_A-Za-z0-9-]*\.go$`)
 
-func (r *FilenameFormatRule) configure(arguments lint.Arguments) {
+func (r *FilenameFormatRule) configure(arguments lint.Arguments) error {
 	argsCount := len(arguments)
 	if argsCount == 0 {
 		r.format = defaultFormat
-		return
+		return nil
 	}
 
 	if argsCount > 1 {
-		panic(fmt.Sprintf("rule %q expects only one argument, got %d %v", r.Name(), argsCount, arguments))
+		return fmt.Errorf("rule %q expects only one argument, got %d %v", r.Name(), argsCount, arguments)
 	}
 
 	arg := arguments[0]
 	str, ok := arg.(string)
 	if !ok {
-		panic(fmt.Sprintf("rule %q expects a string argument, got %v of type %T", r.Name(), arg, arg))
+		return fmt.Errorf("rule %q expects a string argument, got %v of type %T", r.Name(), arg, arg)
 	}
 
 	format, err := regexp.Compile(str)
 	if err != nil {
-		panic(fmt.Sprintf("rule %q expects a valid regexp argument, got %v for %s", r.Name(), err, arg))
+		return fmt.Errorf("rule %q expects a valid regexp argument, got error for %s: %w", r.Name(), str, err)
 	}
 
 	r.format = format
+
+	return nil
 }

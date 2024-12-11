@@ -20,22 +20,28 @@ type CyclomaticRule struct {
 
 const defaultMaxCyclomaticComplexity = 10
 
-func (r *CyclomaticRule) configure(arguments lint.Arguments) {
+func (r *CyclomaticRule) configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		r.maxComplexity = defaultMaxCyclomaticComplexity
-		return
+		return nil
 	}
 
 	complexity, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok {
-		panic(fmt.Sprintf("invalid argument for cyclomatic complexity; expected int but got %T", arguments[0]))
+		return fmt.Errorf("invalid argument for cyclomatic complexity; expected int but got %T", arguments[0])
 	}
 	r.maxComplexity = int(complexity)
+	return nil
 }
 
 // Apply applies the rule to given file.
 func (r *CyclomaticRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
 
 	var failures []lint.Failure
 	for _, decl := range file.AST.Decls {

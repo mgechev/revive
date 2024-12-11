@@ -70,7 +70,7 @@ type ExportedRule struct {
 	configureOnce sync.Once
 }
 
-func (r *ExportedRule) configure(arguments lint.Arguments) {
+func (r *ExportedRule) configure(arguments lint.Arguments) error {
 	r.disabledChecks = disabledChecks{PrivateReceivers: true, PublicInterfaces: true}
 	r.stuttersMsg = "stutters"
 	for _, flag := range arguments {
@@ -96,17 +96,24 @@ func (r *ExportedRule) configure(arguments lint.Arguments) {
 			case "disableChecksOnVariables":
 				r.disabledChecks.Var = true
 			default:
-				panic(fmt.Sprintf("Unknown configuration flag %s for %s rule", flag, r.Name()))
+				return fmt.Errorf("unknown configuration flag %s for %s rule", flag, r.Name())
 			}
 		default:
-			panic(fmt.Sprintf("Invalid argument for the %s rule: expecting a string, got %T", r.Name(), flag))
+			return fmt.Errorf("invalid argument for the %s rule: expecting a string, got %T", r.Name(), flag)
 		}
 	}
+
+	return nil
 }
 
 // Apply applies the rule to given file.
-func (r *ExportedRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(args) })
+func (r *ExportedRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
 
 	var failures []lint.Failure
 	if file.IsTest() {

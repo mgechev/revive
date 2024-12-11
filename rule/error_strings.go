@@ -1,6 +1,7 @@
 package rule
 
 import (
+	"fmt"
 	"go/ast"
 	"go/token"
 	"strconv"
@@ -19,7 +20,7 @@ type ErrorStringsRule struct {
 	configureOnce sync.Once
 }
 
-func (r *ErrorStringsRule) configure(arguments lint.Arguments) {
+func (r *ErrorStringsRule) configure(arguments lint.Arguments) error {
 	r.errorFunctions = map[string]map[string]struct{}{
 		"fmt": {
 			"Errorf": {},
@@ -46,15 +47,21 @@ func (r *ErrorStringsRule) configure(arguments lint.Arguments) {
 		}
 	}
 	if len(invalidCustomFunctions) != 0 {
-		panic("found invalid custom function: " + strings.Join(invalidCustomFunctions, ","))
+		return fmt.Errorf("found invalid custom function: " + strings.Join(invalidCustomFunctions, ","))
 	}
+	return nil
 }
 
 // Apply applies the rule to given file.
 func (r *ErrorStringsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var failures []lint.Failure
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
 
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
+
+	var failures []lint.Failure
 
 	fileAst := file.AST
 	walker := lintErrorStrings{

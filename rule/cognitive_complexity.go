@@ -19,23 +19,29 @@ type CognitiveComplexityRule struct {
 
 const defaultMaxCognitiveComplexity = 7
 
-func (r *CognitiveComplexityRule) configure(arguments lint.Arguments) {
+func (r *CognitiveComplexityRule) configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		r.maxComplexity = defaultMaxCognitiveComplexity
-		return
+		return nil
 	}
 
 	complexity, ok := arguments[0].(int64)
 	if !ok {
-		panic(fmt.Sprintf("invalid argument type for cognitive-complexity, expected int64, got %T", arguments[0]))
+		return fmt.Errorf("invalid argument type for cognitive-complexity, expected int64, got %T", arguments[0])
 	}
 
 	r.maxComplexity = int(complexity)
+	return nil
 }
 
 // Apply applies the rule to given file.
 func (r *CognitiveComplexityRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
 
 	var failures []lint.Failure
 

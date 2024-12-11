@@ -17,15 +17,24 @@ type FunctionLength struct {
 	configureOnce sync.Once
 }
 
-func (r *FunctionLength) configure(arguments lint.Arguments) {
-	maxStmt, maxLines := r.parseArguments(arguments)
+func (r *FunctionLength) configure(arguments lint.Arguments) error {
+	maxStmt, maxLines, err := r.parseArguments(arguments)
+	if err != nil {
+		return err
+	}
 	r.maxStmt = int(maxStmt)
 	r.maxLines = int(maxLines)
+	return nil
 }
 
 // Apply applies the rule to given file.
 func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
 
 	var failures []lint.Failure
 	for _, decl := range file.AST.Decls {
@@ -74,33 +83,33 @@ func (*FunctionLength) Name() string {
 const defaultFuncStmtsLimit = 50
 const defaultFuncLinesLimit = 75
 
-func (*FunctionLength) parseArguments(arguments lint.Arguments) (maxStmt, maxLines int64) {
+func (*FunctionLength) parseArguments(arguments lint.Arguments) (maxStmt, maxLines int64, err error) {
 	if len(arguments) == 0 {
-		return defaultFuncStmtsLimit, defaultFuncLinesLimit
+		return defaultFuncStmtsLimit, defaultFuncLinesLimit, nil
 	}
 
 	const minArguments = 2
 	if len(arguments) != minArguments {
-		panic(fmt.Sprintf(`invalid configuration for "function-length" rule, expected %d arguments but got %d`, minArguments, len(arguments)))
+		return 0, 0, fmt.Errorf(`invalid configuration for "function-length" rule, expected %d arguments but got %d`, minArguments, len(arguments))
 	}
 
 	maxStmt, maxStmtOk := arguments[0].(int64)
 	if !maxStmtOk {
-		panic(fmt.Sprintf(`invalid configuration value for max statements in "function-length" rule; need int64 but got %T`, arguments[0]))
+		return 0, 0, fmt.Errorf(`invalid configuration value for max statements in "function-length" rule; need int64 but got %T`, arguments[0])
 	}
 	if maxStmt < 0 {
-		panic(fmt.Sprintf(`the configuration value for max statements in "function-length" rule cannot be negative, got %d`, maxStmt))
+		return 0, 0, fmt.Errorf(`the configuration value for max statements in "function-length" rule cannot be negative, got %d`, maxStmt)
 	}
 
 	maxLines, maxLinesOk := arguments[1].(int64)
 	if !maxLinesOk {
-		panic(fmt.Sprintf(`invalid configuration value for max lines in "function-length" rule; need int64 but got %T`, arguments[1]))
+		return 0, 0, fmt.Errorf(`invalid configuration value for max lines in "function-length" rule; need int64 but got %T`, arguments[1])
 	}
 	if maxLines < 0 {
-		panic(fmt.Sprintf(`the configuration value for max statements in "function-length" rule cannot be negative, got %d`, maxLines))
+		return 0, 0, fmt.Errorf(`the configuration value for max statements in "function-length" rule cannot be negative, got %d`, maxLines)
 	}
 
-	return maxStmt, maxLines
+	return maxStmt, maxLines, nil
 }
 
 func (*FunctionLength) countLines(b *ast.BlockStmt, file *lint.File) int {

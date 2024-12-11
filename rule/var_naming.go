@@ -33,13 +33,21 @@ type VarNamingRule struct {
 	configureOnce sync.Once
 }
 
-func (r *VarNamingRule) configure(arguments lint.Arguments) {
+func (r *VarNamingRule) configure(arguments lint.Arguments) error {
 	if len(arguments) >= 1 {
-		r.allowList = getList(arguments[0], "allowlist")
+		list, err := getList(arguments[0], "allowlist")
+		if err != nil {
+			return err
+		}
+		r.allowList = list
 	}
 
 	if len(arguments) >= 2 {
-		r.blockList = getList(arguments[1], "blocklist")
+		list, err := getList(arguments[1], "blocklist")
+		if err != nil {
+			return err
+		}
+		r.blockList = list
 	}
 
 	if len(arguments) >= 3 {
@@ -47,18 +55,19 @@ func (r *VarNamingRule) configure(arguments lint.Arguments) {
 		thirdArgument := arguments[2]
 		asSlice, ok := thirdArgument.([]any)
 		if !ok {
-			panic(fmt.Sprintf("Invalid third argument to the var-naming rule. Expecting a %s of type slice, got %T", "options", arguments[2]))
+			return fmt.Errorf("invalid third argument to the var-naming rule. Expecting a %s of type slice, got %T", "options", arguments[2])
 		}
 		if len(asSlice) != 1 {
-			panic(fmt.Sprintf("Invalid third argument to the var-naming rule. Expecting a %s of type slice, of len==1, but %d", "options", len(asSlice)))
+			return fmt.Errorf("invalid third argument to the var-naming rule. Expecting a %s of type slice, of len==1, but %d", "options", len(asSlice))
 		}
 		args, ok := asSlice[0].(map[string]any)
 		if !ok {
-			panic(fmt.Sprintf("Invalid third argument to the var-naming rule. Expecting a %s of type slice, of len==1, with map, but %T", "options", asSlice[0]))
+			return fmt.Errorf("invalid third argument to the var-naming rule. Expecting a %s of type slice, of len==1, with map, but %T", "options", asSlice[0])
 		}
 		r.allowUpperCaseConst = fmt.Sprint(args["upperCaseConst"]) == "true"
 		r.skipPackageNameChecks = fmt.Sprint(args["skipPackageNameChecks"]) == "true"
 	}
+	return nil
 }
 
 func (r *VarNamingRule) applyPackageCheckRules(walker *lintNames) {
@@ -83,7 +92,12 @@ func (r *VarNamingRule) applyPackageCheckRules(walker *lintNames) {
 
 // Apply applies the rule to given file.
 func (r *VarNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	r.configureOnce.Do(func() { r.configure(arguments) })
+	var configureErr error
+	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
+
+	if configureErr != nil {
+		return newInternalFailureError(configureErr)
+	}
 
 	var failures []lint.Failure
 
@@ -263,18 +277,18 @@ func (w *lintNames) Visit(n ast.Node) ast.Visitor {
 	return w
 }
 
-func getList(arg any, argName string) []string {
+func getList(arg any, argName string) ([]string, error) {
 	args, ok := arg.([]any)
 	if !ok {
-		panic(fmt.Sprintf("Invalid argument to the var-naming rule. Expecting a %s of type slice with initialisms, got %T", argName, arg))
+		return nil, fmt.Errorf("invalid argument to the var-naming rule. Expecting a %s of type slice with initialisms, got %T", argName, arg)
 	}
 	var list []string
 	for _, v := range args {
 		val, ok := v.(string)
 		if !ok {
-			panic(fmt.Sprintf("Invalid %s values of the var-naming rule. Expecting slice of strings but got element of type %T", val, arg))
+			return nil, fmt.Errorf("invalid %s values of the var-naming rule. Expecting slice of strings but got element of type %T", val, arg)
 		}
 		list = append(list, val)
 	}
-	return list
+	return list, nil
 }
