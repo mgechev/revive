@@ -79,7 +79,7 @@ func (r *FilenameFormatRule) configure(arguments lint.Arguments) error {
 
 	format, err := regexp.Compile(str)
 	if err != nil {
-		return fmt.Errorf("rule %q expects a valid regexp argument, got error for %s: %w", r.Name(), err)
+		return fmt.Errorf("rule %q expects a valid regexp argument, got error for %s: %w", r.Name(), str, err)
 	}
 
 	r.format = format
