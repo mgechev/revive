@@ -13,6 +13,7 @@ type FileHeaderRule struct {
 	header string
 
 	configureOnce sync.Once
+	configureErr  error
 }
 
 var (
@@ -35,11 +36,9 @@ func (r *FileHeaderRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *FileHeaderRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
+	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
+	if r.configureErr != nil {
+		return newInternalFailureError(r.configureErr)
 	}
 
 	if r.header == "" {

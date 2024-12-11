@@ -18,6 +18,7 @@ type UnusedParamRule struct {
 	failureMsg string
 
 	configureOnce sync.Once
+	configureErr  error
 }
 
 func (r *UnusedParamRule) configure(args lint.Arguments) error {
@@ -51,11 +52,9 @@ func (r *UnusedParamRule) configure(args lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *UnusedParamRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
+	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
+	if r.configureErr != nil {
+		return newInternalFailureError(r.configureErr)
 	}
 
 	var failures []lint.Failure

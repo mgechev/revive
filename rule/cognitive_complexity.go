@@ -15,6 +15,7 @@ type CognitiveComplexityRule struct {
 	maxComplexity int
 
 	configureOnce sync.Once
+	configureErr  error
 }
 
 const defaultMaxCognitiveComplexity = 7
@@ -36,11 +37,9 @@ func (r *CognitiveComplexityRule) configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *CognitiveComplexityRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
+	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
+	if r.configureErr != nil {
+		return newInternalFailureError(r.configureErr)
 	}
 
 	var failures []lint.Failure

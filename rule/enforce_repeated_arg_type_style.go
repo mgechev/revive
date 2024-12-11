@@ -45,6 +45,7 @@ type EnforceRepeatedArgTypeStyleRule struct {
 	funcRetValStyle enforceRepeatedArgTypeStyleType
 
 	configureOnce sync.Once
+	configureErr  error
 }
 
 func (r *EnforceRepeatedArgTypeStyleRule) configure(arguments lint.Arguments) error {
@@ -102,11 +103,9 @@ func (r *EnforceRepeatedArgTypeStyleRule) configure(arguments lint.Arguments) er
 
 // Apply applies the rule to a given file.
 func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
+	r.configureOnce.Do(func() { r.configureErr = r.configure(arguments) })
+	if r.configureErr != nil {
+		return newInternalFailureError(r.configureErr)
 	}
 
 	if r.funcArgStyle == enforceRepeatedArgTypeStyleTypeAny && r.funcRetValStyle == enforceRepeatedArgTypeStyleTypeAny {
