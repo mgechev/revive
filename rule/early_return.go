@@ -35,7 +35,7 @@ func (*EarlyReturnRule) checkIfElse(chain ifelse.Chain, args ifelse.Args) (strin
 
 	if chain.HasPriorNonDeviating && !chain.If.IsEmpty() {
 		// if we de-indent this block then a previous branch
-		// might flow into it, affecting program behaviour
+		// might flow into it, affecting program behavior
 		return "", false
 	}
 
