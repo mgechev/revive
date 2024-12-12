@@ -171,12 +171,12 @@ func parseConfig(path string, config *lint.Config) error {
 	}
 	err = toml.Unmarshal(file, config)
 	if err != nil {
-		return fmt.Errorf("cannot parse the config file: %v", err)
+		return fmt.Errorf("cannot parse the config file: %w", err)
 	}
 	for k, r := range config.Rules {
 		err := r.Initialize()
 		if err != nil {
-			return fmt.Errorf("error in config of rule [%s] : [%v]", k, err)
+			return fmt.Errorf("error in config of rule [%s] : [%w]", k, err)
 		}
 		config.Rules[k] = r
 	}

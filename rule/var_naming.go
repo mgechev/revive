@@ -70,7 +70,7 @@ func (r *VarNamingRule) configure(arguments lint.Arguments) error {
 	return nil
 }
 
-func (r *VarNamingRule) applyPackageCheckRules(walker *lintNames) {
+func (*VarNamingRule) applyPackageCheckRules(walker *lintNames) {
 	// Package names need slightly different handling than other names.
 	if strings.Contains(walker.fileAst.Name.Name, "_") && !strings.HasSuffix(walker.fileAst.Name.Name, "_test") {
 		walker.onFailure(lint.Failure{

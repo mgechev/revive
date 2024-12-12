@@ -40,7 +40,7 @@ func (r *FilenameFormatRule) Apply(file *lint.File, arguments lint.Arguments) []
 	}}
 }
 
-func (r *FilenameFormatRule) getMsgForNonASCIIChars(str string) string {
+func (*FilenameFormatRule) getMsgForNonASCIIChars(str string) string {
 	result := ""
 	for _, c := range str {
 		if c <= unicode.MaxASCII {

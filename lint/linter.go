@@ -163,12 +163,12 @@ func detectGoMod(dir string) (rootDir string, ver *goversion.Version, err error)
 
 	mod, err := os.ReadFile(modFileName)
 	if err != nil {
-		return "", nil, fmt.Errorf("failed to read %q, got %v", modFileName, err)
+		return "", nil, fmt.Errorf("failed to read %q, got %w", modFileName, err)
 	}
 
 	modAst, err := modfile.ParseLax(modFileName, mod, nil)
 	if err != nil {
-		return "", nil, fmt.Errorf("failed to parse %q, got %v", modFileName, err)
+		return "", nil, fmt.Errorf("failed to parse %q, got %w", modFileName, err)
 	}
 
 	if modAst.Go == nil {

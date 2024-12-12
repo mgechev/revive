@@ -49,7 +49,7 @@ func (w lintBareReturnRule) checkFunc(results *ast.FieldList, body *ast.BlockStm
 		return // nothing to do
 	}
 
-	brf := bareReturnFinder{w.onFailure}
+	brf := bareReturnFinder(w)
 	ast.Walk(brf, body)
 }
 

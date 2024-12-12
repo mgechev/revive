@@ -17,6 +17,8 @@ import (
 )
 
 func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.RuleConfig) {
+	t.Helper()
+
 	baseDir := filepath.Join("..", "testdata", filepath.Dir(filename))
 	filename = filepath.Base(filename) + ".go"
 	fullFilePath := filepath.Join(baseDir, filename)
@@ -40,6 +42,8 @@ func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.Rul
 }
 
 func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, rules []lint.Rule, config map[string]lint.RuleConfig) error {
+	t.Helper()
+
 	l := lint.New(os.ReadFile, 0)
 
 	filePath := filepath.Join(baseDir, fi.Name())
@@ -61,6 +65,8 @@ func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, rules []lint.Ru
 }
 
 func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, rules []lint.Rule, config map[string]lint.RuleConfig) error {
+	t.Helper()
+
 	l := lint.New(os.ReadFile, 0)
 
 	ins := parseInstructions(t, filepath.Join(baseDir, fi.Name()), src)
@@ -110,7 +116,6 @@ func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, ru
 				copy(failures[i:], failures[i+1:])
 				failures = failures[:len(failures)-1]
 
-				// t.Logf("/%v/ matched at %s:%d", in.Match, fi.Name(), in.Line)
 				ok = true
 				break
 			}
@@ -144,6 +149,8 @@ type JSONInstruction struct {
 // parseInstructions parses instructions from the comments in a Go source file.
 // It returns nil if none were parsed.
 func parseInstructions(t *testing.T, filename string, src []byte) []instruction {
+	t.Helper()
+
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, filename, src, parser.ParseComments)
 	if err != nil {

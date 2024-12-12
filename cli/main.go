@@ -28,7 +28,7 @@ var (
 	commit  = defaultCommit
 	date    = defaultDate
 	builtBy = defaultBuilder
-	//AppFs is used to operations related with user config files
+	// AppFs is used to operations related with user config files
 	AppFs = afero.NewOsFs()
 )
 
