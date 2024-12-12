@@ -120,7 +120,8 @@ func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, arguments lint.
 	ast.Inspect(astFile, func(n ast.Node) bool {
 		switch fn := n.(type) {
 		case *ast.FuncDecl:
-			if r.funcArgStyle == enforceRepeatedArgTypeStyleTypeFull {
+			switch r.funcArgStyle {
+			case enforceRepeatedArgTypeStyleTypeFull:
 				if fn.Type.Params != nil {
 					for _, field := range fn.Type.Params.List {
 						if len(field.Names) > 1 {
@@ -133,11 +134,9 @@ func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, arguments lint.
 						}
 					}
 				}
-			}
-
-			if r.funcArgStyle == enforceRepeatedArgTypeStyleTypeShort {
-				var prevType ast.Expr
+			case enforceRepeatedArgTypeStyleTypeShort:
 				if fn.Type.Params != nil {
+					var prevType ast.Expr
 					for _, field := range fn.Type.Params.List {
 						prevTypeStr := gofmt(prevType)
 						currentTypeStr := gofmt(field.Type)
@@ -154,7 +153,8 @@ func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, arguments lint.
 				}
 			}
 
-			if r.funcRetValStyle == enforceRepeatedArgTypeStyleTypeFull {
+			switch r.funcRetValStyle {
+			case enforceRepeatedArgTypeStyleTypeFull:
 				if fn.Type.Results != nil {
 					for _, field := range fn.Type.Results.List {
 						if len(field.Names) > 1 {
@@ -167,11 +167,9 @@ func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, arguments lint.
 						}
 					}
 				}
-			}
-
-			if r.funcRetValStyle == enforceRepeatedArgTypeStyleTypeShort {
-				var prevType ast.Expr
+			case enforceRepeatedArgTypeStyleTypeShort:
 				if fn.Type.Results != nil {
+					var prevType ast.Expr
 					for _, field := range fn.Type.Results.List {
 						prevTypeStr := gofmt(prevType)
 						currentTypeStr := gofmt(field.Type)

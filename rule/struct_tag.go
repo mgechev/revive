@@ -117,13 +117,9 @@ func (w lintStructTagRule) checkTagNameIfNeed(tag *structtag.Tag) (string, bool)
 		return "", true
 	}
 
-	needsToCheckTagName := tag.Key == keyBSON ||
-		tag.Key == keyJSON ||
-		tag.Key == keyXML ||
-		tag.Key == keyYAML ||
-		tag.Key == keyProtobuf
-
-	if !needsToCheckTagName {
+	switch tag.Key {
+	case keyBSON, keyJSON, keyXML, keyYAML, keyProtobuf:
+	default:
 		return "", true
 	}
 
