@@ -2,9 +2,10 @@ package formatter
 
 import (
 	"bytes"
+	"cmp"
 	"fmt"
 	"io"
-	"sort"
+	"slices"
 	"strings"
 
 	"github.com/fatih/color"
@@ -112,12 +113,12 @@ func (f *Friendly) printStatistics(w io.Writer, header string, stats map[string]
 	if len(stats) == 0 {
 		return
 	}
-	var data []statEntry
+	data := make([]statEntry, 0, len(stats))
 	for name, total := range stats {
 		data = append(data, statEntry{name, total})
 	}
-	sort.Slice(data, func(i, j int) bool {
-		return data[i].failures > data[j].failures
+	slices.SortFunc(data, func(a, b statEntry) int {
+		return -cmp.Compare(a.failures, b.failures)
 	})
 	formatted := [][]string{}
 	for _, entry := range data {
