@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"go/ast"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -12,21 +11,12 @@ import (
 // MaxControlNestingRule sets restriction for maximum nesting of control structures.
 type MaxControlNestingRule struct {
 	max int64
-
-	configureOnce sync.Once
 }
 
 const defaultMaxControlNesting = 5
 
 // Apply applies the rule to given file.
-func (r *MaxControlNestingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
-	}
-
+func (r *MaxControlNestingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -113,7 +103,10 @@ func (w *lintMaxControlNesting) walkControlledBlock(b ast.Node) {
 	w.nestingLevelAcc = oldNestingLevel
 }
 
-func (r *MaxControlNestingRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *MaxControlNestingRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		r.max = defaultMaxControlNesting
 		return nil

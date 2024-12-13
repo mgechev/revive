@@ -3,7 +3,6 @@ package rule
 import (
 	"fmt"
 	"go/ast"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -43,11 +42,12 @@ func repeatedArgTypeStyleFromString(s string) (enforceRepeatedArgTypeStyleType, 
 type EnforceRepeatedArgTypeStyleRule struct {
 	funcArgStyle    enforceRepeatedArgTypeStyleType
 	funcRetValStyle enforceRepeatedArgTypeStyleType
-
-	configureOnce sync.Once
 }
 
-func (r *EnforceRepeatedArgTypeStyleRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *EnforceRepeatedArgTypeStyleRule) Configure(arguments lint.Arguments) error {
 	r.funcArgStyle = enforceRepeatedArgTypeStyleTypeAny
 	r.funcRetValStyle = enforceRepeatedArgTypeStyleTypeAny
 
@@ -101,14 +101,7 @@ func (r *EnforceRepeatedArgTypeStyleRule) configure(arguments lint.Arguments) er
 }
 
 // Apply applies the rule to a given file.
-func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
-	}
-
+func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	if r.funcArgStyle == enforceRepeatedArgTypeStyleTypeAny && r.funcRetValStyle == enforceRepeatedArgTypeStyleTypeAny {
 		// This linter is not configured, return no failures.
 		return nil

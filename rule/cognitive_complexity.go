@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 	"golang.org/x/tools/go/ast/astutil"
@@ -13,13 +12,14 @@ import (
 // CognitiveComplexityRule sets restriction for maximum cognitive complexity.
 type CognitiveComplexityRule struct {
 	maxComplexity int
-
-	configureOnce sync.Once
 }
 
 const defaultMaxCognitiveComplexity = 7
 
-func (r *CognitiveComplexityRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *CognitiveComplexityRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		r.maxComplexity = defaultMaxCognitiveComplexity
 		return nil
@@ -35,14 +35,7 @@ func (r *CognitiveComplexityRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *CognitiveComplexityRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
-	}
-
+func (r *CognitiveComplexityRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	linter := cognitiveComplexityLinter{

@@ -3,7 +3,6 @@ package rule
 import (
 	"fmt"
 	"regexp"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -11,13 +10,14 @@ import (
 // ImportsBlocklistRule disallows importing the specified packages.
 type ImportsBlocklistRule struct {
 	blocklist []*regexp.Regexp
-
-	configureOnce sync.Once
 }
 
 var replaceImportRegexp = regexp.MustCompile(`/?\*\*/?`)
 
-func (r *ImportsBlocklistRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *ImportsBlocklistRule) Configure(arguments lint.Arguments) error {
 	r.blocklist = []*regexp.Regexp{}
 	for _, arg := range arguments {
 		argStr, ok := arg.(string)
@@ -43,14 +43,7 @@ func (r *ImportsBlocklistRule) isBlocklisted(path string) bool {
 }
 
 // Apply applies the rule to given file.
-func (r *ImportsBlocklistRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
-	}
-
+func (r *ImportsBlocklistRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	for _, is := range file.AST.Imports {

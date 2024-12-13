@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go/ast"
 	"reflect"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -13,11 +12,12 @@ import (
 type FunctionLength struct {
 	maxStmt  int
 	maxLines int
-
-	configureOnce sync.Once
 }
 
-func (r *FunctionLength) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *FunctionLength) Configure(arguments lint.Arguments) error {
 	maxStmt, maxLines, err := r.parseArguments(arguments)
 	if err != nil {
 		return err
@@ -28,14 +28,7 @@ func (r *FunctionLength) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *FunctionLength) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
-	}
-
+func (r *FunctionLength) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	for _, decl := range file.AST.Decls {
 		funcDecl, ok := decl.(*ast.FuncDecl)
@@ -80,8 +73,10 @@ func (*FunctionLength) Name() string {
 	return "function-length"
 }
 
-const defaultFuncStmtsLimit = 50
-const defaultFuncLinesLimit = 75
+const (
+	defaultFuncStmtsLimit = 50
+	defaultFuncLinesLimit = 75
+)
 
 func (*FunctionLength) parseArguments(arguments lint.Arguments) (maxStmt, maxLines int64, err error) {
 	if len(arguments) == 0 {

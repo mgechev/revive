@@ -7,7 +7,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -37,18 +36,10 @@ type AddConstantRule struct {
 	allowList       allowList
 	ignoreFunctions []*regexp.Regexp
 	strLitLimit     int
-
-	configureOnce sync.Once
 }
 
 // Apply applies the rule to given file.
-func (r *AddConstantRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
-	}
-
+func (r *AddConstantRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -206,7 +197,10 @@ func (w *lintAddConstantRule) isStructTag(n *ast.BasicLit) bool {
 	return ok
 }
 
-func (r *AddConstantRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *AddConstantRule) Configure(arguments lint.Arguments) error {
 	r.strLitLimit = defaultStrLitLimit
 	r.allowList = newAllowList()
 	if len(arguments) == 0 {

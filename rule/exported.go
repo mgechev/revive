@@ -5,7 +5,6 @@ import (
 	"go/ast"
 	"go/token"
 	"strings"
-	"sync"
 	"unicode"
 	"unicode/utf8"
 
@@ -25,9 +24,11 @@ type disabledChecks struct {
 	Var              bool
 }
 
-const checkNamePrivateReceivers = "privateReceivers"
-const checkNamePublicInterfaces = "publicInterfaces"
-const checkNameStuttering = "stuttering"
+const (
+	checkNamePrivateReceivers = "privateReceivers"
+	checkNamePublicInterfaces = "publicInterfaces"
+	checkNameStuttering       = "stuttering"
+)
 
 // isDisabled returns true if the given check is disabled, false otherwise
 func (dc *disabledChecks) isDisabled(checkName string) bool {
@@ -66,11 +67,12 @@ var commonMethods = map[string]bool{
 type ExportedRule struct {
 	stuttersMsg    string
 	disabledChecks disabledChecks
-
-	configureOnce sync.Once
 }
 
-func (r *ExportedRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *ExportedRule) Configure(arguments lint.Arguments) error {
 	r.disabledChecks = disabledChecks{PrivateReceivers: true, PublicInterfaces: true}
 	r.stuttersMsg = "stutters"
 	for _, flag := range arguments {
@@ -107,14 +109,7 @@ func (r *ExportedRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *ExportedRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
-	}
-
+func (r *ExportedRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	if file.IsTest() {
 		return failures

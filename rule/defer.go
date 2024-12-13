@@ -3,7 +3,6 @@ package rule
 import (
 	"fmt"
 	"go/ast"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -11,11 +10,12 @@ import (
 // DeferRule lints gotchas in defer statements.
 type DeferRule struct {
 	allow map[string]bool
-
-	configureOnce sync.Once
 }
 
-func (r *DeferRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *DeferRule) Configure(arguments lint.Arguments) error {
 	list, err := r.allowFromArgs(arguments)
 	if err != nil {
 		return err
@@ -25,14 +25,7 @@ func (r *DeferRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *DeferRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
-	}
-
+func (r *DeferRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)

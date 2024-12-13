@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go/ast"
 	"regexp"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -14,11 +13,12 @@ type UnusedReceiverRule struct {
 	// regex to check if some name is valid for unused parameter, "^_$" by default
 	allowRegex *regexp.Regexp
 	failureMsg string
-
-	configureOnce sync.Once
 }
 
-func (r *UnusedReceiverRule) configure(args lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *UnusedReceiverRule) Configure(args lint.Arguments) error {
 	// while by default args is an array, i think it's good to provide structures inside it by default, not arrays or primitives
 	// it's more compatible to JSON nature of configurations
 	r.allowRegex = allowBlankIdentifierRegex
@@ -48,14 +48,7 @@ func (r *UnusedReceiverRule) configure(args lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *UnusedReceiverRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
-	}
-
+func (r *UnusedReceiverRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	for _, decl := range file.AST.Decls {

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"go/ast"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -17,11 +16,12 @@ const (
 // UncheckedTypeAssertionRule lints missing or ignored `ok`-value in dynamic type casts.
 type UncheckedTypeAssertionRule struct {
 	acceptIgnoredAssertionResult bool
-
-	configureOnce sync.Once
 }
 
-func (r *UncheckedTypeAssertionRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *UncheckedTypeAssertionRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) == 0 {
 		return nil
 	}
@@ -46,14 +46,7 @@ func (r *UncheckedTypeAssertionRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *UncheckedTypeAssertionRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
-	}
-
+func (r *UncheckedTypeAssertionRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	walker := &lintUncheckedTypeAssertion{

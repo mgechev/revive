@@ -3,7 +3,6 @@ package rule
 import (
 	"fmt"
 	"go/ast"
-	"sync"
 
 	"github.com/mgechev/revive/internal/typeparams"
 	"github.com/mgechev/revive/lint"
@@ -12,13 +11,13 @@ import (
 // ReceiverNamingRule lints a receiver name.
 type ReceiverNamingRule struct {
 	receiverNameMaxLength int
-
-	configureOnce sync.Once
 }
 
 const defaultReceiverNameMaxLength = -1 // thus will not check
-
-func (r *ReceiverNamingRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *ReceiverNamingRule) Configure(arguments lint.Arguments) error {
 	r.receiverNameMaxLength = defaultReceiverNameMaxLength
 	if len(arguments) < 1 {
 		return nil
@@ -45,14 +44,7 @@ func (r *ReceiverNamingRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *ReceiverNamingRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
-	}
-
+func (r *ReceiverNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	typeReceiver := map[string]string{}
 	var failures []lint.Failure
 	for _, decl := range file.AST.Decls {

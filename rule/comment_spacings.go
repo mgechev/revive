@@ -3,7 +3,6 @@ package rule
 import (
 	"fmt"
 	"strings"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -12,11 +11,12 @@ import (
 // the comment symbol( // ) and the start of the comment text
 type CommentSpacingsRule struct {
 	allowList []string
-
-	configureOnce sync.Once
 }
 
-func (r *CommentSpacingsRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *CommentSpacingsRule) Configure(arguments lint.Arguments) error {
 	r.allowList = []string{}
 	for _, arg := range arguments {
 		allow, ok := arg.(string) // Alt. non panicking version
@@ -29,14 +29,7 @@ func (r *CommentSpacingsRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply the rule.
-func (r *CommentSpacingsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
-	}
-
+func (r *CommentSpacingsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	for _, cg := range file.AST.Comments {

@@ -36,6 +36,10 @@ var rules = []lint.Rule{
 func TestAll(t *testing.T) {
 	baseDir := "../testdata/golint/"
 
+	for _, r := range rules {
+		configureRule(t, r, nil)
+	}
+
 	rx, err := regexp.Compile(*lintMatch)
 	if err != nil {
 		t.Fatalf("Bad -lint.match value %q: %v", *lintMatch, err)

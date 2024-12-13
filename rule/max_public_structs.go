@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"go/ast"
 	"strings"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -13,13 +12,14 @@ import (
 // MaxPublicStructsRule lints the number of public structs in a file.
 type MaxPublicStructsRule struct {
 	max int64
-
-	configureOnce sync.Once
 }
 
 const defaultMaxPublicStructs = 5
 
-func (r *MaxPublicStructsRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *MaxPublicStructsRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		r.max = defaultMaxPublicStructs
 		return nil
@@ -39,14 +39,7 @@ func (r *MaxPublicStructsRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *MaxPublicStructsRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
-	}
-
+func (r *MaxPublicStructsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	if r.max < 1 {

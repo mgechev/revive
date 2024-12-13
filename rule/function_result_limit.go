@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"go/ast"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -12,19 +11,10 @@ import (
 // FunctionResultsLimitRule limits the maximum number of results a function can return.
 type FunctionResultsLimitRule struct {
 	max int
-
-	configureOnce sync.Once
 }
 
 // Apply applies the rule to given file.
-func (r *FunctionResultsLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
-	}
-
+func (r *FunctionResultsLimitRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	for _, decl := range file.AST.Decls {
 		funcDecl, ok := decl.(*ast.FuncDecl)
@@ -59,7 +49,10 @@ func (*FunctionResultsLimitRule) Name() string {
 
 const defaultResultsLimit = 3
 
-func (r *FunctionResultsLimitRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *FunctionResultsLimitRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		r.max = defaultResultsLimit
 		return nil

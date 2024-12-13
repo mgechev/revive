@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"go/token"
 	"strings"
-	"sync"
 	"unicode/utf8"
 
 	"github.com/mgechev/revive/lint"
@@ -16,13 +15,14 @@ import (
 // LineLengthLimitRule lints number of characters in a line.
 type LineLengthLimitRule struct {
 	max int
-
-	configureOnce sync.Once
 }
 
 const defaultLineLengthLimit = 80
 
-func (r *LineLengthLimitRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *LineLengthLimitRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		r.max = defaultLineLengthLimit
 		return nil
@@ -38,14 +38,7 @@ func (r *LineLengthLimitRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *LineLengthLimitRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
-	}
-
+func (r *LineLengthLimitRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	checker := lintLineLengthNum{

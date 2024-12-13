@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -14,13 +13,14 @@ import (
 // CyclomaticRule sets restriction for maximum cyclomatic complexity.
 type CyclomaticRule struct {
 	maxComplexity int
-
-	configureOnce sync.Once
 }
 
 const defaultMaxCyclomaticComplexity = 10
 
-func (r *CyclomaticRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *CyclomaticRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		r.maxComplexity = defaultMaxCyclomaticComplexity
 		return nil
@@ -35,14 +35,7 @@ func (r *CyclomaticRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *CyclomaticRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
-	}
-
+func (r *CyclomaticRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	for _, decl := range file.AST.Decls {
 		fn, ok := decl.(*ast.FuncDecl)

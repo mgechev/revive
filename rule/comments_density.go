@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go/ast"
 	"strings"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -12,13 +11,14 @@ import (
 // CommentsDensityRule enforces a minimum comment / code relation.
 type CommentsDensityRule struct {
 	minimumCommentsDensity int64
-
-	configureOnce sync.Once
 }
 
 const defaultMinimumCommentsPercentage = 0
 
-func (r *CommentsDensityRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *CommentsDensityRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		r.minimumCommentsDensity = defaultMinimumCommentsPercentage
 		return nil
@@ -33,14 +33,7 @@ func (r *CommentsDensityRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *CommentsDensityRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
-	}
-	
+func (r *CommentsDensityRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	commentsLines := countDocLines(file.AST.Comments)
 	statementsCount := countStatements(file.AST)
 	density := (float32(commentsLines) / float32(statementsCount+commentsLines)) * 100

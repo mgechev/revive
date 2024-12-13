@@ -3,7 +3,6 @@ package rule
 import (
 	"fmt"
 	"go/ast"
-	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -40,11 +39,12 @@ func mapStyleFromString(s string) (enforceMapStyleType, error) {
 // EnforceMapStyleRule implements a rule to enforce `make(map[type]type)` over `map[type]type{}`.
 type EnforceMapStyleRule struct {
 	enforceMapStyle enforceMapStyleType
-
-	configureOnce sync.Once
 }
 
-func (r *EnforceMapStyleRule) configure(arguments lint.Arguments) error {
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (r *EnforceMapStyleRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		r.enforceMapStyle = enforceMapStyleTypeAny
 		return nil
@@ -65,14 +65,7 @@ func (r *EnforceMapStyleRule) configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *EnforceMapStyleRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
-	var configureErr error
-	r.configureOnce.Do(func() { configureErr = r.configure(arguments) })
-
-	if configureErr != nil {
-		return newInternalFailureError(configureErr)
-	}
-
+func (r *EnforceMapStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	if r.enforceMapStyle == enforceMapStyleTypeAny {
 		// this linter is not configured
 		return nil
