@@ -1,0 +1,4 @@
+enableAllRules = false
+
+[rule.var-naming]
+  arguments = ["ID", "VM"]
