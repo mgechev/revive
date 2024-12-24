@@ -12,7 +12,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/mgechev/revive/config"
 	"github.com/mgechev/revive/revivelib"
-	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/afero"
 )
 
@@ -128,7 +127,7 @@ func buildDefaultConfigPath() string {
 	configFileName := "revive.toml"
 	configDirFile := filepath.Join(os.Getenv("XDG_CONFIG_HOME"), configFileName)
 
-	if homeDir, err := homedir.Dir(); err == nil {
+	if homeDir, err := os.UserHomeDir(); err == nil {
 		homeDirFile = filepath.Join(homeDir, configFileName)
 	}
 

@@ -9,7 +9,6 @@ require (
 	github.com/fatih/structtag v1.2.0
 	github.com/hashicorp/go-version v1.7.0
 	github.com/mgechev/dots v0.0.0-20210922191527-e955255bf517
-	github.com/mitchellh/go-homedir v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/spf13/afero v1.11.0
 	golang.org/x/mod v0.22.0

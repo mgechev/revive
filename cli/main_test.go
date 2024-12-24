@@ -3,17 +3,17 @@ package cli
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
-	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/afero"
 )
 
 func TestMain(m *testing.M) {
 	os.Unsetenv("HOME")
+	os.Unsetenv("USERPROFILE")
 	os.Unsetenv("XDG_CONFIG_HOME")
 	AppFs = afero.NewMemMapFs()
-	homedir.DisableCache = true
 	os.Exit(m.Run())
 }
 
@@ -32,7 +32,7 @@ func TestXDGConfigDirIsPreferredFirst(t *testing.T) {
 	t.Setenv("XDG_CONFIG_HOME", xdgDirPath)
 
 	afero.WriteFile(AppFs, filepath.Join(homeDirPath, "revive.toml"), []byte("\n"), 0644)
-	t.Setenv("HOME", homeDirPath)
+	setHome(t, homeDirPath)
 
 	got := buildDefaultConfigPath()
 	want := filepath.Join(xdgDirPath, "revive.toml")
@@ -48,7 +48,7 @@ func TestHomeConfigDir(t *testing.T) {
 	AppFs.MkdirAll(homeDirPath, 0755)
 
 	afero.WriteFile(AppFs, filepath.Join(homeDirPath, "revive.toml"), []byte("\n"), 0644)
-	t.Setenv("HOME", homeDirPath)
+	setHome(t, homeDirPath)
 
 	got := buildDefaultConfigPath()
 	want := filepath.Join(homeDirPath, "revive.toml")
@@ -56,6 +56,14 @@ func TestHomeConfigDir(t *testing.T) {
 	if got != want {
 		t.Errorf("got %q, wanted %q", got, want)
 	}
+}
+
+func setHome(t *testing.T, dir string) {
+	homeEnv := "HOME"
+	if runtime.GOOS == "windows" {
+		homeEnv = "USERPROFILE"
+	}
+	t.Setenv(homeEnv, dir)
 }
 
 func TestXDGConfigDir(t *testing.T) {
