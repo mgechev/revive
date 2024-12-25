@@ -57,7 +57,7 @@ func (r *FileLengthLimitRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 
 	return []lint.Failure{
 		{
-			Category:   "code-style",
+			Category:   lint.FailureCategoryCodeStyle,
 			Confidence: 1,
 			Position: lint.FailurePosition{
 				Start: token.Position{

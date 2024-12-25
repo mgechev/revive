@@ -69,7 +69,7 @@ func (w lintErrorf) Visit(n ast.Node) ast.Visitor {
 	}
 
 	failure := lint.Failure{
-		Category:   "errors",
+		Category:   lint.FailureCategoryErrors,
 		Node:       n,
 		Confidence: 1,
 		Failure:    fmt.Sprintf("should replace %s(fmt.Sprintf(...)) with %s.Errorf(...)", w.file.Render(se), errorfPrefix),

@@ -87,7 +87,7 @@ func (r *UnusedReceiverRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 		failures = append(failures, lint.Failure{
 			Confidence: 1,
 			Node:       recID,
-			Category:   "bad practice",
+			Category:   lint.FailureCategoryBadPractice,
 			Failure:    fmt.Sprintf(r.failureMsg, recID.Name),
 		})
 	}

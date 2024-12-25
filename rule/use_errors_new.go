@@ -50,7 +50,7 @@ func (w lintFmtErrorf) Visit(n ast.Node) ast.Visitor {
 
 	// the call is of the form fmt.Errorf("...")
 	w.onFailure(lint.Failure{
-		Category:   "errors",
+		Category:   lint.FailureCategoryErrors,
 		Node:       n,
 		Confidence: 1,
 		Failure:    "replace fmt.Errorf by errors.New",

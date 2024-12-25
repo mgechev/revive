@@ -57,7 +57,7 @@ func (r *CommentSpacingsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 			failures = append(failures, lint.Failure{
 				Node:       comment,
 				Confidence: 1,
-				Category:   "style",
+				Category:   lint.FailureCategoryStyle,
 				Failure:    "no space between comment delimiter and comment text",
 			})
 		}

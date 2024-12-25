@@ -62,7 +62,7 @@ func (r *MaxPublicStructsRule) Apply(file *lint.File, _ lint.Arguments) []lint.F
 			Failure:    fmt.Sprintf("you have exceeded the maximum number (%d) of public struct declarations", r.max),
 			Confidence: 1,
 			Node:       fileAst,
-			Category:   "style",
+			Category:   lint.FailureCategoryStyle,
 		})
 	}
 

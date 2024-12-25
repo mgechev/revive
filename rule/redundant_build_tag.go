@@ -23,7 +23,7 @@ func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 
 			if hasGoBuild && strings.HasPrefix(comment.Text, "// +build ") {
 				return []lint.Failure{{
-					Category:   "style",
+					Category:   lint.FailureCategoryStyle,
 					Confidence: 1,
 					Node:       comment,
 					Failure:    `The build tag "// +build" is redundant since Go 1.17 and can be removed`,

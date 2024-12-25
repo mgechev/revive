@@ -78,7 +78,7 @@ func (w lintOptimizeOperandsOrderlExpr) Visit(node ast.Node) ast.Visitor {
 	w.onFailure(lint.Failure{
 		Failure:    fmt.Sprintf("for better performance '%v' might be rewritten as '%v'", gofmt(binExpr), gofmt(&newExpr)),
 		Node:       node,
-		Category:   "optimization",
+		Category:   lint.FailureCategoryOptimization,
 		Confidence: 0.3,
 	})
 

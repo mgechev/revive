@@ -69,7 +69,7 @@ func (w lintErrors) Visit(_ ast.Node) ast.Visitor {
 				w.onFailure(lint.Failure{
 					Node:       id,
 					Confidence: 0.9,
-					Category:   "naming",
+					Category:   lint.FailureCategoryNaming,
 					Failure:    fmt.Sprintf("error var %s should have name of the form %sFoo", id.Name, prefix),
 				})
 			}

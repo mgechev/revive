@@ -74,7 +74,7 @@ func checkContextKeyType(w lintContextKeyTypes, x *ast.CallExpr) {
 		w.onFailure(lint.Failure{
 			Confidence: 1,
 			Node:       x,
-			Category:   "content",
+			Category:   lint.FailureCategoryContent,
 			Failure:    fmt.Sprintf("should not use basic type %s as key in context.WithValue", key.Type),
 		})
 	}

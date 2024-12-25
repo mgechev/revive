@@ -25,7 +25,7 @@ func (*RedundantImportAlias) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 				Confidence: 1,
 				Failure:    fmt.Sprintf("Import alias \"%s\" is redundant", imp.Name.Name),
 				Node:       imp,
-				Category:   "imports",
+				Category:   lint.FailureCategoryImports,
 			})
 		}
 	}
