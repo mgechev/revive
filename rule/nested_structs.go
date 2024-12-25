@@ -68,7 +68,7 @@ func (l *lintStruct) Visit(n ast.Node) ast.Visitor {
 func (l *lintStruct) fail(n ast.Node) {
 	l.onFailure(lint.Failure{
 		Failure:    "no nested structs are allowed",
-		Category:   "style",
+		Category:   lint.FailureCategoryStyle,
 		Node:       n,
 		Confidence: 1,
 	})

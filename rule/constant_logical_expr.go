@@ -95,7 +95,7 @@ func (w lintConstantLogicalExpr) newFailure(node ast.Node, msg string) {
 	w.onFailure(lint.Failure{
 		Confidence: 1,
 		Node:       node,
-		Category:   "logic",
+		Category:   lint.FailureCategoryLogic,
 		Failure:    msg,
 	})
 }

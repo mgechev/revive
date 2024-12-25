@@ -105,7 +105,7 @@ func (r *EnforceSliceStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint.
 			failures = append(failures, lint.Failure{
 				Confidence: 1,
 				Node:       v,
-				Category:   "style",
+				Category:   lint.FailureCategoryStyle,
 				Failure:    failureMessage,
 			})
 		case *ast.CallExpr:
@@ -165,7 +165,7 @@ func (r *EnforceSliceStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint.
 			failures = append(failures, lint.Failure{
 				Confidence: 1,
 				Node:       v.Args[0],
-				Category:   "style",
+				Category:   lint.FailureCategoryStyle,
 				Failure:    failureMessage,
 			})
 		}

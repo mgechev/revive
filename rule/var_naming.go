@@ -77,7 +77,7 @@ func (*VarNamingRule) applyPackageCheckRules(walker *lintNames) {
 			Failure:    "don't use an underscore in package name",
 			Confidence: 1,
 			Node:       walker.fileAst.Name,
-			Category:   "naming",
+			Category:   lint.FailureCategoryNaming,
 		})
 	}
 	if anyCapsRE.MatchString(walker.fileAst.Name.Name) {
@@ -85,7 +85,7 @@ func (*VarNamingRule) applyPackageCheckRules(walker *lintNames) {
 			Failure:    fmt.Sprintf("don't use MixedCaps in package name; %s should be %s", walker.fileAst.Name.Name, strings.ToLower(walker.fileAst.Name.Name)),
 			Confidence: 1,
 			Node:       walker.fileAst.Name,
-			Category:   "naming",
+			Category:   lint.FailureCategoryNaming,
 		})
 	}
 }
@@ -152,7 +152,7 @@ func (w *lintNames) check(id *ast.Ident, thing string) {
 			Failure:    "don't use ALL_CAPS in Go names; use CamelCase",
 			Confidence: 0.8,
 			Node:       id,
-			Category:   "naming",
+			Category:   lint.FailureCategoryNaming,
 		})
 		return
 	}
@@ -167,7 +167,7 @@ func (w *lintNames) check(id *ast.Ident, thing string) {
 			Failure:    fmt.Sprintf("don't use underscores in Go names; %s %s should be %s", thing, id.Name, should),
 			Confidence: 0.9,
 			Node:       id,
-			Category:   "naming",
+			Category:   lint.FailureCategoryNaming,
 		})
 		return
 	}
@@ -175,7 +175,7 @@ func (w *lintNames) check(id *ast.Ident, thing string) {
 		Failure:    fmt.Sprintf("%s %s should be %s", thing, id.Name, should),
 		Confidence: 0.8,
 		Node:       id,
-		Category:   "naming",
+		Category:   lint.FailureCategoryNaming,
 	})
 }
 

@@ -76,7 +76,7 @@ func (r lintLineLengthNum) check() {
 		c := utf8.RuneCountInString(t)
 		if c > r.max {
 			r.onFailure(lint.Failure{
-				Category: "code-style",
+				Category: lint.FailureCategoryCodeStyle,
 				Position: lint.FailurePosition{
 					// Offset not set; it is non-trivial, and doesn't appear to be needed.
 					Start: token.Position{

@@ -129,7 +129,7 @@ func (w lintUnusedParamRule) Visit(node ast.Node) ast.Visitor {
 				w.onFailure(lint.Failure{
 					Confidence: 1,
 					Node:       n,
-					Category:   "bad practice",
+					Category:   lint.FailureCategoryBadPractice,
 					Failure:    fmt.Sprintf(w.failureMsg, n.Name),
 				})
 			}

@@ -63,7 +63,7 @@ func (l *lintTimeEqual) Visit(node ast.Node) ast.Visitor {
 	}
 
 	l.onFailure(lint.Failure{
-		Category:   "time",
+		Category:   lint.FailureCategoryTime,
 		Confidence: 1,
 		Node:       node,
 		Failure:    fmt.Sprintf("use %s%s.Equal(%s) instead of %q operator", negateStr, gofmt(expr.X), gofmt(expr.Y), expr.Op),

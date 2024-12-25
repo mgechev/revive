@@ -47,7 +47,7 @@ func (*UnexportedReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 			}
 
 			failures = append(failures, lint.Failure{
-				Category:   "unexported-type-in-api",
+				Category:   lint.FailureCategoryUnexportedTypeInAPI,
 				Node:       ret.Type,
 				Confidence: 0.8,
 				Failure: fmt.Sprintf("exported %s %s returns unexported type %s, which can be annoying to use",

@@ -55,7 +55,7 @@ func (w lintEmptyBlock) Visit(node ast.Node) ast.Visitor {
 			w.onFailure(lint.Failure{
 				Confidence: 0.9,
 				Node:       n,
-				Category:   "logic",
+				Category:   lint.FailureCategoryLogic,
 				Failure:    "this block is empty, you can remove it",
 			})
 			return nil // skip visiting the range subtree (it will produce a duplicated failure)
@@ -65,7 +65,7 @@ func (w lintEmptyBlock) Visit(node ast.Node) ast.Visitor {
 			w.onFailure(lint.Failure{
 				Confidence: 1,
 				Node:       n,
-				Category:   "logic",
+				Category:   lint.FailureCategoryLogic,
 				Failure:    "this block is empty, you can remove it",
 			})
 		}

@@ -181,7 +181,7 @@ func (w *lintUncheckedTypeAssertion) Visit(node ast.Node) ast.Visitor {
 func (w *lintUncheckedTypeAssertion) addFailure(n *ast.TypeAssertExpr, why string) {
 	s := fmt.Sprintf("type cast result is unchecked in %v - %s", gofmt(n), why)
 	w.onFailure(lint.Failure{
-		Category:   "bad practice",
+		Category:   lint.FailureCategoryBadPractice,
 		Confidence: 1,
 		Node:       n,
 		Failure:    s,

@@ -34,7 +34,7 @@ func (*ConfusingResultsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 				failures = append(failures, lint.Failure{
 					Node:       result,
 					Confidence: 1,
-					Category:   "naming",
+					Category:   lint.FailureCategoryNaming,
 					Failure:    "unnamed results of the same type may be confusing, consider using named results",
 				})
 

@@ -102,7 +102,7 @@ func checkMethodName(holder string, id *ast.Ident, w *lintConfusingNames) {
 				Failure:    fmt.Sprintf("Method '%s' differs only by capitalization to %s '%s' in %s", id.Name, kind, refMethod.id.Name, fileName),
 				Confidence: 1,
 				Node:       id,
-				Category:   "naming",
+				Category:   lint.FailureCategoryNaming,
 			})
 
 			return
@@ -176,7 +176,7 @@ func checkStructFields(fields *ast.FieldList, structName string, w *lintConfusin
 					Failure:    fmt.Sprintf("Field '%s' differs only by capitalization to other field in the struct type %s", id.Name, structName),
 					Confidence: 1,
 					Node:       id,
-					Category:   "naming",
+					Category:   lint.FailureCategoryNaming,
 				})
 			} else {
 				bl[normName] = true

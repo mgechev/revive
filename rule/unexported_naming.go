@@ -107,7 +107,7 @@ func (unl unexportablenamingLinter) lintIDs(ids []*ast.Ident) {
 			unl.onFailure(lint.Failure{
 				Node:       id,
 				Confidence: 1,
-				Category:   "naming",
+				Category:   lint.FailureCategoryNaming,
 				Failure:    fmt.Sprintf("the symbol %s is local, its name should start with a lowercase letter", id.String()),
 			})
 		}

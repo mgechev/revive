@@ -103,7 +103,7 @@ func (w importShadowing) Visit(n ast.Node) ast.Visitor {
 			w.onFailure(lint.Failure{
 				Confidence: 1,
 				Node:       n,
-				Category:   "naming",
+				Category:   lint.FailureCategoryNaming,
 				Failure:    fmt.Sprintf("The name '%s' shadows an import name", id),
 			})
 

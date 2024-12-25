@@ -223,7 +223,7 @@ func addInvalidFileFailure(filename, errStr string, failures chan Failure) {
 	failures <- Failure{
 		Confidence: 1,
 		Failure:    fmt.Sprintf("invalid file %s: %v", filename, errStr),
-		Category:   "validity",
+		Category:   failureCategoryValidity,
 		Position:   position,
 	}
 }

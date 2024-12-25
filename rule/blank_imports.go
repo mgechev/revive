@@ -23,7 +23,6 @@ func (r *BlankImportsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failu
 
 	const (
 		message         = "a blank import should be only in a main or test package, or have a comment justifying it"
-		category        = "imports"
 		embedImportPath = `"embed"`
 	)
 
@@ -55,7 +54,7 @@ func (r *BlankImportsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failu
 
 		// This is the first blank import of a group.
 		if imp.Doc == nil && imp.Comment == nil {
-			failures = append(failures, lint.Failure{Failure: message, Category: category, Node: imp, Confidence: 1})
+			failures = append(failures, lint.Failure{Failure: message, Category: lint.FailureCategoryImports, Node: imp, Confidence: 1})
 		}
 	}
 

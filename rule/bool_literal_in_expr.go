@@ -53,9 +53,9 @@ func (w *lintBoolLiteral) Visit(node ast.Node) ast.Visitor {
 		isConstant := (n.Op == token.LAND && lexeme == "false") || (n.Op == token.LOR && lexeme == "true")
 
 		if isConstant {
-			w.addFailure(n, "Boolean expression seems to always evaluate to "+lexeme, "logic")
+			w.addFailure(n, "Boolean expression seems to always evaluate to "+lexeme, lint.FailureCategoryLogic)
 		} else {
-			w.addFailure(n, "omit Boolean literal in expression", "style")
+			w.addFailure(n, "omit Boolean literal in expression", lint.FailureCategoryStyle)
 		}
 	}
 

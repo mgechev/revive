@@ -91,7 +91,7 @@ func (r *EnforceMapStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 			failures = append(failures, lint.Failure{
 				Confidence: 1,
 				Node:       v,
-				Category:   "style",
+				Category:   lint.FailureCategoryStyle,
 				Failure:    "use make(map[type]type) instead of map[type]type{}",
 			})
 		case *ast.CallExpr:
@@ -119,7 +119,7 @@ func (r *EnforceMapStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 			failures = append(failures, lint.Failure{
 				Confidence: 1,
 				Node:       v.Args[0],
-				Category:   "style",
+				Category:   lint.FailureCategoryStyle,
 				Failure:    "use map[type]type{} instead of make(map[type]type)",
 			})
 		}

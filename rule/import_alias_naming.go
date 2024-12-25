@@ -80,7 +80,7 @@ func (r *ImportAliasNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.
 				Confidence: 1,
 				Failure:    fmt.Sprintf("import name (%s) must match the regular expression: %s", alias.Name, r.allowRegexp.String()),
 				Node:       alias,
-				Category:   "imports",
+				Category:   lint.FailureCategoryImports,
 			})
 		}
 
@@ -89,7 +89,7 @@ func (r *ImportAliasNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.
 				Confidence: 1,
 				Failure:    fmt.Sprintf("import name (%s) must NOT match the regular expression: %s", alias.Name, r.denyRegexp.String()),
 				Node:       alias,
-				Category:   "imports",
+				Category:   lint.FailureCategoryImports,
 			})
 		}
 	}

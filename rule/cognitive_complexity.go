@@ -73,7 +73,7 @@ func (w cognitiveComplexityLinter) lintCognitiveComplexity() {
 			if c > w.maxComplexity {
 				w.onFailure(lint.Failure{
 					Confidence: 1,
-					Category:   "maintenance",
+					Category:   lint.FailureCategoryMaintenance,
 					Failure:    fmt.Sprintf("function %s has cognitive complexity %d (> max enabled %d)", funcName(fn), c, w.maxComplexity),
 					Node:       fn,
 				})

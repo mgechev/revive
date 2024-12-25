@@ -88,7 +88,7 @@ func (l *lintPackageComments) checkPackageComment() []lint.Failure {
 	if docFile != nil {
 		pkgFile := l.file.Pkg.Files()[fileSource]
 		return []lint.Failure{{
-			Category: "comments",
+			Category: lint.FailureCategoryComments,
 			Position: lint.FailurePosition{
 				Start: pkgFile.ToPosition(docFile.Pos()),
 				End:   pkgFile.ToPosition(docFile.Name.End()),
@@ -131,7 +131,7 @@ func (l *lintPackageComments) Visit(_ ast.Node) ast.Visitor {
 				Column: 1,
 			}
 			l.onFailure(lint.Failure{
-				Category: "comments",
+				Category: lint.FailureCategoryComments,
 				Position: lint.FailurePosition{
 					Start: pos,
 					End:   pos,
@@ -154,7 +154,7 @@ func (l *lintPackageComments) Visit(_ ast.Node) ast.Visitor {
 	// Only non-main packages need to keep to this form.
 	if !l.file.Pkg.IsMain() && !strings.HasPrefix(s, prefix) && !isDirectiveComment(s) {
 		l.onFailure(lint.Failure{
-			Category:   "comments",
+			Category:   lint.FailureCategoryComments,
 			Node:       l.fileAst.Doc,
 			Confidence: 1,
 			Failure:    fmt.Sprintf(`package comment should be of the form "%s..."`, prefix),
