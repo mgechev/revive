@@ -91,7 +91,7 @@ func (*lintConstantLogicalExpr) isInequalityOperator(t token.Token) bool {
 	return false
 }
 
-func (w lintConstantLogicalExpr) newFailure(node ast.Node, msg string) {
+func (w *lintConstantLogicalExpr) newFailure(node ast.Node, msg string) {
 	w.onFailure(lint.Failure{
 		Confidence: 1,
 		Node:       node,

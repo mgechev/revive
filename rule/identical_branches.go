@@ -59,7 +59,7 @@ func (w *lintIdenticalBranches) Visit(node ast.Node) ast.Visitor {
 	return w
 }
 
-func (lintIdenticalBranches) identicalBranches(branches []*ast.BlockStmt) bool {
+func (*lintIdenticalBranches) identicalBranches(branches []*ast.BlockStmt) bool {
 	if len(branches) < 2 {
 		return false // only one branch to compare thus we return
 	}
@@ -77,7 +77,7 @@ func (lintIdenticalBranches) identicalBranches(branches []*ast.BlockStmt) bool {
 	return true
 }
 
-func (w lintIdenticalBranches) newFailure(node ast.Node, msg string) {
+func (w *lintIdenticalBranches) newFailure(node ast.Node, msg string) {
 	w.onFailure(lint.Failure{
 		Confidence: 1,
 		Node:       node,

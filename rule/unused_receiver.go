@@ -19,8 +19,8 @@ type UnusedReceiverRule struct {
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
 func (r *UnusedReceiverRule) Configure(args lint.Arguments) error {
-	// while by default args is an array, i think it's good to provide structures inside it by default, not arrays or primitives
-	// it's more compatible to JSON nature of configurations
+	// while by default args is an array, it could be good to provide structures inside it by default, not arrays or primitives
+	// as it's more compatible to JSON nature of configurations
 	r.allowRegex = allowBlankIdentifierRegex
 	r.failureMsg = "method receiver '%s' is not referenced in method's body, consider removing or renaming it as _"
 	if len(args) == 0 {

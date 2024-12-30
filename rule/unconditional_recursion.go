@@ -17,7 +17,7 @@ func (*UnconditionalRecursionRule) Apply(file *lint.File, _ lint.Arguments) []li
 		failures = append(failures, failure)
 	}
 
-	w := lintUnconditionalRecursionRule{onFailure: onFailure}
+	w := &lintUnconditionalRecursionRule{onFailure: onFailure}
 	ast.Walk(w, file.AST)
 	return failures
 }
@@ -57,7 +57,7 @@ type lintUnconditionalRecursionRule struct {
 // If we find conditional control exits, it means the function is NOT unconditionally-recursive
 // If we find a recursive call before finding any conditional exit, a failure is generated
 // In resume: if we found a recursive call control-dependent from the entry point of the function then we raise a failure.
-func (w lintUnconditionalRecursionRule) Visit(node ast.Node) ast.Visitor {
+func (w *lintUnconditionalRecursionRule) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
 	case *ast.FuncDecl:
 		var rec *ast.Ident
@@ -152,7 +152,7 @@ func (w *lintUnconditionalRecursionRule) updateFuncStatus(node ast.Node) {
 	w.currentFunc.seenConditionalExit = w.hasControlExit(node)
 }
 
-func (lintUnconditionalRecursionRule) hasControlExit(node ast.Node) bool {
+func (*lintUnconditionalRecursionRule) hasControlExit(node ast.Node) bool {
 	// isExit returns true if the given node makes control exit the function
 	isExit := func(node ast.Node) bool {
 		switch n := node.(type) {
