@@ -89,8 +89,8 @@ type cognitiveComplexityVisitor struct {
 }
 
 // subTreeComplexity calculates the cognitive complexity of an AST-subtree.
-func (v cognitiveComplexityVisitor) subTreeComplexity(n ast.Node) int {
-	ast.Walk(&v, n)
+func (v *cognitiveComplexityVisitor) subTreeComplexity(n ast.Node) int {
+	ast.Walk(v, n)
 	return v.complexity
 }
 
@@ -122,7 +122,7 @@ func (v *cognitiveComplexityVisitor) Visit(n ast.Node) ast.Visitor {
 		return nil
 	case *ast.BinaryExpr:
 		v.complexity += v.binExpComplexity(n)
-		return nil // skip visiting binexp sub-tree (already visited by binExpComplexity)
+		return nil // skip visiting binexp subtree (already visited by binExpComplexity)
 	case *ast.BranchStmt:
 		if n.Label != nil {
 			v.complexity++
@@ -156,7 +156,7 @@ func (v *cognitiveComplexityVisitor) walk(complexityIncrement int, targets ...as
 	v.nestingLevel = nesting
 }
 
-func (cognitiveComplexityVisitor) binExpComplexity(n *ast.BinaryExpr) int {
+func (*cognitiveComplexityVisitor) binExpComplexity(n *ast.BinaryExpr) int {
 	calculator := binExprComplexityCalculator{opsStack: []token.Token{}}
 
 	astutil.Apply(n, calculator.pre, calculator.post)

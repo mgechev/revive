@@ -38,7 +38,7 @@ func (w lintWaitGroupByValueRule) Visit(node ast.Node) ast.Visitor {
 		return w
 	}
 
-	// Check all function's parameters
+	// Check all function parameters
 	for _, field := range fd.Type.Params.List {
 		if !w.isWaitGroup(field.Type) {
 			continue

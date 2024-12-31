@@ -70,7 +70,7 @@ func (w rangeValAddress) Visit(node ast.Node) ast.Visitor {
 
 type rangeBodyVisitor struct {
 	valueIsStarExpr bool
-	valueID         *ast.Object
+	valueID         *ast.Object // TODO: ast.Object is deprecated
 	onFailure       func(lint.Failure)
 }
 
@@ -140,7 +140,7 @@ func (bw rangeBodyVisitor) isAccessingRangeValueAddress(exp ast.Expr) bool {
 	v, ok := u.X.(*ast.Ident)
 	if !ok {
 		var s *ast.SelectorExpr
-		s, ok = u.X.(*ast.SelectorExpr)
+		s, ok = u.X.(*ast.SelectorExpr) // TODO: possible BUG: if it's `=` and not `:=`, it means that in the last return `ok` is always true
 		if !ok {
 			return false
 		}
@@ -154,7 +154,7 @@ func (bw rangeBodyVisitor) isAccessingRangeValueAddress(exp ast.Expr) bool {
 		}
 	}
 
-	return ok && v.Obj == bw.valueID
+	return ok && v.Obj == bw.valueID // TODO: ok is always true due to the previous TODO remark
 }
 
 func (bw rangeBodyVisitor) newFailure(node ast.Node) lint.Failure {

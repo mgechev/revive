@@ -22,7 +22,7 @@ func (*StringFormatRule) Apply(file *lint.File, arguments lint.Arguments) []lint
 		failures = append(failures, failure)
 	}
 
-	w := lintStringFormatRule{onFailure: onFailure}
+	w := &lintStringFormatRule{onFailure: onFailure}
 	err := w.parseArguments(arguments)
 	if err != nil {
 		return newInternalFailureError(err)
@@ -39,7 +39,7 @@ func (*StringFormatRule) Name() string {
 }
 
 // ParseArgumentsTest is a public wrapper around w.parseArguments used for testing. Returns the error message provided to panic, or nil if no error was encountered
-func (StringFormatRule) ParseArgumentsTest(arguments lint.Arguments) *string {
+func (*StringFormatRule) ParseArgumentsTest(arguments lint.Arguments) *string {
 	w := lintStringFormatRule{}
 	c := make(chan any)
 	// Parse the arguments in a goroutine, defer a recover() call, return the error encountered (or nil if there was no error)
@@ -101,7 +101,7 @@ func (w *lintStringFormatRule) parseArguments(arguments lint.Arguments) error {
 	return nil
 }
 
-func (w lintStringFormatRule) parseArgument(argument any, ruleNum int) (scopes stringFormatSubruleScopes, regex *regexp.Regexp, negated bool, errorMessage string, err error) {
+func (w *lintStringFormatRule) parseArgument(argument any, ruleNum int) (scopes stringFormatSubruleScopes, regex *regexp.Regexp, negated bool, errorMessage string, err error) {
 	g, ok := argument.([]any) // Cast to generic slice first
 	if !ok {
 		return stringFormatSubruleScopes{}, regex, false, "", w.configError("argument is not a slice", ruleNum, 0)
@@ -179,21 +179,21 @@ func (w lintStringFormatRule) parseArgument(argument any, ruleNum int) (scopes s
 }
 
 // Report an invalid config, this is specifically the user's fault
-func (lintStringFormatRule) configError(msg string, ruleNum, option int) error {
+func (*lintStringFormatRule) configError(msg string, ruleNum, option int) error {
 	return fmt.Errorf("invalid configuration for string-format: %s [argument %d, option %d]", msg, ruleNum, option)
 }
 
 // Report a general config parsing failure, this may be the user's fault, but it isn't known for certain
-func (lintStringFormatRule) parseError(msg string, ruleNum, option int) error {
+func (*lintStringFormatRule) parseError(msg string, ruleNum, option int) error {
 	return fmt.Errorf("failed to parse configuration for string-format: %s [argument %d, option %d]", msg, ruleNum, option)
 }
 
 // Report a general scope config parsing failure, this may be the user's fault, but it isn't known for certain
-func (lintStringFormatRule) parseScopeError(msg string, ruleNum, option, scopeNum int) error {
+func (*lintStringFormatRule) parseScopeError(msg string, ruleNum, option, scopeNum int) error {
 	return fmt.Errorf("failed to parse configuration for string-format: %s [argument %d, option %d, scope index %d]", msg, ruleNum, option, scopeNum)
 }
 
-func (w lintStringFormatRule) Visit(node ast.Node) ast.Visitor {
+func (w *lintStringFormatRule) Visit(node ast.Node) ast.Visitor {
 	// First, check if node is a call expression
 	call, ok := node.(*ast.CallExpr)
 	if !ok {
@@ -218,7 +218,7 @@ func (w lintStringFormatRule) Visit(node ast.Node) ast.Visitor {
 }
 
 // Return the name of a call expression in the form of package.Func or Func
-func (lintStringFormatRule) getCallName(call *ast.CallExpr) (callName string, ok bool) {
+func (*lintStringFormatRule) getCallName(call *ast.CallExpr) (callName string, ok bool) {
 	if ident, ok := call.Fun.(*ast.Ident); ok {
 		// Local function call
 		return ident.Name, true
@@ -278,6 +278,12 @@ func (r *stringFormatSubrule) apply(call *ast.CallExpr, scope *stringFormatSubru
 			return
 		}
 	}
+
+	// extra safety check
+	if lit == nil {
+		return
+	}
+
 	// Unquote the string literal before linting
 	unquoted := lit.Value[1 : len(lit.Value)-1]
 	if r.stringIsOK(unquoted) {

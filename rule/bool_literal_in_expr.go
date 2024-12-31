@@ -88,5 +88,5 @@ func isExprABooleanLit(n ast.Node) (lexeme string, ok bool) {
 		return "", false
 	}
 
-	return oper.Name, (oper.Name == "true" || oper.Name == "false")
+	return oper.Name, oper.Name == "true" || oper.Name == "false"
 }

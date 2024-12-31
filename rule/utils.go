@@ -123,7 +123,7 @@ func isCallToExitFunction(pkgName, functionName string) bool {
 	return exitFunctions[pkgName] != nil && exitFunctions[pkgName][functionName]
 }
 
-// newInternalFailureError returns an slice of Failure with a single internal failure in it
+// newInternalFailureError returns a slice of Failure with a single internal failure in it
 func newInternalFailureError(e error) []lint.Failure {
 	return []lint.Failure{lint.NewInternalFailure(e.Error())}
 }
