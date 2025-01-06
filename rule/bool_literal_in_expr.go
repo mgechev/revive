@@ -62,7 +62,7 @@ func (w *lintBoolLiteral) Visit(node ast.Node) ast.Visitor {
 	return w
 }
 
-func (w lintBoolLiteral) addFailure(node ast.Node, msg, cat string) {
+func (w lintBoolLiteral) addFailure(node ast.Node, msg string, cat lint.FailureCategory) {
 	w.onFailure(lint.Failure{
 		Confidence: 1,
 		Node:       node,

@@ -6,28 +6,51 @@ import (
 )
 
 const (
-	FailureCategoryArgOrder            = "arg-order"
-	FailureCategoryBadPractice         = "bad practice"
-	FailureCategoryCodeStyle           = "code-style"
-	FailureCategoryComments            = "comments"
-	FailureCategoryComplexity          = "complexity"
-	FailureCategoryContent             = "content"
-	FailureCategoryErrors              = "errors"
-	FailureCategoryImports             = "imports"
-	FailureCategoryLogic               = "logic"
-	FailureCategoryMaintenance         = "maintenance"
-	FailureCategoryNaming              = "naming"
-	FailureCategoryOptimization        = "optimization"
-	FailureCategoryStyle               = "style"
-	FailureCategoryTime                = "time"
-	FailureCategoryTypeInference       = "type-inference"
-	FailureCategoryUnaryOp             = "unary-op"
-	FailureCategoryUnexportedTypeInAPI = "unexported-type-in-api"
-	FailureCategoryZeroValue           = "zero-value"
+	// FailureCategoryArgOrder indicates argument order issues.
+	FailureCategoryArgOrder FailureCategory = "arg-order"
+	// FailureCategoryBadPractice indicates bad practice issues.
+	FailureCategoryBadPractice FailureCategory = "bad practice"
+	// FailureCategoryCodeStyle indicates code style issues.
+	FailureCategoryCodeStyle FailureCategory = "code-style"
+	// FailureCategoryComments indicates comment issues.
+	FailureCategoryComments FailureCategory = "comments"
+	// FailureCategoryComplexity indicates complexity issues.
+	FailureCategoryComplexity FailureCategory = "complexity"
+	// FailureCategoryContent indicates content issues.
+	FailureCategoryContent FailureCategory = "content"
+	// FailureCategoryErrors indicates error handling issues.
+	FailureCategoryErrors FailureCategory = "errors"
+	// FailureCategoryImports indicates import issues.
+	FailureCategoryImports FailureCategory = "imports"
+	// FailureCategoryLogic indicates logic issues.
+	FailureCategoryLogic FailureCategory = "logic"
+	// FailureCategoryMaintenance indicates maintenance issues.
+	FailureCategoryMaintenance FailureCategory = "maintenance"
+	// FailureCategoryNaming indicates naming issues.
+	FailureCategoryNaming FailureCategory = "naming"
+	// FailureCategoryOptimization indicates optimization issues.
+	FailureCategoryOptimization FailureCategory = "optimization"
+	// FailureCategoryStyle indicates style issues.
+	FailureCategoryStyle FailureCategory = "style"
+	// FailureCategoryTime indicates time-related issues.
+	FailureCategoryTime FailureCategory = "time"
+	// FailureCategoryTypeInference indicates type inference issues.
+	FailureCategoryTypeInference FailureCategory = "type-inference"
+	// FailureCategoryUnaryOp indicates unary operation issues.
+	FailureCategoryUnaryOp FailureCategory = "unary-op"
+	// FailureCategoryUnexportedTypeInAPI indicates unexported type in API issues.
+	FailureCategoryUnexportedTypeInAPI FailureCategory = "unexported-type-in-api"
+	// FailureCategoryZeroValue indicates zero value issues.
+	FailureCategoryZeroValue FailureCategory = "zero-value"
 
-	failureCategoryInternal = "REVIVE_INTERNAL"
-	failureCategoryValidity = "validity"
+	// failureCategoryInternal indicates internal failures.
+	failureCategoryInternal FailureCategory = "REVIVE_INTERNAL"
+	// failureCategoryValidity indicates validity issues.
+	failureCategoryValidity FailureCategory = "validity"
 )
+
+// FailureCategory is the type for the failure categories.
+type FailureCategory string
 
 const (
 	// SeverityWarning declares failures of type warning
@@ -49,7 +72,7 @@ type FailurePosition struct {
 type Failure struct {
 	Failure    string
 	RuleName   string
-	Category   string
+	Category   FailureCategory
 	Position   FailurePosition
 	Node       ast.Node `json:"-"`
 	Confidence float64
