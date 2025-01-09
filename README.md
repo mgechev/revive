@@ -150,7 +150,7 @@ If you want to use revive with Bazel, look at the [rules](https://github.com/atl
 
 ### Text Editors
 
-- Support for VSCode via [vscode-go](https://code.visualstudio.com/docs/languages/go#_build-and-diagnose) by changing the `go.lintOnSave` setting to `revive`:
+- Support for VSCode via [vscode-go](https://code.visualstudio.com/docs/languages/go#_build-and-diagnose) by changing the `go.lintTool` setting to `revive`:
 
 ```json
 {
