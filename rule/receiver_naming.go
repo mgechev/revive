@@ -63,7 +63,7 @@ func (r *ReceiverNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 			failures = append(failures, lint.Failure{
 				Node:       decl,
 				Confidence: 1,
-				Category:   "naming",
+				Category:   lint.FailureCategoryNaming,
 				Failure:    "receiver name should not be an underscore, omit the name if it is unused",
 			})
 			continue
@@ -73,7 +73,7 @@ func (r *ReceiverNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 			failures = append(failures, lint.Failure{
 				Node:       decl,
 				Confidence: 1,
-				Category:   "naming",
+				Category:   lint.FailureCategoryNaming,
 				Failure:    `receiver name should be a reflection of its identity; don't use generic names such as "this" or "self"`,
 			})
 			continue
@@ -83,7 +83,7 @@ func (r *ReceiverNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 			failures = append(failures, lint.Failure{
 				Node:       decl,
 				Confidence: 1,
-				Category:   "naming",
+				Category:   lint.FailureCategoryNaming,
 				Failure:    fmt.Sprintf("receiver name %s is longer than %d characters", name, r.receiverNameMaxLength),
 			})
 			continue
@@ -94,7 +94,7 @@ func (r *ReceiverNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 			failures = append(failures, lint.Failure{
 				Node:       decl,
 				Confidence: 1,
-				Category:   "naming",
+				Category:   lint.FailureCategoryNaming,
 				Failure:    fmt.Sprintf("receiver name %s should be consistent with previous receiver name %s for %s", name, prev, recv),
 			})
 			continue

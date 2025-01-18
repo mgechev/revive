@@ -81,7 +81,7 @@ func (w conditionVisitor) Visit(node ast.Node) ast.Visitor {
 	w.onFailure(lint.Failure{
 		Confidence: 1,
 		Node:       w.fd.Type.Params,
-		Category:   "bad practice",
+		Category:   lint.FailureCategoryBadPractice,
 		Failure:    fmt.Sprintf("parameter '%s' seems to be a control flag, avoid control coupling", uses[0]),
 	})
 

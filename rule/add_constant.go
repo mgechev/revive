@@ -171,7 +171,7 @@ func (w *lintAddConstantRule) checkStrLit(n *ast.BasicLit) {
 			w.onFailure(lint.Failure{
 				Confidence: 1,
 				Node:       n,
-				Category:   "style",
+				Category:   lint.FailureCategoryStyle,
 				Failure:    fmt.Sprintf("string literal %s appears, at least, %d times, create a named constant for it", n.Value, w.strLits[n.Value]),
 			})
 			w.strLits[n.Value] = -1 // mark it to avoid failing again on the same literal
@@ -187,7 +187,7 @@ func (w *lintAddConstantRule) checkNumLit(kind string, n *ast.BasicLit) {
 	w.onFailure(lint.Failure{
 		Confidence: 1,
 		Node:       n,
-		Category:   "style",
+		Category:   lint.FailureCategoryStyle,
 		Failure:    fmt.Sprintf("avoid magic numbers like '%s', create a named constant for it", n.Value),
 	})
 }

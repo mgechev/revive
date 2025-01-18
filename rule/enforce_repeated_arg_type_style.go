@@ -121,7 +121,7 @@ func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, _ lint.Argument
 							failures = append(failures, lint.Failure{
 								Confidence: 1,
 								Node:       field,
-								Category:   "style",
+								Category:   lint.FailureCategoryStyle,
 								Failure:    "argument types should not be omitted",
 							})
 						}
@@ -137,7 +137,7 @@ func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, _ lint.Argument
 							failures = append(failures, lint.Failure{
 								Confidence: 1,
 								Node:       prevType,
-								Category:   "style",
+								Category:   lint.FailureCategoryStyle,
 								Failure:    fmt.Sprintf("repeated argument type %q can be omitted", prevTypeStr),
 							})
 						}
@@ -154,7 +154,7 @@ func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, _ lint.Argument
 							failures = append(failures, lint.Failure{
 								Confidence: 1,
 								Node:       field,
-								Category:   "style",
+								Category:   lint.FailureCategoryStyle,
 								Failure:    "return types should not be omitted",
 							})
 						}
@@ -170,7 +170,7 @@ func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, _ lint.Argument
 							failures = append(failures, lint.Failure{
 								Confidence: 1,
 								Node:       prevType,
-								Category:   "style",
+								Category:   lint.FailureCategoryStyle,
 								Failure:    fmt.Sprintf("repeated return type %q can be omitted", prevTypeStr),
 							})
 						}

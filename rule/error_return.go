@@ -31,7 +31,7 @@ func (*ErrorReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 		for _, r := range funcResults[:len(funcResults)-1] {
 			if isIdent(r.Type, "error") {
 				failures = append(failures, lint.Failure{
-					Category:   "style",
+					Category:   lint.FailureCategoryStyle,
 					Confidence: 0.9,
 					Node:       funcDecl,
 					Failure:    "error should be the last type when returning multiple items",

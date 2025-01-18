@@ -68,7 +68,7 @@ func (w *lintDeepExit) Visit(node ast.Node) ast.Visitor {
 		w.onFailure(lint.Failure{
 			Confidence: 1,
 			Node:       ce,
-			Category:   "bad practice",
+			Category:   lint.FailureCategoryBadPractice,
 			Failure:    fmt.Sprintf("calls to %s.%s only in main() or init() functions", pkg, fn),
 		})
 	}

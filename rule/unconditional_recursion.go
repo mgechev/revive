@@ -100,7 +100,7 @@ func (w *lintUnconditionalRecursionRule) Visit(node ast.Node) ast.Visitor {
 			!w.currentFunc.seenConditionalExit && // there is a conditional exit in the function
 			w.currentFunc.funcDesc.equal(&funcDesc{selector, funcID}) {
 			w.onFailure(lint.Failure{
-				Category:   "logic",
+				Category:   lint.FailureCategoryLogic,
 				Confidence: 0.8,
 				Node:       n,
 				Failure:    "unconditional recursive call",

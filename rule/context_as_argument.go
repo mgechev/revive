@@ -32,7 +32,7 @@ func (r *ContextAsArgumentRule) Apply(file *lint.File, _ lint.Arguments) []lint.
 			if argIsCtx && !isCtxStillAllowed {
 				failures = append(failures, lint.Failure{
 					Node:       arg,
-					Category:   "arg-order",
+					Category:   lint.FailureCategoryArgOrder,
 					Failure:    "context.Context should be the first parameter of a function",
 					Confidence: 0.9,
 				})

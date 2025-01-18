@@ -81,7 +81,7 @@ func (w lintImports) Visit(_ ast.Node) ast.Visitor {
 				Confidence: 1,
 				Failure:    "should not use dot imports",
 				Node:       importSpec,
-				Category:   "imports",
+				Category:   lint.FailureCategoryImports,
 			})
 		}
 	}

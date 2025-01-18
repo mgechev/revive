@@ -22,7 +22,7 @@ func (*DuplicatedImportsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 				Confidence: 1,
 				Failure:    fmt.Sprintf("Package %s already imported", path),
 				Node:       imp,
-				Category:   "imports",
+				Category:   lint.FailureCategoryImports,
 			})
 			continue
 		}

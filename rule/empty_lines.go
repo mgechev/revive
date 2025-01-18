@@ -60,7 +60,7 @@ func (w lintEmptyLines) checkStart(block *ast.BlockStmt) {
 	w.onFailure(lint.Failure{
 		Confidence: 1,
 		Node:       block,
-		Category:   "style",
+		Category:   lint.FailureCategoryStyle,
 		Failure:    "extra empty line at the start of a block",
 	})
 }
@@ -79,7 +79,7 @@ func (w lintEmptyLines) checkEnd(block *ast.BlockStmt) {
 	w.onFailure(lint.Failure{
 		Confidence: 1,
 		Node:       block,
-		Category:   "style",
+		Category:   lint.FailureCategoryStyle,
 		Failure:    "extra empty line at the end of a block",
 	})
 }

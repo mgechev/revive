@@ -115,7 +115,7 @@ func newUnreachableCodeFailure(node ast.Node) lint.Failure {
 	return lint.Failure{
 		Confidence: 1,
 		Node:       node,
-		Category:   "logic",
+		Category:   lint.FailureCategoryLogic,
 		Failure:    "unreachable code after this statement",
 	}
 }

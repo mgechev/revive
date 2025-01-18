@@ -93,7 +93,7 @@ func (w *lintVarDeclarations) Visit(node ast.Node) ast.Visitor {
 			w.onFailure(lint.Failure{
 				Confidence: 0.9,
 				Node:       rhs,
-				Category:   "zero-value",
+				Category:   lint.FailureCategoryZeroValue,
 				Failure:    fmt.Sprintf("should drop = %s from declaration of var %s; it is the zero value", w.file.Render(rhs), v.Names[0]),
 			})
 			return nil
@@ -127,7 +127,7 @@ func (w *lintVarDeclarations) Visit(node ast.Node) ast.Visitor {
 		}
 
 		w.onFailure(lint.Failure{
-			Category:   "type-inference",
+			Category:   lint.FailureCategoryTypeInference,
 			Confidence: 0.8,
 			Node:       v.Type,
 			Failure:    fmt.Sprintf("should omit type %s from declaration of var %s; it will be inferred from the right-hand side", w.file.Render(v.Type), v.Names[0]),

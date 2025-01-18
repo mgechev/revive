@@ -47,7 +47,7 @@ func (r *CyclomaticRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure
 		if c > r.maxComplexity {
 			failures = append(failures, lint.Failure{
 				Confidence: 1,
-				Category:   "maintenance",
+				Category:   lint.FailureCategoryMaintenance,
 				Failure: fmt.Sprintf("function %s has cyclomatic complexity %d (> max enabled %d)",
 					funcName(fn), c, r.maxComplexity),
 				Node: fn,

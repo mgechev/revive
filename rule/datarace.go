@@ -122,14 +122,14 @@ func (w lintFunctionForDataRaces) Visit(node ast.Node) ast.Visitor {
 				w.onFailure(lint.Failure{
 					Confidence: 1,
 					Node:       id,
-					Category:   "logic",
+					Category:   lint.FailureCategoryLogic,
 					Failure:    fmt.Sprintf("datarace: range value %s is captured (by-reference) in goroutine", id.Name),
 				})
 			case isReturnID:
 				w.onFailure(lint.Failure{
 					Confidence: 0.8,
 					Node:       id,
-					Category:   "logic",
+					Category:   lint.FailureCategoryLogic,
 					Failure:    fmt.Sprintf("potential datarace: return value %s is captured (by-reference) in goroutine", id.Name),
 				})
 			}

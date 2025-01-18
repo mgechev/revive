@@ -53,7 +53,7 @@ func (r *ImportsBlocklistRule) Apply(file *lint.File, _ lint.Arguments) []lint.F
 				Confidence: 1,
 				Failure:    "should not use the following blocklisted import: " + path.Value,
 				Node:       is,
-				Category:   "imports",
+				Category:   lint.FailureCategoryImports,
 			})
 		}
 	}

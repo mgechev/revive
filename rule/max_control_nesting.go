@@ -51,7 +51,7 @@ func (w *lintMaxControlNesting) Visit(n ast.Node) ast.Visitor {
 			Failure:    fmt.Sprintf("control flow nesting exceeds %d", w.max),
 			Confidence: 1,
 			Node:       w.lastCtrlStmt,
-			Category:   "complexity",
+			Category:   lint.FailureCategoryComplexity,
 		})
 		return nil // stop visiting deeper
 	}
