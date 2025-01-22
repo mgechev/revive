@@ -41,5 +41,6 @@ warningCode = 1
 [rule.unreachable-code]
 [rule.unused-parameter]
 [rule.useless-break]
+[rule.use-any]
 [rule.var-declaration]
 [rule.var-naming]

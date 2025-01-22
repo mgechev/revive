@@ -49,7 +49,7 @@ func (f *File) ToPosition(pos token.Pos) token.Position {
 }
 
 // Render renders a node.
-func (f *File) Render(x interface{}) string {
+func (f *File) Render(x any) string {
 	var buf bytes.Buffer
 	if err := printer.Fprint(&buf, f.Pkg.fset, x); err != nil {
 		panic(err)
