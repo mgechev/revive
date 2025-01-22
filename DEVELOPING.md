@@ -23,12 +23,17 @@ The command will produce the `revive` binary in the root of the project.
 
 If you want to develop a new rule, follow as an example the already existing rules in the [rule package](https://github.com/mgechev/revive/tree/master/rule).
 
-Each rule needs to implement the `lint.ConfigurableRule` interface. All rules with a configuration must implement that interface:
-
+Each rule needs to implement the `lint.Rule` interface: 
 ```go
 type Rule interface {
 	Name() string
 	Apply(*File, Arguments) []Failure
+}
+```
+All rules with a configuration must implement `lint.ConfigurableRule` interface:
+```go
+type ConfigurableRule interface {
+	Configure(Arguments) error
 }
 ```
 
