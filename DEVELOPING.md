@@ -10,17 +10,9 @@ Clone the project:
 git clone git@github.com:mgechev/revive.git
 cd revive
 ```
-
-In order to fetch all the dependencies run:
-
-```bash
-make install
-```
-
 ## Build
 
 In order to build the project run:
-
 ```bash
 make build
 ```
@@ -31,7 +23,9 @@ The command will produce the `revive` binary in the root of the project.
 
 If you want to develop a new rule, follow as an example the already existing rules in the [rule package](https://github.com/mgechev/revive/tree/master/rule).
 
-All rules should implement the following interface:
+## Writing a Custom Rule
+
+Each rule needs to implement the `lint.Rule` interface:
 
 ```go
 type Rule interface {
@@ -39,6 +33,25 @@ type Rule interface {
 	Apply(*File, Arguments) []Failure
 }
 ```
+
+The `Arguments` type is an alias of the type `[]interface{}`. The arguments of the rule are passed from the configuration file.
+
+#### Example
+
+Let's suppose we have developed a rule called `BanStructNameRule` which disallow us to name a structure with a given identifier. We can set the banned identifier by using the TOML configuration file:
+
+```toml
+[rule.ban-struct-name]
+  arguments = ["Foo"]
+```
+
+With the snippet above we:
+
+- Enable the rule with the name `ban-struct-name`. The `Name()` method of our rule should return a string that matches `ban-struct-name`.
+- Configure the rule with the argument `Foo`. The list of arguments will be passed to `Apply(*File, Arguments)` together with the target file we're linting currently.
+
+A sample rule implementation can be found [here](/rule/argument_limit.go).
+
 
 ## Development of formatters
 
