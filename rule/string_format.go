@@ -143,7 +143,8 @@ func (w *lintStringFormatRule) parseArgument(argument any, ruleNum int) (scopes 
 			return stringFormatSubruleScopes{}, regex, false, "", w.parseScopeError("unable to parse rule scope", ruleNum, 0, scopeNum)
 		} else if len(matches) != 4 {
 			// The rule's scope matched the parsing regex, but an unexpected number of submatches was returned, probably a bug
-			return stringFormatSubruleScopes{}, regex, false, "", w.parseScopeError(fmt.Sprintf("unexpected number of submatches when parsing scope: %d, expected 4", len(matches)), ruleNum, 0, scopeNum)
+			return stringFormatSubruleScopes{}, regex, false, "",
+				w.parseScopeError(fmt.Sprintf("unexpected number of submatches when parsing scope: %d, expected 4", len(matches)), ruleNum, 0, scopeNum)
 		}
 		scope.funcName = matches[1]
 		if len(matches[2]) > 0 {
