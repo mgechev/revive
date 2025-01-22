@@ -23,9 +23,7 @@ The command will produce the `revive` binary in the root of the project.
 
 If you want to develop a new rule, follow as an example the already existing rules in the [rule package](https://github.com/mgechev/revive/tree/master/rule).
 
-## Writing a Custom Rule
-
-Each rule needs to implement the `lint.Rule` interface:
+Each rule needs to implement the `lint.ConfigurableRule` interface. All rules with a configuration must implement that interface:
 
 ```go
 type Rule interface {
@@ -34,7 +32,7 @@ type Rule interface {
 }
 ```
 
-The `Arguments` type is an alias of the type `[]interface{}`. The arguments of the rule are passed from the configuration file.
+The `Arguments` type is an alias of the type `[]any`. The arguments of the rule are passed from the configuration file.
 
 #### Example
 
