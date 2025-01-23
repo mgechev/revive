@@ -18,3 +18,4 @@ jobs:
       uses: morphy2k/revive-action@v2
       with:
         config: revive.toml
+        path: ./...
