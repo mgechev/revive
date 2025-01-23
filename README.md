@@ -636,32 +636,7 @@ To add a custom formatter you'll have to push it to this repository or fork it. 
 
 ### Writing a Custom Rule
 
-Each rule needs to implement the `lint.Rule` interface:
-
-```go
-type Rule interface {
-	Name() string
-	Apply(*File, Arguments) []Failure
-}
-```
-
-The `Arguments` type is an alias of the type `[]interface{}`. The arguments of the rule are passed from the configuration file.
-
-#### Example
-
-Let's suppose we have developed a rule called `BanStructNameRule` which disallow us to name a structure with a given identifier. We can set the banned identifier by using the TOML configuration file:
-
-```toml
-[rule.ban-struct-name]
-  arguments = ["Foo"]
-```
-
-With the snippet above we:
-
-- Enable the rule with the name `ban-struct-name`. The `Name()` method of our rule should return a string that matches `ban-struct-name`.
-- Configure the rule with the argument `Foo`. The list of arguments will be passed to `Apply(*File, Arguments)` together with the target file we're linting currently.
-
-A sample rule implementation can be found [here](/rule/argument_limit.go).
+See [DEVELOPING.md](./DEVELOPING.md) for instructions on how to write a custom rule.
 
 #### Using `revive` as a library
 
