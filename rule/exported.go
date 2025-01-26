@@ -187,7 +187,7 @@ func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
 		return
 	}
 
-	if fn.Doc == nil {
+	if !hasTextComment(fn.Doc) {
 		w.onFailure(lint.Failure{
 			Node:       fn,
 			Confidence: 1,
@@ -252,7 +252,7 @@ func (w *lintExported) lintTypeDoc(t *ast.TypeSpec, doc *ast.CommentGroup) {
 		return
 	}
 
-	if doc == nil {
+	if !hasTextComment(doc) {
 		w.onFailure(lint.Failure{
 			Node:       t,
 			Confidence: 1,
@@ -319,7 +319,7 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 		return
 	}
 
-	if vs.Doc == nil && gd.Doc == nil {
+	if !hasTextComment(vs.Doc) && !hasTextComment(gd.Doc) {
 		if genDeclMissingComments[gd] {
 			return
 		}
@@ -337,16 +337,16 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 		return
 	}
 	// If this GenDecl has parens and a comment, we don't check its comment form.
-	if gd.Doc != nil && gd.Lparen.IsValid() {
+	if hasTextComment(gd.Doc) && gd.Lparen.IsValid() {
 		return
 	}
 	// The relevant text to check will be on either vs.Doc or gd.Doc.
 	// Use vs.Doc preferentially.
 	var doc *ast.CommentGroup
 	switch {
-	case vs.Doc != nil:
+	case hasTextComment(vs.Doc):
 		doc = vs.Doc
-	case vs.Comment != nil && gd.Doc == nil:
+	case hasTextComment(vs.Comment) && !hasTextComment(gd.Doc):
 		doc = vs.Comment
 	default:
 		doc = gd.Doc
@@ -362,6 +362,19 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 			Failure:    fmt.Sprintf(`comment on exported %s %s should be of the form "%s..."`, kind, name, prefix),
 		})
 	}
+}
+
+// hasTextComment returns true if the comment contains a text comment
+// e.g. //go:embed foo.txt a directive comment, not a text comment
+// e.g. //nolint:whatever is a directive comment, not a text comment
+func hasTextComment(comment *ast.CommentGroup) bool {
+	if comment == nil {
+		return false
+	}
+
+	// a comment could be directive and not a text comment
+	text := comment.Text()
+	return text != ""
 }
 
 // normalizeText is a helper function that normalizes comment strings by:
@@ -393,7 +406,7 @@ func (w *lintExported) Visit(n ast.Node) ast.Visitor {
 	case *ast.TypeSpec:
 		// inside a GenDecl, which usually has the doc
 		doc := v.Doc
-		if doc == nil {
+		if !hasTextComment(doc) {
 			doc = w.lastGen.Doc
 		}
 		w.lintTypeDoc(v, doc)
@@ -429,7 +442,7 @@ func (w *lintExported) lintInterfaceMethod(typeName string, m *ast.Field) {
 		return
 	}
 	name := m.Names[0].Name
-	if m.Doc == nil {
+	if !hasTextComment(m.Doc) {
 		w.onFailure(lint.Failure{
 			Node:       m,
 			Confidence: 1,

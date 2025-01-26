@@ -36,3 +36,7 @@ func TestCheckDisablingOnDeclarationTypes(t *testing.T) {
 
 	testRule(t, "exported_issue_1045", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: args})
 }
+
+func TestCheckDirectiveComment(t *testing.T) {
+	testRule(t, "exported_issue_1202", &rule.ExportedRule{}, &lint.RuleConfig{})
+}
