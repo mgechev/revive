@@ -100,7 +100,6 @@ Here's how `revive` is different from `golint`:
     - [SARIF](#sarif)
   - [Extensibility](#extensibility)
     - [Writing a Custom Rule](#writing-a-custom-rule)
-      - [Example](#example)
       - [Using `revive` as a library](#using-revive-as-a-library)
     - [Custom Formatter](#custom-formatter)
   - [Speed Comparison](#speed-comparison)
