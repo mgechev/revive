@@ -12,11 +12,12 @@ type RedundantTestMainExitRule struct{}
 
 // Apply applies the rule to given file.
 func (*RedundantTestMainExitRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
-	if !file.IsTest() {
-		return nil // skip analysis for non-test files
-	}
-
 	var failures []lint.Failure
+
+	if !file.IsTest() || !file.Pkg.IsAtLeastGo115() {
+		// skip analysis for non-test files or for Go versions before 1.15
+		return failures
+	}
 
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
