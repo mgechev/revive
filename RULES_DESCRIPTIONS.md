@@ -816,6 +816,8 @@ _Description_: This rule warns about redundant `Exit` calls in the `TestMain` fu
 
 _Configuration_: N/A
 
+_Note_: This rule is irrelevant for Go versions below 1.15.
+
 ## string-format
 
 _Description_: This rule allows you to configure a list of regular expressions that string literals in certain function calls are checked against.

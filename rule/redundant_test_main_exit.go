@@ -70,7 +70,7 @@ func (w *lintRedundantTestMainExit) Visit(node ast.Node) ast.Visitor {
 		w.onFailure(lint.Failure{
 			Confidence: 1,
 			Node:       ce,
-			Category:   lint.FailureCategoryBadPractice,
+			Category:   lint.FailureCategoryStyle,
 			Failure:    fmt.Sprintf("redundant call to %s.%s in TestMain function, the test runner will handle it automatically as of Go 1.15", pkg, fn),
 		})
 	}
