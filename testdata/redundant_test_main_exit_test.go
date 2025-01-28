@@ -26,3 +26,13 @@ func teardown() {
 func Test_function(t *testing.T) {
 	t.Error("Fail")
 }
+
+func Test_os_exit(t *testing.T) {
+	// must not match because this is not TestMain function
+	os.Exit(1)
+}
+
+func Test_syscall_exit(t *testing.T) {
+	// must not match because this is not TestMain function
+	syscall.Exit(1)
+}

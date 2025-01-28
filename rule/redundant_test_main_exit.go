@@ -12,13 +12,17 @@ type RedundantTestMainExitRule struct{}
 
 // Apply applies the rule to given file.
 func (*RedundantTestMainExitRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+	if !file.IsTest() {
+		return nil // skip analysis for non-test files
+	}
+
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
 
-	w := &lintRedundantTestMainExit{onFailure: onFailure, isTestFile: file.IsTest()}
+	w := &lintRedundantTestMainExit{onFailure: onFailure}
 	ast.Walk(w, file.AST)
 	return failures
 }
@@ -29,13 +33,16 @@ func (*RedundantTestMainExitRule) Name() string {
 }
 
 type lintRedundantTestMainExit struct {
-	onFailure  func(lint.Failure)
-	isTestFile bool
+	onFailure func(lint.Failure)
 }
 
 func (w *lintRedundantTestMainExit) Visit(node ast.Node) ast.Visitor {
-	if !w.isTestFile {
-		return nil // skip analysis of this file if it is not a test file
+	if fd, ok := node.(*ast.FuncDecl); ok {
+		if fd.Name.Name != "TestMain" {
+			return nil // skip analysis for other functions than TestMain
+		}
+
+		return w
 	}
 
 	se, ok := node.(*ast.ExprStmt)
@@ -68,8 +75,4 @@ func (w *lintRedundantTestMainExit) Visit(node ast.Node) ast.Visitor {
 	}
 
 	return w
-}
-
-func (w *lintRedundantTestMainExit) isTestMain(fd *ast.FuncDecl) bool {
-	return w.isTestFile && fd.Name.Name == "TestMain"
 }
