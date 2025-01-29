@@ -14,7 +14,7 @@ func TestMain(m *testing.M) {
 	os.Unsetenv("USERPROFILE")
 	os.Unsetenv("XDG_CONFIG_HOME")
 	AppFs = afero.NewMemMapFs()
-	os.Exit(m.Run())
+	m.Run()
 }
 
 func TestXDGConfigDirIsPreferredFirst(t *testing.T) {

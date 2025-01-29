@@ -66,6 +66,7 @@ List of all available rules.
   - [redefines-builtin-id](#redefines-builtin-id)
   - [redundant-import-alias](#redundant-import-alias)
   - [redundant-build-tag](#redundant-build-tag)
+  - [redundant-test-main-exit](#redundant-test-main-exit)
   - [string-format](#string-format)
   - [string-of-int](#string-of-int)
   - [struct-tag](#struct-tag)
@@ -284,7 +285,7 @@ _Configuration_: N/A
 _Description_: This rule warns on some common mistakes when using `defer` statement. It currently alerts on the following situations:
 
 | name              | description                                                                                                                                                                                     |
-|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | call-chain        | even if deferring call-chains of the form `foo()()` is valid, it does not helps code understanding (only the last call is deferred)                                                             |
 | loop              | deferring inside loops can be misleading (deferred functions are not executed at the end of the loop iteration but of the current function) and it could lead to exhausting the execution stack |
 | method-call       | deferring a call to a method can lead to subtle bugs if the method does not have a pointer receiver                                                                                             |
@@ -808,6 +809,14 @@ _Description_: This rule warns about redundant build tag comments `// +build` wh
 `gofmt` in Go 1.17+ automatically adds the `//go:build` constraint, making the `// +build` comment unnecessary.
 
 _Configuration_: N/A
+
+## redundant-test-main-exit
+
+_Description_: This rule warns about redundant `Exit` calls in the `TestMain` function, as the Go test runner automatically handles program termination starting from Go 1.15.
+
+_Configuration_: N/A
+
+_Note_: This rule is irrelevant for Go versions below 1.15.
 
 ## string-format
 
