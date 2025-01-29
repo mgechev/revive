@@ -200,7 +200,7 @@ func prepareSkips(globs, excludes []string) ([]string, []string, error) {
 				return nil, nil, fmt.Errorf("Skips Error: %v", err)
 			}
 			for _, match := range matches {
-				path = basepath + "/" + match
+				path = basepath+"/"+match
 				// create skip only for .go files
 				if filepath.Ext(path) == ".go" {
 					skips = append(skips, path)
