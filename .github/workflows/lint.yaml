@@ -5,6 +5,32 @@ on:
     types: [opened, edited, synchronize, reopened]
 
 jobs:
+  go-mod:
+    name: Check go.mod
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Check go.mod
+        run: |
+          go mod tidy
+          git diff --exit-code go.mod
+          git diff --exit-code go.sum
+
+  gofmt:
+    name: Check unformatted Go code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Run gofmt
+        run: |
+          find . -type f -name '*.go' -not -path './testdata/*' -exec gofmt -w {} +
+          git diff --exit-code
 
   lint:
     name: Lint
