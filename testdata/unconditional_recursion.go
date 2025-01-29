@@ -199,3 +199,10 @@ func nr902() {
 		nr902() // MATCH /unconditional recursive call/
 	}()
 }
+
+// Test for issue #1212
+func NewFactory() int {
+	return 0
+}
+
+var defaultFactory = NewFactory()

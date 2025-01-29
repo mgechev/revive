@@ -17,8 +17,35 @@ func (*UnconditionalRecursionRule) Apply(file *lint.File, _ lint.Arguments) []li
 		failures = append(failures, failure)
 	}
 
-	w := &lintUnconditionalRecursionRule{onFailure: onFailure}
-	ast.Walk(w, file.AST)
+	// Range over global declarations of the file to detect func/method declarations and analyze them
+	for _, decl := range file.AST.Decls {
+		n, ok := decl.(*ast.FuncDecl)
+		if !ok {
+			continue // not a func/method declaration
+		}
+
+		if n.Body == nil {
+			continue // func/method with empty body => it can not be recursive
+		}
+
+		var rec *ast.Ident
+		switch {
+		case n.Recv == nil:
+			rec = nil
+		case n.Recv.NumFields() < 1 || len(n.Recv.List[0].Names) < 1:
+			rec = &ast.Ident{Name: "_"}
+		default:
+			rec = n.Recv.List[0].Names[0]
+		}
+
+		w := &lintUnconditionalRecursionRule{
+			onFailure:   onFailure,
+			currentFunc: &funcStatus{&funcDesc{rec, n.Name}, false},
+		}
+
+		ast.Walk(w, n.Body)
+	}
+
 	return failures
 }
 
@@ -50,8 +77,7 @@ type lintUnconditionalRecursionRule struct {
 	inGoStatement bool
 }
 
-// Visit will traverse the file AST.
-// The rule is based in the following algorithm: inside each function body we search for calls to the function itself.
+// Visit will traverse function's body we search for calls to the function itself.
 // We do not search inside conditional control structures (if, for, switch, ...) because any recursive call inside them is conditioned
 // We do search inside conditional control structures are statements that will take the control out of the function (return, exit, panic)
 // If we find conditional control exits, it means the function is NOT unconditionally-recursive
@@ -59,17 +85,6 @@ type lintUnconditionalRecursionRule struct {
 // In resume: if we found a recursive call control-dependent from the entry point of the function then we raise a failure.
 func (w *lintUnconditionalRecursionRule) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
-	case *ast.FuncDecl:
-		var rec *ast.Ident
-		switch {
-		case n.Recv == nil:
-			rec = nil
-		case n.Recv.NumFields() < 1 || len(n.Recv.List[0].Names) < 1:
-			rec = &ast.Ident{Name: "_"}
-		default:
-			rec = n.Recv.List[0].Names[0]
-		}
-		w.currentFunc = &funcStatus{&funcDesc{rec, n.Name}, false}
 	case *ast.CallExpr:
 		// check if call arguments has a recursive call
 		for _, arg := range n.Args {
