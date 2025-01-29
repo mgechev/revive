@@ -2,9 +2,11 @@ package formatter
 
 import (
 	"bytes"
+	"cmp"
 	"fmt"
 	"io"
-	"sort"
+	"slices"
+	"strings"
 
 	"github.com/fatih/color"
 	"github.com/mgechev/revive/lint"
@@ -32,7 +34,7 @@ func (*Friendly) Name() string {
 
 // Format formats the failures gotten from the lint.
 func (f *Friendly) Format(failures <-chan lint.Failure, config lint.Config) (string, error) {
-	var buf bytes.Buffer
+	var buf strings.Builder
 	errorMap := map[string]int{}
 	warningMap := map[string]int{}
 	totalErrors := 0
@@ -40,38 +42,38 @@ func (f *Friendly) Format(failures <-chan lint.Failure, config lint.Config) (str
 	for failure := range failures {
 		sev := severity(config, failure)
 		f.printFriendlyFailure(&buf, failure, sev)
-		if sev == lint.SeverityWarning {
+		switch sev {
+		case lint.SeverityWarning:
 			warningMap[failure.RuleName]++
 			totalWarnings++
-		}
-		if sev == lint.SeverityError {
+		case lint.SeverityError:
 			errorMap[failure.RuleName]++
 			totalErrors++
 		}
 	}
+
 	f.printSummary(&buf, totalErrors, totalWarnings)
 	f.printStatistics(&buf, color.RedString("Errors:"), errorMap)
 	f.printStatistics(&buf, color.YellowString("Warnings:"), warningMap)
 	return buf.String(), nil
 }
 
-func (f *Friendly) printFriendlyFailure(w io.Writer, failure lint.Failure, severity lint.Severity) {
-	f.printHeaderRow(w, failure, severity)
-	f.printFilePosition(w, failure)
-	fmt.Fprintln(w)
-	fmt.Fprintln(w)
+func (f *Friendly) printFriendlyFailure(sb *strings.Builder, failure lint.Failure, severity lint.Severity) {
+	f.printHeaderRow(sb, failure, severity)
+	f.printFilePosition(sb, failure)
+	sb.WriteString("\n\n")
 }
 
-func (f *Friendly) printHeaderRow(w io.Writer, failure lint.Failure, severity lint.Severity) {
+func (f *Friendly) printHeaderRow(sb *strings.Builder, failure lint.Failure, severity lint.Severity) {
 	emoji := getWarningEmoji()
 	if severity == lint.SeverityError {
 		emoji = getErrorEmoji()
 	}
-	fmt.Fprint(w, f.table([][]string{{emoji, "https://revive.run/r#" + failure.RuleName, color.GreenString(failure.Failure)}}))
+	sb.WriteString(f.table([][]string{{emoji, ruleDescriptionURL(failure.RuleName), color.GreenString(failure.Failure)}}))
 }
 
-func (*Friendly) printFilePosition(w io.Writer, failure lint.Failure) {
-	fmt.Fprintf(w, "  %s:%d:%d", failure.GetFilename(), failure.Position.Start.Line, failure.Position.Start.Column)
+func (*Friendly) printFilePosition(sb *strings.Builder, failure lint.Failure) {
+	sb.WriteString(fmt.Sprintf("  %s:%d:%d", failure.GetFilename(), failure.Position.Start.Line, failure.Position.Start.Column))
 }
 
 type statEntry struct {
@@ -98,13 +100,11 @@ func (*Friendly) printSummary(w io.Writer, errors, warnings int) {
 	}
 	str := fmt.Sprintf("%d %s (%d %s, %d %s)", errors+warnings, problemsLabel, errors, errorsLabel, warnings, warningsLabel)
 	if errors > 0 {
-		fmt.Fprintf(w, "%s %s\n", emoji, color.RedString(str))
-		fmt.Fprintln(w)
+		fmt.Fprintf(w, "%s %s\n\n", emoji, color.RedString(str))
 		return
 	}
 	if warnings > 0 {
-		fmt.Fprintf(w, "%s %s\n", emoji, color.YellowString(str))
-		fmt.Fprintln(w)
+		fmt.Fprintf(w, "%s %s\n\n", emoji, color.YellowString(str))
 		return
 	}
 }
@@ -113,12 +113,12 @@ func (f *Friendly) printStatistics(w io.Writer, header string, stats map[string]
 	if len(stats) == 0 {
 		return
 	}
-	var data []statEntry
+	data := make([]statEntry, 0, len(stats))
 	for name, total := range stats {
 		data = append(data, statEntry{name, total})
 	}
-	sort.Slice(data, func(i, j int) bool {
-		return data[i].failures > data[j].failures
+	slices.SortFunc(data, func(a, b statEntry) int {
+		return -cmp.Compare(a.failures, b.failures)
 	})
 	formatted := [][]string{}
 	for _, entry := range data {

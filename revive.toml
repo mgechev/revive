@@ -1,0 +1,46 @@
+# This configuration for the revive linter used for linting the revive's codebase itself.
+# See .github/workflows/lint.yaml.
+
+ignoreGeneratedHeader = false
+severity = "warning"
+confidence = 0.8
+errorCode = 1
+warningCode = 1
+
+[rule.bare-return]
+[rule.blank-imports]
+[rule.context-as-argument]
+[rule.context-keys-type]
+[rule.dot-imports]
+[rule.empty-block]
+[rule.empty-lines]
+[rule.enforce-map-style]
+    arguments = ["literal"]
+[rule.enforce-slice-style]
+    arguments = ["literal"]
+[rule.error-naming]
+[rule.error-return]
+[rule.error-strings]
+[rule.errorf]
+[rule.exported]
+[rule.filename-format]
+    # Override the default pattern to forbid .go files with uppercase letters and dashes.
+    arguments=["^[_a-z][_a-z0-9]*\\.go$"]
+[rule.increment-decrement]
+[rule.indent-error-flow]
+[rule.line-length-limit]
+    arguments = [200]
+[rule.package-comments]
+[rule.range]
+[rule.receiver-naming]
+[rule.redefines-builtin-id]
+[rule.superfluous-else]
+[rule.time-naming]
+[rule.unexported-naming]
+[rule.unexported-return]
+[rule.unreachable-code]
+[rule.unused-parameter]
+[rule.useless-break]
+[rule.use-any]
+[rule.var-declaration]
+[rule.var-naming]

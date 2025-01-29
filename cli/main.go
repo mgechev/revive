@@ -12,16 +12,22 @@ import (
 	"github.com/fatih/color"
 	"github.com/mgechev/revive/config"
 	"github.com/mgechev/revive/revivelib"
-	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/afero"
 )
 
+const (
+	defaultVersion = "dev"
+	defaultCommit  = "none"
+	defaultDate    = "unknown"
+	defaultBuilder = "unknown"
+)
+
 var (
-	version = "dev"
-	commit  = "none"
-	date    = "unknown"
-	builtBy = "unknown"
-	//AppFs is used to operations related with user config files
+	version = defaultVersion
+	commit  = defaultCommit
+	date    = defaultDate
+	builtBy = defaultBuilder
+	// AppFs is used to operations related with user config files
 	AppFs = afero.NewOsFs()
 )
 
@@ -35,6 +41,12 @@ func RunRevive(extraRules ...revivelib.ExtraRule) {
 	// move parsing flags outside of init() otherwise tests dont works properly
 	// more info: https://github.com/golang/go/issues/46869#issuecomment-865695953
 	initConfig()
+
+	if versionFlag {
+		fmt.Print(getVersion(builtBy, date, commit, version))
+		os.Exit(0)
+	}
+
 	conf, err := config.GetConfig(configPath)
 	if err != nil {
 		fail(err.Error())
@@ -115,15 +127,16 @@ func buildDefaultConfigPath() string {
 	configFileName := "revive.toml"
 	configDirFile := filepath.Join(os.Getenv("XDG_CONFIG_HOME"), configFileName)
 
-	if homeDir, err := homedir.Dir(); err == nil {
+	if homeDir, err := os.UserHomeDir(); err == nil {
 		homeDirFile = filepath.Join(homeDir, configFileName)
 	}
 
-	if fileExist(configDirFile) {
+	switch {
+	case fileExist(configDirFile):
 		result = configDirFile
-	} else if fileExist(homeDirFile) {
+	case fileExist(homeDirFile):
 		result = homeDirFile
-	} else {
+	default:
 		result = ""
 	}
 
@@ -160,35 +173,30 @@ func initConfig() {
 	flag.BoolVar(&setExitStatus, "set_exit_status", false, exitStatusUsage)
 	flag.IntVar(&maxOpenFiles, "max_open_files", 0, maxOpenFilesUsage)
 	flag.Parse()
+}
 
-	// Output build info (version, commit, date and builtBy)
-	if versionFlag {
-		var buildInfo string
-		if date != "unknown" && builtBy != "unknown" {
-			buildInfo = fmt.Sprintf("Built\t\t%s by %s\n", date, builtBy)
-		}
+// getVersion returns build info (version, commit, date and builtBy)
+func getVersion(builtBy, date, commit, version string) string {
+	var buildInfo string
+	if date != defaultDate && builtBy != defaultBuilder {
+		buildInfo = fmt.Sprintf("Built\t\t%s by %s\n", date, builtBy)
+	}
 
-		if commit != "none" {
-			buildInfo = fmt.Sprintf("Commit:\t\t%s\n%s", commit, buildInfo)
-		}
+	if commit != defaultCommit {
+		buildInfo = fmt.Sprintf("Commit:\t\t%s\n%s", commit, buildInfo)
+	}
 
-		if version == "dev" {
-			bi, ok := debug.ReadBuildInfo()
-			if ok {
-				version = bi.Main.Version
-				if strings.HasPrefix(version, "v") {
-					version = bi.Main.Version[1:]
-				}
-				if len(buildInfo) == 0 {
-					fmt.Printf("version %s\n", version)
-					os.Exit(0)
-				}
+	if version == defaultVersion {
+		bi, ok := debug.ReadBuildInfo()
+		if ok {
+			version = strings.TrimPrefix(bi.Main.Version, "v")
+			if len(buildInfo) == 0 {
+				return fmt.Sprintf("version %s\n", version)
 			}
 		}
-
-		fmt.Printf("Version:\t%s\n%s", version, buildInfo)
-		os.Exit(0)
 	}
+
+	return fmt.Sprintf("Version:\t%s\n%s", version, buildInfo)
 }
 
 func fileExist(path string) bool {

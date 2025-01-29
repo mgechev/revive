@@ -5,23 +5,34 @@ on:
     types: [opened, edited, synchronize, reopened]
 
 jobs:
-  test:
-    name: Test
+  tests-on-unix:
+    name: Tests on Unix
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         go-version:
-          - 1.21.x
-          - 1.22.x
+          - oldstable
+          - stable
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v4
       - name: Set up Go
-        uses: actions/setup-go@v3.2.0
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
-          cache: true
-          cache-dependency-path: '**/go.sum'
       - name: Run tests
-        run: go test -race ./...
+        run: go test -race -shuffle=on ./...
+
+  tests-on-windows:
+    name: Tests on Windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Run tests
+        run: go test -race -shuffle=on ./...

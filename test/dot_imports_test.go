@@ -7,12 +7,14 @@ import (
 	"github.com/mgechev/revive/rule"
 )
 
-func TestDotImports(t *testing.T) {
-	args := []any{map[string]any{
-		"allowedPackages": []any{"errors", "context", "github.com/BurntSushi/toml"},
-	}}
+func TestDotImportsDefault(t *testing.T) {
+	testRule(t, "dot_imports_default", &rule.DotImportsRule{}, &lint.RuleConfig{})
+}
 
-	testRule(t, "import-dot", &rule.DotImportsRule{}, &lint.RuleConfig{
-		Arguments: args,
+func TestDotImports(t *testing.T) {
+	testRule(t, "dot_imports", &rule.DotImportsRule{}, &lint.RuleConfig{
+		Arguments: []any{map[string]any{
+			"allowedPackages": []any{"errors", "context", "github.com/BurntSushi/toml"},
+		}},
 	})
 }

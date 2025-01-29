@@ -1,6 +1,7 @@
 package lint
 
 import (
+	"errors"
 	"go/ast"
 	"go/importer"
 	"go/token"
@@ -8,7 +9,9 @@ import (
 	"sync"
 
 	goversion "github.com/hashicorp/go-version"
+	"golang.org/x/sync/errgroup"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/internal/typeparams"
 )
 
@@ -31,7 +34,6 @@ type Package struct {
 var (
 	trueValue  = 1
 	falseValue = 2
-	notSet     = 3
 
 	go121 = goversion.Must(goversion.NewVersion("1.21"))
 	go122 = goversion.Must(goversion.NewVersion("1.22"))
@@ -88,27 +90,32 @@ func (p *Package) TypeCheck() error {
 	p.Lock()
 	defer p.Unlock()
 
-	// If type checking has already been performed
-	// skip it.
-	if p.typesInfo != nil || p.typesPkg != nil {
+	alreadyTypeChecked := p.typesInfo != nil || p.typesPkg != nil
+	if alreadyTypeChecked {
 		return nil
 	}
+
 	config := &types.Config{
 		// By setting a no-op error reporter, the type checker does as much work as possible.
 		Error:    func(error) {},
 		Importer: importer.Default(),
 	}
 	info := &types.Info{
-		Types:  make(map[ast.Expr]types.TypeAndValue),
-		Defs:   make(map[*ast.Ident]types.Object),
-		Uses:   make(map[*ast.Ident]types.Object),
-		Scopes: make(map[ast.Node]*types.Scope),
+		Types:  map[ast.Expr]types.TypeAndValue{},
+		Defs:   map[*ast.Ident]types.Object{},
+		Uses:   map[*ast.Ident]types.Object{},
+		Scopes: map[ast.Node]*types.Scope{},
 	}
 	var anyFile *File
 	var astFiles []*ast.File
 	for _, f := range p.files {
 		anyFile = f
 		astFiles = append(astFiles, f.AST)
+	}
+
+	if anyFile == nil {
+		// this is unlikely to happen, but technically guarantees anyFile to not be nil
+		return errors.New("no ast.File found")
 	}
 
 	typesPkg, err := check(config, anyFile.AST.Name.Name, p.fset, astFiles, info)
@@ -135,7 +142,7 @@ func check(config *types.Config, n string, fset *token.FileSet, astFiles []*ast.
 	return config.Check(n, fset, astFiles, info)
 }
 
-// TypeOf returns the type of an expression.
+// TypeOf returns the type of expression.
 func (p *Package) TypeOf(expr ast.Expr) types.Type {
 	if p.typesInfo == nil {
 		return nil
@@ -143,56 +150,48 @@ func (p *Package) TypeOf(expr ast.Expr) types.Type {
 	return p.typesInfo.TypeOf(expr)
 }
 
-type walker struct {
-	nmap map[string]int
-	has  map[string]int
-}
+type sortableMethodsFlags int
 
-func (w *walker) Visit(n ast.Node) ast.Visitor {
-	fn, ok := n.(*ast.FuncDecl)
-	if !ok || fn.Recv == nil || len(fn.Recv.List) == 0 {
-		return w
-	}
-	// TODO(dsymonds): We could check the signature to be more precise.
-	recv := typeparams.ReceiverType(fn)
-	if i, ok := w.nmap[fn.Name.Name]; ok {
-		w.has[recv] |= i
-	}
-	return w
-}
+// flags for sortable interface methods.
+const (
+	bfLen sortableMethodsFlags = 1 << iota
+	bfLess
+	bfSwap
+)
 
 func (p *Package) scanSortable() {
-	p.sortable = make(map[string]bool)
-
-	// bitfield for which methods exist on each type.
-	const (
-		Len = 1 << iota
-		Less
-		Swap
-	)
-	nmap := map[string]int{"Len": Len, "Less": Less, "Swap": Swap}
-	has := make(map[string]int)
+	sortableFlags := map[string]sortableMethodsFlags{}
 	for _, f := range p.files {
-		ast.Walk(&walker{nmap, has}, f.AST)
+		for _, decl := range f.AST.Decls {
+			fn, ok := decl.(*ast.FuncDecl)
+			isAMethodDeclaration := ok && fn.Recv != nil && len(fn.Recv.List) != 0
+			if !isAMethodDeclaration {
+				continue
+			}
+
+			recvType := typeparams.ReceiverType(fn)
+			sortableFlags[recvType] |= getSortableMethodFlagForFunction(fn)
+		}
 	}
-	for typ, ms := range has {
-		if ms == Len|Less|Swap {
+
+	p.sortable = make(map[string]bool, len(sortableFlags))
+	for typ, ms := range sortableFlags {
+		if ms == bfLen|bfLess|bfSwap {
 			p.sortable[typ] = true
 		}
 	}
 }
 
-func (p *Package) lint(rules []Rule, config Config, failures chan Failure) {
+func (p *Package) lint(rules []Rule, config Config, failures chan Failure) error {
 	p.scanSortable()
-	var wg sync.WaitGroup
+	var eg errgroup.Group
 	for _, file := range p.files {
-		wg.Add(1)
-		go (func(file *File) {
-			file.lint(rules, config, failures)
-			defer wg.Done()
-		})(file)
+		eg.Go(func() error {
+			return file.lint(rules, config, failures)
+		})
 	}
-	wg.Wait()
+
+	return eg.Wait()
 }
 
 // IsAtLeastGo121 returns true if the Go version for this package is 1.21 or higher, false otherwise
@@ -203,4 +202,17 @@ func (p *Package) IsAtLeastGo121() bool {
 // IsAtLeastGo122 returns true if the Go version for this package is 1.22 or higher, false otherwise
 func (p *Package) IsAtLeastGo122() bool {
 	return p.goVersion.GreaterThanOrEqual(go122)
+}
+
+func getSortableMethodFlagForFunction(fn *ast.FuncDecl) sortableMethodsFlags {
+	switch {
+	case astutils.FuncSignatureIs(fn, "Len", []string{}, []string{"int"}):
+		return bfLen
+	case astutils.FuncSignatureIs(fn, "Less", []string{"int", "int"}, []string{"bool"}):
+		return bfLess
+	case astutils.FuncSignatureIs(fn, "Swap", []string{"int", "int"}, []string{}):
+		return bfSwap
+	default:
+		return 0
+	}
 }

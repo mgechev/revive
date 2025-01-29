@@ -16,7 +16,7 @@ func TestReviveLint(t *testing.T) {
 	revive := getMockRevive(t)
 
 	// ACT
-	failures, err := revive.Lint(revivelib.Include("../testdata/if-return.go"))
+	failures, err := revive.Lint(revivelib.Include("../testdata/if_return.go"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -77,7 +77,7 @@ func TestReviveFormat(t *testing.T) {
 	// ARRANGE
 	revive := getMockRevive(t)
 
-	failuresChan, err := revive.Lint(revivelib.Include("../testdata/if-return.go"))
+	failuresChan, err := revive.Lint(revivelib.Include("../testdata/if_return.go"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -91,11 +91,11 @@ func TestReviveFormat(t *testing.T) {
 	}
 
 	errorMsgs := []string{
-		"(91, 3)  https://revive.run/r#unreachable-code  unreachable code after this statement",
-		"(98, 3)  https://revive.run/r#unreachable-code  unreachable code after this statement",
-		"(15, 2)  https://revive.run/r#if-return         redundant if ...; err != nil check, just return error instead.",
-		"(88, 3)  https://revive.run/r#if-return         redundant if ...; err != nil check, just return error instead.",
-		"(95, 3)  https://revive.run/r#if-return         redundant if ...; err != nil check, just return error instead.",
+		"(91, 3)  https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#unreachable-code  unreachable code after this statement",
+		"(98, 3)  https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#unreachable-code  unreachable code after this statement",
+		"(15, 2)  https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#if-return         redundant if ...; err != nil check, just return error instead.",
+		"(88, 3)  https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#if-return         redundant if ...; err != nil check, just return error instead.",
+		"(95, 3)  https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#if-return         redundant if ...; err != nil check, just return error instead.",
 	}
 	for _, errorMsg := range errorMsgs {
 		if !strings.Contains(failures, errorMsg) {
@@ -111,11 +111,11 @@ func TestReviveFormat(t *testing.T) {
 
 type mockRule struct{}
 
-func (r *mockRule) Name() string {
+func (*mockRule) Name() string {
 	return "mock-rule"
 }
 
-func (r *mockRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
+func (*mockRule) Apply(_ *lint.File, _ lint.Arguments) []lint.Failure {
 	return nil
 }
 
@@ -135,7 +135,7 @@ func getMockRevive(t *testing.T) *revivelib.Revive {
 		revivelib.NewExtraRule(&mockRule{}, lint.RuleConfig{}),
 	)
 	if err != nil {
-		t.Fatal(err.Error())
+		t.Fatal(err)
 	}
 
 	return revive

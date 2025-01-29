@@ -8,7 +8,7 @@ import (
 )
 
 func TestUncheckedDynamicCast(t *testing.T) {
-	testRule(t, "unchecked-type-assertion", &rule.UncheckedTypeAssertionRule{})
+	testRule(t, "unchecked_type_assertion", &rule.UncheckedTypeAssertionRule{})
 }
 
 func TestUncheckedDynamicCastWithAcceptIgnored(t *testing.T) {
@@ -16,5 +16,5 @@ func TestUncheckedDynamicCastWithAcceptIgnored(t *testing.T) {
 		"acceptIgnoredAssertionResult": true,
 	}}
 
-	testRule(t, "unchecked-type-assertion-accept-ignored", &rule.UncheckedTypeAssertionRule{}, &lint.RuleConfig{Arguments: args})
+	testRule(t, "unchecked_type_assertion_accept_ignored", &rule.UncheckedTypeAssertionRule{}, &lint.RuleConfig{Arguments: args})
 }

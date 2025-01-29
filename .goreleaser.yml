@@ -1,6 +1,7 @@
 # This is an example goreleaser.yaml file with some sane defaults.
 # Make sure to check the documentation at http://goreleaser.com
 ---
+version: 2
 archives:
   - id: revive
     name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
@@ -18,23 +19,6 @@ builds:
       - darwin
       - windows
 
-dockers:
-  - image_templates:
-      - "ghcr.io/mgechev/revive:{{ .Version }}"
-      - "ghcr.io/mgechev/revive:{{ .Tag }}"
-      - "ghcr.io/mgechev/revive:v{{ .Major }}.{{ .Minor }}"
-      - "ghcr.io/mgechev/revive:v{{ .Major }}"
-      - "ghcr.io/mgechev/revive:latest"
-    dockerfile: Dockerfile
-    build_flag_templates:
-      - --label=org.opencontainers.image.created={{.Date}}
-      - --label=org.opencontainers.image.title={{ .ProjectName }}
-      - "--label=org.opencontainers.image.description=🔥 ~6x faster, stricter, configurable, extensible, and beautiful drop-in replacement for golint"
-      - --label=org.opencontainers.image.url=https://github.com/mgechev/revive
-      - --label=org.opencontainers.image.source=https://github.com/mgechev/revive
-      - --label=org.opencontainers.image.version={{ .Version }}
-      - --label=org.opencontainers.image.revision={{ .FullCommit }}
-      - --label=org.opencontainers.image.licenses=MIT
 changelog:
   filters:
     exclude:
@@ -44,5 +28,5 @@ changelog:
 checksum:
   name_template: checksums.txt
 snapshot:
-  name_template: "{{ .Tag }}-next"
+  version_template: "{{ .Tag }}-next"
 project_name: revive

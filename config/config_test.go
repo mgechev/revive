@@ -88,6 +88,7 @@ func TestGetLintingRules(t *testing.T) {
 	tt := map[string]struct {
 		confPath       string
 		wantRulesCount int
+		wantErr        string
 	}{
 		"no rules": {
 			confPath:       "testdata/noRules.toml",
@@ -105,6 +106,10 @@ func TestGetLintingRules(t *testing.T) {
 			confPath:       "testdata/enable2.toml",
 			wantRulesCount: 2,
 		},
+		"var-naming configure error": {
+			confPath: "testdata/varNamingConfigureError.toml",
+			wantErr:  `cannot configure rule: "var-naming": invalid argument to the var-naming rule. Expecting a allowlist of type slice with initialisms, got string`,
+		},
 	}
 
 	for name, tc := range tt {
@@ -114,6 +119,13 @@ func TestGetLintingRules(t *testing.T) {
 				t.Fatalf("Unexpected error while loading conf: %v", err)
 			}
 			rules, err := GetLintingRules(cfg, []lint.Rule{})
+			if tc.wantErr != "" {
+				if err == nil || err.Error() != tc.wantErr {
+					t.Fatalf("Expected error %q, got %q", tc.wantErr, err)
+				}
+				return
+			}
+
 			switch {
 			case err != nil:
 				t.Fatalf("Unexpected error\n\t%v", err)
@@ -172,4 +184,31 @@ func TestGetGlobalSeverity(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetFormatter(t *testing.T) {
+	t.Run("default formatter", func(t *testing.T) {
+		formatter, err := GetFormatter("")
+		if err != nil {
+			t.Fatalf("Unexpected error %q", err)
+		}
+		if formatter == nil || formatter.Name() != "default" {
+			t.Errorf("Expected formatter %q, got %v", "default", formatter)
+		}
+	})
+	t.Run("unknown formatter", func(t *testing.T) {
+		_, err := GetFormatter("unknown")
+		if err == nil || err.Error() != "unknown formatter unknown" {
+			t.Errorf("Expected error %q, got: %q", "unknown formatter unknown", err)
+		}
+	})
+	t.Run("checkstyle formatter", func(t *testing.T) {
+		formatter, err := GetFormatter("checkstyle")
+		if err != nil {
+			t.Fatalf("Unexpected error: %q", err)
+		}
+		if formatter == nil || formatter.Name() != "checkstyle" {
+			t.Errorf("Expected formatter %q, got %v", "checkstyle", formatter)
+		}
+	})
 }

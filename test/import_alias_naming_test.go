@@ -1,0 +1,44 @@
+package test
+
+import (
+	"testing"
+
+	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
+)
+
+func TestImportAliasNaming(t *testing.T) {
+	testRule(t, "import_alias_naming", &rule.ImportAliasNamingRule{})
+	testRule(t, "import_alias_naming", &rule.ImportAliasNamingRule{}, &lint.RuleConfig{
+		Arguments: lint.Arguments{
+			map[string]any{},
+		},
+	})
+}
+
+func TestImportAliasNaming_CustomConfig(t *testing.T) {
+	testRule(t, "import_alias_naming_custom_config", &rule.ImportAliasNamingRule{}, &lint.RuleConfig{
+		Arguments: []any{`^[a-z]+$`},
+	})
+}
+
+func TestImportAliasNaming_CustomConfigWithMultipleRules(t *testing.T) {
+	testRule(t, "import_alias_naming_custom_config_with_multiple_values", &rule.ImportAliasNamingRule{}, &lint.RuleConfig{
+		Arguments: []any{
+			map[string]any{
+				"allowRegex": `^[a-z][a-z0-9]*$`,
+				"denyRegex":  `^((v\d+)|(v\d+alpha\d+))$`,
+			},
+		},
+	})
+}
+
+func TestImportAliasNaming_CustomConfigWithOnlyDeny(t *testing.T) {
+	testRule(t, "import_alias_naming_custom_config_with_only_deny", &rule.ImportAliasNamingRule{}, &lint.RuleConfig{
+		Arguments: []any{
+			map[string]any{
+				"denyRegex": `^((v\d+)|(v\d+alpha\d+))$`,
+			},
+		},
+	})
+}

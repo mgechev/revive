@@ -18,7 +18,7 @@ func TestReviveCreateInstance(t *testing.T) {
 		t.Fatal("Expected MaxOpenFiles to be 2048")
 	}
 
-	if revive.lintingRules == nil || len(revive.lintingRules) == 0 {
+	if len(revive.lintingRules) == 0 {
 		t.Fatal("Linting rules not loaded.")
 	}
 
@@ -62,7 +62,7 @@ func getMockRevive(t *testing.T) *Revive {
 		NewExtraRule(&mockRule{}, lint.RuleConfig{}),
 	)
 	if err != nil {
-		t.Fatal(err.Error())
+		t.Fatal(err)
 	}
 
 	return revive

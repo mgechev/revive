@@ -38,6 +38,8 @@ List of all available rules.
   - [errorf](#errorf)
   - [exported](#exported)
   - [file-header](#file-header)
+  - [file-length-limit](#file-length-limit)
+  - [filename-format](#filename-format)
   - [flag-parameter](#flag-parameter)
   - [function-length](#function-length)
   - [function-result-limit](#function-result-limit)
@@ -63,6 +65,7 @@ List of all available rules.
   - [receiver-naming](#receiver-naming)
   - [redefines-builtin-id](#redefines-builtin-id)
   - [redundant-import-alias](#redundant-import-alias)
+  - [redundant-build-tag](#redundant-build-tag)
   - [string-format](#string-format)
   - [string-of-int](#string-of-int)
   - [struct-tag](#struct-tag)
@@ -79,6 +82,7 @@ List of all available rules.
   - [unused-parameter](#unused-parameter)
   - [unused-receiver](#unused-receiver)
   - [use-any](#use-any)
+  - [use-errors-new](#use-errors-new)
   - [useless-break](#useless-break)
   - [var-declaration](#var-declaration)
   - [var-naming](#var-naming)
@@ -344,12 +348,13 @@ if !cond {
 _Configuration_: ([]string) rule flags. Available flags are:
 
 * _preserveScope_: do not suggest refactorings that would increase variable scope
+* _allowJump_: suggest a new jump (`return`, `continue` or `break` statement) if it could unnest multiple statements. By default, only relocation of _existing_ jumps (i.e. from the `else` clause) are suggested.
 
 Example:
 
 ```toml
 [rule.early-return]
-  arguments = ["preserveScope"]
+  arguments = ["preserveScope", "allowJump"]
 ```
 
 ## empty-block
@@ -499,6 +504,35 @@ Example:
 ```toml
 [rule.file-header]
   arguments = ["This is the text that must appear at the top of source files."]
+```
+
+## file-length-limit
+
+_Description_: This rule enforces a maximum number of lines per file, in order to aid in maintainability and reduce complexity.
+
+_Configuration_:
+
+* `max` (int) a maximum number of lines in a file. Must be non-negative integers. 0 means the rule is disabled (default `0`);
+* `skipComments` (bool) if true ignore and do not count lines containing just comments (default `false`);
+* `skipBlankLines` (bool) if true ignore and do not count lines made up purely of whitespace (default `false`).
+
+Example:
+
+```toml
+[rule.file-length-limit]
+  arguments = [{max=100,skipComments=true,skipBlankLines=true}]
+```
+
+## filename-format
+_Description_: enforces conventions on source file names. By default, the rule enforces filenames of the form `^[_A-Za-z0-9][_A-Za-z0-9-]*\.go$`: Optionally, the rule can be configured to enforce other forms.
+
+_Configuration_: (string) regular expression for source filenames.
+
+Example:
+
+```toml
+[rule.filename-format]
+    arguments=["^[_a-z][_a-z0-9]*\\.go$"]
 ```
 
 ## flag-parameter
@@ -725,12 +759,16 @@ _Description_: Range variables in a loop are reused at each iteration. This rule
 
 _Configuration_: N/A
 
+_Note_: This rule is irrelevant for Go 1.22+.
+
 ## range-val-in-closure
 
 _Description_: Range variables in a loop are reused at each iteration; therefore a goroutine created in a loop will point to the range variable with from the upper scope. This way, the goroutine could use the variable with an undesired value.
 This rule warns when a range value (or index) is used inside a closure
 
 _Configuration_: N/A
+
+_Note_: This rule is irrelevant for Go 1.22+.
 
 ## range
 
@@ -761,6 +799,13 @@ _Configuration_: N/A
 ## redundant-import-alias
 
 _Description_: This rule warns on redundant import aliases. This happens when the alias used on the import statement matches the imported package name.
+
+_Configuration_: N/A
+
+## redundant-build-tag
+
+_Description_: This rule warns about redundant build tag comments `// +build` when `//go:build` is present.
+`gofmt` in Go 1.17+ automatically adds the `//go:build` constraint, making the `// +build` comment unnecessary.
 
 _Configuration_: N/A
 
@@ -912,7 +957,7 @@ _Configuration_: Supports arguments with single of `map[string]any` with option 
 
 ```toml
 [rule.unused-parameter]
-    Arguments = [{ allowRegex = "^_" }]
+    arguments = [{ allowRegex = "^_" }]
 ```
 
 allows any names started with `_`, not just `_` itself:
@@ -929,7 +974,7 @@ _Configuration_: Supports arguments with single of `map[string]any` with option 
 
 ```toml
 [rule.unused-receiver]
-    Arguments = [{ allowRegex = "^_" }]
+    arguments = [{ allowRegex = "^_" }]
 ```
 
 allows any names started with `_`, not just `_` itself:
@@ -943,6 +988,13 @@ func (_my *MyStruct) SomeMethod() {} // matches rule
 _Description_: Since Go 1.18, `interface{}` has an alias: `any`. This rule proposes to replace instances of `interface{}` with `any`.
 
 _Configuration_: N/A
+
+## use-errors-new
+
+_Description_: This rules identifies calls to `fmt.Errorf` that can be safely replaced by, the more efficient, `errors.New`.
+
+_Configuration_: N/A
+
 
 ## useless-break
 
@@ -962,7 +1014,7 @@ _Configuration_: N/A
 
 ## var-naming
 
-_Description_: This rule warns when [initialism](https://go.dev/wiki/CodeReviewComments#initialisms), [variable](https://go.dev/wiki/CodeReviewComments#variable-names) or [package](https://go.dev/wiki/CodeReviewComments#package-names) naming conventions are not followed.
+_Description_: This rule warns when [initialism](https://go.dev/wiki/CodeReviewComments#initialisms), [variable](https://go.dev/wiki/CodeReviewComments#variable-names) or [package](https://go.dev/wiki/CodeReviewComments#package-names) naming conventions are not followed. It ignores functions starting with `Example`, `Test`, `Benchmark`, and `Fuzz` in test files, preserving `golint` original behavior.
 
 _Configuration_: This rule accepts two slices of strings and one optional slice with single map with named parameters.
 (it's due to TOML hasn't "slice of any" and we keep backward compatibility with previous config version)

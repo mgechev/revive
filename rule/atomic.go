@@ -8,7 +8,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// AtomicRule lints given else constructs.
+// AtomicRule lints usages of the `sync/atomic` package.
 type AtomicRule struct{}
 
 // Apply applies the rule to given file.
