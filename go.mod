@@ -12,7 +12,7 @@ require (
 	github.com/mgechev/dots v0.0.0-20210922191527-e955255bf517
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/spf13/afero v1.12.0
-	golang.org/x/mod v0.22.0
+	golang.org/x/mod v0.23.0
 	golang.org/x/sync v0.10.0
 	golang.org/x/tools v0.29.0
 )
