@@ -36,6 +36,43 @@ func TestReviveLint(t *testing.T) {
 	}
 }
 
+func TestReviveLintExcludeWithRegexp(t *testing.T) {
+	// ARRANGE
+	revive := getMockRevive(t)
+
+	// ACT
+	files := []string{"../testdata/if_return.go"}
+	excludePatterns := []string{"*return*"}
+	packages := []*revivelib.LintPattern{}
+	for _, file := range files {
+		packages = append(packages, revivelib.Include(file))
+	}
+
+	for _, file := range excludePatterns {
+		packages = append(packages, revivelib.Exclude(file))
+	}
+
+	failures, err := revive.Lint(packages...)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// ASSERT
+	failureList := []lint.Failure{}
+
+	for failure := range failures {
+		failureList = append(failureList, failure)
+	}
+
+	const expected = 0
+
+	got := len(failureList)
+	if got != expected {
+		t.Fatalf("Expected failures to have %d failures, but it has %d.", expected, got)
+	}
+}
+
 func TestReviveFormat(t *testing.T) {
 	// ARRANGE
 	revive := getMockRevive(t)

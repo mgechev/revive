@@ -4,6 +4,7 @@ go 1.22.1
 
 require (
 	github.com/BurntSushi/toml v1.4.0
+	github.com/bmatcuk/doublestar/v4 v4.8.1
 	github.com/chavacava/garif v0.1.0
 	github.com/fatih/color v1.18.0
 	github.com/fatih/structtag v1.2.0
