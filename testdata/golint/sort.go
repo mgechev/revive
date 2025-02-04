@@ -41,3 +41,6 @@ func (vv Vv) Less(i int, j int) (result bool) { return w[i] < w[j] } // MATCH /e
 type X []int
 
 func (x X) Less(i *pkg.tip) (result bool) { return len(x) } // MATCH /exported method X.Less should have comment or be unexported/
+
+// Test for issue #1217
+func (s *synchronized[T]) Swap(other Synchronized[T]) {}
