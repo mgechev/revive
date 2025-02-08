@@ -197,7 +197,7 @@ func prepareSkips(globs, excludes []string) ([]string, []string, error) {
 		for _, skip := range excludes {
 			matches, err := doublestar.Glob(fsys, skip)
 			if err != nil {
-				return nil, nil, fmt.Errorf("Skips Error: %v", err)
+				return nil, nil, fmt.Errorf("Skips Error: %w", err)
 			}
 			for _, match := range matches {
 				path = basepath + "/" + match

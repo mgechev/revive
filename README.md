@@ -100,7 +100,6 @@ Here's how `revive` is different from `golint`:
     - [SARIF](#sarif)
   - [Extensibility](#extensibility)
     - [Writing a Custom Rule](#writing-a-custom-rule)
-      - [Example](#example)
       - [Using `revive` as a library](#using-revive-as-a-library)
     - [Custom Formatter](#custom-formatter)
   - [Speed Comparison](#speed-comparison)
@@ -561,6 +560,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`filename-format`](./RULES_DESCRIPTIONS.md#filename-format) | regular expression (optional) | Enforces the formatting of filenames |   no    |  no   |
 | [`redundant-build-tag`](./RULES_DESCRIPTIONS.md#redundant-build-tag) | n/a   | Warns about redundant `// +build` comment lines |   no    |  no   |
 | [`use-errors-new`](./RULES_DESCRIPTIONS.md#use-errors-new) | n/a   | Spots calls to `fmt.Errorf` that can be replaced by `errors.New` |   no    |  no   |
+| [`redundant-test-main-exit`](./RULES_DESCRIPTIONS.md#redundant-test-main-exit) |  n/a   | Suggests removing `Exit` call in `TestMain` function for test files |    no    |  no   |
 
 ## Configurable rules
 

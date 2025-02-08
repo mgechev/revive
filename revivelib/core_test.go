@@ -41,7 +41,7 @@ func TestReviveLintExcludeWithRegexp(t *testing.T) {
 	revive := getMockRevive(t)
 
 	// ACT
-	files := []string{"../testdata/if-return.go"}
+	files := []string{"../testdata/if_return.go"}
 	excludePatterns := []string{"*return*"}
 	packages := []*revivelib.LintPattern{}
 	for _, file := range files {

@@ -71,6 +71,8 @@ func getFieldTypeName(typ ast.Expr) string {
 		return f.Sel.Name + "." + getFieldTypeName(f.X)
 	case *ast.StarExpr:
 		return "*" + getFieldTypeName(f.X)
+	case *ast.IndexExpr:
+		return getFieldTypeName(f.X) + "[" + getFieldTypeName(f.Index) + "]"
 	default:
 		panic(fmt.Sprintf("not supported type %T", typ))
 	}
