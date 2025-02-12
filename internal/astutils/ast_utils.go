@@ -2,7 +2,6 @@
 package astutils
 
 import (
-	"fmt"
 	"go/ast"
 )
 
