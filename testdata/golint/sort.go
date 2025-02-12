@@ -44,3 +44,12 @@ func (x X) Less(i *pkg.tip) (result bool) { return len(x) } // MATCH /exported m
 
 // Test for issue #1217
 func (s *synchronized[T]) Swap(other Synchronized[T]) {}
+
+// Swap for issue #1228
+func (s *synchronized[T]) Swap(other interface{}) {}
+
+// Swap for issue #1228
+func (s *synchronized[T]) Swap(other []int) {}
+
+// Swap for issue #1228
+func (s *synchronized[T]) Swap(other []interface{}) {}
