@@ -78,6 +78,6 @@ func getFieldTypeName(typ ast.Expr) string {
 	case *ast.InterfaceType:
 		return "interface{}"
 	default:
-		panic(fmt.Sprintf("not supported type %T", typ))
+		return "UNHANDLED_TYPE"
 	}
 }
