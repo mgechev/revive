@@ -5,10 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"strings"
 
-	"github.com/bmatcuk/doublestar/v4"
 	"github.com/mgechev/dots"
 	"github.com/mgechev/revive/config"
 	"github.com/mgechev/revive/lint"
@@ -175,40 +173,12 @@ func getPackages(includePatterns []string, excludePatterns ArrayFlags) ([][]stri
 		globs = append(globs, ".")
 	}
 
-	globs, skips, err := prepareSkips(globs, normalizeSplit(excludePatterns))
-	if err != nil {
-		return nil, fmt.Errorf("prepare skips - resolving excludes before dots: %w", err)
-	}
-
-	packages, err := dots.ResolvePackages(globs, skips)
+	packages, err := dots.ResolvePackages(globs, normalizeSplit(excludePatterns))
 	if err != nil {
 		return nil, fmt.Errorf("getting packages - resolving packages in dots: %w", err)
 	}
 
 	return packages, nil
-}
-
-func prepareSkips(globs, excludes []string) ([]string, []string, error) {
-	var skips []string
-	for _, path := range globs {
-		var basepath string
-		basepath, _ = doublestar.SplitPattern(path)
-		fsys := os.DirFS(basepath)
-		for _, skip := range excludes {
-			matches, err := doublestar.Glob(fsys, skip)
-			if err != nil {
-				return nil, nil, fmt.Errorf("Skips Error: %w", err)
-			}
-			for _, match := range matches {
-				path = basepath + "/" + match
-				// create skip only for .go files
-				if filepath.Ext(path) == ".go" {
-					skips = append(skips, path)
-				}
-			}
-		}
-	}
-	return globs, skips, nil
 }
 
 func normalizeSplit(strs []string) []string {
