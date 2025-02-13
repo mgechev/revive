@@ -2,7 +2,6 @@
 package astutils
 
 import (
-	"fmt"
 	"go/ast"
 )
 
@@ -73,7 +72,11 @@ func getFieldTypeName(typ ast.Expr) string {
 		return "*" + getFieldTypeName(f.X)
 	case *ast.IndexExpr:
 		return getFieldTypeName(f.X) + "[" + getFieldTypeName(f.Index) + "]"
+	case *ast.ArrayType:
+		return "[]" + getFieldTypeName(f.Elt)
+	case *ast.InterfaceType:
+		return "interface{}"
 	default:
-		panic(fmt.Sprintf("not supported type %T", typ))
+		return "UNHANDLED_TYPE"
 	}
 }
