@@ -16,3 +16,7 @@ func TestStructTagWithUserOptions(t *testing.T) {
 		Arguments: []any{"json,inline,outline", "bson,gnu"},
 	})
 }
+
+func TestStructTagAfterGo1_24(t *testing.T) {
+	testRule(t, "go1.24/struct_tag", &rule.StructTagRule{})
+}

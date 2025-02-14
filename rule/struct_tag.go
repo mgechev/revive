@@ -54,8 +54,9 @@ func (r *StructTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 	}
 
 	w := lintStructTagRule{
-		onFailure:   onFailure,
-		userDefined: r.userDefined,
+		onFailure:      onFailure,
+		userDefined:    r.userDefined,
+		isAtLeastGo124: file.Pkg.IsAtLeastGo124(),
 	}
 
 	ast.Walk(w, file.AST)
@@ -69,10 +70,11 @@ func (*StructTagRule) Name() string {
 }
 
 type lintStructTagRule struct {
-	onFailure   func(lint.Failure)
-	userDefined map[string][]string // map: key -> []option
-	usedTagNbr  map[int]bool        // list of used tag numbers
-	usedTagName map[string]bool     // list of used tag keys
+	onFailure      func(lint.Failure)
+	userDefined    map[string][]string // map: key -> []option
+	usedTagNbr     map[int]bool        // list of used tag numbers
+	usedTagName    map[string]bool     // list of used tag keys
+	isAtLeastGo124 bool
 }
 
 func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
@@ -281,6 +283,11 @@ func (w lintStructTagRule) checkJSONTag(name string, options []string) (string, 
 			if name != "-" {
 				return "option can not be empty in JSON tag", false
 			}
+		case "omitzero":
+			if w.isAtLeastGo124 {
+				continue
+			}
+			fallthrough
 		default:
 			if w.isUserDefined(keyJSON, opt) {
 				continue

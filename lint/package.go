@@ -38,6 +38,7 @@ var (
 	go115 = goversion.Must(goversion.NewVersion("1.15"))
 	go121 = goversion.Must(goversion.NewVersion("1.21"))
 	go122 = goversion.Must(goversion.NewVersion("1.22"))
+	go124 = goversion.Must(goversion.NewVersion("1.24"))
 )
 
 // Files return package's files.
@@ -208,6 +209,11 @@ func (p *Package) IsAtLeastGo121() bool {
 // IsAtLeastGo122 returns true if the Go version for this package is 1.22 or higher, false otherwise
 func (p *Package) IsAtLeastGo122() bool {
 	return p.goVersion.GreaterThanOrEqual(go122)
+}
+
+// IsAtLeastGo124 returns true if the Go version for this package is 1.24 or higher, false otherwise
+func (p *Package) IsAtLeastGo124() bool {
+	return p.goVersion.GreaterThanOrEqual(go124)
 }
 
 func getSortableMethodFlagForFunction(fn *ast.FuncDecl) sortableMethodsFlags {

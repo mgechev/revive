@@ -25,7 +25,7 @@ type decodeAndValidateRequest struct {
 	// No-reg test for bug https://github.com/mgechev/revive/issues/208
 	Tiret       string `json:"-,"`
 	BadTiret    string `json:"other,"`               // MATCH /option can not be empty in JSON tag/
-	ForOmitzero string `json:"forOmitZero,omitzero"` // MATCH /unknown option 'omitzero' in JSON tag/
+	ForOmitzero string `json:"forOmitZero,omitzero"` // 'omitzero' is valid in go 1.24
 }
 
 type RangeAllocation struct {
