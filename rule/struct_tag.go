@@ -107,6 +107,7 @@ const (
 	keyProtobuf     = "protobuf"
 	keyRequired     = "required"
 	keyURL          = "url"
+	keyValidate     = "validate"
 	keyXML          = "xml"
 	keyYAML         = "yaml"
 )
@@ -213,6 +214,12 @@ func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
 			}
 		case keyURL:
 			msg, ok := w.checkURLTag(tag.Options)
+			if !ok {
+				w.addFailure(f.Tag, msg)
+			}
+		case keyValidate:
+			opts := append([]string{tag.Name}, tag.Options...)
+			msg, ok := w.checkValidateTag(opts)
 			if !ok {
 				w.addFailure(f.Tag, msg)
 			}
@@ -400,6 +407,59 @@ func (w lintStructTagRule) checkMapstructureTag(options []string) (string, bool)
 	return "", true
 }
 
+func (w lintStructTagRule) checkValidateTag(options []string) (string, bool) {
+	previousOption := ""
+	seenKeysOption := false
+	for _, opt := range options {
+		switch opt {
+		case "keys":
+			if previousOption != "dive" {
+				return "option 'keys' must follow a 'dive' option in Validate tag", false
+			}
+			seenKeysOption = true
+		case "endkeys":
+			if !seenKeysOption {
+				return "option 'endkeys' without a previous 'keys' option in Validate tag", false
+			}
+			seenKeysOption = false
+		default:
+			parts := strings.Split(opt, "|")
+			errMsg, ok := w.checkValidateOptionsAlternatives(parts)
+			if !ok {
+				return errMsg, false
+			}
+		}
+		previousOption = opt
+	}
+
+	return "", true
+}
+
+func (w lintStructTagRule) checkValidateOptionsAlternatives(alternatives []string) (string, bool) {
+	for _, alternative := range alternatives {
+		alternative := strings.TrimSpace(alternative)
+		parts := strings.Split(alternative, "=")
+		switch len(parts) {
+		case 1:
+			badOpt, ok := areValidateOpts(parts[0])
+			if ok || w.isUserDefined(keyValidate, badOpt) {
+				continue
+			}
+			return fmt.Sprintf("unknown option '%s' in Validate tag", badOpt), false
+		case 2:
+			lhs := parts[0]
+			_, ok := validateLhs[lhs]
+			if ok || w.isUserDefined(keyValidate, lhs) {
+				continue
+			}
+			return fmt.Sprintf("unknown option '%s' in Validate tag", lhs), false
+		default:
+			return fmt.Sprintf("malformed options '%s' in Validate tag, not expected more than one '='", alternative), false
+		}
+	}
+	return "", true
+}
+
 func (lintStructTagRule) typeValueMatch(t ast.Expr, val string) bool {
 	tID, ok := t.(*ast.Ident)
 	if !ok {
@@ -499,4 +559,155 @@ func (w lintStructTagRule) isUserDefined(key, opt string) bool {
 		}
 	}
 	return false
+}
+
+func areValidateOpts(opts string) (string, bool) {
+	parts := strings.Split(opts, "|")
+	for _, opt := range parts {
+		_, ok := validateSingleOptions[opt]
+		if !ok {
+			return opt, false
+		}
+	}
+
+	return "", true
+}
+
+var validateSingleOptions = map[string]struct{}{
+	"alpha":                     {},
+	"alphanum":                  {},
+	"alphanumunicode":           {},
+	"alphaunicode":              {},
+	"ascii":                     {},
+	"base32":                    {},
+	"base64":                    {},
+	"base64url":                 {},
+	"bcp47_language_tag":        {},
+	"boolean":                   {},
+	"bic":                       {},
+	"btc_addr":                  {},
+	"btc_addr_bech32":           {},
+	"cidr":                      {},
+	"cidrv4":                    {},
+	"cidrv6":                    {},
+	"country_code":              {},
+	"credit_card":               {},
+	"cron":                      {},
+	"cve":                       {},
+	"datauri":                   {},
+	"dir":                       {},
+	"dirpath":                   {},
+	"dive":                      {},
+	"dns_rfc1035_label":         {},
+	"e164":                      {},
+	"email":                     {},
+	"eth_addr":                  {},
+	"file":                      {},
+	"filepath":                  {},
+	"fqdn":                      {},
+	"hexadecimal":               {},
+	"hexcolor":                  {},
+	"hostname":                  {},
+	"hostname_port":             {},
+	"hostname_rfc1123":          {},
+	"hsl":                       {},
+	"hsla":                      {},
+	"html":                      {},
+	"html_encoded":              {},
+	"image":                     {},
+	"ip":                        {},
+	"ip4_addr":                  {},
+	"ip6_addr":                  {},
+	"ip_addr":                   {},
+	"ipv4":                      {},
+	"ipv6":                      {},
+	"isbn":                      {},
+	"isbn10":                    {},
+	"isbn13":                    {},
+	"isdefault":                 {},
+	"iso3166_1_alpha2":          {},
+	"iso3166_1_alpha3":          {},
+	"iscolor":                   {},
+	"json":                      {},
+	"jwt":                       {},
+	"latitude":                  {},
+	"longitude":                 {},
+	"lowercase":                 {},
+	"luhn_checksum":             {},
+	"mac":                       {},
+	"mongodb":                   {},
+	"mongodb_connection_string": {},
+	"multibyte":                 {},
+	"nostructlevel":             {},
+	"number":                    {},
+	"numeric":                   {},
+	"omitempty":                 {},
+	"printascii":                {},
+	"required":                  {},
+	"rgb":                       {},
+	"rgba":                      {},
+	"semver":                    {},
+	"ssn":                       {},
+	"structonly":                {},
+	"tcp_addr":                  {},
+	"tcp4_addr":                 {},
+	"tcp6_addr":                 {},
+	"timezone":                  {},
+	"udp4_addr":                 {},
+	"udp6_addr":                 {},
+	"ulid":                      {},
+	"unique":                    {},
+	"unix_addr":                 {},
+	"uppercase":                 {},
+	"uri":                       {},
+	"url":                       {},
+	"url_encoded":               {},
+	"urn_rfc2141":               {},
+	"uuid":                      {},
+	"uuid3":                     {},
+	"uuid4":                     {},
+	"uuid5":                     {},
+}
+
+var validateLhs = map[string]struct{}{
+	"contains":             {},
+	"containsany":          {},
+	"containsfield":        {},
+	"containsrune":         {},
+	"datetime":             {},
+	"endsnotwith":          {},
+	"endswith":             {},
+	"eq":                   {},
+	"eqfield":              {},
+	"eqcsfield":            {},
+	"excluded_if":          {},
+	"excluded_unless":      {},
+	"excludes":             {},
+	"excludesall":          {},
+	"excludesfield":        {},
+	"excludesrune":         {},
+	"gt":                   {},
+	"gtcsfield":            {},
+	"gtecsfield":           {},
+	"len":                  {},
+	"lt":                   {},
+	"lte":                  {},
+	"ltcsfield":            {},
+	"ltecsfield":           {},
+	"max":                  {},
+	"min":                  {},
+	"ne":                   {},
+	"necsfield":            {},
+	"oneof":                {},
+	"oneofci":              {},
+	"required_if":          {},
+	"required_unless":      {},
+	"required_with":        {},
+	"required_with_all":    {},
+	"required_without":     {},
+	"required_without_all": {},
+	"spicedb":              {},
+	"startsnotwith":        {},
+	"startswith":           {},
+	"unique":               {},
 }
