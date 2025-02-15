@@ -18,6 +18,7 @@ func TestStructTagWithUserOptions(t *testing.T) {
 			"bson,gnu",
 			"url,myURLOption",
 			"datastore,myDatastoreOption",
+			"mapstructure,myMapstructureOption",
 		},
 	})
 }

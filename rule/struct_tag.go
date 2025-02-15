@@ -98,16 +98,17 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 }
 
 const (
-	keyASN1      = "asn1"
-	keyBSON      = "bson"
-	keyDatastore = "datastore"
-	keyDefault   = "default"
-	keyJSON      = "json"
-	keyProtobuf  = "protobuf"
-	keyRequired  = "required"
-	keyURL       = "url"
-	keyXML       = "xml"
-	keyYAML      = "yaml"
+	keyASN1         = "asn1"
+	keyBSON         = "bson"
+	keyDatastore    = "datastore"
+	keyDefault      = "default"
+	keyJSON         = "json"
+	keyMapstructure = "mapstructure"
+	keyProtobuf     = "protobuf"
+	keyRequired     = "required"
+	keyURL          = "url"
+	keyXML          = "xml"
+	keyYAML         = "yaml"
 )
 
 func (w lintStructTagRule) checkTagNameIfNeed(tag *structtag.Tag) (string, bool) {
@@ -193,6 +194,11 @@ func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
 			}
 		case keyJSON:
 			msg, ok := w.checkJSONTag(tag.Name, tag.Options)
+			if !ok {
+				w.addFailure(f.Tag, msg)
+			}
+		case keyMapstructure:
+			msg, ok := w.checkMapstructureTag(tag.Options)
 			if !ok {
 				w.addFailure(f.Tag, msg)
 			}
@@ -373,6 +379,21 @@ func (w lintStructTagRule) checkDatastoreTag(options []string) (string, bool) {
 				continue
 			}
 			return fmt.Sprintf("unknown option '%s' in Datastore tag", opt), false
+		}
+	}
+
+	return "", true
+}
+
+func (w lintStructTagRule) checkMapstructureTag(options []string) (string, bool) {
+	for _, opt := range options {
+		switch opt {
+		case "omitempty", "reminder", "squash":
+		default:
+			if w.isUserDefined(keyMapstructure, opt) {
+				continue
+			}
+			return fmt.Sprintf("unknown option '%s' in Mapstructure tag", opt), false
 		}
 	}
 
