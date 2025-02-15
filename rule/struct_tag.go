@@ -102,6 +102,7 @@ const (
 	keyJSON     = "json"
 	keyProtobuf = "protobuf"
 	keyRequired = "required"
+	keyURL      = "url"
 	keyXML      = "xml"
 	keyYAML     = "yaml"
 )
@@ -195,6 +196,11 @@ func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
 		case keyRequired:
 			if tag.Name != "true" && tag.Name != "false" {
 				w.addFailure(f.Tag, "required should be 'true' or 'false'")
+			}
+		case keyURL:
+			msg, ok := w.checkURLTag(tag.Options)
+			if !ok {
+				w.addFailure(f.Tag, msg)
 			}
 		case keyXML:
 			msg, ok := w.checkXMLTag(tag.Options)
@@ -316,6 +322,28 @@ func (w lintStructTagRule) checkYAMLTag(options []string) (string, bool) {
 				continue
 			}
 			return fmt.Sprintf("unknown option '%s' in YAML tag", opt), false
+		}
+	}
+
+	return "", true
+}
+
+func (w lintStructTagRule) checkURLTag(options []string) (string, bool) {
+	var delimiter = ""
+	for _, opt := range options {
+		switch opt {
+		case "int", "omitempty", "numbered", "brackets":
+		case "comma", "semicolon", "space":
+			if delimiter == "" {
+				delimiter = opt
+				continue
+			}
+			return fmt.Sprintf("can not set both '%s' and '%s' as delimiters in URL tag", opt, delimiter), false
+		default:
+			if w.isUserDefined(keyURL, opt) {
+				continue
+			}
+			return fmt.Sprintf("unknown option '%s' in URL tag", opt), false
 		}
 	}
 

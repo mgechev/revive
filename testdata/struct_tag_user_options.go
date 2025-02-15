@@ -13,3 +13,9 @@ type RangeAllocation struct {
 	Range             string `bson:"range,flow"` // MATCH /unknown option 'flow' in BSON tag/
 	Data              []byte `bson:"data,inline"`
 }
+
+type RequestQueryOptions struct {
+	Properties       []string `url:"properties,commmma,omitempty"` // MATCH /unknown option 'commmma' in URL tag/
+	CustomProperties []string `url:"-"`
+	Archived         bool     `url:"archived,myURLOption"`
+}
