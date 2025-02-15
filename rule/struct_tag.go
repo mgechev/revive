@@ -98,15 +98,16 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 }
 
 const (
-	keyASN1     = "asn1"
-	keyBSON     = "bson"
-	keyDefault  = "default"
-	keyJSON     = "json"
-	keyProtobuf = "protobuf"
-	keyRequired = "required"
-	keyURL      = "url"
-	keyXML      = "xml"
-	keyYAML     = "yaml"
+	keyASN1      = "asn1"
+	keyBSON      = "bson"
+	keyDatastore = "datastore"
+	keyDefault   = "default"
+	keyJSON      = "json"
+	keyProtobuf  = "protobuf"
+	keyRequired  = "required"
+	keyURL       = "url"
+	keyXML       = "xml"
+	keyYAML      = "yaml"
 )
 
 func (w lintStructTagRule) checkTagNameIfNeed(tag *structtag.Tag) (string, bool) {
@@ -178,6 +179,11 @@ func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
 			}
 		case keyBSON:
 			msg, ok := w.checkBSONTag(tag.Options)
+			if !ok {
+				w.addFailure(f.Tag, msg)
+			}
+		case keyDatastore:
+			msg, ok := w.checkDatastoreTag(tag.Options)
 			if !ok {
 				w.addFailure(f.Tag, msg)
 			}
@@ -352,6 +358,21 @@ func (w lintStructTagRule) checkURLTag(options []string) (string, bool) {
 				continue
 			}
 			return fmt.Sprintf("unknown option '%s' in URL tag", opt), false
+		}
+	}
+
+	return "", true
+}
+
+func (w lintStructTagRule) checkDatastoreTag(options []string) (string, bool) {
+	for _, opt := range options {
+		switch opt {
+		case "flatten", "noindex", "omitempty":
+		default:
+			if w.isUserDefined(keyDatastore, opt) {
+				continue
+			}
+			return fmt.Sprintf("unknown option '%s' in Datastore tag", opt), false
 		}
 	}
 

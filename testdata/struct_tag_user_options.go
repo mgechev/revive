@@ -19,3 +19,8 @@ type RequestQueryOptions struct {
 	CustomProperties []string `url:"-"`
 	Archived         bool     `url:"archived,myURLOption"`
 }
+
+type Fields struct {
+	Field      string `datastore:",noindex,flatten,omitempty,myDatastoreOption"`
+	OtherField string `datastore:",unknownOption"` // MATCH /unknown option 'unknownOption' in Datastore tag/
+}
