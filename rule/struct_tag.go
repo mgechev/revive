@@ -106,6 +106,7 @@ const (
 	keyMapstructure = "mapstructure"
 	keyProtobuf     = "protobuf"
 	keyRequired     = "required"
+	keyTOML         = "toml"
 	keyURL          = "url"
 	keyValidate     = "validate"
 	keyXML          = "xml"
@@ -211,6 +212,11 @@ func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
 		case keyRequired:
 			if tag.Name != "true" && tag.Name != "false" {
 				w.addFailure(f.Tag, "required should be 'true' or 'false'")
+			}
+		case keyTOML:
+			msg, ok := w.checkTOMLTag(tag.Options)
+			if !ok {
+				w.addFailure(f.Tag, msg)
 			}
 		case keyURL:
 			msg, ok := w.checkURLTag(tag.Options)
@@ -430,6 +436,21 @@ func (w lintStructTagRule) checkValidateTag(options []string) (string, bool) {
 			}
 		}
 		previousOption = opt
+	}
+
+	return "", true
+}
+
+func (w lintStructTagRule) checkTOMLTag(options []string) (string, bool) {
+	for _, opt := range options {
+		switch opt {
+		case "omitempty":
+		default:
+			if w.isUserDefined(keyTOML, opt) {
+				continue
+			}
+			return fmt.Sprintf("unknown option '%s' in TOML tag", opt), false
+		}
 	}
 
 	return "", true

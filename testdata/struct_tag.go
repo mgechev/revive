@@ -158,3 +158,8 @@ type ValidateUser struct {
 	BadComplex2 string `validate:"gt=0,dive,eq=1|eq=2,endkeys,required"`              // MATCH /option 'endkeys' without a previous 'keys' option in validate tag/
 	BadComplex3 string `validate:"gt=0,dive,keys,eq=1|eq=2,endkeys,endkeys,required"` // MATCH /option 'endkeys' without a previous 'keys' option in validate tag/
 }
+
+type TomlUser struct {
+	Username string `toml:"username,omitempty"`
+	Location string `toml:"location,unknown"` // MATCH /unknown option 'unknown' in TOML tag/
+}
