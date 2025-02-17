@@ -333,6 +333,7 @@ func (w lintStructTagRule) checkURLTag(options []string) (string, bool) {
 	for _, opt := range options {
 		switch opt {
 		case "int", "omitempty", "numbered", "brackets":
+		case "unix", "unixmilli", "unixnano": // TODO : check that the field is of type time.Time
 		case "comma", "semicolon", "space":
 			if delimiter == "" {
 				delimiter = opt
