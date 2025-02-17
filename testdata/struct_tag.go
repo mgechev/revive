@@ -123,3 +123,16 @@ type Simple struct {
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
+
+type RequestQueryOption struct {
+	Properties           []string `url:"properties,comma,omitempty"`
+	CustomProperties     []string `url:"-"`
+	Associations         []string `url:"associations,brackets,omitempty"`
+	Associations2        []string `url:"associations2,semicolon,omitempty"`
+	Associations3        []string `url:"associations3,space,brackets,omitempty"`
+	Associations4        []string `url:"associations4,numbered,omitempty"`
+	Associations5        []string `url:"associations5,space,semicolon,omitempty"` // MATCH /can not set both 'semicolon' and 'space' as delimiters in URL tag/
+	PaginateAssociations bool     `url:"paginateAssociations,int,omitempty"`
+	Archived             bool     `url:"archived,myURLOption"` // MATCH /unknown option 'myURLOption' in URL tag/
+	IDProperty           string   `url:"idProperty,omitempty"`
+}

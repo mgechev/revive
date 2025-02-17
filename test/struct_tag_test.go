@@ -13,7 +13,7 @@ func TestStructTag(t *testing.T) {
 
 func TestStructTagWithUserOptions(t *testing.T) {
 	testRule(t, "struct_tag_user_options", &rule.StructTagRule{}, &lint.RuleConfig{
-		Arguments: []any{"json,inline,outline", "bson,gnu"},
+		Arguments: []any{"json,inline,outline", "bson,gnu", "url,myURLOption"},
 	})
 }
 
