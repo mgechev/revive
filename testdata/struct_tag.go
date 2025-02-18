@@ -136,3 +136,8 @@ type RequestQueryOption struct {
 	Archived             bool     `url:"archived,myURLOption"` // MATCH /unknown option 'myURLOption' in URL tag/
 	IDProperty           string   `url:"idProperty,omitempty"`
 }
+
+type Fields struct {
+	Field      string `datastore:",noindex,flatten,omitempty"`
+	OtherField string `datastore:",unknownOption"` // MATCH /unknown option 'unknownOption' in Datastore tag/
+}
