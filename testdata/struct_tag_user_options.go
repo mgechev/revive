@@ -24,3 +24,8 @@ type Fields struct {
 	Field      string `datastore:",noindex,flatten,omitempty,myDatastoreOption"`
 	OtherField string `datastore:",unknownOption"` // MATCH /unknown option 'unknownOption' in Datastore tag/
 }
+
+type MapStruct struct {
+	Field1     string `mapstructure:",squash,reminder,omitempty,myMapstructureOption"`
+	OtherField string `mapstructure:",unknownOption"` // MATCH /unknown option 'unknownOption' in Mapstructure tag/
+}
