@@ -448,7 +448,7 @@ func (w lintStructTagRule) checkValidateOptionsAlternatives(alternatives []strin
 			return fmt.Sprintf("unknown option '%s' in validate tag", badOpt), false
 		case 2:
 			lhs := parts[0]
-			_, ok := validateLhs[lhs]
+			_, ok := validateLHS[lhs]
 			if ok || w.isUserDefined(keyValidate, lhs) {
 				continue
 			}
@@ -669,7 +669,7 @@ var validateSingleOptions = map[string]struct{}{
 	"uuid5":                     {},
 }
 
-var validateLhs = map[string]struct{}{
+var validateLHS = map[string]struct{}{
 	"contains":             {},
 	"containsany":          {},
 	"containsfield":        {},
