@@ -19,6 +19,7 @@ func TestStructTagWithUserOptions(t *testing.T) {
 			"url,myURLOption",
 			"datastore,myDatastoreOption",
 			"mapstructure,myMapstructureOption",
+			"validate,displayName",
 		},
 	})
 }
