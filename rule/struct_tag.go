@@ -414,12 +414,12 @@ func (w lintStructTagRule) checkValidateTag(options []string) (string, bool) {
 		switch opt {
 		case "keys":
 			if previousOption != "dive" {
-				return "option 'keys' must follow a 'dive' option in Validate tag", false
+				return "option 'keys' must follow a 'dive' option in validate tag", false
 			}
 			seenKeysOption = true
 		case "endkeys":
 			if !seenKeysOption {
-				return "option 'endkeys' without a previous 'keys' option in Validate tag", false
+				return "option 'endkeys' without a previous 'keys' option in validate tag", false
 			}
 			seenKeysOption = false
 		default:
@@ -445,16 +445,16 @@ func (w lintStructTagRule) checkValidateOptionsAlternatives(alternatives []strin
 			if ok || w.isUserDefined(keyValidate, badOpt) {
 				continue
 			}
-			return fmt.Sprintf("unknown option '%s' in Validate tag", badOpt), false
+			return fmt.Sprintf("unknown option '%s' in validate tag", badOpt), false
 		case 2:
 			lhs := parts[0]
 			_, ok := validateLhs[lhs]
 			if ok || w.isUserDefined(keyValidate, lhs) {
 				continue
 			}
-			return fmt.Sprintf("unknown option '%s' in Validate tag", lhs), false
+			return fmt.Sprintf("unknown option '%s' in validate tag", lhs), false
 		default:
-			return fmt.Sprintf("malformed options '%s' in Validate tag, not expected more than one '='", alternative), false
+			return fmt.Sprintf("malformed options '%s' in validate tag, not expected more than one '='", alternative), false
 		}
 	}
 	return "", true
