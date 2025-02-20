@@ -29,3 +29,15 @@ type MapStruct struct {
 	Field1     string `mapstructure:",squash,reminder,omitempty,myMapstructureOption"`
 	OtherField string `mapstructure:",unknownOption"` // MATCH /unknown option 'unknownOption' in Mapstructure tag/
 }
+
+type ValidateUser struct {
+	Username    string `validate:"required,min=3,max=32"`
+	Email       string `validate:"required,email"`
+	Password    string `validate:"required,min=8,max=32"`
+	Biography   string `validate:"min=0,max=1000"`
+	DisplayName string `validate:"displayName,min=3,max=32"`
+	Complex     string `validate:"gt=0,dive,keys,eq=1|eq=2,endkeys,required"`
+	BadComplex  string `validate:"gt=0,keys,eq=1|eq=2,endkeys,required"`              // MATCH /option 'keys' must follow a 'dive' option in validate tag/
+	BadComplex2 string `validate:"gt=0,dive,eq=1|eq=2,endkeys,required"`              // MATCH /option 'endkeys' without a previous 'keys' option in validate tag/
+	BadComplex3 string `validate:"gt=0,dive,keys,eq=1|eq=2,endkeys,endkeys,required"` // MATCH /option 'endkeys' without a previous 'keys' option in validate tag/
+}
