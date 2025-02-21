@@ -120,14 +120,19 @@ func (l *lintPackageComments) Visit(_ ast.Node) ast.Visitor {
 	if lastCG != nil && strings.HasPrefix(lastCG.Text(), prefix) {
 		endPos := l.file.ToPosition(lastCG.End())
 		pkgPos := l.file.ToPosition(l.fileAst.Package)
-		if endPos.Line+1 < pkgPos.Line {
+		lastGCEndLine := endPos.Line + 1
+		if l.file.IsCRLFTerminated() {
+			// Workaround for https://github.com/mgechev/revive/issues/607
+			lastGCEndLine++
+		}
+		if lastGCEndLine < pkgPos.Line {
 			// There isn't a great place to anchor this error;
 			// the start of the blank lines between the doc and the package statement
 			// is at least pointing at the location of the problem.
 			pos := token.Position{
 				Filename: endPos.Filename,
 				// Offset not set; it is non-trivial, and doesn't appear to be needed.
-				Line:   endPos.Line + 1,
+				Line:   lastGCEndLine,
 				Column: 1,
 			}
 			l.onFailure(lint.Failure{

@@ -1,0 +1,2 @@
+# Files in these directory must have Windows line endings
+*.* text eol=crlf

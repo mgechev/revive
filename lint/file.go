@@ -29,6 +29,11 @@ func (f *File) Content() []byte {
 	return f.content
 }
 
+// IsCRLFTerminated returns if the file is terminated with CRLF.
+func (f *File) IsCRLFTerminated() bool {
+	return bytes.HasSuffix(f.content, []byte("\r\n"))
+}
+
 // NewFile creates a new file
 func NewFile(name string, content []byte, pkg *Package) (*File, error) {
 	f, err := parser.ParseFile(pkg.fset, name, content, parser.ParseComments)
