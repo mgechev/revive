@@ -47,7 +47,7 @@ func (r *ErrorStringsRule) Configure(arguments lint.Arguments) error {
 			continue
 		}
 		if _, ok := r.errorFunctions[pkg]; !ok {
-			r.errorFunctions[pkg] = make(map[string]struct{})
+			r.errorFunctions[pkg] = map[string]struct{}{}
 		}
 		r.errorFunctions[pkg][function] = struct{}{}
 	}
