@@ -46,12 +46,10 @@ func (r *ErrorStringsRule) Configure(arguments lint.Arguments) error {
 			invalidCustomFunctions = append(invalidCustomFunctions, pkgFunction)
 			continue
 		}
-		functions, ok := r.errorFunctions[pkg]
-		if !ok {
-			r.errorFunctions[pkg] = map[string]struct{}{function: {}}
-		} else {
-			functions[function] = struct{}{}
+		if _, ok := r.errorFunctions[pkg]; !ok {
+			r.errorFunctions[pkg] = make(map[string]struct{})
 		}
+		r.errorFunctions[pkg][function] = struct{}{}
 	}
 	if len(invalidCustomFunctions) != 0 {
 		return fmt.Errorf("found invalid custom function: %s", strings.Join(invalidCustomFunctions, ","))
