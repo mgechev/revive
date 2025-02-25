@@ -37,13 +37,20 @@ func (r *ErrorStringsRule) Configure(arguments lint.Arguments) error {
 
 	var invalidCustomFunctions []string
 	for _, argument := range arguments {
-		if functionName, ok := argument.(string); ok {
-			fields := strings.Split(strings.TrimSpace(functionName), ".")
-			if len(fields) != 2 || len(fields[0]) == 0 || len(fields[1]) == 0 {
-				invalidCustomFunctions = append(invalidCustomFunctions, functionName)
-				continue
-			}
-			r.errorFunctions[fields[0]] = map[string]struct{}{fields[1]: {}}
+		pkgFunction, ok := argument.(string)
+		if !ok {
+			continue
+		}
+		pkg, function, ok := strings.Cut(strings.TrimSpace(pkgFunction), ".")
+		if !ok || pkg == "" || function == "" {
+			invalidCustomFunctions = append(invalidCustomFunctions, pkgFunction)
+			continue
+		}
+		functions, ok := r.errorFunctions[pkg]
+		if !ok {
+			r.errorFunctions[pkg] = map[string]struct{}{function: {}}
+		} else {
+			functions[function] = struct{}{}
 		}
 	}
 	if len(invalidCustomFunctions) != 0 {
