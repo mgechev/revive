@@ -38,7 +38,7 @@ func (r *UnusedParamRule) Configure(args lint.Arguments) error {
 	// Arguments = [{allowRegex="^_"}]
 	allowRegexStr, ok := allowRegexParam.(string)
 	if !ok {
-		panic(fmt.Errorf("error configuring %s rule: allowRegex is not string but [%T]", r.Name(), allowRegexParam))
+		return fmt.Errorf("error configuring %s rule: allowRegex is not string but [%T]", r.Name(), allowRegexParam)
 	}
 	var err error
 	r.allowRegex, err = regexp.Compile(allowRegexStr)

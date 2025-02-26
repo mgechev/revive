@@ -36,7 +36,7 @@ func (r *UnusedReceiverRule) Configure(args lint.Arguments) error {
 	// Arguments = [{allowRegex="^_"}]
 	allowRegexStr, ok := allowRegexParam.(string)
 	if !ok {
-		panic(fmt.Errorf("error configuring [unused-receiver] rule: allowRegex is not string but [%T]", allowRegexParam))
+		return fmt.Errorf("error configuring [unused-receiver] rule: allowRegex is not string but [%T]", allowRegexParam)
 	}
 	var err error
 	r.allowRegex, err = regexp.Compile(allowRegexStr)
