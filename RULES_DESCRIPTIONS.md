@@ -865,7 +865,7 @@ _Configuration_: N/A
 ## struct-tag
 
 _Description_: Struct tags are not checked at compile time.
-This rule, checks and warns if it finds errors in common struct tags types like: asn1, default, json, protobuf, xml, yaml.
+This rule spots errors in struct tags of the following types: asn1, bson, datastore, default, json, mapstructure, protobuf, required, toml, url, validate, xml, yaml.
 
 _Configuration_: (optional) list of user defined options.
 
