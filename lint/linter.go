@@ -19,8 +19,6 @@ import (
 // ReadFile defines an abstraction for reading files.
 type ReadFile func(path string) (result []byte, err error)
 
-type disabledIntervalsMap = map[string][]DisabledInterval
-
 // Linter is used for linting set of files.
 type Linter struct {
 	reader         ReadFile
