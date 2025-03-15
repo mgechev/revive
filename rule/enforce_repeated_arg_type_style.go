@@ -3,6 +3,7 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"strings"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -69,8 +70,8 @@ func (r *EnforceRepeatedArgTypeStyleRule) Configure(arguments lint.Arguments) er
 		r.funcRetValStyle = valstyle
 	case map[string]any: // expecting map[string]string
 		for k, v := range funcArgStyle {
-			switch k {
-			case "funcArgStyle":
+			switch strings.ToLower(k) {
+			case "funcargstyle":
 				val, ok := v.(string)
 				if !ok {
 					return fmt.Errorf("invalid map value type for 'enforce-repeated-arg-type-style' rule. Expecting string, got %T", v)
@@ -80,7 +81,7 @@ func (r *EnforceRepeatedArgTypeStyleRule) Configure(arguments lint.Arguments) er
 					return err
 				}
 				r.funcArgStyle = valstyle
-			case "funcRetValStyle":
+			case "funcretvalstyle":
 				val, ok := v.(string)
 				if !ok {
 					return fmt.Errorf("invalid map value '%v' for 'enforce-repeated-arg-type-style' rule. Expecting string, got %T", v, v)

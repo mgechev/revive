@@ -212,16 +212,16 @@ func (r *AddConstantRule) Configure(arguments lint.Arguments) error {
 	}
 	for k, v := range args {
 		kind := ""
-		switch k {
-		case "allowFloats":
+		switch strings.ToLower(k) {
+		case "allowfloats":
 			kind = kindFLOAT
 			fallthrough
-		case "allowInts":
+		case "allowints":
 			if kind == "" {
 				kind = kindINT
 			}
 			fallthrough
-		case "allowStrs":
+		case "allowstrs":
 			if kind == "" {
 				kind = kindSTRING
 			}
@@ -230,7 +230,7 @@ func (r *AddConstantRule) Configure(arguments lint.Arguments) error {
 				return fmt.Errorf("invalid argument to the add-constant rule, string expected. Got '%v' (%T)", v, v)
 			}
 			r.allowList.add(kind, list)
-		case "maxLitCount":
+		case "maxlitcount":
 			sl, ok := v.(string)
 			if !ok {
 				return fmt.Errorf("invalid argument to the add-constant rule, expecting string representation of an integer. Got '%v' (%T)", v, v)
@@ -241,7 +241,7 @@ func (r *AddConstantRule) Configure(arguments lint.Arguments) error {
 				return fmt.Errorf("invalid argument to the add-constant rule, expecting string representation of an integer. Got '%v'", v)
 			}
 			r.strLitLimit = limit
-		case "ignoreFuncs":
+		case "ignorefuncs":
 			excludes, ok := v.(string)
 			if !ok {
 				return fmt.Errorf("invalid argument to the ignoreFuncs parameter of add-constant rule, string expected. Got '%v' (%T)", v, v)
