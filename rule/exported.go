@@ -78,24 +78,24 @@ func (r *ExportedRule) Configure(arguments lint.Arguments) error {
 	for _, flag := range arguments {
 		switch flag := flag.(type) {
 		case string:
-			switch flag {
-			case "checkPrivateReceivers":
+			switch strings.ToLower(flag) {
+			case "checkprivatereceivers":
 				r.disabledChecks.PrivateReceivers = false
-			case "disableStutteringCheck":
+			case "disablestutteringcheck":
 				r.disabledChecks.Stuttering = true
-			case "sayRepetitiveInsteadOfStutters":
+			case "sayrepetitiveinsteadofstutters":
 				r.stuttersMsg = "is repetitive"
-			case "checkPublicInterface":
+			case "checkpublicinterface":
 				r.disabledChecks.PublicInterfaces = false
-			case "disableChecksOnConstants":
+			case "disablechecksonconstants":
 				r.disabledChecks.Const = true
-			case "disableChecksOnFunctions":
+			case "disablechecksonfunctions":
 				r.disabledChecks.Function = true
-			case "disableChecksOnMethods":
+			case "disablechecksonmethods":
 				r.disabledChecks.Method = true
-			case "disableChecksOnTypes":
+			case "disablechecksontypes":
 				r.disabledChecks.Type = true
-			case "disableChecksOnVariables":
+			case "disablechecksonvariables":
 				r.disabledChecks.Var = true
 			default:
 				return fmt.Errorf("unknown configuration flag %s for %s rule", flag, r.Name())
