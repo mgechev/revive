@@ -1,0 +1,17 @@
+ignoreGeneratedHeader = false
+severity = "warning"
+confidence = 0.8
+errorCode = 0
+warningCode = 0
+
+[rule.unreachable-code]
+[rule.indent-error-flow]
+[rule.empty-block]
+[rule.superfluous-else]
+[rule.struct-tag]
+[rule.constant-logical-expr]
+[rule.unconditional-recursion]
+[rule.identical-branches]
+[rule.useless-break]
+[rule.datarace]
+[rule.use-errors-new]
