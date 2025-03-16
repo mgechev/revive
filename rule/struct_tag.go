@@ -56,7 +56,7 @@ func (r *StructTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 	w := lintStructTagRule{
 		onFailure:      onFailure,
 		userDefined:    r.userDefined,
-		isAtLeastGo124: file.Pkg.IsAtLeastGo124(),
+		isAtLeastGo124: file.Pkg.IsAtLeastGoVersion(lint.Go124),
 	}
 
 	ast.Walk(w, file.AST)

@@ -561,6 +561,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`redundant-build-tag`](./RULES_DESCRIPTIONS.md#redundant-build-tag) | n/a   | Warns about redundant `// +build` comment lines |   no    |  no   |
 | [`use-errors-new`](./RULES_DESCRIPTIONS.md#use-errors-new) | n/a   | Spots calls to `fmt.Errorf` that can be replaced by `errors.New` |   no    |  no   |
 | [`redundant-test-main-exit`](./RULES_DESCRIPTIONS.md#redundant-test-main-exit) |  n/a   | Suggests removing `Exit` call in `TestMain` function for test files |    no    |  no   |
+| [`time-after-leak`](./RULES_DESCRIPTIONS.md#time-after-leak) |  n/a   | Suggests replacing `time.After` with `time.NewTimer` to prevent goroutine leak |    no    |  no   |
 
 ## Configurable rules
 

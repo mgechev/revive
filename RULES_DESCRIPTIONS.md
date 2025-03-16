@@ -71,6 +71,7 @@ List of all available rules.
   - [string-of-int](#string-of-int)
   - [struct-tag](#struct-tag)
   - [superfluous-else](#superfluous-else)
+  - [time-after-leak](#time-after-leak)
   - [time-equal](#time-equal)
   - [time-naming](#time-naming)
   - [unchecked-type-assertion](#unchecked-type-assertion)
@@ -892,6 +893,11 @@ Example:
 [rule.superfluous-else]
   arguments = ["preserveScope"]
 ```
+## time-after-leak
+
+_Description_: This rule warns on temporary goroutine leak when using `time.After` in select statements. In Go versions before 1.23, [the garbage collector does not recover the underlying thread until the timer fires](https://pkg.go.dev/time#After).
+
+_Configuration_: N/A
 
 ## time-equal
 

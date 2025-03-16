@@ -12,7 +12,7 @@ type DataRaceRule struct{}
 
 // Apply applies the rule to given file.
 func (r *DataRaceRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
-	isGo122 := file.Pkg.IsAtLeastGo122()
+	isGo122 := file.Pkg.IsAtLeastGoVersion(lint.Go122)
 	var failures []lint.Failure
 	for _, decl := range file.AST.Decls {
 		funcDecl, ok := decl.(*ast.FuncDecl)
