@@ -27,12 +27,16 @@ func (r *UnusedReceiverRule) Configure(args lint.Arguments) error {
 		return nil
 	}
 	// Arguments = [{}]
-	options := args[0].(map[string]any)
+	options, ok := args[0].(map[string]any)
+	if !ok {
+		return nil
+	}
 
 	allowRegexParam, ok := options["allowRegex"]
 	if !ok {
 		return nil
 	}
+
 	// Arguments = [{allowRegex="^_"}]
 	allowRegexStr, ok := allowRegexParam.(string)
 	if !ok {

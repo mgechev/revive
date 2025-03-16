@@ -87,19 +87,19 @@ func (r *FileLengthLimitRule) Configure(arguments lint.Arguments) error {
 		case "max":
 			maxLines, ok := v.(int64)
 			if !ok || maxLines < 0 {
-				return fmt.Errorf(`invalid configuration value for max lines in "file-length-limit" rule; need positive int64 but got %T`, arguments[0])
+				return fmt.Errorf(`invalid configuration value for max lines in "file-length-limit" rule; need positive int64 but got %T`, v)
 			}
 			r.max = int(maxLines)
 		case "skipComments":
 			skipComments, ok := v.(bool)
 			if !ok {
-				return fmt.Errorf(`invalid configuration value for skip comments in "file-length-limit" rule; need bool but got %T`, arguments[1])
+				return fmt.Errorf(`invalid configuration value for skip comments in "file-length-limit" rule; need bool but got %T`, v)
 			}
 			r.skipComments = skipComments
 		case "skipBlankLines":
 			skipBlankLines, ok := v.(bool)
 			if !ok {
-				return fmt.Errorf(`invalid configuration value for skip blank lines in "file-length-limit" rule; need bool but got %T`, arguments[2])
+				return fmt.Errorf(`invalid configuration value for skip blank lines in "file-length-limit" rule; need bool but got %T`, v)
 			}
 			r.skipBlankLines = skipBlankLines
 		}
