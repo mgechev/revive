@@ -35,10 +35,14 @@ var (
 	trueValue  = 1
 	falseValue = 2
 
-	go115 = goversion.Must(goversion.NewVersion("1.15"))
-	go121 = goversion.Must(goversion.NewVersion("1.21"))
-	go122 = goversion.Must(goversion.NewVersion("1.22"))
-	go124 = goversion.Must(goversion.NewVersion("1.24"))
+	// Go115 is a constant representing the Go version 1.15
+	Go115 = goversion.Must(goversion.NewVersion("1.15"))
+	// Go121 is a constant representing the Go version 1.21
+	Go121 = goversion.Must(goversion.NewVersion("1.21"))
+	// Go122 is a constant representing the Go version 1.22
+	Go122 = goversion.Must(goversion.NewVersion("1.22"))
+	// Go124 is a constant representing the Go version 1.24
+	Go124 = goversion.Must(goversion.NewVersion("1.24"))
 )
 
 // Files return package's files.
@@ -196,24 +200,9 @@ func (p *Package) lint(rules []Rule, config Config, failures chan Failure) error
 	return eg.Wait()
 }
 
-// IsAtLeastGo115 returns true if the Go version for this package is 1.15 or higher, false otherwise
-func (p *Package) IsAtLeastGo115() bool {
-	return p.goVersion.GreaterThanOrEqual(go115)
-}
-
-// IsAtLeastGo121 returns true if the Go version for this package is 1.21 or higher, false otherwise
-func (p *Package) IsAtLeastGo121() bool {
-	return p.goVersion.GreaterThanOrEqual(go121)
-}
-
-// IsAtLeastGo122 returns true if the Go version for this package is 1.22 or higher, false otherwise
-func (p *Package) IsAtLeastGo122() bool {
-	return p.goVersion.GreaterThanOrEqual(go122)
-}
-
-// IsAtLeastGo124 returns true if the Go version for this package is 1.24 or higher, false otherwise
-func (p *Package) IsAtLeastGo124() bool {
-	return p.goVersion.GreaterThanOrEqual(go124)
+// IsAtLeastGoVersion returns true if the Go version for this package is v or higher, false otherwise
+func (p *Package) IsAtLeastGoVersion(v *goversion.Version) bool {
+	return p.goVersion.GreaterThanOrEqual(v)
 }
 
 func getSortableMethodFlagForFunction(fn *ast.FuncDecl) sortableMethodsFlags {
