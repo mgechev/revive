@@ -113,8 +113,12 @@ func checkNumberOfArguments(expected int, args lint.Arguments, ruleName string) 
 	return nil
 }
 
+// isRuleOption returns true if arg and name are the same after normalization.
+func isRuleOption(arg, name string) bool {
+	return normalizeRuleOption(arg) == normalizeRuleOption(name)
+}
+
 // normalizeRuleOption returns an option name from the argument. It is lowercased and without hyphens.
-// This function is used in the Rule.Configure method.
 //
 // Example: normalizeRuleOption("allowTypesBefore"), normalizeRuleOption("allow-types-before") -> "allowtypesbefore"
 func normalizeRuleOption(arg string) string {

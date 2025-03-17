@@ -29,7 +29,7 @@ func (r *ReceiverNamingRule) Configure(arguments lint.Arguments) error {
 	}
 
 	for k, v := range args {
-		if normalizeRuleOption(k) != normalizeRuleOption("maxLength") {
+		if !isRuleOption(k, "maxLength") {
 			return fmt.Errorf("unknown argument %s for %s rule", k, r.Name())
 		}
 		value, ok := v.(int64)

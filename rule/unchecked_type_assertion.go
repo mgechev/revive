@@ -32,7 +32,7 @@ func (r *UncheckedTypeAssertionRule) Configure(arguments lint.Arguments) error {
 	}
 
 	for k, v := range args {
-		if normalizeRuleOption(k) != normalizeRuleOption("acceptIgnoredAssertionResult") {
+		if !isRuleOption(k, "acceptIgnoredAssertionResult") {
 			return fmt.Errorf("unknown argument: %s", k)
 		}
 		r.acceptIgnoredAssertionResult, ok = v.(bool)

@@ -27,10 +27,10 @@ func (e *EarlyReturnRule) Configure(arguments lint.Arguments) error {
 		if !ok {
 			continue
 		}
-		switch normalizeRuleOption(sarg) {
-		case normalizeRuleOption("preserveScope"):
+		switch {
+		case isRuleOption(sarg, "preserveScope"):
 			e.preserveScope = true
-		case normalizeRuleOption("allowJump"):
+		case isRuleOption(sarg, "allowJump"):
 			e.allowJump = true
 		}
 	}

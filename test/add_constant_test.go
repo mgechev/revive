@@ -24,10 +24,10 @@ func TestAddConstantWithArguments(t *testing.T) {
 	testRule(t, "add_constant", &rule.AddConstantRule{}, &lint.RuleConfig{
 		Arguments: []any{map[string]any{
 			"max-lit-count": "2",
-			"allow-strs":    "\"\"",
+			"allow-strs":    `""`,
 			"allow-ints":    "0,1,2",
 			"allow-floats":  "0.0,1.0",
-			"ignore-funcs":  "os\\.(CreateFile|WriteFile|Chmod|FindProcess),\\.Println,ignoredFunc,\\.Info",
+			"ignore-funcs":  `os\.(CreateFile|WriteFile|Chmod|FindProcess),\.Println,ignoredFunc,\.Info`,
 		}},
 	})
 }

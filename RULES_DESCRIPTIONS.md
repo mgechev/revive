@@ -1045,7 +1045,7 @@ _Configuration_: Supports arguments with single of `map[string]any` with option 
 
 Examples:
 
-This allows any names started with `_`, not just `_` itself:
+This allows any names starting with `_`, not just `_` itself:
 
 ```go
 func SomeFunc(_someObj *MyStruct) {} // matches rule
@@ -1069,7 +1069,7 @@ _Configuration_: Supports arguments with single of `map[string]any` with option 
 
 Examples:
 
-This allows any names started with `_`, not just `_` itself:
+This allows any names starting with `_`, not just `_` itself:
 
 ```go
 func (_my *MyStruct) SomeMethod() {} // matches rule

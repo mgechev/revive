@@ -74,7 +74,7 @@ func (*ContextAsArgumentRule) getAllowTypesFromArguments(args lint.Arguments) (m
 			return nil, fmt.Errorf("invalid argument to the context-as-argument rule. Expecting a k,v map, got %T", args[0])
 		}
 		for k, v := range argKV {
-			if normalizeRuleOption(k) != normalizeRuleOption("allowTypesBefore") {
+			if !isRuleOption(k, "allowTypesBefore") {
 				return nil, fmt.Errorf("invalid argument to the context-as-argument rule. Unrecognized key %s", k)
 			}
 			typesBefore, ok := v.(string)

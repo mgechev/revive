@@ -65,10 +65,10 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 			return fmt.Errorf("invalid third argument to the var-naming rule. Expecting a %s of type slice, of len==1, with map, but %T", "options", asSlice[0])
 		}
 		for k, v := range args {
-			switch normalizeRuleOption(k) {
-			case normalizeRuleOption("upperCaseConst"):
+			switch {
+			case isRuleOption(k, "upperCaseConst"):
 				r.allowUpperCaseConst = fmt.Sprint(v) == "true"
-			case normalizeRuleOption("skipPackageNameChecks"):
+			case isRuleOption(k, "skipPackageNameChecks"):
 				r.skipPackageNameChecks = fmt.Sprint(v) == "true"
 			}
 		}

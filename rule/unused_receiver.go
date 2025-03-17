@@ -33,7 +33,7 @@ func (r *UnusedReceiverRule) Configure(args lint.Arguments) error {
 	}
 
 	for k, v := range options {
-		if normalizeRuleOption(k) != normalizeRuleOption("allowRegex") {
+		if !isRuleOption(k, "allowRegex") {
 			return nil
 		}
 		// Arguments = [{allowRegex="^_"}]

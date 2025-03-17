@@ -22,7 +22,7 @@ func (e *SuperfluousElseRule) Configure(arguments lint.Arguments) error {
 		if !ok {
 			continue
 		}
-		if normalizeRuleOption(sarg) == normalizeRuleOption("preserveScope") {
+		if isRuleOption(sarg, "preserveScope") {
 			e.preserveScope = true
 		}
 	}

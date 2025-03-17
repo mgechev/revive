@@ -78,24 +78,24 @@ func (r *ExportedRule) Configure(arguments lint.Arguments) error {
 	for _, flag := range arguments {
 		switch flag := flag.(type) {
 		case string:
-			switch normalizeRuleOption(flag) {
-			case normalizeRuleOption("checkPrivateReceivers"):
+			switch {
+			case isRuleOption(flag, "checkPrivateReceivers"):
 				r.disabledChecks.PrivateReceivers = false
-			case normalizeRuleOption("disableStutteringCheck"):
+			case isRuleOption(flag, "disableStutteringCheck"):
 				r.disabledChecks.Stuttering = true
-			case normalizeRuleOption("sayRepetitiveInsteadOfStutters"):
+			case isRuleOption(flag, "sayRepetitiveInsteadOfStutters"):
 				r.stuttersMsg = "is repetitive"
-			case normalizeRuleOption("checkPublicInterface"):
+			case isRuleOption(flag, "checkPublicInterface"):
 				r.disabledChecks.PublicInterfaces = false
-			case normalizeRuleOption("disableChecksOnConstants"):
+			case isRuleOption(flag, "disableChecksOnConstants"):
 				r.disabledChecks.Const = true
-			case normalizeRuleOption("disableChecksOnFunctions"):
+			case isRuleOption(flag, "disableChecksOnFunctions"):
 				r.disabledChecks.Function = true
-			case normalizeRuleOption("disableChecksOnMethods"):
+			case isRuleOption(flag, "disableChecksOnMethods"):
 				r.disabledChecks.Method = true
-			case normalizeRuleOption("disableChecksOnTypes"):
+			case isRuleOption(flag, "disableChecksOnTypes"):
 				r.disabledChecks.Type = true
-			case normalizeRuleOption("disableChecksOnVariables"):
+			case isRuleOption(flag, "disableChecksOnVariables"):
 				r.disabledChecks.Var = true
 			default:
 				return fmt.Errorf("unknown configuration flag %s for %s rule", flag, r.Name())
