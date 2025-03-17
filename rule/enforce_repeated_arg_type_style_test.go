@@ -59,7 +59,7 @@ func TestEnforceRepeatedArgTypeStyleRule_Configure(t *testing.T) {
 			name: "valid kebab-cased arguments",
 			arguments: lint.Arguments{
 				map[string]any{
-					"func-arg-style":    "full",
+					"func-arg-style":     "full",
 					"func-ret-val-style": "short",
 				},
 			},

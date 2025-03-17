@@ -70,11 +70,11 @@ func TestAddConstantRule_Configure(t *testing.T) {
 			name: "valid kebab-cased arguments",
 			arguments: lint.Arguments{
 				map[string]any{
-					"allow-floats": "1.0,2.0",
-					"allow-ints":   "1,2",
-					"allow-strs":   "a,b",
+					"allow-floats":  "1.0,2.0",
+					"allow-ints":    "1,2",
+					"allow-strs":    "a,b",
 					"max-lit-count": "3",
-					"ignore-funcs": "fmt.Println,fmt.Printf",
+					"ignore-funcs":  "fmt.Println,fmt.Printf",
 				},
 			},
 			wantErr: nil,

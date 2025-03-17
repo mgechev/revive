@@ -64,7 +64,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{"ID"},
 				[]any{"VM"},
 				[]any{map[string]any{
-					"upper-case-const":        true,
+					"upper-case-const":         true,
 					"skip-package-name-checks": true,
 				}},
 			},

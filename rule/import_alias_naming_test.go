@@ -69,7 +69,7 @@ func TestImportAliasNamingRule_Configure(t *testing.T) {
 		{
 			name:      "invalid string argument regex",
 			arguments: lint.Arguments{"["},
-			wantErr:   errors.New(`invalid argument to the import-alias-naming allowRegexp rule. Expecting "[" to be a valid regular expression, got: error parsing regexp: missing closing ]: ` + "`[`"),
+			wantErr:   errors.New("invalid argument to the import-alias-naming allowRegexp rule. Expecting \"[\" to be a valid regular expression, got: error parsing regexp: missing closing ]: `[`"),
 		},
 		{
 			name: "invalid map key",
