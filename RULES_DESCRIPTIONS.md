@@ -95,17 +95,22 @@ _Description_: Suggests using constant for [magic numbers](https://en.wikipedia.
 
 _Configuration_:
 
-* `maxLitCount` : (string) maximum number of instances of a string literal that are tolerated before warn.
-* `allowStrs`: (string) comma-separated list of allowed string literals
-* `allowInts`: (string) comma-separated list of allowed integers
-* `allowFloats`: (string) comma-separated list of allowed floats
-* `ignoreFuncs`: (string) comma-separated list of function names regexp patterns to exclude
+* `maxLitCount` (`maxlitcount`, `max-lit-count`): (string) maximum number of instances of a string literal that are tolerated before warn.
+* `allowStrs` (`allowstrs`, `allow-strs`): (string) comma-separated list of allowed string literals
+* `allowInts` (`allowints`, `allow-ints`): (string) comma-separated list of allowed integers
+* `allowFloats` (`allowfloats`, `allow-floats`): (string) comma-separated list of allowed floats
+* `ignoreFuncs` (`ignorefuncs`, `ignore-funcs`): (string) comma-separated list of function names regexp patterns to exclude
 
-Example:
+Examples:
 
 ```toml
 [rule.add-constant]
   arguments = [{ maxLitCount = "3", allowStrs = "\"\"", allowInts = "0,1,2", allowFloats = "0.0,0.,1.0,1.,2.0,2.", ignoreFuncs = "os\\.*,fmt\\.Println,make" }]
+```
+
+```toml
+[rule.add-constant]
+  arguments = [{ max-lit-count = "3", allow-strs = "\"\"", allow-ints = "0,1,2", allow-floats = "0.0,0.,1.0,1.,2.0,2.", ignore-funcs = "os\\.*,fmt\\.Println,make" }]
 ```
 
 ## argument-limit
@@ -240,13 +245,18 @@ _Description_: By [convention](https://go.dev/wiki/CodeReviewComments#contexts),
 
 _Configuration_:
 
-* `allowTypesBefore` : (string) comma-separated list of types that may be before 'context.Context'
+* `allowTypesBefore` (`allowtypesbefore`, `allow-types-before`): (string) comma-separated list of types that may be before 'context.Context'
 
-Example:
+Examples:
 
 ```toml
 [rule.context-as-argument]
   arguments = [{allowTypesBefore = "*testing.T,*github.com/user/repo/testing.Harness"}]
+```
+
+```toml
+[rule.context-as-argument]
+  arguments = [{allow-types-before = "*testing.T,*github.com/user/repo/testing.Harness"}]
 ```
 
 ## context-keys-type
@@ -286,20 +296,27 @@ _Description_: This rule warns on some common mistakes when using `defer` statem
 
 | name              | description                                                                                                                                                                                     |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| call-chain        | even if deferring call-chains of the form `foo()()` is valid, it does not helps code understanding (only the last call is deferred)                                                             |
+| call-chain (callChain, callchain)        | even if deferring call-chains of the form `foo()()` is valid, it does not helps code understanding (only the last call is deferred)                                                             |
 | loop              | deferring inside loops can be misleading (deferred functions are not executed at the end of the loop iteration but of the current function) and it could lead to exhausting the execution stack |
-| method-call       | deferring a call to a method can lead to subtle bugs if the method does not have a pointer receiver                                                                                             |
+| method-call (methodCall, methodcall)       | deferring a call to a method can lead to subtle bugs if the method does not have a pointer receiver                                                                                             |
 | recover           | calling `recover` outside a deferred function has no effect                                                                                                                                     |
-| immediate-recover | calling `recover` at the time a defer is registered, rather than as part of the deferred callback.  e.g. `defer recover()` or equivalent.                                                       |
+| immediate-recover (immediateRecover, immediaterecover) | calling `recover` at the time a defer is registered, rather than as part of the deferred callback.  e.g. `defer recover()` or equivalent.                                                       |
 | return            | returning values form a deferred function has no effect                                                                                                                                         |
 
 These gotchas are described [here](https://blog.learngoprogramming.com/gotchas-of-defer-in-go-1-8d070894cb01)
 
 _Configuration_: by default all warnings are enabled but it is possible selectively enable them through configuration. For example to enable only `call-chain` and `loop`:
 
+Examples:
+
 ```toml
 [rule.defer]
-  arguments = [["call-chain","loop"]]
+  arguments = [["callChain", "loop"]]
+```
+
+```toml
+[rule.defer]
+  arguments = [["call-chain", "loop"]]
 ```
 
 ## dot-imports
@@ -310,13 +327,18 @@ More information [here](https://go.dev/wiki/CodeReviewComments#import-dot)
 
 _Configuration_:
 
-* `allowedPackages`: (list of strings) comma-separated list of allowed dot import packages
+* `allowedPackages` (`allowedpackages`, `allowed-packages`): (list of strings) comma-separated list of allowed dot import packages
 
-Example:
+Examples:
 
 ```toml
 [rule.dot-imports]
   arguments = [{ allowedPackages = ["github.com/onsi/ginkgo/v2","github.com/onsi/gomega"] }]
+```
+
+```toml
+[rule.dot-imports]
+  arguments = [{ allowed-packages = ["github.com/onsi/ginkgo/v2","github.com/onsi/gomega"] }]
 ```
 
 ## duplicated-imports
@@ -348,14 +370,19 @@ if !cond {
 
 _Configuration_: ([]string) rule flags. Available flags are:
 
-* _preserveScope_: do not suggest refactorings that would increase variable scope
-* _allowJump_: suggest a new jump (`return`, `continue` or `break` statement) if it could unnest multiple statements. By default, only relocation of _existing_ jumps (i.e. from the `else` clause) are suggested.
+* `preserveScope` (`preservescope`, `preserve-scope`): do not suggest refactorings that would increase variable scope
+* `allowJump` (`allowjump`, `allow-jump`): suggest a new jump (`return`, `continue` or `break` statement) if it could unnest multiple statements. By default, only relocation of _existing_ jumps (i.e. from the `else` clause) are suggested.
 
-Example:
+Examples:
 
 ```toml
 [rule.early-return]
   arguments = ["preserveScope", "allowJump"]
+```
+
+```toml
+[rule.early-return]
+  arguments = ["preserve-scope", "allow-jump"]
 ```
 
 ## empty-block
@@ -399,8 +426,8 @@ _Configuration (1)_: (string) as a single string, it configures both argument
 and return value styles. Accepts 'any', 'short', or 'full' (default: 'any').
 
 _Configuration (2)_: (map[string]any) as a map, allows separate configuration
-for function arguments and return values. Valid keys are "funcArgStyle" and
-"funcRetValStyle", each accepting 'any', 'short', or 'full'. If a key is not
+for function arguments and return values. Valid keys are `funcArgStyle` (`funcargstyle`, `func-arg-style`) and
+`funcRetValStyle` (`funcretvalstyle`, `func-ret-val-style`), each accepting 'any', 'short', or 'full'. If a key is not
 specified, the default value of 'any' is used.
 
 _Note_: The rule applies checks based on the specified styles. For 'full' style,
@@ -415,11 +442,16 @@ Example (1):
   arguments = ["short"]
 ```
 
-Example (2):
+Examples (2):
 
 ```toml
 [rule.enforce-repeated-arg-type-style]
   arguments = [{ funcArgStyle = "full", funcRetValStyle = "short" }]
+```
+
+```toml
+[rule.enforce-repeated-arg-type-style]
+  arguments = [{ func-arg-style = "full", func-ret-val-style = "short" }]
 ```
 
 ## enforce-slice-style
@@ -487,21 +519,26 @@ _Configuration_: ([]string) rule flags.
 Please notice that without configuration, the default behavior of the rule is that of its `golint` counterpart.
 Available flags are:
 
-* _checkPrivateReceivers_ enables checking public methods of private types
-* _disableStutteringCheck_ disables checking for method names that stutter with the package name (i.e. avoid failure messages of the form _type name will be used as x.XY by other packages, and that stutters; consider calling this Y_)
-* _sayRepetitiveInsteadOfStutters_ replaces the use of the term _stutters_ by _repetitive_ in failure messages
-* _checkPublicInterface_ enabled checking public method definitions in public interface types
-* _disableChecksOnConstants_ disable all checks on constant declarations
-* _disableChecksOnFunctions_ disable all checks on function declarations
-* _disableChecksOnMethods_ disable all checks on method declarations
-* _disableChecksOnTypes_ disable all checks on type declarations
-* _disableChecksOnVariables_ disable all checks on variable declarations
+* `checkPrivateReceivers` (`checkprivatereceivers`, `check-private-receivers`) enables checking public methods of private types
+* `disableStutteringCheck` (`disablestutteringcheck`, `disable-stuttering-check`) disables checking for method names that stutter with the package name (i.e. avoid failure messages of the form _type name will be used as x.XY by other packages, and that stutters; consider calling this Y_)
+* `sayRepetitiveInsteadOfStutters` (`sayrepetitiveinsteadofstutters`, `say-repetitive-instead-of-stutters`) replaces the use of the term _stutters_ by _repetitive_ in failure messages
+* `checkPublicInterface` (`checkpublicinterface`, `check-public-interface`) enabled checking public method definitions in public interface types
+* `disableChecksOnConstants` (`disablechecksonconstants`, `disable-checks-on-constants`) disable all checks on constant declarations
+* `disableChecksOnFunctions` (`disablechecksonfunctions`, `disable-checks-on-functions`) disable all checks on function declarations
+* `disableChecksOnMethods` (`disablechecksonmethods`, `disable-checks-on-methods`) disable all checks on method declarations
+* `disableChecksOnTypes` (`disablechecksontypes`, `disable-checks-on-types`) disable all checks on type declarations
+* `disableChecksOnVariables` (`disablechecksonvariables`, `disable-checks-on-variables`) disable all checks on variable declarations
 
-Example:
+Examples:
 
 ```toml
 [rule.exported]
   arguments = ["checkPrivateReceivers", "disableStutteringCheck", "checkPublicInterface", "disableChecksOnFunctions"]
+```
+
+```toml
+[rule.exported]
+  arguments = ["check-private-receivers", "disable-stuttering-check", "check-public-interface", "disable-checks-on-functions"]
 ```
 
 ## file-header
@@ -523,15 +560,20 @@ _Description_: This rule enforces a maximum number of lines per file, in order t
 
 _Configuration_:
 
-* `max` (int) a maximum number of lines in a file. Must be non-negative integers. 0 means the rule is disabled (default `0`);
-* `skipComments` (bool) if true ignore and do not count lines containing just comments (default `false`);
-* `skipBlankLines` (bool) if true ignore and do not count lines made up purely of whitespace (default `false`).
+* `max`: (int) a maximum number of lines in a file. Must be non-negative integers. 0 means the rule is disabled (default `0`);
+* `skipComments` (`skipcomments`, `skip-comments`): (bool) if true ignore and do not count lines containing just comments (default `false`);
+* `skipBlankLines` (`skipblanklines`, `skip-blank-lines`): (bool) if true ignore and do not count lines made up purely of whitespace (default `false`).
 
-Example:
+Examples:
 
 ```toml
 [rule.file-length-limit]
   arguments = [{max=100,skipComments=true,skipBlankLines=true}]
+```
+
+```toml
+[rule.file-length-limit]
+  arguments = [{max=100,skip-comments=true,skip-blank-lines=true}]
 ```
 
 ## filename-format
@@ -609,8 +651,8 @@ Importantly, aliases with underscores ("_") are always allowed.
 _Configuration_ (1): (`string`) as plain string accepts allow regexp pattern for aliases (default: `^[a-z][a-z0-9]{0,}$`).
 
 _Configuration_ (2): (`map[string]string`) as a map accepts two values:
-* for a key "allowRegex" accepts allow regexp pattern
-* for a key "denyRegex deny regexp pattern
+* for a key `allowRegex` (`allowregex`, `allow-regex`) accepts allow regexp pattern
+* for a key `denyRegex` (`denyregex`, `deny-regex`) deny regexp pattern
 
 _Note_: If both `allowRegex` and `denyRegex` are provided, the alias must comply with both of them.
 If none are given (i.e. an empty map), the default value `^[a-z][a-z0-9]{0,}$` for allowRegex is used.
@@ -623,11 +665,16 @@ Example (1):
   arguments = ["^[a-z][a-z0-9]{0,}$"]
 ```
 
-Example (2):
+Examples (2):
 
 ```toml
 [rule.import-alias-naming]
   arguments = [{ allowRegex = "^[a-z][a-z0-9]{0,}$", denyRegex = '^v\d+$' }]
+```
+
+```toml
+[rule.import-alias-naming]
+  arguments = [{ allow-regex = "^[a-z][a-z0-9]{0,}$", deny-regex = '^v\d+$' }]
 ```
 
 ## import-shadowing
@@ -667,13 +714,18 @@ More information [here](https://go.dev/wiki/CodeReviewComments#indent-error-flow
 
 _Configuration_: ([]string) rule flags. Available flags are:
 
-* _preserveScope_: do not suggest refactorings that would increase variable scope
+* `preserveScope` (`preservescope`, `preserve-scope`): do not suggest refactorings that would increase variable scope
 
-Example:
+Examples:
 
 ```toml
 [rule.indent-error-flow]
   arguments = ["preserveScope"]
+```
+
+```toml
+[rule.indent-error-flow]
+  arguments = ["preserve-scope"]
 ```
 
 ## line-length-limit
@@ -793,11 +845,18 @@ _Description_: By convention, receiver names in a method should reflect their id
 
 _Configuration_: (optional) list of key-value-pair-map (`[]map[string]any`).
 
-- `maxLength` : (int) max length of receiver name
+- `maxLength` (`maxlength`, `max-length`): (int) max length of receiver name
+
+Examples:
 
 ```toml
 [rule.receiver-naming]
     arguments = [{maxLength=2}]
+```
+
+```toml
+[rule.receiver-naming]
+    arguments = [{max-length=2}]
 ```
 
 ## redefines-builtin-id
@@ -884,13 +943,18 @@ This rule highlights redundant _else-blocks_ that can be eliminated from the cod
 
 _Configuration_: ([]string) rule flags. Available flags are:
 
-* _preserveScope_: do not suggest refactorings that would increase variable scope
+* `preserveScope` (`preservescope`, `preserve-scope`): (string) do not suggest refactorings that would increase variable scope
 
-Example:
+Examples:
 
 ```toml
 [rule.superfluous-else]
   arguments = ["preserveScope"]
+```
+
+```toml
+[rule.superfluous-else]
+  arguments = ["preserve-scope"]
 ```
 
 ## time-equal
@@ -911,18 +975,23 @@ _Description_: This rule checks whether a type assertion result is checked (the 
 
 _Configuration_: list of key-value-pair-map (`[]map[string]any`).
 
-- `acceptIgnoredAssertionResult` : (bool) default `false`, set it to `true` to accept ignored type assertion results like this:
+- `acceptIgnoredAssertionResult` (`acceptignoredassertionresult`, `accept-ignored-assertion-result`): (bool) default `false`, set it to `true` to accept ignored type assertion results like this:
 
 ```go
 foo, _ := bar(.*Baz).
 //   ^
 ```
 
-Example:
+Examples:
 
 ```toml
 [rule.unchecked-type-assertion]
   arguments = [{acceptIgnoredAssertionResult=true}]
+```
+
+```toml
+[rule.unchecked-type-assertion]
+  arguments = [{accept-ignored-assertion-result=true}]
 ```
 
 ## unconditional-recursion
@@ -972,34 +1041,48 @@ _Configuration_: N/A
 
 _Description_: This rule warns on unused parameters. Functions or methods with unused parameters can be a symptom of an unfinished refactoring or a bug.
 
-_Configuration_: Supports arguments with single of `map[string]any` with option `allowRegex` to provide additional to `_` mask to allowed unused parameter names, for example:
+_Configuration_: Supports arguments with single of `map[string]any` with option `allowRegex` (`allowregex`, `allow-regex`) to provide additional to `_` mask to allowed unused parameter names.
+
+Examples:
+
+This allows any names started with `_`, not just `_` itself:
+
+```go
+func SomeFunc(_someObj *MyStruct) {} // matches rule
+```
 
 ```toml
 [rule.unused-parameter]
     arguments = [{ allowRegex = "^_" }]
 ```
 
-allows any names started with `_`, not just `_` itself:
-
-```go
-func SomeFunc(_someObj *MyStruct) {} // matches rule
+```toml
+[rule.unused-parameter]
+    arguments = [{ allow-regex = "^_" }]
 ```
 
 ## unused-receiver
 
 _Description_: This rule warns on unused method receivers. Methods with unused receivers can be a symptom of an unfinished refactoring or a bug.
 
-_Configuration_: Supports arguments with single of `map[string]any` with option `allowRegex` to provide additional to `_` mask to allowed unused receiver names, for example:
+_Configuration_: Supports arguments with single of `map[string]any` with option `allowRegex` to provide additional to `_` mask to allowed unused receiver names.
+
+Examples:
+
+This allows any names started with `_`, not just `_` itself:
+
+```go
+func (_my *MyStruct) SomeMethod() {} // matches rule
+```
 
 ```toml
 [rule.unused-receiver]
     arguments = [{ allowRegex = "^_" }]
 ```
 
-allows any names started with `_`, not just `_` itself:
-
-```go
-func (_my *MyStruct) SomeMethod() {} // matches rule
+```toml
+[rule.unused-receiver]
+    arguments = [{ allow-regex = "^_" }]
 ```
 
 ## use-any
@@ -1038,24 +1121,30 @@ _Description_: This rule warns when [initialism](https://go.dev/wiki/CodeReviewC
 _Configuration_: This rule accepts two slices of strings and one optional slice with single map with named parameters.
 (it's due to TOML hasn't "slice of any" and we keep backward compatibility with previous config version)
 First slice is an allowlist and second one is a blocklist of initialisms.
-In map, you can add "upperCaseConst=true" parameter to allow `UPPER_CASE` for `const`
+In map, you can add boolean `upperCaseConst` (`uppercaseconst`, `upper-case-const`) parameter to allow `UPPER_CASE` for `const`
+You can also add boolean `skipPackageNameChecks` (`skippackagenamechecks`, `skip-package-name-checks`) to skip package name checks.
 By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
 
-Example:
+Examples:
 
 ```toml
 [rule.var-naming]
   arguments = [["ID"], ["VM"], [{upperCaseConst=true}]]
 ```
 
-You can also add "skipPackageNameChecks=true" to skip package name checks.
-
-Example:
-
-
 ```toml
 [rule.var-naming]
   arguments = [[], [], [{skipPackageNameChecks=true}]]
+```
+
+```toml
+[rule.var-naming]
+  arguments = [["ID"], ["VM"], [{upper-case-const=true}]]
+```
+
+```toml
+[rule.var-naming]
+  arguments = [[], [], [{skip-package-name-checks=true}]]
 ```
 
 ## waitgroup-by-value
