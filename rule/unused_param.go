@@ -28,25 +28,31 @@ func (r *UnusedParamRule) Configure(args lint.Arguments) error {
 	if len(args) == 0 {
 		return nil
 	}
-	// Arguments = [{}]
-	options := args[0].(map[string]any)
 
-	allowRegexParam, ok := options["allowRegex"]
-	if !ok {
+	switch options := args[0].(type) {
+	case map[string]any: // Arguments = [{}]
+		for k, v := range options {
+			switch normalizeRuleOption(k) {
+			case normalizeRuleOption("allowRegex"):
+				// Arguments = [{allowRegex="_"}]
+				allowRegexStr, ok := v.(string)
+				if !ok {
+					return fmt.Errorf("error configuring %s rule: allowRegex is not string but [%T]", r.Name(), v)
+				}
+				var err error
+				r.allowRegex, err = regexp.Compile(allowRegexStr)
+				if err != nil {
+					return fmt.Errorf("error configuring %s rule: allowRegex is not valid regex [%s]: %w", r.Name(), allowRegexStr, err)
+				}
+				r.failureMsg = "parameter '%s' seems to be unused, consider removing or renaming it to match " + r.allowRegex.String()
+			default:
+				return nil
+			}
+		}
+		return nil
+	default:
 		return nil
 	}
-	// Arguments = [{allowRegex="^_"}]
-	allowRegexStr, ok := allowRegexParam.(string)
-	if !ok {
-		return fmt.Errorf("error configuring %s rule: allowRegex is not string but [%T]", r.Name(), allowRegexParam)
-	}
-	var err error
-	r.allowRegex, err = regexp.Compile(allowRegexStr)
-	if err != nil {
-		return fmt.Errorf("error configuring %s rule: allowRegex is not valid regex [%s]: %w", r.Name(), allowRegexStr, err)
-	}
-	r.failureMsg = "parameter '%s' seems to be unused, consider removing or renaming it to match " + r.allowRegex.String()
-	return nil
 }
 
 // Apply applies the rule to given file.

@@ -48,6 +48,44 @@ func TestAddConstantRule_Configure(t *testing.T) {
 			wantStrLitLimit: 3,
 		},
 		{
+			name: "valid lowercased arguments",
+			arguments: lint.Arguments{
+				map[string]any{
+					"allowfloats": "1.0,2.0",
+					"allowints":   "1,2",
+					"allowstrs":   "a,b",
+					"maxlitcount": "3",
+					"ignorefuncs": "fmt.Println,fmt.Printf",
+				},
+			},
+			wantErr: nil,
+			wantList: allowList{
+				kindFLOAT:  {"1.0": true, "2.0": true},
+				kindINT:    {"1": true, "2": true},
+				kindSTRING: {"a": true, "b": true},
+			},
+			wantStrLitLimit: 3,
+		},
+		{
+			name: "valid kebab-cased arguments",
+			arguments: lint.Arguments{
+				map[string]any{
+					"allow-floats": "1.0,2.0",
+					"allow-ints":   "1,2",
+					"allow-strs":   "a,b",
+					"max-lit-count": "3",
+					"ignore-funcs": "fmt.Println,fmt.Printf",
+				},
+			},
+			wantErr: nil,
+			wantList: allowList{
+				kindFLOAT:  {"1.0": true, "2.0": true},
+				kindINT:    {"1": true, "2": true},
+				kindSTRING: {"a": true, "b": true},
+			},
+			wantStrLitLimit: 3,
+		},
+		{
 			name: "unrecognized key",
 			arguments: lint.Arguments{
 				map[string]any{

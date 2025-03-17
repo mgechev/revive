@@ -28,6 +28,22 @@ func TestIndentErrorFlowRule_Configure(t *testing.T) {
 			wantPreserveScope: true,
 		},
 		{
+			name: "valid lowercased arguments",
+			arguments: lint.Arguments{
+				"preservescope",
+			},
+			wantErr:           nil,
+			wantPreserveScope: true,
+		},
+		{
+			name: "valid kebab-cased arguments",
+			arguments: lint.Arguments{
+				"preserve-scope",
+			},
+			wantErr:           nil,
+			wantPreserveScope: true,
+		},
+		{
 			name: "invalid arguments",
 			arguments: lint.Arguments{
 				"unknown",

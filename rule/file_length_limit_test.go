@@ -37,6 +37,30 @@ func TestFileLengthLimitRule_Configure(t *testing.T) {
 			wantSkipBlankLines: true,
 		},
 		{
+			name: "valid lowercased arguments",
+			arguments: lint.Arguments{map[string]any{
+				"max":            int64(100),
+				"skipcomments":   true,
+				"skipblanklines": true,
+			}},
+			wantErr:            nil,
+			wantMax:            100,
+			wantSkipComments:   true,
+			wantSkipBlankLines: true,
+		},
+		{
+			name: "valid kebab-cased arguments",
+			arguments: lint.Arguments{map[string]any{
+				"max":              int64(100),
+				"skip-comments":    true,
+				"skip-blank-lines": true,
+			}},
+			wantErr:            nil,
+			wantMax:            100,
+			wantSkipComments:   true,
+			wantSkipBlankLines: true,
+		},
+		{
 			name:      "invalid argument",
 			arguments: lint.Arguments{123},
 			wantErr:   errors.New(`invalid argument to the "file-length-limit" rule. Expecting a k,v map, got int`),

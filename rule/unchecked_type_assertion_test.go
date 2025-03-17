@@ -29,6 +29,22 @@ func TestUncheckedTypeAssertionRule_Configure(t *testing.T) {
 			wantAcceptIgnoredAssertionResult: true,
 		},
 		{
+			name: "valid lowercased argument",
+			arguments: lint.Arguments{map[string]any{
+				"acceptignoredassertionresult": true,
+			}},
+			wantErr:                          nil,
+			wantAcceptIgnoredAssertionResult: true,
+		},
+		{
+			name: "valid kebab-cased argument",
+			arguments: lint.Arguments{map[string]any{
+				"accept-ignored-assertion-result": true,
+			}},
+			wantErr:                          nil,
+			wantAcceptIgnoredAssertionResult: true,
+		},
+		{
 			name:      "invalid type",
 			arguments: lint.Arguments{123},
 			wantErr:   errors.New("unable to get arguments. Expected object of key-value-pairs"),

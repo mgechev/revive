@@ -36,6 +36,28 @@ func TestUnusedParamRule_Configure(t *testing.T) {
 			wantFailureMsg: "parameter '%s' seems to be unused, consider removing or renaming it to match ^_",
 		},
 		{
+			name: "valid lowercased arguments",
+			arguments: lint.Arguments{
+				map[string]any{
+					"allowregex": "^_",
+				},
+			},
+			wantErr:        nil,
+			wantAllowRegex: regexp.MustCompile("^_"),
+			wantFailureMsg: "parameter '%s' seems to be unused, consider removing or renaming it to match ^_",
+		},
+		{
+			name: "valid kebab-cased arguments",
+			arguments: lint.Arguments{
+				map[string]any{
+					"allow-regex": "^_",
+				},
+			},
+			wantErr:        nil,
+			wantAllowRegex: regexp.MustCompile("^_"),
+			wantFailureMsg: "parameter '%s' seems to be unused, consider removing or renaming it to match ^_",
+		},
+		{
 			name: "missed allowRegex value",
 			arguments: lint.Arguments{
 				map[string]any{

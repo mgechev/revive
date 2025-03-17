@@ -44,6 +44,30 @@ func TestEnforceRepeatedArgTypeStyleRule_Configure(t *testing.T) {
 			wantFuncRetValStyle: "short",
 		},
 		{
+			name: "valid lowercased arguments",
+			arguments: lint.Arguments{
+				map[string]any{
+					"funcargstyle":    "full",
+					"funcretvalstyle": "short",
+				},
+			},
+			wantErr:             nil,
+			wantFuncArgStyle:    "full",
+			wantFuncRetValStyle: "short",
+		},
+		{
+			name: "valid kebab-cased arguments",
+			arguments: lint.Arguments{
+				map[string]any{
+					"func-arg-style":    "full",
+					"func-ret-val-style": "short",
+				},
+			},
+			wantErr:             nil,
+			wantFuncArgStyle:    "full",
+			wantFuncRetValStyle: "short",
+		},
+		{
 			name: "unrecognized key",
 			arguments: lint.Arguments{
 				map[string]any{

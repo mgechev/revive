@@ -46,6 +46,34 @@ func TestDotImportsRule_Configure(t *testing.T) {
 			},
 		},
 		{
+			name: "valid lowercased arguments",
+			arguments: lint.Arguments{
+				map[string]any{
+					"allowedpackages": []any{
+						"github.com/onsi/ginkgo/v2",
+					},
+				},
+			},
+			wantErr: nil,
+			wantAllowPackages: allowPackages{
+				`"github.com/onsi/ginkgo/v2"`: struct{}{},
+			},
+		},
+		{
+			name: "valid kebab-cased arguments",
+			arguments: lint.Arguments{
+				map[string]any{
+					"allowed-packages": []any{
+						"github.com/onsi/ginkgo/v2",
+					},
+				},
+			},
+			wantErr: nil,
+			wantAllowPackages: allowPackages{
+				`"github.com/onsi/ginkgo/v2"`: struct{}{},
+			},
+		},
+		{
 			name: "invalid argument type",
 			arguments: lint.Arguments{
 				"invalid_argument",

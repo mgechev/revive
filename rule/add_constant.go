@@ -212,16 +212,16 @@ func (r *AddConstantRule) Configure(arguments lint.Arguments) error {
 	}
 	for k, v := range args {
 		kind := ""
-		switch k {
-		case "allowFloats":
+		switch normalizeRuleOption(k) {
+		case normalizeRuleOption("allowFloats"):
 			kind = kindFLOAT
 			fallthrough
-		case "allowInts":
+		case normalizeRuleOption("allowInts"):
 			if kind == "" {
 				kind = kindINT
 			}
 			fallthrough
-		case "allowStrs":
+		case normalizeRuleOption("allowStrs"):
 			if kind == "" {
 				kind = kindSTRING
 			}
@@ -230,7 +230,7 @@ func (r *AddConstantRule) Configure(arguments lint.Arguments) error {
 				return fmt.Errorf("invalid argument to the add-constant rule, string expected. Got '%v' (%T)", v, v)
 			}
 			r.allowList.add(kind, list)
-		case "maxLitCount":
+		case normalizeRuleOption("maxLitCount"):
 			sl, ok := v.(string)
 			if !ok {
 				return fmt.Errorf("invalid argument to the add-constant rule, expecting string representation of an integer. Got '%v' (%T)", v, v)
@@ -241,7 +241,7 @@ func (r *AddConstantRule) Configure(arguments lint.Arguments) error {
 				return fmt.Errorf("invalid argument to the add-constant rule, expecting string representation of an integer. Got '%v'", v)
 			}
 			r.strLitLimit = limit
-		case "ignoreFuncs":
+		case normalizeRuleOption("ignoreFuncs"):
 			excludes, ok := v.(string)
 			if !ok {
 				return fmt.Errorf("invalid argument to the ignoreFuncs parameter of add-constant rule, string expected. Got '%v' (%T)", v, v)

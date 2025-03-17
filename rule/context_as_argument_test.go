@@ -32,6 +32,38 @@ func TestContextAsArgumentRule_Configure(t *testing.T) {
 			},
 		},
 		{
+			name: "valid lowercased arguments",
+			arguments: lint.Arguments{
+				map[string]any{
+					"allowtypesbefore": "AllowedBeforeType,AllowedBeforeStruct,*AllowedBeforePtrStruct,*testing.T",
+				},
+			},
+			wantErr: nil,
+			wantTypes: map[string]struct{}{
+				"context.Context":         {},
+				"AllowedBeforeType":       {},
+				"AllowedBeforeStruct":     {},
+				"*AllowedBeforePtrStruct": {},
+				"*testing.T":              {},
+			},
+		},
+		{
+			name: "valid kebab-cased arguments",
+			arguments: lint.Arguments{
+				map[string]any{
+					"allow-types-before": "AllowedBeforeType,AllowedBeforeStruct,*AllowedBeforePtrStruct,*testing.T",
+				},
+			},
+			wantErr: nil,
+			wantTypes: map[string]struct{}{
+				"context.Context":         {},
+				"AllowedBeforeType":       {},
+				"AllowedBeforeStruct":     {},
+				"*AllowedBeforePtrStruct": {},
+				"*testing.T":              {},
+			},
+		},
+		{
 			name: "invalid argument type",
 			arguments: lint.Arguments{
 				"invalid_argument",

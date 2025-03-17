@@ -16,7 +16,11 @@ type IndentErrorFlowRule struct {
 // Configuration implements the [lint.ConfigurableRule] interface.
 func (e *IndentErrorFlowRule) Configure(arguments lint.Arguments) error {
 	for _, arg := range arguments {
-		if arg == "preserveScope" {
+		sarg, ok := arg.(string)
+		if !ok {
+			continue
+		}
+		if normalizeRuleOption(sarg) == normalizeRuleOption("preserveScope") {
 			e.preserveScope = true
 		}
 	}

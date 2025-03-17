@@ -32,6 +32,26 @@ func TestEarlyReturn_Configure(t *testing.T) {
 			wantAllowJump:     true,
 		},
 		{
+			name: "valid lowercased arguments",
+			arguments: lint.Arguments{
+				"preservescope",
+				"allowjump",
+			},
+			wantErr:           nil,
+			wantPreserveScope: true,
+			wantAllowJump:     true,
+		},
+		{
+			name: "valid kebab-cased arguments",
+			arguments: lint.Arguments{
+				"preserve-scope",
+				"allow-jump",
+			},
+			wantErr:           nil,
+			wantPreserveScope: true,
+			wantAllowJump:     true,
+		},
+		{
 			name: "invalid arguments",
 			arguments: lint.Arguments{
 				"unknown",

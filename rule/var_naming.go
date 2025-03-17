@@ -64,8 +64,14 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 		if !ok {
 			return fmt.Errorf("invalid third argument to the var-naming rule. Expecting a %s of type slice, of len==1, with map, but %T", "options", asSlice[0])
 		}
-		r.allowUpperCaseConst = fmt.Sprint(args["upperCaseConst"]) == "true"
-		r.skipPackageNameChecks = fmt.Sprint(args["skipPackageNameChecks"]) == "true"
+		for k, v := range args {
+			switch normalizeRuleOption(k) {
+			case normalizeRuleOption("upperCaseConst"):
+				r.allowUpperCaseConst = fmt.Sprint(v) == "true"
+			case normalizeRuleOption("skipPackageNameChecks"):
+				r.skipPackageNameChecks = fmt.Sprint(v) == "true"
+			}
+		}
 	}
 	return nil
 }

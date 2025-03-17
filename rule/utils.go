@@ -7,6 +7,7 @@ import (
 	"go/printer"
 	"go/token"
 	"regexp"
+	"strings"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -110,6 +111,14 @@ func checkNumberOfArguments(expected int, args lint.Arguments, ruleName string) 
 		return fmt.Errorf("not enough arguments for %s rule, expected %d, got %d. Please check the rule's documentation", ruleName, expected, len(args))
 	}
 	return nil
+}
+
+// normalizeRuleOption returns an option name from the argument. It is lowercased and without hyphens.
+// This function is used in the Rule.Configure method.
+//
+// Example: normalizeRuleOption("allowTypesBefore"), normalizeRuleOption("allow-types-before") -> "allowtypesbefore"
+func normalizeRuleOption(arg string) string {
+	return strings.ToLower(strings.ReplaceAll(arg, "-", ""))
 }
 
 var directiveCommentRE = regexp.MustCompile("^//(line |extern |export |[a-z0-9]+:[a-z0-9])") // see https://go-review.googlesource.com/c/website/+/442516/1..2/_content/doc/comment.md#494

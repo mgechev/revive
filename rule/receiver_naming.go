@@ -29,8 +29,8 @@ func (r *ReceiverNamingRule) Configure(arguments lint.Arguments) error {
 	}
 
 	for k, v := range args {
-		switch k {
-		case "maxLength":
+		switch normalizeRuleOption(k) {
+		case normalizeRuleOption("maxLength"):
 			value, ok := v.(int64)
 			if !ok {
 				return fmt.Errorf("invalid value %v for argument %s of rule %s, expected integer value got %T", v, k, r.Name(), v)

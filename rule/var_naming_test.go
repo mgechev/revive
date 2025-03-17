@@ -43,6 +43,38 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			wantSkipPackageNameChecks: true,
 		},
 		{
+			name: "valid lowercased arguments",
+			arguments: lint.Arguments{
+				[]any{"ID"},
+				[]any{"VM"},
+				[]any{map[string]any{
+					"uppercaseconst":        true,
+					"skippackagenamechecks": true,
+				}},
+			},
+			wantErr:                   nil,
+			wantAllowList:             []string{"ID"},
+			wantBlockList:             []string{"VM"},
+			wantAllowUpperCaseConst:   true,
+			wantSkipPackageNameChecks: true,
+		},
+		{
+			name: "valid kebab-cased arguments",
+			arguments: lint.Arguments{
+				[]any{"ID"},
+				[]any{"VM"},
+				[]any{map[string]any{
+					"upper-case-const":        true,
+					"skip-package-name-checks": true,
+				}},
+			},
+			wantErr:                   nil,
+			wantAllowList:             []string{"ID"},
+			wantBlockList:             []string{"VM"},
+			wantAllowUpperCaseConst:   true,
+			wantSkipPackageNameChecks: true,
+		},
+		{
 			name:      "invalid allowlist type",
 			arguments: lint.Arguments{123},
 			wantErr:   errors.New("invalid argument to the var-naming rule. Expecting a allowlist of type slice with initialisms, got int"),

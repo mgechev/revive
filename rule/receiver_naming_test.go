@@ -34,6 +34,22 @@ func TestReceiverNamingRule_Configure(t *testing.T) {
 			wantMaxLength: 10,
 		},
 		{
+			name: "valid lowercased argument",
+			arguments: lint.Arguments{map[string]any{
+				"maxlength": int64(10),
+			}},
+			wantErr:       nil,
+			wantMaxLength: 10,
+		},
+		{
+			name: "valid kebab-cased argument",
+			arguments: lint.Arguments{map[string]any{
+				"max-length": int64(10),
+			}},
+			wantErr:       nil,
+			wantMaxLength: 10,
+		},
+		{
 			name: "invalid maxLength type",
 			arguments: lint.Arguments{map[string]any{
 				"maxLength": "10",

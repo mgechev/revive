@@ -42,6 +42,26 @@ func TestImportAliasNamingRule_Configure(t *testing.T) {
 			wantDenyRegex:  regexp.MustCompile("^v\\d+$"),
 		},
 		{
+			name: "valid map lowercased arguments",
+			arguments: lint.Arguments{map[string]any{
+				"allowregex": "^[a-z][a-z0-9]*$",
+				"denyregex":  "^v\\d+$",
+			}},
+			wantErr:        nil,
+			wantAllowRegex: regexp.MustCompile("^[a-z][a-z0-9]*$"),
+			wantDenyRegex:  regexp.MustCompile("^v\\d+$"),
+		},
+		{
+			name: "valid map kebab-cased arguments",
+			arguments: lint.Arguments{map[string]any{
+				"allow-regex": "^[a-z][a-z0-9]*$",
+				"deny-regex":  "^v\\d+$",
+			}},
+			wantErr:        nil,
+			wantAllowRegex: regexp.MustCompile("^[a-z][a-z0-9]*$"),
+			wantDenyRegex:  regexp.MustCompile("^v\\d+$"),
+		},
+		{
 			name:      "invalid argument type",
 			arguments: lint.Arguments{123},
 			wantErr:   errors.New(`invalid argument '123' for 'import-alias-naming' rule. Expecting string or map[string]string, got int`),

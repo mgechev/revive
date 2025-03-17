@@ -23,10 +23,14 @@ type EarlyReturnRule struct {
 // Configuration implements the [lint.ConfigurableRule] interface.
 func (e *EarlyReturnRule) Configure(arguments lint.Arguments) error {
 	for _, arg := range arguments {
-		switch arg {
-		case "preserveScope":
+		sarg, ok := arg.(string)
+		if !ok {
+			continue
+		}
+		switch normalizeRuleOption(sarg) {
+		case normalizeRuleOption("preserveScope"):
 			e.preserveScope = true
-		case "allowJump":
+		case normalizeRuleOption("allowJump"):
 			e.allowJump = true
 		}
 	}

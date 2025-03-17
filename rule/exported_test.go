@@ -51,9 +51,83 @@ func TestExportedRule_Configure(t *testing.T) {
 			wantStuttersMsg: "stutters",
 		},
 		{
+			name: "valid lowercased arguments",
+			arguments: lint.Arguments{
+				"checkprivatereceivers",
+				"disablestutteringcheck",
+				"checkpublicinterface",
+				"disablechecksonconstants",
+				"disablechecksonfunctions",
+				"disablechecksonmethods",
+				"disablechecksontypes",
+				"disablechecksonvariables",
+			},
+			wantErr: nil,
+			wantDisabledChecks: disabledChecks{
+				PrivateReceivers: false,
+				PublicInterfaces: false,
+				Const:            true,
+				Function:         true,
+				Method:           true,
+				Stuttering:       true,
+				Type:             true,
+				Var:              true,
+			},
+			wantStuttersMsg: "stutters",
+		},
+		{
+			name: "valid kebab-cased arguments",
+			arguments: lint.Arguments{
+				"check-private-receivers",
+				"disable-stuttering-check",
+				"check-public-interface",
+				"disable-checks-on-constants",
+				"disable-checks-on-functions",
+				"disable-checks-on-methods",
+				"disable-checks-on-types",
+				"disable-checks-on-variables",
+			},
+			wantErr: nil,
+			wantDisabledChecks: disabledChecks{
+				PrivateReceivers: false,
+				PublicInterfaces: false,
+				Const:            true,
+				Function:         true,
+				Method:           true,
+				Stuttering:       true,
+				Type:             true,
+				Var:              true,
+			},
+			wantStuttersMsg: "stutters",
+		},
+		{
 			name: "valid sayRepetitiveInsteadOfStutters",
 			arguments: lint.Arguments{
 				"sayRepetitiveInsteadOfStutters",
+			},
+			wantErr: nil,
+			wantDisabledChecks: disabledChecks{
+				PrivateReceivers: true,
+				PublicInterfaces: true,
+			},
+			wantStuttersMsg: "is repetitive",
+		},
+		{
+			name: "valid lowercased sayRepetitiveInsteadOfStutters",
+			arguments: lint.Arguments{
+				"sayrepetitiveinsteadofstutters",
+			},
+			wantErr: nil,
+			wantDisabledChecks: disabledChecks{
+				PrivateReceivers: true,
+				PublicInterfaces: true,
+			},
+			wantStuttersMsg: "is repetitive",
+		},
+		{
+			name: "valid kebab-cased sayRepetitiveInsteadOfStutters",
+			arguments: lint.Arguments{
+				"say-repetitive-instead-of-stutters",
 			},
 			wantErr: nil,
 			wantDisabledChecks: disabledChecks{
