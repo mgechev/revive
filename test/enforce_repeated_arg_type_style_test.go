@@ -26,10 +26,24 @@ func TestEnforceRepeatedArgTypeStyleShort(t *testing.T) {
 			},
 		},
 	})
+	testRule(t, "enforce_repeated_arg_type_style_short_args", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
+		Arguments: []any{
+			map[string]any{
+				"func-arg-style": `short`,
+			},
+		},
+	})
 	testRule(t, "enforce_repeated_arg_type_style_short_return", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
 		Arguments: []any{
 			map[string]any{
 				"funcRetValStyle": `short`,
+			},
+		},
+	})
+	testRule(t, "enforce_repeated_arg_type_style_short_return", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
+		Arguments: []any{
+			map[string]any{
+				"func-ret-val-style": `short`,
 			},
 		},
 	})

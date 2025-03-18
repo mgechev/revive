@@ -29,4 +29,7 @@ func TestFileLengthLimit(t *testing.T) {
 	testRule(t, "file_length_limit_4_skip_comments_skip_blank", &rule.FileLengthLimitRule{}, &lint.RuleConfig{
 		Arguments: []any{map[string]any{"max": int64(4), "skipComments": true, "skipBlankLines": true}},
 	})
+	testRule(t, "file_length_limit_4_skip_comments_skip_blank", &rule.FileLengthLimitRule{}, &lint.RuleConfig{
+		Arguments: []any{map[string]any{"max": int64(4), "skip-comments": true, "skip-blank-lines": true}},
+	})
 }

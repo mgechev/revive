@@ -9,11 +9,40 @@ import (
 
 // EarlyReturnRule finds opportunities to reduce nesting by inverting
 // the condition of an "if" block.
-type EarlyReturnRule struct{}
+type EarlyReturnRule struct {
+	// preserveScope prevents suggestions that would enlarge variable scope.
+	preserveScope bool
+	// allowJump permits early-return to suggest introducing a new jump
+	// (return, continue, etc) statement to reduce nesting.
+	// By default, suggestions only bring existing jumps earlier.
+	allowJump bool
+}
+
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
+func (e *EarlyReturnRule) Configure(arguments lint.Arguments) error {
+	for _, arg := range arguments {
+		sarg, ok := arg.(string)
+		if !ok {
+			continue
+		}
+		switch {
+		case isRuleOption(sarg, "preserveScope"):
+			e.preserveScope = true
+		case isRuleOption(sarg, "allowJump"):
+			e.allowJump = true
+		}
+	}
+	return nil
+}
 
 // Apply applies the rule to given file.
-func (e *EarlyReturnRule) Apply(file *lint.File, args lint.Arguments) []lint.Failure {
-	return ifelse.Apply(e.checkIfElse, file.AST, ifelse.TargetIf, args)
+func (e *EarlyReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+	return ifelse.Apply(e.checkIfElse, file.AST, ifelse.TargetIf, ifelse.Args{
+		PreserveScope: e.preserveScope,
+		AllowJump:     e.allowJump,
+	})
 }
 
 // Name returns the rule name.
@@ -21,13 +50,13 @@ func (*EarlyReturnRule) Name() string {
 	return "early-return"
 }
 
-func (*EarlyReturnRule) checkIfElse(chain ifelse.Chain, args ifelse.Args) (string, bool) {
+func (e *EarlyReturnRule) checkIfElse(chain ifelse.Chain) (string, bool) {
 	if chain.HasElse {
 		if !chain.Else.BranchKind.Deviates() {
 			// this rule only applies if the else-block deviates control flow
 			return "", false
 		}
-	} else if !args.AllowJump || !chain.AtBlockEnd || !chain.BlockEndKind.Deviates() || chain.If.IsShort() {
+	} else if !e.allowJump || !chain.AtBlockEnd || !chain.BlockEndKind.Deviates() || chain.If.IsShort() {
 		// this kind of refactor requires introducing a new indented "return", "continue" or "break" statement,
 		// so ignore unless we are able to outdent multiple statements in exchange.
 		return "", false
@@ -44,7 +73,7 @@ func (*EarlyReturnRule) checkIfElse(chain ifelse.Chain, args ifelse.Args) (strin
 		return "", false
 	}
 
-	if args.PreserveScope && !chain.AtBlockEnd && (chain.HasInitializer || chain.If.HasDecls()) {
+	if e.preserveScope && !chain.AtBlockEnd && (chain.HasInitializer || chain.If.HasDecls()) {
 		// avoid increasing variable scope
 		return "", false
 	}

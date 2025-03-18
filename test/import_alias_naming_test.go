@@ -31,6 +31,14 @@ func TestImportAliasNaming_CustomConfigWithMultipleRules(t *testing.T) {
 			},
 		},
 	})
+	testRule(t, "import_alias_naming_custom_config_with_multiple_values", &rule.ImportAliasNamingRule{}, &lint.RuleConfig{
+		Arguments: []any{
+			map[string]any{
+				"allow-regex": `^[a-z][a-z0-9]*$`,
+				"deny-regex":  `^((v\d+)|(v\d+alpha\d+))$`,
+			},
+		},
+	})
 }
 
 func TestImportAliasNaming_CustomConfigWithOnlyDeny(t *testing.T) {

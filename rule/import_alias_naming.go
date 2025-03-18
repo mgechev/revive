@@ -34,13 +34,13 @@ func (r *ImportAliasNamingRule) Configure(arguments lint.Arguments) error {
 		}
 	case map[string]any: // expecting map[string]string
 		for k, v := range namingRule {
-			switch k {
-			case "allowRegex":
+			switch {
+			case isRuleOption(k, "allowRegex"):
 				err := r.setAllowRule(v)
 				if err != nil {
 					return err
 				}
-			case "denyRegex":
+			case isRuleOption(k, "denyRegex"):
 				err := r.setDenyRule(v)
 				if err != nil {
 					return err

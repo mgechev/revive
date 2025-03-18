@@ -29,16 +29,14 @@ func (r *ReceiverNamingRule) Configure(arguments lint.Arguments) error {
 	}
 
 	for k, v := range args {
-		switch k {
-		case "maxLength":
-			value, ok := v.(int64)
-			if !ok {
-				return fmt.Errorf("invalid value %v for argument %s of rule %s, expected integer value got %T", v, k, r.Name(), v)
-			}
-			r.receiverNameMaxLength = int(value)
-		default:
+		if !isRuleOption(k, "maxLength") {
 			return fmt.Errorf("unknown argument %s for %s rule", k, r.Name())
 		}
+		value, ok := v.(int64)
+		if !ok {
+			return fmt.Errorf("invalid value %v for argument %s of rule %s, expected integer value got %T", v, k, r.Name(), v)
+		}
+		r.receiverNameMaxLength = int(value)
 	}
 	return nil
 }
