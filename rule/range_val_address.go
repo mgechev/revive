@@ -4,16 +4,19 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
+	"log"
 	"strings"
 
 	"github.com/mgechev/revive/lint"
 )
 
 // RangeValAddress lints
-type RangeValAddress struct{}
+type RangeValAddress struct {
+	logger *log.Logger
+}
 
 // Apply applies the rule to given file.
-func (*RangeValAddress) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *RangeValAddress) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	if file.Pkg.IsAtLeastGoVersion(lint.Go122) {
@@ -27,7 +30,9 @@ func (*RangeValAddress) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 		},
 	}
 
-	file.Pkg.TypeCheck()
+	if err := file.Pkg.TypeCheck(); err != nil {
+		r.logger.Printf("Rule=%q TypeCheck() error=%v\n", r.Name(), err)
+	}
 	ast.Walk(walker, file.AST)
 
 	return failures
@@ -36,6 +41,11 @@ func (*RangeValAddress) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 // Name returns the rule name.
 func (*RangeValAddress) Name() string {
 	return "range-val-address"
+}
+
+// SetLogger sets the logger field.
+func (r *RangeValAddress) SetLogger(logger *log.Logger) {
+	r.logger = logger
 }
 
 type rangeValAddress struct {

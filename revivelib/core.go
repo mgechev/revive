@@ -34,6 +34,8 @@ func New(
 		return nil, fmt.Errorf("initializing revive - getting logger: %w", err)
 	}
 
+	conf.Logger = logger
+
 	if setExitStatus {
 		conf.ErrorCode = 1
 		conf.WarningCode = 1

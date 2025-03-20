@@ -2,6 +2,7 @@ package lint
 
 import (
 	"go/token"
+	"log"
 )
 
 // DisabledInterval contains a single disabled interval and the associated rule name.
@@ -20,6 +21,11 @@ type Rule interface {
 // ConfigurableRule defines an abstract configurable rule interface.
 type ConfigurableRule interface {
 	Configure(Arguments) error
+}
+
+// SettableLoggerRule defines a rule with SetLogger method.
+type SettableLoggerRule interface {
+	SetLogger(*log.Logger)
 }
 
 // ToFailurePosition returns the failure position.

@@ -37,6 +37,7 @@ func TestAll(t *testing.T) {
 	baseDir := "../testdata/golint/"
 
 	for _, r := range rules {
+		setLoggerRule(t, r)
 		configureRule(t, r, nil)
 	}
 

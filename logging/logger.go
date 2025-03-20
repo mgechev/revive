@@ -16,16 +16,14 @@ func GetLogger() (*log.Logger, error) {
 		return logger, nil
 	}
 
-	var writer io.Writer
-	var err error
-
-	writer = io.Discard // by default, suppress all logging output
-	debugModeEnabled := os.Getenv("DEBUG") == "1"
+	writer := io.Discard // by default, suppress all logging output
+	debugModeEnabled := os.Getenv("DEBUG") != ""
 	if debugModeEnabled {
-		writer, err = os.Create("revive.log")
+		fileWriter, err := os.Create("revive.log")
 		if err != nil {
 			return nil, err
 		}
+		writer = io.MultiWriter(fileWriter, os.Stderr)
 	}
 
 	logger = log.New(writer, "", log.LstdFlags)
