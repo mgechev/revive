@@ -3,19 +3,24 @@ package rule
 import (
 	"go/ast"
 	"go/token"
+	"log"
 	"strings"
 
 	"github.com/mgechev/revive/lint"
 )
 
 // ModifiesValRecRule lints assignments to value method-receivers.
-type ModifiesValRecRule struct{}
+type ModifiesValRecRule struct {
+	logger *log.Logger
+}
 
 // Apply applies the rule to given file.
 func (r *ModifiesValRecRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
-	file.Pkg.TypeCheck()
+	if err := file.Pkg.TypeCheck(); err != nil {
+		r.logger.Printf("Rule=%q TypeCheck() error=%v\n", r.Name(), err)
+	}
 	for _, decl := range file.AST.Decls {
 		funcDecl, ok := decl.(*ast.FuncDecl)
 		isAMethod := ok && funcDecl.Recv != nil
@@ -54,6 +59,11 @@ func (r *ModifiesValRecRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 // Name returns the rule name.
 func (*ModifiesValRecRule) Name() string {
 	return "modifies-value-receiver"
+}
+
+// SetLogger sets the logger field.
+func (r *ModifiesValRecRule) SetLogger(logger *log.Logger) {
+	r.logger = logger
 }
 
 func (*ModifiesValRecRule) skipType(t ast.Expr, pkg *lint.Package) bool {

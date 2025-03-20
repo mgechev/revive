@@ -4,15 +4,18 @@ import (
 	"fmt"
 	"go/ast"
 	"go/types"
+	"log"
 
 	"github.com/mgechev/revive/lint"
 )
 
 // ContextKeysType disallows the usage of basic types in `context.WithValue`.
-type ContextKeysType struct{}
+type ContextKeysType struct {
+	logger *log.Logger
+}
 
 // Apply applies the rule to given file.
-func (*ContextKeysType) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *ContextKeysType) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -24,7 +27,9 @@ func (*ContextKeysType) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 		},
 	}
 
-	file.Pkg.TypeCheck()
+	if err := file.Pkg.TypeCheck(); err != nil {
+		r.logger.Printf("Rule=%q TypeCheck() error=%v\n", r.Name(), err)
+	}
 	ast.Walk(walker, fileAst)
 
 	return failures
@@ -33,6 +38,11 @@ func (*ContextKeysType) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 // Name returns the rule name.
 func (*ContextKeysType) Name() string {
 	return "context-keys-type"
+}
+
+// SetLogger sets the logger field.
+func (r *ContextKeysType) SetLogger(logger *log.Logger) {
+	r.logger = logger
 }
 
 type lintContextKeyTypes struct {
