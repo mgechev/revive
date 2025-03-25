@@ -19,6 +19,16 @@ make build
 
 The command will produce the `revive` binary in the root of the project.
 
+## Debug
+
+To enable debug logging, set the `DEBUG` environment variable:
+
+```sh
+DEBUG=1 go run main.go
+```
+
+This will output debug information to `stderr` and to the log file `revive.log` created in the current working directory.
+
 ## Development of rules
 
 If you want to develop a new rule, follow as an example the already existing rules in the [rule package](https://github.com/mgechev/revive/tree/master/rule).
