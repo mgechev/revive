@@ -41,6 +41,7 @@ func (*ContextKeysType) Name() string {
 }
 
 // SetLogger sets the logger field.
+// It implements [lint.SettableLoggerRule], this way [config.GettingRules] can inject the logger.
 func (r *ContextKeysType) SetLogger(logger *log.Logger) {
 	r.logger = logger
 }
