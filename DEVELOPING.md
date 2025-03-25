@@ -24,7 +24,7 @@ The command will produce the `revive` binary in the root of the project.
 To enable debug logging, set the `DEBUG` environment variable:
 
 ```sh
-DEBUG=1 revive
+DEBUG=1 go run main.go
 ```
 
 This will output debug information to `stderr` and to the log file `revive.log` created in the current working directory.
