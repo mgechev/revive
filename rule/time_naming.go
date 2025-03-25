@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/types"
-	"log"
+	"log/slog"
 	"strings"
 
 	"github.com/mgechev/revive/lint"
@@ -12,7 +12,7 @@ import (
 
 // TimeNamingRule lints the name of a time variable.
 type TimeNamingRule struct {
-	logger *log.Logger
+	logger *slog.Logger
 }
 
 // Apply applies the rule to given file.
@@ -26,7 +26,7 @@ func (r *TimeNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure
 	w := &lintTimeNames{file, onFailure}
 
 	if err := file.Pkg.TypeCheck(); err != nil {
-		r.logger.Printf("Rule=%q TypeCheck() error=%v\n", r.Name(), err)
+		r.logger.Info("TypeCheck returns error", "rule", r.Name(), "err", err)
 	}
 	ast.Walk(w, file.AST)
 	return failures
@@ -38,7 +38,7 @@ func (*TimeNamingRule) Name() string {
 }
 
 // SetLogger sets the logger field.
-func (r *TimeNamingRule) SetLogger(logger *log.Logger) {
+func (r *TimeNamingRule) SetLogger(logger *slog.Logger) {
 	r.logger = logger
 }
 

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/types"
-	"log"
+	"log/slog"
 	"regexp"
 	"strings"
 
@@ -14,7 +14,7 @@ import (
 
 // UnhandledErrorRule warns on unhandled errors returned by function calls.
 type UnhandledErrorRule struct {
-	logger     *log.Logger
+	logger     *slog.Logger
 	ignoreList []*regexp.Regexp
 }
 
@@ -56,7 +56,7 @@ func (r *UnhandledErrorRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 	}
 
 	if err := file.Pkg.TypeCheck(); err != nil {
-		r.logger.Printf("Rule=%q TypeCheck() error=%v\n", r.Name(), err)
+		r.logger.Info("TypeCheck returns error", "rule", r.Name(), "err", err)
 	}
 	ast.Walk(walker, file.AST)
 
@@ -69,7 +69,7 @@ func (*UnhandledErrorRule) Name() string {
 }
 
 // SetLogger sets the logger field.
-func (r *UnhandledErrorRule) SetLogger(logger *log.Logger) {
+func (r *UnhandledErrorRule) SetLogger(logger *slog.Logger) {
 	r.logger = logger
 }
 

@@ -5,7 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 	"go/types"
-	"log"
+	"log/slog"
 	"strings"
 
 	"github.com/mgechev/revive/lint"
@@ -28,7 +28,7 @@ var zeroLiteral = map[string]bool{
 
 // VarDeclarationsRule reduces redundancies around variable declaration.
 type VarDeclarationsRule struct {
-	logger *log.Logger
+	logger *slog.Logger
 }
 
 // Apply applies the rule to given file.
@@ -45,7 +45,7 @@ func (r *VarDeclarationsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 	}
 
 	if err := file.Pkg.TypeCheck(); err != nil {
-		r.logger.Printf("Rule=%q TypeCheck() error=%v\n", r.Name(), err)
+		r.logger.Info("TypeCheck returns error", "rule", r.Name(), "err", err)
 	}
 	ast.Walk(walker, fileAst)
 
@@ -58,7 +58,7 @@ func (*VarDeclarationsRule) Name() string {
 }
 
 // SetLogger sets the logger field.
-func (r *VarDeclarationsRule) SetLogger(logger *log.Logger) {
+func (r *VarDeclarationsRule) SetLogger(logger *slog.Logger) {
 	r.logger = logger
 }
 

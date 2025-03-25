@@ -3,14 +3,14 @@ package rule
 import (
 	"go/ast"
 	"go/types"
-	"log"
+	"log/slog"
 
 	"github.com/mgechev/revive/lint"
 )
 
 // StringOfIntRule warns when logic expressions contains Boolean literals.
 type StringOfIntRule struct {
-	logger *log.Logger
+	logger *slog.Logger
 }
 
 // Apply applies the rule to given file.
@@ -23,7 +23,7 @@ func (r *StringOfIntRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failur
 
 	astFile := file.AST
 	if err := file.Pkg.TypeCheck(); err != nil {
-		r.logger.Printf("Rule=%q TypeCheck() error=%v\n", r.Name(), err)
+		r.logger.Info("TypeCheck returns error", "rule", r.Name(), "err", err)
 	}
 
 	w := &lintStringInt{file, onFailure}
@@ -38,7 +38,7 @@ func (*StringOfIntRule) Name() string {
 }
 
 // SetLogger sets the logger field.
-func (r *StringOfIntRule) SetLogger(logger *log.Logger) {
+func (r *StringOfIntRule) SetLogger(logger *slog.Logger) {
 	r.logger = logger
 }
 

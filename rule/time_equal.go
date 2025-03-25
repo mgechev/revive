@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
-	"log"
+	"log/slog"
 
 	"github.com/mgechev/revive/lint"
 )
 
 // TimeEqualRule shows where "==" and "!=" used for equality check time.Time
 type TimeEqualRule struct {
-	logger *log.Logger
+	logger *slog.Logger
 }
 
 // Apply applies the rule to given file.
@@ -24,7 +24,7 @@ func (r *TimeEqualRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 
 	w := &lintTimeEqual{file, onFailure}
 	if err := w.file.Pkg.TypeCheck(); err != nil {
-		r.logger.Printf("Rule=%q TypeCheck() error=%v\n", r.Name(), err)
+		r.logger.Info("TypeCheck returns error", "rule", r.Name(), "err", err)
 		return nil
 	}
 
@@ -38,7 +38,7 @@ func (*TimeEqualRule) Name() string {
 }
 
 // SetLogger sets the logger field.
-func (r *TimeEqualRule) SetLogger(logger *log.Logger) {
+func (r *TimeEqualRule) SetLogger(logger *slog.Logger) {
 	r.logger = logger
 }
 

@@ -3,7 +3,7 @@ package rule
 import (
 	"go/ast"
 	"go/token"
-	"log"
+	"log/slog"
 	"strings"
 
 	"github.com/mgechev/revive/lint"
@@ -11,7 +11,7 @@ import (
 
 // ModifiesValRecRule lints assignments to value method-receivers.
 type ModifiesValRecRule struct {
-	logger *log.Logger
+	logger *slog.Logger
 }
 
 // Apply applies the rule to given file.
@@ -19,7 +19,7 @@ func (r *ModifiesValRecRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 	var failures []lint.Failure
 
 	if err := file.Pkg.TypeCheck(); err != nil {
-		r.logger.Printf("Rule=%q TypeCheck() error=%v\n", r.Name(), err)
+		r.logger.Info("TypeCheck returns error", "rule", r.Name(), "err", err)
 	}
 	for _, decl := range file.AST.Decls {
 		funcDecl, ok := decl.(*ast.FuncDecl)
@@ -62,7 +62,7 @@ func (*ModifiesValRecRule) Name() string {
 }
 
 // SetLogger sets the logger field.
-func (r *ModifiesValRecRule) SetLogger(logger *log.Logger) {
+func (r *ModifiesValRecRule) SetLogger(logger *slog.Logger) {
 	r.logger = logger
 }
 

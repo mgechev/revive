@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"go/ast"
 	"go/types"
-	"log"
+	"log/slog"
 
 	"github.com/mgechev/revive/lint"
 )
 
 // ContextKeysType disallows the usage of basic types in `context.WithValue`.
 type ContextKeysType struct {
-	logger *log.Logger
+	logger *slog.Logger
 }
 
 // Apply applies the rule to given file.
@@ -28,7 +28,7 @@ func (r *ContextKeysType) Apply(file *lint.File, _ lint.Arguments) []lint.Failur
 	}
 
 	if err := file.Pkg.TypeCheck(); err != nil {
-		r.logger.Printf("Rule=%q TypeCheck() error=%v\n", r.Name(), err)
+		r.logger.Info("TypeCheck returns error", "rule", r.Name(), "err", err)
 	}
 	ast.Walk(walker, fileAst)
 
@@ -42,7 +42,7 @@ func (*ContextKeysType) Name() string {
 
 // SetLogger sets the logger field.
 // It implements [lint.SettableLoggerRule], this way [config.GettingRules] can inject the logger.
-func (r *ContextKeysType) SetLogger(logger *log.Logger) {
+func (r *ContextKeysType) SetLogger(logger *slog.Logger) {
 	r.logger = logger
 }
 

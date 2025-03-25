@@ -3,7 +3,7 @@ package rule
 import (
 	"fmt"
 	"go/ast"
-	"log"
+	"log/slog"
 	"regexp"
 	"strings"
 
@@ -12,7 +12,7 @@ import (
 
 // ErrorfRule suggests using `fmt.Errorf` instead of `errors.New(fmt.Sprintf())`.
 type ErrorfRule struct {
-	logger *log.Logger
+	logger *slog.Logger
 }
 
 // Apply applies the rule to given file.
@@ -29,7 +29,7 @@ func (r *ErrorfRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	}
 
 	if err := file.Pkg.TypeCheck(); err != nil {
-		r.logger.Printf("Rule=%q TypeCheck() error=%v\n", r.Name(), err)
+		r.logger.Info("TypeCheck returns error", "rule", r.Name(), "err", err)
 	}
 	ast.Walk(walker, fileAst)
 
@@ -42,7 +42,7 @@ func (*ErrorfRule) Name() string {
 }
 
 // SetLogger sets the logger field.
-func (r *ErrorfRule) SetLogger(logger *log.Logger) {
+func (r *ErrorfRule) SetLogger(logger *slog.Logger) {
 	r.logger = logger
 }
 
