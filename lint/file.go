@@ -154,7 +154,7 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, fa
 
 		for ruleName, disabledArr := range enabledDisabledRulesMap {
 			ruleResult := []DisabledInterval{}
-			for i := 0; i < len(disabledArr); i++ {
+			for i := range disabledArr {
 				interval := DisabledInterval{
 					RuleName: ruleName,
 					From: token.Position{

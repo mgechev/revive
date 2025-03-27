@@ -3,6 +3,7 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -574,12 +575,7 @@ func (w lintStructTagRule) isUserDefined(key, opt string) bool {
 	}
 
 	options := w.userDefined[key]
-	for _, o := range options {
-		if opt == o {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(options, opt)
 }
 
 func areValidateOpts(opts string) (string, bool) {
