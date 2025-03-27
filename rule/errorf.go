@@ -29,7 +29,7 @@ func (r *ErrorfRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	}
 
 	if err := file.Pkg.TypeCheck(); err != nil {
-		r.logger.Info("TypeCheck returns error", "rule", r.Name(), "err", err)
+		r.logger.Info("TypeCheck returns error", "err", err)
 	}
 	ast.Walk(walker, fileAst)
 
@@ -43,7 +43,7 @@ func (*ErrorfRule) Name() string {
 
 // SetLogger sets the logger field.
 func (r *ErrorfRule) SetLogger(logger *slog.Logger) {
-	r.logger = logger
+	r.logger = logger.With("rule", r.Name())
 }
 
 type lintErrorf struct {

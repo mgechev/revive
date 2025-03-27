@@ -23,7 +23,7 @@ func (r *StringOfIntRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failur
 
 	astFile := file.AST
 	if err := file.Pkg.TypeCheck(); err != nil {
-		r.logger.Info("TypeCheck returns error", "rule", r.Name(), "err", err)
+		r.logger.Info("TypeCheck returns error", "err", err)
 	}
 
 	w := &lintStringInt{file, onFailure}
@@ -39,7 +39,7 @@ func (*StringOfIntRule) Name() string {
 
 // SetLogger sets the logger field.
 func (r *StringOfIntRule) SetLogger(logger *slog.Logger) {
-	r.logger = logger
+	r.logger = logger.With("rule", r.Name())
 }
 
 type lintStringInt struct {

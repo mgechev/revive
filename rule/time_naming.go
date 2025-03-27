@@ -26,7 +26,7 @@ func (r *TimeNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure
 	w := &lintTimeNames{file, onFailure}
 
 	if err := file.Pkg.TypeCheck(); err != nil {
-		r.logger.Info("TypeCheck returns error", "rule", r.Name(), "err", err)
+		r.logger.Info("TypeCheck returns error", "err", err)
 	}
 	ast.Walk(w, file.AST)
 	return failures
@@ -39,7 +39,7 @@ func (*TimeNamingRule) Name() string {
 
 // SetLogger sets the logger field.
 func (r *TimeNamingRule) SetLogger(logger *slog.Logger) {
-	r.logger = logger
+	r.logger = logger.With("rule", r.Name())
 }
 
 type lintTimeNames struct {

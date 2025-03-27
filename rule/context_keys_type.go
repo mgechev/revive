@@ -28,7 +28,7 @@ func (r *ContextKeysType) Apply(file *lint.File, _ lint.Arguments) []lint.Failur
 	}
 
 	if err := file.Pkg.TypeCheck(); err != nil {
-		r.logger.Info("TypeCheck returns error", "rule", r.Name(), "err", err)
+		r.logger.Info("TypeCheck returns error", "err", err)
 	}
 	ast.Walk(walker, fileAst)
 
@@ -43,7 +43,7 @@ func (*ContextKeysType) Name() string {
 // SetLogger sets the logger field.
 // It implements [lint.SettableLoggerRule], this way [config.GettingRules] can inject the logger.
 func (r *ContextKeysType) SetLogger(logger *slog.Logger) {
-	r.logger = logger
+	r.logger = logger.With("rule", r.Name())
 }
 
 type lintContextKeyTypes struct {

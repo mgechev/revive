@@ -19,7 +19,7 @@ func (r *ModifiesValRecRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 	var failures []lint.Failure
 
 	if err := file.Pkg.TypeCheck(); err != nil {
-		r.logger.Info("TypeCheck returns error", "rule", r.Name(), "err", err)
+		r.logger.Info("TypeCheck returns error", "err", err)
 	}
 	for _, decl := range file.AST.Decls {
 		funcDecl, ok := decl.(*ast.FuncDecl)
@@ -63,7 +63,7 @@ func (*ModifiesValRecRule) Name() string {
 
 // SetLogger sets the logger field.
 func (r *ModifiesValRecRule) SetLogger(logger *slog.Logger) {
-	r.logger = logger
+	r.logger = logger.With("rule", r.Name())
 }
 
 func (*ModifiesValRecRule) skipType(t ast.Expr, pkg *lint.Package) bool {

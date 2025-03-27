@@ -56,7 +56,7 @@ func (r *UnhandledErrorRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 	}
 
 	if err := file.Pkg.TypeCheck(); err != nil {
-		r.logger.Info("TypeCheck returns error", "rule", r.Name(), "err", err)
+		r.logger.Info("TypeCheck returns error", "err", err)
 	}
 	ast.Walk(walker, file.AST)
 
@@ -70,7 +70,7 @@ func (*UnhandledErrorRule) Name() string {
 
 // SetLogger sets the logger field.
 func (r *UnhandledErrorRule) SetLogger(logger *slog.Logger) {
-	r.logger = logger
+	r.logger = logger.With("rule", r.Name())
 }
 
 type lintUnhandledErrors struct {

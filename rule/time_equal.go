@@ -24,7 +24,7 @@ func (r *TimeEqualRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 
 	w := &lintTimeEqual{file, onFailure}
 	if err := w.file.Pkg.TypeCheck(); err != nil {
-		r.logger.Info("TypeCheck returns error", "rule", r.Name(), "err", err)
+		r.logger.Info("TypeCheck returns error", "err", err)
 		return nil
 	}
 
@@ -39,7 +39,7 @@ func (*TimeEqualRule) Name() string {
 
 // SetLogger sets the logger field.
 func (r *TimeEqualRule) SetLogger(logger *slog.Logger) {
-	r.logger = logger
+	r.logger = logger.With("rule", r.Name())
 }
 
 type lintTimeEqual struct {

@@ -45,7 +45,7 @@ func (r *VarDeclarationsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 	}
 
 	if err := file.Pkg.TypeCheck(); err != nil {
-		r.logger.Info("TypeCheck returns error", "rule", r.Name(), "err", err)
+		r.logger.Info("TypeCheck returns error", "err", err)
 	}
 	ast.Walk(walker, fileAst)
 
@@ -59,7 +59,7 @@ func (*VarDeclarationsRule) Name() string {
 
 // SetLogger sets the logger field.
 func (r *VarDeclarationsRule) SetLogger(logger *slog.Logger) {
-	r.logger = logger
+	r.logger = logger.With("rule", r.Name())
 }
 
 type lintVarDeclarations struct {
