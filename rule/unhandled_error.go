@@ -70,7 +70,9 @@ func (*UnhandledErrorRule) Name() string {
 
 // SetLogger sets the logger field.
 func (r *UnhandledErrorRule) SetLogger(logger *slog.Logger) {
-	r.logger = logger.With("rule", r.Name())
+	if logger != nil {
+		r.logger = logger.With("rule", r.Name())
+	}
 }
 
 type lintUnhandledErrors struct {

@@ -45,7 +45,9 @@ func (*RangeValAddress) Name() string {
 
 // SetLogger sets the logger field.
 func (r *RangeValAddress) SetLogger(logger *slog.Logger) {
-	r.logger = logger.With("rule", r.Name())
+	if logger != nil {
+		r.logger = logger.With("rule", r.Name())
+	}
 }
 
 type rangeValAddress struct {

@@ -63,7 +63,9 @@ func (*ModifiesValRecRule) Name() string {
 
 // SetLogger sets the logger field.
 func (r *ModifiesValRecRule) SetLogger(logger *slog.Logger) {
-	r.logger = logger.With("rule", r.Name())
+	if logger != nil {
+		r.logger = logger.With("rule", r.Name())
+	}
 }
 
 func (*ModifiesValRecRule) skipType(t ast.Expr, pkg *lint.Package) bool {
