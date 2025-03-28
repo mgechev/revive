@@ -3,15 +3,18 @@ package rule
 import (
 	"go/ast"
 	"go/types"
+	"log/slog"
 
 	"github.com/mgechev/revive/lint"
 )
 
 // StringOfIntRule warns when logic expressions contains Boolean literals.
-type StringOfIntRule struct{}
+type StringOfIntRule struct {
+	logger *slog.Logger
+}
 
 // Apply applies the rule to given file.
-func (*StringOfIntRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *StringOfIntRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -19,7 +22,9 @@ func (*StringOfIntRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 	}
 
 	astFile := file.AST
-	file.Pkg.TypeCheck()
+	if err := file.Pkg.TypeCheck(); err != nil {
+		r.logger.Info("TypeCheck returns error", "err", err)
+	}
 
 	w := &lintStringInt{file, onFailure}
 	ast.Walk(w, astFile)
@@ -30,6 +35,13 @@ func (*StringOfIntRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 // Name returns the rule name.
 func (*StringOfIntRule) Name() string {
 	return "string-of-int"
+}
+
+// SetLogger sets the logger field.
+func (r *StringOfIntRule) SetLogger(logger *slog.Logger) {
+	if logger != nil {
+		r.logger = logger.With("rule", r.Name())
+	}
 }
 
 type lintStringInt struct {

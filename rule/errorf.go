@@ -3,6 +3,7 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"log/slog"
 	"regexp"
 	"strings"
 
@@ -10,10 +11,12 @@ import (
 )
 
 // ErrorfRule suggests using `fmt.Errorf` instead of `errors.New(fmt.Sprintf())`.
-type ErrorfRule struct{}
+type ErrorfRule struct {
+	logger *slog.Logger
+}
 
 // Apply applies the rule to given file.
-func (*ErrorfRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *ErrorfRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	fileAst := file.AST
@@ -25,7 +28,9 @@ func (*ErrorfRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 		},
 	}
 
-	file.Pkg.TypeCheck()
+	if err := file.Pkg.TypeCheck(); err != nil {
+		r.logger.Info("TypeCheck returns error", "err", err)
+	}
 	ast.Walk(walker, fileAst)
 
 	return failures
@@ -34,6 +39,13 @@ func (*ErrorfRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 // Name returns the rule name.
 func (*ErrorfRule) Name() string {
 	return "errorf"
+}
+
+// SetLogger sets the logger field.
+func (r *ErrorfRule) SetLogger(logger *slog.Logger) {
+	if logger != nil {
+		r.logger = logger.With("rule", r.Name())
+	}
 }
 
 type lintErrorf struct {

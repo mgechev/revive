@@ -14,6 +14,7 @@ import (
 	"testing"
 
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/logging"
 )
 
 // configureRule configures the given rule with the given configuration
@@ -30,6 +31,24 @@ func configureRule(t *testing.T, rule lint.Rule, arguments lint.Arguments) {
 	if err != nil {
 		t.Fatalf("Cannot configure rule %s: %v", rule.Name(), err)
 	}
+}
+
+// setLoggerRule sets the logger field to the given rule with logger
+// if the rule implements the SettableLoggerRule interface
+func setLoggerRule(t *testing.T, rule lint.Rule) {
+	t.Helper()
+
+	r, ok := rule.(lint.SettableLoggerRule)
+	if !ok {
+		return
+	}
+
+	logger, err := logging.GetLogger()
+	if err != nil {
+		t.Fatalf("GetLogger: %v", err)
+	}
+
+	r.SetLogger(logger)
 }
 
 func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.RuleConfig) {
@@ -52,6 +71,7 @@ func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.Rul
 		ruleConfig = *config[0]
 		c[rule.Name()] = ruleConfig
 	}
+	setLoggerRule(t, rule)
 	configureRule(t, rule, ruleConfig.Arguments)
 
 	if parseInstructions(t, fullFilePath, src) == nil {

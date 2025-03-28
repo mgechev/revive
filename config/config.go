@@ -150,6 +150,10 @@ func GetLintingRules(config *lint.Config, extraRules []lint.Rule) ([]lint.Rule, 
 			continue // skip disabled rules
 		}
 
+		if r, ok := r.(lint.SettableLoggerRule); ok {
+			r.SetLogger(config.Logger)
+		}
+
 		if r, ok := r.(lint.ConfigurableRule); ok {
 			if err := r.Configure(ruleConfig.Arguments); err != nil {
 				return nil, fmt.Errorf("cannot configure rule: %q: %w", name, err)

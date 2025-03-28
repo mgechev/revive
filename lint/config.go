@@ -1,6 +1,8 @@
 package lint
 
 import (
+	"log/slog"
+
 	goversion "github.com/hashicorp/go-version"
 )
 
@@ -56,6 +58,7 @@ type DirectivesConfig = map[string]DirectiveConfig
 
 // Config defines the config of the linter.
 type Config struct {
+	Logger                *slog.Logger
 	IgnoreGeneratedHeader bool `toml:"ignoreGeneratedHeader"`
 	Confidence            float64
 	Severity              Severity
