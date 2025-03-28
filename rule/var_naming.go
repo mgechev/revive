@@ -64,8 +64,14 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 		if !ok {
 			return fmt.Errorf("invalid third argument to the var-naming rule. Expecting a %s of type slice, of len==1, with map, but %T", "options", asSlice[0])
 		}
-		r.allowUpperCaseConst = fmt.Sprint(args["upperCaseConst"]) == "true"
-		r.skipPackageNameChecks = fmt.Sprint(args["skipPackageNameChecks"]) == "true"
+		for k, v := range args {
+			switch {
+			case isRuleOption(k, "upperCaseConst"):
+				r.allowUpperCaseConst = fmt.Sprint(v) == "true"
+			case isRuleOption(k, "skipPackageNameChecks"):
+				r.skipPackageNameChecks = fmt.Sprint(v) == "true"
+			}
+		}
 	}
 	return nil
 }
@@ -279,7 +285,7 @@ func getList(arg any, argName string) ([]string, error) {
 	for _, v := range args {
 		val, ok := v.(string)
 		if !ok {
-			return nil, fmt.Errorf("invalid %s values of the var-naming rule. Expecting slice of strings but got element of type %T", val, arg)
+			return nil, fmt.Errorf("invalid %v values of the var-naming rule. Expecting slice of strings but got element of type %T", v, arg)
 		}
 		list = append(list, val)
 	}
