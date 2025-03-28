@@ -12,9 +12,18 @@ func TestUncheckedDynamicCast(t *testing.T) {
 }
 
 func TestUncheckedDynamicCastWithAcceptIgnored(t *testing.T) {
-	args := []any{map[string]any{
-		"acceptIgnoredAssertionResult": true,
-	}}
-
-	testRule(t, "unchecked_type_assertion_accept_ignored", &rule.UncheckedTypeAssertionRule{}, &lint.RuleConfig{Arguments: args})
+	testRule(t, "unchecked_type_assertion_accept_ignored", &rule.UncheckedTypeAssertionRule{},
+		&lint.RuleConfig{
+			Arguments: []any{
+				map[string]any{"acceptIgnoredAssertionResult": true},
+			},
+		},
+	)
+	testRule(t, "unchecked_type_assertion_accept_ignored", &rule.UncheckedTypeAssertionRule{},
+		&lint.RuleConfig{
+			Arguments: []any{
+				map[string]any{"accept-ignored-assertion-result": true},
+			},
+		},
+	)
 }

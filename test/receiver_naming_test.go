@@ -16,9 +16,18 @@ func TestReceiverNamingTypeParams(t *testing.T) {
 }
 
 func TestReceiverNamingMaxLength(t *testing.T) {
-	args := []any{map[string]any{
-		"maxLength": int64(2),
-	}}
 	testRule(t, "receiver_naming_issue_1040", &rule.ReceiverNamingRule{},
-		&lint.RuleConfig{Arguments: args})
+		&lint.RuleConfig{
+			Arguments: []any{
+				map[string]any{"maxLength": int64(2)},
+			},
+		},
+	)
+	testRule(t, "receiver_naming_issue_1040", &rule.ReceiverNamingRule{},
+		&lint.RuleConfig{
+			Arguments: []any{
+				map[string]any{"max-length": int64(2)},
+			},
+		},
+	)
 }
