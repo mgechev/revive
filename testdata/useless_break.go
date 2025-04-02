@@ -87,4 +87,25 @@ func UselessBreaks() {
 	default:
 		s.errorf("range can't iterate over %v", val)
 	}
+
+	// issue #1281
+	switch 1 {
+	case 1:
+		fmt.Println("foo bar")
+		if false {
+			goto SOME_LABEL
+		}
+		if true {
+			goto OTHER_LABEL
+		}
+		break
+	SOME_LABEL:
+		fmt.Println("fizz")
+		break
+	OTHER_LABEL:
+		fmt.Println("buzz")
+		break // MATCH /useless break in case clause/
+		fmt.Println("foobar")
+		break // MATCH /useless break in case clause/
+	}
 }

@@ -47,21 +47,21 @@ func (w *lintUselessBreak) Visit(node ast.Node) ast.Visitor {
 		w.inLoopBody = false
 		return nil
 	case *ast.CommClause:
-		for _, n := range v.Body {
-			w.inspectCaseStatement(n)
+		for i, n := range v.Body {
+			w.inspectCaseStatement(n, v.Body[i:])
 		}
 		return nil
 	case *ast.CaseClause:
-		for _, n := range v.Body {
-			w.inspectCaseStatement(n)
+		for i, n := range v.Body {
+			w.inspectCaseStatement(n, v.Body[i:])
 		}
 		return nil
 	}
 	return w
 }
 
-func (w *lintUselessBreak) inspectCaseStatement(n ast.Stmt) {
-	switch s := n.(type) {
+func (w *lintUselessBreak) inspectCaseStatement(s ast.Stmt, followings []ast.Stmt) {
+	switch s := s.(type) {
 	case *ast.BranchStmt:
 		if s.Tok != token.BREAK {
 			return // not a break statement
@@ -73,6 +73,13 @@ func (w *lintUselessBreak) inspectCaseStatement(n ast.Stmt) {
 		if w.inLoopBody {
 			msg += " (WARN: this break statement affects this switch or select statement and not the loop enclosing it)"
 		}
+
+		for _, f := range followings {
+			if _, ok := f.(*ast.LabeledStmt); ok {
+				return // there is a label statement following the break statement
+			}
+		}
+
 		w.onFailure(lint.Failure{
 			Confidence: 1,
 			Node:       s,
