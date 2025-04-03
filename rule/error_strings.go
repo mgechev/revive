@@ -178,11 +178,11 @@ func (lintErrorStrings) checkArg(expr *ast.CallExpr, arg int) (s *ast.BasicLit, 
 func lintErrorString(s string) (isClean bool, conf float64) {
 	const basicConfidence = 0.8
 	const capConfidence = basicConfidence - 0.2
-	confidence := basicConfidence
+
 	first, firstN := utf8.DecodeRuneInString(s)
 	last, _ := utf8.DecodeLastRuneInString(s)
 	if last == '.' || last == ':' || last == '!' || last == '\n' {
-		return false, confidence
+		return false, basicConfidence
 	}
 
 	if unicode.IsUpper(first) {
