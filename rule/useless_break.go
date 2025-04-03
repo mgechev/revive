@@ -63,7 +63,7 @@ func (w *lintUselessBreak) inspectCaseStatement(body []ast.Stmt) {
 	}
 
 	s := body[l-1] // pick the last statement
-	if !isUnlabeledBreak(s) {
+	if !isUnlabelledBreak(s) {
 		return
 	}
 
@@ -79,7 +79,7 @@ func (w *lintUselessBreak) inspectCaseStatement(body []ast.Stmt) {
 	})
 }
 
-func isUnlabeledBreak(stmt ast.Stmt) bool {
+func isUnlabelledBreak(stmt ast.Stmt) bool {
 	s, ok := stmt.(*ast.BranchStmt)
 	return ok && s.Tok == token.BREAK && s.Label == nil
 }
