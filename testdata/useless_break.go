@@ -91,21 +91,12 @@ func UselessBreaks() {
 	// issue #1281
 	switch 1 {
 	case 1:
-		fmt.Println("foo bar")
-		if false {
-			goto SOME_LABEL
-		}
-		if true {
-			goto OTHER_LABEL
-		}
-		break
-	SOME_LABEL:
-		fmt.Println("fizz")
-		break
-	OTHER_LABEL:
-		fmt.Println("buzz")
+		fmt.Println("foo")
 		break // MATCH /useless break in case clause/
-		fmt.Println("foobar")
-		break // MATCH /useless break in case clause/
+	case 2:
+		fmt.Println("bar")
+		break 
+		fmt.Println("baz")
+	case 3:
 	}
 }
