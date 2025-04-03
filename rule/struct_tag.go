@@ -105,6 +105,7 @@ const (
 	keyDefault      = "default"
 	keyJSON         = "json"
 	keyMapstructure = "mapstructure"
+	keyProperties   = "properties"
 	keyProtobuf     = "protobuf"
 	keyRequired     = "required"
 	keyTOML         = "toml"
@@ -202,6 +203,11 @@ func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
 			}
 		case keyMapstructure:
 			msg, ok := w.checkMapstructureTag(tag.Options)
+			if !ok {
+				w.addFailure(f.Tag, msg)
+			}
+		case keyProperties:
+			msg, ok := w.checkPropertiesTag(f.Type, tag.Options)
 			if !ok {
 				w.addFailure(f.Tag, msg)
 			}
@@ -505,6 +511,40 @@ func (lintStructTagRule) typeValueMatch(t ast.Expr, val string) bool {
 	}
 
 	return typeMatches
+}
+
+func (w lintStructTagRule) checkPropertiesTag(t ast.Expr, options []string) (string, bool) {
+	if len(options) == 0 {
+		return "", true
+	}
+
+	var hasDefault, hasField bool
+	for _, opt := range options {
+		println(">>>> ", opt)
+		switch {
+		case strings.HasPrefix(opt, "default"):
+			if hasDefault {
+				return "Properties tag accepts only one 'default' option", false
+			}
+			hasDefault = true
+
+			parts := strings.Split(opt, "=")
+			if len(parts) < 2 {
+				return "malformed default for Properties tag", false
+			}
+
+			if !w.typeValueMatch(t, parts[1]) {
+				return "field's type and default value's type mismatch", false
+			}
+		default:
+			hasField = true
+		}
+	}
+
+	if !hasDefault && !hasField {
+		return "default is required if field is not set", false
+	}
+	return "", true
 }
 
 func (w lintStructTagRule) checkProtobufTag(tag *structtag.Tag) (string, bool) {
