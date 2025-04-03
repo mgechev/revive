@@ -178,21 +178,25 @@ func (lintErrorStrings) checkArg(expr *ast.CallExpr, arg int) (s *ast.BasicLit, 
 func lintErrorString(s string) (isClean bool, conf float64) {
 	const basicConfidence = 0.8
 	const capConfidence = basicConfidence - 0.2
+	confidence := basicConfidence
 	first, firstN := utf8.DecodeRuneInString(s)
 	last, _ := utf8.DecodeLastRuneInString(s)
 	if last == '.' || last == ':' || last == '!' || last == '\n' {
-		return false, basicConfidence
+		return false, confidence
 	}
+
 	if unicode.IsUpper(first) {
 		// People use proper nouns and exported Go identifiers in error strings,
 		// so decrease the confidence of warnings for capitalization.
-		if len(s) <= firstN {
-			return false, capConfidence
+
+		for _, r := range s[firstN:] {
+			if unicode.IsUpper(r) {
+				return true, 0 // accept words with more than 2 capital letters (e.g. GitHub, URLs, )
+			}
 		}
+
 		// Flag strings starting with something that doesn't look like an initialism.
-		if second, _ := utf8.DecodeRuneInString(s[firstN:]); !unicode.IsUpper(second) {
-			return false, capConfidence
-		}
+		return false, capConfidence
 	}
 	return true, 0
 }
