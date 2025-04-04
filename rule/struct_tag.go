@@ -207,7 +207,7 @@ func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
 				w.addFailure(f.Tag, msg)
 			}
 		case keyProperties:
-			msg, ok := w.checkPropertiesTag(f.Type, tag.Options)
+			msg, ok := w.checkPropertiesTag(f.Type, tag.Name, tag.Options)
 			if !ok {
 				w.addFailure(f.Tag, msg)
 			}
@@ -555,32 +555,37 @@ func (w lintStructTagRule) checkPropertiesTag(t ast.Expr, options []string) (str
 		return "", true
 	}
 
-	var hasDefault, hasField bool
+	hasDefault := false
 	for _, opt := range options {
-		println(">>>> ", opt)
 		switch {
 		case strings.HasPrefix(opt, "default"):
 			if hasDefault {
-				return "Properties tag accepts only one 'default' option", false
+				return "properties tag accepts only one default option", false
 			}
 			hasDefault = true
 
 			parts := strings.Split(opt, "=")
 			if len(parts) < 2 {
-				return "malformed default for Properties tag", false
+				return "malformed default for properties tag", false
 			}
 
 			if !w.typeValueMatch(t, parts[1]) {
 				return "field's type and default value's type mismatch", false
 			}
+		case strings.HasPrefix(opt, "layout"):
+			parts := strings.Split(opt, "=")
+			if len(parts) < 2 || strings.TrimSpace(parts[1]) == "" {
+				return "malformed layout option for properties tag", false
+			}
+
+			if gofmt(t) != "time.Time" {
+				return "layout option is only applicable to fields of type time.Time", false
+			}
 		default:
-			hasField = true
+			return fmt.Sprintf("unknown option %q in properties tag", opt), false
 		}
 	}
 
-	if !hasDefault && !hasField {
-		return "default is required if field is not set", false
-	}
 	return "", true
 }
 
