@@ -163,7 +163,7 @@ func (r *Revive) Format(
 	<-exitChan
 
 	if formatErr != nil {
-		return "", exitCode, fmt.Errorf("formatting: %w", err)
+		return "", exitCode, fmt.Errorf("formatting: %w", formatErr)
 	}
 
 	return output, exitCode, nil
