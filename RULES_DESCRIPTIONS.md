@@ -64,8 +64,8 @@ List of all available rules.
   - [range](#range)
   - [receiver-naming](#receiver-naming)
   - [redefines-builtin-id](#redefines-builtin-id)
-  - [redundant-import-alias](#redundant-import-alias)
   - [redundant-build-tag](#redundant-build-tag)
+  - [redundant-import-alias](#redundant-import-alias)
   - [redundant-test-main-exit](#redundant-test-main-exit)
   - [string-format](#string-format)
   - [string-of-int](#string-of-int)
@@ -866,16 +866,16 @@ Even if possible, redefining these built in names can lead to bugs very difficul
 
 _Configuration_: N/A
 
-## redundant-import-alias
-
-_Description_: This rule warns on redundant import aliases. This happens when the alias used on the import statement matches the imported package name.
-
-_Configuration_: N/A
-
 ## redundant-build-tag
 
 _Description_: This rule warns about redundant build tag comments `// +build` when `//go:build` is present.
 `gofmt` in Go 1.17+ automatically adds the `//go:build` constraint, making the `// +build` comment unnecessary.
+
+_Configuration_: N/A
+
+## redundant-import-alias
+
+_Description_: This rule warns on redundant import aliases. This happens when the alias used on the import statement matches the imported package name.
 
 _Configuration_: N/A
 
