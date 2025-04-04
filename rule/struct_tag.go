@@ -207,7 +207,7 @@ func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
 				w.addFailure(f.Tag, msg)
 			}
 		case keyProperties:
-			msg, ok := w.checkPropertiesTag(f.Type, tag.Name, tag.Options)
+			msg, ok := w.checkPropertiesTag(f.Type, tag.Options)
 			if !ok {
 				w.addFailure(f.Tag, msg)
 			}
