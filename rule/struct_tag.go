@@ -172,83 +172,90 @@ func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
 	}
 
 	for _, tag := range tags.Tags() {
-		if msg, ok := w.checkTagNameIfNeed(tag); !ok {
+		failure := checkTag()
+		if failure != nil {
+			w.onFailure(failure)
+		}
+	}
+}
+
+func (w lintStructTagRule) checkTag() lint.Failure {
+	if msg, ok := w.checkTagNameIfNeed(tag); !ok {
+		return w.addFailure(f.Tag, msg)
+	}
+
+	switch key := tag.Key; key {
+	case keyASN1:
+		msg, ok := w.checkASN1Tag(f.Type, tag)
+		if !ok {
 			w.addFailure(f.Tag, msg)
 		}
-
-		switch key := tag.Key; key {
-		case keyASN1:
-			msg, ok := w.checkASN1Tag(f.Type, tag)
-			if !ok {
-				w.addFailure(f.Tag, msg)
-			}
-		case keyBSON:
-			msg, ok := w.checkBSONTag(tag.Options)
-			if !ok {
-				w.addFailure(f.Tag, msg)
-			}
-		case keyDatastore:
-			msg, ok := w.checkDatastoreTag(tag.Options)
-			if !ok {
-				w.addFailure(f.Tag, msg)
-			}
-		case keyDefault:
-			if !w.typeValueMatch(f.Type, tag.Name) {
-				w.addFailure(f.Tag, "field's type and default value's type mismatch")
-			}
-		case keyJSON:
-			msg, ok := w.checkJSONTag(tag.Name, tag.Options)
-			if !ok {
-				w.addFailure(f.Tag, msg)
-			}
-		case keyMapstructure:
-			msg, ok := w.checkMapstructureTag(tag.Options)
-			if !ok {
-				w.addFailure(f.Tag, msg)
-			}
-		case keyProperties:
-			msg, ok := w.checkPropertiesTag(f.Type, tag.Options)
-			if !ok {
-				w.addFailure(f.Tag, msg)
-			}
-		case keyProtobuf:
-			msg, ok := w.checkProtobufTag(tag)
-			if !ok {
-				w.addFailure(f.Tag, msg)
-			}
-		case keyRequired:
-			if tag.Name != "true" && tag.Name != "false" {
-				w.addFailure(f.Tag, "required should be 'true' or 'false'")
-			}
-		case keyTOML:
-			msg, ok := w.checkTOMLTag(tag.Options)
-			if !ok {
-				w.addFailure(f.Tag, msg)
-			}
-		case keyURL:
-			msg, ok := w.checkURLTag(tag.Options)
-			if !ok {
-				w.addFailure(f.Tag, msg)
-			}
-		case keyValidate:
-			opts := append([]string{tag.Name}, tag.Options...)
-			msg, ok := w.checkValidateTag(opts)
-			if !ok {
-				w.addFailure(f.Tag, msg)
-			}
-		case keyXML:
-			msg, ok := w.checkXMLTag(tag.Options)
-			if !ok {
-				w.addFailure(f.Tag, msg)
-			}
-		case keyYAML:
-			msg, ok := w.checkYAMLTag(tag.Options)
-			if !ok {
-				w.addFailure(f.Tag, msg)
-			}
-		default:
-			// unknown key
+	case keyBSON:
+		msg, ok := w.checkBSONTag(tag.Options)
+		if !ok {
+			w.addFailure(f.Tag, msg)
 		}
+	case keyDatastore:
+		msg, ok := w.checkDatastoreTag(tag.Options)
+		if !ok {
+			w.addFailure(f.Tag, msg)
+		}
+	case keyDefault:
+		if !w.typeValueMatch(f.Type, tag.Name) {
+			w.addFailure(f.Tag, "field's type and default value's type mismatch")
+		}
+	case keyJSON:
+		msg, ok := w.checkJSONTag(tag.Name, tag.Options)
+		if !ok {
+			w.addFailure(f.Tag, msg)
+		}
+	case keyMapstructure:
+		msg, ok := w.checkMapstructureTag(tag.Options)
+		if !ok {
+			w.addFailure(f.Tag, msg)
+		}
+	case keyProperties:
+		msg, ok := w.checkPropertiesTag(f.Type, tag.Options)
+		if !ok {
+			w.addFailure(f.Tag, msg)
+		}
+	case keyProtobuf:
+		msg, ok := w.checkProtobufTag(tag)
+		if !ok {
+			w.addFailure(f.Tag, msg)
+		}
+	case keyRequired:
+		if tag.Name != "true" && tag.Name != "false" {
+			w.addFailure(f.Tag, "required should be 'true' or 'false'")
+		}
+	case keyTOML:
+		msg, ok := w.checkTOMLTag(tag.Options)
+		if !ok {
+			w.addFailure(f.Tag, msg)
+		}
+	case keyURL:
+		msg, ok := w.checkURLTag(tag.Options)
+		if !ok {
+			w.addFailure(f.Tag, msg)
+		}
+	case keyValidate:
+		opts := append([]string{tag.Name}, tag.Options...)
+		msg, ok := w.checkValidateTag(opts)
+		if !ok {
+			w.addFailure(f.Tag, msg)
+		}
+	case keyXML:
+		msg, ok := w.checkXMLTag(tag.Options)
+		if !ok {
+			w.addFailure(f.Tag, msg)
+		}
+	case keyYAML:
+		msg, ok := w.checkYAMLTag(tag.Options)
+		if !ok {
+			w.addFailure(f.Tag, msg)
+		}
+	default:
+		// unknown key
 	}
 }
 
