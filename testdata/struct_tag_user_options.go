@@ -4,30 +4,30 @@ type RangeAllocation struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 	Range             string `json:"range,outline"`
-	Data              []byte `json:"data,flow"` // MATCH /unknown option 'flow' in JSON tag/
+	Data              []byte `json:"data,flow"` // MATCH /unknown option "flow" in JSON tag/
 }
 
 type RangeAllocation struct {
 	metav1.TypeMeta   `bson:",minsize,gnu"`
 	metav1.ObjectMeta `bson:"metadata,omitempty"`
-	Range             string `bson:"range,flow"` // MATCH /unknown option 'flow' in BSON tag/
+	Range             string `bson:"range,flow"` // MATCH /unknown option "flow" in BSON tag/
 	Data              []byte `bson:"data,inline"`
 }
 
 type RequestQueryOptions struct {
-	Properties       []string `url:"properties,commmma,omitempty"` // MATCH /unknown option 'commmma' in URL tag/
+	Properties       []string `url:"properties,commmma,omitempty"` // MATCH /unknown option "commmma" in URL tag/
 	CustomProperties []string `url:"-"`
 	Archived         bool     `url:"archived,myURLOption"`
 }
 
 type Fields struct {
 	Field      string `datastore:",noindex,flatten,omitempty,myDatastoreOption"`
-	OtherField string `datastore:",unknownOption"` // MATCH /unknown option 'unknownOption' in Datastore tag/
+	OtherField string `datastore:",unknownOption"` // MATCH /unknown option "unknownOption" in Datastore tag/
 }
 
 type MapStruct struct {
 	Field1     string `mapstructure:",squash,reminder,omitempty,myMapstructureOption"`
-	OtherField string `mapstructure:",unknownOption"` // MATCH /unknown option 'unknownOption' in Mapstructure tag/
+	OtherField string `mapstructure:",unknownOption"` // MATCH /unknown option "unknownOption" in Mapstructure tag/
 }
 
 type ValidateUser struct {
@@ -37,9 +37,9 @@ type ValidateUser struct {
 	Biography   string `validate:"min=0,max=1000"`
 	DisplayName string `validate:"displayName,min=3,max=32"`
 	Complex     string `validate:"gt=0,dive,keys,eq=1|eq=2,endkeys,required"`
-	BadComplex  string `validate:"gt=0,keys,eq=1|eq=2,endkeys,required"`              // MATCH /option 'keys' must follow a 'dive' option in validate tag/
-	BadComplex2 string `validate:"gt=0,dive,eq=1|eq=2,endkeys,required"`              // MATCH /option 'endkeys' without a previous 'keys' option in validate tag/
-	BadComplex3 string `validate:"gt=0,dive,keys,eq=1|eq=2,endkeys,endkeys,required"` // MATCH /option 'endkeys' without a previous 'keys' option in validate tag/
+	BadComplex  string `validate:"gt=0,keys,eq=1|eq=2,endkeys,required"`              // MATCH /option "keys" must follow a "dive" option in validate tag/
+	BadComplex2 string `validate:"gt=0,dive,eq=1|eq=2,endkeys,required"`              // MATCH /option "endkeys" without a previous "keys" option in validate tag/
+	BadComplex3 string `validate:"gt=0,dive,keys,eq=1|eq=2,endkeys,endkeys,required"` // MATCH /option "endkeys" without a previous "keys" option in validate tag/
 }
 
 type TomlUser struct {
