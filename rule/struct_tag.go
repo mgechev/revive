@@ -532,7 +532,7 @@ func (w lintStructTagRule) checkPropertiesTag(t ast.Expr, name string, options [
 			}
 
 			if !w.typeValueMatch(t, val) {
-				return "field's type and default value's type mismatch", false
+				return "field type and default value type mismatch", false
 			}
 		case "layout":
 			if !found || strings.TrimSpace(val) == "" {
