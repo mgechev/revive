@@ -512,7 +512,7 @@ func (lintStructTagRule) typeValueMatch(t ast.Expr, val string) bool {
 
 	return typeMatches
 }
-func (w lintStructTagRule) checkPropertiesTag(t ast.Expr, name string, options []string) (string, bool) {
+func (w lintStructTagRule) checkPropertiesTag(t ast.Expr, options []string) (string, bool) {
 	if len(options) == 0 {
 		return "", true
 	}
@@ -532,15 +532,15 @@ func (w lintStructTagRule) checkPropertiesTag(t ast.Expr, name string, options [
 			}
 
 			if !w.typeValueMatch(t, val) {
-				return "field type and default value type mismatch", false
+				return "field type and default value type mismatch in properties tag", false
 			}
 		case "layout":
 			if !found || strings.TrimSpace(val) == "" {
 				return "malformed layout option for properties tag", false
 			}
 
-			if gofmt(val) != "time.Time" {
-				return "layout option is only applicable to fields of type time.Time", false
+			if gofmt(t) != "time.Time" {
+				return "layout option is only applicable to fields of type time.Time in properties tag", false
 			}
 		default:
 			return fmt.Sprintf("unknown option %q in properties tag", opt), false
