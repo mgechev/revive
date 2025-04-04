@@ -512,35 +512,34 @@ func (lintStructTagRule) typeValueMatch(t ast.Expr, val string) bool {
 
 	return typeMatches
 }
-func (w lintStructTagRule) checkPropertiesTag(t ast.Expr, options []string) (string, bool) {
+func (w lintStructTagRule) checkPropertiesTag(t ast.Expr, name string, options []string) (string, bool) {
 	if len(options) == 0 {
 		return "", true
 	}
 
 	hasDefault := false
 	for _, opt := range options {
-		switch {
-		case strings.HasPrefix(opt, "default"):
+		key, val, found := strings.Cut(opt, "=")
+		switch key {
+		case "default":
 			if hasDefault {
 				return "properties tag accepts only one default option", false
 			}
 			hasDefault = true
 
-			parts := strings.Split(opt, "=")
-			if len(parts) < 2 {
+			if !found {
 				return "malformed default for properties tag", false
 			}
 
-			if !w.typeValueMatch(t, parts[1]) {
+			if !w.typeValueMatch(t, val) {
 				return "field's type and default value's type mismatch", false
 			}
-		case strings.HasPrefix(opt, "layout"):
-			parts := strings.Split(opt, "=")
-			if len(parts) < 2 || strings.TrimSpace(parts[1]) == "" {
+		case "layout":
+			if !found || strings.TrimSpace(val) == "" {
 				return "malformed layout option for properties tag", false
 			}
 
-			if gofmt(t) != "time.Time" {
+			if gofmt(val) != "time.Time" {
 				return "layout option is only applicable to fields of type time.Time", false
 			}
 		default:
