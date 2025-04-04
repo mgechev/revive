@@ -63,8 +63,8 @@ List of all available rules.
   - [range-val-in-closure](#range-val-in-closure)
   - [range](#range)
   - [receiver-naming](#receiver-naming)
-  - [redundant-build-tag](#redundant-build-tag)
   - [redefines-builtin-id](#redefines-builtin-id)
+  - [redundant-build-tag](#redundant-build-tag)
   - [redundant-import-alias](#redundant-import-alias)
   - [redundant-test-main-exit](#redundant-test-main-exit)
   - [string-format](#string-format)
@@ -859,17 +859,17 @@ Examples:
     arguments = [{max-length=2}]
 ```
 
-## redundant-build-tag
-
-_Description_: This rule warns about redundant build tag comments `// +build` when `//go:build` is present.
-`gofmt` in Go 1.17+ automatically adds the `//go:build` constraint, making the `// +build` comment unnecessary.
-
-_Configuration_: N/A
-
 ## redefines-builtin-id
 
 _Description_: Constant names like `false`, `true`, `nil`, function names like `append`, `make`, and basic type names like `bool`, and `byte` are not reserved words of the language; therefore the can be redefined.
 Even if possible, redefining these built in names can lead to bugs very difficult to detect.
+
+_Configuration_: N/A
+
+## redundant-build-tag
+
+_Description_: This rule warns about redundant build tag comments `// +build` when `//go:build` is present.
+`gofmt` in Go 1.17+ automatically adds the `//go:build` constraint, making the `// +build` comment unnecessary.
 
 _Configuration_: N/A
 
