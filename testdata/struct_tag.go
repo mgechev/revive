@@ -163,3 +163,19 @@ type TomlUser struct {
 	Username string `toml:"username,omitempty"`
 	Location string `toml:"location,unknown"` // MATCH /unknown option 'unknown' in TOML tag/
 }
+
+type PropertiesTags struct {
+	Field int               `properties:"-"`
+	Field int               `properties:"myName"`
+	Field int               `properties:"myName,default=15"`
+	Field int               `properties:"myName,default=sString"` // MATCH /field type and default value type mismatch in properties tag/
+	Field int               `properties:",default:15"`            // MATCH /unknown option "default:15" in properties tag/
+	Field int               `properties:",default=15,default=2"`  // MATCH /properties tag accepts only one default option/
+	Field time.Time         `properties:"date,layout=2006-01-02"`
+	Field time.Time         `properties:",layout=2006-01-02"`
+	Field time.Time         `properties:"date,layout"`            // MATCH /malformed layout option for properties tag/
+	Field time.Time         `properties:"date,layout=  "`         // MATCH /malformed layout option for properties tag/
+	Field string            `properties:"date,layout=2006-01-02"` // MATCH /layout option is only applicable to fields of type time.Time in properties tag/
+	Field []string          `properties:",default=a;b;c"`
+	Field map[string]string `properties:"myName,omitempty"` // MATCH /unknown option "omitempty" in properties tag/
+}
