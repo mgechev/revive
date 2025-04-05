@@ -35,7 +35,7 @@ const (
 	keyYAML         tagKey = "yaml"
 )
 
-type tagChecker func(ctx *checkContext, tag *structtag.Tag, fieldType ast.Expr) (failureMessage string, checkSuccedded bool)
+type tagChecker func(ctx *checkContext, tag *structtag.Tag, fieldType ast.Expr) (message string, succeded bool)
 
 // populate tag checkers map
 var tagCheckers = map[tagKey]tagChecker{
@@ -47,7 +47,7 @@ var tagCheckers = map[tagKey]tagChecker{
 	keyMapstructure: checkMapstructureTag,
 	keyProperties:   checkPropertiesTag,
 	keyProtobuf:     checkProtobufTag,
-	keyRequired:     checkrequiredTag,
+	keyRequired:     checkRequiredTag,
 	keyTOML:         checkTOMLTag,
 	keyURL:          checkURLTag,
 	keyValidate:     checkValidateTag,
@@ -190,7 +190,7 @@ func (w lintStructTagRule) checkTaggedField(ctx *checkContext, f *ast.Field) {
 	}
 }
 
-func (w lintStructTagRule) checkTagNameIfNeed(ctx *checkContext, tag *structtag.Tag) (string, bool) {
+func (w lintStructTagRule) checkTagNameIfNeed(ctx *checkContext, tag *structtag.Tag) (message string, succeded bool) {
 	isUnnamedTag := tag.Name == "" || tag.Name == "-"
 	if isUnnamedTag {
 		return "", true
@@ -235,7 +235,7 @@ func (lintStructTagRule) getTagName(tag *structtag.Tag) string {
 	}
 }
 
-func checkASN1Tag(ctx *checkContext, tag *structtag.Tag, fieldType ast.Expr) (string, bool) {
+func checkASN1Tag(ctx *checkContext, tag *structtag.Tag, fieldType ast.Expr) (message string, succeded bool) {
 	checkList := append(tag.Options, tag.Name)
 	for _, opt := range checkList {
 		switch opt {
@@ -252,7 +252,7 @@ func checkASN1Tag(ctx *checkContext, tag *structtag.Tag, fieldType ast.Expr) (st
 	return "", true
 }
 
-func checkCompoundANS1Option(ctx *checkContext, opt string, fieldType ast.Expr) (string, bool) {
+func checkCompoundANS1Option(ctx *checkContext, opt string, fieldType ast.Expr) (message string, succeded bool) {
 	parts := strings.Split(opt, ":")
 	switch parts[0] {
 	case "tag":
@@ -280,7 +280,7 @@ func checkCompoundANS1Option(ctx *checkContext, opt string, fieldType ast.Expr) 
 	return "", true
 }
 
-func checkDatastoreTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (string, bool) {
+func checkDatastoreTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "flatten", "noindex", "omitempty":
@@ -295,7 +295,7 @@ func checkDatastoreTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (strin
 	return "", true
 }
 
-func checkDefaultTag(_ *checkContext, tag *structtag.Tag, fieldType ast.Expr) (string, bool) {
+func checkDefaultTag(_ *checkContext, tag *structtag.Tag, fieldType ast.Expr) (message string, succeded bool) {
 	if !typeValueMatch(fieldType, tag.Name) {
 		return "field type and default value type mismatch", false
 	}
@@ -303,7 +303,7 @@ func checkDefaultTag(_ *checkContext, tag *structtag.Tag, fieldType ast.Expr) (s
 	return "", true
 }
 
-func checkBSONTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (string, bool) {
+func checkBSONTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "inline", "minsize", "omitempty":
@@ -318,7 +318,7 @@ func checkBSONTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (string, bo
 	return "", true
 }
 
-func checkJSONTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (string, bool) {
+func checkJSONTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "omitempty", "string":
@@ -343,7 +343,7 @@ func checkJSONTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (string, bo
 	return "", true
 }
 
-func checkMapstructureTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (string, bool) {
+func checkMapstructureTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "omitempty", "reminder", "squash":
@@ -358,7 +358,7 @@ func checkMapstructureTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (st
 	return "", true
 }
 
-func checkPropertiesTag(ctx *checkContext, tag *structtag.Tag, fieldType ast.Expr) (string, bool) {
+func checkPropertiesTag(ctx *checkContext, tag *structtag.Tag, fieldType ast.Expr) (message string, succeded bool) {
 	options := tag.Options
 	if len(options) == 0 {
 		return "", true
@@ -383,7 +383,7 @@ func checkPropertiesTag(ctx *checkContext, tag *structtag.Tag, fieldType ast.Exp
 	return "", true
 }
 
-func checkCompoundPropertiesOption(key, value string, fieldType ast.Expr, seenOptions map[string]bool) (string, bool) {
+func checkCompoundPropertiesOption(key, value string, fieldType ast.Expr, seenOptions map[string]bool) (message string, succeded bool) {
 	if _, ok := seenOptions[key]; ok {
 		return fmt.Sprintf("duplicated option %q in properties tag", key), false
 	}
@@ -407,7 +407,7 @@ func checkCompoundPropertiesOption(key, value string, fieldType ast.Expr, seenOp
 	return "", true
 }
 
-func checkProtobufTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (string, bool) {
+func checkProtobufTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeded bool) {
 	// check name
 	switch tag.Name {
 	case "bytes", "fixed32", "fixed64", "group", "varint", "zigzag32", "zigzag64":
@@ -461,7 +461,7 @@ func checkProtobufTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (string
 	return "", true
 }
 
-func checkrequiredTag(_ *checkContext, tag *structtag.Tag, _ ast.Expr) (string, bool) {
+func checkRequiredTag(_ *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeded bool) {
 	if tag.Name != "true" && tag.Name != "false" {
 		return `required should be "true" or "false"`, false
 	}
@@ -469,7 +469,7 @@ func checkrequiredTag(_ *checkContext, tag *structtag.Tag, _ ast.Expr) (string, 
 	return "", true
 }
 
-func checkTOMLTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (string, bool) {
+func checkTOMLTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "omitempty":
@@ -484,7 +484,7 @@ func checkTOMLTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (string, bo
 	return "", true
 }
 
-func checkURLTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (string, bool) {
+func checkURLTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeded bool) {
 	var delimiter = ""
 	for _, opt := range tag.Options {
 		switch opt {
@@ -507,7 +507,7 @@ func checkURLTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (string, boo
 	return "", true
 }
 
-func checkValidateTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (string, bool) {
+func checkValidateTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeded bool) {
 	previousOption := ""
 	seenKeysOption := false
 	options := append([]string{tag.Name}, tag.Options...)
@@ -536,7 +536,7 @@ func checkValidateTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (string
 	return "", true
 }
 
-func checkXMLTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (string, bool) {
+func checkXMLTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "any", "attr", "cdata", "chardata", "comment", "innerxml", "omitempty", "typeattr":
@@ -551,7 +551,7 @@ func checkXMLTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (string, boo
 	return "", true
 }
 
-func checkYAMLTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (string, bool) {
+func checkYAMLTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "flow", "inline", "omitempty":
@@ -566,7 +566,7 @@ func checkYAMLTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (string, bo
 	return "", true
 }
 
-func checkValidateOptionsAlternatives(ctx *checkContext, alternatives []string) (string, bool) {
+func checkValidateOptionsAlternatives(ctx *checkContext, alternatives []string) (message string, succeded bool) {
 	for _, alternative := range alternatives {
 		alternative := strings.TrimSpace(alternative)
 		parts := strings.Split(alternative, "=")
@@ -615,147 +615,13 @@ func typeValueMatch(t ast.Expr, val string) bool {
 
 	return typeMatches
 }
-func (w lintStructTagRule) checkPropertiesTag(t ast.Expr, options []string) (string, bool) {
-	if len(options) == 0 {
-		return "", true
-	}
-
-	hasDefault := false
-	for _, opt := range options {
-		key, val, found := strings.Cut(opt, "=")
-		switch key {
-		case "default":
-			if hasDefault {
-				return "properties tag accepts only one default option", false
-			}
-			hasDefault = true
-
-			if !found {
-				return "malformed default for properties tag", false
-			}
-
-			if !w.typeValueMatch(t, val) {
-				return "field type and default value type mismatch in properties tag", false
-			}
-		case "layout":
-			if !found || strings.TrimSpace(val) == "" {
-				return "malformed layout option for properties tag", false
-			}
-
-			if gofmt(t) != "time.Time" {
-				return "layout option is only applicable to fields of type time.Time in properties tag", false
-			}
-		default:
-			return fmt.Sprintf("unknown option %q in properties tag", opt), false
-		}
-	}
-
-	return "", true
-}
-
-func (w lintStructTagRule) checkPropertiesTag(t ast.Expr, options []string) (string, bool) {
-	if len(options) == 0 {
-		return "", true
-	}
-
-	hasDefault := false
-	for _, opt := range options {
-		switch {
-		case strings.HasPrefix(opt, "default"):
-			if hasDefault {
-				return "properties tag accepts only one default option", false
-			}
-			hasDefault = true
-
-			parts := strings.Split(opt, "=")
-			if len(parts) < 2 {
-				return "malformed default for properties tag", false
-			}
-
-			if !w.typeValueMatch(t, parts[1]) {
-				return "field's type and default value's type mismatch", false
-			}
-		case strings.HasPrefix(opt, "layout"):
-			parts := strings.Split(opt, "=")
-			if len(parts) < 2 || strings.TrimSpace(parts[1]) == "" {
-				return "malformed layout option for properties tag", false
-			}
-
-			if gofmt(t) != "time.Time" {
-				return "layout option is only applicable to fields of type time.Time", false
-			}
-		default:
-			return fmt.Sprintf("unknown option %q in properties tag", opt), false
-		}
-	}
-
-	return "", true
-}
-
-func (w lintStructTagRule) checkProtobufTag(tag *structtag.Tag) (string, bool) {
-	// check name
-	switch tag.Name {
-	case "bytes", "fixed32", "fixed64", "group", "varint", "zigzag32", "zigzag64":
-		// do nothing
-	default:
-		return fmt.Sprintf("invalid protobuf tag name '%s'", tag.Name), false
-	}
-
-	// check options
-	seenOptions := map[string]bool{}
-	for _, opt := range tag.Options {
-		if number, err := strconv.Atoi(opt); err == nil {
-			_, alreadySeen := w.usedTagNbr[number]
-			if alreadySeen {
-				return fmt.Sprintf("duplicated tag number %v", number), false
-			}
-			w.usedTagNbr[number] = true
-			continue // option is an integer
-		}
-
-		switch {
-		case opt == "opt" || opt == "proto3" || opt == "rep" || opt == "req":
-			// do nothing
-		case strings.Contains(opt, "="):
-			o := strings.Split(opt, "=")[0]
-			_, alreadySeen := seenOptions[o]
-			if alreadySeen {
-				return fmt.Sprintf("protobuf tag has duplicated option '%s'", o), false
-			}
-			seenOptions[o] = true
-			continue
-		}
-	}
-	_, hasName := seenOptions["name"]
-	if !hasName {
-		return "protobuf tag lacks mandatory option 'name'", false
-	}
-
-	for k := range seenOptions {
-		switch k {
-		case "name", "json":
-			// do nothing
-		default:
-			if w.isUserDefined(keyProtobuf, k) {
-				continue
-			}
-			return fmt.Sprintf("unknown option '%s' in protobuf tag", k), false
-		}
-	}
-
-	return "", true
-}
 
 func (w lintStructTagRule) addFailure(n ast.Node, msg string) {
 	w.onFailure(lint.Failure{
 		Node:       n,
 		Failure:    msg,
 		Confidence: 1,
-	}
-}
-
-func (w lintStructTagRule) addFailure(n ast.Node, msg string) {
-	w.onFailure(w.newFailure(n, msg))
+	})
 }
 
 func areValidateOpts(opts string) (string, bool) {
