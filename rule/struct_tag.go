@@ -105,6 +105,7 @@ const (
 	keyDefault      = "default"
 	keyJSON         = "json"
 	keyMapstructure = "mapstructure"
+	keyProperties   = "properties"
 	keyProtobuf     = "protobuf"
 	keyRequired     = "required"
 	keyTOML         = "toml"
@@ -202,6 +203,11 @@ func (w lintStructTagRule) checkTaggedField(f *ast.Field) {
 			}
 		case keyMapstructure:
 			msg, ok := w.checkMapstructureTag(tag.Options)
+			if !ok {
+				w.addFailure(f.Tag, msg)
+			}
+		case keyProperties:
+			msg, ok := w.checkPropertiesTag(f.Type, tag.Options)
 			if !ok {
 				w.addFailure(f.Tag, msg)
 			}
@@ -505,6 +511,43 @@ func (lintStructTagRule) typeValueMatch(t ast.Expr, val string) bool {
 	}
 
 	return typeMatches
+}
+func (w lintStructTagRule) checkPropertiesTag(t ast.Expr, options []string) (string, bool) {
+	if len(options) == 0 {
+		return "", true
+	}
+
+	hasDefault := false
+	for _, opt := range options {
+		key, val, found := strings.Cut(opt, "=")
+		switch key {
+		case "default":
+			if hasDefault {
+				return "properties tag accepts only one default option", false
+			}
+			hasDefault = true
+
+			if !found {
+				return "malformed default for properties tag", false
+			}
+
+			if !w.typeValueMatch(t, val) {
+				return "field type and default value type mismatch in properties tag", false
+			}
+		case "layout":
+			if !found || strings.TrimSpace(val) == "" {
+				return "malformed layout option for properties tag", false
+			}
+
+			if gofmt(t) != "time.Time" {
+				return "layout option is only applicable to fields of type time.Time in properties tag", false
+			}
+		default:
+			return fmt.Sprintf("unknown option %q in properties tag", opt), false
+		}
+	}
+
+	return "", true
 }
 
 func (w lintStructTagRule) checkProtobufTag(tag *structtag.Tag) (string, bool) {
