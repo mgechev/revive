@@ -175,7 +175,7 @@ func (w lintStructTagRule) checkTaggedField(ctx *checkContext, f *ast.Field) {
 
 	for _, tag := range tags.Tags() {
 		if msg, ok := w.checkTagNameIfNeed(ctx, tag); !ok {
-			w.addFailure(f.Tag, msg)
+			w.addFailureWithTagKey(f.Tag, msg, tag.Key)
 		}
 
 		checker, ok := w.tagCheckers[tagKey(tag.Key)]
@@ -185,7 +185,7 @@ func (w lintStructTagRule) checkTaggedField(ctx *checkContext, f *ast.Field) {
 
 		msg, ok := checker(ctx, tag, f.Type)
 		if !ok {
-			w.addFailure(f.Tag, msg)
+			w.addFailureWithTagKey(f.Tag, msg, tag.Key)
 		}
 	}
 }
@@ -212,7 +212,7 @@ func (w lintStructTagRule) checkTagNameIfNeed(ctx *checkContext, tag *structtag.
 	// to allow the same tag name in different tag type.
 	mapKey := tag.Key + ":" + tagName
 	if _, ok := ctx.usedTagName[mapKey]; ok {
-		return fmt.Sprintf("duplicate tag name: %q", tagName), false
+		return fmt.Sprintf(msgDuplicatedTagName, tagName), false
 	}
 
 	ctx.usedTagName[mapKey] = true
@@ -259,22 +259,22 @@ func checkCompoundANS1Option(ctx *checkContext, opt string, fieldType ast.Expr) 
 		tagNumber := strings.TrimLeft(opt, "tag:")
 		number, err := strconv.Atoi(tagNumber)
 		if err != nil {
-			return fmt.Sprintf("ASN1 tag must be a number, got %q", tagNumber), false
+			return fmt.Sprintf("tag must be a number but is %q", tagNumber), false
 		}
 		if ctx.usedTagNbr[number] {
-			return fmt.Sprintf("duplicated tag number %v", number), false
+			return fmt.Sprintf(msgDuplicatedTagNumber, number), false
 		}
 		ctx.usedTagNbr[number] = true
 	case "default":
 		if len(parts) < 2 {
-			return "malformed default for ASN1 tag", false
+			return "malformed default", false
 		}
 		if !typeValueMatch(fieldType, parts[1]) {
-			return "field type and default value type mismatch", false
+			return msgTypeMismatch, false
 		}
 	default:
 		if !ctx.isUserDefined(keyASN1, opt) {
-			return fmt.Sprintf("unknown option %q in ASN1 tag", opt), false
+			return fmt.Sprintf(msgUnknownOption, opt), false
 		}
 	}
 	return "", true
@@ -288,7 +288,7 @@ func checkDatastoreTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (messa
 			if ctx.isUserDefined(keyDatastore, opt) {
 				continue
 			}
-			return fmt.Sprintf("unknown option %q in Datastore tag", opt), false
+			return fmt.Sprintf(msgUnknownOption, opt), false
 		}
 	}
 
@@ -297,7 +297,7 @@ func checkDatastoreTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (messa
 
 func checkDefaultTag(_ *checkContext, tag *structtag.Tag, fieldType ast.Expr) (message string, succeded bool) {
 	if !typeValueMatch(fieldType, tag.Name) {
-		return "field type and default value type mismatch", false
+		return msgTypeMismatch, false
 	}
 
 	return "", true
@@ -311,7 +311,7 @@ func checkBSONTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (message st
 			if ctx.isUserDefined(keyBSON, opt) {
 				continue
 			}
-			return fmt.Sprintf("unknown option %q in BSON tag", opt), false
+			return fmt.Sprintf(msgUnknownOption, opt), false
 		}
 	}
 
@@ -325,7 +325,7 @@ func checkJSONTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (message st
 		case "":
 			// special case for JSON key "-"
 			if tag.Name != "-" {
-				return "option can not be empty in JSON tag", false
+				return "option can not be empty", false
 			}
 		case "omitzero":
 			if ctx.isAtLeastGo124 {
@@ -336,7 +336,7 @@ func checkJSONTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (message st
 			if ctx.isUserDefined(keyJSON, opt) {
 				continue
 			}
-			return fmt.Sprintf("unknown option %q in JSON tag", opt), false
+			return fmt.Sprintf(msgUnknownOption, opt), false
 		}
 	}
 
@@ -351,7 +351,7 @@ func checkMapstructureTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (me
 			if ctx.isUserDefined(keyMapstructure, opt) {
 				continue
 			}
-			return fmt.Sprintf("unknown option %q in Mapstructure tag", opt), false
+			return fmt.Sprintf(msgUnknownOption, opt), false
 		}
 	}
 
@@ -373,7 +373,7 @@ func checkPropertiesTag(ctx *checkContext, tag *structtag.Tag, fieldType ast.Exp
 		case 2:
 			msg, ok = checkCompoundPropertiesOption(parts[0], parts[1], fieldType, seenOptions)
 		default:
-			msg, ok = fmt.Sprintf("unknown or malformed option %q in properties tag", opt), false
+			msg, ok = fmt.Sprintf("unknown or malformed option %q", opt), false
 		}
 		if !ok {
 			return msg, false
@@ -385,18 +385,18 @@ func checkPropertiesTag(ctx *checkContext, tag *structtag.Tag, fieldType ast.Exp
 
 func checkCompoundPropertiesOption(key, value string, fieldType ast.Expr, seenOptions map[string]bool) (message string, succeded bool) {
 	if _, ok := seenOptions[key]; ok {
-		return fmt.Sprintf("duplicated option %q in properties tag", key), false
+		return fmt.Sprintf(msgDuplicatedOption, key), false
 	}
 	seenOptions[key] = true
 
 	if strings.TrimSpace(value) == "" {
-		return fmt.Sprintf("expected option %q to be of the form %s=value in properties tag", key, key), false
+		return fmt.Sprintf("option %q not of the form %s=value", key, key), false
 	}
 
 	switch key {
 	case "default":
 		if !typeValueMatch(fieldType, value) {
-			return "field type and default value type mismatch", false
+			return msgTypeMismatch, false
 		}
 	case "layout":
 		if gofmt(fieldType) != "time.Time" {
@@ -413,49 +413,48 @@ func checkProtobufTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (messag
 	case "bytes", "fixed32", "fixed64", "group", "varint", "zigzag32", "zigzag64":
 		// do nothing
 	default:
-		return fmt.Sprintf("invalid protobuf tag name %q", tag.Name), false
+		return fmt.Sprintf("invalid tag name %q", tag.Name), false
 	}
 
-	// check options
+	return checkProtobufOptions(ctx, tag.Options)
+}
+
+func checkProtobufOptions(ctx *checkContext, options []string) (message string, succeded bool) {
 	seenOptions := map[string]bool{}
-	for _, opt := range tag.Options {
+	hasName := false
+	for _, opt := range options {
+		opt := strings.Split(opt, "=")[0]
+
 		if number, err := strconv.Atoi(opt); err == nil {
 			_, alreadySeen := ctx.usedTagNbr[number]
 			if alreadySeen {
-				return fmt.Sprintf("duplicated tag number %v", number), false
+				return fmt.Sprintf(msgDuplicatedTagNumber, number), false
 			}
 			ctx.usedTagNbr[number] = true
 			continue // option is an integer
 		}
 
-		switch {
-		case opt == "opt" || opt == "proto3" || opt == "rep" || opt == "req":
+		switch opt {
+		case "json", "opt", "proto3", "rep", "req":
 			// do nothing
-		case strings.Contains(opt, "="):
-			o := strings.Split(opt, "=")[0]
-			_, alreadySeen := seenOptions[o]
-			if alreadySeen {
-				return fmt.Sprintf("protobuf tag has duplicated option %q", o), false
-			}
-			seenOptions[o] = true
-			continue
-		}
-	}
-	_, hasName := seenOptions["name"]
-	if !hasName {
-		return `protobuf tag lacks mandatory option "name"`, false
-	}
-
-	for k := range seenOptions {
-		switch k {
-		case "name", "json":
-			// do nothing
+		case "name":
+			hasName = true
 		default:
-			if ctx.isUserDefined(keyProtobuf, k) {
+			if ctx.isUserDefined(keyProtobuf, opt) {
 				continue
 			}
-			return fmt.Sprintf("unknown option %q in protobuf tag", k), false
+			return fmt.Sprintf(msgUnknownOption, opt), false
 		}
+
+		_, alreadySeen := seenOptions[opt]
+		if alreadySeen {
+			return fmt.Sprintf(msgDuplicatedOption, opt), false
+		}
+		seenOptions[opt] = true
+	}
+
+	if !hasName {
+		return `mandatory option "name" not found`, false
 	}
 
 	return "", true
@@ -477,7 +476,7 @@ func checkTOMLTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (message st
 			if ctx.isUserDefined(keyTOML, opt) {
 				continue
 			}
-			return fmt.Sprintf("unknown option %q in TOML tag", opt), false
+			return fmt.Sprintf(msgUnknownOption, opt), false
 		}
 	}
 
@@ -495,12 +494,12 @@ func checkURLTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (message str
 				delimiter = opt
 				continue
 			}
-			return fmt.Sprintf("can not set both %q and %q as delimiters in URL tag", opt, delimiter), false
+			return fmt.Sprintf("can not set both %q and %q as delimiters", opt, delimiter), false
 		default:
 			if ctx.isUserDefined(keyURL, opt) {
 				continue
 			}
-			return fmt.Sprintf("unknown option %q in URL tag", opt), false
+			return fmt.Sprintf(msgUnknownOption, opt), false
 		}
 	}
 
@@ -515,12 +514,12 @@ func checkValidateTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (messag
 		switch opt {
 		case "keys":
 			if previousOption != "dive" {
-				return `option "keys" must follow a "dive" option in validate tag`, false
+				return `option "keys" must follow a "dive" option`, false
 			}
 			seenKeysOption = true
 		case "endkeys":
 			if !seenKeysOption {
-				return `option "endkeys" without a previous "keys" option in validate tag`, false
+				return `option "endkeys" without a previous "keys" option`, false
 			}
 			seenKeysOption = false
 		default:
@@ -544,7 +543,7 @@ func checkXMLTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (message str
 			if ctx.isUserDefined(keyXML, opt) {
 				continue
 			}
-			return fmt.Sprintf("unknown option %q in XML tag", opt), false
+			return fmt.Sprintf(msgUnknownOption, opt), false
 		}
 	}
 
@@ -559,7 +558,7 @@ func checkYAMLTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (message st
 			if ctx.isUserDefined(keyYAML, opt) {
 				continue
 			}
-			return fmt.Sprintf("unknown option %q in YAML tag", opt), false
+			return fmt.Sprintf(msgUnknownOption, opt), false
 		}
 	}
 
@@ -576,16 +575,16 @@ func checkValidateOptionsAlternatives(ctx *checkContext, alternatives []string) 
 			if ok || ctx.isUserDefined(keyValidate, badOpt) {
 				continue
 			}
-			return fmt.Sprintf("unknown option %q in validate tag", badOpt), false
+			return fmt.Sprintf(msgUnknownOption, badOpt), false
 		case 2:
 			lhs := parts[0]
 			_, ok := validateLHS[lhs]
 			if ok || ctx.isUserDefined(keyValidate, lhs) {
 				continue
 			}
-			return fmt.Sprintf("unknown option %q in validate tag", lhs), false
+			return fmt.Sprintf(msgUnknownOption, lhs), false
 		default:
-			return fmt.Sprintf("malformed options %q in validate tag, not expected more than one '='", alternative), false
+			return fmt.Sprintf("malformed options %q, not expected more than one '='", alternative), false
 		}
 	}
 	return "", true
@@ -616,6 +615,10 @@ func typeValueMatch(t ast.Expr, val string) bool {
 	return typeMatches
 }
 
+func (w lintStructTagRule) addFailureWithTagKey(n ast.Node, msg string, tagKey string) {
+	w.addFailure(n, fmt.Sprintf("%s in %s tag", msg, tagKey))
+}
+
 func (w lintStructTagRule) addFailure(n ast.Node, msg string) {
 	w.onFailure(lint.Failure{
 		Node:       n,
@@ -635,6 +638,14 @@ func areValidateOpts(opts string) (string, bool) {
 
 	return "", true
 }
+
+const (
+	msgDuplicatedOption    = "duplicated option %q"
+	msgDuplicatedTagName   = "duplicated tag name %q"
+	msgDuplicatedTagNumber = "duplicated tag number %v"
+	msgUnknownOption       = "unknown option %q"
+	msgTypeMismatch        = "type mismatch between field type and default value type"
+)
 
 var validateSingleOptions = map[string]struct{}{
 	"alpha":                     {},
