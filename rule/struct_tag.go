@@ -358,7 +358,7 @@ func checkMapstructureTag(ctx *checkContext, tag *structtag.Tag, _ ast.Expr) (me
 	return "", true
 }
 
-func checkPropertiesTag(ctx *checkContext, tag *structtag.Tag, fieldType ast.Expr) (message string, succeded bool) {
+func checkPropertiesTag(_ *checkContext, tag *structtag.Tag, fieldType ast.Expr) (message string, succeded bool) {
 	options := tag.Options
 	if len(options) == 0 {
 		return "", true
