@@ -240,43 +240,43 @@ func checkASN1Tag(ctx *checkContext, tag *structtag.Tag, fieldType ast.Expr) (st
 	for _, opt := range checkList {
 		switch opt {
 		case "application", "explicit", "generalized", "ia5", "omitempty", "optional", "set", "utf8":
-
+			// do nothing
 		default:
-			if strings.HasPrefix(opt, "tag:") {
-				parts := strings.Split(opt, ":")
-				tagNumber := parts[1]
-				number, err := strconv.Atoi(tagNumber)
-				if err != nil {
-					return fmt.Sprintf("ASN1 tag must be a number, got %q", tagNumber), false
-				}
-				if ctx.usedTagNbr[number] {
-					return fmt.Sprintf("duplicated tag number %v", number), false
-				}
-				ctx.usedTagNbr[number] = true
-
-				continue
+			msg, ok := checkCompoundANS1Option(ctx, opt, fieldType)
+			if !ok {
+				return msg, false
 			}
-
-			if strings.HasPrefix(opt, "default:") {
-				parts := strings.Split(opt, ":")
-				if len(parts) < 2 {
-					return "malformed default for ASN1 tag", false
-				}
-				if !typeValueMatch(fieldType, parts[1]) {
-					return "field type and default value type mismatch", false
-				}
-
-				continue
-			}
-
-			if ctx.isUserDefined(keyASN1, opt) {
-				continue
-			}
-
-			return fmt.Sprintf("unknown option %q in ASN1 tag", opt), false
 		}
 	}
 
+	return "", true
+}
+
+func checkCompoundANS1Option(ctx *checkContext, opt string, fieldType ast.Expr) (string, bool) {
+	parts := strings.Split(opt, ":")
+	switch parts[0] {
+	case "tag":
+		tagNumber := strings.TrimLeft(opt, "tag:")
+		number, err := strconv.Atoi(tagNumber)
+		if err != nil {
+			return fmt.Sprintf("ASN1 tag must be a number, got %q", tagNumber), false
+		}
+		if ctx.usedTagNbr[number] {
+			return fmt.Sprintf("duplicated tag number %v", number), false
+		}
+		ctx.usedTagNbr[number] = true
+	case "default":
+		if len(parts) < 2 {
+			return "malformed default for ASN1 tag", false
+		}
+		if !typeValueMatch(fieldType, parts[1]) {
+			return "field type and default value type mismatch", false
+		}
+	default:
+		if !ctx.isUserDefined(keyASN1, opt) {
+			return fmt.Sprintf("unknown option %q in ASN1 tag", opt), false
+		}
+	}
 	return "", true
 }
 
@@ -364,34 +364,43 @@ func checkPropertiesTag(ctx *checkContext, tag *structtag.Tag, fieldType ast.Exp
 		return "", true
 	}
 
-	hasDefault := false
+	seenOptions := map[string]bool{}
 	for _, opt := range options {
-		switch {
-		case strings.HasPrefix(opt, "default"):
-			if hasDefault {
-				return "properties tag accepts only one default option", false
-			}
-			hasDefault = true
-
-			parts := strings.Split(opt, "=")
-			if len(parts) < 2 {
-				return "malformed default for properties tag", false
-			}
-
-			if !typeValueMatch(fieldType, parts[1]) {
-				return "field type and default value type mismatch", false
-			}
-		case strings.HasPrefix(opt, "layout"):
-			parts := strings.Split(opt, "=")
-			if len(parts) < 2 || strings.TrimSpace(parts[1]) == "" {
-				return "malformed layout option for properties tag", false
-			}
-
-			if gofmt(fieldType) != "time.Time" {
-				return "layout option is only applicable to fields of type time.Time", false
-			}
+		var msg string
+		var ok bool
+		parts := strings.Split(opt, "=")
+		switch len(parts) {
+		case 2:
+			msg, ok = checkCompoundPropertiesOption(parts[0], parts[1], fieldType, seenOptions)
 		default:
-			return fmt.Sprintf("unknown option %q in properties tag", opt), false
+			msg, ok = fmt.Sprintf("unknown or malformed option %q in properties tag", opt), false
+		}
+		if !ok {
+			return msg, false
+		}
+	}
+
+	return "", true
+}
+
+func checkCompoundPropertiesOption(key, value string, fieldType ast.Expr, seenOptions map[string]bool) (string, bool) {
+	if _, ok := seenOptions[key]; ok {
+		return fmt.Sprintf("duplicated option %q in properties tag", key), false
+	}
+	seenOptions[key] = true
+
+	if strings.TrimSpace(value) == "" {
+		return fmt.Sprintf("expected option %q to be of the form %s=value in properties tag", key, key), false
+	}
+
+	switch key {
+	case "default":
+		if !typeValueMatch(fieldType, value) {
+			return "field type and default value type mismatch", false
+		}
+	case "layout":
+		if gofmt(fieldType) != "time.Time" {
+			return "layout option is only applicable to fields of type time.Time", false
 		}
 	}
 
