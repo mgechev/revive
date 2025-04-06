@@ -6,9 +6,15 @@ const PI = 3.14 // MATCH /exported const PI should have comment or be unexported
 // Deprecated: this is deprecated
 var Buffer []byte // MATCH /exported var Buffer should have comment or be unexported/
 
+// Eq returns true if a == b, false otherwise.
+// Deprecated: this is deprecated
+func Eq(a, b int) bool {
+	return a == b
+}
+
 // Deprecated: this is deprecated, use min instead
-// Minimum returns a if a <= b, b otherwise.
-func Min(a, b int) int { // MATCH /comment on exported function Min should be of the form "Min ..."/
+// Min returns a if a <= b, b otherwise.
+func Min(a, b int) int { // MATCH /exported function Min should have comment or be unexported/
 	if a < b {
 		return a
 	}
@@ -17,7 +23,7 @@ func Min(a, b int) int { // MATCH /comment on exported function Min should be of
 
 // Maximum returns a if a >= b, b otherwise.
 // Deprecated: this is deprecated, use max instead
-func Max(a, b int) int { // MATCH:18 /comment on exported function Max should be of the form "Max ..."/
+func Max(a, b int) int { // MATCH:24 /comment on exported function Max should be of the form "Max ..."/
 	if a > b {
 		return a
 	}

@@ -375,6 +375,8 @@ func hasDocComment(comment *ast.CommentGroup) bool {
 }
 
 // isOnlyDeprecationComment returns true if the comment starts with a standard deprecation notice.
+// It considers all paragraphs following the deprecation notice as part of the deprecation comment.
+// Assumes the comment is following the general ordering convention: (doc comment + deprecation)
 func isOnlyDeprecationComment(comment string) bool {
 	return strings.HasPrefix(comment, "Deprecated: ")
 }
