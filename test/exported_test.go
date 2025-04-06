@@ -43,3 +43,7 @@ func TestCheckDisablingOnDeclarationTypes(t *testing.T) {
 func TestCheckDirectiveComment(t *testing.T) {
 	testRule(t, "exported_issue_1202", &rule.ExportedRule{}, &lint.RuleConfig{})
 }
+
+func TestCheckDeprecationComment(t *testing.T) {
+	testRule(t, "exported_issue_1231", &rule.ExportedRule{}, &lint.RuleConfig{})
+}
