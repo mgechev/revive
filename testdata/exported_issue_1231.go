@@ -7,16 +7,17 @@ const PI = 3.14 // MATCH /exported const PI should have comment or be unexported
 var Buffer []byte // MATCH /exported var Buffer should have comment or be unexported/
 
 // Deprecated: this is deprecated, use min instead
-func Min(a, b int) int { // MATCH /exported function Min should have comment or be unexported/
+// Minimum returns a if a <= b, b otherwise.
+func Min(a, b int) int { // MATCH /comment on exported function Min should be of the form "Min ..."/
 	if a < b {
 		return a
 	}
 	return b
 }
 
-// Max returns the maximum one of two integers.
+// Maximum returns a if a >= b, b otherwise.
 // Deprecated: this is deprecated, use max instead
-func Max(a, b int) int {
+func Max(a, b int) int { // MATCH:18 /comment on exported function Max should be of the form "Max ..."/
 	if a > b {
 		return a
 	}
