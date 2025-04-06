@@ -182,7 +182,9 @@ func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
 		return
 	}
 
-	if !hasDocComment(fn.Doc) {
+	firstCommentLine := firstCommentLine(fn.Doc)
+
+	if firstCommentLine == "" {
 		w.onFailure(lint.Failure{
 			Node:       fn,
 			Confidence: 1,
@@ -192,9 +194,8 @@ func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
 		return
 	}
 
-	s := normalizeText(fn.Doc.Text())
 	prefix := fn.Name.Name + " "
-	if !strings.HasPrefix(s, prefix) {
+	if !strings.HasPrefix(firstCommentLine, prefix) {
 		w.onFailure(lint.Failure{
 			Node:       fn.Doc,
 			Confidence: 0.8,
@@ -247,7 +248,9 @@ func (w *lintExported) lintTypeDoc(t *ast.TypeSpec, doc *ast.CommentGroup) {
 		return
 	}
 
-	if !hasDocComment(doc) {
+	firstCommentLine := firstCommentLine(doc)
+
+	if firstCommentLine == "" {
 		w.onFailure(lint.Failure{
 			Node:       t,
 			Confidence: 1,
@@ -257,21 +260,20 @@ func (w *lintExported) lintTypeDoc(t *ast.TypeSpec, doc *ast.CommentGroup) {
 		return
 	}
 
-	s := normalizeText(doc.Text())
 	articles := [...]string{"A", "An", "The", "This"}
 	for _, a := range articles {
 		if t.Name.Name == a {
 			continue
 		}
 		var found bool
-		if s, found = strings.CutPrefix(s, a+" "); found {
+		if firstCommentLine, found = strings.CutPrefix(firstCommentLine, a+" "); found {
 			break
 		}
 	}
 
 	// if comment starts with name of type and has some text after - it's ok
 	expectedPrefix := t.Name.Name + " "
-	if strings.HasPrefix(s, expectedPrefix) {
+	if strings.HasPrefix(firstCommentLine, expectedPrefix) {
 		return
 	}
 
@@ -314,7 +316,9 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 		return
 	}
 
-	if !hasDocComment(vs.Doc) && !hasDocComment(gd.Doc) {
+	vsFirstCommentLine := firstCommentLine(vs.Doc)
+	gdFirstCommentLine := firstCommentLine(gd.Doc)
+	if vsFirstCommentLine == "" && gdFirstCommentLine == "" {
 		if genDeclMissingComments[gd] {
 			return
 		}
@@ -332,24 +336,23 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 		return
 	}
 	// If this GenDecl has parens and a comment, we don't check its comment form.
-	if hasDocComment(gd.Doc) && gd.Lparen.IsValid() {
+	if gdFirstCommentLine != "" && gd.Lparen.IsValid() {
 		return
 	}
 	// The relevant text to check will be on either vs.Doc or gd.Doc.
 	// Use vs.Doc preferentially.
 	var doc *ast.CommentGroup
 	switch {
-	case hasDocComment(vs.Doc):
+	case vsFirstCommentLine != "":
 		doc = vs.Doc
-	case hasDocComment(vs.Comment) && !hasDocComment(gd.Doc):
+	case vsFirstCommentLine != "" && gdFirstCommentLine == "":
 		doc = vs.Comment
 	default:
 		doc = gd.Doc
 	}
 
 	prefix := name + " "
-	s := normalizeText(doc.Text())
-	if !strings.HasPrefix(s, prefix) {
+	if !strings.HasPrefix(firstCommentLine(doc), prefix) {
 		w.onFailure(lint.Failure{
 			Confidence: 1,
 			Node:       doc,
@@ -359,34 +362,31 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 	}
 }
 
-// hasDocComment reports whether the comment group contains a documentation comment,
-// excluding directive comments and those consisting solely of a deprecation notice.
-// e.g. //go:embed foo.txt a directive comment, not a text comment
-// e.g. //nolint:whatever is a directive comment, not a text comment
-// e.g. // Deprecated: this is a deprecation comment
-func hasDocComment(comment *ast.CommentGroup) bool {
+// firstCommentLine yields the first line of interest in comment group or "" if there is nothing of interest.
+// An "interesting line" is a comment line that is neither a directive (e.g. //go:...) or a deprecation comment
+// (lines from the first line with a prefix // Deprecated: to the end of the comment group)
+// Empty or spaces-only lines are discarded.
+func firstCommentLine(comment *ast.CommentGroup) (result string) {
 	if comment == nil {
-		return false
+		return ""
 	}
 
-	// a comment could be directive and not a text comment
-	text := comment.Text() // removes directives from the comment block
-	return text != "" && !isOnlyDeprecationComment(text)
-}
+	commentWithoutDirectives := comment.Text() // removes directives from the comment block
+	lines := strings.Split(commentWithoutDirectives, "\n")
+	for _, line := range lines {
+		line := strings.TrimSpace(line)
+		if line == "" {
+			continue // ignore empty lines
+		}
+		if strings.HasPrefix(line, "Deprecated: ") {
+			break // ignore deprecation comment line and the subsequent lines of the original comment
+		}
 
-// isOnlyDeprecationComment returns true if the comment starts with a standard deprecation notice.
-// It considers all paragraphs following the deprecation notice as part of the deprecation comment.
-// Assumes the comment is following the general ordering convention: (doc comment + deprecation)
-func isOnlyDeprecationComment(comment string) bool {
-	return strings.HasPrefix(comment, "Deprecated: ")
-}
+		result = line
+		break // first non-directive/non-empty/non-deprecation comment line found
+	}
 
-// normalizeText is a helper function that normalizes comment strings by:
-// * removing one leading space
-//
-// This function is needed because ast.CommentGroup.Text() does not handle //-style and /*-style comments uniformly
-func normalizeText(t string) string {
-	return strings.TrimSpace(t)
+	return result
 }
 
 func (w *lintExported) Visit(n ast.Node) ast.Visitor {
@@ -410,7 +410,8 @@ func (w *lintExported) Visit(n ast.Node) ast.Visitor {
 	case *ast.TypeSpec:
 		// inside a GenDecl, which usually has the doc
 		doc := v.Doc
-		if !hasDocComment(doc) {
+
+		if firstCommentLine(doc) == "" {
 			doc = w.lastGen.Doc
 		}
 		w.lintTypeDoc(v, doc)
@@ -446,7 +447,8 @@ func (w *lintExported) lintInterfaceMethod(typeName string, m *ast.Field) {
 		return
 	}
 	name := m.Names[0].Name
-	if !hasDocComment(m.Doc) {
+	firstCommentLine := firstCommentLine(m.Doc)
+	if firstCommentLine == "" {
 		w.onFailure(lint.Failure{
 			Node:       m,
 			Confidence: 1,
@@ -455,9 +457,9 @@ func (w *lintExported) lintInterfaceMethod(typeName string, m *ast.Field) {
 		})
 		return
 	}
-	s := normalizeText(m.Doc.Text())
+
 	expectedPrefix := m.Names[0].Name + " "
-	if !strings.HasPrefix(s, expectedPrefix) {
+	if !strings.HasPrefix(firstCommentLine, expectedPrefix) {
 		w.onFailure(lint.Failure{
 			Node:       m.Doc,
 			Confidence: 0.8,
