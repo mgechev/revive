@@ -44,7 +44,7 @@ func TestExportedRule_Configure(t *testing.T) {
 				Const:            true,
 				Function:         true,
 				Method:           true,
-				Stuttering:       true,
+				RepetitiveNames:  true,
 				Type:             true,
 				Var:              true,
 			},
@@ -69,7 +69,7 @@ func TestExportedRule_Configure(t *testing.T) {
 				Const:            true,
 				Function:         true,
 				Method:           true,
-				Stuttering:       true,
+				RepetitiveNames:  true,
 				Type:             true,
 				Var:              true,
 			},
@@ -94,7 +94,7 @@ func TestExportedRule_Configure(t *testing.T) {
 				Const:            true,
 				Function:         true,
 				Method:           true,
-				Stuttering:       true,
+				RepetitiveNames:  true,
 				Type:             true,
 				Var:              true,
 			},
@@ -170,8 +170,8 @@ func TestExportedRule_Configure(t *testing.T) {
 			if rule.disabledChecks != tt.wantDisabledChecks {
 				t.Errorf("unexpected disabledChecks: got = %+v, want %+v", rule.disabledChecks, tt.wantDisabledChecks)
 			}
-			if rule.stuttersMsg != tt.wantStuttersMsg {
-				t.Errorf("unexpected stuttersMsg: got = %v, want %v", rule.stuttersMsg, tt.wantStuttersMsg)
+			if rule.isRepetitiveMsg != tt.wantStuttersMsg {
+				t.Errorf("unexpected stuttersMsg: got = %v, want %v", rule.isRepetitiveMsg, tt.wantStuttersMsg)
 			}
 		})
 	}
