@@ -9,11 +9,11 @@ import (
 
 func TestExportedRule_Configure(t *testing.T) {
 	tests := []struct {
-		name               string
-		arguments          lint.Arguments
-		wantErr            error
-		wantDisabledChecks disabledChecks
-		wantStuttersMsg    string
+		name                string
+		arguments           lint.Arguments
+		wantErr             error
+		wantDisabledChecks  disabledChecks
+		wantIsRepetitiveMsg string
 	}{
 		{
 			name:      "default configuration",
@@ -23,7 +23,7 @@ func TestExportedRule_Configure(t *testing.T) {
 				PrivateReceivers: true,
 				PublicInterfaces: true,
 			},
-			wantStuttersMsg: "stutters",
+			wantIsRepetitiveMsg: "stutters",
 		},
 		{
 			name: "valid arguments",
@@ -48,7 +48,7 @@ func TestExportedRule_Configure(t *testing.T) {
 				Type:             true,
 				Var:              true,
 			},
-			wantStuttersMsg: "stutters",
+			wantIsRepetitiveMsg: "stutters",
 		},
 		{
 			name: "valid lowercased arguments",
@@ -73,7 +73,7 @@ func TestExportedRule_Configure(t *testing.T) {
 				Type:             true,
 				Var:              true,
 			},
-			wantStuttersMsg: "stutters",
+			wantIsRepetitiveMsg: "stutters",
 		},
 		{
 			name: "valid kebab-cased arguments",
@@ -98,7 +98,7 @@ func TestExportedRule_Configure(t *testing.T) {
 				Type:             true,
 				Var:              true,
 			},
-			wantStuttersMsg: "stutters",
+			wantIsRepetitiveMsg: "stutters",
 		},
 		{
 			name: "valid sayRepetitiveInsteadOfStutters",
@@ -110,7 +110,7 @@ func TestExportedRule_Configure(t *testing.T) {
 				PrivateReceivers: true,
 				PublicInterfaces: true,
 			},
-			wantStuttersMsg: "is repetitive",
+			wantIsRepetitiveMsg: "is repetitive",
 		},
 		{
 			name: "valid lowercased sayRepetitiveInsteadOfStutters",
@@ -122,7 +122,7 @@ func TestExportedRule_Configure(t *testing.T) {
 				PrivateReceivers: true,
 				PublicInterfaces: true,
 			},
-			wantStuttersMsg: "is repetitive",
+			wantIsRepetitiveMsg: "is repetitive",
 		},
 		{
 			name: "valid kebab-cased sayRepetitiveInsteadOfStutters",
@@ -134,7 +134,7 @@ func TestExportedRule_Configure(t *testing.T) {
 				PrivateReceivers: true,
 				PublicInterfaces: true,
 			},
-			wantStuttersMsg: "is repetitive",
+			wantIsRepetitiveMsg: "is repetitive",
 		},
 		{
 			name:      "unknown configuration flag",
@@ -170,8 +170,8 @@ func TestExportedRule_Configure(t *testing.T) {
 			if rule.disabledChecks != tt.wantDisabledChecks {
 				t.Errorf("unexpected disabledChecks: got = %+v, want %+v", rule.disabledChecks, tt.wantDisabledChecks)
 			}
-			if rule.isRepetitiveMsg != tt.wantStuttersMsg {
-				t.Errorf("unexpected stuttersMsg: got = %v, want %v", rule.isRepetitiveMsg, tt.wantStuttersMsg)
+			if rule.isRepetitiveMsg != tt.wantIsRepetitiveMsg {
+				t.Errorf("unexpected stuttersMsg: got = %v, want %v", rule.isRepetitiveMsg, tt.wantIsRepetitiveMsg)
 			}
 		})
 	}
