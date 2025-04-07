@@ -168,16 +168,16 @@ func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
 	firstCommentLine := firstCommentLine(fn.Doc)
 
 	if firstCommentLine == "" {
-		w.addFailure(fn, 1, lint.FailureCategoryComments,
-			fmt.Sprintf("exported %s %s should have comment or be unexported", kind, name),
+		w.addFailuref(fn, 1, lint.FailureCategoryComments,
+			"exported %s %s should have comment or be unexported", kind, name,
 		)
 		return
 	}
 
 	prefix := fn.Name.Name + " "
 	if !strings.HasPrefix(firstCommentLine, prefix) {
-		w.addFailure(fn.Doc, 0.8, lint.FailureCategoryComments,
-			fmt.Sprintf(`comment on exported %s %s should be of the form "%s..."`, kind, name, prefix),
+		w.addFailuref(fn.Doc, 0.8, lint.FailureCategoryComments,
+			`comment on exported %s %s should be of the form "%s..."`, kind, name, prefix,
 		)
 	}
 }
@@ -207,8 +207,8 @@ func (w *lintExported) checkRepetitiveNames(id *ast.Ident, thing string) {
 	// the it's starting a new word and thus this name is repetitive.
 	rem := name[len(pkg):]
 	if next, _ := utf8.DecodeRuneInString(rem); next == '_' || unicode.IsUpper(next) {
-		w.addFailure(id, 0.8, lint.FailureCategoryNaming,
-			fmt.Sprintf("%s name will be used as %s.%s by other packages, and that %s; consider calling this %s", thing, pkg, name, w.isRepetitiveMsg, rem),
+		w.addFailuref(id, 0.8, lint.FailureCategoryNaming,
+			"%s name will be used as %s.%s by other packages, and that %s; consider calling this %s", thing, pkg, name, w.isRepetitiveMsg, rem,
 		)
 	}
 }
@@ -227,8 +227,8 @@ func (w *lintExported) lintTypeDoc(t *ast.TypeSpec, doc *ast.CommentGroup, first
 	}
 
 	if firstCommentLine == "" {
-		w.addFailure(t, 1, lint.FailureCategoryComments,
-			fmt.Sprintf("exported type %v should have comment or be unexported", t.Name),
+		w.addFailuref(t, 1, lint.FailureCategoryComments,
+			"exported type %v should have comment or be unexported", t.Name,
 		)
 		return
 	}
@@ -249,8 +249,8 @@ func (w *lintExported) lintTypeDoc(t *ast.TypeSpec, doc *ast.CommentGroup, first
 		return
 	}
 
-	w.addFailure(doc, 1, lint.FailureCategoryComments,
-		fmt.Sprintf(`comment on exported type %v should be of the form "%s..." (with optional leading article)`, t.Name, expectedPrefix),
+	w.addFailuref(doc, 1, lint.FailureCategoryComments,
+		`comment on exported type %v should be of the form "%s..." (with optional leading article)`, t.Name, expectedPrefix,
 	)
 }
 
@@ -263,8 +263,8 @@ func (w *lintExported) checkValueNames(names []*ast.Ident, nodeToBlame ast.Node,
 
 	for _, n := range names[1:] {
 		if ast.IsExported(n.Name) {
-			w.addFailure(nodeToBlame, 1, lint.FailureCategoryComments,
-				fmt.Sprintf("exported %s %s should have its own declaration", kind, n.Name),
+			w.addFailuref(nodeToBlame, 1, lint.FailureCategoryComments,
+				"exported %s %s should have its own declaration", kind, n.Name,
 			)
 			return false
 		}
@@ -302,8 +302,8 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 		if kind == "const" && gd.Lparen.IsValid() {
 			block = " (or a comment on this block)"
 		}
-		w.addFailure(vs, 1, lint.FailureCategoryComments,
-			fmt.Sprintf("exported %s %s should have comment%s or be unexported", kind, name, block),
+		w.addFailuref(vs, 1, lint.FailureCategoryComments,
+			"exported %s %s should have comment%s or be unexported", kind, name, block,
 		)
 		genDeclMissingComments[gd] = true
 		return
@@ -328,8 +328,8 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 
 	prefix := name + " "
 	if !strings.HasPrefix(firstCommentLine(doc), prefix) {
-		w.addFailure(doc, 1, lint.FailureCategoryComments,
-			fmt.Sprintf(`comment on exported %s %s should be of the form "%s..."`, kind, name, prefix),
+		w.addFailuref(doc, 1, lint.FailureCategoryComments,
+			`comment on exported %s %s should be of the form "%s..."`, kind, name, prefix,
 		)
 	}
 }
@@ -424,16 +424,16 @@ func (w *lintExported) lintInterfaceMethod(typeName string, m *ast.Field) {
 	name := m.Names[0].Name
 	firstCommentLine := firstCommentLine(m.Doc)
 	if firstCommentLine == "" {
-		w.addFailure(m, 1, lint.FailureCategoryComments,
-			fmt.Sprintf("public interface method %s.%s should be commented", typeName, name),
+		w.addFailuref(m, 1, lint.FailureCategoryComments,
+			"public interface method %s.%s should be commented", typeName, name,
 		)
 		return
 	}
 
 	expectedPrefix := m.Names[0].Name + " "
 	if !strings.HasPrefix(firstCommentLine, expectedPrefix) {
-		w.addFailure(m.Doc, 0.8, lint.FailureCategoryComments,
-			fmt.Sprintf(`comment on exported interface method %s.%s should be of the form "%s..."`, typeName, name, expectedPrefix),
+		w.addFailuref(m.Doc, 0.8, lint.FailureCategoryComments,
+			`comment on exported interface method %s.%s should be of the form "%s..."`, typeName, name, expectedPrefix,
 		)
 	}
 }
@@ -462,11 +462,11 @@ func (w *lintExported) mustCheckMethod(fn *ast.FuncDecl) bool {
 	return true
 }
 
-func (w *lintExported) addFailure(node ast.Node, confidence float64, category lint.FailureCategory, message string) {
+func (w *lintExported) addFailuref(node ast.Node, confidence float64, category lint.FailureCategory, message string, args ...any) {
 	w.onFailure(lint.Failure{
 		Node:       node,
 		Confidence: confidence,
 		Category:   category,
-		Failure:    message,
+		Failure:    fmt.Sprintf(message, args...),
 	})
 }
