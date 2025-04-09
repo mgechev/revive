@@ -331,7 +331,7 @@ func checkJSONTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (messa
 			if checkCtx.isAtLeastGo124 {
 				continue
 			}
-			fallthrough
+			return `prior Go 1.24, option "omitzero" is unsupported`, false
 		default:
 			if checkCtx.isUserDefined(keyJSON, opt) {
 				continue

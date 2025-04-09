@@ -25,7 +25,7 @@ type decodeAndValidateRequest struct {
 	// No-reg test for bug https://github.com/mgechev/revive/issues/208
 	Tiret       string `json:"-,"`
 	BadTiret    string `json:"other,"`               // MATCH /option can not be empty in json tag/
-	ForOmitzero string `json:"forOmitZero,omitzero"` // MATCH /unknown option "omitzero" in json tag/
+	ForOmitzero string `json:"forOmitZero,omitzero"` // MATCH /prior Go 1.24, option "omitzero" is unsupported in json tag/
 	// MATCH:30 /option can not be empty in json tag/
 	BadTiret string `json:"other,"` // MATCH /duplicated tag name "other" in json tag/
 }
