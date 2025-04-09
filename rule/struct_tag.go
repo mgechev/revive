@@ -212,7 +212,7 @@ func (w lintStructTagRule) checkTagNameIfNeed(ctx *checkContext, tag *structtag.
 	// to allow the same tag name in different tag type.
 	mapKey := tag.Key + ":" + tagName
 	if _, ok := ctx.usedTagName[mapKey]; ok {
-		return fmt.Sprintf(msgDuplicatedTagName, tagName), false
+		return fmt.Sprintf("duplicated tag name %q", tagName), false
 	}
 
 	ctx.usedTagName[mapKey] = true
@@ -641,7 +641,6 @@ func areValidateOpts(opts string) (string, bool) {
 
 const (
 	msgDuplicatedOption    = "duplicated option %q"
-	msgDuplicatedTagName   = "duplicated tag name %q"
 	msgDuplicatedTagNumber = "duplicated tag number %v"
 	msgUnknownOption       = "unknown option %q"
 	msgTypeMismatch        = "type mismatch between field type and default value type"
