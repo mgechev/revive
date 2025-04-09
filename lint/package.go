@@ -47,6 +47,9 @@ var (
 
 // Files return package's files.
 func (p *Package) Files() map[string]*File {
+	p.RLock()
+	defer p.RUnlock()
+
 	return p.files
 }
 
@@ -74,6 +77,7 @@ func (p *Package) IsMain() bool {
 func (p *Package) TypesPkg() *types.Package {
 	p.RLock()
 	defer p.RUnlock()
+
 	return p.typesPkg
 }
 
@@ -81,6 +85,7 @@ func (p *Package) TypesPkg() *types.Package {
 func (p *Package) TypesInfo() *types.Info {
 	p.RLock()
 	defer p.RUnlock()
+
 	return p.typesInfo
 }
 
@@ -88,6 +93,7 @@ func (p *Package) TypesInfo() *types.Info {
 func (p *Package) Sortable() map[string]bool {
 	p.RLock()
 	defer p.RUnlock()
+
 	return p.sortable
 }
 
@@ -150,9 +156,13 @@ func check(config *types.Config, n string, fset *token.FileSet, astFiles []*ast.
 
 // TypeOf returns the type of expression.
 func (p *Package) TypeOf(expr ast.Expr) types.Type {
+	p.RLock()
+	defer p.RUnlock()
+
 	if p.typesInfo == nil {
 		return nil
 	}
+
 	return p.typesInfo.TypeOf(expr)
 }
 
@@ -166,6 +176,9 @@ const (
 )
 
 func (p *Package) scanSortable() {
+	p.Lock()
+	defer p.Unlock()
+
 	sortableFlags := map[string]sortableMethodsFlags{}
 	for _, f := range p.files {
 		for _, decl := range f.AST.Decls {
@@ -191,7 +204,7 @@ func (p *Package) scanSortable() {
 func (p *Package) lint(rules []Rule, config Config, failures chan Failure) error {
 	p.scanSortable()
 	var eg errgroup.Group
-	for _, file := range p.files {
+	for _, file := range p.Files() {
 		eg.Go(func() error {
 			return file.lint(rules, config, failures)
 		})
@@ -202,6 +215,9 @@ func (p *Package) lint(rules []Rule, config Config, failures chan Failure) error
 
 // IsAtLeastGoVersion returns true if the Go version for this package is v or higher, false otherwise
 func (p *Package) IsAtLeastGoVersion(v *goversion.Version) bool {
+	p.RLock()
+	defer p.RUnlock()
+
 	return p.goVersion.GreaterThanOrEqual(v)
 }
 
