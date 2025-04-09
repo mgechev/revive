@@ -13,7 +13,7 @@ import (
 
 // StructTagRule lints struct tags.
 type StructTagRule struct {
-	userDefined map[string][]string // map: key -> []option
+	userDefined map[tagKey][]string // map: key -> []option
 }
 
 type tagKey string
@@ -56,7 +56,7 @@ var tagCheckers = map[tagKey]tagChecker{
 }
 
 type checkContext struct {
-	userDefined    map[string][]string // map: key -> []option
+	userDefined    map[tagKey][]string // map: key -> []option
 	usedTagNbr     map[int]bool        // list of used tag numbers
 	usedTagName    map[string]bool     // list of used tag keys
 	isAtLeastGo124 bool
@@ -67,7 +67,7 @@ func (checkCtx checkContext) isUserDefined(key tagKey, opt string) bool {
 		return false
 	}
 
-	options := checkCtx.userDefined[string(key)]
+	options := checkCtx.userDefined[key]
 	return slices.Contains(options, opt)
 }
 
@@ -84,7 +84,7 @@ func (r *StructTagRule) Configure(arguments lint.Arguments) error {
 		return err
 	}
 
-	r.userDefined = make(map[string][]string, len(arguments))
+	r.userDefined = make(map[tagKey][]string, len(arguments))
 	for _, arg := range arguments {
 		item, ok := arg.(string)
 		if !ok {
@@ -94,7 +94,7 @@ func (r *StructTagRule) Configure(arguments lint.Arguments) error {
 		if len(parts) < 2 {
 			return fmt.Errorf("invalid argument to the %s rule. Expecting a string of the form key[,option]+, got %s", r.Name(), item)
 		}
-		key := strings.TrimSpace(parts[0])
+		key := tagKey(strings.TrimSpace(parts[0]))
 		for i := 1; i < len(parts); i++ {
 			option := strings.TrimSpace(parts[i])
 			r.userDefined[key] = append(r.userDefined[key], option)
@@ -130,7 +130,7 @@ func (*StructTagRule) Name() string {
 
 type lintStructTagRule struct {
 	onFailure      func(lint.Failure)
-	userDefined    map[string][]string // map: key -> []option
+	userDefined    map[tagKey][]string // map: key -> []option
 	isAtLeastGo124 bool
 	tagCheckers    map[tagKey]tagChecker
 }
