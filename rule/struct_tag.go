@@ -561,25 +561,23 @@ func checkYAMLTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (messa
 func checkValidateOptionsAlternatives(checkCtx *checkContext, alternatives []string) (message string, succeeded bool) {
 	for _, alternative := range alternatives {
 		alternative := strings.TrimSpace(alternative)
-		parts := strings.Split(alternative, "=")
-		switch len(parts) {
-		case 1:
-			badOpt, ok := areValidateOpts(parts[0])
-			if ok || checkCtx.isUserDefined(keyValidate, badOpt) {
-				continue
-			}
-			return fmt.Sprintf(msgUnknownOption, badOpt), false
-		case 2:
-			lhs := parts[0]
+		lhs, _, found := strings.Cut(alternative, "=")
+		if found {
 			_, ok := validateLHS[lhs]
 			if ok || checkCtx.isUserDefined(keyValidate, lhs) {
 				continue
 			}
 			return fmt.Sprintf(msgUnknownOption, lhs), false
-		default:
-			return fmt.Sprintf("malformed options %q, not expected more than one '='", alternative), false
 		}
+
+		badOpt, ok := areValidateOpts(alternative)
+		if ok || checkCtx.isUserDefined(keyValidate, badOpt) {
+			continue
+		}
+
+		return fmt.Sprintf(msgUnknownOption, badOpt), false
 	}
+
 	return "", true
 }
 
