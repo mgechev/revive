@@ -164,18 +164,18 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 // precondition: the field has a tag
 func (w lintStructTagRule) checkTaggedField(checkCtx *checkContext, f *ast.Field) {
 	if len(f.Names) > 0 && !f.Names[0].IsExported() {
-		w.addFailure(f, "tag on not-exported field "+f.Names[0].Name)
+		w.addFailuref(f, "tag on not-exported field %s", f.Names[0].Name)
 	}
 
 	tags, err := structtag.Parse(strings.Trim(f.Tag.Value, "`"))
 	if err != nil || tags == nil {
-		w.addFailure(f.Tag, "malformed tag")
+		w.addFailuref(f.Tag, "malformed tag")
 		return
 	}
 
 	for _, tag := range tags.Tags() {
 		if msg, ok := w.checkTagNameIfNeed(checkCtx, tag); !ok {
-			w.addFailureWithTagKey(f.Tag, msg, tag.Key)
+			w.addFailureWithTagKeyf(f.Tag, msg, tag.Key)
 		}
 
 		checker, ok := w.tagCheckers[tagKey(tag.Key)]
@@ -185,7 +185,7 @@ func (w lintStructTagRule) checkTaggedField(checkCtx *checkContext, f *ast.Field
 
 		msg, ok := checker(checkCtx, tag, f.Type)
 		if !ok {
-			w.addFailureWithTagKey(f.Tag, msg, tag.Key)
+			w.addFailureWithTagKeyf(f.Tag, msg, tag.Key)
 		}
 	}
 }
@@ -606,14 +606,14 @@ func typeValueMatch(t ast.Expr, val string) bool {
 	return typeMatches
 }
 
-func (w lintStructTagRule) addFailureWithTagKey(n ast.Node, msg string, tagKey string) {
-	w.addFailure(n, fmt.Sprintf("%s in %s tag", msg, tagKey))
+func (w lintStructTagRule) addFailureWithTagKeyf(n ast.Node, msg string, tagKey string) {
+	w.addFailuref(n, "%s in %s tag", msg, tagKey)
 }
 
-func (w lintStructTagRule) addFailure(n ast.Node, msg string) {
+func (w lintStructTagRule) addFailuref(n ast.Node, msg string, args ...any) {
 	w.onFailure(lint.Failure{
 		Node:       n,
-		Failure:    msg,
+		Failure:    fmt.Sprintf(msg, args...),
 		Confidence: 1,
 	})
 }
