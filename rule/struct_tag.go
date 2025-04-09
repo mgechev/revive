@@ -453,11 +453,12 @@ func checkProtobufOptions(checkCtx *checkContext, options []string) (message str
 }
 
 func checkRequiredTag(_ *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
-	if tag.Name != "true" && tag.Name != "false" {
+	switch tag.Name {
+	case "true", "false":
+		return "", true
+	default:
 		return `required should be "true" or "false"`, false
 	}
-
-	return "", true
 }
 
 func checkTOMLTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
