@@ -253,23 +253,19 @@ func checkASN1Tag(checkCtx *checkContext, tag *structtag.Tag, fieldType ast.Expr
 }
 
 func checkCompoundANS1Option(checkCtx *checkContext, opt string, fieldType ast.Expr) (message string, succeeded bool) {
-	parts := strings.Split(opt, ":")
-	switch parts[0] {
+	key, value, _ := strings.Cut(opt, ":")
+	switch key {
 	case "tag":
-		tagNumber := strings.TrimLeft(opt, "tag:")
-		number, err := strconv.Atoi(tagNumber)
+		number, err := strconv.Atoi(value)
 		if err != nil {
-			return fmt.Sprintf("tag must be a number but is %q", tagNumber), false
+			return fmt.Sprintf("tag must be a number but is %q", value), false
 		}
 		if checkCtx.usedTagNbr[number] {
 			return fmt.Sprintf(msgDuplicatedTagNumber, number), false
 		}
 		checkCtx.usedTagNbr[number] = true
 	case "default":
-		if len(parts) < 2 {
-			return "malformed default", false
-		}
-		if !typeValueMatch(fieldType, parts[1]) {
+		if !typeValueMatch(fieldType, value) {
 			return msgTypeMismatch, false
 		}
 	default:
