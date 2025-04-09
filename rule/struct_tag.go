@@ -366,15 +366,11 @@ func checkPropertiesTag(_ *checkContext, tag *structtag.Tag, fieldType ast.Expr)
 
 	seenOptions := map[string]bool{}
 	for _, opt := range options {
-		var msg string
-		var ok bool
-		parts := strings.Split(opt, "=")
-		switch len(parts) {
-		case 2:
-			msg, ok = checkCompoundPropertiesOption(parts[0], parts[1], fieldType, seenOptions)
-		default:
-			msg, ok = fmt.Sprintf("unknown or malformed option %q", opt), false
+		msg, ok := fmt.Sprintf("unknown or malformed option %q", opt), false
+		if key, value, found := strings.Cut(opt, "="); found {
+			msg, ok = checkCompoundPropertiesOption(key, value, fieldType, seenOptions)
 		}
+
 		if !ok {
 			return msg, false
 		}
