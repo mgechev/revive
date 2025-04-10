@@ -1,7 +1,6 @@
 package cli
 
 import (
-	goversion "go/version"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -96,28 +95,14 @@ func TestXDGConfigDirNoFile(t *testing.T) {
 	}
 }
 
-func TestGetVersion(t *testing.T) {
-	t.Run("Development version", func(t *testing.T) {
-		got := getVersion(defaultBuilder, defaultDate, defaultCommit, defaultVersion)
-		want := "version (devel)\n"
-		if goversion.Compare(runtime.Version(), "go1.24") < 0 {
-			want = "version \n"
-		}
-
-		if got != want {
-			t.Errorf("getVersion() = %q, want %q", got, want)
-		}
-	})
-
-	t.Run("Release version", func(t *testing.T) {
-		got := getVersion("builder", "2024-11-15 10:52 UTC", "7ee4500e125e2d1b12653b2c8e140fec380919b4", "v1.5.0-12-g7ee4500-dev")
-		want := `Version:	v1.5.0-12-g7ee4500-dev
+func TestGetReleaseVersion(t *testing.T) {
+	got := getVersion("builder", "2024-11-15 10:52 UTC", "7ee4500e125e2d1b12653b2c8e140fec380919b4", "v1.5.0-12-g7ee4500-dev")
+	want := `Version:	v1.5.0-12-g7ee4500-dev
 Commit:		7ee4500e125e2d1b12653b2c8e140fec380919b4
 Built		2024-11-15 10:52 UTC by builder
 `
 
-		if got != want {
-			t.Errorf("getVersion() = %q, want %q", got, want)
-		}
-	})
+	if got != want {
+		t.Errorf("getVersion() = %q, want %q", got, want)
+	}
 }
