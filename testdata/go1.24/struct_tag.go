@@ -1,7 +1,7 @@
 package fixtures
 
 type decodeAndValidateRequest struct {
-	// BEAWRE : the flag of URLParam should match the const string URLParam
+	// BEWARE : the flag of URLParam should match the const string URLParam
 	URLParam    string `json:"-" path:"url_param" validate:"numeric"`
 	Text        string `json:"text" validate:"max=10"`
 	DefaultInt  int    `json:"defaultInt" default:"10.0"` // MATCH /type mismatch between field type and default value type in default tag/

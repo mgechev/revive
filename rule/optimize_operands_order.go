@@ -18,7 +18,7 @@ func (*OptimizeOperandsOrderRule) Apply(file *lint.File, _ lint.Arguments) []lin
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
-	w := lintOptimizeOperandsOrderlExpr{
+	w := lintOptimizeOperandsOrderExpr{
 		onFailure: onFailure,
 	}
 	ast.Walk(w, file.AST)
@@ -30,13 +30,13 @@ func (*OptimizeOperandsOrderRule) Name() string {
 	return "optimize-operands-order"
 }
 
-type lintOptimizeOperandsOrderlExpr struct {
+type lintOptimizeOperandsOrderExpr struct {
 	onFailure func(failure lint.Failure)
 }
 
 // Visit checks boolean AND and OR expressions to determine
 // if swapping their operands may result in an execution speedup.
-func (w lintOptimizeOperandsOrderlExpr) Visit(node ast.Node) ast.Visitor {
+func (w lintOptimizeOperandsOrderExpr) Visit(node ast.Node) ast.Visitor {
 	binExpr, ok := node.(*ast.BinaryExpr)
 	if !ok {
 		return w
