@@ -16,6 +16,8 @@ type UnexportedReturnRule struct{}
 func (*UnexportedReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
+	file.Pkg.TypeCheck()
+
 	for _, decl := range file.AST.Decls {
 		fn, ok := decl.(*ast.FuncDecl)
 		if !ok {
@@ -70,7 +72,7 @@ func (*UnexportedReturnRule) Name() string {
 // It is imprecise, and will err on the side of returning true,
 // such as for composite types.
 func exportedType(typ types.Type) bool {
-	switch t := typ.(type) {
+	switch t := types.Unalias(typ).(type) {
 	case *types.Named:
 		obj := t.Obj()
 		switch {
