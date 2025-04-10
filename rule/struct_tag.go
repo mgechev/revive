@@ -175,7 +175,7 @@ func (w lintStructTagRule) checkTaggedField(checkCtx *checkContext, f *ast.Field
 
 	for _, tag := range tags.Tags() {
 		if msg, ok := w.checkTagNameIfNeed(checkCtx, tag); !ok {
-			w.addFailureWithTagKeyf(f.Tag, msg, tag.Key)
+			w.addFailureWithTagKey(f.Tag, msg, tag.Key)
 		}
 
 		checker, ok := w.tagCheckers[tagKey(tag.Key)]
@@ -185,7 +185,7 @@ func (w lintStructTagRule) checkTaggedField(checkCtx *checkContext, f *ast.Field
 
 		msg, ok := checker(checkCtx, tag, f.Type)
 		if !ok {
-			w.addFailureWithTagKeyf(f.Tag, msg, tag.Key)
+			w.addFailureWithTagKey(f.Tag, msg, tag.Key)
 		}
 	}
 }
@@ -606,7 +606,7 @@ func typeValueMatch(t ast.Expr, val string) bool {
 	return typeMatches
 }
 
-func (w lintStructTagRule) addFailureWithTagKeyf(n ast.Node, msg string, tagKey string) {
+func (w lintStructTagRule) addFailureWithTagKey(n ast.Node, msg string, tagKey string) {
 	w.addFailuref(n, "%s in %s tag", msg, tagKey)
 }
 
