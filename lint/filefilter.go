@@ -117,7 +117,7 @@ func (ff *FileFilter) prepareRegexp() error {
 		return nil
 	}
 
-	// it's whole file mask, just escape dots and normilze separators
+	// it's whole file mask, just escape dots and normalize separators
 	fillRx := src
 	fillRx = strings.ReplaceAll(fillRx, "\\", "/")
 	fillRx = strings.ReplaceAll(fillRx, ".", `\.`)
