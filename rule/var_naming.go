@@ -22,6 +22,10 @@ var knownNameExceptions = map[string]bool{
 	"kWh":          true,
 }
 
+// meaninglessPackageNames is the list of "bad" package names from https://go.dev/wiki/CodeReviewComments#package-names
+// and https://go.dev/blog/package-names#bad-package-names.
+// The rule warns about the usage of any package name in this list if skipPackageNameChecks is false.
+// Values in the list should be lowercased.
 var meaninglessPackageNames = map[string]struct{}{
 	"common":     {},
 	"interfaces": {},
@@ -86,13 +90,15 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 }
 
 func (*VarNamingRule) applyPackageCheckRules(walker *lintNames) {
-	packageName := walker.fileAst.Name.Name
+	node := walker.fileAst.Name
+	packageName := node.Name
+	lowerPackageName := strings.ToLower(packageName)
 
-	if _, ok := meaninglessPackageNames[strings.ToLower(packageName)]; ok {
+	if _, ok := meaninglessPackageNames[lowerPackageName]; ok {
 		walker.onFailure(lint.Failure{
 			Failure:    "avoid meaningless package names",
 			Confidence: 1,
-			Node:       walker.fileAst.Name,
+			Node:       node,
 			Category:   lint.FailureCategoryNaming,
 		})
 		return
@@ -103,15 +109,15 @@ func (*VarNamingRule) applyPackageCheckRules(walker *lintNames) {
 		walker.onFailure(lint.Failure{
 			Failure:    "don't use an underscore in package name",
 			Confidence: 1,
-			Node:       walker.fileAst.Name,
+			Node:       node,
 			Category:   lint.FailureCategoryNaming,
 		})
 	}
 	if anyCapsRE.MatchString(packageName) {
 		walker.onFailure(lint.Failure{
-			Failure:    fmt.Sprintf("don't use MixedCaps in package name; %s should be %s", packageName, strings.ToLower(packageName)),
+			Failure:    fmt.Sprintf("don't use MixedCaps in package name; %s should be %s", packageName, lowerPackageName),
 			Confidence: 1,
-			Node:       walker.fileAst.Name,
+			Node:       node,
 			Category:   lint.FailureCategoryNaming,
 		})
 	}
