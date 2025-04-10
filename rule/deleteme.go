@@ -2,7 +2,6 @@ package rule
 
 import (
 	"go/ast"
-	"go/token"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -12,10 +11,6 @@ type DeletemeRule struct{}
 
 // Apply applies the rule to given file.
 func (r *DeletemeRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
-	if file.Pkg.IsAtLeastGo122() {
-		return nil
-	}
-
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -43,46 +38,48 @@ type lintDeletemeRule struct {
 func (w *lintDeletemeRule) Visit(node ast.Node) ast.Visitor {
 	// we visit the AST looking for "case <- time.After(...)"
 	switch n := node.(type) {
-	case *ast.CommClause: // is a select case
-		comm := n.Comm
-		if comm == nil {
-			return nil // is the default select case, do not visit the body of the case
+	case *ast.IfStmt: // is a select case
+		if n.Else == nil {
+			return w
 		}
-
-		// case something
-
-		exprStmt, ok := comm.(*ast.ExprStmt)
+		elseBlock, ok := n.Else.(*ast.BlockStmt)
 		if !ok {
-			return nil // is not an expression statement... is that even possible? Do not visit the body of the case
+			return w
 		}
 
-		expr, ok := exprStmt.X.(*ast.UnaryExpr)
-		isChannelRead := ok && expr.Op != token.ARROW
-		if !isChannelRead {
-			return nil // is not a channel read expression, do not visit the body of the case
+		if len(n.Body.List) < 1 || len(n.Body.List) > 1 || len(elseBlock.List) > 1 {
+			return w
 		}
 
-		// case <- expr
-
-		call, ok := expr.X.(*ast.CallExpr)
-		if !ok {
-			return nil // is not a read from a channel returned by a function call, do not visit the body of the case
+		if !isReturnBoolean(n.Body.List[0]) {
+			return w
 		}
 
-		// case <- f()
-
-		if isPkgDot(call.Fun, "time", "After") {
-			// case <- time.After(...)
-			w.onFailure(lint.Failure{
-				Confidence: 0.8,
-				Node:       call.Fun,
-				Category:   lint.FailureCategoryBadPractice,
-				Failure:    "the time.After() goroutine is not garbage-collected until timer expiration, prefer NewTimer+Timer.Stop",
-			})
+		if !isReturnBoolean(elseBlock.List[0]) {
+			return w
 		}
 
-		return nil // do not visit the body of the case
-	default:
-		return w
+		w.onFailure(lint.Failure{
+			Confidence: 0.8,
+			Node:       n,
+			Category:   lint.FailureCategoryBadPractice,
+			Failure:    "return condition",
+		})
 	}
+	return w
+}
+
+func isReturnBoolean(stmt ast.Stmt) bool {
+	returnStmt, ok := stmt.(*ast.ReturnStmt)
+	if !ok {
+		return false
+	}
+
+	if len(returnStmt.Results) > 1 || len(returnStmt.Results) < 1 {
+		return false
+	}
+
+	result := gofmt(returnStmt.Results[0])
+
+	return result == "true" || result == "false"
 }
