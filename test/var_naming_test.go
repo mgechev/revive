@@ -29,4 +29,5 @@ func TestVarNaming(t *testing.T) {
 	testRule(t, "var_naming_skip_package_name_checks_true", &rule.VarNamingRule{}, &lint.RuleConfig{
 		Arguments: []any{[]any{}, []any{}, []any{map[string]any{"skip-package-name-checks": true}}},
 	})
+	testRule(t, "var_naming_package_util", &rule.VarNamingRule{}, &lint.RuleConfig{})
 }

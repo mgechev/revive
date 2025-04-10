@@ -22,6 +22,15 @@ var knownNameExceptions = map[string]bool{
 	"kWh":          true,
 }
 
+var meaninglessPackageNames = map[string]struct{}{
+	"common":     {},
+	"interfaces": {},
+	"misc":       {},
+	"types":      {},
+	"util":       {},
+	"utils":      {},
+}
+
 // VarNamingRule lints the name of a variable.
 type VarNamingRule struct {
 	allowList             []string
@@ -77,8 +86,20 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 }
 
 func (*VarNamingRule) applyPackageCheckRules(walker *lintNames) {
+	packageName := walker.fileAst.Name.Name
+
+	if _, ok := meaninglessPackageNames[strings.ToLower(packageName)]; ok {
+		walker.onFailure(lint.Failure{
+			Failure:    "avoid meaningless package names",
+			Confidence: 1,
+			Node:       walker.fileAst.Name,
+			Category:   lint.FailureCategoryNaming,
+		})
+		return
+	}
+
 	// Package names need slightly different handling than other names.
-	if strings.Contains(walker.fileAst.Name.Name, "_") && !strings.HasSuffix(walker.fileAst.Name.Name, "_test") {
+	if strings.Contains(packageName, "_") && !strings.HasSuffix(packageName, "_test") {
 		walker.onFailure(lint.Failure{
 			Failure:    "don't use an underscore in package name",
 			Confidence: 1,
@@ -86,9 +107,9 @@ func (*VarNamingRule) applyPackageCheckRules(walker *lintNames) {
 			Category:   lint.FailureCategoryNaming,
 		})
 	}
-	if anyCapsRE.MatchString(walker.fileAst.Name.Name) {
+	if anyCapsRE.MatchString(packageName) {
 		walker.onFailure(lint.Failure{
-			Failure:    fmt.Sprintf("don't use MixedCaps in package name; %s should be %s", walker.fileAst.Name.Name, strings.ToLower(walker.fileAst.Name.Name)),
+			Failure:    fmt.Sprintf("don't use MixedCaps in package name; %s should be %s", packageName, strings.ToLower(packageName)),
 			Confidence: 1,
 			Node:       walker.fileAst.Name,
 			Category:   lint.FailureCategoryNaming,
