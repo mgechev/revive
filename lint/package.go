@@ -6,9 +6,9 @@ import (
 	"go/importer"
 	"go/token"
 	"go/types"
+	"go/version"
 	"sync"
 
-	goversion "github.com/hashicorp/go-version"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/mgechev/revive/internal/astutils"
@@ -19,7 +19,7 @@ import (
 type Package struct {
 	fset      *token.FileSet
 	files     map[string]*File
-	goVersion *goversion.Version
+	goVersion string
 
 	typesPkg  *types.Package
 	typesInfo *types.Info
@@ -36,13 +36,13 @@ var (
 	falseValue = 2
 
 	// Go115 is a constant representing the Go version 1.15
-	Go115 = goversion.Must(goversion.NewVersion("1.15"))
+	Go115 = "go1.15"
 	// Go121 is a constant representing the Go version 1.21
-	Go121 = goversion.Must(goversion.NewVersion("1.21"))
+	Go121 = "go1.21"
 	// Go122 is a constant representing the Go version 1.22
-	Go122 = goversion.Must(goversion.NewVersion("1.22"))
+	Go122 = "go1.22"
 	// Go124 is a constant representing the Go version 1.24
-	Go124 = goversion.Must(goversion.NewVersion("1.24"))
+	Go124 = "go1.24"
 )
 
 // Files return package's files.
@@ -214,11 +214,11 @@ func (p *Package) lint(rules []Rule, config Config, failures chan Failure) error
 }
 
 // IsAtLeastGoVersion returns true if the Go version for this package is v or higher, false otherwise
-func (p *Package) IsAtLeastGoVersion(v *goversion.Version) bool {
+func (p *Package) IsAtLeastGoVersion(v string) bool {
 	p.RLock()
 	defer p.RUnlock()
 
-	return p.goVersion.GreaterThanOrEqual(v)
+	return version.Compare(p.goVersion, v) >= 0
 }
 
 func getSortableMethodFlagForFunction(fn *ast.FuncDecl) sortableMethodsFlags {

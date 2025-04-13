@@ -5,13 +5,13 @@ import (
 	"bytes"
 	"fmt"
 	"go/token"
+	"go/version"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 
-	goversion "github.com/hashicorp/go-version"
 	"golang.org/x/mod/modfile"
 	"golang.org/x/sync/errgroup"
 )
@@ -54,21 +54,17 @@ func (l Linter) readFile(path string) (result []byte, err error) {
 var (
 	generatedPrefix  = []byte("// Code generated ")
 	generatedSuffix  = []byte(" DO NOT EDIT.")
-	defaultGoVersion = goversion.Must(goversion.NewVersion("1.0"))
+	defaultGoVersion = "go1.0"
 )
 
 // Lint lints a set of files with the specified rule.
 func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-chan Failure, error) {
 	failures := make(chan Failure)
 
-	perModVersions := map[string]*goversion.Version{}
-	perPkgVersions := make([]*goversion.Version, len(packages))
+	perModVersions := map[string]string{}
+	perPkgVersions := make([]string, len(packages))
 	for n, files := range packages {
 		if len(files) == 0 {
-			continue
-		}
-		if config.GoVersion != nil {
-			perPkgVersions[n] = config.GoVersion
 			continue
 		}
 
@@ -122,7 +118,7 @@ func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-cha
 	return failures, nil
 }
 
-func (l *Linter) lintPackage(filenames []string, gover *goversion.Version, ruleSet []Rule, config Config, failures chan Failure) error {
+func (l *Linter) lintPackage(filenames []string, gover string, ruleSet []Rule, config Config, failures chan Failure) error {
 	if len(filenames) == 0 {
 		return nil
 	}
@@ -156,28 +152,27 @@ func (l *Linter) lintPackage(filenames []string, gover *goversion.Version, ruleS
 	return pkg.lint(ruleSet, config, failures)
 }
 
-func detectGoMod(dir string) (rootDir string, ver *goversion.Version, err error) {
+func detectGoMod(dir string) (rootDir string, ver string, err error) {
 	modFileName, err := retrieveModFile(dir)
 	if err != nil {
-		return "", nil, fmt.Errorf("%q doesn't seem to be part of a Go module", dir)
+		return "", "", fmt.Errorf("%q doesn't seem to be part of a Go module", dir)
 	}
 
 	mod, err := os.ReadFile(modFileName)
 	if err != nil {
-		return "", nil, fmt.Errorf("failed to read %q, got %w", modFileName, err)
+		return "", "", fmt.Errorf("failed to read %q, got %w", modFileName, err)
 	}
 
 	modAst, err := modfile.ParseLax(modFileName, mod, nil)
 	if err != nil {
-		return "", nil, fmt.Errorf("failed to parse %q, got %w", modFileName, err)
+		return "", "", fmt.Errorf("failed to parse %q, got %w", modFileName, err)
 	}
 
 	if modAst.Go == nil {
-		return "", nil, fmt.Errorf("%q does not specify a Go version", modFileName)
+		return "", "", fmt.Errorf("%q does not specify a Go version", modFileName)
 	}
 
-	ver, err = goversion.NewVersion(modAst.Go.Version)
-	return filepath.Dir(modFileName), ver, err
+	return filepath.Dir(modFileName), version.Lang("go" + modAst.Go.Version), nil
 }
 
 func retrieveModFile(dir string) (string, error) {
