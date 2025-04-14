@@ -39,8 +39,8 @@ var meaninglessPackageNames = map[string]struct{}{
 type VarNamingRule struct {
 	allowList             []string
 	blockList             []string
-	allowUpperCaseConst   bool // if true - allows to use UPPER_SOME_NAMES for constants
-	skipPackageNameChecks bool
+	allowUpperCaseConst   bool                // if true - allows to use UPPER_SOME_NAMES for constants
+	skipPackageNameChecks bool                // check for meaningless and user-defined bad package names
 	badPackageNames       map[string]struct{} // inactive if skipPackageNameChecks is false
 }
 
