@@ -41,6 +41,7 @@ type VarNamingRule struct {
 	blockList             []string
 	allowUpperCaseConst   bool // if true - allows to use UPPER_SOME_NAMES for constants
 	skipPackageNameChecks bool
+	badPackageNames       map[string]struct{} // inactive if skipPackageNameChecks is false
 }
 
 // Configure validates the rule configuration, and configures the rule accordingly.
@@ -83,16 +84,37 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 				r.allowUpperCaseConst = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "skipPackageNameChecks"):
 				r.skipPackageNameChecks = fmt.Sprint(v) == "true"
+			case isRuleOption(k, "badPackageNames"):
+				badPackageNames, ok := v.([]string)
+				if !ok {
+					return fmt.Errorf("invalid third argument to the var-naming rule. Expecting badPackageNames of type slice of strings, but %T", v)
+				}
+				for _, elem := range badPackageNames {
+					if r.badPackageNames == nil {
+						r.badPackageNames = map[string]struct{}{}
+					}
+					r.badPackageNames[strings.ToLower(elem)] = struct{}{}
+				}
 			}
 		}
 	}
 	return nil
 }
 
-func (*VarNamingRule) applyPackageCheckRules(walker *lintNames) {
+func (r *VarNamingRule) applyPackageCheckRules(walker *lintNames) {
 	node := walker.fileAst.Name
 	packageName := node.Name
 	lowerPackageName := strings.ToLower(packageName)
+
+	if _, ok := r.badPackageNames[lowerPackageName]; ok {
+		walker.onFailure(lint.Failure{
+			Failure:    "avoid bad package names",
+			Confidence: 1,
+			Node:       node,
+			Category:   lint.FailureCategoryNaming,
+		})
+		return
+	}
 
 	if _, ok := meaninglessPackageNames[lowerPackageName]; ok {
 		walker.onFailure(lint.Failure{
