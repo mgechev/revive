@@ -192,31 +192,34 @@ To enable `revive` in `golangci-lint` you need to add `revive` to the list of en
 
 ```yaml
 # golangci-lint configuration file
+version: "2"
 linters:
    enable:
      - revive
 ```
-Then `revive` can be configured by adding an entry to the `linters-settings` section of the configuration, for example:
+
+Then `revive` can be configured by adding an entry to the `linters.settings` section of the configuration, for example:
 
 ```yaml
 # golangci-lint configuration file
-linters-settings:
-  revive:
-    ignore-generated-header: true
-    severity: warning
-    rules:
-      - name: atomic
-      - name: line-length-limit
-        severity: error
-        arguments: [80]
-      - name: unhandled-error
-        arguments : ["fmt.Printf", "myFunction"]
+linters:
+  settings:
+    revive:
+      severity: warning
+      rules:
+        - name: atomic
+        - name: line-length-limit
+          severity: error
+          arguments: [80]
+        - name: unhandled-error
+          arguments: ["fmt.Printf", "myFunction"]
 ```
 
-The above configuration enables three rules of `revive`: _atomic_, _line-length-limit_ and _unhandled-error_ and pass some arguments to the last two.
-The [Configuration](#configuration) section of this document provides details on how to configure `revive`. Note that while `revive` configuration is in TOML, that of `golangci-lint` is in YAML.
+The above configuration enables three rules of `revive`: _atomic_, _line-length-limit_ and _unhandled-error_ and passes some arguments to the last two.
+The [Configuration](#configuration) section of this document provides details on how to configure `revive`. Note that while `revive` configuration is in TOML, that of `golangci-lint` is in YAML or JSON.
+See the [golangci-lint website](https://golangci-lint.run/usage/linters/#revive) for more information about configuring `revive`.
 
-Please notice that if no particular configuration is provided, `revive` will behave as `go-lint` does, i.e. all `go-lint` rules are enabled (the [Available Rules table](#available-rules) details what are the `go-lint` rules). When a configuration is provided, only rules in the configuration are enabled.
+Please notice that if no particular configuration is provided, `revive` will behave as `golint` does, i.e. all `golint` rules are enabled (the [Available Rules table](#available-rules) details what are the `golint` rules). When a configuration is provided, only rules in the configuration are enabled.
 
 ### Command Line Flags
 
