@@ -2,6 +2,7 @@ package rule
 
 import (
 	"errors"
+	"reflect"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
@@ -16,6 +17,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 		wantBlockList             []string
 		wantAllowUpperCaseConst   bool
 		wantSkipPackageNameChecks bool
+		wantBadPackageNames       map[string]struct{}
 	}{
 		{
 			name:                      "no arguments",
@@ -34,6 +36,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{map[string]any{
 					"upperCaseConst":        true,
 					"skipPackageNameChecks": true,
+					"extraBadPackageNames":  []string{"helpers", "models"},
 				}},
 			},
 			wantErr:                   nil,
@@ -41,6 +44,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			wantBlockList:             []string{"VM"},
 			wantAllowUpperCaseConst:   true,
 			wantSkipPackageNameChecks: true,
+			wantBadPackageNames:       map[string]struct{}{"helpers": {}, "models": {}},
 		},
 		{
 			name: "valid lowercased arguments",
@@ -50,6 +54,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{map[string]any{
 					"uppercaseconst":        true,
 					"skippackagenamechecks": true,
+					"extrabadpackagenames":  []string{"helpers", "models"},
 				}},
 			},
 			wantErr:                   nil,
@@ -57,6 +62,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			wantBlockList:             []string{"VM"},
 			wantAllowUpperCaseConst:   true,
 			wantSkipPackageNameChecks: true,
+			wantBadPackageNames:       map[string]struct{}{"helpers": {}, "models": {}},
 		},
 		{
 			name: "valid kebab-cased arguments",
@@ -66,6 +72,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{map[string]any{
 					"upper-case-const":         true,
 					"skip-package-name-checks": true,
+					"extra-bad-package-names":  []string{"helpers", "models"},
 				}},
 			},
 			wantErr:                   nil,
@@ -73,6 +80,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			wantBlockList:             []string{"VM"},
 			wantAllowUpperCaseConst:   true,
 			wantSkipPackageNameChecks: true,
+			wantBadPackageNames:       map[string]struct{}{"helpers": {}, "models": {}},
 		},
 		{
 			name:      "invalid allowlist type",
@@ -104,6 +112,11 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			arguments: lint.Arguments{[]any{"ID"}, []any{"VM"}, []any{123}},
 			wantErr:   errors.New("invalid third argument to the var-naming rule. Expecting a options of type slice, of len==1, with map, but int"),
 		},
+		{
+			name:      "invalid third argument extraBadPackageNames",
+			arguments: lint.Arguments{[]any{""}, []any{""}, []any{map[string]any{"extraBadPackageNames": []int{1}}}},
+			wantErr:   errors.New("invalid third argument to the var-naming rule. Expecting extraBadPackageNames of type slice of strings, but []int"),
+		},
 	}
 
 	for _, tt := range tests {
@@ -130,6 +143,9 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			}
 			if rule.skipPackageNameChecks != tt.wantSkipPackageNameChecks {
 				t.Errorf("unexpected skipPackageNameChecks: got = %v, want %v", rule.skipPackageNameChecks, tt.wantSkipPackageNameChecks)
+			}
+			if !reflect.DeepEqual(rule.extraBadPackageNames, tt.wantBadPackageNames) {
+				t.Errorf("unexpected extraBadPackageNames: got = %v, want %v", rule.extraBadPackageNames, tt.wantBadPackageNames)
 			}
 		})
 	}
