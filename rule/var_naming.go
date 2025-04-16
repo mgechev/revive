@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
+	"path"
 	"regexp"
 	"strings"
+	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -42,12 +44,15 @@ type VarNamingRule struct {
 	allowUpperCaseConst   bool                // if true - allows to use UPPER_SOME_NAMES for constants
 	skipPackageNameChecks bool                // check for meaningless and user-defined bad package names
 	extraBadPackageNames  map[string]struct{} // inactive if skipPackageNameChecks is false
+	pkgsWithNameFailure   set                 // set of packages with reported failure on its name
 }
 
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
 func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
+	r.pkgsWithNameFailure = set{elements: map[string]struct{}{}}
+
 	if len(arguments) >= 1 {
 		list, err := getList(arguments[0], "allowlist")
 		if err != nil {
@@ -101,48 +106,27 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 	return nil
 }
 
-func (r *VarNamingRule) applyPackageCheckRules(walker *lintNames) {
-	node := walker.fileAst.Name
-	packageName := node.Name
-	lowerPackageName := strings.ToLower(packageName)
+func (r *VarNamingRule) applyPackageCheckRules(pkgName string) []string {
+	lowerPackageName := strings.ToLower(pkgName)
 
 	if _, ok := r.extraBadPackageNames[lowerPackageName]; ok {
-		walker.onFailure(lint.Failure{
-			Failure:    "avoid bad package names",
-			Confidence: 1,
-			Node:       node,
-			Category:   lint.FailureCategoryNaming,
-		})
-		return
+		return []string{"avoid bad package names"}
 	}
 
 	if _, ok := defaultBadPackageNames[lowerPackageName]; ok {
-		walker.onFailure(lint.Failure{
-			Failure:    "avoid meaningless package names",
-			Confidence: 1,
-			Node:       node,
-			Category:   lint.FailureCategoryNaming,
-		})
-		return
+		return []string{"avoid meaningless package names"}
 	}
 
+	result := []string{}
 	// Package names need slightly different handling than other names.
-	if strings.Contains(packageName, "_") && !strings.HasSuffix(packageName, "_test") {
-		walker.onFailure(lint.Failure{
-			Failure:    "don't use an underscore in package name",
-			Confidence: 1,
-			Node:       node,
-			Category:   lint.FailureCategoryNaming,
-		})
+	if strings.Contains(pkgName, "_") && !strings.HasSuffix(pkgName, "_test") {
+		result = append(result, "don't use underscores in package names")
 	}
-	if anyCapsRE.MatchString(packageName) {
-		walker.onFailure(lint.Failure{
-			Failure:    fmt.Sprintf("don't use MixedCaps in package name; %s should be %s", packageName, lowerPackageName),
-			Confidence: 1,
-			Node:       node,
-			Category:   lint.FailureCategoryNaming,
-		})
+	if anyCapsRE.MatchString(pkgName) {
+		result = append(result, fmt.Sprintf("don't use MixedCaps in package names; %s should be %s", pkgName, lowerPackageName))
 	}
+
+	return result
 }
 
 // Apply applies the rule to given file.
@@ -162,13 +146,35 @@ func (r *VarNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 		upperCaseConst: r.allowUpperCaseConst,
 	}
 
-	if !r.skipPackageNameChecks {
-		r.applyPackageCheckRules(&walker)
+	fileDir := path.Dir(file.Name)
+	r.pkgsWithNameFailure.Lock()
+	mustCheckPackageName := !r.pkgsWithNameFailure.has(fileDir) && !r.skipPackageNameChecks
+	if mustCheckPackageName {
+		pkgNameFailures := r.applyPackageCheckRules(fileAst.Name.Name)
+		if len(pkgNameFailures) > 0 {
+			r.pkgsWithNameFailure.add(fileDir)
+			failures = append(failures, r.pkgNameFailures(pkgNameFailures, fileAst.Name)...)
+		}
 	}
+	r.pkgsWithNameFailure.Unlock()
 
 	ast.Walk(&walker, fileAst)
 
 	return failures
+}
+
+func (*VarNamingRule) pkgNameFailures(failureMessages []string, node ast.Node) []lint.Failure {
+	result := []lint.Failure{}
+	for _, msg := range failureMessages {
+		failure := lint.Failure{
+			Failure:    msg,
+			Confidence: 1,
+			Node:       node,
+			Category:   lint.FailureCategoryNaming,
+		}
+		result = append(result, failure)
+	}
+	return result
 }
 
 // Name returns the rule name.
@@ -339,4 +345,18 @@ func getList(arg any, argName string) ([]string, error) {
 		list = append(list, val)
 	}
 	return list, nil
+}
+
+type set struct {
+	sync.Mutex
+	elements map[string]struct{}
+}
+
+func (sm *set) has(s string) bool {
+	_, result := sm.elements[s]
+	return result
+}
+
+func (sm *set) add(s string) {
+	sm.elements[s] = struct{}{}
 }
