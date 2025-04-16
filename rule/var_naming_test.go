@@ -54,7 +54,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{map[string]any{
 					"uppercaseconst":        true,
 					"skippackagenamechecks": true,
-					"extrabadpackagenames":       []string{"helpers", "models"},
+					"extrabadpackagenames":  []string{"helpers", "models"},
 				}},
 			},
 			wantErr:                   nil,
@@ -72,7 +72,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{map[string]any{
 					"upper-case-const":         true,
 					"skip-package-name-checks": true,
-					"extra-bad-package-names":        []string{"helpers", "models"},
+					"extra-bad-package-names":  []string{"helpers", "models"},
 				}},
 			},
 			wantErr:                   nil,
