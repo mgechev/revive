@@ -36,7 +36,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{map[string]any{
 					"upperCaseConst":        true,
 					"skipPackageNameChecks": true,
-					"badPackageNames":       []string{"helpers", "models"},
+					"extraBadPackageNames":  []string{"helpers", "models"},
 				}},
 			},
 			wantErr:                   nil,
@@ -54,7 +54,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{map[string]any{
 					"uppercaseconst":        true,
 					"skippackagenamechecks": true,
-					"badpackagenames":       []string{"helpers", "models"},
+					"extrabadpackagenames":       []string{"helpers", "models"},
 				}},
 			},
 			wantErr:                   nil,
@@ -72,7 +72,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{map[string]any{
 					"upper-case-const":         true,
 					"skip-package-name-checks": true,
-					"bad-package-names":        []string{"helpers", "models"},
+					"extra-bad-package-names":        []string{"helpers", "models"},
 				}},
 			},
 			wantErr:                   nil,
@@ -113,9 +113,9 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			wantErr:   errors.New("invalid third argument to the var-naming rule. Expecting a options of type slice, of len==1, with map, but int"),
 		},
 		{
-			name:      "invalid third argument badPackageNames",
-			arguments: lint.Arguments{[]any{""}, []any{""}, []any{map[string]any{"badPackageNames": []int{1}}}},
-			wantErr:   errors.New("invalid third argument to the var-naming rule. Expecting badPackageNames of type slice of strings, but []int"),
+			name:      "invalid third argument extraBadPackageNames",
+			arguments: lint.Arguments{[]any{""}, []any{""}, []any{map[string]any{"extraBadPackageNames": []int{1}}}},
+			wantErr:   errors.New("invalid third argument to the var-naming rule. Expecting extraBadPackageNames of type slice of strings, but []int"),
 		},
 	}
 
@@ -144,8 +144,8 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			if rule.skipPackageNameChecks != tt.wantSkipPackageNameChecks {
 				t.Errorf("unexpected skipPackageNameChecks: got = %v, want %v", rule.skipPackageNameChecks, tt.wantSkipPackageNameChecks)
 			}
-			if !reflect.DeepEqual(rule.badPackageNames, tt.wantBadPackageNames) {
-				t.Errorf("unexpected badPackageNames: got = %v, want %v", rule.badPackageNames, tt.wantBadPackageNames)
+			if !reflect.DeepEqual(rule.extraBadPackageNames, tt.wantBadPackageNames) {
+				t.Errorf("unexpected extraBadPackageNames: got = %v, want %v", rule.extraBadPackageNames, tt.wantBadPackageNames)
 			}
 		})
 	}

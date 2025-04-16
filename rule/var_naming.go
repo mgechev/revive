@@ -22,11 +22,11 @@ var knownNameExceptions = map[string]bool{
 	"kWh":          true,
 }
 
-// meaninglessPackageNames is the list of "bad" package names from https://go.dev/wiki/CodeReviewComments#package-names
+// extraBadPackageNames is the list of "bad" package names from https://go.dev/wiki/CodeReviewComments#package-names
 // and https://go.dev/blog/package-names#bad-package-names.
 // The rule warns about the usage of any package name in this list if skipPackageNameChecks is false.
 // Values in the list should be lowercased.
-var meaninglessPackageNames = map[string]struct{}{
+var extraBadPackageNames = map[string]struct{}{
 	"common":     {},
 	"interfaces": {},
 	"misc":       {},
@@ -41,7 +41,7 @@ type VarNamingRule struct {
 	blockList             []string
 	allowUpperCaseConst   bool                // if true - allows to use UPPER_SOME_NAMES for constants
 	skipPackageNameChecks bool                // check for meaningless and user-defined bad package names
-	badPackageNames       map[string]struct{} // inactive if skipPackageNameChecks is false
+	extraBadPackageNames  map[string]struct{} // inactive if skipPackageNameChecks is false
 }
 
 // Configure validates the rule configuration, and configures the rule accordingly.
@@ -84,16 +84,16 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 				r.allowUpperCaseConst = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "skipPackageNameChecks"):
 				r.skipPackageNameChecks = fmt.Sprint(v) == "true"
-			case isRuleOption(k, "badPackageNames"):
-				badPackageNames, ok := v.([]string)
+			case isRuleOption(k, "extraBadPackageNames"):
+				extraBadPackageNames, ok := v.([]string)
 				if !ok {
-					return fmt.Errorf("invalid third argument to the var-naming rule. Expecting badPackageNames of type slice of strings, but %T", v)
+					return fmt.Errorf("invalid third argument to the var-naming rule. Expecting extraBadPackageNames of type slice of strings, but %T", v)
 				}
-				for _, elem := range badPackageNames {
-					if r.badPackageNames == nil {
-						r.badPackageNames = map[string]struct{}{}
+				for _, name := range extraBadPackageNames {
+					if r.extraBadPackageNames == nil {
+						r.extraBadPackageNames = map[string]struct{}{}
 					}
-					r.badPackageNames[strings.ToLower(elem)] = struct{}{}
+					r.extraBadPackageNames[strings.ToLower(name)] = struct{}{}
 				}
 			}
 		}
@@ -106,7 +106,7 @@ func (r *VarNamingRule) applyPackageCheckRules(walker *lintNames) {
 	packageName := node.Name
 	lowerPackageName := strings.ToLower(packageName)
 
-	if _, ok := r.badPackageNames[lowerPackageName]; ok {
+	if _, ok := r.extraBadPackageNames[lowerPackageName]; ok {
 		walker.onFailure(lint.Failure{
 			Failure:    "avoid bad package names",
 			Confidence: 1,
@@ -116,7 +116,7 @@ func (r *VarNamingRule) applyPackageCheckRules(walker *lintNames) {
 		return
 	}
 
-	if _, ok := meaninglessPackageNames[lowerPackageName]; ok {
+	if _, ok := extraBadPackageNames[lowerPackageName]; ok {
 		walker.onFailure(lint.Failure{
 			Failure:    "avoid meaningless package names",
 			Confidence: 1,

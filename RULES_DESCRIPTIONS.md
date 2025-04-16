@@ -1123,7 +1123,7 @@ _Configuration_: This rule accepts two slices of strings and one optional slice 
 The first slice is an allowlist, and the second one is a blocklist of initialisms.
 In the map, you can add a boolean `upperCaseConst` (`uppercaseconst`, `upper-case-const`) parameter to allow `UPPER_CASE` for `const`.
 You can also add a boolean `skipPackageNameChecks` (`skippackagenamechecks`, `skip-package-name-checks`) to skip package name checks.
-When `skipPackageNameChecks` is false (the default), you can configure `badPackageNames` (`badpackagenames`, `bad-package-names`) to forbid using the values from the list as package names additionally to the standard meaningless ones: "common", "interfaces", "misc", "types", "util", "utils".
+When `skipPackageNameChecks` is false (the default), you can configure `extraBadPackageNames` (`extrabadpackagenames`, `extra-bad-package-names`) to forbid using the values from the list as package names additionally to the standard meaningless ones: "common", "interfaces", "misc", "types", "util", "utils".
 
 By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89)).
 
@@ -1141,7 +1141,7 @@ Examples:
 
 ```toml
 [rule.var-naming]
-  arguments = [[], [], [{badPackageNames=["helpers", "models"]}]]
+  arguments = [[], [], [{extraBadPackageNames=["helpers", "models"]}]]
 ```
 
 ```toml
@@ -1156,7 +1156,7 @@ Examples:
 
 ```toml
 [rule.var-naming]
-  arguments = [[], [], [{bad-package-names=["helpers", "models"]}]]
+  arguments = [[], [], [{extra-bad-package-names=["helpers", "models"]}]]
 ```
 
 ## waitgroup-by-value
