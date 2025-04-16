@@ -22,11 +22,11 @@ var knownNameExceptions = map[string]bool{
 	"kWh":          true,
 }
 
-// extraBadPackageNames is the list of "bad" package names from https://go.dev/wiki/CodeReviewComments#package-names
+// defaultBadPackageNames is the list of "bad" package names from https://go.dev/wiki/CodeReviewComments#package-names
 // and https://go.dev/blog/package-names#bad-package-names.
 // The rule warns about the usage of any package name in this list if skipPackageNameChecks is false.
 // Values in the list should be lowercased.
-var extraBadPackageNames = map[string]struct{}{
+var defaultBadPackageNames = map[string]struct{}{
 	"common":     {},
 	"interfaces": {},
 	"misc":       {},
@@ -116,7 +116,7 @@ func (r *VarNamingRule) applyPackageCheckRules(walker *lintNames) {
 		return
 	}
 
-	if _, ok := extraBadPackageNames[lowerPackageName]; ok {
+	if _, ok := defaultBadPackageNames[lowerPackageName]; ok {
 		walker.onFailure(lint.Failure{
 			Failure:    "avoid meaningless package names",
 			Confidence: 1,
