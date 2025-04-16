@@ -22,12 +22,26 @@ var knownNameExceptions = map[string]bool{
 	"kWh":          true,
 }
 
+// defaultBadPackageNames is the list of "bad" package names from https://go.dev/wiki/CodeReviewComments#package-names
+// and https://go.dev/blog/package-names#bad-package-names.
+// The rule warns about the usage of any package name in this list if skipPackageNameChecks is false.
+// Values in the list should be lowercased.
+var defaultBadPackageNames = map[string]struct{}{
+	"common":     {},
+	"interfaces": {},
+	"misc":       {},
+	"types":      {},
+	"util":       {},
+	"utils":      {},
+}
+
 // VarNamingRule lints the name of a variable.
 type VarNamingRule struct {
 	allowList             []string
 	blockList             []string
-	allowUpperCaseConst   bool // if true - allows to use UPPER_SOME_NAMES for constants
-	skipPackageNameChecks bool
+	allowUpperCaseConst   bool                // if true - allows to use UPPER_SOME_NAMES for constants
+	skipPackageNameChecks bool                // check for meaningless and user-defined bad package names
+	extraBadPackageNames  map[string]struct{} // inactive if skipPackageNameChecks is false
 }
 
 // Configure validates the rule configuration, and configures the rule accordingly.
@@ -70,27 +84,62 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 				r.allowUpperCaseConst = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "skipPackageNameChecks"):
 				r.skipPackageNameChecks = fmt.Sprint(v) == "true"
+			case isRuleOption(k, "extraBadPackageNames"):
+				extraBadPackageNames, ok := v.([]string)
+				if !ok {
+					return fmt.Errorf("invalid third argument to the var-naming rule. Expecting extraBadPackageNames of type slice of strings, but %T", v)
+				}
+				for _, name := range extraBadPackageNames {
+					if r.extraBadPackageNames == nil {
+						r.extraBadPackageNames = map[string]struct{}{}
+					}
+					r.extraBadPackageNames[strings.ToLower(name)] = struct{}{}
+				}
 			}
 		}
 	}
 	return nil
 }
 
-func (*VarNamingRule) applyPackageCheckRules(walker *lintNames) {
+func (r *VarNamingRule) applyPackageCheckRules(walker *lintNames) {
+	node := walker.fileAst.Name
+	packageName := node.Name
+	lowerPackageName := strings.ToLower(packageName)
+
+	if _, ok := r.extraBadPackageNames[lowerPackageName]; ok {
+		walker.onFailure(lint.Failure{
+			Failure:    "avoid bad package names",
+			Confidence: 1,
+			Node:       node,
+			Category:   lint.FailureCategoryNaming,
+		})
+		return
+	}
+
+	if _, ok := defaultBadPackageNames[lowerPackageName]; ok {
+		walker.onFailure(lint.Failure{
+			Failure:    "avoid meaningless package names",
+			Confidence: 1,
+			Node:       node,
+			Category:   lint.FailureCategoryNaming,
+		})
+		return
+	}
+
 	// Package names need slightly different handling than other names.
-	if strings.Contains(walker.fileAst.Name.Name, "_") && !strings.HasSuffix(walker.fileAst.Name.Name, "_test") {
+	if strings.Contains(packageName, "_") && !strings.HasSuffix(packageName, "_test") {
 		walker.onFailure(lint.Failure{
 			Failure:    "don't use an underscore in package name",
 			Confidence: 1,
-			Node:       walker.fileAst.Name,
+			Node:       node,
 			Category:   lint.FailureCategoryNaming,
 		})
 	}
-	if anyCapsRE.MatchString(walker.fileAst.Name.Name) {
+	if anyCapsRE.MatchString(packageName) {
 		walker.onFailure(lint.Failure{
-			Failure:    fmt.Sprintf("don't use MixedCaps in package name; %s should be %s", walker.fileAst.Name.Name, strings.ToLower(walker.fileAst.Name.Name)),
+			Failure:    fmt.Sprintf("don't use MixedCaps in package name; %s should be %s", packageName, lowerPackageName),
 			Confidence: 1,
-			Node:       walker.fileAst.Name,
+			Node:       node,
 			Category:   lint.FailureCategoryNaming,
 		})
 	}
