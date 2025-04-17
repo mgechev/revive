@@ -44,14 +44,14 @@ type VarNamingRule struct {
 	allowUpperCaseConst   bool                // if true - allows to use UPPER_SOME_NAMES for constants
 	skipPackageNameChecks bool                // check for meaningless and user-defined bad package names
 	extraBadPackageNames  map[string]struct{} // inactive if skipPackageNameChecks is false
-	pkgsWithNameFailure   set                 // set of packages with reported failure on its name
+	pkgNameAlreadyChecked set                 // set of packages with reported failure on its name
 }
 
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
 func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
-	r.pkgsWithNameFailure = set{elements: map[string]struct{}{}}
+	r.pkgNameAlreadyChecked = set{elements: map[string]struct{}{}}
 
 	if len(arguments) >= 1 {
 		list, err := getList(arguments[0], "allowlist")
@@ -106,80 +106,78 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 	return nil
 }
 
-func (r *VarNamingRule) applyPackageCheckRules(pkgName string) []string {
-	lowerPackageName := strings.ToLower(pkgName)
-
-	if _, ok := r.extraBadPackageNames[lowerPackageName]; ok {
-		return []string{"avoid bad package names"}
-	}
-
-	if _, ok := defaultBadPackageNames[lowerPackageName]; ok {
-		return []string{"avoid meaningless package names"}
-	}
-
-	result := []string{}
-	// Package names need slightly different handling than other names.
-	if strings.Contains(pkgName, "_") && !strings.HasSuffix(pkgName, "_test") {
-		result = append(result, "don't use underscores in package names")
-	}
-	if anyCapsRE.MatchString(pkgName) {
-		result = append(result, fmt.Sprintf("don't use MixedCaps in package names; %s should be %s", pkgName, lowerPackageName))
-	}
-
-	return result
-}
-
 // Apply applies the rule to given file.
 func (r *VarNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
+	onFailure := func(failure lint.Failure) {
+		failures = append(failures, failure)
+	}
+
+	r.applyPackageCheckRules(file, onFailure)
 
 	fileAst := file.AST
-
 	walker := lintNames{
-		file:      file,
-		fileAst:   fileAst,
-		allowList: r.allowList,
-		blockList: r.blockList,
-		onFailure: func(failure lint.Failure) {
-			failures = append(failures, failure)
-		},
+		file:           file,
+		fileAst:        fileAst,
+		allowList:      r.allowList,
+		blockList:      r.blockList,
+		onFailure:      onFailure,
 		upperCaseConst: r.allowUpperCaseConst,
 	}
-
-	fileDir := path.Dir(file.Name)
-	r.pkgsWithNameFailure.Lock()
-	mustCheckPackageName := !r.pkgsWithNameFailure.has(fileDir) && !r.skipPackageNameChecks
-	if mustCheckPackageName {
-		pkgNameFailures := r.applyPackageCheckRules(fileAst.Name.Name)
-		if len(pkgNameFailures) > 0 {
-			r.pkgsWithNameFailure.add(fileDir)
-			failures = append(failures, r.pkgNameFailures(pkgNameFailures, fileAst.Name)...)
-		}
-	}
-	r.pkgsWithNameFailure.Unlock()
 
 	ast.Walk(&walker, fileAst)
 
 	return failures
 }
 
-func (*VarNamingRule) pkgNameFailures(failureMessages []string, node ast.Node) []lint.Failure {
-	result := []lint.Failure{}
-	for _, msg := range failureMessages {
-		failure := lint.Failure{
-			Failure:    msg,
-			Confidence: 1,
-			Node:       node,
-			Category:   lint.FailureCategoryNaming,
-		}
-		result = append(result, failure)
-	}
-	return result
-}
-
 // Name returns the rule name.
 func (*VarNamingRule) Name() string {
 	return "var-naming"
+}
+
+func (r *VarNamingRule) applyPackageCheckRules(file *lint.File, onFailure func(failure lint.Failure)) {
+	fileDir := path.Dir(file.Name)
+
+	// Protect pkgsWithNameFailure from concurrent modifications
+	r.pkgNameAlreadyChecked.Lock()
+	defer r.pkgNameAlreadyChecked.Unlock()
+	defer r.pkgNameAlreadyChecked.add(fileDir) // mark this package as already checked
+
+	// Do we need to proceed with the checks on package name?
+	mustSkipCheck := r.pkgNameAlreadyChecked.has(fileDir) || r.skipPackageNameChecks
+	if mustSkipCheck {
+		return
+	}
+
+	pkgNameNode := file.AST.Name
+	pkgName := pkgNameNode.Name
+	pkgNameLower := strings.ToLower(pkgName)
+	if _, ok := r.extraBadPackageNames[pkgNameLower]; ok {
+		onFailure(r.pkgNameFailure(pkgNameNode, "avoid bad package names"))
+		return
+	}
+
+	if _, ok := defaultBadPackageNames[pkgNameLower]; ok {
+		onFailure(r.pkgNameFailure(pkgNameNode, "avoid meaningless package names"))
+		return
+	}
+
+	// Package names need slightly different handling than other names.
+	if strings.Contains(pkgName, "_") && !strings.HasSuffix(pkgName, "_test") {
+		onFailure(r.pkgNameFailure(pkgNameNode, "don't use underscores in package names"))
+	}
+	if anyCapsRE.MatchString(pkgName) {
+		onFailure(r.pkgNameFailure(pkgNameNode, "don't use MixedCaps in package names; %s should be %s", pkgName, pkgNameLower))
+	}
+}
+
+func (*VarNamingRule) pkgNameFailure(node ast.Node, msg string, args ...any) lint.Failure {
+	return lint.Failure{
+		Failure:    fmt.Sprintf(msg, args...),
+		Confidence: 1,
+		Node:       node,
+		Category:   lint.FailureCategoryNaming,
+	}
 }
 
 func (w *lintNames) checkList(fl *ast.FieldList, thing string) {
