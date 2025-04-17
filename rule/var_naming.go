@@ -44,7 +44,7 @@ type VarNamingRule struct {
 	allowUpperCaseConst   bool                // if true - allows to use UPPER_SOME_NAMES for constants
 	skipPackageNameChecks bool                // check for meaningless and user-defined bad package names
 	extraBadPackageNames  map[string]struct{} // inactive if skipPackageNameChecks is false
-	pkgNameAlreadyChecked set                 // set of packages with reported failure on its name
+	pkgNameAlreadyChecked set                 // set of packages names already checked
 }
 
 // Configure validates the rule configuration, and configures the rule accordingly.
