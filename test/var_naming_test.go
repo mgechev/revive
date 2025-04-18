@@ -24,3 +24,12 @@ func TestVarNaming(t *testing.T) {
 		Arguments: []any{[]any{}, []any{}, []any{map[string]any{"skipPackageNameChecks": true}}},
 	})
 }
+
+func BenchmarkUpperCaseConstTrue(b *testing.B) {
+	var t *testing.T
+	for i := 0; i <= b.N; i++ {
+		testRule(t, "var_naming_upper_case_const_true", &rule.VarNamingRule{}, &lint.RuleConfig{
+			Arguments: []any{[]any{}, []any{}, []any{map[string]any{"upperCaseConst": true}}},
+		})
+	}
+}
