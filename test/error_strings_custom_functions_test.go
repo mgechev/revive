@@ -13,3 +13,10 @@ func TestErrorStringsWithCustomFunctions(t *testing.T) {
 		Arguments: args,
 	})
 }
+
+func TestErrorStringsIssue1243(t *testing.T) {
+	args := []any{"errors.Wrap"}
+	testRule(t, "error_strings_issue_1243", &rule.ErrorStringsRule{}, &lint.RuleConfig{
+		Arguments: args,
+	})
+}

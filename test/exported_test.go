@@ -32,11 +32,18 @@ func TestCheckPublicInterfaceOption(t *testing.T) {
 }
 
 func TestCheckDisablingOnDeclarationTypes(t *testing.T) {
-	args := []any{"disableChecksOnConstants", "disableChecksOnFunctions", "disableChecksOnMethods", "disableChecksOnTypes", "disableChecksOnVariables"}
-
-	testRule(t, "exported_issue_1045", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: args})
+	testRule(t, "exported_issue_1045", &rule.ExportedRule{}, &lint.RuleConfig{
+		Arguments: []any{"disableChecksOnConstants", "disableChecksOnFunctions", "disableChecksOnMethods", "disableChecksOnTypes", "disableChecksOnVariables"},
+	})
+	testRule(t, "exported_issue_1045", &rule.ExportedRule{}, &lint.RuleConfig{
+		Arguments: []any{"disable-checks-on-constants", "disable-checks-on-functions", "disable-checks-on-methods", "disable-checks-on-types", "disable-checks-on-variables"},
+	})
 }
 
 func TestCheckDirectiveComment(t *testing.T) {
 	testRule(t, "exported_issue_1202", &rule.ExportedRule{}, &lint.RuleConfig{})
+}
+
+func TestCheckDeprecationComment(t *testing.T) {
+	testRule(t, "exported_issue_1231", &rule.ExportedRule{}, &lint.RuleConfig{})
 }

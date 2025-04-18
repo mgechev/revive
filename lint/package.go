@@ -35,13 +35,21 @@ var (
 	trueValue  = 1
 	falseValue = 2
 
-	go115 = goversion.Must(goversion.NewVersion("1.15"))
-	go121 = goversion.Must(goversion.NewVersion("1.21"))
-	go122 = goversion.Must(goversion.NewVersion("1.22"))
+	// Go115 is a constant representing the Go version 1.15
+	Go115 = goversion.Must(goversion.NewVersion("1.15"))
+	// Go121 is a constant representing the Go version 1.21
+	Go121 = goversion.Must(goversion.NewVersion("1.21"))
+	// Go122 is a constant representing the Go version 1.22
+	Go122 = goversion.Must(goversion.NewVersion("1.22"))
+	// Go124 is a constant representing the Go version 1.24
+	Go124 = goversion.Must(goversion.NewVersion("1.24"))
 )
 
 // Files return package's files.
 func (p *Package) Files() map[string]*File {
+	p.RLock()
+	defer p.RUnlock()
+
 	return p.files
 }
 
@@ -69,6 +77,7 @@ func (p *Package) IsMain() bool {
 func (p *Package) TypesPkg() *types.Package {
 	p.RLock()
 	defer p.RUnlock()
+
 	return p.typesPkg
 }
 
@@ -76,6 +85,7 @@ func (p *Package) TypesPkg() *types.Package {
 func (p *Package) TypesInfo() *types.Info {
 	p.RLock()
 	defer p.RUnlock()
+
 	return p.typesInfo
 }
 
@@ -83,6 +93,7 @@ func (p *Package) TypesInfo() *types.Info {
 func (p *Package) Sortable() map[string]bool {
 	p.RLock()
 	defer p.RUnlock()
+
 	return p.sortable
 }
 
@@ -145,9 +156,13 @@ func check(config *types.Config, n string, fset *token.FileSet, astFiles []*ast.
 
 // TypeOf returns the type of expression.
 func (p *Package) TypeOf(expr ast.Expr) types.Type {
+	p.RLock()
+	defer p.RUnlock()
+
 	if p.typesInfo == nil {
 		return nil
 	}
+
 	return p.typesInfo.TypeOf(expr)
 }
 
@@ -161,6 +176,9 @@ const (
 )
 
 func (p *Package) scanSortable() {
+	p.Lock()
+	defer p.Unlock()
+
 	sortableFlags := map[string]sortableMethodsFlags{}
 	for _, f := range p.files {
 		for _, decl := range f.AST.Decls {
@@ -186,7 +204,7 @@ func (p *Package) scanSortable() {
 func (p *Package) lint(rules []Rule, config Config, failures chan Failure) error {
 	p.scanSortable()
 	var eg errgroup.Group
-	for _, file := range p.files {
+	for _, file := range p.Files() {
 		eg.Go(func() error {
 			return file.lint(rules, config, failures)
 		})
@@ -195,19 +213,12 @@ func (p *Package) lint(rules []Rule, config Config, failures chan Failure) error
 	return eg.Wait()
 }
 
-// IsAtLeastGo115 returns true if the Go version for this package is 1.15 or higher, false otherwise
-func (p *Package) IsAtLeastGo115() bool {
-	return p.goVersion.GreaterThanOrEqual(go115)
-}
+// IsAtLeastGoVersion returns true if the Go version for this package is v or higher, false otherwise
+func (p *Package) IsAtLeastGoVersion(v *goversion.Version) bool {
+	p.RLock()
+	defer p.RUnlock()
 
-// IsAtLeastGo121 returns true if the Go version for this package is 1.21 or higher, false otherwise
-func (p *Package) IsAtLeastGo121() bool {
-	return p.goVersion.GreaterThanOrEqual(go121)
-}
-
-// IsAtLeastGo122 returns true if the Go version for this package is 1.22 or higher, false otherwise
-func (p *Package) IsAtLeastGo122() bool {
-	return p.goVersion.GreaterThanOrEqual(go122)
+	return p.goVersion.GreaterThanOrEqual(v)
 }
 
 func getSortableMethodFlagForFunction(fn *ast.FuncDecl) sortableMethodsFlags {

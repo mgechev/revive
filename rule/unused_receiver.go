@@ -27,23 +27,27 @@ func (r *UnusedReceiverRule) Configure(args lint.Arguments) error {
 		return nil
 	}
 	// Arguments = [{}]
-	options := args[0].(map[string]any)
-
-	allowRegexParam, ok := options["allowRegex"]
+	options, ok := args[0].(map[string]any)
 	if !ok {
 		return nil
 	}
-	// Arguments = [{allowRegex="^_"}]
-	allowRegexStr, ok := allowRegexParam.(string)
-	if !ok {
-		panic(fmt.Errorf("error configuring [unused-receiver] rule: allowRegex is not string but [%T]", allowRegexParam))
+
+	for k, v := range options {
+		if !isRuleOption(k, "allowRegex") {
+			return nil
+		}
+		// Arguments = [{allowRegex="^_"}]
+		allowRegexStr, ok := v.(string)
+		if !ok {
+			return fmt.Errorf("error configuring [unused-receiver] rule: allowRegex is not string but [%T]", v)
+		}
+		var err error
+		r.allowRegex, err = regexp.Compile(allowRegexStr)
+		if err != nil {
+			return fmt.Errorf("error configuring [unused-receiver] rule: allowRegex is not valid regex [%s]: %w", allowRegexStr, err)
+		}
+		r.failureMsg = "method receiver '%s' is not referenced in method's body, consider removing or renaming it to match " + r.allowRegex.String()
 	}
-	var err error
-	r.allowRegex, err = regexp.Compile(allowRegexStr)
-	if err != nil {
-		return fmt.Errorf("error configuring [unused-receiver] rule: allowRegex is not valid regex [%s]: %w", allowRegexStr, err)
-	}
-	r.failureMsg = "method receiver '%s' is not referenced in method's body, consider removing or renaming it to match " + r.allowRegex.String()
 	return nil
 }
 

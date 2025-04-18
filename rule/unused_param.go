@@ -28,24 +28,28 @@ func (r *UnusedParamRule) Configure(args lint.Arguments) error {
 	if len(args) == 0 {
 		return nil
 	}
-	// Arguments = [{}]
-	options := args[0].(map[string]any)
 
-	allowRegexParam, ok := options["allowRegex"]
+	options, ok := args[0].(map[string]any)
 	if !ok {
+		// Arguments = [{}]
 		return nil
 	}
-	// Arguments = [{allowRegex="^_"}]
-	allowRegexStr, ok := allowRegexParam.(string)
-	if !ok {
-		panic(fmt.Errorf("error configuring %s rule: allowRegex is not string but [%T]", r.Name(), allowRegexParam))
+	for k, v := range options {
+		if !isRuleOption(k, "allowRegex") {
+			return nil
+		}
+		// Arguments = [{allowRegex="_"}]
+		allowRegexStr, ok := v.(string)
+		if !ok {
+			return fmt.Errorf("error configuring %s rule: allowRegex is not string but [%T]", r.Name(), v)
+		}
+		var err error
+		r.allowRegex, err = regexp.Compile(allowRegexStr)
+		if err != nil {
+			return fmt.Errorf("error configuring %s rule: allowRegex is not valid regex [%s]: %w", r.Name(), allowRegexStr, err)
+		}
+		r.failureMsg = "parameter '%s' seems to be unused, consider removing or renaming it to match " + r.allowRegex.String()
 	}
-	var err error
-	r.allowRegex, err = regexp.Compile(allowRegexStr)
-	if err != nil {
-		return fmt.Errorf("error configuring %s rule: allowRegex is not valid regex [%s]: %w", r.Name(), allowRegexStr, err)
-	}
-	r.failureMsg = "parameter '%s' seems to be unused, consider removing or renaming it to match " + r.allowRegex.String()
 	return nil
 }
 

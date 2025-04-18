@@ -3,8 +3,10 @@ package revivelib
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
+	"maps"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/mgechev/dots"
@@ -18,7 +20,7 @@ import (
 type Revive struct {
 	config       *lint.Config
 	lintingRules []lint.Rule
-	logger       *log.Logger
+	logger       *slog.Logger
 	maxOpenFiles int
 }
 
@@ -56,7 +58,7 @@ func New(
 		return nil, fmt.Errorf("initializing revive - getting lint rules: %w", err)
 	}
 
-	logger.Println("Config loaded")
+	logger.Info("Config loaded", "rules", slices.Collect(maps.Keys(conf.Rules)))
 
 	return &Revive{
 		logger:       logger,
@@ -161,7 +163,7 @@ func (r *Revive) Format(
 	<-exitChan
 
 	if formatErr != nil {
-		return "", exitCode, fmt.Errorf("formatting: %w", err)
+		return "", exitCode, fmt.Errorf("formatting: %w", formatErr)
 	}
 
 	return output, exitCode, nil

@@ -16,6 +16,9 @@ func TestUnusedParam(t *testing.T) {
 	testRule(t, "unused_param_custom_regex", &rule.UnusedParamRule{}, &lint.RuleConfig{Arguments: []any{
 		map[string]any{"allowRegex": "^xxx"},
 	}})
+	testRule(t, "unused_param_custom_regex", &rule.UnusedParamRule{}, &lint.RuleConfig{Arguments: []any{
+		map[string]any{"allow-regex": "^xxx"},
+	}})
 }
 
 func BenchmarkUnusedParam(b *testing.B) {
