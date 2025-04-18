@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
-	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
@@ -44,14 +44,14 @@ type VarNamingRule struct {
 	allowUpperCaseConst   bool                // if true - allows to use UPPER_SOME_NAMES for constants
 	skipPackageNameChecks bool                // check for meaningless and user-defined bad package names
 	extraBadPackageNames  map[string]struct{} // inactive if skipPackageNameChecks is false
-	pkgNameAlreadyChecked set                 // set of packages names already checked
+	pkgNameAlreadyChecked syncSet             // set of packages names already checked
 }
 
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
 func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
-	r.pkgNameAlreadyChecked = set{elements: map[string]struct{}{}}
+	r.pkgNameAlreadyChecked = syncSet{elements: map[string]struct{}{}}
 
 	if len(arguments) >= 1 {
 		list, err := getList(arguments[0], "allowlist")
@@ -113,7 +113,9 @@ func (r *VarNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 		failures = append(failures, failure)
 	}
 
-	r.applyPackageCheckRules(file, onFailure)
+	if !r.skipPackageNameChecks {
+		r.applyPackageCheckRules(file, onFailure)
+	}
 
 	fileAst := file.AST
 	walker := lintNames{
@@ -136,18 +138,15 @@ func (*VarNamingRule) Name() string {
 }
 
 func (r *VarNamingRule) applyPackageCheckRules(file *lint.File, onFailure func(failure lint.Failure)) {
-	fileDir := path.Dir(file.Name)
+	fileDir := filepath.Dir(file.Name)
 
 	// Protect pkgsWithNameFailure from concurrent modifications
 	r.pkgNameAlreadyChecked.Lock()
 	defer r.pkgNameAlreadyChecked.Unlock()
-	defer r.pkgNameAlreadyChecked.add(fileDir) // mark this package as already checked
-
-	// Do we need to proceed with the checks on package name?
-	mustSkipCheck := r.pkgNameAlreadyChecked.has(fileDir) || r.skipPackageNameChecks
-	if mustSkipCheck {
+	if r.pkgNameAlreadyChecked.has(fileDir) {
 		return
 	}
+	r.pkgNameAlreadyChecked.add(fileDir) // mark this package as already checked
 
 	pkgNameNode := file.AST.Name
 	pkgName := pkgNameNode.Name
@@ -164,7 +163,7 @@ func (r *VarNamingRule) applyPackageCheckRules(file *lint.File, onFailure func(f
 
 	// Package names need slightly different handling than other names.
 	if strings.Contains(pkgName, "_") && !strings.HasSuffix(pkgName, "_test") {
-		onFailure(r.pkgNameFailure(pkgNameNode, "don't use underscores in package names"))
+		onFailure(r.pkgNameFailure(pkgNameNode, "don't use an underscore in package name"))
 	}
 	if anyCapsRE.MatchString(pkgName) {
 		onFailure(r.pkgNameFailure(pkgNameNode, "don't use MixedCaps in package names; %s should be %s", pkgName, pkgNameLower))
@@ -345,16 +344,16 @@ func getList(arg any, argName string) ([]string, error) {
 	return list, nil
 }
 
-type set struct {
+type syncSet struct {
 	sync.Mutex
 	elements map[string]struct{}
 }
 
-func (sm *set) has(s string) bool {
+func (sm *syncSet) has(s string) bool {
 	_, result := sm.elements[s]
 	return result
 }
 
-func (sm *set) add(s string) {
+func (sm *syncSet) add(s string) {
 	sm.elements[s] = struct{}{}
 }
