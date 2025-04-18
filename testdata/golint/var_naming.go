@@ -1,7 +1,7 @@
 // Test for name linting.
 
-// Package pkg_with_underscores ...
-package pkg_with_underscores // MATCH /don't use an underscore in package name/
+// Package pkg ...
+package pkg // package names checks are tested elesewhere
 
 import (
 	"io"

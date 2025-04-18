@@ -90,9 +90,6 @@ func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, ru
 	l := lint.New(os.ReadFile, 0)
 
 	ins := parseInstructions(t, filepath.Join(baseDir, fi.Name()), src)
-	if ins == nil {
-		return fmt.Errorf("Test file %v does not have instructions", fi.Name())
-	}
 
 	ps, err := l.Lint([][]string{{filepath.Join(baseDir, fi.Name())}}, rules, lint.Config{
 		Rules: config,
