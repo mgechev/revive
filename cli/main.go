@@ -38,7 +38,7 @@ func fail(err string) {
 
 // RunRevive runs the CLI for revive.
 func RunRevive(extraRules ...revivelib.ExtraRule) {
-	// move parsing flags outside of init() otherwise tests dont works properly
+	// move parsing flags outside of init() otherwise tests don't works properly
 	// more info: https://github.com/golang/go/issues/46869#issuecomment-865695953
 	initConfig()
 

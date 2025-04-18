@@ -3,40 +3,35 @@ package logging
 
 import (
 	"io"
-	"log"
+	"log/slog"
 	"os"
 )
 
-var logger *log.Logger
+const logFile = "revive.log"
+
+var logger *slog.Logger
 
 // GetLogger retrieves an instance of an application logger which outputs
 // to a file if the debug flag is enabled
-func GetLogger() (*log.Logger, error) {
+func GetLogger() (*slog.Logger, error) {
 	if logger != nil {
 		return logger, nil
 	}
 
-	var writer io.Writer
-	var err error
-
-	writer = io.Discard // by default, suppress all logging output
-	debugModeEnabled := os.Getenv("DEBUG") == "1"
-	if debugModeEnabled {
-		writer, err = os.Create("revive.log")
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	logger = log.New(writer, "", log.LstdFlags)
-
+	debugModeEnabled := os.Getenv("DEBUG") != ""
 	if !debugModeEnabled {
-		// Clear all flags to skip log output formatting step to increase
-		// performance somewhat if we're not logging anything
-		logger.SetFlags(0)
+		// by default, suppress all logging output
+		return slog.New(slog.NewTextHandler(io.Discard, nil)), nil // TODO: change to slog.New(slog.DiscardHandler) when we switch to Go 1.24
 	}
 
-	logger.Println("Logger initialized")
+	fileWriter, err := os.Create(logFile)
+	if err != nil {
+		return nil, err
+	}
+
+	logger = slog.New(slog.NewTextHandler(io.MultiWriter(os.Stderr, fileWriter), nil))
+
+	logger.Info("Logger initialized", "logFile", logFile)
 
 	return logger, nil
 }

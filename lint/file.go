@@ -135,15 +135,16 @@ type enableDisableConfig struct {
 	position int
 }
 
+type disabledIntervalsMap = map[string][]DisabledInterval
+
 const (
-	directiveRE  = `^//[\s]*revive:(enable|disable)(?:-(line|next-line))?(?::([^\s]+))?[\s]*(?: (.+))?$`
 	directivePos = 1
 	modifierPos  = 2
 	rulesPos     = 3
 	reasonPos    = 4
 )
 
-var re = regexp.MustCompile(directiveRE)
+var directiveRegexp = regexp.MustCompile(`^//[\s]*revive:(enable|disable)(?:-(line|next-line))?(?::([^\s]+))?[\s]*(?: (.+))?$`)
 
 func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, failures chan Failure) disabledIntervalsMap {
 	enabledDisabledRulesMap := map[string][]enableDisableConfig{}
@@ -153,7 +154,7 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, fa
 
 		for ruleName, disabledArr := range enabledDisabledRulesMap {
 			ruleResult := []DisabledInterval{}
-			for i := 0; i < len(disabledArr); i++ {
+			for i := range disabledArr {
 				interval := DisabledInterval{
 					RuleName: ruleName,
 					From: token.Position{
@@ -194,8 +195,7 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, fa
 		enabledDisabledRulesMap[name] = existing
 	}
 
-	handleRules := func(_, modifier string, isEnabled bool, line int, ruleNames []string) []DisabledInterval {
-		var result []DisabledInterval
+	handleRules := func(modifier string, isEnabled bool, line int, ruleNames []string) {
 		for _, name := range ruleNames {
 			switch modifier {
 			case "line":
@@ -208,13 +208,12 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, fa
 				handleConfig(isEnabled, line, name)
 			}
 		}
-		return result
 	}
 
-	handleComment := func(filename string, c *ast.CommentGroup, line int) {
+	handleComment := func(c *ast.CommentGroup, line int) {
 		comments := c.List
 		for _, c := range comments {
-			match := re.FindStringSubmatch(c.Text)
+			match := directiveRegexp.FindStringSubmatch(c.Text)
 			if len(match) == 0 {
 				continue
 			}
@@ -247,13 +246,12 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, fa
 				}
 			}
 
-			handleRules(filename, match[modifierPos], match[directivePos] == "enable", line, ruleNames)
+			handleRules(match[modifierPos], match[directivePos] == "enable", line, ruleNames)
 		}
 	}
 
-	comments := f.AST.Comments
-	for _, c := range comments {
-		handleComment(f.Name, c, f.ToPosition(c.End()).Line)
+	for _, c := range f.AST.Comments {
+		handleComment(c, f.ToPosition(c.End()).Line)
 	}
 
 	return getEnabledDisabledIntervals()

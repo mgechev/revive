@@ -291,3 +291,16 @@ func Walk(t *Tree, ch chan int) { // MATCH /function Walk has cognitive complexi
 	ch <- t.Value
 	Walk(t.Right, ch) // +1
 }
+
+// Test if-else if chains
+func chainedIfElse(a, b, c, d bool) { // MATCH /function chainedIfElse has cognitive complexity 4 (> max enabled 0)/
+	if a { // +1
+		foo()
+	} else if b && c { // +2
+		bar()
+	} else if d { // +1
+		baz()
+	} else {
+		qux()
+	}
+}

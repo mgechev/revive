@@ -95,46 +95,14 @@ func TestXDGConfigDirNoFile(t *testing.T) {
 	}
 }
 
-func TestGetVersion(t *testing.T) {
-	tests := []struct {
-		name    string
-		version string
-		commit  string
-		date    string
-		builtBy string
-		want    string
-	}{
-		// TODO re-activate the testcase
-		/*
-			{
-				name:    "Development version",
-				version: defaultVersion,
-				commit:  defaultCommit,
-				date:    defaultDate,
-				builtBy: defaultBuilder,
-				want:    "version \n",
-			},
-		*/
-		{
-			name:    "Release version",
-			version: "v1.5.0-12-g7ee4500-dev",
-			commit:  "7ee4500e125e2d1b12653b2c8e140fec380919b4",
-			date:    "2024-11-15 10:52 UTC",
-			builtBy: "builder",
-			want: `Version:	v1.5.0-12-g7ee4500-dev
+func TestGetReleaseVersion(t *testing.T) {
+	got := getVersion("builder", "2024-11-15 10:52 UTC", "7ee4500e125e2d1b12653b2c8e140fec380919b4", "v1.5.0-12-g7ee4500-dev")
+	want := `Version:	v1.5.0-12-g7ee4500-dev
 Commit:		7ee4500e125e2d1b12653b2c8e140fec380919b4
 Built		2024-11-15 10:52 UTC by builder
-`,
-		},
-	}
+`
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := getVersion(tt.builtBy, tt.date, tt.commit, tt.version)
-
-			if got != tt.want {
-				t.Errorf("getVersion() = %q, want %q", got, tt.want)
-			}
-		})
+	if got != want {
+		t.Errorf("getVersion() = %q, want %q", got, want)
 	}
 }

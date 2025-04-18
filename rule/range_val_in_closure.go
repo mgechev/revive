@@ -14,7 +14,7 @@ type RangeValInClosureRule struct{}
 func (*RangeValInClosureRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
-	if file.Pkg.IsAtLeastGo122() {
+	if file.Pkg.IsAtLeastGoVersion(lint.Go122) {
 		return failures
 	}
 

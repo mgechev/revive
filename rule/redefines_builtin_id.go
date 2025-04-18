@@ -78,7 +78,7 @@ func (*RedefinesBuiltinIDRule) Apply(file *lint.File, _ lint.Arguments) []lint.F
 	astFile := file.AST
 
 	builtFuncs := maps.Clone(builtFunctions)
-	if file.Pkg.IsAtLeastGo121() {
+	if file.Pkg.IsAtLeastGoVersion(lint.Go121) {
 		maps.Copy(builtFuncs, builtFunctionsAfterGo121)
 	}
 	w := &lintRedefinesBuiltinID{

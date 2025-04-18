@@ -32,14 +32,12 @@ func (r *UncheckedTypeAssertionRule) Configure(arguments lint.Arguments) error {
 	}
 
 	for k, v := range args {
-		switch k {
-		case "acceptIgnoredAssertionResult":
-			r.acceptIgnoredAssertionResult, ok = v.(bool)
-			if !ok {
-				return fmt.Errorf("unable to parse argument '%s'. Expected boolean", k)
-			}
-		default:
+		if !isRuleOption(k, "acceptIgnoredAssertionResult") {
 			return fmt.Errorf("unknown argument: %s", k)
+		}
+		r.acceptIgnoredAssertionResult, ok = v.(bool)
+		if !ok {
+			return fmt.Errorf("unable to parse argument '%s'. Expected boolean", k)
 		}
 	}
 	return nil

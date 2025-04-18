@@ -13,6 +13,9 @@ func TestDefer(t *testing.T) {
 
 func TestDeferLoopDisabled(t *testing.T) {
 	testRule(t, "defer_loop_disabled", &rule.DeferRule{}, &lint.RuleConfig{
+		Arguments: []any{[]any{"return", "recover", "callChain", "methodCall"}},
+	})
+	testRule(t, "defer_loop_disabled", &rule.DeferRule{}, &lint.RuleConfig{
 		Arguments: []any{[]any{"return", "recover", "call-chain", "method-call"}},
 	})
 }

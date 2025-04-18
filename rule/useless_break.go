@@ -47,36 +47,39 @@ func (w *lintUselessBreak) Visit(node ast.Node) ast.Visitor {
 		w.inLoopBody = false
 		return nil
 	case *ast.CommClause:
-		for _, n := range v.Body {
-			w.inspectCaseStatement(n)
-		}
+		w.inspectCaseStatement(v.Body)
 		return nil
 	case *ast.CaseClause:
-		for _, n := range v.Body {
-			w.inspectCaseStatement(n)
-		}
+		w.inspectCaseStatement(v.Body)
 		return nil
 	}
 	return w
 }
 
-func (w *lintUselessBreak) inspectCaseStatement(n ast.Stmt) {
-	switch s := n.(type) {
-	case *ast.BranchStmt:
-		if s.Tok != token.BREAK {
-			return // not a break statement
-		}
-		if s.Label != nil {
-			return // labeled break statement, usually affects a nesting loop
-		}
-		msg := "useless break in case clause"
-		if w.inLoopBody {
-			msg += " (WARN: this break statement affects this switch or select statement and not the loop enclosing it)"
-		}
-		w.onFailure(lint.Failure{
-			Confidence: 1,
-			Node:       s,
-			Failure:    msg,
-		})
+func (w *lintUselessBreak) inspectCaseStatement(body []ast.Stmt) {
+	l := len(body)
+	if l == 0 {
+		return // empty body, nothing to do
 	}
+
+	s := body[l-1] // pick the last statement
+	if !isUnlabelledBreak(s) {
+		return
+	}
+
+	msg := "useless break in case clause"
+	if w.inLoopBody {
+		msg += " (WARN: this break statement affects this switch or select statement and not the loop enclosing it)"
+	}
+
+	w.onFailure(lint.Failure{
+		Confidence: 1,
+		Node:       s,
+		Failure:    msg,
+	})
+}
+
+func isUnlabelledBreak(stmt ast.Stmt) bool {
+	s, ok := stmt.(*ast.BranchStmt)
+	return ok && s.Tok == token.BREAK && s.Label == nil
 }
