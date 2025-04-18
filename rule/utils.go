@@ -140,3 +140,77 @@ func isCallToExitFunction(pkgName, functionName string) bool {
 func newInternalFailureError(e error) []lint.Failure {
 	return []lint.Failure{lint.NewInternalFailure(e.Error())}
 }
+
+// anyCaps checks if string contains any capital letter
+func anyCaps(s string) bool {
+	if len(s) == 0 {
+		return false
+	}
+	for _, r := range s {
+		if r >= 'A' && r <= 'Z' {
+			return true
+		}
+	}
+	return false
+}
+
+// allCaps checks if string have all capital letters
+func allCaps(s string) bool {
+	if len(s) == 0 {
+		return false
+	}
+	for _, r := range s {
+		if (r < 'A' || r > 'Z') && (r < '0' || r > '9') && r != '_' {
+			return false
+		}
+	}
+	return true
+}
+
+// isUpperCaseConst checks if string is in constant name format like `SOME_CONST`, `SOME_CONST_2`, `X123_3`, `_SOME_PRIVATE_CONST` (#851, #865)
+func isUpperCaseConst(s string) bool {
+	if len(s) == 0 {
+		return false
+	}
+
+	i := 0
+
+	// Optional leading underscore
+	if s[0] == '_' {
+		i++
+		if i >= len(s) {
+			return false // underscore only is not valid
+		}
+	}
+
+	// Must start with an uppercase letter
+	if s[i] < 'A' || s[i] > 'Z' {
+		return false
+	}
+	i++
+
+	// Continue parsing the rest
+	for i < len(s) {
+		c := s[i]
+		if c == '_' {
+			// Underscore must be followed by at least one uppercase letter or digit
+			i++
+			if i >= len(s) {
+				return false
+			}
+			if !isUpperOrDigit(s[i]) {
+				return false
+			}
+		} else if !isUpperOrDigit(c) {
+			return false
+		}
+		i++
+	}
+
+	return true
+}
+
+// isUpperOrDigit checks if character is capital or digit
+func isUpperOrDigit(c byte) bool {
+	return (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
+}
