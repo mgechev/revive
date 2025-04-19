@@ -4,18 +4,10 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
-	"regexp"
 	"strings"
 
 	"github.com/mgechev/revive/lint"
 )
-
-var anyCapsRE = regexp.MustCompile(`[A-Z]`)
-
-var allCapsRE = regexp.MustCompile(`^[A-Z0-9_]+$`)
-
-// regexp for constant names like `SOME_CONST`, `SOME_CONST_2`, `X123_3`, `_SOME_PRIVATE_CONST` (#851, #865)
-var upperCaseConstRE = regexp.MustCompile(`^_?[A-Z][A-Z\d]*(_[A-Z\d]+)*$`)
 
 var knownNameExceptions = map[string]bool{
 	"LastInsertId": true, // must match database/sql
@@ -135,7 +127,7 @@ func (r *VarNamingRule) applyPackageCheckRules(walker *lintNames) {
 			Category:   lint.FailureCategoryNaming,
 		})
 	}
-	if anyCapsRE.MatchString(packageName) {
+	if anyCaps(packageName) {
 		walker.onFailure(lint.Failure{
 			Failure:    fmt.Sprintf("don't use MixedCaps in package name; %s should be %s", packageName, lowerPackageName),
 			Confidence: 1,
@@ -197,12 +189,12 @@ func (w *lintNames) check(id *ast.Ident, thing string) {
 
 	// #851 upperCaseConst support
 	// if it's const
-	if thing == token.CONST.String() && w.upperCaseConst && upperCaseConstRE.MatchString(id.Name) {
+	if thing == token.CONST.String() && w.upperCaseConst && isUpperCaseConst(id.Name) {
 		return
 	}
 
 	// Handle two common styles from other languages that don't belong in Go.
-	if len(id.Name) >= 5 && allCapsRE.MatchString(id.Name) && strings.Contains(id.Name, "_") {
+	if len(id.Name) >= 5 && allCaps(id.Name) && strings.Contains(id.Name, "_") {
 		w.onFailure(lint.Failure{
 			Failure:    "don't use ALL_CAPS in Go names; use CamelCase",
 			Confidence: 0.8,
