@@ -112,16 +112,19 @@ func TestIsUpperConstFunction(t *testing.T) {
 		varName  string
 		expected bool
 	}{
-
+		{"SOME_CONST_2", true},
+		{"__FOO", false},
+		{"__", false},
 		{"X509B", true},
 		{"FOO", true},
+		{"1FOO", false},
 		{"_FOO123_BAR456", true},
 		{"A1_B2_C3", true},
 		{"A1_b2", false},
-		{"__FOO", false},
 		{"FOO_", false},
 		{"foo", false},
 		{"_", false},
+		{"", false},
 	}
 
 	for _, tt := range tests {

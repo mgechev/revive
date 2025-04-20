@@ -162,10 +162,6 @@ func hasLower(s string) bool {
 		return false
 	}
 	for _, r := range s {
-		if r >= '0' && r <= '9' {
-			continue // skip digits
-		}
-
 		if r >= 'a' && r <= 'z' {
 			return true
 		}
@@ -178,46 +174,34 @@ func isUpperCaseConst(s string) bool {
 	if len(s) == 0 {
 		return false
 	}
-
-	i := 0
-
-	// Optional leading underscore
-	if s[0] == '_' {
-		i++
-		if i >= len(s) {
-			return false // underscore only is not valid
-		}
+	r := []rune(s)
+	c := r[0]
+	if len(r) == 1 {
+		return isUpper(c)
 	}
-
-	// Must start with an uppercase letter
-	if s[i] < 'A' || s[i] > 'Z' {
+	switch {
+	case c == '_', isUpper(c):
+		// Must start with an uppercase letter or underscore
+	default:
 		return false
 	}
-	i++
-
-	// Continue parsing the rest
-	i = 0 // we can remove all the preceding code
-	for i < len(s) {
-		c := s[i]
-		if c == '_' {
+	for i, c := range r {
+		switch {
+		case isUpperOrDigit(c):
+			continue
+		case c == '_':
 			// Underscore must be followed by at least one uppercase letter or digit
-			i++
-			if i >= len(s) {
+			if i+1 >= len(s) || !isUpperOrDigit(r[i+1]) {
 				return false
 			}
-			if !isUpperOrDigit(s[i]) {
-				return false
-			}
-		} else if !isUpperOrDigit(c) {
+
+		default:
 			return false
 		}
-		i++
 	}
-
 	return true
 }
 
-// isUpperOrDigit checks if character is capital or digit
-func isUpperOrDigit(c byte) bool {
-	return (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
+func isUpperOrDigit(c rune) bool {
+	return isUpper(c) || (c >= '0' && c <= '9')
 }
