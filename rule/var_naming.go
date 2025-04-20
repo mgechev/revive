@@ -127,7 +127,7 @@ func (r *VarNamingRule) applyPackageCheckRules(walker *lintNames) {
 			Category:   lint.FailureCategoryNaming,
 		})
 	}
-	if anyCaps(packageName) {
+	if hasUpperCase(packageName) {
 		walker.onFailure(lint.Failure{
 			Failure:    fmt.Sprintf("don't use MixedCaps in package name; %s should be %s", packageName, lowerPackageName),
 			Confidence: 1,
@@ -194,7 +194,7 @@ func (w *lintNames) check(id *ast.Ident, thing string) {
 	}
 
 	// Handle two common styles from other languages that don't belong in Go.
-	if len(id.Name) >= 5 && allCaps(id.Name) && strings.Contains(id.Name, "_") {
+	if len(id.Name) >= 5 && isUpperUnderScore(id.Name) {
 		w.onFailure(lint.Failure{
 			Failure:    "don't use ALL_CAPS in Go names; use CamelCase",
 			Confidence: 0.8,
@@ -224,6 +224,10 @@ func (w *lintNames) check(id *ast.Ident, thing string) {
 		Node:       id,
 		Category:   lint.FailureCategoryNaming,
 	})
+}
+
+func isUpperUnderScore(s string) bool {
+	return !hasLower(s) && strings.Contains(s, "_")
 }
 
 type lintNames struct {

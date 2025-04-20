@@ -32,7 +32,7 @@ func TestIsCallToExitFunction(t *testing.T) {
 	}
 }
 
-func TestAnyCapsFunction(t *testing.T) {
+func TestHasUpperCaseFunction(t *testing.T) {
 	tests := []struct {
 		varName  string
 		expected bool
@@ -40,67 +40,70 @@ func TestAnyCapsFunction(t *testing.T) {
 		{"Exit", true},
 		{"fmt", false},
 		{"_SOME_PRIVATE_CONST_2", true},
+		{"", false},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.varName, func(t *testing.T) {
-			if got := anyCaps(tt.varName); got != tt.expected {
-				t.Errorf("anyCaps(%s) = %v; want %v", tt.varName, got, tt.expected)
+			if got := hasUpperCase(tt.varName); got != tt.expected {
+				t.Errorf("hasCaps(%s) = %v; want %v", tt.varName, got, tt.expected)
 			}
 		})
 	}
 }
 
-func BenchmarkAnyCapsRE(b *testing.B) {
-	var anyCapsRE = regexp.MustCompile(`[A-Z]`)
+func BenchmarkHasUpperCaseRE(b *testing.B) {
+	var anyUpperCaseRE = regexp.MustCompile(`[A-Z]`)
 	for i := 0; i <= b.N; i++ {
 		input := "HeLlo_WoRlD"
-		_ = anyCapsRE.MatchString(input)
+		_ = anyUpperCaseRE.MatchString(input)
 	}
 }
 
-func BenchmarkAnyCaps(b *testing.B) {
+func BenchmarkHasUpperCase(b *testing.B) {
 	for i := 0; i <= b.N; i++ {
 		input := "HeLlo_WoRlD"
-		_ = anyCaps(input)
+		_ = hasUpperCase(input)
 	}
 }
 
-func TestAllCapsFunction(t *testing.T) {
+func TestHasLowerFunction(t *testing.T) {
 	tests := []struct {
 		varName  string
 		expected bool
 	}{
-		{"Exit", false},
-		{"fmt", false},
-		{"_SOME_PRIVATE_CONST_2", true},
-		{"HELLO_WORLD123", true},
-		{"Hello_World", false},
+		{"Exit", true},
+		{"fmt", true},
+		{"_SOME_PRIVATE_CONST_2", false},
+		{"HELLO_WORLD123", false},
+		{"Hello_World", true},
 		{"", false},
 		{"INVALID-CHAR", false},
+		{"abc123", true},
+		{"123", false},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.varName, func(t *testing.T) {
-			if got := allCaps(tt.varName); got != tt.expected {
-				t.Errorf("allCaps(%s) = %v; want %v", tt.varName, got, tt.expected)
+			if got := hasLower(tt.varName); got != tt.expected {
+				t.Errorf("hasLower(%s) = %v; want %v", tt.varName, got, tt.expected)
 			}
 		})
 	}
 }
 
 func BenchmarkAllCapsRE(b *testing.B) {
-	var allCapsRE = regexp.MustCompile(`^_?[A-Z][A-Z\d]*(_[A-Z\d]+)*$`)
+	var allUpperCaseRE = regexp.MustCompile(`^_?[A-Z][A-Z\d]*(_[A-Z\d]+)*$`)
 	for i := 0; i <= b.N; i++ {
 		input := "_SOME_PRIVATE_CONST_2"
-		_ = allCapsRE.MatchString(input)
+		_ = allUpperCaseRE.MatchString(input)
 	}
 }
 
 func BenchmarkAllCaps(b *testing.B) {
 	for i := 0; i <= b.N; i++ {
 		input := "_SOME_PRIVATE_CONST_2"
-		_ = allCaps(input)
+		_ = hasUpperCase(input)
 	}
 }
 
@@ -109,6 +112,8 @@ func TestIsUpperConstFunction(t *testing.T) {
 		varName  string
 		expected bool
 	}{
+
+		{"X509B", true},
 		{"FOO", true},
 		{"_FOO123_BAR456", true},
 		{"A1_B2_C3", true},

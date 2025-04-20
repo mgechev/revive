@@ -141,30 +141,36 @@ func newInternalFailureError(e error) []lint.Failure {
 	return []lint.Failure{lint.NewInternalFailure(e.Error())}
 }
 
-// anyCaps checks if string contains any capital letter
-func anyCaps(s string) bool {
-	if len(s) == 0 {
-		return false
-	}
+// isUpper utility functions
+func isUpper(r rune) bool {
+	return r >= 'A' && r <= 'Z'
+}
+
+// hasUpperCase checks if string contains capital letter
+func hasUpperCase(s string) bool {
 	for _, r := range s {
-		if r >= 'A' && r <= 'Z' {
+		if isUpper(r) {
 			return true
 		}
 	}
 	return false
 }
 
-// allCaps checks if string have all capital letters
-func allCaps(s string) bool {
+// hasLower checks if string have lower case letters
+func hasLower(s string) bool {
 	if len(s) == 0 {
 		return false
 	}
 	for _, r := range s {
-		if (r < 'A' || r > 'Z') && (r < '0' || r > '9') && r != '_' {
-			return false
+		if r >= '0' && r <= '9' {
+			continue // skip digits
+		}
+
+		if r >= 'a' && r <= 'z' {
+			return true
 		}
 	}
-	return true
+	return false
 }
 
 // isUpperCaseConst checks if string is in constant name format like `SOME_CONST`, `SOME_CONST_2`, `X123_3`, `_SOME_PRIVATE_CONST` (#851, #865)
@@ -190,6 +196,7 @@ func isUpperCaseConst(s string) bool {
 	i++
 
 	// Continue parsing the rest
+	i = 0 // we can remove all the preceding code
 	for i < len(s) {
 		c := s[i]
 		if c == '_' {
