@@ -127,7 +127,7 @@ func (r *VarNamingRule) applyPackageCheckRules(walker *lintNames) {
 			Category:   lint.FailureCategoryNaming,
 		})
 	}
-	if hasUpperCase(packageName) {
+	if hasUpperCaseLetter(packageName) {
 		walker.onFailure(lint.Failure{
 			Failure:    fmt.Sprintf("don't use MixedCaps in package name; %s should be %s", packageName, lowerPackageName),
 			Confidence: 1,
@@ -227,7 +227,7 @@ func (w *lintNames) check(id *ast.Ident, thing string) {
 }
 
 func isUpperUnderScore(s string) bool {
-	return !hasLower(s) && strings.Contains(s, "_")
+	return !hasLowerCaseLetter(s) && strings.Contains(s, "_")
 }
 
 type lintNames struct {

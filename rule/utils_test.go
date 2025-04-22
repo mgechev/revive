@@ -45,7 +45,7 @@ func TestHasUpperCaseFunction(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.varName, func(t *testing.T) {
-			if got := hasUpperCase(tt.varName); got != tt.expected {
+			if got := hasUpperCaseLetter(tt.varName); got != tt.expected {
 				t.Errorf("hasCaps(%s) = %v; want %v", tt.varName, got, tt.expected)
 			}
 		})
@@ -63,7 +63,7 @@ func BenchmarkHasUpperCaseRE(b *testing.B) {
 func BenchmarkHasUpperCase(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		input := "HeLlo_WoRlD"
-		_ = hasUpperCase(input)
+		_ = hasUpperCaseLetter(input)
 	}
 }
 
@@ -85,7 +85,7 @@ func TestHasLowerFunction(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.varName, func(t *testing.T) {
-			if got := hasLower(tt.varName); got != tt.expected {
+			if got := hasLowerCaseLetter(tt.varName); got != tt.expected {
 				t.Errorf("hasLower(%s) = %v; want %v", tt.varName, got, tt.expected)
 			}
 		})
@@ -103,7 +103,7 @@ func BenchmarkAllCapsRE(b *testing.B) {
 func BenchmarkAllCaps(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		input := "_SOME_PRIVATE_CONST_2"
-		_ = hasUpperCase(input)
+		_ = hasUpperCaseLetter(input)
 	}
 }
 

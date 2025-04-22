@@ -142,8 +142,8 @@ func newInternalFailureError(e error) []lint.Failure {
 	return []lint.Failure{lint.NewInternalFailure(e.Error())}
 }
 
-// hasUpperCase checks if string contains capital letter
-func hasUpperCase(s string) bool {
+// hasUpperCaseLetter checks if string contains at least one upper case letter
+func hasUpperCaseLetter(s string) bool {
 	for _, r := range s {
 		if unicode.IsUpper(r) {
 			return true
@@ -152,8 +152,8 @@ func hasUpperCase(s string) bool {
 	return false
 }
 
-// hasLower checks if string have lower case letters
-func hasLower(s string) bool {
+// hasLowerCaseLetter checks if string contains at least one lower case letter
+func hasLowerCaseLetter(s string) bool {
 	for _, r := range s {
 		if unicode.IsLower(r) {
 			return true
