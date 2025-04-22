@@ -54,14 +54,14 @@ func TestHasUpperCaseFunction(t *testing.T) {
 
 func BenchmarkHasUpperCaseRE(b *testing.B) {
 	var anyUpperCaseRE = regexp.MustCompile(`[A-Z]`)
-	for i := 0; i <= b.N; i++ {
+	for i := 0; i < b.N; i++ {
 		input := "HeLlo_WoRlD"
 		_ = anyUpperCaseRE.MatchString(input)
 	}
 }
 
 func BenchmarkHasUpperCase(b *testing.B) {
-	for i := 0; i <= b.N; i++ {
+	for i := 0; i < b.N; i++ {
 		input := "HeLlo_WoRlD"
 		_ = hasUpperCase(input)
 	}
@@ -94,14 +94,14 @@ func TestHasLowerFunction(t *testing.T) {
 
 func BenchmarkAllCapsRE(b *testing.B) {
 	var allUpperCaseRE = regexp.MustCompile(`^_?[A-Z][A-Z\d]*(_[A-Z\d]+)*$`)
-	for i := 0; i <= b.N; i++ {
+	for i := 0; i < b.N; i++ {
 		input := "_SOME_PRIVATE_CONST_2"
 		_ = allUpperCaseRE.MatchString(input)
 	}
 }
 
 func BenchmarkAllCaps(b *testing.B) {
-	for i := 0; i <= b.N; i++ {
+	for i := 0; i < b.N; i++ {
 		input := "_SOME_PRIVATE_CONST_2"
 		_ = hasUpperCase(input)
 	}
@@ -138,14 +138,14 @@ func TestIsUpperConstFunction(t *testing.T) {
 
 func BenchmarkUpperCaseConstRE(b *testing.B) {
 	var upperCaseConstRE = regexp.MustCompile(`^_?[A-Z][A-Z\d]*(_[A-Z\d]+)*$`)
-	for i := 0; i <= b.N; i++ {
+	for i := 0; i < b.N; i++ {
 		input := "A1_B2_C3"
 		_ = upperCaseConstRE.MatchString(input)
 	}
 }
 
 func BenchmarkIsUpperCaseConst(b *testing.B) {
-	for i := 0; i <= b.N; i++ {
+	for i := 0; i < b.N; i++ {
 		input := "A1_B2_C3"
 		_ = isUpperCaseConst(input)
 	}
