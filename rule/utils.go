@@ -8,6 +8,7 @@ import (
 	"go/token"
 	"regexp"
 	"strings"
+	"unicode"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -141,15 +142,10 @@ func newInternalFailureError(e error) []lint.Failure {
 	return []lint.Failure{lint.NewInternalFailure(e.Error())}
 }
 
-// isUpper utility functions
-func isUpper(r rune) bool {
-	return r >= 'A' && r <= 'Z'
-}
-
 // hasUpperCase checks if string contains capital letter
 func hasUpperCase(s string) bool {
 	for _, r := range s {
-		if isUpper(r) {
+		if unicode.IsUpper(r) {
 			return true
 		}
 	}
@@ -158,11 +154,8 @@ func hasUpperCase(s string) bool {
 
 // hasLower checks if string have lower case letters
 func hasLower(s string) bool {
-	if len(s) == 0 {
-		return false
-	}
 	for _, r := range s {
-		if r >= 'a' && r <= 'z' {
+		if unicode.IsLower(r) {
 			return true
 		}
 	}
@@ -177,10 +170,10 @@ func isUpperCaseConst(s string) bool {
 	r := []rune(s)
 	c := r[0]
 	if len(r) == 1 {
-		return isUpper(c)
+		return unicode.IsUpper(c)
 	}
 	switch {
-	case c == '_', isUpper(c):
+	case c == '_', unicode.IsUpper(c):
 		// Must start with an uppercase letter or underscore
 	default:
 		return false
@@ -202,6 +195,7 @@ func isUpperCaseConst(s string) bool {
 	return true
 }
 
+// isUpperOrDigit checks if rune is upper case letter or digit
 func isUpperOrDigit(c rune) bool {
-	return isUpper(c) || (c >= '0' && c <= '9')
+	return unicode.IsUpper(c) || unicode.IsDigit(c)
 }
