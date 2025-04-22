@@ -125,6 +125,10 @@ func TestIsUpperConstFunction(t *testing.T) {
 		{"foo", false},
 		{"_", false},
 		{"", false},
+		{"FOOBAR", true},
+		{"FO", true},
+		{"F_O", true},
+		{"FOO123", true},
 	}
 
 	for _, tt := range tests {
@@ -148,5 +152,33 @@ func BenchmarkIsUpperCaseConst(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		input := "A1_B2_C3"
 		_ = isUpperCaseConst(input)
+	}
+}
+
+func TestIsUpperUnderScoreFunction(t *testing.T) {
+	tests := []struct {
+		varName  string
+		expected bool
+	}{
+		{"_", false},
+		{"", false},
+		{"empty string", false},
+		{"_404_404", true},
+		{"FOO_BAR", true},
+		{"FOOBAR", false},
+		{"FO", false},
+		{"F_O", false},
+		{"_FOOBAR", true},
+		{"FOOBAR_", true},
+		{"FOO123", false},
+		{"FOO_123", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.varName, func(t *testing.T) {
+			if got := isUpperUnderScore(tt.varName); got != tt.expected {
+				t.Errorf("isUpperUnderScore(%s) = %v; want %v", tt.varName, got, tt.expected)
+			}
+		})
 	}
 }
