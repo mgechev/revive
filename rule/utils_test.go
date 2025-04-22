@@ -67,31 +67,6 @@ func BenchmarkHasUpperCase(b *testing.B) {
 	}
 }
 
-func TestHasLowerFunction(t *testing.T) {
-	tests := []struct {
-		varName  string
-		expected bool
-	}{
-		{"Exit", true},
-		{"fmt", true},
-		{"_SOME_PRIVATE_CONST_2", false},
-		{"HELLO_WORLD123", false},
-		{"Hello_World", true},
-		{"", false},
-		{"INVALID-CHAR", false},
-		{"abc123", true},
-		{"123", false},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.varName, func(t *testing.T) {
-			if got := hasLowerCaseLetter(tt.varName); got != tt.expected {
-				t.Errorf("hasLower(%s) = %v; want %v", tt.varName, got, tt.expected)
-			}
-		})
-	}
-}
-
 func BenchmarkAllCapsRE(b *testing.B) {
 	var allUpperCaseRE = regexp.MustCompile(`^_?[A-Z][A-Z\d]*(_[A-Z\d]+)*$`)
 	for i := 0; i < b.N; i++ {

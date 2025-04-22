@@ -152,16 +152,6 @@ func hasUpperCaseLetter(s string) bool {
 	return false
 }
 
-// hasLowerCaseLetter checks if string contains at least one lower case letter
-func hasLowerCaseLetter(s string) bool {
-	for _, r := range s {
-		if unicode.IsLower(r) {
-			return true
-		}
-	}
-	return false
-}
-
 // isUpperCaseConst checks if string is in constant name format like `SOME_CONST`, `SOME_CONST_2`, `X123_3`, `_SOME_PRIVATE_CONST` (#851, #865)
 func isUpperCaseConst(s string) bool {
 	if len(s) == 0 {
