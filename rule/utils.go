@@ -165,10 +165,10 @@ func isUpperCaseConst(s string) bool {
 	r := []rune(s)
 	c := r[0]
 	if len(r) == 1 {
-		return unicode.IsUpper(c)
+		return isASCIIUpper(c)
 	}
 	switch {
-	case c == '_', unicode.IsUpper(c):
+	case c == '_', isASCIIUpper(c):
 		// Must start with an uppercase letter or underscore
 	default:
 		return false
@@ -192,7 +192,7 @@ func isUpperCaseConst(s string) bool {
 
 // isUpperOrDigit checks if rune is upper case letter or digit
 func isUpperOrDigit(c rune) bool {
-	return unicode.IsUpper(c) || unicode.IsDigit(c)
+	return isASCIIUpper(c) || unicode.IsDigit(c)
 }
 
 // isUpperUnderScore detects variable that are made from upper case letters, underscore, or digits.
