@@ -142,10 +142,15 @@ func newInternalFailureError(e error) []lint.Failure {
 	return []lint.Failure{lint.NewInternalFailure(e.Error())}
 }
 
+// isASCIIUpper checks if rune is ascii upper case letter
+func isASCIIUpper(r rune) bool {
+	return r >= 'A' && r <= 'Z'
+}
+
 // hasUpperCaseLetter checks if string contains at least one upper case letter
 func hasUpperCaseLetter(s string) bool {
 	for _, r := range s {
-		if unicode.IsUpper(r) {
+		if isASCIIUpper(r) {
 			return true
 		}
 	}

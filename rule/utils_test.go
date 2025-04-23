@@ -41,6 +41,16 @@ func TestHasUpperCaseFunction(t *testing.T) {
 		{"fmt", false},
 		{"_SOME_PRIVATE_CONST_2", true},
 		{"", false},
+		// Unicode uppercase (non-ASCII)
+		{"Ä", false}, // Latin capital letter A with diaeresis
+		{"Ω", false}, // Greek capital letter Omega
+		{"Д", false}, // Cyrillic capital letter De
+
+		// Unicode lowercase/symbols
+		{"ß", false}, // German sharp s
+		{"π", false}, // Greek small letter pi
+		{"💡", false}, // Emoji
+		{"你", false}, // Chinese character
 	}
 
 	for _, tt := range tests {
