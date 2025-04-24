@@ -163,38 +163,71 @@ func TestIsDigitFunction(t *testing.T) {
 }
 
 func TestIsUpperFunction(t *testing.T) {
-	tests := []struct {
-		input    rune
-		expected bool
-	}{
-		{'0', false},
-		{'5', false},
-		{'a', false},
-		{'A', true},
-		{'Ą', false},
-		{'Ć', false},
-		{'B', true},
-		{'C', true},
-		{'Z', true},
-		{' ', false},
-		{'!', false},
-		{'🙂', false}, // Emoji to test unicode
-		{'你', false},
-		{'日', false},
-		{'本', false},
-		{'語', false},
-		{'韓', false},
-		{'中', false},
-		{'文', false},
-		{'あ', false},
-		{'ア', false},
-		{'한', false},
-	}
-
-	for _, tt := range tests {
-		result := isUpper(tt.input)
-		if result != tt.expected {
-			t.Errorf("isUpper(%q) = %v; want %v", tt.input, result, tt.expected)
+	t.Run("non letter", func(t *testing.T) {
+		tests := []rune{
+			'0',
+			'5',
+			' ',
+			'_',
+			'!',
+			'🙂', // Emoji to test unicode
 		}
-	}
+		for _, r := range tests {
+			result := isUpper(r)
+			if result {
+				t.Errorf("isUpper(%q) = %v; want false", r, result)
+			}
+		}
+	})
+
+	t.Run("non ASCII letter", func(t *testing.T) {
+		tests := []rune{
+			'Ą',
+			'Ć',
+			'你',
+			'日',
+			'本',
+			'語',
+			'韓',
+			'中',
+			'文',
+			'あ',
+			'ア',
+			'한',
+		}
+		for _, r := range tests {
+			result := isUpper(r)
+			if result {
+				t.Errorf("isUpper(%q) = %v; want false", r, result)
+			}
+		}
+	})
+
+	t.Run("lowercase ASCII letter", func(t *testing.T) {
+		tests := []rune{
+			'a',
+			'b',
+		}
+		for _, r := range tests {
+			result := isUpper(r)
+			if result {
+				t.Errorf("isUpper(%q) = %v; want false", r, result)
+			}
+		}
+	})
+
+	t.Run("uppercase ASCII letter", func(t *testing.T) {
+		tests := []rune{
+			'A',
+			'B',
+			'C',
+			'Z',
+		}
+		for _, r := range tests {
+			result := isUpper(r)
+			if !result {
+				t.Errorf("isUpper(%q) = %v; want true", r, result)
+			}
+		}
+	})
 }
