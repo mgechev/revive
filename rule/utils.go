@@ -141,12 +141,18 @@ func newInternalFailureError(e error) []lint.Failure {
 	return []lint.Failure{lint.NewInternalFailure(e.Error())}
 }
 
-// isUpper checks if rune is digit
+// isUpper checks if rune is simple digit
+//
+// # Note
+// we don't use [unicode.IsDigit] as it returns true for a large variety of digit that are not 0-9
 func isDigit(r rune) bool {
 	return r >= '0' && r <= '9'
 }
 
-// isUpper checks if rune is ascii upper case letter
+// isUpper checks if rune is ASCII upper case letter
+//
+// # Note
+// We restrict to A-Z because [Unicode.IsUpper] return true for a large variety of letter
 func isUpper(r rune) bool {
 	return r >= 'A' && r <= 'Z'
 }
