@@ -8,7 +8,6 @@ import (
 	"go/token"
 	"regexp"
 	"strings"
-	"unicode"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -142,15 +141,20 @@ func newInternalFailureError(e error) []lint.Failure {
 	return []lint.Failure{lint.NewInternalFailure(e.Error())}
 }
 
-// isASCIIUpper checks if rune is ascii upper case letter
-func isASCIIUpper(r rune) bool {
+// isUpper checks if rune is digit
+func isDigit(r rune) bool {
+	return r >= '0' && r <= '9'
+}
+
+// isUpper checks if rune is ascii upper case letter
+func isUpper(r rune) bool {
 	return r >= 'A' && r <= 'Z'
 }
 
 // hasUpperCaseLetter checks if string contains at least one upper case letter
 func hasUpperCaseLetter(s string) bool {
 	for _, r := range s {
-		if isASCIIUpper(r) {
+		if isUpper(r) {
 			return true
 		}
 	}
@@ -165,10 +169,10 @@ func isUpperCaseConst(s string) bool {
 	r := []rune(s)
 	c := r[0]
 	if len(r) == 1 {
-		return isASCIIUpper(c)
+		return isUpper(c)
 	}
 	switch {
-	case c == '_', isASCIIUpper(c):
+	case c == '_', isUpper(c):
 		// Must start with an uppercase letter or underscore
 	default:
 		return false
@@ -191,8 +195,8 @@ func isUpperCaseConst(s string) bool {
 }
 
 // isUpperOrDigit checks if rune is upper case letter or digit
-func isUpperOrDigit(c rune) bool {
-	return isASCIIUpper(c) || unicode.IsDigit(c)
+func isUpperOrDigit(r rune) bool {
+	return isUpper(r) || isDigit(r)
 }
 
 // isUpperUnderScore detects variable that are made from upper case letters, underscore, or digits.

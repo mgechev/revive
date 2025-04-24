@@ -167,3 +167,59 @@ func TestIsUpperUnderScoreFunction(t *testing.T) {
 		})
 	}
 }
+func TestIsDigitFunction(t *testing.T) {
+	tests := []struct {
+		input    rune
+		expected bool
+	}{
+		{'0', true},
+		{'1', true},
+		{'2', true},
+		{'3', true},
+		{'4', true},
+		{'5', true},
+		{'6', true},
+		{'7', true},
+		{'8', true},
+		{'9', true},
+		{'a', false},
+		{'Z', false},
+		{' ', false},
+		{'!', false},
+		{'🙂', false}, // Emoji to test unicode
+	}
+
+	for _, tt := range tests {
+		result := isDigit(tt.input)
+		if result != tt.expected {
+			t.Errorf("isDigit(%q) = %v; want %v", tt.input, result, tt.expected)
+		}
+	}
+}
+
+func TestIsUpperFunction(t *testing.T) {
+	tests := []struct {
+		input    rune
+		expected bool
+	}{
+		{'0', false},
+		{'5', false},
+		{'a', false},
+		{'A', true},
+		{'Ą', false},
+		{'Ć', false},
+		{'B', true},
+		{'C', true},
+		{'Z', true},
+		{' ', false},
+		{'!', false},
+		{'🙂', false}, // Emoji to test unicode
+	}
+
+	for _, tt := range tests {
+		result := isUpper(tt.input)
+		if result != tt.expected {
+			t.Errorf("isUpper(%q) = %v; want %v", tt.input, result, tt.expected)
+		}
+	}
+}
