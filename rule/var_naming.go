@@ -157,7 +157,7 @@ func (r *VarNamingRule) applyPackageCheckRules(file *lint.File, onFailure func(f
 	if strings.Contains(pkgName, "_") && !strings.HasSuffix(pkgName, "_test") {
 		onFailure(r.pkgNameFailure(pkgNameNode, "don't use an underscore in package name"))
 	}
-	if anyCapsRE.MatchString(pkgName) {
+	if hasUpperCaseLetter(pkgName) {
 		onFailure(r.pkgNameFailure(pkgNameNode, "don't use MixedCaps in package names; %s should be %s", pkgName, pkgNameLower))
 	}
 }
