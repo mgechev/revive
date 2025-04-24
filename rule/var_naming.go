@@ -197,7 +197,7 @@ func (w *lintNames) check(id *ast.Ident, thing string) {
 	}
 
 	// Handle two common styles from other languages that don't belong in Go.
-	if isUpperUnderScore(id.Name) {
+	if isUpperUnderscore(id.Name) {
 		w.onFailure(lint.Failure{
 			Failure:    "don't use ALL_CAPS in Go names; use CamelCase",
 			Confidence: 0.8,

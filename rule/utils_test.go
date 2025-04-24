@@ -161,7 +161,7 @@ func TestIsUpperUnderScoreFunction(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.varName, func(t *testing.T) {
-			if got := isUpperUnderScore(tt.varName); got != tt.expected {
+			if got := isUpperUnderscore(tt.varName); got != tt.expected {
 				t.Errorf("isUpperUnderScore(%s) = %v; want %v", tt.varName, got, tt.expected)
 			}
 		})

@@ -199,10 +199,10 @@ func isUpperOrDigit(r rune) bool {
 	return isUpper(r) || isDigit(r)
 }
 
-// isUpperUnderScore detects variable that are made from upper case letters, underscore, or digits.
+// isUpperUnderscore detects variable that are made from upper case letters, underscore, or digits.
 //
 // short variable names are considered OK
-func isUpperUnderScore(s string) bool {
+func isUpperUnderscore(s string) bool {
 	if !strings.Contains(s, "_") {
 		return false
 	}
