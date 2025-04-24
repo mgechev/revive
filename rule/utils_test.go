@@ -2,7 +2,6 @@ package rule
 
 import (
 	"fmt"
-	"regexp"
 	"testing"
 )
 
@@ -62,36 +61,6 @@ func TestHasUpperCaseFunction(t *testing.T) {
 	}
 }
 
-func BenchmarkHasUpperCaseRE(b *testing.B) {
-	var anyUpperCaseRE = regexp.MustCompile(`[A-Z]`)
-	for i := 0; i < b.N; i++ {
-		input := "HeLlo_WoRlD"
-		_ = anyUpperCaseRE.MatchString(input)
-	}
-}
-
-func BenchmarkHasUpperCase(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		input := "HeLlo_WoRlD"
-		_ = hasUpperCaseLetter(input)
-	}
-}
-
-func BenchmarkAllCapsRE(b *testing.B) {
-	var allUpperCaseRE = regexp.MustCompile(`^_?[A-Z][A-Z\d]*(_[A-Z\d]+)*$`)
-	for i := 0; i < b.N; i++ {
-		input := "_SOME_PRIVATE_CONST_2"
-		_ = allUpperCaseRE.MatchString(input)
-	}
-}
-
-func BenchmarkAllCaps(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		input := "_SOME_PRIVATE_CONST_2"
-		_ = hasUpperCaseLetter(input)
-	}
-}
-
 func TestIsUpperConstFunction(t *testing.T) {
 	tests := []struct {
 		varName  string
@@ -125,21 +94,6 @@ func TestIsUpperConstFunction(t *testing.T) {
 	}
 }
 
-func BenchmarkUpperCaseConstRE(b *testing.B) {
-	var upperCaseConstRE = regexp.MustCompile(`^_?[A-Z][A-Z\d]*(_[A-Z\d]+)*$`)
-	for i := 0; i < b.N; i++ {
-		input := "A1_B2_C3"
-		_ = upperCaseConstRE.MatchString(input)
-	}
-}
-
-func BenchmarkIsUpperCaseConst(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		input := "A1_B2_C3"
-		_ = isUpperCaseConst(input)
-	}
-}
-
 func TestIsUpperUnderScoreFunction(t *testing.T) {
 	tests := []struct {
 		varName  string
@@ -167,6 +121,7 @@ func TestIsUpperUnderScoreFunction(t *testing.T) {
 		})
 	}
 }
+
 func TestIsDigitFunction(t *testing.T) {
 	tests := []struct {
 		input    rune
@@ -187,6 +142,16 @@ func TestIsDigitFunction(t *testing.T) {
 		{' ', false},
 		{'!', false},
 		{'🙂', false}, // Emoji to test unicode
+		{'٠', false}, // Arabic-Indic 0
+		{'١', false}, // Arabic-Indic 1
+		{'२', false}, // Devanagari 2
+		{'৩', false}, // Bengali 3
+		{'४', false}, // Devanagari 4
+		{'௫', false}, // Tamil 5
+		{'๖', false}, // Thai 6
+		{'৭', false}, // Bengali 7
+		{'८', false}, // Devanagari 8
+		{'९', false}, // Devanagari 9
 	}
 
 	for _, tt := range tests {
@@ -214,6 +179,16 @@ func TestIsUpperFunction(t *testing.T) {
 		{' ', false},
 		{'!', false},
 		{'🙂', false}, // Emoji to test unicode
+		{'你', false},
+		{'日', false},
+		{'本', false},
+		{'語', false},
+		{'韓', false},
+		{'中', false},
+		{'文', false},
+		{'あ', false},
+		{'ア', false},
+		{'한', false},
 	}
 
 	for _, tt := range tests {
