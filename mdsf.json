@@ -1,0 +1,12 @@
+{
+  "$schema": "https://raw.githubusercontent.com/hougesen/mdsf/HEAD/schemas/v0.9.1/mdsf.schema.json",
+  "format_finished_document": false,
+  "languages": {
+    "go": [
+      [
+        "gofmt",
+        "goimports"
+      ]
+    ]
+  }
+}

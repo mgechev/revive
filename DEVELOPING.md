@@ -6,14 +6,16 @@ This document explains how to build, test, and develop features for revive.
 
 Clone the project:
 
-```
+```shell
 git clone git@github.com:mgechev/revive.git
 cd revive
 ```
+
 ## Build
 
 In order to build the project run:
-```bash
+
+```shell
 make build
 ```
 
@@ -23,7 +25,7 @@ The command will produce the `revive` binary in the root of the project.
 
 To enable debug logging, set the `DEBUG` environment variable:
 
-```sh
+```shell
 DEBUG=1 go run main.go
 ```
 
@@ -34,13 +36,16 @@ This will output debug information to `stderr` and to the log file `revive.log` 
 If you want to develop a new rule, follow as an example the already existing rules in the [rule package](https://github.com/mgechev/revive/tree/master/rule).
 
 Each rule needs to implement the `lint.Rule` interface: 
+
 ```go
 type Rule interface {
 	Name() string
 	Apply(*File, Arguments) []Failure
 }
 ```
+
 All rules with a configuration must implement `lint.ConfigurableRule` interface:
+
 ```go
 type ConfigurableRule interface {
 	Configure(Arguments) error
@@ -64,7 +69,6 @@ With the snippet above we:
 - Configure the rule with the argument `Foo`. The list of arguments will be passed to `Apply(*File, Arguments)` together with the target file we're linting currently.
 
 A sample rule implementation can be found [here](/rule/argument_limit.go).
-
 
 ## Development of formatters
 

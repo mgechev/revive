@@ -45,3 +45,15 @@ jobs:
       with:
         config: revive.toml
         path: ./...
+
+  lint-md:
+    name: Lint Markdown
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install mdsf
+        uses: hougesen/mdsf@v0.9.1
+
+      - name: Run mdsf
+        run: mdsf verify --log-level error README.md DEVELOPING.md

@@ -239,7 +239,6 @@ Please notice that if no particular configuration is provided, `revive` will beh
 - `-set_exit_status` - set exit status to 1 if any issues are found, overwrites `errorCode` and `warningCode` in config.
 - `-version` - get revive version.
 
-
 ### Sample Invocations
 
 ```shell
@@ -259,6 +258,7 @@ Using comments, you can disable the linter for the entire file or only a range o
 //revive:disable
 
 func Public() {}
+
 //revive:enable
 ```
 
@@ -271,8 +271,9 @@ You can do the same on a rule level. In case you want to disable only a particul
 ```go
 //revive:disable:unexported-return
 func Public() private {
-  return private
+	return private
 }
+
 //revive:enable:unexported-return
 ```
 
@@ -478,6 +479,7 @@ You can use the following exclude patterns
 ## Available Rules
 
 List of all available rules. The rules ported from `golint` are left unchanged and indicated in the `golint` column.
+
 | Name                  | Config | Description                                                      | `golint` | Typed |
 | --------------------- | :----: | :--------------------------------------------------------------- | :------: | :---: |
 | [`add-constant`](./RULES_DESCRIPTIONS.md#add-constant)        |  map   | Suggests using constant for magic numbers and string literals    |    no    |  no   |
@@ -670,7 +672,9 @@ func (f myRule) Name() string {
 	return "myRule"
 }
 
-func (f myRule) Apply(*lint.File, lint.Arguments) []lint.Failure { ... }
+func (f myRule) Apply(*lint.File, lint.Arguments) []lint.Failure {
+	// ...
+}
 ```
 
 You can still go further and use `revive` without its CLI, as part of your library, or your CLI:
@@ -680,38 +684,38 @@ package mylib
 
 import (
 	"github.com/mgechev/revive/cli"
-	"github.com/mgechev/revive/revivelib"
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/revivelib"
 )
 
 // Error checking removed for clarity
 func LintMyFile(file string) {
-	conf, _:= config.GetConfig("../defaults.toml")
+	conf, _ := config.GetConfig("../defaults.toml")
 
 	revive, _ := revivelib.New(
-		conf,  // Configuration file
-		true,  // Set exit status
-		2048,  // Max open files
+		conf, // Configuration file
+		true, // Set exit status
+		2048, // Max open files
 
 		// Then add as many extra rules as you need
 		revivelib.NewExtraRule(&myRule{}, lint.RuleConfig{}),
 	)
 
 	failuresChan, err := revive.Lint(
- 		revivelib.Include(file),
- 		revivelib.Exclude("./fixtures"),
- 		// You can use as many revivelib.Include or revivelib.Exclude as required
- 	)
-  	if err != nil {
-  	 	panic("Shouldn't have failed: " + err.Error())
-  	}
+		revivelib.Include(file),
+		revivelib.Exclude("./fixtures"),
+		// You can use as many revivelib.Include or revivelib.Exclude as required
+	)
+	if err != nil {
+		panic("Shouldn't have failed: " + err.Error())
+	}
 
-  	// Now let's return the formatted errors
+	// Now let's return the formatted errors
 	failures, exitCode, _ := revive.Format("stylish", failuresChan)
 
-  	// failures is the string with all formatted lint error messages
-  	// exit code is 0 if no errors, 1 if errors (unless config options change it)
-  	// ... do something with them
+	// failures is the string with all formatted lint error messages
+	// exit code is 0 if no errors, 1 if errors (unless config options change it)
+	// ... do something with them
 }
 
 type myRule struct{}
@@ -720,7 +724,9 @@ func (f myRule) Name() string {
 	return "myRule"
 }
 
-func (f myRule) Apply(*lint.File, lint.Arguments) []lint.Failure { ... }
+func (f myRule) Apply(*lint.File, lint.Arguments) []lint.Failure {
+	// ...
+}
 ```
 
 ### Custom Formatter
