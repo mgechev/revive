@@ -141,23 +141,21 @@ func newInternalFailureError(e error) []lint.Failure {
 	return []lint.Failure{lint.NewInternalFailure(e.Error())}
 }
 
-// isUpper checks if rune is simple digit
+// isUpper checks if rune is a simple digit.
 //
-// # Note
-// we don't use [unicode.IsDigit] as it returns true for a large variety of digit that are not 0-9
+// We don't use unicode.IsDigit as it returns true for a large variety of digits that are not 0-9.
 func isDigit(r rune) bool {
 	return r >= '0' && r <= '9'
 }
 
 // isUpper checks if rune is ASCII upper case letter
 //
-// # Note
-// We restrict to A-Z because [Unicode.IsUpper] return true for a large variety of letter
+// We restrict to A-Z because unicode.IsUpper returns true for a large variety of letters.
 func isUpper(r rune) bool {
 	return r >= 'A' && r <= 'Z'
 }
 
-// hasUpperCaseLetter checks if string contains at least one upper case letter
+// hasUpperCaseLetter checks if a string contains at least one upper case letter.
 func hasUpperCaseLetter(s string) bool {
 	for _, r := range s {
 		if isUpper(r) {
@@ -167,7 +165,8 @@ func hasUpperCaseLetter(s string) bool {
 	return false
 }
 
-// isUpperCaseConst checks if string is in constant name format like `SOME_CONST`, `SOME_CONST_2`, `X123_3`, `_SOME_PRIVATE_CONST` (#851, #865)
+// isUpperCaseConst checks if a string is in constant name format like `SOME_CONST`, `SOME_CONST_2`, `X123_3`, `_SOME_PRIVATE_CONST`.
+// See #851, #865.
 func isUpperCaseConst(s string) bool {
 	if len(s) == 0 {
 		return false
@@ -200,20 +199,20 @@ func isUpperCaseConst(s string) bool {
 	return true
 }
 
-// isUpperOrDigit checks if rune is upper case letter or digit
+// isUpperOrDigit checks if a rune is an uppercase letter or digit.
 func isUpperOrDigit(r rune) bool {
 	return isUpper(r) || isDigit(r)
 }
 
 // isUpperUnderscore detects variable that are made from upper case letters, underscore, or digits.
 //
-// short variable names are considered OK
+// Short variable names are considered OK.
 func isUpperUnderscore(s string) bool {
 	if !strings.Contains(s, "_") {
 		return false
 	}
 	if len(s) <= 5 {
-		// avoid false positive
+		// avoid false positives
 		return false
 	}
 	for _, r := range s {

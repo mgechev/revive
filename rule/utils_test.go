@@ -31,7 +31,7 @@ func TestIsCallToExitFunction(t *testing.T) {
 	}
 }
 
-func TestHasUpperCaseFunction(t *testing.T) {
+func TestHasUpperCaseLetter(t *testing.T) {
 	tests := []struct {
 		varName  string
 		expected bool
@@ -61,7 +61,7 @@ func TestHasUpperCaseFunction(t *testing.T) {
 	}
 }
 
-func TestIsUpperConstFunction(t *testing.T) {
+func TestIsUpperCaseConst(t *testing.T) {
 	tests := []struct {
 		varName  string
 		expected bool
@@ -94,7 +94,7 @@ func TestIsUpperConstFunction(t *testing.T) {
 	}
 }
 
-func TestIsUpperUnderScoreFunction(t *testing.T) {
+func TestIsUpperUnderscore(t *testing.T) {
 	tests := []struct {
 		varName  string
 		expected bool
@@ -122,7 +122,7 @@ func TestIsUpperUnderScoreFunction(t *testing.T) {
 	}
 }
 
-func TestIsDigitFunction(t *testing.T) {
+func TestIsDigit(t *testing.T) {
 	tests := []struct {
 		input    rune
 		expected bool
@@ -162,7 +162,7 @@ func TestIsDigitFunction(t *testing.T) {
 	}
 }
 
-func TestIsUpperFunction(t *testing.T) {
+func TestIsUpper(t *testing.T) {
 	t.Run("non letter", func(t *testing.T) {
 		tests := []rune{
 			'0',
