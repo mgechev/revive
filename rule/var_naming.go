@@ -5,19 +5,11 @@ import (
 	"go/ast"
 	"go/token"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"sync"
 
 	"github.com/mgechev/revive/lint"
 )
-
-var anyCapsRE = regexp.MustCompile(`[A-Z]`)
-
-var allCapsRE = regexp.MustCompile(`^[A-Z0-9_]+$`)
-
-// regexp for constant names like `SOME_CONST`, `SOME_CONST_2`, `X123_3`, `_SOME_PRIVATE_CONST` (#851, #865)
-var upperCaseConstRE = regexp.MustCompile(`^_?[A-Z][A-Z\d]*(_[A-Z\d]+)*$`)
 
 var knownNameExceptions = map[string]bool{
 	"LastInsertId": true, // must match database/sql
@@ -165,7 +157,7 @@ func (r *VarNamingRule) applyPackageCheckRules(file *lint.File, onFailure func(f
 	if strings.Contains(pkgName, "_") && !strings.HasSuffix(pkgName, "_test") {
 		onFailure(r.pkgNameFailure(pkgNameNode, "don't use an underscore in package name"))
 	}
-	if anyCapsRE.MatchString(pkgName) {
+	if hasUpperCaseLetter(pkgName) {
 		onFailure(r.pkgNameFailure(pkgNameNode, "don't use MixedCaps in package names; %s should be %s", pkgName, pkgNameLower))
 	}
 }
@@ -200,12 +192,12 @@ func (w *lintNames) check(id *ast.Ident, thing string) {
 
 	// #851 upperCaseConst support
 	// if it's const
-	if thing == token.CONST.String() && w.upperCaseConst && upperCaseConstRE.MatchString(id.Name) {
+	if thing == token.CONST.String() && w.upperCaseConst && isUpperCaseConst(id.Name) {
 		return
 	}
 
 	// Handle two common styles from other languages that don't belong in Go.
-	if len(id.Name) >= 5 && allCapsRE.MatchString(id.Name) && strings.Contains(id.Name, "_") {
+	if isUpperUnderscore(id.Name) {
 		w.onFailure(lint.Failure{
 			Failure:    "don't use ALL_CAPS in Go names; use CamelCase",
 			Confidence: 0.8,
@@ -326,6 +318,86 @@ func (w *lintNames) Visit(n ast.Node) ast.Visitor {
 		}
 	}
 	return w
+}
+
+// isUpperCaseConst checks if a string is in constant name format like `SOME_CONST`, `SOME_CONST_2`, `X123_3`, `_SOME_PRIVATE_CONST`.
+// See #851, #865.
+func isUpperCaseConst(s string) bool {
+	if len(s) == 0 {
+		return false
+	}
+	r := []rune(s)
+	c := r[0]
+	if len(r) == 1 {
+		return isUpper(c)
+	}
+	if c != '_' && !isUpper(c) { // Must start with an uppercase letter or underscore
+		return false
+	}
+	for i, c := range r {
+		switch {
+		case isUpperOrDigit(c):
+			continue
+		case c == '_':
+			// Underscore must be followed by at least one uppercase letter or digit
+			if i+1 >= len(s) || !isUpperOrDigit(r[i+1]) {
+				return false
+			}
+
+		default:
+			return false
+		}
+	}
+	return true
+}
+
+// hasUpperCaseLetter checks if a string contains at least one upper case letter.
+func hasUpperCaseLetter(s string) bool {
+	for _, r := range s {
+		if isUpper(r) {
+			return true
+		}
+	}
+	return false
+}
+
+// isUpperOrDigit checks if a rune is an uppercase letter or digit.
+func isUpperOrDigit(r rune) bool {
+	return isUpper(r) || isDigit(r)
+}
+
+// isUpper checks if rune is a simple digit.
+//
+// We don't use unicode.IsDigit as it returns true for a large variety of digits that are not 0-9.
+func isDigit(r rune) bool {
+	return r >= '0' && r <= '9'
+}
+
+// isUpper checks if rune is ASCII upper case letter
+//
+// We restrict to A-Z because unicode.IsUpper returns true for a large variety of letters.
+func isUpper(r rune) bool {
+	return r >= 'A' && r <= 'Z'
+}
+
+// isUpperUnderscore detects variable that are made from upper case letters, underscore, or digits.
+//
+// Short variable names are considered OK.
+func isUpperUnderscore(s string) bool {
+	if !strings.Contains(s, "_") {
+		return false
+	}
+	if len(s) <= 5 {
+		// avoid false positives
+		return false
+	}
+	for _, r := range s {
+		if r == '_' || isUpperOrDigit(r) {
+			continue
+		}
+		return false
+	}
+	return true
 }
 
 func getList(arg any, argName string) ([]string, error) {
