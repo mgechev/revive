@@ -30,6 +30,7 @@ func FuncSignatureIs(funcDecl *ast.FuncDecl, wantName string, wantParametersType
 	return FuncParametersSignatureIs(funcDecl, wantParametersTypes)
 }
 
+// FuncParametersSignatureIs returns true if the function has parameters of the given type and order, false otherwise
 func FuncParametersSignatureIs(funcDecl *ast.FuncDecl, wantParametersTypes []string) bool {
 	funcParametersTypes := getTypeNames(funcDecl.Type.Params)
 	if len(wantParametersTypes) != len(funcParametersTypes) {
