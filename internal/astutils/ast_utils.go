@@ -15,25 +15,30 @@ func FuncSignatureIs(funcDecl *ast.FuncDecl, wantName string, wantParametersType
 		return false // func name doesn't match expected one
 	}
 
-	funcParametersTypes := getTypeNames(funcDecl.Type.Params)
-	if len(wantParametersTypes) != len(funcParametersTypes) {
-		return false // func has not the expected number of parameters
-	}
-
 	funcResultsTypes := getTypeNames(funcDecl.Type.Results)
 	if len(wantResultsTypes) != len(funcResultsTypes) {
 		return false // func has not the expected number of return values
 	}
 
-	for i, wantType := range wantParametersTypes {
-		if wantType != funcParametersTypes[i] {
-			return false // type of a func's parameter does not match the type of the corresponding expected parameter
-		}
-	}
-
 	for i, wantType := range wantResultsTypes {
 		if wantType != funcResultsTypes[i] {
 			return false // type of a func's return value does not match the type of the corresponding expected return value
+		}
+	}
+
+	// Name and return values are those we expected, the final result depends on parameters being what we want.
+	return FuncParametersSignatureIs(funcDecl, wantParametersTypes)
+}
+
+func FuncParametersSignatureIs(funcDecl *ast.FuncDecl, wantParametersTypes []string) bool {
+	funcParametersTypes := getTypeNames(funcDecl.Type.Params)
+	if len(wantParametersTypes) != len(funcParametersTypes) {
+		return false // func has not the expected number of parameters
+	}
+
+	for i, wantType := range wantParametersTypes {
+		if wantType != funcParametersTypes[i] {
+			return false // type of a func's parameter does not match the type of the corresponding expected parameter
 		}
 	}
 
@@ -67,7 +72,7 @@ func getFieldTypeName(typ ast.Expr) string {
 	case *ast.Ident:
 		return f.Name
 	case *ast.SelectorExpr:
-		return f.Sel.Name + "." + getFieldTypeName(f.X)
+		return getFieldTypeName(f.X) + "." + getFieldTypeName(f.Sel)
 	case *ast.StarExpr:
 		return "*" + getFieldTypeName(f.X)
 	case *ast.IndexExpr:

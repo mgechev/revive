@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"strings"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -27,6 +28,10 @@ func (*GetReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 
 		if hasResults(fd.Type.Results) {
 			continue
+		}
+
+		if astutils.FuncParametersSignatureIs(fd, []string{"http.ResponseWriter", "*http.Request"}) {
+			continue // the Get prefix in the function name refers to HTTP GET
 		}
 
 		failures = append(failures, lint.Failure{
