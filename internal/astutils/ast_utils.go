@@ -3,6 +3,7 @@ package astutils
 
 import (
 	"go/ast"
+	"slices"
 )
 
 // FuncSignatureIs returns true if the given func decl satisfies a signature characterized
@@ -15,37 +16,32 @@ func FuncSignatureIs(funcDecl *ast.FuncDecl, wantName string, wantParametersType
 		return false // func name doesn't match expected one
 	}
 
-	funcParametersTypes := getTypeNames(funcDecl.Type.Params)
-	if len(wantParametersTypes) != len(funcParametersTypes) {
-		return false // func has not the expected number of parameters
+	funcResultsTypes := GetTypeNames(funcDecl.Type.Results)
+	if !slices.Equal(wantResultsTypes, funcResultsTypes) {
+		return false // func has not the expected return values
 	}
 
-	funcResultsTypes := getTypeNames(funcDecl.Type.Results)
-	if len(wantResultsTypes) != len(funcResultsTypes) {
-		return false // func has not the expected number of return values
-	}
-
-	for i, wantType := range wantParametersTypes {
-		if wantType != funcParametersTypes[i] {
-			return false // type of a func's parameter does not match the type of the corresponding expected parameter
-		}
-	}
-
-	for i, wantType := range wantResultsTypes {
-		if wantType != funcResultsTypes[i] {
-			return false // type of a func's return value does not match the type of the corresponding expected return value
-		}
-	}
-
-	return true
+	// Name and return values are those we expected,
+	// the final result depends on parameters being what we want.
+	return funcParametersSignatureIs(funcDecl, wantParametersTypes)
 }
 
-func getTypeNames(fields *ast.FieldList) []string {
-	result := []string{}
+// funcParametersSignatureIs returns true if the function has parameters of the given type and order,
+// false otherwise
+func funcParametersSignatureIs(funcDecl *ast.FuncDecl, wantParametersTypes []string) bool {
+	funcParametersTypes := GetTypeNames(funcDecl.Type.Params)
 
+	return slices.Equal(wantParametersTypes, funcParametersTypes)
+}
+
+// GetTypeNames yields an slice with the string representation of the types of given fields.
+// It yields nil if the field list is nil.
+func GetTypeNames(fields *ast.FieldList) []string {
 	if fields == nil {
-		return result
+		return nil
 	}
+
+	result := []string{}
 
 	for _, field := range fields.List {
 		typeName := getFieldTypeName(field.Type)
@@ -67,7 +63,7 @@ func getFieldTypeName(typ ast.Expr) string {
 	case *ast.Ident:
 		return f.Name
 	case *ast.SelectorExpr:
-		return f.Sel.Name + "." + getFieldTypeName(f.X)
+		return getFieldTypeName(f.X) + "." + getFieldTypeName(f.Sel)
 	case *ast.StarExpr:
 		return "*" + getFieldTypeName(f.X)
 	case *ast.IndexExpr:
