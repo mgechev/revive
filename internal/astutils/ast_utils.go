@@ -3,6 +3,7 @@ package astutils
 
 import (
 	"go/ast"
+	"slices"
 )
 
 // FuncSignatureIs returns true if the given func decl satisfies a signature characterized
@@ -15,43 +16,32 @@ func FuncSignatureIs(funcDecl *ast.FuncDecl, wantName string, wantParametersType
 		return false // func name doesn't match expected one
 	}
 
-	funcResultsTypes := getTypeNames(funcDecl.Type.Results)
-	if len(wantResultsTypes) != len(funcResultsTypes) {
-		return false // func has not the expected number of return values
+	funcResultsTypes := GetTypeNames(funcDecl.Type.Results)
+	if !slices.Equal(wantResultsTypes, funcResultsTypes) {
+		return false // func has not the expected return values
 	}
 
-	for i, wantType := range wantResultsTypes {
-		if wantType != funcResultsTypes[i] {
-			return false // type of a func's return value does not match the type of the corresponding expected return value
-		}
-	}
-
-	// Name and return values are those we expected, the final result depends on parameters being what we want.
-	return FuncParametersSignatureIs(funcDecl, wantParametersTypes)
+	// Name and return values are those we expected,
+	// the final result depends on parameters being what we want.
+	return funcParametersSignatureIs(funcDecl, wantParametersTypes)
 }
 
-// FuncParametersSignatureIs returns true if the function has parameters of the given type and order, false otherwise
-func FuncParametersSignatureIs(funcDecl *ast.FuncDecl, wantParametersTypes []string) bool {
-	funcParametersTypes := getTypeNames(funcDecl.Type.Params)
-	if len(wantParametersTypes) != len(funcParametersTypes) {
-		return false // func has not the expected number of parameters
-	}
+// funcParametersSignatureIs returns true if the function has parameters of the given type and order,
+// false otherwise
+func funcParametersSignatureIs(funcDecl *ast.FuncDecl, wantParametersTypes []string) bool {
+	funcParametersTypes := GetTypeNames(funcDecl.Type.Params)
 
-	for i, wantType := range wantParametersTypes {
-		if wantType != funcParametersTypes[i] {
-			return false // type of a func's parameter does not match the type of the corresponding expected parameter
-		}
-	}
-
-	return true
+	return slices.Equal(wantParametersTypes, funcParametersTypes)
 }
 
-func getTypeNames(fields *ast.FieldList) []string {
-	result := []string{}
-
+// GetTypeNames yields an slice with the string representation of the types of given fields.
+// It yields nil if the field list is nil.
+func GetTypeNames(fields *ast.FieldList) []string {
 	if fields == nil {
-		return result
+		return nil
 	}
+
+	result := []string{}
 
 	for _, field := range fields.List {
 		typeName := getFieldTypeName(field.Type)

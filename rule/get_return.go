@@ -30,7 +30,7 @@ func (*GetReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 			continue
 		}
 
-		if astutils.FuncParametersSignatureIs(fd, []string{"http.ResponseWriter", "*http.Request"}) {
+		if isHTTPHandler(fd.Type.Params) {
 			continue // the Get prefix in the function name refers to HTTP GET
 		}
 
@@ -73,4 +73,16 @@ func isGetter(name string) bool {
 
 func hasResults(rs *ast.FieldList) bool {
 	return rs != nil && len(rs.List) > 0
+}
+
+// isHTTPHandler returns true if the given params match with the signature of an HTTP handler, false otherwise
+// A params list is considered to be an HTTP handler if the first two parameters are
+// http.ResponseWriter, *http.Request in that order.
+func isHTTPHandler(params *ast.FieldList) bool {
+	typeNames := astutils.GetTypeNames(params)
+	if len(typeNames) < 2 {
+		return false
+	}
+
+	return typeNames[0] == "http.ResponseWriter" && typeNames[1] == "*http.Request"
 }
