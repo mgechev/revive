@@ -71,6 +71,7 @@ List of all available rules.
   - [string-of-int](#string-of-int)
   - [struct-tag](#struct-tag)
   - [superfluous-else](#superfluous-else)
+  - [time-date](#time-date)
   - [time-equal](#time-equal)
   - [time-naming](#time-naming)
   - [unchecked-type-assertion](#unchecked-type-assertion)
@@ -955,6 +956,26 @@ Examples:
 ```toml
 [rule.superfluous-else]
   arguments = ["preserve-scope"]
+```
+
+## time-date
+
+_Description_: reports bad usage of integer literals with `time.Date`.
+
+_Configuration_: N/A
+
+_Example_:
+
+Here the leading zeros are defining integers with octal notation
+
+```go
+var = time.Date(2023, 01, 02, 03, 04, 00, 00, time.UTC)
+```
+
+It should be
+
+```go
+var = time.Date(2023, 1, 2, 3, 4, 0, 0, time.UTC)
 ```
 
 ## time-equal
