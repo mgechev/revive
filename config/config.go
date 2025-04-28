@@ -83,6 +83,7 @@ var allRules = append([]lint.Rule{
 	&rule.UselessBreak{},
 	&rule.UncheckedTypeAssertionRule{},
 	&rule.TimeEqualRule{},
+	&rule.TimeDateRule{},
 	&rule.BannedCharsRule{},
 	&rule.OptimizeOperandsOrderRule{},
 	&rule.UseAnyRule{},
