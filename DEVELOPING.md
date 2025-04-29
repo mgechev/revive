@@ -6,7 +6,7 @@ This document explains how to build, test, and develop features for revive.
 
 Clone the project:
 
-```shell
+```
 git clone git@github.com:mgechev/revive.git
 cd revive
 ```
@@ -15,7 +15,7 @@ cd revive
 
 In order to build the project run:
 
-```shell
+```bash
 make build
 ```
 
@@ -25,7 +25,7 @@ The command will produce the `revive` binary in the root of the project.
 
 To enable debug logging, set the `DEBUG` environment variable:
 
-```shell
+```sh
 DEBUG=1 go run main.go
 ```
 
