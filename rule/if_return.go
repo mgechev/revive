@@ -36,8 +36,7 @@ type lintElseError struct {
 }
 
 func (w *lintElseError) Visit(node ast.Node) ast.Visitor {
-	switch v := node.(type) {
-	case *ast.BlockStmt:
+	if v, ok := node.(*ast.BlockStmt); ok {
 		for i := range len(v.List) - 1 {
 			// if var := whatever; var != nil { return var }
 			s, ok := v.List[i].(*ast.IfStmt)

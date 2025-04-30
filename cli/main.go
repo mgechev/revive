@@ -33,7 +33,7 @@ var (
 
 func fail(err string) {
 	fmt.Fprintln(os.Stderr, err)
-	os.Exit(1)
+	os.Exit(1) //revive:disable-line:deep-exit
 }
 
 // RunRevive runs the CLI for revive.
@@ -44,7 +44,7 @@ func RunRevive(extraRules ...revivelib.ExtraRule) {
 
 	if versionFlag {
 		fmt.Print(getVersion(builtBy, date, commit, version))
-		os.Exit(0)
+		os.Exit(0) //revive:disable-line:deep-exit
 	}
 
 	conf, err := config.GetConfig(configPath)
@@ -87,7 +87,7 @@ func RunRevive(extraRules ...revivelib.ExtraRule) {
 		fmt.Println(output)
 	}
 
-	os.Exit(exitCode)
+	os.Exit(exitCode) //revive:disable-line:deep-exit
 }
 
 var (

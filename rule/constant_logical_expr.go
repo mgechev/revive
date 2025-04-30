@@ -35,8 +35,7 @@ type lintConstantLogicalExpr struct {
 }
 
 func (w *lintConstantLogicalExpr) Visit(node ast.Node) ast.Visitor {
-	switch n := node.(type) {
-	case *ast.BinaryExpr:
+	if n, ok := node.(*ast.BinaryExpr); ok {
 		if !w.isOperatorWithLogicalResult(n.Op) {
 			return w
 		}
