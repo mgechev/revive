@@ -124,6 +124,10 @@ test.go
 			formatter: &formatter.Unix{},
 			want:      `test.go:2:5: [rule] test failure`,
 		},
+		{
+			formatter: &formatter.Github{},
+			want:      `::warning file=test.go,line=2,endLine=2,title=Revive: rule::test failure`,
+		},
 	} {
 		t.Run(td.formatter.Name(), func(t *testing.T) {
 			dir := t.TempDir()
