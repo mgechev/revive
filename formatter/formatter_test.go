@@ -126,7 +126,7 @@ test.go
 		},
 		{
 			formatter: &formatter.Github{},
-			want:      `::warning file=test.go,line=2,endLine=2,title=Revive: rule::test failure`,
+			want:      `::warning file=test.go,line=2,col=5,endLine=2,endCol=10,title=Revive: rule::test failure`,
 		},
 	} {
 		t.Run(td.formatter.Name(), func(t *testing.T) {

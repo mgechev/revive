@@ -23,11 +23,13 @@ func (*Github) Name() string {
 func (*Github) Format(failures <-chan lint.Failure, config lint.Config) (string, error) {
 	var buf bytes.Buffer
 	for failure := range failures {
-		fmt.Fprintf(&buf, "::%s file=%s,line=%d,endLine=%d,title=Revive: %s::%s",
+		fmt.Fprintf(&buf, "::%s file=%s,line=%d,col=%d,endLine=%d,endCol=%d,title=Revive: %s::%s",
 			severity(config, failure),
 			failure.Position.Start.Filename,
 			failure.Position.Start.Line,
+			failure.Position.Start.Column,
 			failure.Position.End.Line,
+			failure.Position.End.Column,
 			failure.RuleName,
 			failure.Failure,
 		)
