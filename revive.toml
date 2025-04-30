@@ -9,6 +9,8 @@ warningCode = 1
 
 [rule.bare-return]
 [rule.blank-imports]
+[rule.comment-spacings]
+[rule.constant-logical-expr]
 [rule.context-as-argument]
 [rule.context-keys-type]
 [rule.deep-exit]
@@ -27,6 +29,7 @@ warningCode = 1
 [rule.filename-format]
     # Override the default pattern to forbid .go files with uppercase letters and dashes.
     arguments=["^[_a-z][_a-z0-9]*\\.go$"]
+[rule.identical-branches]
 [rule.increment-decrement]
 [rule.indent-error-flow]
 [rule.line-length-limit]
@@ -43,6 +46,7 @@ warningCode = 1
 [rule.unnecessary-stmt]
 [rule.unreachable-code]
 [rule.unused-parameter]
+[rule.unused-receiver]
 [rule.useless-break]
 [rule.use-any]
 [rule.var-declaration]
