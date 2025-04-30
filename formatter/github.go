@@ -33,6 +33,7 @@ func (*GitHub) Format(failures <-chan lint.Failure, config lint.Config) (string,
 			failure.RuleName,
 			failure.Failure,
 		)
+		fmt.Fprintln(&buf)
 	}
 
 	return buf.String(), nil
