@@ -7,20 +7,20 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// Github is an implementation of the Formatter interface
+// GitHub is an implementation of the Formatter interface
 // which formats the errors for GitHub Actions annotations.
 // https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message
-type Github struct {
+type GitHub struct {
 	Metadata lint.FormatterMetadata
 }
 
 // Name returns the name of the formatter
-func (*Github) Name() string {
+func (*GitHub) Name() string {
 	return "github"
 }
 
 // Format formats the failures gotten from the lint.
-func (*Github) Format(failures <-chan lint.Failure, config lint.Config) (string, error) {
+func (*GitHub) Format(failures <-chan lint.Failure, config lint.Config) (string, error) {
 	var buf bytes.Buffer
 	for failure := range failures {
 		fmt.Fprintf(&buf, "::%s file=%s,line=%d,col=%d,endLine=%d,endCol=%d,title=Revive: %s::%s",

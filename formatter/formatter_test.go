@@ -125,7 +125,7 @@ test.go
 			want:      `test.go:2:5: [rule] test failure`,
 		},
 		{
-			formatter: &formatter.Github{},
+			formatter: &formatter.GitHub{},
 			want:      `::warning file=test.go,line=2,col=5,endLine=2,endCol=10,title=Revive: rule::test failure`,
 		},
 	} {

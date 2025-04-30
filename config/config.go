@@ -109,7 +109,7 @@ var allFormatters = []lint.Formatter{
 	&formatter.Checkstyle{},
 	&formatter.Default{},
 	&formatter.Friendly{},
-	&formatter.Github{},
+	&formatter.GitHub{},
 	&formatter.JSON{},
 	&formatter.NDJSON{},
 	&formatter.Plain{},
