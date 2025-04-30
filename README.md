@@ -90,6 +90,7 @@ Here's how `revive` is different from `golint`:
     - [`var-naming`](#var-naming)
   - [Available Formatters](#available-formatters)
     - [Friendly](#friendly)
+    - [GitHub](#github)
     - [Stylish](#stylish)
     - [Default](#default)
     - [Plain](#plain)
@@ -587,6 +588,17 @@ This section lists all the available formatters and provides a screenshot for ea
 ### Friendly
 
 ![Friendly formatter](/assets/formatter-friendly.png)
+
+### GitHub
+
+The `github` formatter outputs failures in a format suitable for GitHub Actions annotations.
+See [Workflow commands for GitHub Actions](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message).
+
+Format:
+```
+::{{severity}} file={name},line={line},col={col},endLine={endLine},endCol={endCol},title=Revive: {{rule-name}}::{{failure-message}}
+```
+Where `severity` can be `error` or `warning`.
 
 ### Stylish
 
