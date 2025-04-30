@@ -3,6 +3,7 @@ package formatter
 import (
 	"bytes"
 	"fmt"
+	"strings"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -21,8 +22,13 @@ func (*GitHub) Name() string {
 
 // Format formats the failures gotten from the lint.
 func (*GitHub) Format(failures <-chan lint.Failure, config lint.Config) (string, error) {
+	replacer := strings.NewReplacer(
+		"\n", "%0A",
+		"\r", "%0D",
+	)
 	var buf bytes.Buffer
 	for failure := range failures {
+		message := replacer.Replace(failure.Failure)
 		fmt.Fprintf(&buf, "::%s file=%s,line=%d,col=%d,endLine=%d,endCol=%d,title=Revive: %s::%s",
 			severity(config, failure),
 			failure.Position.Start.Filename,
@@ -31,7 +37,7 @@ func (*GitHub) Format(failures <-chan lint.Failure, config lint.Config) (string,
 			failure.Position.End.Line,
 			failure.Position.End.Column,
 			failure.RuleName,
-			failure.Failure,
+			message,
 		)
 		fmt.Fprintln(&buf)
 	}
