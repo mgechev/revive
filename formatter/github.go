@@ -29,7 +29,7 @@ func (*GitHub) Format(failures <-chan lint.Failure, config lint.Config) (string,
 	var buf bytes.Buffer
 	for failure := range failures {
 		message := replacer.Replace(failure.Failure)
-		fmt.Fprintf(&buf, "::%s file=%s,line=%d,col=%d,endLine=%d,endCol=%d,title=Revive: %s::%s",
+		fmt.Fprintf(&buf, "::%s file=%s,line=%d,col=%d,endLine=%d,endCol=%d,title=Revive: %s::%s\n",
 			severity(config, failure),
 			failure.Position.Start.Filename,
 			failure.Position.Start.Line,
@@ -39,7 +39,6 @@ func (*GitHub) Format(failures <-chan lint.Failure, config lint.Config) (string,
 			failure.RuleName,
 			message,
 		)
-		fmt.Fprintln(&buf)
 	}
 
 	return buf.String(), nil
