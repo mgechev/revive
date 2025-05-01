@@ -3,7 +3,7 @@ package lint
 import "testing"
 
 // TestName tests Name function
-func TestName(t *testing.T) {
+func TestName(t *testing.T) { //revive:disable-line:exported
 	tests := []struct {
 		name, want string
 	}{
