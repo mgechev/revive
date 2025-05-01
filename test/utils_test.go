@@ -283,7 +283,7 @@ func srcLine(src []byte, p token.Position) string {
 }
 
 // TestLine tests srcLine function
-func TestLine(t *testing.T) { //revive:disable-line:exported
+func TestLine(t *testing.T) {
 	tests := []struct {
 		src    string
 		offset int
@@ -325,7 +325,7 @@ func exportedType(typ types.Type) bool {
 }
 
 // TestExportedType tests exportedType function
-func TestExportedType(t *testing.T) { //revive:disable-line:exported
+func TestExportedType(t *testing.T) {
 	tests := []struct {
 		typString string
 		exp       bool
