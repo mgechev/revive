@@ -42,8 +42,7 @@ type lintContextKeyTypes struct {
 }
 
 func (w lintContextKeyTypes) Visit(n ast.Node) ast.Visitor {
-	switch n := n.(type) {
-	case *ast.CallExpr:
+	if n, ok := n.(*ast.CallExpr); ok {
 		checkContextKeyType(w, n)
 	}
 

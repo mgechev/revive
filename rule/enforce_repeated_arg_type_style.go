@@ -111,8 +111,7 @@ func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, _ lint.Argument
 
 	astFile := file.AST
 	ast.Inspect(astFile, func(n ast.Node) bool {
-		switch fn := n.(type) {
-		case *ast.FuncDecl:
+		if fn, ok := n.(*ast.FuncDecl); ok {
 			switch r.funcArgStyle {
 			case enforceRepeatedArgTypeStyleTypeFull:
 				if fn.Type.Params != nil {

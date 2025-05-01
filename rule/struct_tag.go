@@ -136,8 +136,7 @@ type lintStructTagRule struct {
 }
 
 func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
-	switch n := node.(type) {
-	case *ast.StructType:
+	if n, ok := node.(*ast.StructType); ok {
 		isEmptyStruct := n.Fields == nil || n.Fields.NumFields() < 1
 		if isEmptyStruct {
 			return nil // skip empty structs
