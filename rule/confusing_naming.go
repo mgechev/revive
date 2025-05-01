@@ -159,8 +159,7 @@ func extractFromStarExpr(expr *ast.StarExpr) string {
 }
 
 func extractFromIndexExpr(expr *ast.IndexExpr) string {
-	switch v := expr.X.(type) {
-	case *ast.Ident:
+	if v, ok := expr.X.(*ast.Ident); ok {
 		return v.Name
 	}
 	return defaultStructName
