@@ -44,7 +44,7 @@ func RunRevive(extraRules ...revivelib.ExtraRule) {
 
 	if versionFlag {
 		fmt.Print(getVersion(builtBy, date, commit, version))
-		os.Exit(0) //revive:disable-line:deep-exit
+		return
 	}
 
 	conf, err := config.GetConfig(configPath)
