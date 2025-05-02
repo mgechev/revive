@@ -40,8 +40,13 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v4
 
-    - name: Run Revive Action
-      uses: morphy2k/revive-action@v2
+    - name: Setup Go and register problem matcher
+      uses: actions/setup-go@v5
       with:
-        config: revive.toml
-        path: ./...
+        go-version: stable
+
+    - name: Install revive
+      run: go install
+
+    - name: Run revive
+      run: revive --config revive.toml ./...
