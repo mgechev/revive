@@ -41,7 +41,7 @@ func TestRetrieveModFile(t *testing.T) {
 }
 
 // TestIsGenerated tests isGenerated function.
-func TestIsGenerated(t *testing.T) { //revive:disable-line:exported
+func TestIsGenerated(t *testing.T) {
 	tests := []struct {
 		source    string
 		generated bool
