@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/chavacava/garif"
+	"codeberg.org/chavacava/garif"
 	"github.com/mgechev/revive/lint"
 )
 
