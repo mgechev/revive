@@ -16,6 +16,10 @@ type UnexportedReturnRule struct{}
 func (*UnexportedReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
+	if file.IsTest() {
+		return nil
+	}
+
 	file.Pkg.TypeCheck()
 
 	for _, decl := range file.AST.Decls {
