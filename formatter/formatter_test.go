@@ -50,13 +50,13 @@ func TestFormatter(t *testing.T) {
 		{
 			formatter: &formatter.Friendly{},
 			want: `
-⚠  https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#rule  test failure  
+⚠  https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#rule  test failure 
   test.go:2:5
 
 ⚠ 1 problem (0 errors, 1 warning)
 
 Warnings:
-  1  rule
+ 1  rule
 `,
 		},
 		{
@@ -114,7 +114,7 @@ Warnings:
 			formatter: &formatter.Stylish{},
 			want: `
 test.go
-  (2, 5)  https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#rule  test failure  
+ (2, 5)  https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#rule  test failure 
 
 
  ✖ 1 problem (0 errors) (1 warnings)

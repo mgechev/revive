@@ -11,6 +11,8 @@ import (
 	"github.com/fatih/color"
 	"github.com/mgechev/revive/lint"
 	"github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter/renderer"
+	"github.com/olekukonko/tablewriter/tw"
 )
 
 func getErrorEmoji() string {
@@ -130,12 +132,14 @@ func (f *Friendly) printStatistics(w io.Writer, header string, stats map[string]
 
 func (*Friendly) table(rows [][]string) string {
 	buf := new(bytes.Buffer)
-	table := tablewriter.NewWriter(buf)
-	table.SetBorder(false)
-	table.SetColumnSeparator("")
-	table.SetRowSeparator("")
-	table.SetAutoWrapText(false)
-	table.AppendBulk(rows)
+	table := tablewriter.NewTable(buf,
+		tablewriter.WithRenderer(
+			renderer.NewBlueprint(tw.Rendition{
+				Borders: tw.BorderNone,
+				Symbols: &tw.SymbolNothing{},
+			})),
+	)
+	table.Bulk(rows)
 	table.Render()
 	return buf.String()
 }

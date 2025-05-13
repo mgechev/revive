@@ -24,12 +24,12 @@ func TestFriendly_printStatistics(t *testing.T) {
 		{
 			name:     "single stat",
 			stats:    map[string]int{"rule1": 1},
-			expected: "Warnings:\n  1  rule1  \n\n",
+			expected: "Warnings:\n 1  rule1 \n\n",
 		},
 		{
 			name:     "multiple stats sorted by failures desc",
 			stats:    map[string]int{"rule2": 2, "rule1": 1, "rule3": 3},
-			expected: "Warnings:\n  3  rule3  \n  2  rule2  \n  1  rule1  \n\n",
+			expected: "Warnings:\n 3  rule3 \n 2  rule2 \n 1  rule1 \n\n",
 		},
 	}
 
