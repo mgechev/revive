@@ -16,6 +16,7 @@ type UnexportedReturnRule struct{}
 func (*UnexportedReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
+	// Skip test files, as their functions are not exported anyway.
 	if file.IsTest() {
 		return nil
 	}
