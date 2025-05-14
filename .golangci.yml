@@ -1,0 +1,9 @@
+---
+# golangci-lint configuration file made by @ccoVeille
+# Source: https://github.com/ccoVeille/golangci-lint-config-examples/
+# Author: @ccoVeille
+# License: MIT
+# Variant: 01-defaults
+# Version: v2.0.0
+#
+version: "2"
