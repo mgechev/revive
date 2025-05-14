@@ -34,6 +34,6 @@ linters:
 
   exclusions:
     rules:
-      - linters: staticcheck
+      - linters: [staticcheck]
         # SA1019: Using a deprecated function, variable, constant or field
         text: "SA1019:"
