@@ -52,7 +52,7 @@ func (*EarlyReturnRule) Name() string {
 
 func (e *EarlyReturnRule) checkIfElse(chain ifelse.Chain) (string, bool) {
 	if chain.HasElse {
-		if !chain.Else.BranchKind.Deviates() {
+		if !chain.Else.Deviates() {
 			// this rule only applies if the else-block deviates control flow
 			return "", false
 		}

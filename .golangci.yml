@@ -7,3 +7,30 @@
 # Version: v2.0.0
 #
 version: "2"
+
+linters:
+  # some linters are enabled by default
+  # https://golangci-lint.run/usage/linters/
+  #
+  enable:
+    # Vet examines Go source code and reports suspicious constructs.
+    - govet
+
+    # Detects when assignments to existing variables are not used.
+    - ineffassign
+
+    # It's a set of rules from staticcheck. See https://staticcheck.io/
+    - staticcheck
+
+    # Checks Go code for unused constants, variables, functions and types.
+    - unused
+
+  # TODO: Phase in the following
+  disable:
+    # Errcheck is a program for checking for unchecked errors in Go code.
+    - errcheck
+
+  exclusions:
+    rules:
+      - linters: staticcheck
+        text: "SA1019:"

@@ -73,7 +73,7 @@ func (f *Friendly) printHeaderRow(sb *strings.Builder, failure lint.Failure, sev
 }
 
 func (*Friendly) printFilePosition(sb *strings.Builder, failure lint.Failure) {
-	sb.WriteString(fmt.Sprintf("  %s:%d:%d", failure.GetFilename(), failure.Position.Start.Line, failure.Position.Start.Column))
+	fmt.Fprintf(sb, "  %s:%d:%d", failure.GetFilename(), failure.Position.Start.Line, failure.Position.Start.Column)
 }
 
 type statEntry struct {

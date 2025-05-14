@@ -58,9 +58,10 @@ func (p *Package) IsMain() bool {
 	p.Lock()
 	defer p.Unlock()
 
-	if p.main == trueValue {
+	switch p.main {
+	case trueValue:
 		return true
-	} else if p.main == falseValue {
+	case falseValue:
 		return false
 	}
 	for _, f := range p.files {
