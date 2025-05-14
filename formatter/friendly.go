@@ -1,16 +1,15 @@
 package formatter
 
 import (
-	"bytes"
 	"cmp"
 	"fmt"
 	"io"
 	"slices"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/fatih/color"
 	"github.com/mgechev/revive/lint"
-	"github.com/olekukonko/tablewriter"
 )
 
 func getErrorEmoji() string {
@@ -129,13 +128,27 @@ func (f *Friendly) printStatistics(w io.Writer, header string, stats map[string]
 }
 
 func (*Friendly) table(rows [][]string) string {
-	buf := new(bytes.Buffer)
-	table := tablewriter.NewWriter(buf)
-	table.SetBorder(false)
-	table.SetColumnSeparator("")
-	table.SetRowSeparator("")
-	table.SetAutoWrapText(false)
-	table.AppendBulk(rows)
-	table.Render()
+	if len(rows) == 0 {
+		return ""
+	}
+
+	colWidths := make([]int, len(rows[0]))
+	for _, row := range rows {
+		for i, col := range row {
+			if w := utf8.RuneCountInString(col); w > colWidths[i] {
+				colWidths[i] = w
+			}
+		}
+	}
+
+	var buf strings.Builder
+	for _, row := range rows {
+		buf.WriteString("  ")
+		for i, col := range row {
+			fmt.Fprintf(&buf, "%-*s", colWidths[i]+2, col)
+		}
+		buf.WriteByte('\n')
+	}
+
 	return buf.String()
 }
