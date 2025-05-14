@@ -24,13 +24,16 @@ linters:
 
     # Checks Go code for unused constants, variables, functions and types.
     - unused
-
-  # TODO: Phase in the following
+ 
   disable:
+    # TODO: enable errcheck and resolve all errors
     # Errcheck is a program for checking for unchecked errors in Go code.
     - errcheck
+
+    - revive
 
   exclusions:
     rules:
       - linters: staticcheck
+        # SA1019: Using a deprecated function, variable, constant or field
         text: "SA1019:"
