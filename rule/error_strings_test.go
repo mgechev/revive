@@ -34,7 +34,7 @@ func TestErrorStringsRule_Configure(t *testing.T) {
 		{
 			name:      "Invalid function",
 			arguments: lint.Arguments{"errors."},
-			//nolint: revive
+			//nolint:revive
 			wantErr: errors.New("found invalid custom function: errors."),
 		},
 		{
