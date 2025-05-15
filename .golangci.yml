@@ -26,6 +26,8 @@ linters:
     - unused
 
     - revive
+
+    - nolintlint
  
   disable:
     # TODO: enable errcheck and resolve all errors

@@ -45,9 +45,6 @@ jobs:
       with:
         go-version: stable
 
-    - name: Install revive
-      run: go install
-
     - name: golangci-lint
       uses: golangci/golangci-lint-action@v8
       with:
