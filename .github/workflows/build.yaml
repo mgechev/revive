@@ -9,6 +9,8 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
+      - name: Test required env variable exists
+        run: echo $GA_SERVICE_ACCOUNT
       - uses: actions/checkout@v4
       - name: build
         run: make build
