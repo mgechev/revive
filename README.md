@@ -478,6 +478,7 @@ You can use the following exclude patterns
 ## Available Rules
 
 List of all available rules. The rules ported from `golint` are left unchanged and indicated in the `golint` column.
+
 | Name                  | Config | Description                                                      | `golint` | Typed |
 | --------------------- | :----: | :--------------------------------------------------------------- | :------: | :---: |
 | [`add-constant`](./RULES_DESCRIPTIONS.md#add-constant)        |  map   | Suggests using constant for magic numbers and string literals    |    no    |  no   |
