@@ -2,8 +2,6 @@ package formatter
 
 import (
 	"fmt"
-	"strings"
-	"unicode/utf8"
 
 	"github.com/fatih/color"
 	"github.com/mgechev/revive/lint"
@@ -33,7 +31,7 @@ func formatFailure(failure lint.Failure, severity lint.Severity) []string {
 }
 
 // Format formats the failures gotten from the lint.
-func (s *Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string, error) {
+func (*Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string, error) {
 	var result [][]string
 	totalErrors := 0
 	total := 0
@@ -65,7 +63,7 @@ func (s *Stylish) Format(failures <-chan lint.Failure, config lint.Config) (stri
 	for filename, val := range fileReport {
 		c := color.New(color.Underline)
 		output += c.SprintfFunc()(filename + "\n")
-		output += s.table(val) + "\n"
+		output += formatTable(val) + "\n"
 	}
 
 	suffix := fmt.Sprintf(" %d %s (%d errors) (%d warnings)", total, ps, totalErrors, total-totalErrors)
@@ -80,30 +78,4 @@ func (s *Stylish) Format(failures <-chan lint.Failure, config lint.Config) (stri
 	}
 
 	return output + suffix, nil
-}
-
-func (*Stylish) table(rows [][]string) string {
-	if len(rows) == 0 {
-		return ""
-	}
-
-	colWidths := make([]int, len(rows[0]))
-	for _, row := range rows {
-		for i, col := range row {
-			if w := utf8.RuneCountInString(col); w > colWidths[i] {
-				colWidths[i] = w
-			}
-		}
-	}
-
-	var buf strings.Builder
-	for _, row := range rows {
-		buf.WriteString("  ")
-		for i, col := range row {
-			fmt.Fprintf(&buf, "%-*s", colWidths[i]+2, col)
-		}
-		buf.WriteByte('\n')
-	}
-
-	return buf.String()
 }
