@@ -61,11 +61,15 @@ Warnings:
 		},
 		{
 			formatter: &formatter.JSON{},
-			want:      `[{"Severity":"warning","Failure":"test failure","RuleName":"rule","Category":"cat","Position":{"Start":{"Filename":"test.go","Offset":0,"Line":2,"Column":5},"End":{"Filename":"test.go","Offset":0,"Line":2,"Column":10}},"Confidence":0,"ReplacementLine":""}]`,
+			want: `[{"Severity":"warning","Failure":"test failure","RuleName":"rule",` +
+				`"Category":"cat","Position":{"Start":{"Filename":"test.go","Offset":0,"Line":2,"Column":5},` +
+				`"End":{"Filename":"test.go","Offset":0,"Line":2,"Column":10}},"Confidence":0,"ReplacementLine":""}]`,
 		},
 		{
 			formatter: &formatter.NDJSON{},
-			want:      `{"Severity":"warning","Failure":"test failure","RuleName":"rule","Category":"cat","Position":{"Start":{"Filename":"test.go","Offset":0,"Line":2,"Column":5},"End":{"Filename":"test.go","Offset":0,"Line":2,"Column":10}},"Confidence":0,"ReplacementLine":""}`,
+			want: `{"Severity":"warning","Failure":"test failure","RuleName":"rule",` +
+				`"Category":"cat","Position":{"Start":{"Filename":"test.go","Offset":0,"Line":2,"Column":5},` +
+				`"End":{"Filename":"test.go","Offset":0,"Line":2,"Column":10}},"Confidence":0,"ReplacementLine":""}`,
 		},
 		{
 			formatter: &formatter.Plain{},

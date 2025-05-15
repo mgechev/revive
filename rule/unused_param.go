@@ -144,6 +144,8 @@ func (w lintUnusedParamRule) Visit(node ast.Node) ast.Visitor {
 }
 
 // TODO: ast.Object is deprecated
+//
+//nolint:staticcheck
 func retrieveNamedParams(params *ast.FieldList) map[*ast.Object]bool {
 	result := map[*ast.Object]bool{}
 	if params.List == nil {

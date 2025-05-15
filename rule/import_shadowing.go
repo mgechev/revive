@@ -28,6 +28,7 @@ func (*ImportShadowingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
+		//nolint:staticcheck
 		alreadySeen: map[*ast.Object]struct{}{}, // TODO: ast.Object is deprecated
 		skipIdents:  map[*ast.Ident]struct{}{},
 	}
@@ -62,8 +63,9 @@ type importShadowing struct {
 	packageNameIdent *ast.Ident
 	importNames      map[string]struct{}
 	onFailure        func(lint.Failure)
-	alreadySeen      map[*ast.Object]struct{} // TODO: ast.Object is deprecated
-	skipIdents       map[*ast.Ident]struct{}
+	//nolint:staticcheck
+	alreadySeen map[*ast.Object]struct{} // TODO: ast.Object is deprecated
+	skipIdents  map[*ast.Ident]struct{}
 }
 
 // Visit visits AST nodes and checks if id nodes (ast.Ident) shadow an import name

@@ -24,16 +24,62 @@ linters:
 
     # Checks Go code for unused constants, variables, functions and types.
     - unused
+
+    - revive
  
   disable:
     # TODO: enable errcheck and resolve all errors
     # Errcheck is a program for checking for unchecked errors in Go code.
     - errcheck
 
-    - revive
+  settings:
+    # the following settings should match revive.toml
+    revive:
+      severity: warning
+      confidence: 0.8
 
-  exclusions:
-    rules:
-      - linters: [staticcheck]
-        # SA1019: Using a deprecated function, variable, constant or field
-        text: "SA1019:"
+      rules:
+        - name: bare-return
+        - name: blank-imports
+        - name: comment-spacings
+        - name: constant-logical-expr
+        - name: context-as-argument
+        - name: context-keys-type
+        - name: deep-exit
+        - name: dot-imports
+        - name: empty-block
+        - name: empty-lines
+        - name: enforce-map-style
+          arguments: ["literal"]
+        - name: enforce-slice-style
+          arguments: ["literal"]
+        - name: error-naming
+        - name: error-return
+        - name: error-strings
+        - name: errorf
+        - name: exported
+        - name: filename-format
+          arguments: ["^[_a-z][_a-z0-9]*\\.go$"]
+        - name: identical-branches
+        - name: increment-decrement
+        - name: indent-error-flow
+        - name: line-length-limit
+          arguments: [200]
+        - name: package-comments
+        - name: range
+        - name: receiver-naming
+        - name: redefines-builtin-id
+        - name: redundant-build-tag
+        - name: superfluous-else
+        - name: time-naming
+        - name: unexported-naming
+        - name: unexported-return
+        - name: unnecessary-stmt
+        - name: unreachable-code
+        - name: unused-parameter
+        - name: unused-receiver
+        - name: useless-break
+        - name: use-any
+        - name: var-declaration
+        - name: var-naming
+

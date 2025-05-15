@@ -23,6 +23,7 @@ func (r *DataRaceRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 		funcResults := funcDecl.Type.Results
 
 		// TODO: ast.Object is deprecated
+		//nolint:staticcheck
 		returnIDs := map[*ast.Object]struct{}{}
 		if funcResults != nil {
 			returnIDs = r.extractReturnIDs(funcResults.List)
@@ -35,8 +36,9 @@ func (r *DataRaceRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 		fl := &lintFunctionForDataRaces{
 			onFailure: onFailure,
 			returnIDs: returnIDs,
-			rangeIDs:  map[*ast.Object]struct{}{}, // TODO: ast.Object is deprecated
-			go122for:  isGo122,
+			//nolint:staticcheck
+			rangeIDs: map[*ast.Object]struct{}{}, // TODO: ast.Object is deprecated
+			go122for: isGo122,
 		}
 
 		ast.Walk(fl, funcDecl.Body)
@@ -51,6 +53,8 @@ func (*DataRaceRule) Name() string {
 }
 
 // TODO: ast.Object is deprecated
+//
+//nolint:staticcheck
 func (*DataRaceRule) extractReturnIDs(fields []*ast.Field) map[*ast.Object]struct{} {
 	r := map[*ast.Object]struct{}{}
 	for _, f := range fields {
@@ -65,8 +69,10 @@ func (*DataRaceRule) extractReturnIDs(fields []*ast.Field) map[*ast.Object]struc
 type lintFunctionForDataRaces struct {
 	_         struct{}
 	onFailure func(failure lint.Failure)
+	//nolint:staticcheck
 	returnIDs map[*ast.Object]struct{} // TODO: ast.Object is deprecated
-	rangeIDs  map[*ast.Object]struct{} // TODO: ast.Object is deprecated
+	//nolint:staticcheck
+	rangeIDs map[*ast.Object]struct{} // TODO: ast.Object is deprecated
 
 	go122for bool
 }

@@ -48,9 +48,6 @@ jobs:
     - name: Install revive
       run: go install
 
-    - name: Run revive
-      run: revive --config revive.toml ./...
-
     - name: golangci-lint
       uses: golangci/golangci-lint-action@v8
       with:

@@ -70,8 +70,9 @@ func (w rangeValAddress) Visit(node ast.Node) ast.Visitor {
 
 type rangeBodyVisitor struct {
 	valueIsStarExpr bool
-	valueID         *ast.Object // TODO: ast.Object is deprecated
-	onFailure       func(lint.Failure)
+	//nolint:staticcheck
+	valueID   *ast.Object // TODO: ast.Object is deprecated
+	onFailure func(lint.Failure)
 }
 
 func (bw rangeBodyVisitor) Visit(node ast.Node) ast.Visitor {
