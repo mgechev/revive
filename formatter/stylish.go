@@ -1,12 +1,12 @@
 package formatter
 
 import (
-	"bytes"
 	"fmt"
+	"strings"
+	"unicode/utf8"
 
 	"github.com/fatih/color"
 	"github.com/mgechev/revive/lint"
-	"github.com/olekukonko/tablewriter"
 )
 
 // Stylish is an implementation of the Formatter interface
@@ -33,7 +33,7 @@ func formatFailure(failure lint.Failure, severity lint.Severity) []string {
 }
 
 // Format formats the failures gotten from the lint.
-func (*Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string, error) {
+func (s *Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string, error) {
 	var result [][]string
 	totalErrors := 0
 	total := 0
@@ -63,17 +63,9 @@ func (*Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string
 
 	output := ""
 	for filename, val := range fileReport {
-		buf := new(bytes.Buffer)
-		table := tablewriter.NewWriter(buf)
-		table.SetBorder(false)
-		table.SetColumnSeparator("")
-		table.SetRowSeparator("")
-		table.SetAutoWrapText(false)
-		table.AppendBulk(val)
-		table.Render()
 		c := color.New(color.Underline)
 		output += c.SprintfFunc()(filename + "\n")
-		output += buf.String() + "\n"
+		output += s.table(val) + "\n"
 	}
 
 	suffix := fmt.Sprintf(" %d %s (%d errors) (%d warnings)", total, ps, totalErrors, total-totalErrors)
@@ -88,4 +80,30 @@ func (*Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string
 	}
 
 	return output + suffix, nil
+}
+
+func (*Stylish) table(rows [][]string) string {
+	if len(rows) == 0 {
+		return ""
+	}
+
+	colWidths := make([]int, len(rows[0]))
+	for _, row := range rows {
+		for i, col := range row {
+			if w := utf8.RuneCountInString(col); w > colWidths[i] {
+				colWidths[i] = w
+			}
+		}
+	}
+
+	var buf strings.Builder
+	for _, row := range rows {
+		buf.WriteString("  ")
+		for i, col := range row {
+			fmt.Fprintf(&buf, "%-*s", colWidths[i]+2, col)
+		}
+		buf.WriteByte('\n')
+	}
+
+	return buf.String()
 }
