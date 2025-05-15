@@ -48,4 +48,4 @@ jobs:
     - name: golangci-lint
       uses: golangci/golangci-lint-action@v8
       with:
-        version: v2.1.6
+        version: latest
