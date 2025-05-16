@@ -1,45 +1,33 @@
----
-# golangci-lint configuration file made by @ccoVeille
-# Source: https://github.com/ccoVeille/golangci-lint-config-examples/
-# Author: @ccoVeille
-# License: MIT
-# Variant: 01-defaults
-# Version: v2.0.0
-#
+# This configuration for golangci-lint.
+# See https://golangci-lint.run/usage/configuration/ for details.
+
 version: "2"
 
 linters:
-  # some linters are enabled by default
-  # https://golangci-lint.run/usage/linters/
-  #
+  default: none
   enable:
-    # Vet examines Go source code and reports suspicious constructs.
     - govet
-
-    # Detects when assignments to existing variables are not used.
     - ineffassign
-
-    # It's a set of rules from staticcheck. See https://staticcheck.io/
+    - misspell
+    - nolintlint
+    - revive
     - staticcheck
-
-    # Checks Go code for unused constants, variables, functions and types.
     - unused
 
-    - revive
-
-    - nolintlint
- 
-  disable:
-    # TODO: enable errcheck and resolve all errors
-    # Errcheck is a program for checking for unchecked errors in Go code.
-    - errcheck
-
   settings:
-    # the following settings should match revive.toml
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+        - shadow
+    nolintlint:
+      allow-unused: true
+      require-explanation: true
+      require-specific: true
+    # The following settings should match revive.toml
     revive:
       severity: warning
       confidence: 0.8
-
       rules:
         - name: bare-return
         - name: blank-imports
@@ -61,6 +49,7 @@ linters:
         - name: errorf
         - name: exported
         - name: filename-format
+          # Override the default pattern to forbid .go files with uppercase letters and dashes.
           arguments: ["^[_a-z][_a-z0-9]*\\.go$"]
         - name: identical-branches
         - name: increment-decrement
@@ -84,4 +73,3 @@ linters:
         - name: use-any
         - name: var-declaration
         - name: var-naming
-
