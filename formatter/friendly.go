@@ -6,6 +6,7 @@ import (
 	"io"
 	"slices"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/fatih/color"
 	"github.com/mgechev/revive/lint"
@@ -67,7 +68,7 @@ func (*Friendly) printHeaderRow(sb *strings.Builder, failure lint.Failure, sever
 	if severity == lint.SeverityError {
 		emoji = getErrorEmoji()
 	}
-	sb.WriteString(formatTable([][]string{{emoji, ruleDescriptionURL(failure.RuleName), color.GreenString(failure.Failure)}}))
+	sb.WriteString(table([][]string{{emoji, ruleDescriptionURL(failure.RuleName), color.GreenString(failure.Failure)}}))
 }
 
 func (*Friendly) printFilePosition(sb *strings.Builder, failure lint.Failure) {
@@ -123,5 +124,32 @@ func (*Friendly) printStatistics(w io.Writer, header string, stats map[string]in
 		formatted = append(formatted, []string{color.GreenString(fmt.Sprintf("%d", entry.failures)), entry.name})
 	}
 	fmt.Fprintln(w, header)
-	fmt.Fprintln(w, formatTable(formatted))
+	fmt.Fprintln(w, table(formatted))
+}
+
+func table(rows [][]string) string {
+	if len(rows) == 0 {
+		return ""
+	}
+
+	colWidths := make([]int, len(rows[0]))
+	for _, row := range rows {
+		for i, col := range row {
+			if w := utf8.RuneCountInString(col); w > colWidths[i] {
+				colWidths[i] = w
+			}
+		}
+	}
+
+	var buf strings.Builder
+	indent := "  "
+	for _, row := range rows {
+		buf.WriteString(indent)
+		for i, col := range row {
+			fmt.Fprintf(&buf, "%-*s", colWidths[i]+2, col)
+		}
+		buf.WriteByte('\n')
+	}
+
+	return buf.String()
 }

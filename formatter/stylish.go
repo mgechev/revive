@@ -63,7 +63,7 @@ func (*Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string
 	for filename, val := range fileReport {
 		c := color.New(color.Underline)
 		output += c.SprintfFunc()(filename + "\n")
-		output += formatTable(val) + "\n"
+		output += table(val) + "\n"
 	}
 
 	suffix := fmt.Sprintf(" %d %s (%d errors) (%d warnings)", total, ps, totalErrors, total-totalErrors)
