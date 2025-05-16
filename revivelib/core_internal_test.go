@@ -3,7 +3,6 @@ package revivelib
 import (
 	"testing"
 
-	"github.com/mgechev/revive/config"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -34,36 +33,4 @@ func TestReviveCreateInstance(t *testing.T) {
 	if revive.config.ErrorCode != 1 && revive.config.WarningCode != 1 {
 		t.Fatal("Didn't set the codes in the config instance.")
 	}
-}
-
-type mockRule struct {
-}
-
-func (*mockRule) Name() string {
-	return "mock-rule"
-}
-
-func (*mockRule) Apply(_ *lint.File, _ lint.Arguments) []lint.Failure {
-	return nil
-}
-
-func getMockRevive(t *testing.T) *Revive {
-	t.Helper()
-
-	conf, err := config.GetConfig("../defaults.toml")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	revive, err := New(
-		conf,
-		true,
-		2048,
-		NewExtraRule(&mockRule{}, lint.RuleConfig{}),
-	)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return revive
 }

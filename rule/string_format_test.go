@@ -1,11 +1,10 @@
-package rule_test
+package rule
 
 import (
 	"errors"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
-	"github.com/mgechev/revive/rule"
 )
 
 func TestStringFormatConfigure(t *testing.T) {
@@ -136,7 +135,7 @@ func TestStringFormatConfigure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var r rule.StringFormatRule
+			var r StringFormatRule
 
 			err := r.Configure(tt.arguments)
 

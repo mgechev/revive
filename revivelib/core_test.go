@@ -1,4 +1,4 @@
-package revivelib_test
+package revivelib
 
 import (
 	"strings"
@@ -7,7 +7,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/mgechev/revive/config"
 	"github.com/mgechev/revive/lint"
-	"github.com/mgechev/revive/revivelib"
 	"github.com/mgechev/revive/rule"
 )
 
@@ -16,7 +15,7 @@ func TestReviveLint(t *testing.T) {
 	revive := getMockRevive(t)
 
 	// ACT
-	failures, err := revive.Lint(revivelib.Include("../testdata/if_return.go"))
+	failures, err := revive.Lint(Include("../testdata/if_return.go"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -40,7 +39,7 @@ func TestReviveFormat(t *testing.T) {
 	// ARRANGE
 	revive := getMockRevive(t)
 
-	failuresChan, err := revive.Lint(revivelib.Include("../testdata/if_return.go"))
+	failuresChan, err := revive.Lint(Include("../testdata/if_return.go"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -72,7 +71,8 @@ func TestReviveFormat(t *testing.T) {
 	}
 }
 
-type mockRule struct{}
+type mockRule struct {
+}
 
 func (*mockRule) Name() string {
 	return "mock-rule"
@@ -82,7 +82,7 @@ func (*mockRule) Apply(_ *lint.File, _ lint.Arguments) []lint.Failure {
 	return nil
 }
 
-func getMockRevive(t *testing.T) *revivelib.Revive {
+func getMockRevive(t *testing.T) *Revive {
 	t.Helper()
 
 	conf, err := config.GetConfig("../defaults.toml")
@@ -90,12 +90,12 @@ func getMockRevive(t *testing.T) *revivelib.Revive {
 		t.Fatal(err)
 	}
 
-	revive, err := revivelib.New(
+	revive, err := New(
 		conf,
 		true,
 		2048,
-		revivelib.NewExtraRule(&rule.IfReturnRule{}, lint.RuleConfig{}),
-		revivelib.NewExtraRule(&mockRule{}, lint.RuleConfig{}),
+		NewExtraRule(&rule.IfReturnRule{}, lint.RuleConfig{}),
+		NewExtraRule(&mockRule{}, lint.RuleConfig{}),
 	)
 	if err != nil {
 		t.Fatal(err)

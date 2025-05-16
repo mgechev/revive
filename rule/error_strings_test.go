@@ -1,11 +1,10 @@
-package rule_test
+package rule
 
 import (
 	"errors"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
-	"github.com/mgechev/revive/rule"
 )
 
 func TestErrorStringsRule_Configure(t *testing.T) {
@@ -34,7 +33,8 @@ func TestErrorStringsRule_Configure(t *testing.T) {
 		{
 			name:      "Invalid function",
 			arguments: lint.Arguments{"errors."},
-			wantErr:   errors.New("found invalid custom function: errors."), //nolint:revive // error-strings: it's ok for tests
+			//revive:disable-next-line // error-strings: it's ok for tests
+			wantErr: errors.New("found invalid custom function: errors."), //nolint:revive // error-strings: it's ok for tests
 		},
 		{
 			name:      "Invalid custom function",
@@ -50,7 +50,7 @@ func TestErrorStringsRule_Configure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var r rule.ErrorStringsRule
+			var r ErrorStringsRule
 
 			err := r.Configure(tt.arguments)
 

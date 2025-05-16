@@ -1,4 +1,4 @@
-package formatter_test
+package formatter
 
 import (
 	"go/token"
@@ -6,7 +6,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mgechev/revive/formatter"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -33,7 +32,7 @@ func TestFormatter(t *testing.T) {
 		want      string
 	}{
 		{
-			formatter: &formatter.Checkstyle{},
+			formatter: &Checkstyle{},
 			want: `
 <?xml version='1.0' encoding='UTF-8'?>
 <checkstyle version="5.0">
@@ -44,11 +43,11 @@ func TestFormatter(t *testing.T) {
 `,
 		},
 		{
-			formatter: &formatter.Default{},
+			formatter: &Default{},
 			want:      `test.go:2:5: test failure`,
 		},
 		{
-			formatter: &formatter.Friendly{},
+			formatter: &Friendly{},
 			want: `
 ⚠  https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#rule  test failure  
   test.go:2:5
@@ -60,19 +59,21 @@ Warnings:
 `,
 		},
 		{
-			formatter: &formatter.JSON{},
-			want:      `[{"Severity":"warning","Failure":"test failure","RuleName":"rule","Category":"cat","Position":{"Start":{"Filename":"test.go","Offset":0,"Line":2,"Column":5},"End":{"Filename":"test.go","Offset":0,"Line":2,"Column":10}},"Confidence":0,"ReplacementLine":""}]`, //nolint:revive // line-length-limit
+			formatter: &JSON{},
+			//revive:disable-next-line // line-length-limit
+			want: `[{"Severity":"warning","Failure":"test failure","RuleName":"rule","Category":"cat","Position":{"Start":{"Filename":"test.go","Offset":0,"Line":2,"Column":5},"End":{"Filename":"test.go","Offset":0,"Line":2,"Column":10}},"Confidence":0,"ReplacementLine":""}]`, //nolint:revive // line-length-limit
 		},
 		{
-			formatter: &formatter.NDJSON{},
-			want:      `{"Severity":"warning","Failure":"test failure","RuleName":"rule","Category":"cat","Position":{"Start":{"Filename":"test.go","Offset":0,"Line":2,"Column":5},"End":{"Filename":"test.go","Offset":0,"Line":2,"Column":10}},"Confidence":0,"ReplacementLine":""}`, //nolint:revive // line-length-limit
+			formatter: &NDJSON{},
+			//revive:disable-next-line // line-length-limit
+			want: `{"Severity":"warning","Failure":"test failure","RuleName":"rule","Category":"cat","Position":{"Start":{"Filename":"test.go","Offset":0,"Line":2,"Column":5},"End":{"Filename":"test.go","Offset":0,"Line":2,"Column":10}},"Confidence":0,"ReplacementLine":""}`, //nolint:revive // line-length-limit
 		},
 		{
-			formatter: &formatter.Plain{},
+			formatter: &Plain{},
 			want:      `test.go:2:5: test failure https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#rule`,
 		},
 		{
-			formatter: &formatter.Sarif{},
+			formatter: &Sarif{},
 			want: `
 {
   "runs": [
@@ -111,7 +112,7 @@ Warnings:
 `,
 		},
 		{
-			formatter: &formatter.Stylish{},
+			formatter: &Stylish{},
 			want: `
 test.go
   (2, 5)  https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#rule  test failure  
@@ -121,7 +122,7 @@ test.go
 `,
 		},
 		{
-			formatter: &formatter.Unix{},
+			formatter: &Unix{},
 			want:      `test.go:2:5: [rule] test failure`,
 		},
 	} {

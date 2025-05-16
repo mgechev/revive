@@ -1,14 +1,12 @@
-package lint_test
+package lint
 
 import (
 	"testing"
-
-	"github.com/mgechev/revive/lint"
 )
 
 func TestFileFilter(t *testing.T) {
 	t.Run("whole file name", func(t *testing.T) {
-		ff, err := lint.ParseFileFilter("a/b/c.go")
+		ff, err := ParseFileFilter("a/b/c.go")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -21,7 +19,7 @@ func TestFileFilter(t *testing.T) {
 	})
 
 	t.Run("regex", func(t *testing.T) {
-		ff, err := lint.ParseFileFilter("~b/[cd].go$")
+		ff, err := ParseFileFilter("~b/[cd].go$")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -37,7 +35,7 @@ func TestFileFilter(t *testing.T) {
 	})
 
 	t.Run("TEST well-known", func(t *testing.T) {
-		ff, err := lint.ParseFileFilter("TEST")
+		ff, err := ParseFileFilter("TEST")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -50,7 +48,7 @@ func TestFileFilter(t *testing.T) {
 	})
 
 	t.Run("glob *", func(t *testing.T) {
-		ff, err := lint.ParseFileFilter("a/b/*.pb.go")
+		ff, err := ParseFileFilter("a/b/*.pb.go")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -66,7 +64,7 @@ func TestFileFilter(t *testing.T) {
 	})
 
 	t.Run("glob **", func(t *testing.T) {
-		ff, err := lint.ParseFileFilter("a/**/*.pb.go")
+		ff, err := ParseFileFilter("a/**/*.pb.go")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -85,7 +83,7 @@ func TestFileFilter(t *testing.T) {
 	})
 
 	t.Run("empty", func(t *testing.T) {
-		ff, err := lint.ParseFileFilter("")
+		ff, err := ParseFileFilter("")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -98,7 +96,7 @@ func TestFileFilter(t *testing.T) {
 	})
 
 	t.Run("just *", func(t *testing.T) {
-		ff, err := lint.ParseFileFilter("*")
+		ff, err := ParseFileFilter("*")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -111,7 +109,7 @@ func TestFileFilter(t *testing.T) {
 	})
 
 	t.Run("just ~", func(t *testing.T) {
-		ff, err := lint.ParseFileFilter("~")
+		ff, err := ParseFileFilter("~")
 		if err != nil {
 			t.Fatal(err)
 		}
