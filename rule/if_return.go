@@ -44,6 +44,7 @@ func (w *lintElseError) Visit(node ast.Node) ast.Visitor {
 				continue
 			}
 			assign, ok := s.Init.(*ast.AssignStmt)
+			//nolint:staticcheck // QF1001: it's readable enough
 			if !ok || len(assign.Lhs) != 1 || !(assign.Tok == token.DEFINE || assign.Tok == token.ASSIGN) {
 				continue
 			}

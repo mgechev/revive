@@ -39,7 +39,7 @@ func TestImportAliasNamingRule_Configure(t *testing.T) {
 			}},
 			wantErr:        nil,
 			wantAllowRegex: regexp.MustCompile("^[a-z][a-z0-9]*$"),
-			wantDenyRegex:  regexp.MustCompile("^v\\d+$"),
+			wantDenyRegex:  regexp.MustCompile(`^v\d+$`),
 		},
 		{
 			name: "valid map lowercased arguments",
@@ -49,7 +49,7 @@ func TestImportAliasNamingRule_Configure(t *testing.T) {
 			}},
 			wantErr:        nil,
 			wantAllowRegex: regexp.MustCompile("^[a-z][a-z0-9]*$"),
-			wantDenyRegex:  regexp.MustCompile("^v\\d+$"),
+			wantDenyRegex:  regexp.MustCompile(`^v\d+$`),
 		},
 		{
 			name: "valid map kebab-cased arguments",
@@ -59,7 +59,7 @@ func TestImportAliasNamingRule_Configure(t *testing.T) {
 			}},
 			wantErr:        nil,
 			wantAllowRegex: regexp.MustCompile("^[a-z][a-z0-9]*$"),
-			wantDenyRegex:  regexp.MustCompile("^v\\d+$"),
+			wantDenyRegex:  regexp.MustCompile(`^v\d+$`),
 		},
 		{
 			name:      "invalid argument type",
