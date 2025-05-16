@@ -6,7 +6,7 @@ import (
 	"io"
 	"slices"
 	"strings"
-	"unicode/utf8"
+	"text/tabwriter"
 
 	"github.com/fatih/color"
 	"github.com/mgechev/revive/lint"
@@ -128,28 +128,15 @@ func (*Friendly) printStatistics(w io.Writer, header string, stats map[string]in
 }
 
 func table(rows [][]string) string {
-	if len(rows) == 0 {
-		return ""
-	}
-
-	colWidths := make([]int, len(rows[0]))
-	for _, row := range rows {
-		for i, col := range row {
-			if w := utf8.RuneCountInString(col); w > colWidths[i] {
-				colWidths[i] = w
-			}
-		}
-	}
-
 	var buf strings.Builder
-	indent := "  "
+	tw := tabwriter.NewWriter(&buf, 0, 0, 2, ' ', 0)
 	for _, row := range rows {
-		buf.WriteString(indent)
-		for i, col := range row {
-			fmt.Fprintf(&buf, "%-*s", colWidths[i]+2, col)
+		fmt.Fprintf(tw, "\t")
+		for _, col := range row {
+			fmt.Fprintf(tw, "%s\t", col)
 		}
-		buf.WriteByte('\n')
+		tw.Write([]byte("\n"))
 	}
-
+	tw.Flush()
 	return buf.String()
 }
