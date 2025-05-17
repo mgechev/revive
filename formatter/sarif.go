@@ -27,7 +27,7 @@ func (*Sarif) Format(failures <-chan lint.Failure, cfg lint.Config) (string, err
 	sarifLog := newReviveRunLog(cfg)
 
 	for failure := range failures {
-		sarifLog.AddResult(failure)
+		sarifLog.addResult(failure)
 	}
 
 	buf := new(bytes.Buffer)
@@ -72,7 +72,7 @@ func (l *reviveRunLog) addRules(cfg map[string]lint.RuleConfig) {
 	}
 }
 
-func (l *reviveRunLog) AddResult(failure lint.Failure) {
+func (l *reviveRunLog) addResult(failure lint.Failure) {
 	positiveOrZero := func(x int) int {
 		if x > 0 {
 			return x
