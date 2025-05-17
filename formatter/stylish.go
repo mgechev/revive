@@ -1,12 +1,10 @@
 package formatter
 
 import (
-	"bytes"
 	"fmt"
 
 	"github.com/fatih/color"
 	"github.com/mgechev/revive/lint"
-	"github.com/olekukonko/tablewriter"
 )
 
 // Stylish is an implementation of the Formatter interface
@@ -63,17 +61,9 @@ func (*Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string
 
 	output := ""
 	for filename, val := range fileReport {
-		buf := new(bytes.Buffer)
-		table := tablewriter.NewWriter(buf)
-		table.SetBorder(false)
-		table.SetColumnSeparator("")
-		table.SetRowSeparator("")
-		table.SetAutoWrapText(false)
-		table.AppendBulk(val)
-		table.Render()
 		c := color.New(color.Underline)
 		output += c.SprintfFunc()(filename + "\n")
-		output += buf.String() + "\n"
+		output += table(val) + "\n"
 	}
 
 	suffix := fmt.Sprintf(" %d %s (%d errors) (%d warnings)", total, ps, totalErrors, total-totalErrors)
