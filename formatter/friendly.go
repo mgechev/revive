@@ -13,14 +13,6 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-func getErrorEmoji() string {
-	return color.RedString("✘")
-}
-
-func getWarningEmoji() string {
-	return color.YellowString("⚠")
-}
-
 // Friendly is an implementation of the Formatter interface
 // which formats the errors to JSON.
 type Friendly struct {
@@ -64,10 +56,13 @@ func (f *Friendly) printFriendlyFailure(sb *strings.Builder, failure lint.Failur
 	sb.WriteString("\n\n")
 }
 
+var errorEmoji = color.RedString("✘")
+var warningEmoji = color.YellowString("⚠")
+
 func (*Friendly) printHeaderRow(sb *strings.Builder, failure lint.Failure, severity lint.Severity) {
-	emoji := getWarningEmoji()
+	emoji := warningEmoji
 	if severity == lint.SeverityError {
-		emoji = getErrorEmoji()
+		emoji = errorEmoji
 	}
 	sb.WriteString(table([][]string{{emoji, ruleDescriptionURL(failure.RuleName), color.GreenString(failure.Failure)}}))
 }
@@ -82,9 +77,9 @@ type statEntry struct {
 }
 
 func (*Friendly) printSummary(w io.Writer, errors, warnings int) {
-	emoji := getWarningEmoji()
+	emoji := warningEmoji
 	if errors > 0 {
-		emoji = getErrorEmoji()
+		emoji = errorEmoji
 	}
 	problemsLabel := "problems"
 	if errors+warnings == 1 {
