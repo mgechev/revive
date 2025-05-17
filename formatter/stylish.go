@@ -20,10 +20,10 @@ func (*Stylish) Name() string {
 
 func formatFailure(failure lint.Failure, severity lint.Severity) []string {
 	fString := color.CyanString(failure.Failure)
-	fURL := ruleDescriptionURL(failure.RuleName)
-	fName := color.RedString(fURL)
 	lineColumn := failure.Position
 	pos := fmt.Sprintf("(%d, %d)", lineColumn.Start.Line, lineColumn.Start.Column)
+	fURL := ruleDescriptionURL(failure.RuleName)
+	fName := color.RedString(fURL)
 	if severity == lint.SeverityWarning {
 		fName = color.YellowString(fURL)
 	}
@@ -44,10 +44,6 @@ func (*Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string
 		}
 		result = append(result, formatFailure(f, lint.Severity(currentType)))
 	}
-	ps := "problems"
-	if total == 1 {
-		ps = "problem"
-	}
 
 	fileReport := map[string][][]string{}
 
@@ -66,6 +62,10 @@ func (*Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string
 		output += table(val) + "\n"
 	}
 
+	ps := "problems"
+	if total == 1 {
+		ps = "problem"
+	}
 	suffix := fmt.Sprintf(" %d %s (%d errors) (%d warnings)", total, ps, totalErrors, total-totalErrors)
 
 	switch {
