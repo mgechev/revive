@@ -25,3 +25,7 @@ type Config struct {
 func (c *Config) Port() port { // MATCH /exported method Port returns unexported type fixtures.port, which can be annoying to use/
 	return c.p
 }
+
+func NewConfig() *Config {
+	return &Config{}
+}
