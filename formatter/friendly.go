@@ -1,6 +1,7 @@
 package formatter
 
 import (
+	"bytes"
 	"cmp"
 	"fmt"
 	"io"
@@ -128,14 +129,14 @@ func (*Friendly) printStatistics(w io.Writer, header string, stats map[string]in
 }
 
 func table(rows [][]string) string {
-	var buf strings.Builder
+	var buf bytes.Buffer
 	tw := tabwriter.NewWriter(&buf, 0, 0, 2, ' ', 0)
 	for _, row := range rows {
-		fmt.Fprintf(tw, "\t")
+		tw.Write([]byte{'\t'})
 		for _, col := range row {
-			fmt.Fprintf(tw, "%s\t", col)
+			tw.Write(append([]byte(col), '\t'))
 		}
-		tw.Write([]byte("\n"))
+		tw.Write([]byte{'\n'})
 	}
 	tw.Flush()
 	return buf.String()
