@@ -117,7 +117,7 @@ test.go
   (2, 5)  https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#rule  test failure  
 
 
- ✖ 1 problem (0 errors) (1 warnings)
+ ✖ 1 problem (0 errors) (1 warning)
 `,
 		},
 		{
