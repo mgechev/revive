@@ -62,11 +62,20 @@ func (*Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string
 		output += table(val) + "\n"
 	}
 
-	ps := "problems"
+	problemsLabel := "problems"
 	if total == 1 {
-		ps = "problem"
+		problemsLabel = "problem"
 	}
-	suffix := fmt.Sprintf(" %d %s (%d errors) (%d warnings)", total, ps, totalErrors, total-totalErrors)
+	totalWarnings := total - totalErrors
+	warningsLabel := "warnings"
+	if totalWarnings == 1 {
+		warningsLabel = "warning"
+	}
+	errorsLabel := "errors"
+	if totalErrors == 1 {
+		errorsLabel = "error"
+	}
+	suffix := fmt.Sprintf(" %d %s (%d %s) (%d %s)", total, problemsLabel, totalErrors, errorsLabel, totalWarnings, warningsLabel)
 
 	switch {
 	case total > 0 && totalErrors > 0:
