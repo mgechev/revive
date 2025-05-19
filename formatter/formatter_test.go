@@ -61,11 +61,13 @@ Warnings:
 		},
 		{
 			formatter: &formatter.JSON{},
-			want:      `[{"Severity":"warning","Failure":"test failure","RuleName":"rule","Category":"cat","Position":{"Start":{"Filename":"test.go","Offset":0,"Line":2,"Column":5},"End":{"Filename":"test.go","Offset":0,"Line":2,"Column":10}},"Confidence":0,"ReplacementLine":""}]`, //nolint:revive // line-length-limit
+			//revive:disable-next-line // line-length-limit
+			want: `[{"Severity":"warning","Failure":"test failure","RuleName":"rule","Category":"cat","Position":{"Start":{"Filename":"test.go","Offset":0,"Line":2,"Column":5},"End":{"Filename":"test.go","Offset":0,"Line":2,"Column":10}},"Confidence":0,"ReplacementLine":""}]`, //nolint:revive // line-length-limit
 		},
 		{
 			formatter: &formatter.NDJSON{},
-			want:      `{"Severity":"warning","Failure":"test failure","RuleName":"rule","Category":"cat","Position":{"Start":{"Filename":"test.go","Offset":0,"Line":2,"Column":5},"End":{"Filename":"test.go","Offset":0,"Line":2,"Column":10}},"Confidence":0,"ReplacementLine":""}`, //nolint:revive // line-length-limit
+			//revive:disable-next-line // line-length-limit
+			want: `{"Severity":"warning","Failure":"test failure","RuleName":"rule","Category":"cat","Position":{"Start":{"Filename":"test.go","Offset":0,"Line":2,"Column":5},"End":{"Filename":"test.go","Offset":0,"Line":2,"Column":10}},"Confidence":0,"ReplacementLine":""}`, //nolint:revive // line-length-limit
 		},
 		{
 			formatter: &formatter.Plain{},
