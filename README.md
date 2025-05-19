@@ -64,53 +64,6 @@ Here's how `revive` is different from `golint`:
   <img src="./assets/demo.svg" alt="" width="700">
 </p>
 
-<!-- TOC -->
-
-- [revive](#revive)
-  - [Who uses Revive](#who-uses-revive)
-  - [Installation](#installation)
-  - [Usage](#usage)
-    - [Docker](#docker)
-    - [Bazel](#bazel)
-    - [Text Editors](#text-editors)
-    - [GitHub Actions](#github-actions)
-    - [Continuous Integration](#continuous-integration)
-    - [Linter aggregators](#linter-aggregators)
-      - [golangci-lint](#golangci-lint)
-    - [Command Line Flags](#command-line-flags)
-    - [Sample Invocations](#sample-invocations)
-    - [Comment Directives](#comment-directives)
-    - [Configuration](#configuration)
-    - [Default Configuration](#default-configuration)
-    - [Custom Configuration](#custom-configuration)
-    - [Recommended Configuration](#recommended-configuration)
-    - [Rule-level file excludes](#rule-level-file-excludes)
-  - [Available Rules](#available-rules)
-  - [Configurable rules](#configurable-rules)
-    - [`var-naming`](#var-naming)
-  - [Available Formatters](#available-formatters)
-    - [Friendly](#friendly)
-    - [Stylish](#stylish)
-    - [Default](#default)
-    - [Plain](#plain)
-    - [Unix](#unix)
-    - [JSON](#json)
-    - [NDJSON](#ndjson)
-    - [Checkstyle](#checkstyle)
-    - [SARIF](#sarif)
-  - [Extensibility](#extensibility)
-    - [Writing a Custom Rule](#writing-a-custom-rule)
-      - [Using `revive` as a library](#using-revive-as-a-library)
-    - [Custom Formatter](#custom-formatter)
-  - [Speed Comparison](#speed-comparison)
-    - [golint](#golint)
-    - [revive's speed](#revives-speed)
-  - [Overriding colorization detection](#overriding-colorization-detection)
-  - [Contributors](#contributors)
-  - [License](#license)
-
-<!-- /TOC -->
-
 ## Installation
 
 ```bash
