@@ -54,11 +54,11 @@ func TestReviveFormat(t *testing.T) {
 	}
 
 	errorMsgs := []string{
-		"(91, 3)  https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#unreachable-code  unreachable code after this statement",
-		"(98, 3)  https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#unreachable-code  unreachable code after this statement",
-		"(15, 2)  https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#if-return         redundant if ...; err != nil check, just return error instead.",
-		"(88, 3)  https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#if-return         redundant if ...; err != nil check, just return error instead.",
-		"(95, 3)  https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#if-return         redundant if ...; err != nil check, just return error instead.",
+		"(91, 3)  https://revive.run/r#unreachable-code  unreachable code after this statement",
+		"(98, 3)  https://revive.run/r#unreachable-code  unreachable code after this statement",
+		"(15, 2)  https://revive.run/r#if-return         redundant if ...; err != nil check, just return error instead.",
+		"(88, 3)  https://revive.run/r#if-return         redundant if ...; err != nil check, just return error instead.",
+		"(95, 3)  https://revive.run/r#if-return         redundant if ...; err != nil check, just return error instead.",
 	}
 	for _, errorMsg := range errorMsgs {
 		if !strings.Contains(failures, errorMsg) {
