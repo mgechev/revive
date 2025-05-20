@@ -50,7 +50,7 @@ func TestFormatter(t *testing.T) {
 		{
 			formatter: &formatter.Friendly{},
 			want: `
-⚠  https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#rule  test failure  
+⚠  https://revive.run/r#rule  test failure  
   test.go:2:5
 
 ⚠ 1 problem (0 errors, 1 warning)
@@ -71,7 +71,7 @@ Warnings:
 		},
 		{
 			formatter: &formatter.Plain{},
-			want:      `test.go:2:5: test failure https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#rule`,
+			want:      `test.go:2:5: test failure https://revive.run/r#rule`,
 		},
 		{
 			formatter: &formatter.Sarif{},
@@ -102,7 +102,7 @@ Warnings:
       ],
       "tool": {
         "driver": {
-          "informationUri": "https://github.com/mgechev/revive",
+          "informationUri": "https://revive.run",
           "name": "revive"
         }
       }
@@ -116,7 +116,7 @@ Warnings:
 			formatter: &formatter.Stylish{},
 			want: `
 test.go
-  (2, 5)  https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#rule  test failure  
+  (2, 5)  https://revive.run/r#rule  test failure  
 
 
  ✖ 1 problem (0 errors) (1 warning)

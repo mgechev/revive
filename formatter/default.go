@@ -28,5 +28,5 @@ func (*Default) Format(failures <-chan lint.Failure, _ lint.Config) (string, err
 }
 
 func ruleDescriptionURL(ruleName string) string {
-	return "https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md#" + ruleName
+	return "https://revive.run/r#" + ruleName
 }
