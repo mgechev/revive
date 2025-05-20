@@ -32,8 +32,8 @@ jobs:
           find . -type f -name '*.go' -not -path './testdata/*' -exec gofmt -w {} +
           git diff --exit-code
 
-  lint:
-    name: Lint
+  lint-go:
+    name: Lint Go
     runs-on: ubuntu-latest
     steps:
 
@@ -55,3 +55,12 @@ jobs:
       uses: golangci/golangci-lint-action@v8
       with:
         version: v2.1.6
+
+  lint-md:
+    name: Lint Markdown
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DavidAnson/markdownlint-cli2-action@v20
+        with:
+          config: .markdownlint-cli2.yaml

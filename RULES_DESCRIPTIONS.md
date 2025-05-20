@@ -2,7 +2,6 @@
 
 List of all available rules.
 
-
 - [Description of available rules](#description-of-available-rules)
   - [add-constant](#add-constant)
   - [argument-limit](#argument-limit)
@@ -91,15 +90,16 @@ List of all available rules.
 
 ## add-constant
 
-_Description_: Suggests using constant for [magic numbers](https://en.wikipedia.org/wiki/Magic_number_(programming)#Unnamed_numerical_constants) and string literals.
+_Description_: Suggests using constant for [magic numbers](https://en.wikipedia.org/wiki/Magic_number_(programming)#Unnamed_numerical_constants)
+and string literals.
 
 _Configuration_:
 
-* `maxLitCount` (`maxlitcount`, `max-lit-count`): (string) maximum number of instances of a string literal that are tolerated before warn.
-* `allowStrs` (`allowstrs`, `allow-strs`): (string) comma-separated list of allowed string literals
-* `allowInts` (`allowints`, `allow-ints`): (string) comma-separated list of allowed integers
-* `allowFloats` (`allowfloats`, `allow-floats`): (string) comma-separated list of allowed floats
-* `ignoreFuncs` (`ignorefuncs`, `ignore-funcs`): (string) comma-separated list of function names regexp patterns to exclude
+- `maxLitCount` (`maxlitcount`, `max-lit-count`): (string) maximum number of instances of a string literal that are tolerated before warn.
+- `allowStrs` (`allowstrs`, `allow-strs`): (string) comma-separated list of allowed string literals
+- `allowInts` (`allowints`, `allow-ints`): (string) comma-separated list of allowed integers
+- `allowFloats` (`allowfloats`, `allow-floats`): (string) comma-separated list of allowed floats
+- `ignoreFuncs` (`ignorefuncs`, `ignore-funcs`): (string) comma-separated list of function names regexp patterns to exclude
 
 Examples:
 
@@ -160,22 +160,24 @@ _Configuration_: N/A
 
 ## bool-literal-in-expr
 
-_Description_: Using Boolean literals (`true`, `false`) in logic expressions may make the code less readable. This rule suggests removing Boolean literals from logic expressions.
+_Description_: Using Boolean literals (`true`, `false`) in logic expressions may make the code less readable.
+This rule suggests removing Boolean literals from logic expressions.
 
 _Configuration_: N/A
 
 ## call-to-gc
 
-_Description_:  Explicitly invoking the garbage collector is, except for specific uses in benchmarking, very dubious.
+_Description_: Explicitly invoking the garbage collector is, except for specific uses in benchmarking, very dubious.
 
-The garbage collector can be configured through environment variables as described [here](https://golang.org/pkg/runtime/).
+The garbage collector can be configured through environment variables as [described here](https://golang.org/pkg/runtime/).
 
 _Configuration_: N/A
 
 ## cognitive-complexity
 
 _Description_: [Cognitive complexity](https://www.sonarsource.com/docs/CognitiveComplexity.pdf) is a measure of how hard code is to understand.
-While cyclomatic complexity is good to measure "testability" of the code, cognitive complexity aims to provide a more precise measure of the difficulty of understanding the code.
+While cyclomatic complexity is good to measure "testability" of the code,
+cognitive complexity aims to provide a more precise measure of the difficulty of understanding the code.
 Enforcing a maximum complexity per function helps to keep code readable and maintainable.
 
 _Configuration_: (int) the maximum function complexity
@@ -190,15 +192,18 @@ Example:
 ## comment-spacings
 
 _Description_: Spots comments of the form:
+
 ```go
 //This is a malformed comment: no space between // and the start of the sentence
 ```
 
 _Configuration_: ([]string) list of exceptions. For example, to accept comments of the form
+
 ```go
 //mypragma: activate something
 //+optional
 ```
+
 You need to add both `"mypragma:"` and `"+optional"` in the configuration
 
 Example:
@@ -210,7 +215,8 @@ Example:
 
 ## comments-density
 
-_Description_: Spots files not respecting a minimum value for the [_comments lines density_](https://docs.sonarsource.com/sonarqube/latest/user-guide/metric-definitions/) metric = _comment lines / (lines of code + comment lines) * 100_
+_Description_: Spots files not respecting a minimum value for the [_comments lines density_](https://docs.sonarsource.com/sonarqube/latest/user-guide/metric-definitions/)
+metric = _comment lines / (lines of code + comment lines) * 100_
 
 _Configuration_: (int) the minimum expected comments lines density.
 
@@ -241,11 +247,12 @@ _Configuration_: N/A
 
 ## context-as-argument
 
-_Description_: By [convention](https://go.dev/wiki/CodeReviewComments#contexts), `context.Context` should be the first parameter of a function. This rule spots function declarations that do not follow the convention.
+_Description_: By [convention](https://go.dev/wiki/CodeReviewComments#contexts), `context.Context` should be the first parameter of a function.
+This rule spots function declarations that do not follow the convention.
 
 _Configuration_:
 
-* `allowTypesBefore` (`allowtypesbefore`, `allow-types-before`): (string) comma-separated list of types that may be before 'context.Context'
+- `allowTypesBefore` (`allowtypesbefore`, `allow-types-before`): (string) comma-separated list of types that may be before 'context.Context'
 
 Examples:
 
@@ -267,7 +274,8 @@ _Configuration_: N/A
 
 ## cyclomatic
 
-_Description_: [Cyclomatic complexity](https://en.wikipedia.org/wiki/Cyclomatic_complexity) is a measure of code complexity. Enforcing a maximum complexity per function helps to keep code readable and maintainable.
+_Description_: [Cyclomatic complexity](https://en.wikipedia.org/wiki/Cyclomatic_complexity) is a measure of code complexity.
+Enforcing a maximum complexity per function helps to keep code readable and maintainable.
 
 _Configuration_: (int) the maximum function complexity
 
@@ -280,19 +288,24 @@ Example:
 
 ## datarace
 
-_Description_: This rule spots potential dataraces caused by go-routines capturing (by-reference) particular identifiers of the function from which go-routines are created. The rule is able to spot two of such cases: go-routines capturing named return values, and capturing `for-range` values.
+_Description_: This rule spots potential dataraces caused by goroutines capturing (by-reference) particular identifiers of the function from
+which goroutines are created.
+The rule is able to spot two of such cases: go-routines capturing named return values, and capturing `for-range` values.
 
 _Configuration_: N/A
 
 ## deep-exit
 
-_Description_: Packages exposing functions that can stop program execution by exiting are hard to reuse. This rule looks for program exits in functions other than `main()` or `init()`.
+_Description_: Packages exposing functions that can stop program execution by exiting are hard to reuse.
+This rule looks for program exits in functions other than `main()` or `init()`.
 
 _Configuration_: N/A
 
 ## defer
 
 _Description_: This rule warns on some common mistakes when using `defer` statement. It currently alerts on the following situations:
+
+<!-- markdownlint-disable MD013 -->
 
 | name              | description                                                                                                                                                                                     |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -303,9 +316,12 @@ _Description_: This rule warns on some common mistakes when using `defer` statem
 | immediate-recover (immediateRecover, immediaterecover) | calling `recover` at the time a defer is registered, rather than as part of the deferred callback.  e.g. `defer recover()` or equivalent.                                                       |
 | return            | returning values form a deferred function has no effect                                                                                                                                         |
 
-These gotchas are described [here](https://blog.learngoprogramming.com/gotchas-of-defer-in-go-1-8d070894cb01)
+<!-- markdownlint-enable MD013 -->
 
-_Configuration_: by default all warnings are enabled but it is possible selectively enable them through configuration. For example to enable only `call-chain` and `loop`:
+These gotchas are [described here](https://blog.learngoprogramming.com/gotchas-of-defer-in-go-1-8d070894cb01).
+
+_Configuration_: By default, all warnings are enabled but it is possible selectively enable them through configuration.
+For example to enable only `call-chain` and `loop`:
 
 Examples:
 
@@ -321,13 +337,14 @@ Examples:
 
 ## dot-imports
 
-_Description_: Importing with `.` makes the programs much harder to understand because it is unclear whether names belong to the current package or to an imported package.
+_Description_: Importing with `.` makes the programs much harder to understand because it is unclear whether names belong to the current package or
+to an imported package.
 
-More information [here](https://go.dev/wiki/CodeReviewComments#import-dot)
+More [information here](https://go.dev/wiki/CodeReviewComments#import-dot).
 
 _Configuration_:
 
-* `allowedPackages` (`allowedpackages`, `allowed-packages`): (list of strings) comma-separated list of allowed dot import packages
+- `allowedPackages` (`allowedpackages`, `allowed-packages`): (list of strings) comma-separated list of allowed dot import packages
 
 Examples:
 
@@ -349,7 +366,9 @@ _Configuration_: N/A
 
 ## early-return
 
-_Description_: In Go it is idiomatic to minimize nesting statements, a typical example is to avoid if-then-else constructions. This rule spots constructions like
+_Description_: In Go it is idiomatic to minimize nesting statements, a typical example is to avoid if-then-else constructions.
+This rule spots constructions like
+
 ```go
 if cond {
   // do something
@@ -358,7 +377,9 @@ if cond {
   return ...
 }
 ```
+
 where the `if` condition may be inverted in order to reduce nesting:
+
 ```go
 if !cond {
   // do other thing
@@ -370,8 +391,9 @@ if !cond {
 
 _Configuration_: ([]string) rule flags. Available flags are:
 
-* `preserveScope` (`preservescope`, `preserve-scope`): do not suggest refactorings that would increase variable scope
-* `allowJump` (`allowjump`, `allow-jump`): suggest a new jump (`return`, `continue` or `break` statement) if it could unnest multiple statements. By default, only relocation of _existing_ jumps (i.e. from the `else` clause) are suggested.
+- `preserveScope` (`preservescope`, `preserve-scope`): do not suggest refactorings that would increase variable scope
+- `allowJump` (`allowjump`, `allow-jump`): suggest a new jump (`return`, `continue` or `break` statement) if it could unnest multiple statements.
+By default, only relocation of _existing_ jumps (i.e. from the `else` clause) are suggested.
 
 Examples:
 
@@ -393,15 +415,18 @@ _Configuration_: N/A
 
 ## empty-lines
 
-_Description_: Sometimes `gofmt` is not enough to enforce a common formatting of a code-base; this rule warns when there are heading or trailing newlines in code blocks.
+_Description_: Sometimes `gofmt` is not enough to enforce a common formatting of a code-base;
+this rule warns when there are heading or trailing newlines in code blocks.
 
 _Configuration_: N/A
 
 ## enforce-map-style
 
-_Description_: This rule enforces consistent usage of `make(map[type]type)` or `map[type]type{}` for map initialization. It does not affect `make(map[type]type, size)` constructions as well as `map[type]type{k1: v1}`.
+_Description_: This rule enforces consistent usage of `make(map[type]type)` or `map[type]type{}` for map initialization.
+It does not affect `make(map[type]type, size)` constructions as well as `map[type]type{k1: v1}`.
 
 _Configuration_: (string) Specifies the enforced style for map initialization. The options are:
+
 - "any": No enforcement (default).
 - "make": Enforces the usage of `make(map[type]type)`.
 - "literal": Enforces the usage of `map[type]type{}`.
@@ -415,10 +440,10 @@ Example:
 
 ## enforce-repeated-arg-type-style
 
-_Description_: This rule is designed to maintain consistency in the declaration
-of repeated argument and return value types in Go functions. It supports three styles:
-'any', 'short', and 'full'. The 'any' style is lenient and allows any form of type
-declaration. The 'short' style encourages omitting repeated types for conciseness,
+_Description_: This rule is designed to maintain consistency in the declaration of repeated argument and return value types in Go functions.
+It supports three styles: 'any', 'short', and 'full'.
+The 'any' style is lenient and allows any form of type declaration.
+The 'short' style encourages omitting repeated types for conciseness,
 whereas the 'full' style mandates explicitly stating the type for each argument
 and return value, even if they are repeated, promoting clarity.
 
@@ -461,6 +486,7 @@ It does not affect `make([]type, non_zero_len, or_non_zero_cap)` constructions a
 Nil slices are always permitted.
 
 _Configuration_: (string) Specifies the enforced style for slice initialization. The options are:
+
 - "any": No enforcement (default).
 - "make": Enforces the usage of `make([]type, 0)`.
 - "literal": Enforces the usage of `[]type{}`.
@@ -491,7 +517,7 @@ _Description_: By convention, for better readability, error messages should not 
 By default, the rule analyzes functions for creating errors from `fmt`, `errors`, and `github.com/pkg/errors`.
 Optionally, the rule can be configured to analyze user functions that create errors.
 
-More information [here](https://go.dev/wiki/CodeReviewComments#error-strings)
+More [information here](https://go.dev/wiki/CodeReviewComments#error-strings).
 
 _Configuration_: ([]string) the list of additional error functions to check.
 The format of values is `package.FunctionName`.
@@ -505,7 +531,8 @@ Example:
 
 ## errorf
 
-_Description_: It is possible to get a simpler program by replacing `errors.New(fmt.Sprintf())` with `fmt.Errorf()`. This rule spots that kind of simplification opportunities.
+_Description_: It is possible to get a simpler program by replacing `errors.New(fmt.Sprintf())` with `fmt.Errorf()`.
+This rule spots that kind of simplification opportunities.
 
 _Configuration_: N/A
 
@@ -513,21 +540,23 @@ _Configuration_: N/A
 
 _Description_: Exported function and methods should have comments. This warns on undocumented exported functions and methods.
 
-More information [here](https://go.dev/wiki/CodeReviewComments#doc-comments)
+More [information here](https://go.dev/wiki/CodeReviewComments#doc-comments).
 
 _Configuration_: ([]string) rule flags.
 Please notice that without configuration, the default behavior of the rule is that of its `golint` counterpart.
 Available flags are:
 
-* `checkPrivateReceivers` (`checkprivatereceivers`, `check-private-receivers`) enables checking public methods of private types
-* `disableStutteringCheck` (`disablestutteringcheck`, `disable-stuttering-check`) disables checking for method names that stutter with the package name (i.e. avoid failure messages of the form _type name will be used as x.XY by other packages, and that stutters; consider calling this Y_)
-* `sayRepetitiveInsteadOfStutters` (`sayrepetitiveinsteadofstutters`, `say-repetitive-instead-of-stutters`) replaces the use of the term _stutters_ by _repetitive_ in failure messages
-* `checkPublicInterface` (`checkpublicinterface`, `check-public-interface`) enabled checking public method definitions in public interface types
-* `disableChecksOnConstants` (`disablechecksonconstants`, `disable-checks-on-constants`) disable all checks on constant declarations
-* `disableChecksOnFunctions` (`disablechecksonfunctions`, `disable-checks-on-functions`) disable all checks on function declarations
-* `disableChecksOnMethods` (`disablechecksonmethods`, `disable-checks-on-methods`) disable all checks on method declarations
-* `disableChecksOnTypes` (`disablechecksontypes`, `disable-checks-on-types`) disable all checks on type declarations
-* `disableChecksOnVariables` (`disablechecksonvariables`, `disable-checks-on-variables`) disable all checks on variable declarations
+- `checkPrivateReceivers` (`checkprivatereceivers`, `check-private-receivers`) enables checking public methods of private types
+- `disableStutteringCheck` (`disablestutteringcheck`, `disable-stuttering-check`) disables checking for method names that stutter with the package name
+(i.e. avoid failure messages of the form _type name will be used as x.XY by other packages, and that stutters; consider calling this Y_)
+- `sayRepetitiveInsteadOfStutters` (`sayrepetitiveinsteadofstutters`, `say-repetitive-instead-of-stutters`) replaces the use of the term _stutters_
+by _repetitive_ in failure messages
+- `checkPublicInterface` (`checkpublicinterface`, `check-public-interface`) enabled checking public method definitions in public interface types
+- `disableChecksOnConstants` (`disablechecksonconstants`, `disable-checks-on-constants`) disable all checks on constant declarations
+- `disableChecksOnFunctions` (`disablechecksonfunctions`, `disable-checks-on-functions`) disable all checks on function declarations
+- `disableChecksOnMethods` (`disablechecksonmethods`, `disable-checks-on-methods`) disable all checks on method declarations
+- `disableChecksOnTypes` (`disablechecksontypes`, `disable-checks-on-types`) disable all checks on type declarations
+- `disableChecksOnVariables` (`disablechecksonvariables`, `disable-checks-on-variables`) disable all checks on variable declarations
 
 Examples:
 
@@ -560,9 +589,9 @@ _Description_: This rule enforces a maximum number of lines per file, in order t
 
 _Configuration_:
 
-* `max`: (int) a maximum number of lines in a file. Must be non-negative integers. 0 means the rule is disabled (default `0`);
-* `skipComments` (`skipcomments`, `skip-comments`): (bool) if true ignore and do not count lines containing just comments (default `false`);
-* `skipBlankLines` (`skipblanklines`, `skip-blank-lines`): (bool) if true ignore and do not count lines made up purely of whitespace (default `false`).
+- `max`: (int) a maximum number of lines in a file. Must be non-negative integers. 0 means the rule is disabled (default `0`);
+- `skipComments` (`skipcomments`, `skip-comments`): (bool) if true ignore and do not count lines containing just comments (default `false`);
+- `skipBlankLines` (`skipblanklines`, `skip-blank-lines`): (bool) if true ignore and do not count lines made up purely of whitespace (default `false`).
 
 Examples:
 
@@ -577,7 +606,9 @@ Examples:
 ```
 
 ## filename-format
-_Description_: enforces conventions on source file names. By default, the rule enforces filenames of the form `^[_A-Za-z0-9][_A-Za-z0-9-]*\.go$`: Optionally, the rule can be configured to enforce other forms.
+
+_Description_: enforces conventions on source file names. By default, the rule enforces filenames of the form `^[_A-Za-z0-9][_A-Za-z0-9-]*\.go$`.
+Optionally, the rule can be configured to enforce other forms.
 
 _Configuration_: (string) regular expression for source filenames.
 
@@ -585,7 +616,7 @@ Example:
 
 ```toml
 [rule.filename-format]
-    arguments=["^[_a-z][_a-z0-9]*\\.go$"]
+  arguments=["^[_a-z][_a-z0-9]*\\.go$"]
 ```
 
 ## flag-parameter
@@ -608,6 +639,7 @@ Example:
 [rule.function-length]
   arguments = [10, 0]
 ```
+
 Will check for functions exceeding 10 statements and will not check the number of lines of functions
 
 ## function-result-limit
@@ -631,7 +663,7 @@ _Configuration_: N/A
 
 ## identical-branches
 
-_Description_: an `if-then-else` conditional with identical implementations in both branches is an error.
+_Description_: An `if-then-else` conditional with identical implementations in both branches is an error.
 
 _Configuration_: N/A
 
@@ -651,8 +683,9 @@ Importantly, aliases with underscores ("_") are always allowed.
 _Configuration_ (1): (`string`) as plain string accepts allow regexp pattern for aliases (default: `^[a-z][a-z0-9]{0,}$`).
 
 _Configuration_ (2): (`map[string]string`) as a map accepts two values:
-* for a key `allowRegex` (`allowregex`, `allow-regex`) accepts allow regexp pattern
-* for a key `denyRegex` (`denyregex`, `deny-regex`) deny regexp pattern
+
+- for a key `allowRegex` (`allowregex`, `allow-regex`) accepts allow regexp pattern
+- for a key `denyRegex` (`denyregex`, `deny-regex`) deny regexp pattern
 
 _Note_: If both `allowRegex` and `denyRegex` are provided, the alias must comply with both of them.
 If none are given (i.e. an empty map), the default value `^[a-z][a-z0-9]{0,}$` for allowRegex is used.
@@ -701,7 +734,7 @@ Example:
 ## increment-decrement
 
 _Description_: By convention, for better readability, incrementing an integer variable by 1 is recommended to be done using the `++` operator.
-This rule spots expressions  like `i += 1` and `i -= 1` and proposes to change them into `i++` and `i--`.
+This rule spots expressions like `i += 1` and `i -= 1` and proposes to change them into `i++` and `i--`.
 
 _Configuration_: N/A
 
@@ -710,11 +743,11 @@ _Configuration_: N/A
 _Description_: To improve the readability of code, it is recommended to reduce the indentation as much as possible.
 This rule highlights redundant _else-blocks_ that can be eliminated from the code.
 
-More information [here](https://go.dev/wiki/CodeReviewComments#indent-error-flow)
+More [information here](https://go.dev/wiki/CodeReviewComments#indent-error-flow).
 
 _Configuration_: ([]string) rule flags. Available flags are:
 
-* `preserveScope` (`preservescope`, `preserve-scope`): do not suggest refactorings that would increase variable scope
+- `preserveScope` (`preservescope`, `preserve-scope`): do not suggest refactorings that would increase variable scope
 
 Examples:
 
@@ -772,14 +805,16 @@ Example:
 
 ## modifies-parameter
 
-_Description_: A function that modifies its parameters can be hard to understand. It can also be misleading if the arguments are passed by value by the caller.
+_Description_: A function that modifies its parameters can be hard to understand.
+It can also be misleading if the arguments are passed by value by the caller.
 This rule warns when a function modifies one or more of its parameters.
 
 _Configuration_: N/A
 
 ## modifies-value-receiver
 
-_Description_: A method that modifies its receiver value can have undesired behavior. The modification can be also the root of a bug because the actual value receiver could be a copy of that used at the calling site.
+_Description_: A method that modifies its receiver value can have undesired behavior.
+The modification can be also the root of a bug because the actual value receiver could be a copy of that used at the calling site.
 This rule warns when a method modifies its receiver.
 
 _Configuration_: N/A
@@ -792,7 +827,11 @@ _Configuration_: N/A
 
 ## optimize-operands-order
 
-_Description_: conditional expressions can be written to take advantage of short circuit evaluation and speed up its average evaluation time by forcing the evaluation of less time-consuming terms before more costly ones. This rule spots logical expressions where the order of evaluation of terms seems non optimal. Please notice that confidence of this rule is low and is up to the user to decide if the suggested rewrite of the expression keeps the semantics of the original one.
+_Description_: Conditional expressions can be written to take advantage of short circuit evaluation and speed up its average evaluation time
+by forcing the evaluation of less time-consuming terms before more costly ones.
+This rule spots logical expressions where the order of evaluation of terms seems non optimal.
+Please notice that confidence of this rule is low and is up to the user to decide if the suggested rewrite of the expression
+keeps the semantics of the original one.
 
 _Configuration_: N/A
 
@@ -812,13 +851,14 @@ if !config.IgnoreGeneratedHeader && isGenerated(content) {
 
 _Description_: Packages should have comments. This rule warns on undocumented packages and when packages comments are detached to the `package` keyword.
 
-More information [here](https://go.dev/wiki/CodeReviewComments#package-comments)
+More [information here](https://go.dev/wiki/CodeReviewComments#package-comments).
 
 _Configuration_: N/A
 
 ## range-val-address
 
-_Description_: Range variables in a loop are reused at each iteration. This rule warns when assigning the address of the variable, passing the address to append() or using it in a map.
+_Description_: Range variables in a loop are reused at each iteration.
+This rule warns when assigning the address of the variable, passing the address to append() or using it in a map.
 
 _Configuration_: N/A
 
@@ -826,8 +866,9 @@ _Note_: This rule is irrelevant for Go 1.22+.
 
 ## range-val-in-closure
 
-_Description_: Range variables in a loop are reused at each iteration; therefore a goroutine created in a loop will point to the range variable with from the upper scope. This way, the goroutine could use the variable with an undesired value.
-This rule warns when a range value (or index) is used inside a closure
+_Description_: Range variables in a loop are reused at each iteration; therefore a goroutine created in a loop will point to the range variable
+with from the upper scope. This way, the goroutine could use the variable with an undesired value.
+This rule warns when a range value (or index) is used inside a closure.
 
 _Configuration_: N/A
 
@@ -841,7 +882,9 @@ _Configuration_: N/A
 
 ## receiver-naming
 
-_Description_: By convention, receiver names in a method should reflect their identity. For example, if the receiver is of type `Parts`, `p` is an adequate name for it. Contrary to other languages, it is not idiomatic to name receivers as `this` or `self`.
+_Description_: By convention, receiver names in a method should reflect their identity.
+For example, if the receiver is of type `Parts`, `p` is an adequate name for it.
+Contrary to other languages, it is not idiomatic to name receivers as `this` or `self`.
 
 _Configuration_: (optional) list of key-value-pair-map (`[]map[string]any`).
 
@@ -851,17 +894,18 @@ Examples:
 
 ```toml
 [rule.receiver-naming]
-    arguments = [{maxLength=2}]
+  arguments = [{maxLength=2}]
 ```
 
 ```toml
 [rule.receiver-naming]
-    arguments = [{max-length=2}]
+  arguments = [{max-length=2}]
 ```
 
 ## redefines-builtin-id
 
-_Description_: Constant names like `false`, `true`, `nil`, function names like `append`, `make`, and basic type names like `bool`, and `byte` are not reserved words of the language; therefore the can be redefined.
+_Description_: Constant names like `false`, `true`, `nil`, function names like `append`, `make`,
+and basic type names like `bool`, and `byte` are not reserved words of the language; therefore the can be redefined.
 Even if possible, redefining these built in names can lead to bugs very difficult to detect.
 
 _Configuration_: N/A
@@ -881,7 +925,8 @@ _Configuration_: N/A
 
 ## redundant-test-main-exit
 
-_Description_: This rule warns about redundant `Exit` calls in the `TestMain` function, as the Go test runner automatically handles program termination starting from Go 1.15.
+_Description_: This rule warns about redundant `Exit` calls in the `TestMain` function,
+as the Go test runner automatically handles program termination starting from Go 1.15.
 
 _Configuration_: N/A
 
@@ -890,16 +935,25 @@ _Note_: This rule is irrelevant for Go versions below 1.15.
 ## string-format
 
 _Description_: This rule allows you to configure a list of regular expressions that string literals in certain function calls are checked against.
-This is geared towards user facing applications where string literals are often used for messages that will be presented to users, so it may be desirable to enforce consistent formatting.
+This is geared towards user facing applications where string literals are often used for messages that will be presented to users,
+so it may be desirable to enforce consistent formatting.
 
 _Configuration_: Each argument is a slice containing 2-3 strings: a scope, a regex, and an optional error message.
 
-1. The first string defines a **scope**. This controls which string literals the regex will apply to, and is defined as a function argument. It must contain at least a function name (`core.WriteError`). Scopes may optionally contain a number specifying which argument in the function to check (`core.WriteError[1]`), as well as a struct field (`core.WriteError[1].Message`, only works for top level fields). Function arguments are counted starting at 0, so `[0]` would refer to the first argument, `[1]` would refer to the second, etc. If no argument number is provided, the first argument will be used (same as `[0]`). You can use multiple scopes to one regex. Split them by `,` (`core.WriteError,fmt.Errorf`). 
+1. The first string defines a **scope**. This controls which string literals the regex will apply to, and is defined as a function argument.
+It must contain at least a function name (`core.WriteError`).
+Scopes may optionally contain a number specifying which argument in the function to check (`core.WriteError[1]`),
+as well as a struct field (`core.WriteError[1].Message`, only works for top level fields).
+Function arguments are counted starting at 0, so `[0]` would refer to the first argument, `[1]` would refer to the second, etc.
+If no argument number is provided, the first argument will be used (same as `[0]`).
+You can use multiple scopes to one regex. Split them by `,` (`core.WriteError,fmt.Errorf`).
 
-2. The second string is a **regular expression** (beginning and ending with a `/` character), which will be used to check the string literals in the scope. The default semantics is "_strings matching the regular expression are OK_". If you need to inverse the semantics you can add a `!` just before the first `/`. Examples:
+2. The second string is a **regular expression** (beginning and ending with a `/` character), which will be used to check the string literals in the scope.
+The default semantics is "_strings matching the regular expression are OK_".
+If you need to inverse the semantics you can add a `!` just before the first `/`. Examples:
 
-    * with `"/^[A-Z].*$/"` the rule will **accept** strings starting with capital letters
-    * with `"!/^[A-Z].*$/"` the rule will a **fail** on strings starting with capital letters
+    - with `"/^[A-Z].*$/"` the rule will **accept** strings starting with capital letters
+    - with `"!/^[A-Z].*$/"` the rule will a **fail** on strings starting with capital letters
 
 3. The third string (optional) is a **message** containing the purpose for the regex, which will be used in lint errors.
 
@@ -917,14 +971,16 @@ Example:
 
 ## string-of-int
 
-_Description_:  explicit type conversion `string(i)` where `i` has an integer type other than `rune` might behave not as expected by the developer (e.g. `string(42)` is not `"42"`). This rule spot that kind of suspicious conversions.
+_Description_: Explicit type conversion `string(i)` where `i` has an integer type other than `rune` might behave not as expected by the developer
+(e.g. `string(42)` is not `"42"`). This rule spot that kind of suspicious conversions.
 
 _Configuration_: N/A
 
 ## struct-tag
 
 _Description_: Struct tags are not checked at compile time.
-This rule spots errors in struct tags of the following types: asn1, bson, datastore, default, json, mapstructure, properties, protobuf, required, toml, url, validate, xml, yaml.
+This rule spots errors in struct tags of the following types:
+asn1, bson, datastore, default, json, mapstructure, properties, protobuf, required, toml, url, validate, xml, yaml.
 
 _Configuration_: (optional) list of user defined options.
 
@@ -943,7 +999,7 @@ This rule highlights redundant _else-blocks_ that can be eliminated from the cod
 
 _Configuration_: ([]string) rule flags. Available flags are:
 
-* `preserveScope` (`preservescope`, `preserve-scope`): (string) do not suggest refactorings that would increase variable scope
+- `preserveScope` (`preservescope`, `preserve-scope`): (string) do not suggest refactorings that would increase variable scope
 
 Examples:
 
@@ -959,13 +1015,15 @@ Examples:
 
 ## time-equal
 
-_Description_: This rule warns when using `==` and `!=` for equality check `time.Time` and suggest to `time.time.Equal` method, for about information follow this [link](https://pkg.go.dev/time#Time)
+_Description_: This rule warns when using `==` and `!=` for equality check `time.Time` and suggest to `time.time.Equal` method,
+for about information follow [this link](https://pkg.go.dev/time#Time)
 
 _Configuration_: N/A
 
 ## time-naming
 
-_Description_: Using unit-specific suffix like "Secs", "Mins", ... when naming variables of type `time.Duration` can be misleading, this rule highlights those cases.
+_Description_: Using unit-specific suffix like "Secs", "Mins", ... when naming variables of type `time.Duration` can be misleading,
+this rule highlights those cases.
 
 _Configuration_: N/A
 
@@ -975,7 +1033,8 @@ _Description_: This rule checks whether a type assertion result is checked (the 
 
 _Configuration_: list of key-value-pair-map (`[]map[string]any`).
 
-- `acceptIgnoredAssertionResult` (`acceptignoredassertionresult`, `accept-ignored-assertion-result`): (bool) default `false`, set it to `true` to accept ignored type assertion results like this:
+- `acceptIgnoredAssertionResult` (`acceptignoredassertionresult`, `accept-ignored-assertion-result`): (bool) default `false`,
+set it to `true` to accept ignored type assertion results like this:
 
 ```go
 foo, _ := bar(.*Baz).
@@ -996,7 +1055,8 @@ Examples:
 
 ## unconditional-recursion
 
-_Description_: Unconditional recursive calls will produce infinite recursion, thus program stack overflow. This rule detects and warns about unconditional (direct) recursive calls.
+_Description_: Unconditional recursive calls will produce infinite recursion, thus program stack overflow.
+This rule detects and warns about unconditional (direct) recursive calls.
 
 _Configuration_: N/A
 
@@ -1041,7 +1101,8 @@ _Configuration_: N/A
 
 _Description_: This rule warns on unused parameters. Functions or methods with unused parameters can be a symptom of an unfinished refactoring or a bug.
 
-_Configuration_: Supports arguments with single of `map[string]any` with option `allowRegex` (`allowregex`, `allow-regex`) to provide additional to `_` mask to allowed unused parameter names.
+_Configuration_: Supports arguments with single of `map[string]any` with option `allowRegex` (`allowregex`, `allow-regex`) to provide additional
+to `_` mask to allowed unused parameter names.
 
 Examples:
 
@@ -1053,19 +1114,20 @@ func SomeFunc(_someObj *MyStruct) {} // matches rule
 
 ```toml
 [rule.unused-parameter]
-    arguments = [{ allowRegex = "^_" }]
+  arguments = [{ allowRegex = "^_" }]
 ```
 
 ```toml
 [rule.unused-parameter]
-    arguments = [{ allow-regex = "^_" }]
+  arguments = [{ allow-regex = "^_" }]
 ```
 
 ## unused-receiver
 
 _Description_: This rule warns on unused method receivers. Methods with unused receivers can be a symptom of an unfinished refactoring or a bug.
 
-_Configuration_: Supports arguments with single of `map[string]any` with option `allowRegex` to provide additional to `_` mask to allowed unused receiver names.
+_Configuration_:
+Supports arguments with single of `map[string]any` with option `allowRegex` to provide additional to `_` mask to allowed unused receiver names.
 
 Examples:
 
@@ -1077,12 +1139,12 @@ func (_my *MyStruct) SomeMethod() {} // matches rule
 
 ```toml
 [rule.unused-receiver]
-    arguments = [{ allowRegex = "^_" }]
+  arguments = [{ allowRegex = "^_" }]
 ```
 
 ```toml
 [rule.unused-receiver]
-    arguments = [{ allow-regex = "^_" }]
+  arguments = [{ allow-regex = "^_" }]
 ```
 
 ## use-any
@@ -1097,13 +1159,14 @@ _Description_: This rules identifies calls to `fmt.Errorf` that can be safely re
 
 _Configuration_: N/A
 
-
 ## useless-break
 
-_Description_: This rule warns on useless `break` statements in case clauses of switch and select statements. Go, unlike other programming languages like C, only executes statements of the selected case while ignoring the subsequent case clauses.
+_Description_: This rule warns on useless `break` statements in case clauses of switch and select statements. Go,
+unlike other programming languages like C, only executes statements of the selected case while ignoring the subsequent case clauses.
 Therefore, inserting a `break` at the end of a case clause has no effect.
 
-Because `break` statements are rarely used in case clauses, when switch or select statements are inside a for-loop, the programmer might wrongly assume that a `break` in a case clause will take the control out of the loop.
+Because `break` statements are rarely used in case clauses, when switch or select statements are inside a for-loop,
+the programmer might wrongly assume that a `break` in a case clause will take the control out of the loop.
 The rule emits a specific warning for such cases.
 
 _Configuration_: N/A
@@ -1116,14 +1179,18 @@ _Configuration_: N/A
 
 ## var-naming
 
-_Description_: This rule warns when [initialism](https://go.dev/wiki/CodeReviewComments#initialisms), [variable](https://go.dev/wiki/CodeReviewComments#variable-names) or [package](https://go.dev/wiki/CodeReviewComments#package-names) naming conventions are not followed. It ignores functions starting with `Example`, `Test`, `Benchmark`, and `Fuzz` in test files, preserving `golint` original behavior.
+_Description_: This rule warns when [initialism](https://go.dev/wiki/CodeReviewComments#initialisms), [variable](https://go.dev/wiki/CodeReviewComments#variable-names)
+or [package](https://go.dev/wiki/CodeReviewComments#package-names) naming conventions are not followed.
+It ignores functions starting with `Example`, `Test`, `Benchmark`, and `Fuzz` in test files, preserving `golint` original behavior.
 
 _Configuration_: This rule accepts two slices of strings and one optional slice containing a single map with named parameters.
 (This is because TOML does not support "slice of any," and we maintain backward compatibility with the previous configuration version).
 The first slice is an allowlist, and the second one is a blocklist of initialisms.
 In the map, you can add a boolean `upperCaseConst` (`uppercaseconst`, `upper-case-const`) parameter to allow `UPPER_CASE` for `const`.
 You can also add a boolean `skipPackageNameChecks` (`skippackagenamechecks`, `skip-package-name-checks`) to skip package name checks.
-When `skipPackageNameChecks` is false (the default), you can configure `extraBadPackageNames` (`extrabadpackagenames`, `extra-bad-package-names`) to forbid using the values from the list as package names additionally to the standard meaningless ones: "common", "interfaces", "misc", "types", "util", "utils".
+When `skipPackageNameChecks` is false (the default), you can configure `extraBadPackageNames` (`extrabadpackagenames`, `extra-bad-package-names`)
+to forbid using the values from the list as package names additionally to the standard meaningless ones:
+"common", "interfaces", "misc", "types", "util", "utils".
 
 By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89)).
 
@@ -1161,7 +1228,8 @@ Examples:
 
 ## waitgroup-by-value
 
-_Description_: Function parameters that are passed by value, are in fact a copy of the original argument. Passing a copy of a `sync.WaitGroup` is usually not what the developer wants to do.
+_Description_: Function parameters that are passed by value, are in fact a copy of the original argument.
+Passing a copy of a `sync.WaitGroup` is usually not what the developer wants to do.
 This rule warns when a `sync.WaitGroup` expected as a by-value parameter in a function or method.
 
 _Configuration_: N/A
