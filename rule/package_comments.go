@@ -143,7 +143,7 @@ func (l *lintPackageComments) Visit(_ ast.Node) ast.Visitor {
 		}
 	}
 
-	if emptyDoc(l.fileAst.Doc) {
+	if isEmptyDoc(l.fileAst.Doc) {
 		for _, failure := range l.checkPackageComment() {
 			l.onFailure(failure)
 		}
@@ -153,7 +153,6 @@ func (l *lintPackageComments) Visit(_ ast.Node) ast.Visitor {
 
 	// Only non-main packages need to keep to this form.
 	if !l.file.Pkg.IsMain() && !strings.HasPrefix(s, prefix) && !isDirectiveComment(s) {
-		println("failing")
 		l.onFailure(lint.Failure{
 			Category:   lint.FailureCategoryComments,
 			Node:       l.fileAst.Doc,
@@ -164,7 +163,7 @@ func (l *lintPackageComments) Visit(_ ast.Node) ast.Visitor {
 	return nil
 }
 
-func emptyDoc(commentGroup *ast.CommentGroup) bool {
+func isEmptyDoc(commentGroup *ast.CommentGroup) bool {
 	if commentGroup == nil {
 		return true
 	}
