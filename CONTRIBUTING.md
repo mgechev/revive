@@ -16,11 +16,14 @@ Prerequisites:
 
 ## Submitting a Pull Request
 
-All submissions, including submissions by project members, require review. We use GitHub pull requests for this purpose. See our [developer guide](DEVELOPING.md) for instructions on building the project.
+All submissions, including submissions by project members, require review. We use GitHub pull requests for this purpose.
+See our [developer guide](DEVELOPING.md) for instructions on building the project.
 
-Pull requests (fixes, new features, tests) are a great way to contribute to the project and help us make it better. Ideally, try to keep your PRs as focused as possible and keep your commits atomic and readable.
+Pull requests (fixes, new features, tests) are a great way to contribute to the project and help us make it better.
+Ideally, try to keep your PRs as focused as possible and keep your commits atomic and readable.
 
-To avoid disappointment when working on a PR, please ask us first in case someone else is already working on a PR for a change you wished to make. It's always a good idea to file an issue before starting work on a PR unless it's for something minor (such as a typo fix).
+To avoid disappointment when working on a PR, please ask us first in case someone else is already working on a PR for a change you wished to make.
+It's always a good idea to file an issue before starting work on a PR unless it's for something minor (such as a typo fix).
 
 We greatly appreciate any attention to tests. These help us validate that new work continues to function as expected over time.
 

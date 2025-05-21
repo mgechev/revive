@@ -1,8 +1,11 @@
-[![Build Status](https://github.com/mgechev/revive/actions/workflows/test.yaml/badge.svg)](https://github.com/mgechev/revive/actions/workflows/test.yaml)
-
 # revive
 
-Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in replacement of golint. **`Revive` provides a framework for development of custom rules, and lets you define a strict preset for enhancing your development & code review processes**.
+[![Build Status](https://github.com/mgechev/revive/actions/workflows/test.yaml/badge.svg)](https://github.com/mgechev/revive/actions/workflows/test.yaml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/mgechev/revive.svg)](https://pkg.go.dev/github.com/mgechev/revive)
+
+Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in replacement of golint.
+**`Revive` provides a framework for development of custom rules,
+and lets you define a strict preset for enhancing your development & code review processes**.
 
 <p align="center">
   <img src="./assets/logo.png" alt="" width="300">
@@ -17,48 +20,12 @@ Here's how `revive` is different from `golint`:
 - 2x faster running the same rules as golint.
 - Provides functionality for disabling a specific rule or the entire linter for a file or a range of lines.
   - `golint` allows this only for generated files.
-- Optional type checking. Most rules in golint do not require type checking. If you disable them in the config file, revive will run over 6x faster than golint.
+- Optional type checking. Most rules in golint do not require type checking.
+If you disable them in the config file, revive will run over 6x faster than golint.
 - Provides multiple formatters which let us customize the output.
 - Allows to customize the return code for the entire linter or based on the failure of only some rules.
 - _Everyone can extend it easily with custom rules or formatters._
 - `Revive` provides more rules compared to `golint`.
-
-## Who uses Revive
-
-- [`tidb`](https://github.com/pingcap/tidb) - TiDB is a distributed HTAP database compatible with the MySQL protocol
-- [`grafana`](https://github.com/grafana/grafana) - The tool for beautiful monitoring and metric analytics & dashboards for Graphite, InfluxDB & Prometheus & More
-- [`etcd`](https://github.com/etcd-io/etcd) - Distributed reliable key-value store for the most critical data of a distributed system
-- [`cadence`](https://github.com/uber/cadence) - Cadence is a distributed, scalable, durable, and highly available orchestration engine by Uber to execute asynchronous long-running business logic in a scalable and resilient way
-- [`ferret`](https://github.com/MontFerret/ferret) - Declarative web scraping
-- [`gopass`](https://github.com/gopasspw/gopass) - The slightly more awesome standard unix password manager for teams
-- [`gitea`](https://github.com/go-gitea/gitea) - Git with a cup of tea, painless self-hosted git service
-- [`excelize`](https://github.com/360EntSecGroup-Skylar/excelize) - Go library for reading and writing Microsoft Excel™ (XLSX) files
-- [`aurora`](https://github.com/xuri/aurora) - aurora is a web-based Beanstalk queue server console written in Go
-- [`soar`](https://github.com/XiaoMi/soar) - SQL Optimizer And Rewriter
-- [`pyroscope`](https://github.com/pyroscope-io/pyroscope) - Continuous profiling platform
-- [`gorush`](https://github.com/appleboy/gorush) - A push notification server written in Go (Golang).
-- [`dry`](https://github.com/moncho/dry) - dry - A Docker manager for the terminal.
-- [`go-echarts`](https://github.com/chenjiandongx/go-echarts) - The adorable charts library for Golang
-- [`reviewdog`](https://github.com/reviewdog/reviewdog) - Automated code review tool integrated with any code analysis tools regardless of programming language
-- [`rudder-server`](https://github.com/rudderlabs/rudder-server) - Privacy and Security focused Segment-alternative, in Golang and React.
-- [`sklearn`](https://github.com/pa-m/sklearn) - A partial port of scikit-learn written in Go.
-- [`protoc-gen-doc`](https://github.com/pseudomuto/protoc-gen-doc) - Documentation generator plugin for Google Protocol Buffers.
-- [`llvm`](https://github.com/llir/llvm) - Library for interacting with LLVM IR in pure Go.
-- [`jenkins-library`](https://github.com/SAP/jenkins-library) - Jenkins shared library for Continuous Delivery pipelines by SAP.
-- [`pd`](https://github.com/tikv/pd) - Placement driver for TiKV.
-- [`shellhub`](https://github.com/shellhub-io/shellhub) - ShellHub enables teams to easily access any Linux device behind firewall and NAT.
-- [`lorawan-stack`](https://github.com/TheThingsNetwork/lorawan-stack) - The Things Network Stack for LoRaWAN V3
-- [`gin-jwt`](https://github.com/appleboy/gin-jwt) - This is a JWT middleware for Gin framework.
-- [`gofight`](https://github.com/appleboy/gofight) - Testing API Handler written in Golang.
-- [`Beaver`](https://github.com/Clivern/Beaver) - A Real Time Messaging Server.
-- [`ggz`](https://github.com/go-ggz/ggz) - An URL shortener service written in Golang
-- [`Codeac.io`](https://www.codeac.io?ref=revive) - Automated code review service integrates with GitHub, Bitbucket and GitLab (even self-hosted) and helps you fight technical debt.
-- [`DevLake`](https://github.com/apache/incubator-devlake) - Apache DevLake is an open-source dev data platform to ingest, analyze, and visualize the fragmented data from DevOps tools，which can distill insights to improve engineering productivity.
-- [`checker`](https://github.com/cinar/checker) - Checker helps validating user input through rules defined in struct tags or directly through functions.
-- [`milvus`](https://github.com/milvus-io/milvus) - A cloud-native vector database, storage for next generation AI applications.
-- [`indicator`](https://github.com/cinar/indicator) - Indicator provides various technical analysis indicators, strategies, and a backtesting framework.
-
-*Open a PR to add your project*.
 
 <p align="center">
   <img src="./assets/demo.svg" alt="" width="700">
@@ -67,7 +34,6 @@ Here's how `revive` is different from `golint`:
 <!-- TOC -->
 
 - [revive](#revive)
-  - [Who uses Revive](#who-uses-revive)
   - [Installation](#installation)
   - [Usage](#usage)
     - [Docker](#docker)
@@ -106,6 +72,7 @@ Here's how `revive` is different from `golint`:
     - [golint](#golint)
     - [revive's speed](#revives-speed)
   - [Overriding colorization detection](#overriding-colorization-detection)
+  - [Who uses Revive](#who-uses-revive)
   - [Contributors](#contributors)
   - [License](#license)
 
@@ -120,15 +87,18 @@ go install github.com/mgechev/revive@latest
 or get a released executable from the [Releases](https://github.com/mgechev/revive/releases) page.
 
 You can install the main branch (including the last commit) with:
+
 ```bash
 go install github.com/mgechev/revive@master
 ```
 
 ## Usage
 
-Since the default behavior of `revive` is compatible with `golint`, without providing any additional flags, the only difference you'd notice is faster execution.
+Since the default behavior of `revive` is compatible with `golint`, without providing any additional flags,the only difference you'd notice is faster execution.
 
-`revive` supports a `-config` flag whose value should correspond to a TOML file describing which rules to use for `revive`'s linting. If not provided, `revive` will try to use a global config file (assumed to be located at `$HOME/revive.toml`). Otherwise, if no configuration TOML file is found then `revive` uses a built-in set of default linting rules.
+`revive` supports a `-config` flag whose value should correspond to a TOML file describing which rules to use for `revive`'s linting.
+If not provided, `revive` will try to use a global config file (assumed to be located at `$HOME/revive.toml`).
+Otherwise, if no configuration TOML file is found then `revive` uses a built-in set of default linting rules.
 
 ### Docker
 
@@ -140,7 +110,7 @@ docker run -v "$(pwd)":/var/<repository> ghcr.io/mgechev/revive:v1.3.7 -config /
 ```
 
 - `-v` is for the volume
-- `ghcr.io/mgechev/revive:v1.3.7 ` is the image name and its version corresponds to `revive` command
+- `ghcr.io/mgechev/revive:v1.3.7` is the image name and its version corresponds to `revive` command
 - The provided flags are the same as the binary usage.
 
 ### Bazel
@@ -182,7 +152,11 @@ If you want to use revive with Bazel, look at the [rules](https://github.com/atl
 
 ### Continuous Integration
 
-[Codeac.io](https://www.codeac.io?ref=revive) - Automated code review service integrates with GitHub, Bitbucket and GitLab (even self-hosted) and helps you fight technical debt. Check your [pull-requests](https://www.codeac.io/documentation/pull-requests.html?ref=revive) with [revive](https://www.codeac.io/documentation/revive-configuration.html?ref=revive) automatically. (free for open-source projects)
+[Codeac.io](https://www.codeac.io?ref=revive) - Automated code review service integrates with GitHub,
+Bitbucket and GitLab (even self-hosted) and helps you fight technical debt.
+Check your [pull-requests](https://www.codeac.io/documentation/pull-requests.html?ref=revive) with
+[revive](https://www.codeac.io/documentation/revive-configuration.html?ref=revive) automatically.
+(Free for open-source projects)
 
 ### Linter aggregators
 
@@ -216,17 +190,23 @@ linters:
 ```
 
 The above configuration enables three rules of `revive`: _atomic_, _line-length-limit_ and _unhandled-error_ and passes some arguments to the last two.
-The [Configuration](#configuration) section of this document provides details on how to configure `revive`. Note that while `revive` configuration is in TOML, that of `golangci-lint` is in YAML or JSON.
+The [Configuration](#configuration) section of this document provides details on how to configure `revive`.
+Note that while `revive` configuration is in TOML, that of `golangci-lint` is in YAML or JSON.
 See the [golangci-lint website](https://golangci-lint.run/usage/linters/#revive) for more information about configuring `revive`.
 
-Please notice that if no particular configuration is provided, `revive` will behave as `golint` does, i.e. all `golint` rules are enabled (the [Available Rules table](#available-rules) details what are the `golint` rules). When a configuration is provided, only rules in the configuration are enabled.
+Please notice that if no particular configuration is provided, `revive` will behave as `golint` does, i.e. all `golint` rules are enabled
+(the [Available Rules table](#available-rules) details what are the `golint` rules).
+When a configuration is provided, only rules in the configuration are enabled.
 
 ### Command Line Flags
 
 `revive` accepts the following command line parameters:
 
 - `-config [PATH]` - path to the config file in TOML format, defaults to `$HOME/revive.toml` if present.
-- `-exclude [PATTERN]` - pattern for files/directories/packages to be excluded for linting. You can specify the files you want to exclude for linting either as package name (i.e. `github.com/mgechev/revive`), list them as individual files (i.e. `file.go`), directories (i.e. `./foo/...`), or any combination of the three. If no exclusion patterns are specified, `vendor/...` will be excluded by default.
+- `-exclude [PATTERN]` - pattern for files/directories/packages to be excluded for linting.
+You can specify the files you want to exclude for linting either as package name (i.e. `github.com/mgechev/revive`),
+list them as individual files (i.e. `file.go`), directories (i.e. `./foo/...`), or any combination of the three.
+If no exclusion patterns are specified, `vendor/...` will be excluded by default.
 - `-formatter [NAME]` - formatter to be used for the output. The currently available formatters are:
 
   - `default` - will output the failures the same way that `golint` does.
@@ -238,7 +218,6 @@ Please notice that if no particular configuration is provided, `revive` will beh
 - `-max_open_files` -  maximum number of open files at the same time. Defaults to unlimited.
 - `-set_exit_status` - set exit status to 1 if any issues are found, overwrites `errorCode` and `warningCode` in config.
 - `-version` - get revive version.
-
 
 ### Sample Invocations
 
@@ -262,7 +241,8 @@ func Public() {}
 //revive:enable
 ```
 
-The snippet above, will disable `revive` between the `revive:disable` and `revive:enable` comments. If you skip `revive:enable`, the linter will be disabled for the rest of the file.
+The snippet above, will disable `revive` between the `revive:disable` and `revive:enable` comments.
+If you skip `revive:enable`, the linter will be disabled for the rest of the file.
 
 With `revive:disable-next-line` and `revive:disable-line` you can disable `revive` on a particular code line.
 
@@ -352,7 +332,8 @@ For example:
 ```
 
 When enabling all rules you still need/can provide specific configurations for rules.
-The following file is an example configuration where all rules are enabled, except for those that are explicitly disabled, and some rules are configured with particular arguments:
+The following file is an example configuration where all rules are enabled, except for those that are explicitly disabled,
+and some rules are configured with particular arguments:
 
 ```toml
 severity = "warning"
@@ -392,7 +373,8 @@ enableAllRules = true
 
 ### Default Configuration
 
-The default configuration of `revive` can be found at `defaults.toml`. This will enable all rules available in `golint` and use their default configuration (i.e. the way they are hardcoded in `golint`).
+The default configuration of `revive` can be found at `defaults.toml`.
+This will enable all rules available in `golint` and use their default configuration (i.e. the way they are hardcoded in `golint`).
 
 ```shell
 revive -config defaults.toml github.com/mgechev/revive
@@ -523,7 +505,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`get-return`](./RULES_DESCRIPTIONS.md#get-return)          |  n/a   | Warns on getters that do not yield any result                    |    no    |  no   |
 | [`identical-branches`](./RULES_DESCRIPTIONS.md#identical-branches)          |  n/a   | Spots if-then-else statements with identical `then` and `else` branches       |    no    |  no   |
 | [`if-return`](./RULES_DESCRIPTIONS.md#if-return)           |  n/a   | Redundant if when returning an error.                            |   no    |  no   |
-| [`import-alias-naming`](./RULES_DESCRIPTIONS.md#import-alias-naming)         | string or map[string]string (defaults to allow regex pattern ^[a-z][a-z0-9]{0,}$) | Conventions around the naming of import aliases.                              |    no    |  no   |
+| [`import-alias-naming`](./RULES_DESCRIPTIONS.md#import-alias-naming)         | string or map[string]string (defaults to allow regex pattern `^[a-z][a-z0-9]{0,}$`) | Conventions around the naming of import aliases.                              |    no    |  no   |
 | [`import-shadowing`](./RULES_DESCRIPTIONS.md#import-shadowing)   | n/a    | Spots identifiers that shadow an import    |    no    |  no   |
 | [`imports-blocklist`](./RULES_DESCRIPTIONS.md#imports-blocklist)   | []string | Disallows importing the specified packages                     |    no    |  no   |
 | [`increment-decrement`](./RULES_DESCRIPTIONS.md#increment-decrement) |  n/a   | Use `i++` and `i--` instead of `i += 1` and `i -= 1`.            |   yes    |  no   |
@@ -572,7 +554,8 @@ Here you can find how you can configure some existing rules:
 
 ### `var-naming`
 
-This rule accepts two slices of strings, an allowlist and a blocklist of initialisms. By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
+This rule accepts two slices of strings, an allowlist and a blocklist of initialisms. By default, the rule behaves exactly as the alternative
+in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
 
 ```toml
 [rule.var-naming]
@@ -625,7 +608,8 @@ The `checkstyle` formatter produces output in a [Checkstyle-like](https://checks
 
 ### SARIF
 
-The `sarif`  formatter produces output in SARIF, for _Static Analysis Results Interchange Format_, a standard JSON-based format for the output of static analysis tools defined and promoted by [OASIS](https://www.oasis-open.org/).
+The `sarif`  formatter produces output in SARIF, for _Static Analysis Results Interchange Format_,
+a standard JSON-based format for the output of static analysis tools defined and promoted by [OASIS](https://www.oasis-open.org/).
 
 Current supported version of the standard is [SARIF-v2.1.0](https://docs.oasis-open.org/sarif/sarif/v2.1.0/csprd01/sarif-v2.1.0-csprd01.html
 ).
@@ -636,7 +620,8 @@ The tool can be extended with custom rules or formatters. This section contains 
 
 To extend the linter with a custom rule you can push it to this repository or use `revive` as a library (see below)
 
-To add a custom formatter you'll have to push it to this repository or fork it. This is due to the limited `-buildmode=plugin` support which [works only on Linux (with known issues)](https://golang.org/pkg/plugin/).
+To add a custom formatter you'll have to push it to this repository or fork it.
+This is due to the limited `-buildmode=plugin` support which [works only on Linux (with known issues)](https://golang.org/pkg/plugin/).
 
 ### Writing a Custom Rule
 
@@ -735,13 +720,16 @@ type Formatter interface {
 }
 ```
 
-The `Format` method accepts a channel of `Failure` instances and the configuration of the enabled rules. The `Name()` method should return a string different from the names of the already existing rules. This string is used when specifying the formatter when invoking the `revive` CLI tool.
+The `Format` method accepts a channel of `Failure` instances and the configuration of the enabled rules.
+The `Name()` method should return a string different from the names of the already existing rules.
+This string is used when specifying the formatter when invoking the `revive` CLI tool.
 
 For a sample formatter, take a look at [this file](/formatter/json.go).
 
 ## Speed Comparison
 
-Compared to `golint`, `revive` performs better because it lints the files for each individual rule into a separate goroutine. Here's a basic performance benchmark on MacBook Pro Early 2013 run on Kubernetes:
+Compared to `golint`, `revive` performs better because it lints the files for each individual rule into a separate goroutine.
+Here's a basic performance benchmark on MacBook Pro Early 2013 run on Kubernetes:
 
 ### golint
 
@@ -788,6 +776,47 @@ To force colorization, add `REVIVE_FORCE_COLOR=1` to the environment you're runn
 ```shell
 REVIVE_FORCE_COLOR=1 revive -formatter friendly ./... | tee revive.log
 ```
+
+## Who uses Revive
+
+<!-- markdownlint-disable MD013 -->
+
+- [`tidb`](https://github.com/pingcap/tidb) - TiDB is a distributed HTAP database compatible with the MySQL protocol
+- [`grafana`](https://github.com/grafana/grafana) - The tool for beautiful monitoring and metric analytics & dashboards for Graphite, InfluxDB & Prometheus & More
+- [`etcd`](https://github.com/etcd-io/etcd) - Distributed reliable key-value store for the most critical data of a distributed system
+- [`cadence`](https://github.com/uber/cadence) - Cadence is a distributed, scalable, durable, and highly available orchestration engine by Uber to execute asynchronous long-running business logic in a scalable and resilient way
+- [`ferret`](https://github.com/MontFerret/ferret) - Declarative web scraping
+- [`gopass`](https://github.com/gopasspw/gopass) - The slightly more awesome standard unix password manager for teams
+- [`gitea`](https://github.com/go-gitea/gitea) - Git with a cup of tea, painless self-hosted git service
+- [`excelize`](https://github.com/360EntSecGroup-Skylar/excelize) - Go library for reading and writing Microsoft Excel™ (XLSX) files
+- [`aurora`](https://github.com/xuri/aurora) - aurora is a web-based Beanstalk queue server console written in Go
+- [`soar`](https://github.com/XiaoMi/soar) - SQL Optimizer And Rewriter
+- [`pyroscope`](https://github.com/pyroscope-io/pyroscope) - Continuous profiling platform
+- [`gorush`](https://github.com/appleboy/gorush) - A push notification server written in Go (Golang).
+- [`dry`](https://github.com/moncho/dry) - dry - A Docker manager for the terminal.
+- [`go-echarts`](https://github.com/chenjiandongx/go-echarts) - The adorable charts library for Golang
+- [`reviewdog`](https://github.com/reviewdog/reviewdog) - Automated code review tool integrated with any code analysis tools regardless of programming language
+- [`rudder-server`](https://github.com/rudderlabs/rudder-server) - Privacy and Security focused Segment-alternative, in Golang and React.
+- [`sklearn`](https://github.com/pa-m/sklearn) - A partial port of scikit-learn written in Go.
+- [`protoc-gen-doc`](https://github.com/pseudomuto/protoc-gen-doc) - Documentation generator plugin for Google Protocol Buffers.
+- [`llvm`](https://github.com/llir/llvm) - Library for interacting with LLVM IR in pure Go.
+- [`jenkins-library`](https://github.com/SAP/jenkins-library) - Jenkins shared library for Continuous Delivery pipelines by SAP.
+- [`pd`](https://github.com/tikv/pd) - Placement driver for TiKV.
+- [`shellhub`](https://github.com/shellhub-io/shellhub) - ShellHub enables teams to easily access any Linux device behind firewall and NAT.
+- [`lorawan-stack`](https://github.com/TheThingsNetwork/lorawan-stack) - The Things Network Stack for LoRaWAN V3
+- [`gin-jwt`](https://github.com/appleboy/gin-jwt) - This is a JWT middleware for Gin framework.
+- [`gofight`](https://github.com/appleboy/gofight) - Testing API Handler written in Golang.
+- [`Beaver`](https://github.com/Clivern/Beaver) - A Real Time Messaging Server.
+- [`ggz`](https://github.com/go-ggz/ggz) - An URL shortener service written in Golang
+- [`Codeac.io`](https://www.codeac.io?ref=revive) - Automated code review service integrates with GitHub, Bitbucket and GitLab (even self-hosted) and helps you fight technical debt.
+- [`DevLake`](https://github.com/apache/incubator-devlake) - Apache DevLake is an open-source dev data platform to ingest, analyze, and visualize the fragmented data from DevOps tools，which can distill insights to improve engineering productivity.
+- [`checker`](https://github.com/cinar/checker) - Checker helps validating user input through rules defined in struct tags or directly through functions.
+- [`milvus`](https://github.com/milvus-io/milvus) - A cloud-native vector database, storage for next generation AI applications.
+- [`indicator`](https://github.com/cinar/indicator) - Indicator provides various technical analysis indicators, strategies, and a backtesting framework.
+
+<!-- markdownlint-enable MD013 -->
+
+_Open a PR to add your project_.
 
 ## Contributors
 

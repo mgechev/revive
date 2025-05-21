@@ -1,0 +1,34 @@
+# A configuration file for markdownlint-cli2.
+
+# Fix any fixable errors
+fix: false
+
+# Rules description can be found at https://github.com/DavidAnson/markdownlint/blob/HEAD/doc/Rules.md
+config:
+  # Default state for all rules
+  default: true
+
+  # MD010/no-hard-tabs : Hard tabs : https://github.com/DavidAnson/markdownlint/blob/HEAD/doc/md010.md
+  MD010:
+    code_blocks: false
+
+  # MD013/line-length : Line length : https://github.com/DavidAnson/markdownlint/blob/HEAD/doc/md013.md
+  MD013:
+    line_length: 150
+    code_block_line_length: 200
+
+  # MD033/no-inline-html : Inline HTML : https://github.com/DavidAnson/markdownlint/blob/HEAD/doc/md033.md
+  MD033: false
+
+  # MD055/table-pipe-style : Table pipe style : https://github.com/DavidAnson/markdownlint/blob/HEAD/doc/md055.md
+  MD055: false
+
+# Define glob expressions to use
+globs:
+  - "*.md"
+
+# Disable banner message on stdout
+noBanner: true
+
+# Show found files on stdout
+showFound: true
