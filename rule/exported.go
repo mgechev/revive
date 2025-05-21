@@ -292,9 +292,8 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 		return
 	}
 
-	vsFirstCommentLine := firstCommentLine(vs.Doc)
-	gdFirstCommentLine := firstCommentLine(gd.Doc)
-	if vsFirstCommentLine == "" && gdFirstCommentLine == "" {
+	vsFirstDocLine, vsFirstCommentLine, gdFirstDocLine := firstCommentLine(vs.Doc), firstCommentLine(vs.Comment), firstCommentLine(gd.Doc)
+	if vsFirstDocLine == "" && vsFirstCommentLine == "" && gdFirstDocLine == "" {
 		if genDeclMissingComments[gd] {
 			return
 		}
@@ -310,7 +309,7 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 	}
 
 	// If this GenDecl has parens and a comment, we don't check its comment form.
-	if gdFirstCommentLine != "" && gd.Lparen.IsValid() {
+	if gdFirstDocLine != "" && gd.Lparen.IsValid() {
 		return
 	}
 
@@ -318,9 +317,9 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 	// Use vs.Doc preferentially.
 	var doc *ast.CommentGroup
 	switch {
-	case vsFirstCommentLine != "":
+	case vsFirstDocLine != "":
 		doc = vs.Doc
-	case vsFirstCommentLine != "" && gdFirstCommentLine == "":
+	case vsFirstCommentLine != "" && gdFirstDocLine == "":
 		doc = vs.Comment
 	default:
 		doc = gd.Doc
