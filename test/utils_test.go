@@ -50,7 +50,7 @@ func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.Rul
 
 // testRuleOnDir tests the given rule on all the Go files under the given dir
 func testRuleOnDir(t *testing.T, dir string, rule lint.Rule, config ...*lint.RuleConfig) {
-	pattern := filepath.Join(testDataDir, dir) + "/..." // should be filepath.Join(testDataDir, dir, "...") but dots.Resolve has a windows compatibility bug
+	pattern := filepath.Join(testDataDir, dir, "...")
 	packages, err := revivelib.GetPackages([]string{pattern}, revivelib.ArrayFlags{})
 	if err != nil {
 		t.Fatalf("Can not retrieve packages under test: %v", err)
