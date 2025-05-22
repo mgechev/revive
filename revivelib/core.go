@@ -9,7 +9,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/chavacava/dots"
+	"github.com/mgechev/dots"
 	"github.com/mgechev/revive/config"
 	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/logging"

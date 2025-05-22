@@ -8,5 +8,10 @@ import (
 )
 
 func TestPackageCommentsIssue1363(t *testing.T) {
-	testRuleOnDir(t, "package_comments_issue1363", &rule.PackageCommentsRule{}, &lint.RuleConfig{})
+	files := []string{
+		"../testdata/package_comments_issue1363/myfile1.go",
+		"../testdata/package_comments_issue1363/myfile2.go",
+	}
+
+	testRuleOnFiles(t, files, &rule.PackageCommentsRule{}, &lint.RuleConfig{})
 }
