@@ -90,7 +90,7 @@ func (r *Revive) Lint(patterns ...*LintPattern) (<-chan lint.Failure, error) {
 		excludePatterns = []string{"vendor/..."}
 	}
 
-	packages, err := GetPackages(includePatterns, excludePatterns)
+	packages, err := getPackages(includePatterns, excludePatterns)
 	if err != nil {
 		return nil, fmt.Errorf("linting - getting packages: %w", err)
 	}
@@ -169,8 +169,8 @@ func (r *Revive) Format(
 	return output, exitCode, nil
 }
 
-// GetPackages yields the packages and corresponding files for the given patterns
-func GetPackages(includePatterns []string, excludePatterns ArrayFlags) ([][]string, error) {
+// getPackages yields the packages and corresponding files for the given patterns
+func getPackages(includePatterns []string, excludePatterns ArrayFlags) ([][]string, error) {
 	globs := normalizeSplit(includePatterns)
 	if len(globs) == 0 {
 		globs = append(globs, ".")
