@@ -57,12 +57,12 @@ func testRuleOnDir(t *testing.T, dir string, rule lint.Rule, config ...*lint.Rul
 	}
 
 	if len(packages) == 0 {
-		t.Fatalf("Can not retrieve files for pattern %v", dir)
+		t.Fatalf("Can not retrieve packages for pattern %v", pattern)
 	}
 
 	files := packages[0]
 	if len(packages) == 0 {
-		t.Fatalf("Can not retrieve files for pattern %v", dir)
+		t.Fatalf("Can not retrieve files for pattern %v", pattern)
 	}
 
 	testRuleOnFiles(t, files, rule, config...)
