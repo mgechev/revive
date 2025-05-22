@@ -530,6 +530,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`string-of-int`](./RULES_DESCRIPTIONS.md#string-of-int)          |  n/a   | Warns on suspicious casts from int to string            |    no    |  yes   |
 | [`struct-tag`](./RULES_DESCRIPTIONS.md#struct-tag)          |  []string   | Checks common struct tags like `json`, `xml`, `yaml`               |    no    |  no   |
 | [`superfluous-else`](./RULES_DESCRIPTIONS.md#superfluous-else)    |  []string   | Prevents redundant else statements (extends [`indent-error-flow`](./RULES_DESCRIPTIONS.md#indent-error-flow)) |    no    |  no   |
+| [`time-date`](./RULES_DESCRIPTIONS.md#time-date)         |  n/a   | Reports bad usage of `time.Date`.                 |   no    |  yes  |
 | [`time-equal`](./RULES_DESCRIPTIONS.md#time-equal)         |  n/a   | Suggests to use `time.Time.Equal` instead of `==` and `!=` for equality check time.                 |   no    |  yes  |
 | [`time-naming`](./RULES_DESCRIPTIONS.md#time-naming)         |  n/a   | Conventions around the naming of time variables.                 |   yes    |  yes  |
 | [`unchecked-type-assertions`](./RULES_DESCRIPTIONS.md#unchecked-type-assertions)         |  n/a   | Disallows type assertions without checking the result.                 |   no    |  yes  |
