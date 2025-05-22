@@ -5,7 +5,7 @@ go 1.23.0
 require (
 	codeberg.org/chavacava/garif v0.2.0
 	github.com/BurntSushi/toml v1.5.0
-	github.com/chavacava/dots v0.0.0-20250522105112-35a45f089d80
+	github.com/chavacava/dots v0.0.0-20250522110346-34cd222bee22
 	github.com/fatih/color v1.18.0
 	github.com/fatih/structtag v1.2.0
 	github.com/hashicorp/go-version v1.7.0
