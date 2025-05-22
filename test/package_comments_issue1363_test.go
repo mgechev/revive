@@ -8,5 +8,5 @@ import (
 )
 
 func TestPackageCommentsIssue1363(t *testing.T) {
-	testRuleOnDir(t, "../testdata", "package_comments_issue1363/...", &rule.PackageCommentsRule{}, &lint.RuleConfig{})
+	testRuleOnDir(t, "package_comments_issue1363", &rule.PackageCommentsRule{}, &lint.RuleConfig{})
 }

@@ -33,47 +33,42 @@ func configureRule(t *testing.T, rule lint.Rule, arguments lint.Arguments) {
 	}
 }
 
+var testDataDir = filepath.Join("..", "testdata")
+
 func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.RuleConfig) {
 	t.Helper()
 
-	baseDir := filepath.Join("..", "testdata", filepath.Dir(filename))
+	baseDir := filepath.Join(testDataDir, filepath.Dir(filename))
 	filename = filepath.Base(filename) + ".go"
 	fullFilePath := filepath.Join(baseDir, filename)
-	stat, err := os.Stat(fullFilePath)
+	_, err := os.Stat(fullFilePath)
 	if err != nil {
 		t.Fatalf("Cannot get file info for %s: %v", rule.Name(), err)
 	}
-	var ruleConfig lint.RuleConfig
-	c := map[string]lint.RuleConfig{}
-	if len(config) > 0 {
-		ruleConfig = *config[0]
-		c[rule.Name()] = ruleConfig
-	}
-	configureRule(t, rule, ruleConfig.Arguments)
-
-	if len(parseInstructions(t, []string{fullFilePath})) == 0 {
-		assertSuccess(t, baseDir, []string{stat.Name()}, []lint.Rule{rule}, c)
-		return
-	}
-	assertFailures(t, baseDir, []string{stat.Name()}, []lint.Rule{rule}, c)
+	testRuleOnFiles(t, []string{fullFilePath}, rule, config...)
 }
 
-func testRuleOnDir(t *testing.T, baseDir string, pattern string, rule lint.Rule, config ...*lint.RuleConfig) {
-	pattern = filepath.Join(baseDir, pattern)
+// testRuleOnDir tests the given rule on all the Go files under the given dir
+func testRuleOnDir(t *testing.T, dir string, rule lint.Rule, config ...*lint.RuleConfig) {
+	pattern := filepath.Join(testDataDir, dir, "...")
 	packages, err := revivelib.GetPackages([]string{pattern}, revivelib.ArrayFlags{})
 	if err != nil {
 		t.Fatalf("Can not retrieve packages under test: %v", err)
 	}
 
 	if len(packages) == 0 {
-		t.Fatalf("Can not retrieve files for pattern %v", pattern)
+		t.Fatalf("Can not retrieve files for pattern %v", dir)
 	}
 
 	files := packages[0]
 	if len(packages) == 0 {
-		t.Fatalf("Can not retrieve files for pattern %v", pattern)
+		t.Fatalf("Can not retrieve files for pattern %v", dir)
 	}
 
+	testRuleOnFiles(t, files, rule, config...)
+}
+
+func testRuleOnFiles(t *testing.T, files []string, rule lint.Rule, config ...*lint.RuleConfig) {
 	var ruleConfig lint.RuleConfig
 	c := map[string]lint.RuleConfig{}
 	if len(config) > 0 {
@@ -83,23 +78,18 @@ func testRuleOnDir(t *testing.T, baseDir string, pattern string, rule lint.Rule,
 	configureRule(t, rule, ruleConfig.Arguments)
 
 	if len(parseInstructions(t, files)) == 0 {
-		assertSuccess(t, baseDir, files, []lint.Rule{rule}, c)
+		assertSuccess(t, files, []lint.Rule{rule}, c)
 		return
 	}
-	assertFailures(t, baseDir, files, []lint.Rule{rule}, c)
+	assertFailures(t, files, []lint.Rule{rule}, c)
 }
 
-func assertSuccess(t *testing.T, baseDir string, files []string, rules []lint.Rule, config map[string]lint.RuleConfig) error {
+func assertSuccess(t *testing.T, files []string, rules []lint.Rule, config map[string]lint.RuleConfig) error {
 	t.Helper()
 
 	l := lint.New(os.ReadFile, 0)
 
-	canonicalFiles := []string{}
-	for _, file := range files {
-		filePath := filepath.Join(baseDir, file)
-		canonicalFiles = append(canonicalFiles, filePath)
-	}
-	ps, err := l.Lint([][]string{canonicalFiles}, rules, lint.Config{
+	ps, err := l.Lint([][]string{files}, rules, lint.Config{
 		Rules: config,
 	})
 	if err != nil {
@@ -116,20 +106,14 @@ func assertSuccess(t *testing.T, baseDir string, files []string, rules []lint.Ru
 	return nil
 }
 
-func assertFailures(t *testing.T, baseDir string, files []string, rules []lint.Rule, config map[string]lint.RuleConfig) error {
+func assertFailures(t *testing.T, files []string, rules []lint.Rule, config map[string]lint.RuleConfig) error {
 	t.Helper()
 
 	l := lint.New(os.ReadFile, 0)
 
-	canonicalFiles := []string{}
-	for _, file := range files {
-		filePath := filepath.Join(baseDir, file)
-		canonicalFiles = append(canonicalFiles, filePath)
-	}
+	ins := parseInstructions(t, files)
 
-	ins := parseInstructions(t, canonicalFiles)
-
-	ps, err := l.Lint([][]string{canonicalFiles}, rules, lint.Config{
+	ps, err := l.Lint([][]string{files}, rules, lint.Config{
 		Rules: config,
 	})
 	if err != nil {

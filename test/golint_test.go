@@ -59,12 +59,12 @@ func TestAll(t *testing.T) {
 		t.Run(fi.Name(), func(t *testing.T) {
 			filePath := filepath.Join(baseDir, fi.Name())
 
-			fileInfo, err := os.Stat(filePath)
+			_, err := os.Stat(filePath)
 			if err != nil {
 				t.Fatalf("Failed reading %s: %v", fi.Name(), err)
 			}
 
-			if err := assertFailures(t, filepath.Dir(baseDir), []string{fileInfo.Name()}, rules, map[string]lint.RuleConfig{}); err != nil {
+			if err := assertFailures(t, []string{filePath}, rules, map[string]lint.RuleConfig{}); err != nil {
 				t.Errorf("Linting %s: %v", fi.Name(), err)
 			}
 		})
