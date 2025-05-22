@@ -815,5 +815,4 @@ var validateLHS = map[string]struct{}{
 	"startswith":           {},
 	"unique":               {},
 	"validateFn":           {},
-	"":                     {},
 }
