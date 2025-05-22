@@ -14,7 +14,6 @@ import (
 	"testing"
 
 	"github.com/mgechev/revive/lint"
-	"github.com/mgechev/revive/revivelib"
 )
 
 // configureRule configures the given rule with the given configuration
@@ -46,26 +45,6 @@ func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.Rul
 		t.Fatalf("Cannot get file info for %s: %v", rule.Name(), err)
 	}
 	testRuleOnFiles(t, []string{fullFilePath}, rule, config...)
-}
-
-// testRuleOnDir tests the given rule on all the Go files under the given dir
-func testRuleOnDir(t *testing.T, dir string, rule lint.Rule, config ...*lint.RuleConfig) {
-	pattern := filepath.Join(testDataDir, dir, "...")
-	packages, err := revivelib.GetPackages([]string{pattern}, revivelib.ArrayFlags{})
-	if err != nil {
-		t.Fatalf("Can not retrieve packages under test: %v", err)
-	}
-
-	if len(packages) == 0 {
-		t.Fatalf("Can not retrieve packages for pattern %v", pattern)
-	}
-
-	files := packages[0]
-	if len(packages) == 0 {
-		t.Fatalf("Can not retrieve files for pattern %v", pattern)
-	}
-
-	testRuleOnFiles(t, files, rule, config...)
 }
 
 func testRuleOnFiles(t *testing.T, files []string, rule lint.Rule, config ...*lint.RuleConfig) {
