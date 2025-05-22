@@ -169,7 +169,6 @@ func (r *Revive) Format(
 	return output, exitCode, nil
 }
 
-// getPackages yields the packages and corresponding files for the given patterns
 func getPackages(includePatterns []string, excludePatterns ArrayFlags) ([][]string, error) {
 	globs := normalizeSplit(includePatterns)
 	if len(globs) == 0 {
