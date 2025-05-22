@@ -106,12 +106,16 @@ Examples:
 
 ```toml
 [rule.add-constant]
-  arguments = [{ maxLitCount = "3", allowStrs = "\"\"", allowInts = "0,1,2", allowFloats = "0.0,0.,1.0,1.,2.0,2.", ignoreFuncs = "os\\.*,fmt\\.Println,make" }]
+arguments = [
+  { maxLitCount = "3", allowStrs = "\"\"", allowInts = "0,1,2", allowFloats = "0.0,0.,1.0,1.,2.0,2.", ignoreFuncs = "os\\.*,fmt\\.Println,make" },
+]
 ```
 
 ```toml
 [rule.add-constant]
-  arguments = [{ max-lit-count = "3", allow-strs = "\"\"", allow-ints = "0,1,2", allow-floats = "0.0,0.,1.0,1.,2.0,2.", ignore-funcs = "os\\.*,fmt\\.Println,make" }]
+arguments = [
+  { max-lit-count = "3", allow-strs = "\"\"", allow-ints = "0,1,2", allow-floats = "0.0,0.,1.0,1.,2.0,2.", ignore-funcs = "os\\.*,fmt\\.Println,make" },
+]
 ```
 
 ## argument-limit
@@ -125,7 +129,7 @@ Example:
 
 ```toml
 [rule.argument-limit]
-  arguments = [4]
+arguments = [4]
 ```
 
 ## atomic
@@ -144,7 +148,7 @@ Example:
 
 ```toml
 [rule.banned-characters]
-  arguments = ["Ω","Σ","σ"]
+arguments = ["Ω", "Σ", "σ"]
 ```
 
 ## bare-return
@@ -187,7 +191,7 @@ Example:
 
 ```toml
 [rule.cognitive-complexity]
-  arguments = [7]
+arguments = [7]
 ```
 
 ## comment-spacings
@@ -211,7 +215,7 @@ Example:
 
 ```toml
 [rule.comment-spacings]
-  arguments = ["mypragma:", "+optional"]
+arguments = ["mypragma:", "+optional"]
 ```
 
 ## comments-density
@@ -225,7 +229,7 @@ Example:
 
 ```toml
 [rule.comments-density]
-  arguments = [15]
+arguments = [15]
 ```
 
 ## confusing-naming
@@ -259,12 +263,16 @@ Examples:
 
 ```toml
 [rule.context-as-argument]
-  arguments = [{allowTypesBefore = "*testing.T,*github.com/user/repo/testing.Harness"}]
+arguments = [
+  { allowTypesBefore = "*testing.T,*github.com/user/repo/testing.Harness" },
+]
 ```
 
 ```toml
 [rule.context-as-argument]
-  arguments = [{allow-types-before = "*testing.T,*github.com/user/repo/testing.Harness"}]
+arguments = [
+  { allow-types-before = "*testing.T,*github.com/user/repo/testing.Harness" },
+]
 ```
 
 ## context-keys-type
@@ -284,7 +292,7 @@ Example:
 
 ```toml
 [rule.cyclomatic]
-  arguments = [3]
+arguments = [3]
 ```
 
 ## datarace
@@ -328,12 +336,12 @@ Examples:
 
 ```toml
 [rule.defer]
-  arguments = [["callChain", "loop"]]
+arguments = [["callChain", "loop"]]
 ```
 
 ```toml
 [rule.defer]
-  arguments = [["call-chain", "loop"]]
+arguments = [["call-chain", "loop"]]
 ```
 
 ## dot-imports
@@ -351,12 +359,22 @@ Examples:
 
 ```toml
 [rule.dot-imports]
-  arguments = [{ allowedPackages = ["github.com/onsi/ginkgo/v2","github.com/onsi/gomega"] }]
+arguments = [
+  { allowedPackages = [
+    "github.com/onsi/ginkgo/v2",
+    "github.com/onsi/gomega",
+  ] },
+]
 ```
 
 ```toml
 [rule.dot-imports]
-  arguments = [{ allowed-packages = ["github.com/onsi/ginkgo/v2","github.com/onsi/gomega"] }]
+arguments = [
+  { allowed-packages = [
+    "github.com/onsi/ginkgo/v2",
+    "github.com/onsi/gomega",
+  ] },
+]
 ```
 
 ## duplicated-imports
@@ -370,21 +388,21 @@ _Configuration_: N/A
 _Description_: In Go it is idiomatic to minimize nesting statements, a typical example is to avoid if-then-else constructions.
 This rule spots constructions like
 
-```go
+```golang
 if cond {
-  // do something
+	// do something
 } else {
-  // do other thing
-  return ...
+	// do other thing
+	return ...
 }
 ```
 
 where the `if` condition may be inverted in order to reduce nesting:
 
-```go
+```golang
 if !cond {
-  // do other thing
-  return ...
+	// do other thing
+	return ...
 }
 
 // do something
@@ -400,12 +418,12 @@ Examples:
 
 ```toml
 [rule.early-return]
-  arguments = ["preserveScope", "allowJump"]
+arguments = ["preserveScope", "allowJump"]
 ```
 
 ```toml
 [rule.early-return]
-  arguments = ["preserve-scope", "allow-jump"]
+arguments = ["preserve-scope", "allow-jump"]
 ```
 
 ## empty-block
@@ -436,7 +454,7 @@ Example:
 
 ```toml
 [rule.enforce-map-style]
-  arguments = ["make"]
+arguments = ["make"]
 ```
 
 ## enforce-repeated-arg-type-style
@@ -465,19 +483,19 @@ Example (1):
 
 ```toml
 [rule.enforce-repeated-arg-type-style]
-  arguments = ["short"]
+arguments = ["short"]
 ```
 
 Examples (2):
 
 ```toml
 [rule.enforce-repeated-arg-type-style]
-  arguments = [{ funcArgStyle = "full", funcRetValStyle = "short" }]
+arguments = [{ funcArgStyle = "full", funcRetValStyle = "short" }]
 ```
 
 ```toml
 [rule.enforce-repeated-arg-type-style]
-  arguments = [{ func-arg-style = "full", func-ret-val-style = "short" }]
+arguments = [{ func-arg-style = "full", func-ret-val-style = "short" }]
 ```
 
 ## enforce-slice-style
@@ -497,7 +515,7 @@ Example:
 
 ```toml
 [rule.enforce-slice-style]
-  arguments = ["make"]
+arguments = ["make"]
 ```
 
 ## error-naming
@@ -527,7 +545,7 @@ Example:
 
 ```toml
 [rule.error-strings]
-  arguments = ["xerrors.Errorf"]
+arguments = ["xerrors.Errorf"]
 ```
 
 ## errorf
@@ -563,12 +581,22 @@ Examples:
 
 ```toml
 [rule.exported]
-  arguments = ["checkPrivateReceivers", "disableStutteringCheck", "checkPublicInterface", "disableChecksOnFunctions"]
+arguments = [
+  "checkPrivateReceivers",
+  "disableStutteringCheck",
+  "checkPublicInterface",
+  "disableChecksOnFunctions",
+]
 ```
 
 ```toml
 [rule.exported]
-  arguments = ["check-private-receivers", "disable-stuttering-check", "check-public-interface", "disable-checks-on-functions"]
+arguments = [
+  "check-private-receivers",
+  "disable-stuttering-check",
+  "check-public-interface",
+  "disable-checks-on-functions",
+]
 ```
 
 ## file-header
@@ -581,7 +609,7 @@ Example:
 
 ```toml
 [rule.file-header]
-  arguments = ["This is the text that must appear at the top of source files."]
+arguments = ["This is the text that must appear at the top of source files."]
 ```
 
 ## file-length-limit
@@ -598,12 +626,12 @@ Examples:
 
 ```toml
 [rule.file-length-limit]
-  arguments = [{max=100,skipComments=true,skipBlankLines=true}]
+arguments = [{ max = 100, skipComments = true, skipBlankLines = true }]
 ```
 
 ```toml
 [rule.file-length-limit]
-  arguments = [{max=100,skip-comments=true,skip-blank-lines=true}]
+arguments = [{ max = 100, skip-comments = true, skip-blank-lines = true }]
 ```
 
 ## filename-format
@@ -617,7 +645,7 @@ Example:
 
 ```toml
 [rule.filename-format]
-  arguments=["^[_a-z][_a-z0-9]*\\.go$"]
+arguments = ["^[_a-z][_a-z0-9]*\\.go$"]
 ```
 
 ## flag-parameter
@@ -638,7 +666,7 @@ Example:
 
 ```toml
 [rule.function-length]
-  arguments = [10, 0]
+arguments = [10, 0]
 ```
 
 Will check for functions exceeding 10 statements and will not check the number of lines of functions
@@ -653,7 +681,7 @@ Example:
 
 ```toml
 [rule.function-result-limit]
-  arguments = [3]
+arguments = [3]
 ```
 
 ## get-return
@@ -696,19 +724,19 @@ Example (1):
 
 ```toml
 [rule.import-alias-naming]
-  arguments = ["^[a-z][a-z0-9]{0,}$"]
+arguments = ["^[a-z][a-z0-9]{0,}$"]
 ```
 
 Examples (2):
 
 ```toml
 [rule.import-alias-naming]
-  arguments = [{ allowRegex = "^[a-z][a-z0-9]{0,}$", denyRegex = '^v\d+$' }]
+arguments = [{ allowRegex = "^[a-z][a-z0-9]{0,}$", denyRegex = '^v\d+$' }]
 ```
 
 ```toml
 [rule.import-alias-naming]
-  arguments = [{ allow-regex = "^[a-z][a-z0-9]{0,}$", deny-regex = '^v\d+$' }]
+arguments = [{ allow-regex = "^[a-z][a-z0-9]{0,}$", deny-regex = '^v\d+$' }]
 ```
 
 ## import-shadowing
@@ -729,7 +757,7 @@ Example:
 
 ```toml
 [rule.imports-blocklist]
-  arguments = ["crypto/md5", "crypto/sha1", "crypto/**/pkix"]
+arguments = ["crypto/md5", "crypto/sha1", "crypto/**/pkix"]
 ```
 
 ## increment-decrement
@@ -754,12 +782,12 @@ Examples:
 
 ```toml
 [rule.indent-error-flow]
-  arguments = ["preserveScope"]
+arguments = ["preserveScope"]
 ```
 
 ```toml
 [rule.indent-error-flow]
-  arguments = ["preserve-scope"]
+arguments = ["preserve-scope"]
 ```
 
 ## line-length-limit
@@ -772,7 +800,7 @@ Example:
 
 ```toml
 [rule.line-length-limit]
-  arguments = [80]
+arguments = [80]
 ```
 
 ## max-control-nesting
@@ -785,7 +813,7 @@ Example:
 
 ```toml
 [rule.max-control-nesting]
-  arguments = [3]
+arguments = [3]
 ```
 
 ## max-public-structs
@@ -801,7 +829,7 @@ Example:
 
 ```toml
 [rule.max-public-structs]
-  arguments = [3]
+arguments = [3]
 ```
 
 ## modifies-parameter
@@ -838,13 +866,13 @@ _Configuration_: N/A
 
 Example:
 
-```go
+```golang
 if isGenerated(content) && !config.IgnoreGeneratedHeader {
 ```
 
 Swap left and right side :
 
-```go
+```golang
 if !config.IgnoreGeneratedHeader && isGenerated(content) {
 ```
 
@@ -895,12 +923,12 @@ Examples:
 
 ```toml
 [rule.receiver-naming]
-  arguments = [{maxLength=2}]
+arguments = [{ maxLength = 2 }]
 ```
 
 ```toml
 [rule.receiver-naming]
-  arguments = [{max-length=2}]
+arguments = [{ max-length = 2 }]
 ```
 
 ## redefines-builtin-id
@@ -962,12 +990,28 @@ Example:
 
 ```toml
 [rule.string-format]
-  arguments = [
-    ["core.WriteError[1].Message", "/^([^A-Z]|$)/", "must not start with a capital letter"],
-    ["fmt.Errorf[0]", "/(^|[^\\.!?])$/", "must not end in punctuation"],
-    ["panic", "/^[^\\n]*$/", "must not contain line breaks"],
-    ["fmt.Errorf[0],core.WriteError[1].Message", "!/^.*%w.*$/", "must not contain '%w'"],
-  ]
+arguments = [
+  [
+    "core.WriteError[1].Message",
+    "/^([^A-Z]|$)/",
+    "must not start with a capital letter",
+  ],
+  [
+    "fmt.Errorf[0]",
+    "/(^|[^\\.!?])$/",
+    "must not end in punctuation",
+  ],
+  [
+    "panic",
+    "/^[^\\n]*$/",
+    "must not contain line breaks",
+  ],
+  [
+    "fmt.Errorf[0],core.WriteError[1].Message",
+    "!/^.*%w.*$/",
+    "must not contain '%w'",
+  ],
+]
 ```
 
 ## string-of-int
@@ -990,7 +1034,7 @@ To accept the `inline` option in JSON tags (and `outline` and `gnu` in BSON tags
 
 ```toml
 [rule.struct-tag]
-  arguments = ["json,inline", "bson,outline,gnu"]
+arguments = ["json,inline", "bson,outline,gnu"]
 ```
 
 ## superfluous-else
@@ -1006,12 +1050,12 @@ Examples:
 
 ```toml
 [rule.superfluous-else]
-  arguments = ["preserveScope"]
+arguments = ["preserveScope"]
 ```
 
 ```toml
 [rule.superfluous-else]
-  arguments = ["preserve-scope"]
+arguments = ["preserve-scope"]
 ```
 
 ## time-date
@@ -1086,7 +1130,7 @@ _Configuration_: list of key-value-pair-map (`[]map[string]any`).
 - `acceptIgnoredAssertionResult` (`acceptignoredassertionresult`, `accept-ignored-assertion-result`): (bool) default `false`,
 set it to `true` to accept ignored type assertion results like this:
 
-```go
+```golang
 foo, _ := bar(.*Baz).
 //   ^
 ```
@@ -1095,12 +1139,12 @@ Examples:
 
 ```toml
 [rule.unchecked-type-assertion]
-  arguments = [{acceptIgnoredAssertionResult=true}]
+arguments = [{ acceptIgnoredAssertionResult = true }]
 ```
 
 ```toml
 [rule.unchecked-type-assertion]
-  arguments = [{accept-ignored-assertion-result=true}]
+arguments = [{ accept-ignored-assertion-result = true }]
 ```
 
 ## unconditional-recursion
@@ -1164,12 +1208,12 @@ func SomeFunc(_someObj *MyStruct) {} // matches rule
 
 ```toml
 [rule.unused-parameter]
-  arguments = [{ allowRegex = "^_" }]
+arguments = [{ allowRegex = "^_" }]
 ```
 
 ```toml
 [rule.unused-parameter]
-  arguments = [{ allow-regex = "^_" }]
+arguments = [{ allow-regex = "^_" }]
 ```
 
 ## unused-receiver
@@ -1189,12 +1233,12 @@ func (_my *MyStruct) SomeMethod() {} // matches rule
 
 ```toml
 [rule.unused-receiver]
-  arguments = [{ allowRegex = "^_" }]
+arguments = [{ allowRegex = "^_" }]
 ```
 
 ```toml
 [rule.unused-receiver]
-  arguments = [{ allow-regex = "^_" }]
+arguments = [{ allow-regex = "^_" }]
 ```
 
 ## use-any
@@ -1248,32 +1292,32 @@ Examples:
 
 ```toml
 [rule.var-naming]
-  arguments = [["ID"], ["VM"], [{upperCaseConst=true}]]
+arguments = [["ID"], ["VM"], [{ upperCaseConst = true }]]
 ```
 
 ```toml
 [rule.var-naming]
-  arguments = [[], [], [{skipPackageNameChecks=true}]]
+arguments = [[], [], [{ skipPackageNameChecks = true }]]
 ```
 
 ```toml
 [rule.var-naming]
-  arguments = [[], [], [{extraBadPackageNames=["helpers", "models"]}]]
+arguments = [[], [], [{ extraBadPackageNames = ["helpers", "models"] }]]
 ```
 
 ```toml
 [rule.var-naming]
-  arguments = [["ID"], ["VM"], [{upper-case-const=true}]]
+arguments = [["ID"], ["VM"], [{ upper-case-const = true }]]
 ```
 
 ```toml
 [rule.var-naming]
-  arguments = [[], [], [{skip-package-name-checks=true}]]
+arguments = [[], [], [{ skip-package-name-checks = true }]]
 ```
 
 ```toml
 [rule.var-naming]
-  arguments = [[], [], [{extra-bad-package-names=["helpers", "models"]}]]
+arguments = [[], [], [{ extra-bad-package-names = ["helpers", "models"] }]]
 ```
 
 ## waitgroup-by-value

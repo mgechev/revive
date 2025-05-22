@@ -61,6 +61,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: DavidAnson/markdownlint-cli2-action@v20
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Setup mdsf
+        uses: hougesen/mdsf@v0.9.5
+
+      - name: Setup formatters
+        run: |
+          # goimports
+          go install golang.org/x/tools/cmd/goimports@latest
+          # shfmt https://github.com/mvdan/sh#shfmt
+          go install mvdan.cc/sh/v3/cmd/shfmt@latest
+          # taplo https://taplo.tamasfe.dev/cli/installation/binary.html
+          curl -fsSL https://github.com/tamasfe/taplo/releases/latest/download/taplo-full-linux-x86_64.gz | gzip -d - | install -m 755 /dev/stdin /usr/local/bin/taplo
+
+      - name: Verify files format using markdownlint-cli2
+        uses: DavidAnson/markdownlint-cli2-action@v20
         with:
           config: .markdownlint-cli2.yaml
+
+      - name: Verify code snippets using mdsf
+        run: mdsf verify --on-missing-language-definition ignore --on-missing-tool-binary fail-fast .

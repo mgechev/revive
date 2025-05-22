@@ -106,7 +106,7 @@ A volume must be mounted to share the current repository with the container.
 Please refer to the [bind mounts Docker documentation](https://docs.docker.com/storage/bind-mounts/)
 
 ```bash
-docker run -v "$(pwd)":/var/<repository> ghcr.io/mgechev/revive:v1.3.7 -config /var/<repository>/revive.toml -formatter stylish ./var/kidle/...
+docker run -v "$(pwd)":/var/YOUR_REPOSITORY ghcr.io/mgechev/revive:v1.3.7 -config /var/YOUR_REPOSITORY/revive.toml -formatter stylish ./var/YOUR_REPOSITORY/...
 ```
 
 - `-v` is for the volume
@@ -238,6 +238,7 @@ Using comments, you can disable the linter for the entire file or only a range o
 //revive:disable
 
 func Public() {}
+
 //revive:enable
 ```
 
@@ -251,8 +252,9 @@ You can do the same on a rule level. In case you want to disable only a particul
 ```go
 //revive:disable:unexported-return
 func Public() private {
-  return private
+	return private
 }
+
 //revive:enable:unexported-return
 ```
 
@@ -278,7 +280,7 @@ in the configuration. You can set the severity (defaults to _warning_) of the vi
 
 ```toml
 [directive.specify-disable-reason]
-    severity = "error"
+severity = "error"
 ```
 
 ### Configuration
@@ -305,11 +307,11 @@ warningCode = 0
 # Configuration of the `cyclomatic` rule. Here we specify that
 # the rule should fail if it detects code with higher complexity than 10.
 [rule.cyclomatic]
-  arguments = [10]
+arguments = [10]
 
 # Sets the severity of the `package-comments` rule to "error".
 [rule.package-comments]
-  severity = "error"
+severity = "error"
 ```
 
 By default `revive` will enable only the linting rules that are named in the configuration file.
@@ -328,7 +330,7 @@ For example:
 
 ```toml
 [rule.line-length-limit]
-    Disabled = true
+Disabled = true
 ```
 
 When enabling all rules you still need/can provide specific configurations for rules.
@@ -346,29 +348,29 @@ enableAllRules = true
 
 # Disabled rules
 [rule.blank-imports]
-    Disabled = true
+Disabled = true
 [rule.file-header]
-    Disabled = true
+Disabled = true
 [rule.max-public-structs]
-    Disabled = true
+Disabled = true
 [rule.line-length-limit]
-    Disabled = true
+Disabled = true
 [rule.function-length]
-    Disabled = true
+Disabled = true
 [rule.banned-characters]
-    Disabled = true
+Disabled = true
 
 # Rule tuning
 [rule.argument-limit]
-    Arguments = [5]
+Arguments = [5]
 [rule.cyclomatic]
-    Arguments = [10]
+Arguments = [10]
 [rule.cognitive-complexity]
-    Arguments = [7]
+Arguments = [7]
 [rule.function-result-limit]
-    Arguments = [3]
+Arguments = [3]
 [rule.error-strings]
-    Arguments = ["mypackage.Error"]
+Arguments = ["mypackage.Error"]
 ```
 
 ### Default Configuration
@@ -440,9 +442,9 @@ errorCode = 0
 warningCode = 0
 
 [rule.blank-imports]
-   Exclude=["**/*.pb.go"]
+Exclude = ["**/*.pb.go"]
 [rule.context-as-argument]
-   Exclude=["src/somepkg/*.go", "TEST"]
+Exclude = ["src/somepkg/*.go", "TEST"]
 ```
 
 You can use the following exclude patterns
@@ -560,7 +562,7 @@ in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https:
 
 ```toml
 [rule.var-naming]
-  arguments = [["ID"], ["VM"]]
+arguments = [["ID"], ["VM"]]
 ```
 
 This way, revive will not warn for an identifier called `customId` but will warn that `customVm` should be called `customVM`.
@@ -657,7 +659,9 @@ func (f myRule) Name() string {
 	return "myRule"
 }
 
-func (f myRule) Apply(*lint.File, lint.Arguments) []lint.Failure { ... }
+func (f myRule) Apply(*lint.File, lint.Arguments) []lint.Failure {
+	// ...
+}
 ```
 
 You can still go further and use `revive` without its CLI, as part of your library, or your CLI:
@@ -666,39 +670,39 @@ You can still go further and use `revive` without its CLI, as part of your libra
 package mylib
 
 import (
-	"github.com/mgechev/revive/cli"
-	"github.com/mgechev/revive/revivelib"
+	"github.com/mgechev/revive/config"
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/revivelib"
 )
 
 // Error checking removed for clarity
 func LintMyFile(file string) {
-	conf, _:= config.GetConfig("../defaults.toml")
+	conf, _ := config.GetConfig("../defaults.toml")
 
 	revive, _ := revivelib.New(
-		conf,  // Configuration file
-		true,  // Set exit status
-		2048,  // Max open files
+		conf, // Configuration file
+		true, // Set exit status
+		2048, // Max open files
 
 		// Then add as many extra rules as you need
 		revivelib.NewExtraRule(&myRule{}, lint.RuleConfig{}),
 	)
 
 	failuresChan, err := revive.Lint(
- 		revivelib.Include(file),
- 		revivelib.Exclude("./fixtures"),
- 		// You can use as many revivelib.Include or revivelib.Exclude as required
- 	)
-  	if err != nil {
-  	 	panic("Shouldn't have failed: " + err.Error())
-  	}
+		revivelib.Include(file),
+		revivelib.Exclude("./fixtures"),
+		// You can use as many revivelib.Include or revivelib.Exclude as required
+	)
+	if err != nil {
+		panic("Shouldn't have failed: " + err.Error())
+	}
 
-  	// Now let's return the formatted errors
+	// Now let's return the formatted errors
 	failures, exitCode, _ := revive.Format("stylish", failuresChan)
 
-  	// failures is the string with all formatted lint error messages
-  	// exit code is 0 if no errors, 1 if errors (unless config options change it)
-  	// ... do something with them
+	// failures is the string with all formatted lint error messages
+	// exit code is 0 if no errors, 1 if errors (unless config options change it)
+	// ... do something with them
 }
 
 type myRule struct{}
@@ -707,7 +711,9 @@ func (f myRule) Name() string {
 	return "myRule"
 }
 
-func (f myRule) Apply(*lint.File, lint.Arguments) []lint.Failure { ... }
+func (f myRule) Apply(*lint.File, lint.Arguments) []lint.Failure {
+	// ...
+}
 ```
 
 ### Custom Formatter
@@ -734,8 +740,8 @@ Here's a basic performance benchmark on MacBook Pro Early 2013 run on Kubernetes
 
 ### golint
 
-```shell
-time golint kubernetes/... > /dev/null
+```zsh
+$ time golint kubernetes/... > /dev/null
 
 real    0m54.837s
 user    0m57.844s
@@ -744,9 +750,9 @@ sys     0m9.146s
 
 ### revive's speed
 
-```shell
+```zsh
 # no type checking
-time revive -config untyped.toml kubernetes/... > /dev/null
+$ time revive -config untyped.toml kubernetes/... > /dev/null
 
 real    0m8.471s
 user    0m40.721s
@@ -755,9 +761,9 @@ sys     0m3.262s
 
 Keep in mind that if you use rules that require type checking, the performance may drop to 2x faster than `golint`:
 
-```shell
+```zsh
 # type checking enabled
-time revive kubernetes/... > /dev/null
+$ time revive kubernetes/... > /dev/null
 
 real    0m26.211s
 user    2m6.708s

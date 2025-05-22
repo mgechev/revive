@@ -61,7 +61,7 @@ We can set the banned identifier by using the TOML configuration file:
 
 ```toml
 [rule.ban-struct-name]
-  arguments = ["Foo"]
+arguments = ["Foo"]
 ```
 
 With the snippet above we:
@@ -89,22 +89,28 @@ type Formatter interface {
 
 ### Lint Markdown files
 
-We are using [markdownlint](https://github.com/DavidAnson/markdownlint) for checking Markdown files.
+We use [markdownlint](https://github.com/DavidAnson/markdownlint) and [mdsf](https://github.com/hougesen/mdsf) to check Markdown files.
+`markdownlint` verifies document formatting, such as line length and empty lines, while `mdsf` is responsible for formatting code snippets.
 
 1. Install [markdownlint-cli2](https://github.com/DavidAnson/markdownlint-cli2#install).
-2. Run the following command:
+2. Install [mdsf](https://mdsf.mhouge.dk/#installation) and formatters:
+    - [goimports](https://pkg.go.dev/golang.org/x/tools/cmd/goimports) for `go`: `go install golang.org/x/tools/cmd/goimports@latest`
+    - [shfmt](https://github.com/mvdan/sh#shfmt) for `sh, shell, bash`: `go install mvdan.cc/sh/v3/cmd/shfmt@latest`
+    - [taplo](https://taplo.tamasfe.dev/cli/installation/binary.html) for `toml`
+3. Run the following command to check formatting:
 
 ```sh
-$ markdownlint-cli2 .
-Finding: *.{md,markdown} *.md
-Found:
- CODE_OF_CONDUCT.md
- CONTRIBUTING.md
- DEVELOPING.md
- README.md
- RULES_DESCRIPTIONS.md
-Linting: 5 file(s)
-Summary: 0 error(s)
+markdownlint-cli2 .
 ```
 
-The tool automatically uses the config file [.markdownlint-cli2.yaml](./.markdownlint-cli2.yaml).
+_The `markdownlint-cli2` tool automatically uses the config file [.markdownlint-cli2.yaml](./.markdownlint-cli2.yaml)._
+\
+4. Run the following commands to verify and format code snippets:
+
+```sh
+mdsf verify .
+```
+
+```sh
+mdsf format .
+```
