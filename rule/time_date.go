@@ -56,6 +56,15 @@ var (
 	timeDateArity = len(timeDateArgumentNames)
 )
 
+var timeDateArgumentBoundaries = map[string][2]int64{
+	"month":      {1, 12},
+	"day":        {1, 31},
+	"hour":       {0, 23},
+	"minute":     {0, 59},
+	"second":     {0, 59},
+	"nanosecond": {0, 999999999},
+}
+
 func (w lintTimeDate) Visit(n ast.Node) ast.Visitor {
 	ce, ok := n.(*ast.CallExpr)
 	if !ok || len(ce.Args) != timeDateArity {
@@ -66,14 +75,44 @@ func (w lintTimeDate) Visit(n ast.Node) ast.Visitor {
 	}
 
 	// The last argument is a timezone, there is no need to check it, also it has a different type
-	for pos, arg := range ce.Args[:timeDateArity-1] {
+	for pos, realArg := range ce.Args[:timeDateArity-1] {
+		arg := realArg
+		var isNegative bool
+		ua, found := arg.(*ast.UnaryExpr)
+		if found {
+			// this is the argument we want to check
+			arg = ua.X
+			if ua.Op == token.SUB {
+				isNegative = true
+			}
+		}
+
 		bl, ok := arg.(*ast.BasicLit)
 		if !ok {
 			continue
 		}
+		fieldName := timeDateArgumentNames[pos]
 
-		replacedValue, err := parseDecimalInteger(bl)
+		parsedValue, err := parseDecimalInteger(bl)
 		if err == nil {
+			if isNegative {
+				parsedValue = -parsedValue
+			}
+
+			boundaries, found := timeDateArgumentBoundaries[fieldName]
+			if found {
+				if parsedValue < boundaries[0] || parsedValue > boundaries[1] {
+					w.onFailure(lint.Failure{
+						Category:   "time",
+						Node:       realArg,
+						Confidence: 0.8,
+						Failure: fmt.Sprintf(
+							"time.Date %s argument is supposed to be between %d and %d, found: %d",
+							fieldName, boundaries[0], boundaries[1], parsedValue),
+					})
+				}
+			}
+
 			continue
 		}
 
@@ -97,6 +136,7 @@ func (w lintTimeDate) Visit(n ast.Node) ast.Visitor {
 
 		confidence := 0.8 // default confidence
 		errMessage := err.Error()
+		replacedValue := strconv.FormatInt(parsedValue, 10)
 		instructions := fmt.Sprintf("use %s instead of %s", replacedValue, bl.Value)
 		switch {
 		case errors.Is(err, errParsedOctalWithZero):
@@ -147,16 +187,12 @@ var (
 	errParsedInvalid                = errors.New("invalid notation")
 )
 
-func parseDecimalInteger(bl *ast.BasicLit) (string, error) {
+func parseDecimalInteger(bl *ast.BasicLit) (int64, error) {
 	currentValue := strings.ToLower(bl.Value)
 
-	switch currentValue {
-	case "0":
+	if currentValue == "0" {
 		// skip 0 as it is a valid value for all the arguments
-		return bl.Value, nil
-	case "00", "01", "02", "03", "04", "05", "06", "07":
-		// people can use 00, 01, 02, 03, 04, 05, 06, 07, if they want
-		return bl.Value[1:], errParsedOctalWithZero
+		return 0, nil
 	}
 
 	switch bl.Kind {
@@ -165,7 +201,7 @@ func parseDecimalInteger(bl *ast.BasicLit) (string, error) {
 		parsedValue, err := strconv.ParseFloat(currentValue, 64)
 		if err != nil {
 			// This is not supposed to happen
-			return bl.Value, fmt.Errorf(
+			return 0, fmt.Errorf(
 				"%w: %s: %w",
 				errParsedInvalid,
 				"failed to parse number as float",
@@ -174,19 +210,18 @@ func parseDecimalInteger(bl *ast.BasicLit) (string, error) {
 		}
 
 		// this will convert back the number to a string
-		cleanedValue := strconv.FormatFloat(parsedValue, 'f', -1, 64)
 		if strings.Contains(currentValue, "e") {
-			return cleanedValue, errParsedExponential
+			return int64(parsedValue), errParsedExponential
 		}
 
-		return cleanedValue, errParsedFloat
+		return int64(parsedValue), errParsedFloat
 
 	case token.INT:
 		// we expect this format
 
 	default:
 		// This is not supposed to happen
-		return bl.Value, fmt.Errorf(
+		return 0, fmt.Errorf(
 			"%w: %s",
 			errParsedInvalid,
 			"unexpected kind of literal",
@@ -197,7 +232,7 @@ func parseDecimalInteger(bl *ast.BasicLit) (string, error) {
 	parsedValue, err := strconv.ParseInt(currentValue, 0, 64)
 	if err != nil {
 		// This is not supposed to happen
-		return bl.Value, fmt.Errorf(
+		return 0, fmt.Errorf(
 			"%w: %s: %w",
 			errParsedInvalid,
 			"failed to parse number as integer",
@@ -205,33 +240,35 @@ func parseDecimalInteger(bl *ast.BasicLit) (string, error) {
 		)
 	}
 
-	cleanedValue := strconv.FormatInt(parsedValue, 10)
-
 	// Let's figure out the notation to return an error
 	switch {
 	case strings.HasPrefix(currentValue, "0b"):
-		return cleanedValue, errParseBinary
+		return parsedValue, errParseBinary
 	case strings.HasPrefix(currentValue, "0x"):
-		return cleanedValue, errParsedHexadecimal
+		return parsedValue, errParsedHexadecimal
 	case strings.HasPrefix(currentValue, "0"):
 		// this matches both "0" and "0o" octal notation.
 
-		if strings.HasPrefix(currentValue, "00") {
-			// 00123456 (octal) is about 123456 or 42798 ?
-			return cleanedValue, errParsedOctalWithPaddingZeroes
+		switch currentValue {
+		// people can use 00, 01, 02, 03, 04, 05, 06, 07, if they want
+		case "00", "01", "02", "03", "04", "05", "06", "07":
+			return parsedValue, errParsedOctalWithZero
 		}
 
-		// 0006 is a valid octal notation, but we can use 6 instead.
-		return cleanedValue, errParsedOctal
+		if strings.HasPrefix(currentValue, "00") {
+			// 00123456 (octal) is about 123456 or 42798 ?
+			return parsedValue, errParsedOctalWithPaddingZeroes
+		}
+
+		return parsedValue, errParsedOctal
 	}
 
 	// Convert back the number to a string, and compare it with the original one
 	formattedValue := strconv.FormatInt(parsedValue, 10)
 	if formattedValue != currentValue {
 		// This can catch some edge cases like: 1_0 ...
-		return cleanedValue, errParsedAlternative
+		return parsedValue, errParsedAlternative
 	}
 
-	// The number is a decimal integer, we can use it as is.
-	return bl.Value, nil
+	return parsedValue, nil
 }
