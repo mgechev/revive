@@ -1,7 +1,6 @@
 package lint
 
 import (
-	"fmt"
 	"go/ast"
 	"go/token"
 )
@@ -97,9 +96,4 @@ func NewInternalFailure(message string) Failure {
 		Category: failureCategoryInternal,
 		Failure:  message,
 	}
-}
-
-// String returns the string representation of the failure.
-func (f *Failure) String() string {
-	return fmt.Sprintf("%s at %s:%d (rule %s)", f.Failure, f.Position.Start.Filename, f.Position.Start.Offset, f.RuleName)
 }
