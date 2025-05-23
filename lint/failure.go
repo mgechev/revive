@@ -80,8 +80,8 @@ type Failure struct {
 	ReplacementLine string
 }
 
-// GetFilename returns the filename.
-func (f *Failure) GetFilename() string {
+// Filename returns the filename.
+func (f *Failure) Filename() string {
 	return f.Position.Start.Filename
 }
 

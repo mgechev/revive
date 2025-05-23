@@ -43,7 +43,7 @@ func (*Checkstyle) Format(failures <-chan lint.Failure, config lint.Config) (str
 			Severity:   severity(config, failure),
 			RuleName:   failure.RuleName,
 		}
-		fn := failure.GetFilename()
+		fn := failure.Filename()
 		if issues[fn] == nil {
 			issues[fn] = []issue{}
 		}

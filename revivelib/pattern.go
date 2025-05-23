@@ -11,8 +11,8 @@ func (p *LintPattern) IsExclude() bool {
 	return p.isExclude
 }
 
-// GetPattern - returns the actual pattern
-func (p *LintPattern) GetPattern() string {
+// Pattern - returns the actual pattern
+func (p *LintPattern) Pattern() string {
 	return p.pattern
 }
 

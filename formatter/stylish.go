@@ -27,7 +27,7 @@ func formatFailure(failure lint.Failure, severity lint.Severity) []string {
 	if severity == lint.SeverityWarning {
 		fName = color.YellowString(fURL)
 	}
-	return []string{failure.GetFilename(), pos, fName, fString}
+	return []string{failure.Filename(), pos, fName, fString}
 }
 
 // Format formats the failures gotten from the lint.
