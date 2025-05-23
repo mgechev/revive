@@ -1,0 +1,2 @@
+//nolint:dupl
+package foo
