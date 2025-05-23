@@ -46,14 +46,20 @@ type formattingSpec struct {
 }
 
 var formattingFuncs = map[string]formattingSpec{
-	"fmt.Appendf": {1, "fmt.Append"},
-	"fmt.Errorf":  {0, "errors.New"},
-	"fmt.Fprintf": {1, "fmt.Fprint"},
-	"fmt.Fscanf":  {1, "fmt.Fscan or fmt.Fscanln"},
-	"fmt.Printf":  {0, "fmt.Print or fmt.Println"},
-	"fmt.Scanf":   {0, "fmt.Scan"},
-	"fmt.Sprintf": {0, "fmt.Sprint or just the string itself"},
-	"fmt.Sscanf":  {1, "fmt.Sscan"},
+	"fmt.Appendf":   {1, "fmt.Append"},
+	"fmt.Errorf":    {0, "errors.New"},
+	"fmt.Fprintf":   {1, "fmt.Fprint"},
+	"fmt.Fscanf":    {1, "fmt.Fscan or fmt.Fscanln"},
+	"fmt.Printf":    {0, "fmt.Print or fmt.Println"},
+	"fmt.Scanf":     {0, "fmt.Scan"},
+	"fmt.Sprintf":   {0, "fmt.Sprint or just the string itself"},
+	"fmt.Sscanf":    {1, "fmt.Sscan"},
+	"log.Fatalf":    {0, "log.Fatal"},
+	"log.Panicf":    {0, "log.Panic"},
+	"log.Printf":    {0, "log.Print"},
+	"logger.Fatalf": {0, "logger.Fatal"},
+	"logger.Panicf": {0, "logger.Panic"},
+	"logger.Printf": {0, "logger.Print"},
 }
 
 func (w lintUnnecessaryFormat) Visit(n ast.Node) ast.Visitor {
