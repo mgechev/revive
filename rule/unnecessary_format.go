@@ -77,7 +77,7 @@ func (w lintUnnecessaryFormat) Visit(n ast.Node) ast.Visitor {
 
 	format := gofmt(ce.Args[pos])
 
-	if !(format[0] == '"') || strings.Contains(format, `%`) {
+	if format[0] != '"' || strings.Contains(format, `%`) {
 		return w
 	}
 
