@@ -17,8 +17,6 @@ func (*UnnecessaryFormatRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 
 	fileAst := file.AST
 	walker := lintUnnecessaryFormat{
-		file:    file,
-		fileAst: fileAst,
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
 		},
@@ -35,8 +33,6 @@ func (*UnnecessaryFormatRule) Name() string {
 }
 
 type lintUnnecessaryFormat struct {
-	file      *lint.File
-	fileAst   *ast.File
 	onFailure func(lint.Failure)
 }
 
