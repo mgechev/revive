@@ -164,9 +164,5 @@ func (l *lintPackageComments) Visit(_ ast.Node) ast.Visitor {
 }
 
 func isEmptyDoc(commentGroup *ast.CommentGroup) bool {
-	if commentGroup == nil {
-		return true
-	}
-
-	return commentGroup.Text() == ""
+	return commentGroup == nil || commentGroup.Text() == ""
 }

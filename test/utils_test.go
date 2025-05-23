@@ -32,22 +32,20 @@ func configureRule(t *testing.T, rule lint.Rule, arguments lint.Arguments) {
 	}
 }
 
-var testDataDir = filepath.Join("..", "testdata")
-
 func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.RuleConfig) {
 	t.Helper()
 
-	baseDir := filepath.Join(testDataDir, filepath.Dir(filename))
+	baseDir := filepath.Join("..", "testdata", filepath.Dir(filename))
 	filename = filepath.Base(filename) + ".go"
 	fullFilePath := filepath.Join(baseDir, filename)
-	_, err := os.Stat(fullFilePath)
+	src, err := os.ReadFile(fullFilePath)
+	if err != nil {
+		t.Fatalf("Bad filename path in test for %s: %v", rule.Name(), err)
+	}
+	stat, err := os.Stat(fullFilePath)
 	if err != nil {
 		t.Fatalf("Cannot get file info for %s: %v", rule.Name(), err)
 	}
-	testRuleOnFiles(t, []string{fullFilePath}, rule, config...)
-}
-
-func testRuleOnFiles(t *testing.T, files []string, rule lint.Rule, config ...*lint.RuleConfig) {
 	var ruleConfig lint.RuleConfig
 	c := map[string]lint.RuleConfig{}
 	if len(config) > 0 {
@@ -56,19 +54,20 @@ func testRuleOnFiles(t *testing.T, files []string, rule lint.Rule, config ...*li
 	}
 	configureRule(t, rule, ruleConfig.Arguments)
 
-	if len(parseInstructions(t, files)) == 0 {
-		assertSuccess(t, files, []lint.Rule{rule}, c)
+	if parseInstructions(t, fullFilePath, src) == nil {
+		assertSuccess(t, baseDir, stat, []lint.Rule{rule}, c)
 		return
 	}
-	assertFailures(t, files, []lint.Rule{rule}, c)
+	assertFailures(t, baseDir, stat, src, []lint.Rule{rule}, c)
 }
 
-func assertSuccess(t *testing.T, files []string, rules []lint.Rule, config map[string]lint.RuleConfig) error {
+func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, rules []lint.Rule, config map[string]lint.RuleConfig) error {
 	t.Helper()
 
 	l := lint.New(os.ReadFile, 0)
 
-	ps, err := l.Lint([][]string{files}, rules, lint.Config{
+	filePath := filepath.Join(baseDir, fi.Name())
+	ps, err := l.Lint([][]string{{filePath}}, rules, lint.Config{
 		Rules: config,
 	})
 	if err != nil {
@@ -77,7 +76,7 @@ func assertSuccess(t *testing.T, files []string, rules []lint.Rule, config map[s
 
 	failures := ""
 	for p := range ps {
-		failures += p.String() + "\n"
+		failures += p.Failure
 	}
 	if failures != "" {
 		t.Errorf("Expected the rule to pass but got the following failures: %s", failures)
@@ -85,68 +84,65 @@ func assertSuccess(t *testing.T, files []string, rules []lint.Rule, config map[s
 	return nil
 }
 
-func assertFailures(t *testing.T, files []string, rules []lint.Rule, config map[string]lint.RuleConfig) error {
+func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, rules []lint.Rule, config map[string]lint.RuleConfig) error {
 	t.Helper()
 
 	l := lint.New(os.ReadFile, 0)
 
-	ins := parseInstructions(t, files)
+	ins := parseInstructions(t, filepath.Join(baseDir, fi.Name()), src)
 
-	ps, err := l.Lint([][]string{files}, rules, lint.Config{
+	ps, err := l.Lint([][]string{{filepath.Join(baseDir, fi.Name())}}, rules, lint.Config{
 		Rules: config,
 	})
 	if err != nil {
 		return err
 	}
 
-	failures := map[string][]lint.Failure{} // file -> failures
+	failures := []lint.Failure{}
 	for f := range ps {
-		failures[f.GetFilename()] = append(failures[f.GetFilename()], f)
+		failures = append(failures, f)
 	}
 
-	for file, ins := range ins {
-		failures := failures[file]
-		for _, in := range ins {
-			ok := false
-			for i, p := range failures {
-				if p.Position.Start.Line != in.Line {
-					continue
+	for _, in := range ins {
+		ok := false
+		for i, p := range failures {
+			if p.Position.Start.Line != in.Line {
+				continue
+			}
+
+			if in.Match == p.Failure {
+				// check replacement if we are expecting one
+				if in.Replacement != "" {
+					// ignore any inline comments, since that would be recursive
+					r := p.ReplacementLine
+					if i := strings.Index(r, " //"); i >= 0 {
+						r = r[:i]
+					}
+					if r != in.Replacement {
+						t.Errorf("Lint failed at %s:%d; got replacement %q, want %q", fi.Name(), in.Line, r, in.Replacement)
+					}
 				}
 
-				if in.Match == p.Failure {
-					// check replacement if we are expecting one
-					if in.Replacement != "" {
-						// ignore any inline comments, since that would be recursive
-						r := p.ReplacementLine
-						if i := strings.Index(r, " //"); i >= 0 {
-							r = r[:i]
-						}
-						if r != in.Replacement {
-							t.Errorf("Lint failed at %s:%d; got replacement %q, want %q", file, in.Line, r, in.Replacement)
-						}
+				if in.Confidence > 0 {
+					if in.Confidence != p.Confidence {
+						t.Errorf("Lint failed at %s:%d; got confidence %f, want %f", fi.Name(), in.Line, p.Confidence, in.Confidence)
 					}
-
-					if in.Confidence > 0 {
-						if in.Confidence != p.Confidence {
-							t.Errorf("Lint failed at %s:%d; got confidence %f, want %f", file, in.Line, p.Confidence, in.Confidence)
-						}
-					}
-
-					// remove this problem from ps
-					copy(failures[i:], failures[i+1:])
-					failures = failures[:len(failures)-1]
-
-					ok = true
-					break
 				}
-			}
-			if !ok {
-				t.Errorf("Lint failed at %s:%d; /%v/ did not match", file, in.Line, in.Match)
+
+				// remove this problem from ps
+				copy(failures[i:], failures[i+1:])
+				failures = failures[:len(failures)-1]
+
+				ok = true
+				break
 			}
 		}
-		for _, p := range failures {
-			t.Errorf("Unexpected problem at %s:%d: %v", file, p.Position.Start.Line, p.Failure)
+		if !ok {
+			t.Errorf("Lint failed at %s:%d; /%v/ did not match", fi.Name(), in.Line, in.Match)
 		}
+	}
+	for _, p := range failures {
+		t.Errorf("Unexpected problem at %s:%d: %v", fi.Name(), p.Position.Start.Line, p.Failure)
 	}
 	return nil
 }
@@ -169,73 +165,62 @@ type JSONInstruction struct {
 
 // parseInstructions parses instructions from the comments in a Go source file.
 // It returns nil if none were parsed.
-func parseInstructions(t *testing.T, files []string) map[string][]instruction {
+func parseInstructions(t *testing.T, filename string, src []byte) []instruction {
 	t.Helper()
 
-	result := map[string][]instruction{}
-	for _, file := range files {
-		src, err := os.ReadFile(file)
-		if err != nil {
-			t.Fatalf("Bad filename path in test: %v", err)
-		}
-		fset := token.NewFileSet()
-		f, err := parser.ParseFile(fset, file, src, parser.ParseComments)
-		if err != nil {
-			t.Fatalf("Test file %v does not parse: %v", file, err)
-		}
-		var ins []instruction
-		for _, cg := range f.Comments {
-			ln := fset.Position(cg.Pos()).Line
-			raw := cg.Text()
-			for _, line := range strings.Split(raw, "\n") {
-				if line == "" || strings.HasPrefix(line, "#") || strings.HasPrefix(line, "ignore") {
-					continue
+	fset := token.NewFileSet()
+	f, err := parser.ParseFile(fset, filename, src, parser.ParseComments)
+	if err != nil {
+		t.Fatalf("Test file %v does not parse: %v", filename, err)
+	}
+	var ins []instruction
+	for _, cg := range f.Comments {
+		ln := fset.Position(cg.Pos()).Line
+		raw := cg.Text()
+		for _, line := range strings.Split(raw, "\n") {
+			if line == "" || strings.HasPrefix(line, "#") || strings.HasPrefix(line, "ignore") {
+				continue
+			}
+			if line == "OK" && ins == nil {
+				// so our return value will be non-nil
+				ins = []instruction{}
+				continue
+			}
+			switch extractDataMode(line) {
+			case "json":
+				jsonInst, err := extractInstructionFromJSON(strings.TrimPrefix(line, "json:"), ln)
+				if err != nil {
+					t.Fatalf("At %v:%d: %v", filename, ln, err)
 				}
-				if line == "OK" && ins == nil {
-					// so our return value will be non-nil
-					ins = []instruction{}
-					continue
+				ins = append(ins, jsonInst)
+			case "classic":
+				match, err := extractPattern(line)
+				if err != nil {
+					t.Fatalf("At %v:%d: %v", filename, ln, err)
 				}
-				switch extractDataMode(line) {
-				case "json":
-					jsonInst, err := extractInstructionFromJSON(strings.TrimPrefix(line, "json:"), ln)
+				matchLine := ln
+				if i := strings.Index(line, "MATCH:"); i >= 0 {
+					// This is a match for a different line.
+					lns := strings.TrimPrefix(line[i:], "MATCH:")
+					lns = lns[:strings.Index(lns, " ")]
+					matchLine, err = strconv.Atoi(lns)
 					if err != nil {
-						t.Fatalf("At %v:%d: %v", file, ln, err)
+						t.Fatalf("Bad match line number %q at %v:%d: %v", lns, filename, ln, err)
 					}
-					ins = append(ins, jsonInst)
-				case "classic":
-					match, err := extractPattern(line)
-					if err != nil {
-						t.Fatalf("At %v:%d: %v", file, ln, err)
-					}
-					matchLine := ln
-					if i := strings.Index(line, "MATCH:"); i >= 0 {
-						// This is a match for a different line.
-						lns := strings.TrimPrefix(line[i:], "MATCH:")
-						lns = lns[:strings.Index(lns, " ")]
-						matchLine, err = strconv.Atoi(lns)
-						if err != nil {
-							t.Fatalf("Bad match line number %q at %v:%d: %v", lns, file, ln, err)
-						}
-					}
-					var repl string
-					if r, ok := extractReplacement(line); ok {
-						repl = r
-					}
-					ins = append(ins, instruction{
-						Line:        matchLine,
-						Match:       match,
-						Replacement: repl,
-					})
 				}
+				var repl string
+				if r, ok := extractReplacement(line); ok {
+					repl = r
+				}
+				ins = append(ins, instruction{
+					Line:        matchLine,
+					Match:       match,
+					Replacement: repl,
+				})
 			}
 		}
-		if len(ins) != 0 {
-			result[file] = ins
-		}
 	}
-
-	return result
+	return ins
 }
 
 func extractInstructionFromJSON(line string, lineNumber int) (instruction, error) {
