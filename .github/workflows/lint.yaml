@@ -70,14 +70,17 @@ jobs:
       - name: Setup mdsf
         uses: hougesen/mdsf@v0.9.5
 
-      - name: Setup formatters
-        run: |
-          # goimports
-          go install golang.org/x/tools/cmd/goimports@latest
-          # shfmt https://github.com/mvdan/sh#shfmt
-          go install mvdan.cc/sh/v3/cmd/shfmt@latest
-          # taplo https://taplo.tamasfe.dev/cli/installation/binary.html
-          curl -fsSL https://github.com/tamasfe/taplo/releases/latest/download/taplo-full-linux-x86_64.gz | gzip -d - | install -m 755 /dev/stdin /usr/local/bin/taplo
+      - name: Setup goimports
+        # https://pkg.go.dev/golang.org/x/tools/cmd/goimports
+        run: go install golang.org/x/tools/cmd/goimports@v0.33.0
+
+      - name: Setup shfmt
+        # https://github.com/mvdan/sh#shfmt
+        run: go install mvdan.cc/sh/v3/cmd/shfmt@v3.11.0
+
+      - name: Setup taplo
+        # https://taplo.tamasfe.dev/cli/installation/binary.html
+        run: curl -fsSL https://github.com/tamasfe/taplo/releases/download/0.10.0/taplo-linux-x86_64.gz | gzip -d - | install -m 755 /dev/stdin /usr/local/bin/taplo
 
       - name: Verify files format using markdownlint-cli2
         uses: DavidAnson/markdownlint-cli2-action@v20
@@ -85,4 +88,11 @@ jobs:
           config: .markdownlint-cli2.yaml
 
       - name: Verify code snippets using mdsf
+        id: verify_snippets
         run: mdsf verify --on-missing-language-definition ignore --on-missing-tool-binary fail-fast .
+
+      - name: Show diff when mdsf failed
+        if: failure() && steps.verify_snippets.outcome == 'failure'
+        run: |
+          mdsf format --debug --on-missing-language-definition ignore --on-missing-tool-binary fail-fast .
+          git diff --exit-code

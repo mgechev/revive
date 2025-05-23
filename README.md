@@ -740,7 +740,7 @@ Here's a basic performance benchmark on MacBook Pro Early 2013 run on Kubernetes
 
 ### golint
 
-```zsh
+```shellsession
 $ time golint kubernetes/... > /dev/null
 
 real    0m54.837s
@@ -750,7 +750,7 @@ sys     0m9.146s
 
 ### revive's speed
 
-```zsh
+```shellsession
 # no type checking
 $ time revive -config untyped.toml kubernetes/... > /dev/null
 
@@ -761,7 +761,7 @@ sys     0m3.262s
 
 Keep in mind that if you use rules that require type checking, the performance may drop to 2x faster than `golint`:
 
-```zsh
+```shellsession
 # type checking enabled
 $ time revive kubernetes/... > /dev/null
 

@@ -99,8 +99,17 @@ We use [markdownlint](https://github.com/DavidAnson/markdownlint) and [mdsf](htt
     - [taplo](https://taplo.tamasfe.dev/cli/installation/binary.html) for `toml`
 3. Run the following command to check formatting:
 
-```sh
-markdownlint-cli2 .
+```shellsession
+$ markdownlint-cli2 .
+Finding: *.{md,markdown} *.md
+Found:
+ CODE_OF_CONDUCT.md
+ CONTRIBUTING.md
+ DEVELOPING.md
+ README.md
+ RULES_DESCRIPTIONS.md
+Linting: 5 file(s)
+Summary: 0 error(s)
 ```
 
 _The `markdownlint-cli2` tool automatically uses the config file [.markdownlint-cli2.yaml](./.markdownlint-cli2.yaml)._
