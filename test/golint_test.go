@@ -63,12 +63,9 @@ func TestAll(t *testing.T) {
 				t.Fatalf("Failed reading %s: %v", fi.Name(), err)
 			}
 
-			fileInfo, err := os.Stat(filePath)
-			if err != nil {
-				t.Fatalf("Failed reading %s: %v", fi.Name(), err)
-			}
+			ins := parseInstructions(t, filePath, src)
 
-			if err := assertFailures(t, filepath.Dir(baseDir), fileInfo, src, rules, map[string]lint.RuleConfig{}); err != nil {
+			if err := assertFailures(t, filePath, rules, map[string]lint.RuleConfig{}, ins); err != nil {
 				t.Errorf("Linting %s: %v", fi.Name(), err)
 			}
 		})

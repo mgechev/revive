@@ -42,10 +42,7 @@ func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.Rul
 	if err != nil {
 		t.Fatalf("Bad filename path in test for %s: %v", rule.Name(), err)
 	}
-	stat, err := os.Stat(fullFilePath)
-	if err != nil {
-		t.Fatalf("Cannot get file info for %s: %v", rule.Name(), err)
-	}
+
 	var ruleConfig lint.RuleConfig
 	c := map[string]lint.RuleConfig{}
 	if len(config) > 0 {
@@ -54,19 +51,19 @@ func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.Rul
 	}
 	configureRule(t, rule, ruleConfig.Arguments)
 
-	if parseInstructions(t, fullFilePath, src) == nil {
-		assertSuccess(t, baseDir, stat, []lint.Rule{rule}, c)
+	ins := parseInstructions(t, fullFilePath, src)
+	if ins == nil {
+		assertSuccess(t, fullFilePath, []lint.Rule{rule}, c)
 		return
 	}
-	assertFailures(t, baseDir, stat, src, []lint.Rule{rule}, c)
+	assertFailures(t, fullFilePath, []lint.Rule{rule}, c, ins)
 }
 
-func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, rules []lint.Rule, config map[string]lint.RuleConfig) error {
+func assertSuccess(t *testing.T, filePath string, rules []lint.Rule, config map[string]lint.RuleConfig) error {
 	t.Helper()
 
 	l := lint.New(os.ReadFile, 0)
 
-	filePath := filepath.Join(baseDir, fi.Name())
 	ps, err := l.Lint([][]string{{filePath}}, rules, lint.Config{
 		Rules: config,
 	})
@@ -84,14 +81,12 @@ func assertSuccess(t *testing.T, baseDir string, fi os.FileInfo, rules []lint.Ru
 	return nil
 }
 
-func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, rules []lint.Rule, config map[string]lint.RuleConfig) error {
+func assertFailures(t *testing.T, filePath string, rules []lint.Rule, config map[string]lint.RuleConfig, ins []instruction) error {
 	t.Helper()
 
 	l := lint.New(os.ReadFile, 0)
 
-	ins := parseInstructions(t, filepath.Join(baseDir, fi.Name()), src)
-
-	ps, err := l.Lint([][]string{{filepath.Join(baseDir, fi.Name())}}, rules, lint.Config{
+	ps, err := l.Lint([][]string{{filePath}}, rules, lint.Config{
 		Rules: config,
 	})
 	if err != nil {
@@ -119,13 +114,13 @@ func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, ru
 						r = r[:i]
 					}
 					if r != in.Replacement {
-						t.Errorf("Lint failed at %s:%d; got replacement %q, want %q", fi.Name(), in.Line, r, in.Replacement)
+						t.Errorf("Lint failed at %s:%d; got replacement %q, want %q", filePath, in.Line, r, in.Replacement)
 					}
 				}
 
 				if in.Confidence > 0 {
 					if in.Confidence != p.Confidence {
-						t.Errorf("Lint failed at %s:%d; got confidence %f, want %f", fi.Name(), in.Line, p.Confidence, in.Confidence)
+						t.Errorf("Lint failed at %s:%d; got confidence %f, want %f", filePath, in.Line, p.Confidence, in.Confidence)
 					}
 				}
 
@@ -138,11 +133,11 @@ func assertFailures(t *testing.T, baseDir string, fi os.FileInfo, src []byte, ru
 			}
 		}
 		if !ok {
-			t.Errorf("Lint failed at %s:%d; /%v/ did not match", fi.Name(), in.Line, in.Match)
+			t.Errorf("Lint failed at %s:%d; /%v/ did not match", filePath, in.Line, in.Match)
 		}
 	}
 	for _, p := range failures {
-		t.Errorf("Unexpected problem at %s:%d: %v", fi.Name(), p.Position.Start.Line, p.Failure)
+		t.Errorf("Unexpected problem at %s:%d: %v", filePath, p.Position.Start.Line, p.Failure)
 	}
 	return nil
 }
