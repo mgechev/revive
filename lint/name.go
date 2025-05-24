@@ -28,9 +28,10 @@ func Name(name string, allowlist, blocklist []string) (should string) {
 	w, i := 0, 0 // index of start of word, scan
 	for i+1 <= len(runes) {
 		eow := false // whether we hit the end of a word
-		if i+1 == len(runes) {
+		switch {
+		case i+1 == len(runes):
 			eow = true
-		} else if runes[i+1] == '_' {
+		case runes[i+1] == '_':
 			// underscore; shift the remainder forward over any run of underscores
 			eow = true
 			n := 1
@@ -45,7 +46,7 @@ func Name(name string, allowlist, blocklist []string) (should string) {
 
 			copy(runes[i+1:], runes[i+n+1:])
 			runes = runes[:len(runes)-n]
-		} else if unicode.IsLower(runes[i]) && !unicode.IsLower(runes[i+1]) {
+		case unicode.IsLower(runes[i]) && !unicode.IsLower(runes[i+1]):
 			// lower->non-lower
 			eow = true
 		}

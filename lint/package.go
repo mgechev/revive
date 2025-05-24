@@ -16,6 +16,8 @@ import (
 )
 
 // Package represents a package in the project.
+//
+//nolint:gocritic // exposedSyncMutex
 type Package struct {
 	fset      *token.FileSet
 	files     map[string]*File

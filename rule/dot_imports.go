@@ -3,6 +3,7 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"strconv"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -94,7 +95,7 @@ func (w lintImports) Visit(_ ast.Node) ast.Visitor {
 type allowPackages map[string]struct{}
 
 func (ap allowPackages) add(pkg string) {
-	ap[fmt.Sprintf(`"%s"`, pkg)] = struct{}{} // import path strings are with double quotes
+	ap[strconv.Quote(pkg)] = struct{}{} // import path strings are with double quotes
 }
 
 func (ap allowPackages) isAllowedPackage(pkg string) bool {

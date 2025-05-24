@@ -118,7 +118,7 @@ func (r *StringFormatRule) parseArgument(argument any, ruleNum int) (scopes stri
 	for scopeNum, rawScope := range rawScopes {
 		rawScope = strings.TrimSpace(rawScope)
 
-		if len(rawScope) == 0 {
+		if rawScope == "" {
 			return stringFormatSubruleScopes{}, regex, false, "", r.parseScopeError("empty scope in rule scopes:", ruleNum, 0, scopeNum)
 		}
 
@@ -133,14 +133,14 @@ func (r *StringFormatRule) parseArgument(argument any, ruleNum int) (scopes stri
 				r.parseScopeError(fmt.Sprintf("unexpected number of submatches when parsing scope: %d, expected 4", len(matches)), ruleNum, 0, scopeNum)
 		}
 		scope.funcName = matches[1]
-		if len(matches[2]) > 0 {
+		if matches[2] != "" {
 			var err error
 			scope.argument, err = strconv.Atoi(matches[2])
 			if err != nil {
 				return stringFormatSubruleScopes{}, regex, false, "", r.parseScopeError("unable to parse argument number in rule scope", ruleNum, 0, scopeNum)
 			}
 		}
-		if len(matches[3]) > 0 {
+		if matches[3] != "" {
 			scope.field = matches[3]
 		}
 
@@ -235,7 +235,7 @@ func (r *stringFormatSubrule) apply(call *ast.CallExpr, scope *stringFormatSubru
 
 	arg := call.Args[scope.argument]
 	var lit *ast.BasicLit
-	if len(scope.field) > 0 {
+	if scope.field != "" {
 		// Try finding the scope's Field, treating arg as a composite literal
 		composite, ok := arg.(*ast.CompositeLit)
 		if !ok {
@@ -292,7 +292,7 @@ func (r *stringFormatSubrule) stringIsOK(s string) bool {
 func (r *stringFormatSubrule) generateFailure(node ast.Node) {
 	var failure string
 	switch {
-	case len(r.errorMessage) > 0:
+	case r.errorMessage != "":
 		failure = r.errorMessage
 	case r.negated:
 		failure = fmt.Sprintf("string literal matches user defined regex /%s/", r.regexp.String())

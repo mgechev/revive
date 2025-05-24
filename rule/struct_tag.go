@@ -235,7 +235,7 @@ func (lintStructTagRule) getTagName(tag *structtag.Tag) string {
 }
 
 func checkASN1Tag(checkCtx *checkContext, tag *structtag.Tag, fieldType ast.Expr) (message string, succeeded bool) {
-	checkList := append(tag.Options, tag.Name)
+	checkList := slices.Concat(tag.Options, []string{tag.Name})
 	for _, opt := range checkList {
 		switch opt {
 		case "application", "explicit", "generalized", "ia5", "omitempty", "optional", "set", "utf8":
@@ -605,7 +605,7 @@ func typeValueMatch(t ast.Expr, val string) bool {
 	return typeMatches
 }
 
-func (w lintStructTagRule) addFailureWithTagKey(n ast.Node, msg string, tagKey string) {
+func (w lintStructTagRule) addFailureWithTagKey(n ast.Node, msg, tagKey string) {
 	w.addFailuref(n, "%s in %s tag", msg, tagKey)
 }
 
