@@ -19,9 +19,13 @@ var (
 	e1 = fmt.Errorf("blah %d", 4) // MATCH /error var e1 should have name of the form errFoo/
 	// E2 ...
 	E2 = fmt.Errorf("blah %d", 5) // MATCH /error var E2 should have name of the form ErrFoo/
+
+	_ = errors.New("ok")
 )
 
 func f() {
 	var whatever = errors.New("ok") // ok
 	_ = whatever
+
+	_ = errors.New("ok")
 }
