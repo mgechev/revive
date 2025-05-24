@@ -101,24 +101,24 @@ var (
 
 var originalUsage = flag.Usage
 
-func getLogo() string {
+func logo() string {
 	return color.YellowString(` _ __ _____   _(_)__  _____
 | '__/ _ \ \ / / \ \ / / _ \
 | | |  __/\ V /| |\ V /  __/
 |_|  \___| \_/ |_| \_/ \___|`)
 }
 
-func getCall() string {
+func call() string {
 	return color.MagentaString("revive -config c.toml -formatter friendly -exclude a.go -exclude b.go ./...")
 }
 
-func getBanner() string {
+func banner() string {
 	return fmt.Sprintf(`
 %s
 
 Example:
   %s
-`, getLogo(), getCall())
+`, logo(), call())
 }
 
 func buildDefaultConfigPath() string {
@@ -150,7 +150,7 @@ func initConfig() {
 	}
 
 	flag.Usage = func() {
-		fmt.Println(getBanner())
+		fmt.Println(banner())
 		originalUsage()
 	}
 

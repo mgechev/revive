@@ -12,7 +12,14 @@ func (p *LintPattern) IsExclude() bool {
 }
 
 // GetPattern - returns the actual pattern
+//
+// Deprecated: Use [Pattern].
 func (p *LintPattern) GetPattern() string {
+	return p.Pattern()
+}
+
+// Pattern - returns the actual pattern
+func (p *LintPattern) Pattern() string {
 	return p.pattern
 }
 

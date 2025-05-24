@@ -75,9 +75,9 @@ func (r *Revive) Lint(patterns ...*LintPattern) (<-chan lint.Failure, error) {
 
 	for _, lintpkg := range patterns {
 		if lintpkg.IsExclude() {
-			excludePatterns = append(excludePatterns, lintpkg.GetPattern())
+			excludePatterns = append(excludePatterns, lintpkg.Pattern())
 		} else {
-			includePatterns = append(includePatterns, lintpkg.GetPattern())
+			includePatterns = append(includePatterns, lintpkg.Pattern())
 		}
 	}
 
