@@ -1138,13 +1138,14 @@ Example:
 
 ## unnecessary-format
 
-_Description_: This rule identifies calls to formatting functions where the format string does not contain any formatting verbs and recommends switching to the non-formatting, more efficient alternative.
+_Description_: This rule identifies calls to formatting functions where the format string does not contain any formatting verbs 
+and recommends switching to the non-formatting, more efficient alternative.
 
 _Configuration_: N/A
 
 ## unnecessary-stmt
 
-_Description_: This rule suggests to remove redundant statements like a `break` at the end of a case block, for improving the code's readability. 
+_Description_: This rule suggests to remove redundant statements like a `break` at the end of a case block, for improving the code's readability.
 
 _Configuration_: N/A
 
