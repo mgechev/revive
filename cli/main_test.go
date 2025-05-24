@@ -25,13 +25,13 @@ func TestXDGConfigDirIsPreferredFirst(t *testing.T) {
 
 	xdgDirPath := filepath.FromSlash("/tmp-iofs/xdg/config")
 	homeDirPath := filepath.FromSlash("/tmp-iofs/home/tester")
-	AppFs.MkdirAll(xdgDirPath, 0755)
-	AppFs.MkdirAll(homeDirPath, 0755)
+	AppFs.MkdirAll(xdgDirPath, 0o755)
+	AppFs.MkdirAll(homeDirPath, 0o755)
 
-	afero.WriteFile(AppFs, filepath.Join(xdgDirPath, "revive.toml"), []byte("\n"), 0644)
+	afero.WriteFile(AppFs, filepath.Join(xdgDirPath, "revive.toml"), []byte("\n"), 0o644)
 	t.Setenv("XDG_CONFIG_HOME", xdgDirPath)
 
-	afero.WriteFile(AppFs, filepath.Join(homeDirPath, "revive.toml"), []byte("\n"), 0644)
+	afero.WriteFile(AppFs, filepath.Join(homeDirPath, "revive.toml"), []byte("\n"), 0o644)
 	setHome(t, homeDirPath)
 
 	got := buildDefaultConfigPath()
@@ -45,9 +45,9 @@ func TestXDGConfigDirIsPreferredFirst(t *testing.T) {
 func TestHomeConfigDir(t *testing.T) {
 	t.Cleanup(func() { AppFs = afero.NewMemMapFs() })
 	homeDirPath := filepath.FromSlash("/tmp-iofs/home/tester")
-	AppFs.MkdirAll(homeDirPath, 0755)
+	AppFs.MkdirAll(homeDirPath, 0o755)
 
-	afero.WriteFile(AppFs, filepath.Join(homeDirPath, "revive.toml"), []byte("\n"), 0644)
+	afero.WriteFile(AppFs, filepath.Join(homeDirPath, "revive.toml"), []byte("\n"), 0o644)
 	setHome(t, homeDirPath)
 
 	got := buildDefaultConfigPath()
@@ -69,9 +69,9 @@ func setHome(t *testing.T, dir string) {
 func TestXDGConfigDir(t *testing.T) {
 	t.Cleanup(func() { AppFs = afero.NewMemMapFs() })
 	xdgDirPath := filepath.FromSlash("/tmp-iofs/xdg/config")
-	AppFs.MkdirAll(xdgDirPath, 0755)
+	AppFs.MkdirAll(xdgDirPath, 0o755)
 
-	afero.WriteFile(AppFs, filepath.Join(xdgDirPath, "revive.toml"), []byte("\n"), 0644)
+	afero.WriteFile(AppFs, filepath.Join(xdgDirPath, "revive.toml"), []byte("\n"), 0o644)
 	t.Setenv("XDG_CONFIG_HOME", xdgDirPath)
 
 	got := buildDefaultConfigPath()
