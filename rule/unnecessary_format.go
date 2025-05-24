@@ -70,6 +70,8 @@ var formattingFuncs = map[string]formattingSpec{
 	"f.Fatalf": {0, "f.Fatal"},
 	"f.Logf":   {0, "f.Log"},
 	"f.Skipf":  {0, "f.Skip"},
+	// standard trace functions
+	"trace.Logf": {2, "trace.Log"},
 }
 
 func (w lintUnnecessaryFormat) Visit(n ast.Node) ast.Visitor {

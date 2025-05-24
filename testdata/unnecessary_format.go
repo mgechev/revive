@@ -3,6 +3,7 @@ package fixtures
 import (
 	"fmt"
 	"log"
+	"runtime/trace"
 	"testing"
 )
 
@@ -37,6 +38,8 @@ func unnecessaryFormat(t *testing.T, b *testing.B, f *testing.F) {
 	f.Fatalf("no format") // MATCH /unnecessary use of formatting function f.Fatalf, you can replace it with f.Fatal/
 	f.Logf("no format")   // MATCH /unnecessary use of formatting function f.Logf, you can replace it with f.Log/
 	f.Skipf("no format")  // MATCH /unnecessary use of formatting function f.Skipf, you can replace it with f.Skip/
+	// standard trace functions
+	trace.Logf(nil, "http", "no format", nil) // MATCH /unnecessary use of formatting function trace.Logf, you can replace it with trace.Log/
 
 	fmt.Appendf(nil, "format %d", 0)
 	fmt.Errorf("format %d", 0)
@@ -66,4 +69,6 @@ func unnecessaryFormat(t *testing.T, b *testing.B, f *testing.F) {
 	f.Fatalf("format %d", 0)
 	f.Logf("format %d", 0)
 	f.Skipf("format %d", 0)
+	// standard trace functions
+	trace.Logf(nil, "http", "format %d", nil)
 }
