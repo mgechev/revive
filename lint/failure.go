@@ -80,6 +80,12 @@ type Failure struct {
 	ReplacementLine string
 }
 
+// GetFilename returns the filename.
+// Deprecated: Use Filename.
+func (f *Failure) GetFilename() string {
+	return f.Filename()
+}
+
 // Filename returns the filename.
 func (f *Failure) Filename() string {
 	return f.Position.Start.Filename
