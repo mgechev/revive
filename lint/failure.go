@@ -81,7 +81,8 @@ type Failure struct {
 }
 
 // GetFilename returns the filename.
-// Deprecated: Use Filename.
+//
+// Deprecated: Use [Filename].
 func (f *Failure) GetFilename() string {
 	return f.Filename()
 }
