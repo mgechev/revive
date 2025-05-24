@@ -171,6 +171,15 @@ func (*VarNamingRule) pkgNameFailure(node ast.Node, msg string, args ...any) lin
 	}
 }
 
+type lintNames struct {
+	file           *lint.File
+	fileAst        *ast.File
+	onFailure      func(lint.Failure)
+	allowList      []string
+	blockList      []string
+	upperCaseConst bool
+}
+
 func (w *lintNames) checkList(fl *ast.FieldList, thing string) {
 	if fl == nil {
 		return
@@ -227,15 +236,6 @@ func (w *lintNames) check(id *ast.Ident, thing string) {
 		Node:       id,
 		Category:   lint.FailureCategoryNaming,
 	})
-}
-
-type lintNames struct {
-	file           *lint.File
-	fileAst        *ast.File
-	onFailure      func(lint.Failure)
-	allowList      []string
-	blockList      []string
-	upperCaseConst bool
 }
 
 func (w *lintNames) Visit(n ast.Node) ast.Visitor {
@@ -323,7 +323,7 @@ func (w *lintNames) Visit(n ast.Node) ast.Visitor {
 // isUpperCaseConst checks if a string is in constant name format like `SOME_CONST`, `SOME_CONST_2`, `X123_3`, `_SOME_PRIVATE_CONST`.
 // See #851, #865.
 func isUpperCaseConst(s string) bool {
-	if len(s) == 0 {
+	if s == "" {
 		return false
 	}
 	r := []rune(s)

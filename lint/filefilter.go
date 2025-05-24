@@ -31,7 +31,7 @@ func ParseFileFilter(rawFilter string) (*FileFilter, error) {
 	rawFilter = strings.TrimSpace(rawFilter)
 	result := new(FileFilter)
 	result.raw = rawFilter
-	result.matchesNothing = len(result.raw) == 0
+	result.matchesNothing = result.raw == ""
 	result.matchesAll = result.raw == "*" || result.raw == "~"
 	if !result.matchesAll && !result.matchesNothing {
 		if err := result.prepareRegexp(); err != nil {
