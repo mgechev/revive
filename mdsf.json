@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/hougesen/mdsf/HEAD/schemas/v0.9.5/mdsf.schema.json",
+  "format_finished_document": false,
+  "languages": {
+    "go": "goimports",
+    "shell": "shfmt",
+    "toml": "taplo"
+  },
+  "language_aliases": {
+    "bash": "shell",
+    "sh": "shell"
+  }
+}
