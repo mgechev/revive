@@ -71,6 +71,15 @@ var (
 		time.UTC)
 )
 
+// here we are checking that we also detect non-decimal notation in methods/functions/lambdas
+func _() {
+	_ = time.Date(2023, 01, 2, 3, 4, 5, 6, time.UTC) // MATCH /use decimal digits for time.Date month argument: octal notation with leading zero found: use 1 instead of 01/
+
+	_ = func() time.Time {
+		return time.Date(2023, 01, 2, 3, 4, 5, 6, time.UTC) // MATCH /use decimal digits for time.Date month argument: octal notation with leading zero found: use 1 instead of 01/
+	}
+}
+
 // these should never match
 var (
 	_ = time.Date(2023, 1, 2, 3, 4, 5, 1234567, time.UTC)
