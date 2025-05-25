@@ -81,9 +81,9 @@ linters:
         - name: var-naming
 
 issues:
-  # Maximum issues count per one linter.
-  # Set to 0 to disable.
+  # Show all issues from a linter.
   max-issues-per-linter: 0
-  # Maximum count of issues with the same text.
-  # Set to 0 to disable.
+  # Show all issues with the same text.
   max-same-issues: 0
+  # Show all issues for a line.
+  uniq-by-line: false
