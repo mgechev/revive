@@ -66,7 +66,18 @@ func (w lintTimeDate) Visit(n ast.Node) ast.Visitor {
 		return w
 	}
 
-	// The last argument is a timezone, there is no need to check it, also it has a different type
+	// The last argument is a timezone, check it
+	tzArg := ce.Args[timeDateArity-1]
+	if astutils.IsIdent(tzArg, "nil") {
+		w.onFailure(lint.Failure{
+			Category:   "time",
+			Node:       tzArg,
+			Confidence: 1,
+			Failure:    "time.Date timezone argument cannot be nil, it would panic on runtime",
+		})
+	}
+
+	// All the other arguments should be decimal integers.
 	for pos, arg := range ce.Args[:timeDateArity-1] {
 		bl, ok := arg.(*ast.BasicLit)
 		if !ok {
