@@ -59,6 +59,8 @@ func TestHomeConfigDir(t *testing.T) {
 }
 
 func setHome(t *testing.T, dir string) {
+	t.Helper()
+
 	homeEnv := "HOME"
 	if runtime.GOOS == "windows" {
 		homeEnv = "USERPROFILE"
