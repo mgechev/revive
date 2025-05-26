@@ -6,6 +6,7 @@ version: "2"
 linters:
   default: none
   enable:
+    - gocritic
     - govet
     - ineffassign
     - misspell
@@ -15,6 +16,11 @@ linters:
     - unused
 
   settings:
+    gocritic:
+      enable-all: true
+      disabled-checks:
+        - hugeParam
+        - rangeValCopy
     govet:
       enable-all: true
       disable:
@@ -73,3 +79,11 @@ linters:
         - name: use-any
         - name: var-declaration
         - name: var-naming
+
+issues:
+  # Show all issues from a linter.
+  max-issues-per-linter: 0
+  # Show all issues with the same text.
+  max-same-issues: 0
+  # Show all issues for a line.
+  uniq-by-line: false

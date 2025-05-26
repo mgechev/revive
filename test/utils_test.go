@@ -197,7 +197,7 @@ func parseInstructions(t *testing.T, filename string, src []byte) []instruction 
 				if i := strings.Index(line, "MATCH:"); i >= 0 {
 					// This is a match for a different line.
 					lns := strings.TrimPrefix(line[i:], "MATCH:")
-					lns = lns[:strings.Index(lns, " ")]
+					lns = lns[:strings.Index(lns, " ")] //nolint:gocritic // offBy1: false positive
 					matchLine, err = strconv.Atoi(lns)
 					if err != nil {
 						t.Fatalf("Bad match line number %q at %v:%d: %v", lns, filename, ln, err)

@@ -116,7 +116,7 @@ func (r *Revive) Lint(patterns ...*LintPattern) (<-chan lint.Failure, error) {
 func (r *Revive) Format(
 	formatterName string,
 	failuresChan <-chan lint.Failure,
-) (string, int, error) {
+) (output string, exitCode int, err error) {
 	conf := r.config
 	formatChan := make(chan lint.Failure)
 	exitChan := make(chan bool)
@@ -126,18 +126,11 @@ func (r *Revive) Format(
 		return "", 0, fmt.Errorf("formatting - getting formatter: %w", err)
 	}
 
-	var (
-		output    string
-		formatErr error
-	)
-
 	go func() {
-		output, formatErr = formatter.Format(formatChan, *conf)
+		output, err = formatter.Format(formatChan, *conf)
 
 		exitChan <- true
 	}()
-
-	exitCode := 0
 
 	for failure := range failuresChan {
 		if failure.Confidence < conf.Confidence {
@@ -162,8 +155,8 @@ func (r *Revive) Format(
 	close(formatChan)
 	<-exitChan
 
-	if formatErr != nil {
-		return "", exitCode, fmt.Errorf("formatting: %w", formatErr)
+	if err != nil {
+		return "", exitCode, fmt.Errorf("formatting: %w", err)
 	}
 
 	return output, exitCode, nil
@@ -188,7 +181,7 @@ func normalizeSplit(strs []string) []string {
 
 	for _, s := range strs {
 		t := strings.Trim(s, " \t")
-		if len(t) > 0 {
+		if t != "" {
 			res = append(res, t)
 		}
 	}

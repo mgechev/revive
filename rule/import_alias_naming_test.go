@@ -21,7 +21,7 @@ func TestImportAliasNamingRule_Configure(t *testing.T) {
 			name:           "no arguments",
 			arguments:      lint.Arguments{},
 			wantErr:        nil,
-			wantAllowRegex: regexp.MustCompile("^[a-z][a-z0-9]{0,}$"),
+			wantAllowRegex: regexp.MustCompile("^[a-z][a-z0-9]{0,}$"), //nolint:gocritic // regexpSimplify: backward compatibility
 			wantDenyRegex:  nil,
 		},
 		{

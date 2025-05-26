@@ -222,7 +222,7 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, fa
 
 			for _, name := range tempNames {
 				name = strings.Trim(name, "\n")
-				if len(name) > 0 {
+				if name != "" {
 					ruleNames = append(ruleNames, name)
 				}
 			}
