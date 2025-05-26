@@ -117,6 +117,7 @@ func (r *EnforceSliceStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint.
 				return true
 			}
 
+			// TODO @SVC: replace by IsIdent(v.Fun,"make")
 			ident, ok := v.Fun.(*ast.Ident)
 			if !ok || ident.Name != "make" {
 				return true

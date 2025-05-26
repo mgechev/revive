@@ -55,6 +55,7 @@ func (w lintWaitGroupByValueRule) Visit(node ast.Node) ast.Visitor {
 }
 
 func (lintWaitGroupByValueRule) isWaitGroup(ft ast.Expr) bool {
+	// TODO @SVC: replace by isPkgDot(ft,"sync","WaitGroup")
 	se, ok := ft.(*ast.SelectorExpr)
 	if !ok {
 		return false

@@ -51,15 +51,7 @@ func (w lintContextKeyTypes) Visit(n ast.Node) ast.Visitor {
 
 func checkContextKeyType(w lintContextKeyTypes, x *ast.CallExpr) {
 	f := w.file
-	sel, ok := x.Fun.(*ast.SelectorExpr)
-	if !ok {
-		return
-	}
-	pkg, ok := sel.X.(*ast.Ident)
-	if !ok || pkg.Name != "context" {
-		return
-	}
-	if sel.Sel.Name != "WithValue" {
+	if !isPkgDot(x.Fun, "context", "WithValue") {
 		return
 	}
 
