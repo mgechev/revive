@@ -6,6 +6,7 @@ version: "2"
 linters:
   default: none
   enable:
+    - dupword
     - gocritic
     - govet
     - ineffassign
