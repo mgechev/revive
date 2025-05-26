@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/fatih/structtag"
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -390,7 +391,7 @@ func checkCompoundPropertiesOption(key, value string, fieldType ast.Expr, seenOp
 			return msgTypeMismatch, false
 		}
 	case "layout":
-		if gofmt(fieldType) != "time.Time" {
+		if astutils.GoFmt(fieldType) != "time.Time" {
 			return "layout option is only applicable to fields of type time.Time", false
 		}
 	}

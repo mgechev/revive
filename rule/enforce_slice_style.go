@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -117,7 +118,7 @@ func (r *EnforceSliceStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint.
 				return true
 			}
 
-			if !isIdent(v.Fun, "make") {
+			if !astutils.IsIdent(v.Fun, "make") {
 				return true
 			}
 

@@ -3,6 +3,7 @@ package rule
 import (
 	"go/ast"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -174,7 +175,7 @@ func (*lintUnconditionalRecursionRule) hasControlExit(node ast.Node) bool {
 		case *ast.ReturnStmt:
 			return true
 		case *ast.CallExpr:
-			if isIdent(n.Fun, "panic") {
+			if astutils.IsIdent(n.Fun, "panic") {
 				return true
 			}
 			se, ok := n.Fun.(*ast.SelectorExpr)
@@ -197,5 +198,5 @@ func (*lintUnconditionalRecursionRule) hasControlExit(node ast.Node) bool {
 		return false
 	}
 
-	return len(pick(node, isExit)) != 0
+	return len(astutils.PickNodes(node, isExit)) != 0
 }

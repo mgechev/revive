@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -111,7 +112,7 @@ func (w lintFunctionForDataRaces) Visit(node ast.Node) ast.Visitor {
 			return ok
 		}
 
-		ids := pick(funcLit.Body, selectIDs)
+		ids := astutils.PickNodes(funcLit.Body, selectIDs)
 		for _, id := range ids {
 			id := id.(*ast.Ident)
 			_, isRangeID := w.rangeIDs[id.Obj]

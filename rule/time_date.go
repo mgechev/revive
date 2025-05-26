@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/logging"
 )
@@ -61,7 +62,7 @@ func (w lintTimeDate) Visit(n ast.Node) ast.Visitor {
 	if !ok || len(ce.Args) != timeDateArity {
 		return w
 	}
-	if !isPkgDot(ce.Fun, "time", "Date") {
+	if !astutils.IsPkgDotName(ce.Fun, "time", "Date") {
 		return w
 	}
 

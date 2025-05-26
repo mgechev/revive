@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -122,7 +123,7 @@ func (w *lintUnhandledErrors) addFailure(n *ast.CallExpr) {
 func (w *lintUnhandledErrors) funcName(call *ast.CallExpr) string {
 	fn, ok := w.getFunc(call)
 	if !ok {
-		return gofmt(call.Fun)
+		return astutils.GoFmt(call.Fun)
 	}
 
 	name := fn.FullName()

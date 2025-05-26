@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -101,7 +102,7 @@ func (r *EnforceMapStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 				return true
 			}
 
-			if !isIdent(v.Fun, "make") {
+			if !astutils.IsIdent(v.Fun, "make") {
 				return true
 			}
 

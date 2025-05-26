@@ -3,6 +3,7 @@ package rule
 import (
 	"go/ast"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -21,7 +22,7 @@ func (*ErrorReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 		}
 
 		funcResults := funcDecl.Type.Results.List
-		isLastResultError := isIdent(funcResults[len(funcResults)-1].Type, "error")
+		isLastResultError := astutils.IsIdent(funcResults[len(funcResults)-1].Type, "error")
 		if isLastResultError {
 			continue
 		}
@@ -29,7 +30,7 @@ func (*ErrorReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 		// An error return parameter should be the last parameter.
 		// Flag any error parameters found before the last.
 		for _, r := range funcResults[:len(funcResults)-1] {
-			if isIdent(r.Type, "error") {
+			if astutils.IsIdent(r.Type, "error") {
 				failures = append(failures, lint.Failure{
 					Category:   lint.FailureCategoryStyle,
 					Confidence: 0.9,

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go/ast"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -70,7 +71,7 @@ type lintUncheckedTypeAssertion struct {
 }
 
 func isIgnored(e ast.Expr) bool {
-	return isIdent(e, "_")
+	return astutils.IsIdent(e, "_")
 }
 
 func isTypeSwitch(e *ast.TypeAssertExpr) bool {
@@ -172,7 +173,7 @@ func (w *lintUncheckedTypeAssertion) Visit(node ast.Node) ast.Visitor {
 }
 
 func (w *lintUncheckedTypeAssertion) addFailure(n *ast.TypeAssertExpr, why string) {
-	s := fmt.Sprintf("type cast result is unchecked in %v - %s", gofmt(n), why)
+	s := fmt.Sprintf("type cast result is unchecked in %v - %s", astutils.GoFmt(n), why)
 	w.onFailure(lint.Failure{
 		Category:   lint.FailureCategoryBadPractice,
 		Confidence: 1,

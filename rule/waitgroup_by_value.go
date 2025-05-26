@@ -3,6 +3,7 @@ package rule
 import (
 	"go/ast"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -40,7 +41,7 @@ func (w lintWaitGroupByValueRule) Visit(node ast.Node) ast.Visitor {
 
 	// Check all function parameters
 	for _, field := range fd.Type.Params.List {
-		if !isPkgDot(field.Type, "sync", "WaitGroup") {
+		if !astutils.IsPkgDotName(field.Type, "sync", "WaitGroup") {
 			continue
 		}
 

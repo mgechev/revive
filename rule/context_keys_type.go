@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/types"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -51,7 +52,7 @@ func (w lintContextKeyTypes) Visit(n ast.Node) ast.Visitor {
 
 func checkContextKeyType(w lintContextKeyTypes, x *ast.CallExpr) {
 	f := w.file
-	if !isPkgDot(x.Fun, "context", "WithValue") {
+	if !astutils.IsPkgDotName(x.Fun, "context", "WithValue") {
 		return
 	}
 

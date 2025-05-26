@@ -4,6 +4,7 @@ import (
 	"go/ast"
 	"go/token"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -40,7 +41,7 @@ func (w *lintConstantLogicalExpr) Visit(node ast.Node) ast.Visitor {
 			return w
 		}
 
-		subExpressionsAreNotEqual := gofmt(n.X) != gofmt(n.Y)
+		subExpressionsAreNotEqual := astutils.GoFmt(n.X) != astutils.GoFmt(n.Y)
 		if subExpressionsAreNotEqual {
 			return w // nothing to say
 		}

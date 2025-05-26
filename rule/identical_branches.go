@@ -3,6 +3,7 @@ package rule
 import (
 	"go/ast"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -64,12 +65,12 @@ func (*lintIdenticalBranches) identicalBranches(branches []*ast.BlockStmt) bool 
 		return false // only one branch to compare thus we return
 	}
 
-	referenceBranch := gofmt(branches[0])
+	referenceBranch := astutils.GoFmt(branches[0])
 	referenceBranchSize := len(branches[0].List)
 	for i := 1; i < len(branches); i++ {
 		currentBranch := branches[i]
 		currentBranchSize := len(currentBranch.List)
-		if currentBranchSize != referenceBranchSize || gofmt(currentBranch) != referenceBranch {
+		if currentBranchSize != referenceBranchSize || astutils.GoFmt(currentBranch) != referenceBranch {
 			return false
 		}
 	}

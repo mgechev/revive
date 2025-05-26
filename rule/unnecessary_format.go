@@ -94,7 +94,7 @@ func (w lintUnnecessaryFormat) Visit(n ast.Node) ast.Visitor {
 		return w
 	}
 
-	funcName := gofmt(ce.Fun)
+	funcName := astutils.GoFmt(ce.Fun)
 	spec, ok := formattingFuncs[funcName]
 	if !ok {
 		return w
@@ -110,7 +110,7 @@ func (w lintUnnecessaryFormat) Visit(n ast.Node) ast.Visitor {
 		return w
 	}
 
-	format := gofmt(arg)
+	format := astutils.GoFmt(arg)
 
 	if strings.Contains(format, `%`) {
 		return w

@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -47,7 +48,7 @@ func (w lintErrorf) Visit(n ast.Node) ast.Visitor {
 	if !ok || len(ce.Args) != 1 {
 		return w
 	}
-	isErrorsNew := isPkgDot(ce.Fun, "errors", "New")
+	isErrorsNew := astutils.IsPkgDotName(ce.Fun, "errors", "New")
 	var isTestingError bool
 	se, ok := ce.Fun.(*ast.SelectorExpr)
 	if ok && se.Sel.Name == "Error" {
@@ -60,7 +61,7 @@ func (w lintErrorf) Visit(n ast.Node) ast.Visitor {
 	}
 	arg := ce.Args[0]
 	ce, ok = arg.(*ast.CallExpr)
-	if !ok || !isPkgDot(ce.Fun, "fmt", "Sprintf") {
+	if !ok || !astutils.IsPkgDotName(ce.Fun, "fmt", "Sprintf") {
 		return w
 	}
 	errorfPrefix := "fmt"

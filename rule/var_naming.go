@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -267,7 +268,7 @@ func (w *lintNames) Visit(n ast.Node) ast.Visitor {
 		// Exclude naming warnings for functions that are exported to C but
 		// not exported in the Go API.
 		// See https://github.com/golang/lint/issues/144.
-		if ast.IsExported(v.Name.Name) || !isCgoExported(v) {
+		if ast.IsExported(v.Name.Name) || !astutils.IsCgoExported(v) {
 			w.check(v.Name, thing)
 		}
 
