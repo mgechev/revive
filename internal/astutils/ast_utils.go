@@ -3,6 +3,7 @@ package astutils
 
 import (
 	"go/ast"
+	"go/token"
 	"slices"
 )
 
@@ -75,4 +76,11 @@ func getFieldTypeName(typ ast.Expr) string {
 	default:
 		return "UNHANDLED_TYPE"
 	}
+}
+
+// IsStringLiteral returns true if the given expression is a string literal, false otherwise
+func IsStringLiteral(e ast.Expr) bool {
+	sl, ok := e.(*ast.BasicLit)
+
+	return ok && sl.Kind == token.STRING
 }
