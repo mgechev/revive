@@ -5,4 +5,3 @@ import (
 	"crypto/sha1" // MATCH /should not use the following blocklisted import: "crypto/sha1"/
 	"strings"
 )
-

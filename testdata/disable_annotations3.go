@@ -1,5 +1,6 @@
 // Package fix_tures is a testing package
 // tests for issue #540
+//
 //revive:disable-next-line:var-naming
 package fix_tures
 

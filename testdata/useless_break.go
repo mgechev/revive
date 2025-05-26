@@ -95,7 +95,7 @@ func UselessBreaks() {
 		break // MATCH /useless break in case clause/
 	case 2:
 		fmt.Println("bar")
-		break 
+		break
 		fmt.Println("baz")
 	case 3:
 	}

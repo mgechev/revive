@@ -12,7 +12,6 @@ func foo11() {
 	var invalid_name2 = 1 //revive:disable-line:var-naming I'm an Eiffel programmer thus I like underscores
 }
 
-
 func foo2() {
 	// 		revive:disable-next-line:var-naming
 	//revive:disable
