@@ -70,13 +70,7 @@ type lintUncheckedTypeAssertion struct {
 }
 
 func isIgnored(e ast.Expr) bool {
-	// TODO @SVC: replace by IsIdent(e,"_")
-	ident, ok := e.(*ast.Ident)
-	if !ok {
-		return false
-	}
-
-	return ident.Name == "_"
+	return isIdent(e, "_")
 }
 
 func isTypeSwitch(e *ast.TypeAssertExpr) bool {
