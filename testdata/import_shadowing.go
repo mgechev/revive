@@ -1,14 +1,14 @@
 package fixtures
 
 import (
-	ast "go/ast"
 	"bytes"
-        "crypto/md5"
+	"crypto/md5"
+	"fixtures" // Test case for issue #534
 	"fmt"
+	ast "go/ast"
 	_ "net/http"
 	"strings"
 	str "strings"
-	"fixtures" // Test case for issue #534
 )
 
 const str = "" // MATCH /The name 'str' shadows an import name/
@@ -17,9 +17,9 @@ type myAst struct {
 	ast *ast.GenDecl
 }
 
-type bytes struct {} // MATCH /The name 'bytes' shadows an import name/
+type bytes struct{} // MATCH /The name 'bytes' shadows an import name/
 
-type fmt interface {} // MATCH /The name 'fmt' shadows an import name/
+type fmt interface{} // MATCH /The name 'fmt' shadows an import name/
 
 func (ast myAst) foo() {} // MATCH /The name 'ast' shadows an import name/
 
@@ -40,6 +40,6 @@ func toto() {
 }
 
 func titi() {
-	v := md5+bytes
+	v := md5 + bytes
 	return ast
 }

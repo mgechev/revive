@@ -3,7 +3,7 @@ package golint
 
 import "net/http"
 
-//  GolintFoo is a dummy function
+// GolintFoo is a dummy function
 func GolintFoo() {} // MATCH /func name will be used as golint.GolintFoo by other packages, and that stutters; consider calling this Foo/
 
 type (
@@ -33,12 +33,11 @@ const FirstLetter = "A"
 /*Bar2 something */
 type Bar2 struct{}
 
+/* Bar3 */ // MATCH /comment on exported type Bar3 should be of the form "Bar3 ..." (with optional leading article)/
+type Bar3 struct{}
 
-/* Bar3 */  // MATCH /comment on exported type Bar3 should be of the form "Bar3 ..." (with optional leading article)/
-type Bar3 struct{}  
-
-/* BarXXX invalid */  // MATCH /comment on exported type Bar4 should be of the form "Bar4 ..." (with optional leading article)/ 
-type Bar4 struct{} 
+/* BarXXX invalid */ // MATCH /comment on exported type Bar4 should be of the form "Bar4 ..." (with optional leading article)/
+type Bar4 struct{}
 
 /*Toto2 something */
 func Toto2() {}
@@ -47,7 +46,7 @@ func Toto2() {}
 const SecondLetter = "B"
 
 // Tests for common method names
-//// Should NOT fail for methods
+// Should NOT fail for methods
 func (_) Error() string                                    { return "" }
 func (_) String() string                                   { return "" }
 func (_) ServeHTTP(w http.ResponseWriter, r *http.Request) {}
@@ -55,7 +54,7 @@ func (_) Read(p []byte) (n int, err error)                 { return 0, nil }
 func (_) Write(p []byte) (n int, err error)                { return 0, nil }
 func (_) Unwrap(err error) error                           { return nil }
 
-//// Should fail for functions
+// Should fail for functions
 
 func Error() string                                    { return "" }     // MATCH /exported function Error should have comment or be unexported/
 func String() string                                   { return "" }     // MATCH /exported function String should have comment or be unexported/
