@@ -44,7 +44,7 @@ func (ps *packages) methodNames(lp *lint.Package) pkgMethods {
 
 var allPkgs = packages{pkgs: make([]pkgMethods, 1)}
 
-// ConfusingNamingRule lints method names that differ only by capitalization
+// ConfusingNamingRule lints method names that differ only by capitalization.
 type ConfusingNamingRule struct{}
 
 // Apply applies the rule to given file.
@@ -127,7 +127,7 @@ type lintConfusingNames struct {
 
 const defaultStructName = "_" // used to map functions
 
-// getStructName of a function receiver. Defaults to defaultStructName
+// getStructName of a function receiver. Defaults to defaultStructName.
 func getStructName(r *ast.FieldList) string {
 	result := defaultStructName
 

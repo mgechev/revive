@@ -9,7 +9,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// RangeValAddress lints
+// RangeValAddress warns if address of range value is used dangerously.
 type RangeValAddress struct{}
 
 // Apply applies the rule to given file.

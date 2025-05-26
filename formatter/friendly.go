@@ -19,7 +19,7 @@ type Friendly struct {
 	Metadata lint.FormatterMetadata
 }
 
-// Name returns the name of the formatter
+// Name returns the name of the formatter.
 func (*Friendly) Name() string {
 	return "friendly"
 }

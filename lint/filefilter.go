@@ -6,12 +6,12 @@ import (
 	"strings"
 )
 
-// FileFilter - file filter to exclude some files for rule
-// supports whole
-// 1. file/dir names : pkg/mypkg/my.go,
-// 2. globs: **/*.pb.go,
-// 3. regexes (~ prefix) ~-tmp\.\d+\.go
-// 4. special test marker `TEST` - treats as `~_test\.go`
+// FileFilter filters file to exclude some files for a rule.
+// Supports the following:
+//   - File or directory names: pkg/mypkg/my.go
+//   - Globs: **/*.pb.go,
+//   - Regexes (with ~ prefix): ~-tmp\.\d+\.go
+//   - Special test marker `TEST` (treated as `~_test\.go`).
 type FileFilter struct {
 	// raw definition of filter inside config
 	raw string
@@ -23,10 +23,10 @@ type FileFilter struct {
 	matchesNothing bool
 }
 
-// ParseFileFilter - creates [FileFilter] for given raw filter
-// if empty string, it matches nothing
-// if `*`, or `~`, it matches everything
-// while regexp could be invalid, it could return it's compilation error
+// ParseFileFilter creates a [FileFilter] for the given raw filter.
+// If the string is empty, it matches nothing.
+// If the string is `*` or `~`, it matches everything.
+// If the regular expression is invalid, it returns a compilation error.
 func ParseFileFilter(rawFilter string) (*FileFilter, error) {
 	rawFilter = strings.TrimSpace(rawFilter)
 	result := new(FileFilter)
@@ -43,7 +43,7 @@ func ParseFileFilter(rawFilter string) (*FileFilter, error) {
 
 func (ff *FileFilter) String() string { return ff.raw }
 
-// MatchFileName - checks if file name matches filter
+// MatchFileName checks if the file name matches the filter.
 func (ff *FileFilter) MatchFileName(name string) bool {
 	if ff.matchesAll {
 		return true

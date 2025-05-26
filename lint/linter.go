@@ -25,7 +25,7 @@ type Linter struct {
 	fileReadTokens chan struct{}
 }
 
-// New creates a new Linter
+// New creates a new Linter.
 func New(reader ReadFile, maxOpenFiles int) Linter {
 	var fileReadTokens chan struct{}
 	if maxOpenFiles > 0 {
@@ -215,7 +215,7 @@ func isGenerated(src []byte) bool {
 	return false
 }
 
-// addInvalidFileFailure adds a failure for an invalid formatted file
+// addInvalidFileFailure adds a failure for an invalid formatted file.
 func addInvalidFileFailure(filename, errStr string, failures chan Failure) {
 	position := getPositionInvalidFile(filename, errStr)
 	failures <- Failure{
@@ -226,12 +226,14 @@ func addInvalidFileFailure(filename, errStr string, failures chan Failure) {
 	}
 }
 
-// errPosRegexp matches with an NewFile error message
-// i.e. :  corrupted.go:10:4: expected '}', found 'EOF
-// first group matches the line and the second group, the column
+// errPosRegexp matches with a NewFile error message:
+//
+//	corrupted.go:10:4: expected '}', found 'EOF
+//
+// The first group matches the line, and the second group matches the column.
 var errPosRegexp = regexp.MustCompile(`.*:(\d*):(\d*):.*$`)
 
-// getPositionInvalidFile gets the position of the error in an invalid file
+// getPositionInvalidFile gets the position of the error in an invalid file.
 func getPositionInvalidFile(filename, s string) FailurePosition {
 	pos := errPosRegexp.FindStringSubmatch(s)
 	if len(pos) < 3 {

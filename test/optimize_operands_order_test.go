@@ -7,7 +7,7 @@ import (
 	"github.com/mgechev/revive/rule"
 )
 
-// Test that left and right side of Binary operators (only AND, OR) are swapable
+// Test that left and right side of Binary operators (only AND, OR) are swapable.
 func TestOptimizeOperandsOrder(t *testing.T) {
 	testRule(t, "optimize_operands_order", &rule.OptimizeOperandsOrderRule{}, &lint.RuleConfig{})
 }

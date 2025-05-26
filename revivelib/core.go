@@ -68,7 +68,7 @@ func New(
 	}, nil
 }
 
-// Lint the included patterns, skipping excluded ones
+// Lint the included patterns, skipping excluded ones.
 func (r *Revive) Lint(patterns ...*LintPattern) (<-chan lint.Failure, error) {
 	includePatterns := []string{}
 	excludePatterns := []string{}

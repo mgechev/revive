@@ -8,7 +8,7 @@ import (
 )
 
 // CommentSpacingsRule check whether there is a space between
-// the comment symbol( // ) and the start of the comment text
+// the comment symbol( // ) and the start of the comment text.
 type CommentSpacingsRule struct {
 	allowList []string
 }

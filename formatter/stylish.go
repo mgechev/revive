@@ -13,7 +13,7 @@ type Stylish struct {
 	Metadata lint.FormatterMetadata
 }
 
-// Name returns the name of the formatter
+// Name returns the name of the formatter.
 func (*Stylish) Name() string {
 	return "stylish"
 }

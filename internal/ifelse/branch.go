@@ -58,7 +58,7 @@ func StmtBranch(stmt ast.Stmt) Branch {
 	return Regular.Branch()
 }
 
-// String returns a brief string representation
+// String returns a brief string representation.
 func (b Branch) String() string {
 	switch b.BranchKind {
 	case Empty:
@@ -71,7 +71,7 @@ func (b Branch) String() string {
 	return fmt.Sprintf("{ ... %v }", b.BranchKind)
 }
 
-// LongString returns a longer form string representation
+// LongString returns a longer form string representation.
 func (b Branch) LongString() string {
 	switch b.BranchKind {
 	case Panic, Exit:
@@ -80,7 +80,7 @@ func (b Branch) LongString() string {
 	return b.BranchKind.LongString()
 }
 
-// HasDecls returns whether the branch has any top-level declarations
+// HasDecls returns whether the branch has any top-level declarations.
 func (b Branch) HasDecls() bool {
 	for _, stmt := range b.block {
 		switch stmt := stmt.(type) {
@@ -95,7 +95,7 @@ func (b Branch) HasDecls() bool {
 	return false
 }
 
-// IsShort returns whether the branch is empty or consists of a single statement
+// IsShort returns whether the branch is empty or consists of a single statement.
 func (b Branch) IsShort() bool {
 	switch len(b.block) {
 	case 0:

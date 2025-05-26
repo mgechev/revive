@@ -27,7 +27,7 @@ var (
 	commit  = defaultCommit
 	date    = defaultDate
 	builtBy = defaultBuilder
-	// AppFs is used to operations related with user config files
+	// AppFs is used for operations related to user config files.
 	AppFs = afero.NewOsFs()
 )
 
@@ -38,8 +38,8 @@ func fail(err string) {
 
 // RunRevive runs the CLI for revive.
 func RunRevive(extraRules ...revivelib.ExtraRule) {
-	// move parsing flags outside of init() otherwise tests don't works properly
-	// more info: https://github.com/golang/go/issues/46869#issuecomment-865695953
+	// Move parsing flags outside of init(); otherwise, tests don't work properly.
+	// More info: https://github.com/golang/go/issues/46869#issuecomment-865695953
 	initConfig()
 
 	if versionFlag {
@@ -175,7 +175,7 @@ func initConfig() {
 	flag.Parse()
 }
 
-// getVersion returns build info (version, commit, date and builtBy)
+// getVersion returns build info (version, commit, date, and builtBy).
 func getVersion(builtBy, date, commit, version string) string {
 	var buildInfo string
 	if date != defaultDate && builtBy != defaultBuilder {

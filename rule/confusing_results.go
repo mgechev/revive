@@ -7,7 +7,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ConfusingResultsRule lints given function declarations
+// ConfusingResultsRule lints given function declarations.
 type ConfusingResultsRule struct{}
 
 // Apply applies the rule to given file.
