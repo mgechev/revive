@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -63,20 +64,20 @@ func (w lintOptimizeOperandsOrderExpr) Visit(node ast.Node) ast.Visitor {
 	}
 
 	// check if the left sub-expression contains a function call
-	nodes := pick(binExpr.X, isCaller)
+	nodes := astutils.PickNodes(binExpr.X, isCaller)
 	if len(nodes) < 1 {
 		return w
 	}
 
 	// check if the right sub-expression does not contain a function call
-	nodes = pick(binExpr.Y, isCaller)
+	nodes = astutils.PickNodes(binExpr.Y, isCaller)
 	if len(nodes) > 0 {
 		return w
 	}
 
 	newExpr := ast.BinaryExpr{X: binExpr.Y, Y: binExpr.X, Op: binExpr.Op}
 	w.onFailure(lint.Failure{
-		Failure:    fmt.Sprintf("for better performance '%v' might be rewritten as '%v'", gofmt(binExpr), gofmt(&newExpr)),
+		Failure:    fmt.Sprintf("for better performance '%v' might be rewritten as '%v'", astutils.GoFmt(binExpr), astutils.GoFmt(&newExpr)),
 		Node:       node,
 		Category:   lint.FailureCategoryOptimization,
 		Confidence: 0.3,

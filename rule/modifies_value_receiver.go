@@ -5,6 +5,7 @@ import (
 	"go/token"
 	"strings"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -116,7 +117,7 @@ func (r *ModifiesValRecRule) findReturnReceiverStatements(receiverName string, t
 		return false
 	}
 
-	return pick(target, finder)
+	return astutils.PickNodes(target, finder)
 }
 
 func (r *ModifiesValRecRule) mustSkip(receiver *ast.Field, pkg *lint.Package) bool {
@@ -179,5 +180,5 @@ func (r *ModifiesValRecRule) getReceiverModifications(receiverName string, funcB
 		return false
 	}
 
-	return pick(funcBody, receiverModificationFinder)
+	return astutils.PickNodes(funcBody, receiverModificationFinder)
 }

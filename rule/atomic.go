@@ -5,6 +5,7 @@ import (
 	"go/token"
 	"go/types"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -76,9 +77,9 @@ func (w atomic) Visit(node ast.Node) ast.Visitor {
 			broken := false
 
 			if uarg, ok := arg.(*ast.UnaryExpr); ok && uarg.Op == token.AND {
-				broken = gofmt(left) == gofmt(uarg.X)
+				broken = astutils.GoFmt(left) == astutils.GoFmt(uarg.X)
 			} else if star, ok := left.(*ast.StarExpr); ok {
-				broken = gofmt(star.X) == gofmt(arg)
+				broken = astutils.GoFmt(star.X) == astutils.GoFmt(arg)
 			}
 
 			if broken {

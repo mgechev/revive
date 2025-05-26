@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"regexp"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -122,7 +123,7 @@ func (w lintUnusedParamRule) Visit(node ast.Node) ast.Visitor {
 
 		return false
 	}
-	_ = pick(funcBody, fselect)
+	_ = astutils.PickNodes(funcBody, fselect)
 
 	for _, p := range funcType.Params.List {
 		for _, n := range p.Names {

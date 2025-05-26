@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -66,7 +67,7 @@ func (l *lintTimeEqual) Visit(node ast.Node) ast.Visitor {
 		Category:   lint.FailureCategoryTime,
 		Confidence: 1,
 		Node:       node,
-		Failure:    fmt.Sprintf("use %s%s.Equal(%s) instead of %q operator", negateStr, gofmt(expr.X), gofmt(expr.Y), expr.Op),
+		Failure:    fmt.Sprintf("use %s%s.Equal(%s) instead of %q operator", negateStr, astutils.GoFmt(expr.X), astutils.GoFmt(expr.Y), expr.Op),
 	})
 
 	return l

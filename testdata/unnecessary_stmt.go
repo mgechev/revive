@@ -1,5 +1,11 @@
 package fixtures
 
+import (
+	ast "go/ast"
+
+	"github.com/mgechev/revive/lint"
+)
+
 func foo(a, b, c, d int) {
 	switch n := node.(type) { // MATCH /switch with only one case can be replaced by an if-then/
 	case *ast.SwitchStmt:
@@ -7,7 +13,7 @@ func foo(a, b, c, d int) {
 			_, ok := n.(*ast.CaseClause)
 			return ok
 		}
-		cases := pick(n.Body, caseSelector, nil)
+		cases := astutils.PickNodes(n.Body, caseSelector, nil)
 		if len(cases) == 1 {
 			cs, ok := cases[0].(*ast.CaseClause)
 			if ok && len(cs.List) == 1 {

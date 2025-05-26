@@ -7,6 +7,7 @@ import (
 	"go/types"
 	"strings"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -79,14 +80,14 @@ func (w *lintVarDeclarations) Visit(node ast.Node) ast.Visitor {
 		rhs := v.Values[0]
 		// An underscore var appears in a common idiom for compile-time interface satisfaction,
 		// as in "var _ Interface = (*Concrete)(nil)".
-		if isIdent(v.Names[0], "_") {
+		if astutils.IsIdent(v.Names[0], "_") {
 			return nil
 		}
 		// If the RHS is a isZero value, suggest dropping it.
 		isZero := false
 		if lit, ok := rhs.(*ast.BasicLit); ok {
 			isZero = isZeroValue(lit.Value, v.Type)
-		} else if isIdent(rhs, "nil") {
+		} else if astutils.IsIdent(rhs, "nil") {
 			isZero = true
 		}
 		if isZero {
@@ -122,7 +123,7 @@ func (w *lintVarDeclarations) Visit(node ast.Node) ast.Visitor {
 			return nil
 		}
 		// If the RHS is an untyped const, only warn if the LHS type is its default type.
-		if defType, ok := w.file.IsUntypedConst(rhs); ok && !isIdent(v.Type, defType) {
+		if defType, ok := w.file.IsUntypedConst(rhs); ok && !astutils.IsIdent(v.Type, defType) {
 			return nil
 		}
 

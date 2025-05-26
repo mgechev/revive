@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -26,7 +27,7 @@ func (*FlagParamRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 
 		boolParams := map[string]struct{}{}
 		for _, param := range fd.Type.Params.List {
-			if !isIdent(param.Type, "bool") {
+			if !astutils.IsIdent(param.Type, "bool") {
 				continue
 			}
 
@@ -77,7 +78,7 @@ func (w conditionVisitor) Visit(node ast.Node) ast.Visitor {
 		return w.idents[ident.Name] == struct{}{}
 	}
 
-	uses := pick(ifStmt.Cond, findUsesOfIdents)
+	uses := astutils.PickNodes(ifStmt.Cond, findUsesOfIdents)
 
 	if len(uses) < 1 {
 		return w

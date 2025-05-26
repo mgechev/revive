@@ -6,6 +6,7 @@ import (
 	"go/token"
 	"strings"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -56,7 +57,7 @@ func (w lintErrors) Visit(_ ast.Node) ast.Visitor {
 			if !ok {
 				continue
 			}
-			if !isPkgDot(ce.Fun, "errors", "New") && !isPkgDot(ce.Fun, "fmt", "Errorf") {
+			if !astutils.IsPkgDotName(ce.Fun, "errors", "New") && !astutils.IsPkgDotName(ce.Fun, "fmt", "Errorf") {
 				continue
 			}
 

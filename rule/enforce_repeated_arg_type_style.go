@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -130,8 +131,8 @@ func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, _ lint.Argument
 				if fn.Type.Params != nil {
 					var prevType ast.Expr
 					for _, field := range fn.Type.Params.List {
-						prevTypeStr := gofmt(prevType)
-						currentTypeStr := gofmt(field.Type)
+						prevTypeStr := astutils.GoFmt(prevType)
+						currentTypeStr := astutils.GoFmt(field.Type)
 						if currentTypeStr == prevTypeStr {
 							failures = append(failures, lint.Failure{
 								Confidence: 1,
@@ -163,8 +164,8 @@ func (r *EnforceRepeatedArgTypeStyleRule) Apply(file *lint.File, _ lint.Argument
 				if fn.Type.Results != nil {
 					var prevType ast.Expr
 					for _, field := range fn.Type.Results.List {
-						prevTypeStr := gofmt(prevType)
-						currentTypeStr := gofmt(field.Type)
+						prevTypeStr := astutils.GoFmt(prevType)
+						currentTypeStr := astutils.GoFmt(field.Type)
 						if field.Names != nil && currentTypeStr == prevTypeStr {
 							failures = append(failures, lint.Failure{
 								Confidence: 1,

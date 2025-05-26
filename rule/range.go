@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"strings"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -43,7 +44,7 @@ func (w *lintRanges) Visit(node ast.Node) ast.Visitor {
 		// for x = range m { ... }
 		return w // single var form
 	}
-	if !isIdent(rs.Value, "_") {
+	if !astutils.IsIdent(rs.Value, "_") {
 		// for ?, y = range m { ... }
 		return w
 	}
