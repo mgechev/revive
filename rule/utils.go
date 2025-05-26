@@ -97,11 +97,13 @@ func (p picker) Visit(node ast.Node) ast.Visitor {
 	return p
 }
 
+var gofmtConfig = &printer.Config{Tabwidth: 8}
+
 // gofmt returns a string representation of an AST subtree.
 func gofmt(x any) string {
 	buf := bytes.Buffer{}
 	fs := token.NewFileSet()
-	printer.Fprint(&buf, fs, x)
+	gofmtConfig.Fprint(&buf, fs, x)
 	return buf.String()
 }
 
