@@ -17,11 +17,7 @@ func (*CallToGCRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 		failures = append(failures, failure)
 	}
 
-	gcTriggeringFunctions := map[string]map[string]bool{
-		"runtime": {"GC": true},
-	}
-
-	w := lintCallToGC{onFailure, gcTriggeringFunctions}
+	w := lintCallToGC{onFailure}
 	ast.Walk(w, file.AST)
 
 	return failures
@@ -33,8 +29,7 @@ func (*CallToGCRule) Name() string {
 }
 
 type lintCallToGC struct {
-	onFailure             func(lint.Failure)
-	gcTriggeringFunctions map[string]map[string]bool
+	onFailure func(lint.Failure)
 }
 
 func (w lintCallToGC) Visit(node ast.Node) ast.Visitor {
