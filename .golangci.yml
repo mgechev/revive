@@ -28,6 +28,8 @@ linters:
       disable:
         - fieldalignment
         - shadow
+    misspell:
+      locale: US
     nolintlint:
       allow-unused: true
       require-explanation: true
