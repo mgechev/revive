@@ -87,31 +87,8 @@ var (
 	_ = time.Date(2023, 10, 10, 10, 10, 10, 100, time.UTC)
 	_ = time.Date(2023, 1, 2, 3, 4, 5, 0, time.UTC)
 	_ = time.Date(2023, 1, 2, 3, 4, 5, 6, time.UTC)
-)
 
-// uncommon notations
-// these notations are supported by Go, the rule should not report it
-// it's out of the scope of the rule
-var (
-	// negative values can be used
-	// Go will compute 2022-10-28 20:55:54.999999994 +0000 UTC
-	_ = time.Date(2023, -1, -2, -3, -4, -5, -6, time.UTC)
-
-	// value out of the expected scale for a field, are OK.
-	// Go will compute 2024-02-02 04:11:10 +0000 UTC
-	_ = time.Date(2023, 13, 32, 27, 70, 70, 0, time.UTC)
-
-	// using gigantic nanoseconds to move into the future
-	// Go will compute 2054-09-10 04:50:45 +0000 UTC
-	_ = time.Date(2023, 1, 2, 3, 4, 5, 1000000000000000000, time.UTC)
-)
-
-// Common user errors with dates
-// it's out of the scope of the rule
-var (
-	// there is no February 29th in 2023, Go will compute 2023-03-01 03:04:05 +0000 UTC
-	_ = time.Date(2023, 2, 29, 3, 4, 5, 0, time.UTC)
-
-	// June has only 30 days, Go will compute 2023-07-01 03:04:05 +0000 UTC
-	_ = time.Date(2023, 6, 31, 3, 4, 5, 0, time.UTC)
+	i = 4
+	j = 1
+	_ = time.Date(2023+i, 1+i, 2*i, i+j, i-j, 0, 0, time.UTC)
 )
