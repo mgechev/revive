@@ -1065,9 +1065,25 @@ _Description_: Reports bad usage of `time.Date`.
 
 _Configuration_: N/A
 
-_Example_:
+_Examples_:
 
-Here the leading zeros are defining integers with octal notation
+- Invalid dates reporting:
+
+  - 0 for the month or day argument
+  - out of bounds argument for the month (12), day (31), hour (23), minute (59), or seconds (59)
+  - an invalid date: 31st of June, 29th of February in 2023, ...
+
+- Non-decimal integers are used as arguments
+
+  This includes:
+
+  - leading zero notation like using 00 for hours, minutes, and seconds.
+  - octal notation 0o1, 0o0 that are often caused by using gofumpt on leading zero notation.
+  - padding zeros such as 00123456 that are source of bugs.
+  - ... and some other use cases.
+
+<details>
+<summary>More information about what is detected and reported</summary>
 
 ```go
 import "time"
@@ -1113,6 +1129,8 @@ import "time"
 
 var _ = time.Date(2023, 01, 02, 03, 04, 00, 0, time.UTC)
 ```
+
+</details>
 
 ## time-equal
 
