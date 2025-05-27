@@ -1,17 +1,17 @@
 package rule
 
 import (
+	"fmt"
 	"go/ast"
 
-	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
-// UseFmtPrint lints calls to print and println.
-type UseFmtPrint struct{}
+// UseFmtPrintRule lints calls to print and println.
+type UseFmtPrintRule struct{}
 
 // Apply applies the rule to given file.
-func (*UseFmtPrint) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*UseFmtPrintRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
@@ -24,7 +24,7 @@ func (*UseFmtPrint) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 }
 
 // Name returns the rule name.
-func (*UseFmtPrint) Name() string {
+func (*UseFmtPrintRule) Name() string {
 	return "use-fmt-print"
 }
 
@@ -38,15 +38,26 @@ func (w lintUseFmtPrint) Visit(node ast.Node) ast.Visitor {
 		return w // nothing to do, the node is not a call
 	}
 
-	if !astutils.IsIdent(ce.Fun, "println") && !astutils.IsIdent(ce.Fun, "print") {
+	id, ok := (ce.Fun).(*ast.Ident)
+	if !ok {
+		return nil
+	}
+
+	name := id.Name
+	replacement := "Println"
+	switch name {
+	default:
 		return nil // nothing to do, the call is not println(...) nor print(...)
+	case "println":
+	case "print":
+		replacement = "Print"
 	}
 
 	w.onFailure(lint.Failure{
 		Confidence: 1,
 		Node:       node,
 		Category:   lint.FailureCategoryBadPractice,
-		Failure:    "avoid using built in printing functions, use fmt.Print or fmt.Println",
+		Failure:    fmt.Sprintf(`avoid using built-in function %q, use "fmt.%s" instead`, name, replacement),
 	})
 
 	return w
