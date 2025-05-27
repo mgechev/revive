@@ -1073,7 +1073,7 @@ _Examples_:
   - out of bounds argument for the month (12), day (31), hour (23), minute (59), or seconds (59)
   - an invalid date: 31st of June, 29th of February in 2023, ...
 
-- Non-decimal integers used are used as arguments
+- Non-decimal integers are used as arguments
 
   This includes:
 

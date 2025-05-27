@@ -141,10 +141,8 @@ func (w lintTimeDate) Visit(n ast.Node) ast.Visitor {
 				parsedDate.month = parsedValue
 
 				if parsedValue == 0 {
-					// this is a special case, where the month is 0
-					// Go will ignore it and use January,
-					// but we can still report it as a failure
-
+					// Special case: month is 0.
+					// Go treats it as January, but we still report it as a failure.
 					w.onFailure(lint.Failure{
 						Category:   "time",
 						Node:       arg,
@@ -158,10 +156,8 @@ func (w lintTimeDate) Visit(n ast.Node) ast.Visitor {
 
 				switch {
 				case parsedValue == 0:
-					// this is a special case, where the day is 0
-					// Go will ignore it and use the first day of the month,
-					// but we can still report it as a failure
-
+					// Special case: day is 0.
+					// Go treats it as the first day of the month, but we still report it as a failure.
 					w.onFailure(lint.Failure{
 						Category:   "time",
 						Node:       arg,
@@ -170,7 +166,7 @@ func (w lintTimeDate) Visit(n ast.Node) ast.Visitor {
 					})
 					continue
 
-				// the month is valid, we can check the day
+				// the month is valid, check the day
 				case parsedDate.month >= 1 && parsedDate.month <= 12:
 					month := time.Month(parsedDate.month)
 
@@ -303,8 +299,8 @@ func (w *lintTimeDate) checkArgSign(arg ast.Node, fieldName timeDateArgument) (*
 	// We can have an unary expression like -1, -a, +a, +1...
 	node, ok := arg.(*ast.UnaryExpr)
 	if !ok {
-		// Any other expression is not supported
-		// it could be something like this:
+		// Any other expression is not supported.
+		// It could be something like this:
 		// time.Date(2023, 2 * a, 3 + b, 4, 5, 6, 7, time.UTC)
 		return nil, false
 	}
@@ -352,7 +348,7 @@ func (w *lintTimeDate) checkArgSign(arg ast.Node, fieldName timeDateArgument) (*
 			),
 		})
 	default:
-		// Other unary expressions are not supported
+		// Other unary expressions are not supported.
 		//
 		// It could be something like this:
 		// ^1, ^0x1234
@@ -364,7 +360,7 @@ func (w *lintTimeDate) checkArgSign(arg ast.Node, fieldName timeDateArgument) (*
 }
 
 // isLeapYear checks if the year is a leap year.
-// this is used to check if the date is valid according to Go implementation.
+// This is used to check if the date is valid according to Go implementation.
 func (lintTimeDate) isLeapYear(year int64) bool {
 	// We cannot use the classic formula of
 	// year%4 == 0 && (year%100 != 0 || year%400 == 0)
