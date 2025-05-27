@@ -12,6 +12,7 @@ linters:
     - misspell
     - nolintlint
     - revive
+    - thelper
     - staticcheck
     - unused
 
