@@ -21,7 +21,7 @@ type RuleConfig struct {
 	excludeFilters []*FileFilter
 }
 
-// Initialize - should be called after reading from TOML file
+// Initialize should be called after reading from TOML file.
 func (rc *RuleConfig) Initialize() error {
 	for _, f := range rc.Exclude {
 		ff, err := ParseFileFilter(f)
@@ -36,7 +36,7 @@ func (rc *RuleConfig) Initialize() error {
 // RulesConfig defines the config for all rules.
 type RulesConfig = map[string]RuleConfig
 
-// MustExclude - checks if given filename `name` must be excluded
+// MustExclude checks if given filename `name` must be excluded.
 func (rc *RuleConfig) MustExclude(name string) bool {
 	for _, exclude := range rc.excludeFilters {
 		if exclude.MatchFileName(name) {

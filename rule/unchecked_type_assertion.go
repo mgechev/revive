@@ -136,7 +136,7 @@ func (w *lintUncheckedTypeAssertion) handleAssignment(n *ast.AssignStmt) {
 	}
 }
 
-// handles "return foo(.*bar)" - one of them is enough to fail as golang does not forward the type cast tuples in return statements
+// handles "return foo(.*bar)" - one of them is enough to fail as golang does not forward the type cast tuples in return statements.
 func (w *lintUncheckedTypeAssertion) handleReturn(n *ast.ReturnStmt) {
 	for _, r := range n.Results {
 		w.requireNoTypeAssert(r)

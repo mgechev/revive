@@ -8,6 +8,7 @@ linters:
   enable:
     - dupword
     - gocritic
+    - godot
     - govet
     - ineffassign
     - misspell

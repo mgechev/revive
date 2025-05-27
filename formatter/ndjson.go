@@ -13,7 +13,7 @@ type NDJSON struct {
 	Metadata lint.FormatterMetadata
 }
 
-// Name returns the name of the formatter
+// Name returns the name of the formatter.
 func (*NDJSON) Name() string {
 	return "ndjson"
 }

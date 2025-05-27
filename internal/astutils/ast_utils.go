@@ -15,7 +15,7 @@ import (
 // by the given name, parameters types and return types; false otherwise.
 //
 // Example: to check if a function declaration has the signature Foo(int, string) (bool,error)
-// call to FuncSignatureIs(funcDecl,"Foo",[]string{"int","string"},[]string{"bool","error"})
+// call to FuncSignatureIs(funcDecl,"Foo",[]string{"int","string"},[]string{"bool","error"}).
 func FuncSignatureIs(funcDecl *ast.FuncDecl, wantName string, wantParametersTypes, wantResultsTypes []string) bool {
 	if wantName != funcDecl.Name.String() {
 		return false // func name doesn't match expected one
@@ -32,7 +32,7 @@ func FuncSignatureIs(funcDecl *ast.FuncDecl, wantName string, wantParametersType
 }
 
 // funcParametersSignatureIs returns true if the function has parameters of the given type and order,
-// false otherwise
+// false otherwise.
 func funcParametersSignatureIs(funcDecl *ast.FuncDecl, wantParametersTypes []string) bool {
 	funcParametersTypes := GetTypeNames(funcDecl.Type.Params)
 
@@ -117,7 +117,7 @@ func IsPkgDotName(expr ast.Expr, pkg, name string) bool {
 }
 
 // PickNodes yields a list of nodes by picking them from a sub-ast with root node n.
-// Nodes are selected by applying the selector function
+// Nodes are selected by applying the selector function.
 func PickNodes(n ast.Node, selector func(n ast.Node) bool) []ast.Node {
 	var result []ast.Node
 

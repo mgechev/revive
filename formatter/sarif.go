@@ -15,7 +15,7 @@ type Sarif struct {
 	Metadata lint.FormatterMetadata
 }
 
-// Name returns the name of the formatter
+// Name returns the name of the formatter.
 func (*Sarif) Name() string {
 	return "sarif"
 }

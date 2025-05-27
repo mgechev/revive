@@ -12,7 +12,7 @@ const logFile = "revive.log"
 var logger *slog.Logger
 
 // GetLogger retrieves an instance of an application logger which outputs
-// to a file if the debug flag is enabled
+// to a file if the debug flag is enabled.
 func GetLogger() (*slog.Logger, error) {
 	if logger != nil {
 		return logger, nil

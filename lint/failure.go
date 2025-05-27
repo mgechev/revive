@@ -53,7 +53,7 @@ const (
 type FailureCategory string
 
 const (
-	// SeverityWarning declares failures of type warning
+	// SeverityWarning declares failures of type warning.
 	SeverityWarning = "warning"
 	// SeverityError declares failures of type error.
 	SeverityError = "error"
@@ -62,7 +62,7 @@ const (
 // Severity is the type for the failure types.
 type Severity string
 
-// FailurePosition returns the failure position
+// FailurePosition returns the failure position.
 type FailurePosition struct {
 	Start token.Position
 	End   token.Position

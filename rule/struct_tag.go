@@ -38,7 +38,6 @@ const (
 
 type tagChecker func(checkCtx *checkContext, tag *structtag.Tag, fieldType ast.Expr) (message string, succeeded bool)
 
-// populate tag checkers map
 var tagCheckers = map[tagKey]tagChecker{
 	keyASN1:         checkASN1Tag,
 	keyBSON:         checkBSONTag,
@@ -757,8 +756,9 @@ var validateSingleOptions = map[string]struct{}{
 	"uuid5_rfc4122":                 {},
 }
 
-// These are options that are used in expressions of the form
-// <option> = <RHS>
+// These are options that are used in expressions of the form:
+//
+//	<option> = <RHS>
 var validateLHS = map[string]struct{}{
 	"contains":             {},
 	"containsany":          {},

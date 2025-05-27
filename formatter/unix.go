@@ -15,7 +15,7 @@ type Unix struct {
 	Metadata lint.FormatterMetadata
 }
 
-// Name returns the name of the formatter
+// Name returns the name of the formatter.
 func (*Unix) Name() string {
 	return "unix"
 }

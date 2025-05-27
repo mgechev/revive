@@ -50,12 +50,12 @@ func (r *BannedCharsRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failur
 	return failures
 }
 
-// Name returns the rule name
+// Name returns the rule name.
 func (*BannedCharsRule) Name() string {
 	return bannedCharsRuleName
 }
 
-// getBannedCharsList converts arguments into the banned characters list
+// getBannedCharsList converts arguments into the banned characters list.
 func (r *BannedCharsRule) getBannedCharsList(args lint.Arguments) ([]string, error) {
 	var bannedChars []string
 	for _, char := range args {
@@ -74,7 +74,7 @@ type lintBannedCharsRule struct {
 	onFailure   func(lint.Failure)
 }
 
-// Visit checks for each node if an identifier contains banned characters
+// Visit checks for each node if an identifier contains banned characters.
 func (w lintBannedCharsRule) Visit(node ast.Node) ast.Visitor {
 	n, ok := node.(*ast.Ident)
 	if !ok {

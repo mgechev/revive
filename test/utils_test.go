@@ -17,7 +17,7 @@ import (
 )
 
 // configureRule configures the given rule with the given configuration
-// if the rule implements the ConfigurableRule interface
+// if the rule implements the ConfigurableRule interface.
 func configureRule(t *testing.T, rule lint.Rule, arguments lint.Arguments) {
 	t.Helper()
 
@@ -151,7 +151,7 @@ type instruction struct {
 	Confidence  float64 // confidence level
 }
 
-// JSONInstruction structure used when we parse json object instead of classic MATCH string
+// JSONInstruction structure used when we parse json object instead of classic MATCH string.
 type JSONInstruction struct {
 	Match      string  `json:"MATCH"`
 	Category   string  `json:"Category"`
@@ -277,7 +277,7 @@ func srcLine(src []byte, p token.Position) string {
 	return string(src[lo:hi])
 }
 
-// TestLine tests srcLine function
+// TestLine tests srcLine function.
 func TestLine(t *testing.T) {
 	tests := []struct {
 		src    string
@@ -319,7 +319,7 @@ func exportedType(typ types.Type) bool {
 	return true
 }
 
-// TestExportedType tests exportedType function
+// TestExportedType tests exportedType function.
 func TestExportedType(t *testing.T) {
 	tests := []struct {
 		typString string

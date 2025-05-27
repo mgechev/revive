@@ -66,7 +66,7 @@ type importShadowing struct {
 	skipIdents       map[*ast.Ident]struct{}
 }
 
-// Visit visits AST nodes and checks if id nodes (ast.Ident) shadow an import name
+// Visit visits AST nodes and checks if id nodes (ast.Ident) shadow an import name.
 func (w importShadowing) Visit(n ast.Node) ast.Visitor {
 	switch n := n.(type) {
 	case *ast.AssignStmt:

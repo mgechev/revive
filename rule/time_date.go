@@ -41,7 +41,7 @@ type lintTimeDate struct {
 }
 
 var (
-	// timeDateArgumentNames are the names of the arguments of time.Date
+	// timeDateArgumentNames are the names of the arguments of time.Date.
 	timeDateArgumentNames = []string{
 		"year",
 		"month",
@@ -53,7 +53,7 @@ var (
 		"timezone",
 	}
 
-	// timeDateArity is the number of arguments of time.Date
+	// timeDateArity is the number of arguments of time.Date.
 	timeDateArity = len(timeDateArgumentNames)
 )
 

@@ -34,13 +34,13 @@ var (
 	trueValue  = 1
 	falseValue = 2
 
-	// Go115 is a constant representing the Go version 1.15
+	// Go115 is a constant representing the Go version 1.15.
 	Go115 = goversion.Must(goversion.NewVersion("1.15"))
-	// Go121 is a constant representing the Go version 1.21
+	// Go121 is a constant representing the Go version 1.21.
 	Go121 = goversion.Must(goversion.NewVersion("1.21"))
-	// Go122 is a constant representing the Go version 1.22
+	// Go122 is a constant representing the Go version 1.22.
 	Go122 = goversion.Must(goversion.NewVersion("1.22"))
-	// Go124 is a constant representing the Go version 1.24
+	// Go124 is a constant representing the Go version 1.24.
 	Go124 = goversion.Must(goversion.NewVersion("1.24"))
 )
 
@@ -73,7 +73,7 @@ func (p *Package) IsMain() bool {
 	return false
 }
 
-// TypesPkg yields information on this package
+// TypesPkg yields information on this package.
 func (p *Package) TypesPkg() *types.Package {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
@@ -81,7 +81,7 @@ func (p *Package) TypesPkg() *types.Package {
 	return p.typesPkg
 }
 
-// TypesInfo yields type information of this package identifiers
+// TypesInfo yields type information of this package identifiers.
 func (p *Package) TypesInfo() *types.Info {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
@@ -89,7 +89,7 @@ func (p *Package) TypesInfo() *types.Info {
 	return p.typesInfo
 }
 
-// Sortable yields a map of sortable types in this package
+// Sortable yields a map of sortable types in this package.
 func (p *Package) Sortable() map[string]bool {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
@@ -141,7 +141,7 @@ func (p *Package) TypeCheck() error {
 }
 
 // check function encapsulates the call to go/types.Config.Check method and
-// recovers if the called method panics (see issue #59)
+// recovers if the called method panics (see issue #59).
 func check(config *types.Config, n string, fset *token.FileSet, astFiles []*ast.File, info *types.Info) (p *types.Package, err error) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -213,7 +213,7 @@ func (p *Package) lint(rules []Rule, config Config, failures chan Failure) error
 	return eg.Wait()
 }
 
-// IsAtLeastGoVersion returns true if the Go version for this package is v or higher, false otherwise
+// IsAtLeastGoVersion returns true if the Go version for this package is v or higher, false otherwise.
 func (p *Package) IsAtLeastGoVersion(v *goversion.Version) bool {
 	p.mu.RLock()
 	defer p.mu.RUnlock()

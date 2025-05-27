@@ -35,7 +35,7 @@ func srcLine(src []byte, p token.Position) string {
 	return string(src[lo:hi])
 }
 
-// checkNumberOfArguments fails if the given number of arguments is not, at least, the expected one
+// checkNumberOfArguments fails if the given number of arguments is not, at least, the expected one.
 func checkNumberOfArguments(expected int, args lint.Arguments, ruleName string) error {
 	if len(args) < expected {
 		return fmt.Errorf("not enough arguments for %s rule, expected %d, got %d. Please check the rule's documentation", ruleName, expected, len(args))
@@ -50,7 +50,7 @@ func isRuleOption(arg, name string) bool {
 
 // normalizeRuleOption returns an option name from the argument. It is lowercased and without hyphens.
 //
-// Example: normalizeRuleOption("allowTypesBefore"), normalizeRuleOption("allow-types-before") -> "allowtypesbefore"
+// Example: normalizeRuleOption("allowTypesBefore"), normalizeRuleOption("allow-types-before") -> "allowtypesbefore".
 func normalizeRuleOption(arg string) string {
 	return strings.ToLower(strings.ReplaceAll(arg, "-", ""))
 }
@@ -66,7 +66,7 @@ func isCallToExitFunction(pkgName, functionName string) bool {
 	return exitFunctions[pkgName] != nil && exitFunctions[pkgName][functionName]
 }
 
-// newInternalFailureError returns a slice of Failure with a single internal failure in it
+// newInternalFailureError returns a slice of Failure with a single internal failure in it.
 func newInternalFailureError(e error) []lint.Failure {
 	return []lint.Failure{lint.NewInternalFailure(e.Error())}
 }

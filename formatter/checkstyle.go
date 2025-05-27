@@ -14,7 +14,7 @@ type Checkstyle struct {
 	Metadata lint.FormatterMetadata
 }
 
-// Name returns the name of the formatter
+// Name returns the name of the formatter.
 func (*Checkstyle) Name() string {
 	return "checkstyle"
 }

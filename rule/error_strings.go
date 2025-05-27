@@ -88,7 +88,7 @@ type lintErrorStrings struct {
 	onFailure      func(lint.Failure)
 }
 
-// Visit browses the AST
+// Visit browses the AST.
 func (w lintErrorStrings) Visit(n ast.Node) ast.Visitor {
 	ce, ok := n.(*ast.CallExpr)
 	if !ok {
@@ -126,8 +126,8 @@ func (w lintErrorStrings) Visit(n ast.Node) ast.Visitor {
 	return w
 }
 
-// match returns true if the expression corresponds to the known pkg.function
-// i.e.: errors.Wrap
+// match returns true if the expression corresponds to the known pkg.function,
+// i.e.: errors.Wrap.
 func (w lintErrorStrings) match(expr *ast.CallExpr) bool {
 	sel, ok := expr.Fun.(*ast.SelectorExpr)
 	if !ok {
@@ -147,8 +147,8 @@ func (w lintErrorStrings) match(expr *ast.CallExpr) bool {
 	return ok
 }
 
-// getMessage returns the message depending on its position
-// returns false if the cast is unsuccessful
+// getMessage returns the message depending on its position.
+// Returns false if the cast is unsuccessful.
 func (w lintErrorStrings) getMessage(expr *ast.CallExpr) (s *ast.BasicLit, success bool) {
 	str, ok := w.checkArg(expr, 0)
 	if ok {

@@ -29,7 +29,7 @@ func (f *File) Content() []byte {
 	return f.content
 }
 
-// NewFile creates a new file
+// NewFile creates a new file.
 func NewFile(name string, content []byte, pkg *Package) (*File, error) {
 	f, err := parser.ParseFile(pkg.fset, name, content, parser.ParseComments)
 	if err != nil {
@@ -73,7 +73,7 @@ var basicTypeKinds = map[types.BasicKind]string{
 
 // IsUntypedConst reports whether expr is an untyped constant,
 // and indicates what its default type is.
-// scope may be nil.
+// Scope may be nil.
 func (f *File) IsUntypedConst(expr ast.Expr) (defType string, ok bool) {
 	// Re-evaluate expr outside its context to see if it's untyped.
 	// (An expr evaluated within, for example, an assignment context will get the type of the LHS.)

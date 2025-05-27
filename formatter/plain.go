@@ -13,7 +13,7 @@ type Plain struct {
 	Metadata lint.FormatterMetadata
 }
 
-// Name returns the name of the formatter
+// Name returns the name of the formatter.
 func (*Plain) Name() string {
 	return "plain"
 }

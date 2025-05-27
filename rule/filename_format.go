@@ -9,7 +9,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// FilenameFormatRule lints source filenames according to a set of regular expressions given as arguments
+// FilenameFormatRule lints source filenames according to a set of regular expressions given as arguments.
 type FilenameFormatRule struct {
 	format *regexp.Regexp
 }
