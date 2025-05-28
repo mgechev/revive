@@ -70,13 +70,13 @@ func (w lintUseFmtPrint) Visit(node ast.Node) ast.Visitor {
 		Confidence: 1,
 		Node:       node,
 		Category:   lint.FailureCategoryBadPractice,
-		Failure:    fmt.Sprintf(`avoid using built-in function %q, replace by "fmt.F%s(os.Stderr, %s)"`, name, name, callArgs),
+		Failure:    fmt.Sprintf(`avoid using built-in function %q, replace it by "fmt.F%s(os.Stderr, %s)"`, name, name, callArgs),
 	})
 
 	return w
 }
 
-func (w lintUseFmtPrint) callArgsAsStr(args []ast.Expr) string {
+func (lintUseFmtPrint) callArgsAsStr(args []ast.Expr) string {
 	strs := []string{}
 	for _, expr := range args {
 		strs = append(strs, astutils.GoFmt(expr))
