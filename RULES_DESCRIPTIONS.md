@@ -85,6 +85,7 @@ List of all available rules.
   - [unused-receiver](#unused-receiver)
   - [use-any](#use-any)
   - [use-errors-new](#use-errors-new)
+  - [use-fmt-print](#use-fmt-print)
   - [useless-break](#useless-break)
   - [var-declaration](#var-declaration)
   - [var-naming](#var-naming)
@@ -1287,7 +1288,16 @@ _Configuration_: N/A
 
 ## use-errors-new
 
-_Description_: This rules identifies calls to `fmt.Errorf` that can be safely replaced by, the more efficient, `errors.New`.
+_Description_: This rule identifies calls to `fmt.Errorf` that can be safely replaced by, the more efficient, `errors.New`.
+
+_Configuration_: N/A
+
+## use-fmt-print
+
+_Description_: This rule proposes to replace calls to built-in `print` and `println` with their equivalents from `fmt` standard package.
+
+`print` and `println` built-in functions are not recommended for use-cases other than
+[language boostraping and are not guaranteed to stay in the language](https://go.dev/ref/spec#Bootstrapping).
 
 _Configuration_: N/A
 
