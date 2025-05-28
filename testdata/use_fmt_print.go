@@ -16,6 +16,6 @@ func useFmtPrint() {
 	t.print("just testing")
 	t.println("just testing")
 
-	println("just testing") // MATCH /avoid using built-in function "println", use fmt.Fprintln(os.Stderr, ...) instead/
-	print("just testing")   // MATCH /avoid using built-in function "print", use fmt.Fprint(os.Stderr, ...) instead/
+	println("just testing", something)   // MATCH /avoid using built-in function "println", replace by "fmt.Fprintln(os.Stderr, "just testing", something)"/
+	print("just testing", some, thing+1) // MATCH /avoid using built-in function "print", replace by "fmt.Fprint(os.Stderr, "just testing", some, thing + 1)"/
 }

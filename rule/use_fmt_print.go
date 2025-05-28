@@ -3,7 +3,9 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"strings"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -51,8 +53,6 @@ func (w lintUseFmtPrint) Visit(node ast.Node) ast.Visitor {
 
 	name := id.Name
 	switch name {
-	default:
-		return nil // nothing to do, the call is not println(...) nor print(...)
 	case "print":
 		if w.redefinesPrint {
 			return nil // it's a call to user-defined print
@@ -61,16 +61,28 @@ func (w lintUseFmtPrint) Visit(node ast.Node) ast.Visitor {
 		if w.redefinesPrintln {
 			return nil // it's a call to user-defined println
 		}
+	default:
+		return nil // nothing to do, the call is not println(...) nor print(...)
 	}
 
+	callArgs := w.callArgsAsStr(ce.Args)
 	w.onFailure(lint.Failure{
 		Confidence: 1,
 		Node:       node,
 		Category:   lint.FailureCategoryBadPractice,
-		Failure:    fmt.Sprintf(`avoid using built-in function %q, use fmt.F%s(os.Stderr, ...) instead`, name, name),
+		Failure:    fmt.Sprintf(`avoid using built-in function %q, replace by "fmt.F%s(os.Stderr, %s)"`, name, name, callArgs),
 	})
 
 	return w
+}
+
+func (w lintUseFmtPrint) callArgsAsStr(args []ast.Expr) string {
+	strs := []string{}
+	for _, expr := range args {
+		strs = append(strs, astutils.GoFmt(expr))
+	}
+
+	return strings.Join(strs, ", ")
 }
 
 func (UseFmtPrintRule) analyzeRedefinitions(decls []ast.Decl) (redefinesPrint, redefinesPrintln bool) {
