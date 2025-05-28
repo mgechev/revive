@@ -44,21 +44,18 @@ func (w lintUseFmtPrint) Visit(node ast.Node) ast.Visitor {
 	}
 
 	name := id.Name
-	replacement := "Println"
 	switch name {
 	default:
 		return nil // nothing to do, the call is not println(...) nor print(...)
-	case "println":
-	case "print":
-		replacement = "Print"
+	case "println", "print":
+
+		w.onFailure(lint.Failure{
+			Confidence: 1,
+			Node:       node,
+			Category:   lint.FailureCategoryBadPractice,
+			Failure:    fmt.Sprintf(`avoid using built-in function %q, use fmt.F%s(os.Stderr, ...) instead`, name, name),
+		})
+
+		return w
 	}
-
-	w.onFailure(lint.Failure{
-		Confidence: 1,
-		Node:       node,
-		Category:   lint.FailureCategoryBadPractice,
-		Failure:    fmt.Sprintf(`avoid using built-in function %q, use "fmt.%s" instead`, name, replacement),
-	})
-
-	return w
 }
