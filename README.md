@@ -74,7 +74,6 @@ If you disable them in the config file, revive will run over 6x faster than goli
   - [Overriding colorization detection](#overriding-colorization-detection)
   - [Who uses Revive](#who-uses-revive)
   - [Contributors](#contributors)
-    - [Maintainers](#maintainers)
     - [All](#all)
   - [License](#license)
 
@@ -829,12 +828,6 @@ REVIVE_FORCE_COLOR=1 revive -formatter friendly ./... | tee revive.log
 _Open a PR to add your project_.
 
 ## Contributors
-
-### Maintainers
-
-[<img alt="mgechev" src="https://avatars.githubusercontent.com/u/455023?v=4&s=100" width="100">](https://github.com/mgechev) |[<img alt="chavacava" src="https://avatars.githubusercontent.com/u/25788468?v=4&s=100" width="100">](https://github.com/chavacava) |[<img alt="denisvmedia" src="https://avatars.githubusercontent.com/u/5462781?v=4&s=100" width="100">](https://github.com/denisvmedia) |[<img alt="alexandear" src="https://avatars.githubusercontent.com/u/3228886?v=4&s=100" width="100">](https://github.com/alexandear) |
-:---: |:---: |:---: |:---: |
-[mgechev](https://github.com/mgechev) |[chavacava](https://github.com/chavacava) |[denisvmedia](https://github.com/denisvmedia) |[alexandear](https://github.com/alexandear) |
 
 ### All
 
