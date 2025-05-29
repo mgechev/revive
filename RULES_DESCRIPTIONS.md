@@ -520,6 +520,7 @@ Example:
 [rule.enforce-slice-style]
 arguments = ["make"]
 ```
+
 ## enforce-switch-default
 
 _Description_: This rule enforces consistent usage of `default` on `switch` statements.
