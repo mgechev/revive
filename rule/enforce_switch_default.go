@@ -88,7 +88,7 @@ func (r *EnforceSwitchDefaultRule) Apply(file *lint.File, _ lint.Arguments) []li
 	return failures
 }
 
-func (r *EnforceSwitchDefaultRule) seekDefaultCase(body *ast.BlockStmt) (defaultClause *ast.CaseClause, isLast bool) {
+func (*EnforceSwitchDefaultRule) seekDefaultCase(body *ast.BlockStmt) (defaultClause *ast.CaseClause, isLast bool) {
 	var last *ast.CaseClause
 	for _, stmt := range body.List {
 		cc, _ := stmt.(*ast.CaseClause) // no need to check for ok
