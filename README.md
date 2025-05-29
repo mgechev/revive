@@ -76,6 +76,7 @@ If you disable them in the config file, revive will run over 6x faster than goli
   - [Contributors](#contributors)
     - [Maintainers](#maintainers)
     - [All](#all)
+  - [License](#license)
 
 <!-- /TOC -->
 
@@ -837,4 +838,10 @@ _Open a PR to add your project_.
 
 ### All
 
-This project exists thanks to all the people who contribute.
+We are grateful to everyone who has contributed to this project.
+
+![All Contributors](https://contrib.rocks/image?repo=mgechev/revive&max=500)
+
+## License
+
+MIT
