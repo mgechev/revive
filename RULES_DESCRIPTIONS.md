@@ -533,15 +533,20 @@ _Configuration_: ([]string) Specifies what to enforced: occurrence and/or positi
 Examples:
 
 To enforce that all `switch` statements have a `default` clause as its the last case clause:
+
 ```toml
 [rule.enforce-slice-style]
 ```
+
 To enforce that all `switch` statements have a `default` clause but its position is unimportant:
+
 ```toml
 [rule.enforce-slice-style]
 arguments = ["allowDefaultNotLast"]
 ```
+
 To enforce that in all `switch` statements with a `default` clause, the `default` is the last case clause:
+
 ```toml
 [rule.enforce-slice-style]
 arguments = ["allowNoDefault"]
