@@ -1,6 +1,6 @@
 package fixtures
 
-func enforceSwitchDefault() {
+func enforceSwitchStyle2() {
 
 	switch expression {
 	case condition:

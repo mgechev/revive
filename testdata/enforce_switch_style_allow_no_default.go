@@ -1,6 +1,6 @@
 package fixtures
 
-func enforceSwitchDefault() {
+func enforceSwitchStyle() {
 
 	switch expression {
 	case condition:
@@ -12,7 +12,7 @@ func enforceSwitchDefault() {
 	case condition:
 	}
 
-	switch expression { // MATCH /switch must have a default case clause/
+	switch expression {
 	case condition:
 	}
 }

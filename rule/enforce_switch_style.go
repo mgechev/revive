@@ -3,13 +3,12 @@ package rule
 import (
 	"fmt"
 	"go/ast"
-	"strings"
 
 	"github.com/mgechev/revive/lint"
 )
 
-// EnforceSwitchDefaultRule implements a rule to enforce default clauses use and/or position.
-type EnforceSwitchDefaultRule struct {
+// EnforceSwitchStyleRule implements a rule to enforce default clauses use and/or position.
+type EnforceSwitchStyleRule struct {
 	allowNoDefault      bool // allow absence of default
 	allowDefaultNotLast bool // allow default, if present, not being the last case
 }
@@ -17,7 +16,7 @@ type EnforceSwitchDefaultRule struct {
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
-func (r *EnforceSwitchDefaultRule) Configure(arguments lint.Arguments) error {
+func (r *EnforceSwitchStyleRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		return nil
 	}
@@ -27,10 +26,10 @@ func (r *EnforceSwitchDefaultRule) Configure(arguments lint.Arguments) error {
 		if !ok {
 			return fmt.Errorf("invalid argument for rule %s; expected string but got %T", r.Name(), arg)
 		}
-		switch strings.ToLower(argStr) {
-		case "allownodefault":
+		switch {
+		case isRuleOption(argStr, "allowNoDefault"):
 			r.allowNoDefault = true
-		case "allowdefaultnotlast":
+		case isRuleOption(argStr, "allowDefaultNotLast"):
 			r.allowDefaultNotLast = true
 		default:
 			return fmt.Errorf(`invalid argument %q for rule %s; expected "allowNoDefault" or "allowDefaultNotLast"`, argStr, r.Name())
@@ -41,7 +40,7 @@ func (r *EnforceSwitchDefaultRule) Configure(arguments lint.Arguments) error {
 }
 
 // Apply applies the rule to given file.
-func (r *EnforceSwitchDefaultRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *EnforceSwitchStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	astFile := file.AST
 	ast.Inspect(astFile, func(n ast.Node) bool {
@@ -88,7 +87,7 @@ func (r *EnforceSwitchDefaultRule) Apply(file *lint.File, _ lint.Arguments) []li
 	return failures
 }
 
-func (*EnforceSwitchDefaultRule) seekDefaultCase(body *ast.BlockStmt) (defaultClause *ast.CaseClause, isLast bool) {
+func (*EnforceSwitchStyleRule) seekDefaultCase(body *ast.BlockStmt) (defaultClause *ast.CaseClause, isLast bool) {
 	var last *ast.CaseClause
 	for _, stmt := range body.List {
 		cc, _ := stmt.(*ast.CaseClause) // no need to check for ok
@@ -102,6 +101,6 @@ func (*EnforceSwitchDefaultRule) seekDefaultCase(body *ast.BlockStmt) (defaultCl
 }
 
 // Name returns the rule name.
-func (*EnforceSwitchDefaultRule) Name() string {
-	return "enforce-switch-default"
+func (*EnforceSwitchStyleRule) Name() string {
+	return "enforce-switch-style"
 }
