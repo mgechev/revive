@@ -840,10 +840,6 @@ _Open a PR to add your project_.
 
 This project exists thanks to all the people who contribute.
 
-<a href="https://github.com/mgechev/revive/graphs/contributors">
-  <img alt="All Contributors" src="https://contrib.rocks/image?repo=mgechev/revive&amp;max=500" />
-</a>
-
 ## License
 
 MIT
