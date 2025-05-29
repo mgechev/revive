@@ -72,7 +72,6 @@ If you disable them in the config file, revive will run over 6x faster than goli
     - [golint](#golint)
     - [revive's speed](#revives-speed)
   - [Overriding colorization detection](#overriding-colorization-detection)
-  - [Who uses Revive](#who-uses-revive)
   - [Contributors](#contributors)
     - [Maintainers](#maintainers)
     - [All](#all)
@@ -785,48 +784,6 @@ To force colorization, add `REVIVE_FORCE_COLOR=1` to the environment you're runn
 ```shell
 REVIVE_FORCE_COLOR=1 revive -formatter friendly ./... | tee revive.log
 ```
-
-## Who uses Revive
-
-<!-- markdownlint-disable MD013 -->
-
-- [`tidb`](https://github.com/pingcap/tidb) - TiDB is a distributed HTAP database compatible with the MySQL protocol
-- [`grafana`](https://github.com/grafana/grafana) - The tool for beautiful monitoring and metric analytics & dashboards for Graphite, InfluxDB & Prometheus & More
-- [`etcd`](https://github.com/etcd-io/etcd) - Distributed reliable key-value store for the most critical data of a distributed system
-- [`cadence`](https://github.com/uber/cadence) - Cadence is a distributed, scalable, durable, and highly available orchestration engine by Uber to execute asynchronous long-running business logic in a scalable and resilient way
-- [`ferret`](https://github.com/MontFerret/ferret) - Declarative web scraping
-- [`gopass`](https://github.com/gopasspw/gopass) - The slightly more awesome standard unix password manager for teams
-- [`gitea`](https://github.com/go-gitea/gitea) - Git with a cup of tea, painless self-hosted git service
-- [`excelize`](https://github.com/360EntSecGroup-Skylar/excelize) - Go library for reading and writing Microsoft Excel™ (XLSX) files
-- [`aurora`](https://github.com/xuri/aurora) - aurora is a web-based Beanstalk queue server console written in Go
-- [`soar`](https://github.com/XiaoMi/soar) - SQL Optimizer And Rewriter
-- [`pyroscope`](https://github.com/pyroscope-io/pyroscope) - Continuous profiling platform
-- [`gorush`](https://github.com/appleboy/gorush) - A push notification server written in Go (Golang).
-- [`dry`](https://github.com/moncho/dry) - dry - A Docker manager for the terminal.
-- [`go-echarts`](https://github.com/chenjiandongx/go-echarts) - The adorable charts library for Golang
-- [`reviewdog`](https://github.com/reviewdog/reviewdog) - Automated code review tool integrated with any code analysis tools regardless of programming language
-- [`rudder-server`](https://github.com/rudderlabs/rudder-server) - Privacy and Security focused Segment-alternative, in Golang and React.
-- [`sklearn`](https://github.com/pa-m/sklearn) - A partial port of scikit-learn written in Go.
-- [`protoc-gen-doc`](https://github.com/pseudomuto/protoc-gen-doc) - Documentation generator plugin for Google Protocol Buffers.
-- [`llvm`](https://github.com/llir/llvm) - Library for interacting with LLVM IR in pure Go.
-- [`jenkins-library`](https://github.com/SAP/jenkins-library) - Jenkins shared library for Continuous Delivery pipelines by SAP.
-- [`pd`](https://github.com/tikv/pd) - Placement driver for TiKV.
-- [`shellhub`](https://github.com/shellhub-io/shellhub) - ShellHub enables teams to easily access any Linux device behind firewall and NAT.
-- [`lorawan-stack`](https://github.com/TheThingsNetwork/lorawan-stack) - The Things Network Stack for LoRaWAN V3
-- [`gin-jwt`](https://github.com/appleboy/gin-jwt) - This is a JWT middleware for Gin framework.
-- [`gofight`](https://github.com/appleboy/gofight) - Testing API Handler written in Golang.
-- [`Beaver`](https://github.com/Clivern/Beaver) - A Real Time Messaging Server.
-- [`ggz`](https://github.com/go-ggz/ggz) - An URL shortener service written in Golang
-- [`Codeac.io`](https://www.codeac.io?ref=revive) - Automated code review service integrates with GitHub, Bitbucket and GitLab (even self-hosted) and helps you fight technical debt.
-- [`DevLake`](https://github.com/apache/incubator-devlake) - Apache DevLake is an open-source dev data platform to ingest, analyze, and visualize the fragmented data from DevOps tools，which can distill insights to improve engineering productivity.
-- [`checker`](https://github.com/cinar/checker) - Checker helps validating user input through rules defined in struct tags or directly through functions.
-- [`milvus`](https://github.com/milvus-io/milvus) - A cloud-native vector database, storage for next generation AI applications.
-- [`indicator`](https://github.com/cinar/indicator) - Indicator provides various technical analysis indicators, strategies, and a backtesting framework.
-
-<!-- markdownlint-enable MD013 -->
-
-_Open a PR to add your project_.
-
 ## Contributors
 
 ### Maintainers
