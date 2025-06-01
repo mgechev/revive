@@ -104,6 +104,7 @@ var allRules = append([]lint.Rule{
 	&rule.RedundantTestMainExitRule{},
 	&rule.UnnecessaryFormatRule{},
 	&rule.UseFmtPrintRule{},
+	&rule.EnforceSwitchStyleRule{},
 }, defaultRules...)
 
 // allFormatters is a list of all available formatters to output the linting results.
