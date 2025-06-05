@@ -102,6 +102,8 @@ func (b Branch) IsShort() bool {
 		return true
 	case 1:
 		return isShortStmt(b.block[0])
+	case 2:
+		return isShortStmt(b.block[1])
 	}
 	return false
 }
