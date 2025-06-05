@@ -14,6 +14,12 @@ type UnexportedReturnRule struct{}
 
 // Apply applies the rule to given file.
 func (*UnexportedReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+	if !file.IsImportable() {
+		// Symbols defined in such files cannot be used in other packages.
+		// Therefore, we don't need to check for unexported return types.
+		return nil
+	}
+
 	var failures []lint.Failure
 
 	file.Pkg.TypeCheck()
