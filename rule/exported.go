@@ -110,11 +110,11 @@ func (r *ExportedRule) Configure(arguments lint.Arguments) error {
 
 // Apply applies the rule to given file.
 func (r *ExportedRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
-	var failures []lint.Failure
-	if file.IsTest() {
-		return failures
+	if !file.IsImportable() {
+		return nil
 	}
 
+	var failures []lint.Failure
 	walker := lintExported{
 		file: file,
 		onFailure: func(failure lint.Failure) {
