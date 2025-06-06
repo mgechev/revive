@@ -24,6 +24,23 @@ type File struct {
 // IsTest returns if the file contains tests.
 func (f *File) IsTest() bool { return strings.HasSuffix(f.Name, "_test.go") }
 
+// IsImportable returns if the symbols defined in this file can be imported in other packages.
+//
+// Symbols from the package `main` or test files are not exported, so they cannot be imported.
+func (f *File) IsImportable() bool {
+	if f.IsTest() {
+		// Test files cannot be imported.
+		return false
+	}
+
+	if f.Pkg.IsMain() {
+		// The package `main` cannot be imported.
+		return false
+	}
+
+	return true
+}
+
 // Content returns the file's content.
 func (f *File) Content() []byte {
 	return f.content
