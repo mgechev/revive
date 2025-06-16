@@ -47,3 +47,7 @@ func TestCheckDirectiveComment(t *testing.T) {
 func TestCheckDeprecationComment(t *testing.T) {
 	testRule(t, "exported_issue_1231", &rule.ExportedRule{}, &lint.RuleConfig{})
 }
+
+func TestExportedMainPackage(t *testing.T) {
+	testRule(t, "exported_main", &rule.ExportedRule{}, &lint.RuleConfig{})
+}
