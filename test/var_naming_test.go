@@ -37,7 +37,7 @@ func TestVarNaming(t *testing.T) {
 	})
 	testRule(t, "var_naming_bad_package_name", &rule.VarNamingRule{}, &lint.RuleConfig{
 		Arguments: []any{[]any{}, []any{},
-			[]any{map[string]any{"skip-package-name-checks": false, "extra-bad-package-names": []string{"helpers"}}},
+			[]any{map[string]any{"skip-package-name-checks": false, "extra-bad-package-names": []any{"helpers"}}},
 		},
 	})
 }
