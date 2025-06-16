@@ -117,6 +117,11 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			arguments: lint.Arguments{[]any{""}, []any{""}, []any{map[string]any{"extraBadPackageNames": []int{1}}}},
 			wantErr:   errors.New("invalid third argument to the var-naming rule. Expecting extraBadPackageNames of type slice of strings, but []int"),
 		},
+		{
+			name:      "invalid third argument value type for extraBadPackageNames",
+			arguments: lint.Arguments{[]any{""}, []any{""}, []any{map[string]any{"extraBadPackageNames": []any{"helpers", 1}}}},
+			wantErr:   errors.New("invalid third argument to the var-naming rule: expected element 1 of extraBadPackageNames to be a string, but got type int"),
+		},
 	}
 
 	for _, tt := range tests {

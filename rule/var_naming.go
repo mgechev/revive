@@ -87,11 +87,15 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 				if !ok {
 					return fmt.Errorf("invalid third argument to the var-naming rule. Expecting extraBadPackageNames of type slice of strings, but %T", v)
 				}
-				for _, name := range extraBadPackageNames {
+				for i, name := range extraBadPackageNames {
 					if r.extraBadPackageNames == nil {
 						r.extraBadPackageNames = map[string]struct{}{}
 					}
-					r.extraBadPackageNames[strings.ToLower(name.(string))] = struct{}{}
+					n, ok := name.(string)
+					if !ok {
+						return fmt.Errorf("invalid third argument to the var-naming rule: expected element %d of extraBadPackageNames to be a string, but got type %T", i, name)
+					}
+					r.extraBadPackageNames[strings.ToLower(n)] = struct{}{}
 				}
 			}
 		}
