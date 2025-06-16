@@ -83,7 +83,7 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 			case isRuleOption(k, "skipPackageNameChecks"):
 				r.skipPackageNameChecks = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "extraBadPackageNames"):
-				extraBadPackageNames, ok := v.([]string)
+				extraBadPackageNames, ok := v.([]any)
 				if !ok {
 					return fmt.Errorf("invalid third argument to the var-naming rule. Expecting extraBadPackageNames of type slice of strings, but %T", v)
 				}
@@ -91,7 +91,7 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 					if r.extraBadPackageNames == nil {
 						r.extraBadPackageNames = map[string]struct{}{}
 					}
-					r.extraBadPackageNames[strings.ToLower(name)] = struct{}{}
+					r.extraBadPackageNames[strings.ToLower(name.(string))] = struct{}{}
 				}
 			}
 		}
