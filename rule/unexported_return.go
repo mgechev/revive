@@ -78,7 +78,7 @@ func (*UnexportedReturnRule) Name() string {
 // It is imprecise, and will err on the side of returning true,
 // such as for composite types.
 func exportedType(typ types.Type) bool {
-	switch t := types.Unalias(typ).(type) {
+	switch t := typ.(type) {
 	case *types.Named:
 		obj := t.Obj()
 		switch {

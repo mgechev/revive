@@ -58,3 +58,20 @@ type int struct{}
 func ExportedIntReturner() int { // MATCH /exported func ExportedIntReturner returns unexported type foo.int, which can be annoying to use/
 	return int{}
 }
+
+type config struct {
+	N int
+}
+
+// Option is an option for [New].
+type Option = option
+
+// option is the hidden concrete implementation of Option.
+type option func(*config)
+
+// WithN sets N.
+func WithN(n int) Option {
+	return func(c *config) {
+		c.N = n
+	}
+}
