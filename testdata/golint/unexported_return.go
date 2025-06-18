@@ -63,7 +63,7 @@ type config struct {
 	N int
 }
 
-// Option is an option for [New].
+// Option hides the concrete implementations
 type Option = option
 
 // option is the hidden concrete implementation of Option.
