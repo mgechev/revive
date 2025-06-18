@@ -58,3 +58,31 @@ type int struct{}
 func ExportedIntReturner() int { // MATCH /exported func ExportedIntReturner returns unexported type foo.int, which can be annoying to use/
 	return int{}
 }
+
+type config struct {
+	N int
+}
+
+// Option ...
+type Option = option
+
+type option func(*config)
+
+// WithN ...
+func WithN(n int) Option {
+	return func(c *config) {
+		c.N = n
+	}
+}
+
+type b = A
+
+// A ...
+type A func(*config)
+
+// WithA ...
+func WithA(n int) b { // MATCH /exported func WithA returns unexported type foo.b, which can be annoying to use/
+	return func(c *config) {
+		c.N = n
+	}
+}
