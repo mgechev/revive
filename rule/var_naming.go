@@ -93,7 +93,7 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 					}
 					n, ok := name.(string)
 					if !ok {
-						return fmt.Errorf("invalid third argument to the var-naming rule: expected element %d of extraBadPackageNames to be a string, but got type %T", i, name)
+						return fmt.Errorf("invalid third argument to the var-naming rule: expected element %d of extraBadPackageNames to be a string, but got %v(%T)", i, name, name)
 					}
 					r.extraBadPackageNames[strings.ToLower(n)] = struct{}{}
 				}
