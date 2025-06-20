@@ -174,12 +174,58 @@ func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
 		return
 	}
 
-	prefix := fn.Name.Name + " "
-	if !strings.HasPrefix(firstCommentLine, prefix) {
-		w.addFailuref(fn.Doc, 0.8, lint.FailureCategoryComments,
-			`comment on exported %s %s should be of the form "%s..."`, kind, name, prefix,
-		)
+	expectedPrefix := fn.Name.Name + " "
+	if strings.HasPrefix(firstCommentLine, expectedPrefix) {
+		return
 	}
+
+	if !w.HasPrefixFold(firstCommentLine, expectedPrefix) {
+		// The comment does not start with the expected prefix.
+		w.addFailuref(fn.Doc, 0.8, lint.FailureCategoryComments,
+			`comment on exported %s %s should be of the form "%s..."`, kind, name, expectedPrefix,
+		)
+		return
+	}
+
+	// They have the same prefix, but the case is different.
+	// For example, the comment starts with "SendJson" but should start with "SendJSON".
+
+	currentPrefix := strings.Split(firstCommentLine, " ")[0]
+	if strings.HasPrefix(w.StripFirstRune(firstCommentLine), w.StripFirstRune(expectedPrefix)) {
+		// Only the first character differs, such as "sendJSON" became "SendJSON".
+		// so we consider the scope has changed.
+
+		w.addFailuref(fn.Doc, 1, lint.FailureCategoryComments,
+			`comment on exported %s %s should be of the form "%s..." to match its exported status, not "%s ..."`,
+			kind, name, expectedPrefix, currentPrefix,
+		)
+		return
+	}
+
+	w.addFailuref(fn.Doc, 1, lint.FailureCategoryComments,
+		`comment on exported %s %s should be of the form "%s..." by using its correct casing, not "%s ..."`,
+		kind, name, expectedPrefix, currentPrefix,
+	)
+}
+
+func (*lintExported) HasPrefixFold(s, prefix string) bool {
+	return strings.HasPrefix(strings.ToLower(s), strings.ToLower(prefix))
+}
+
+func (*lintExported) StripFirstRune(s string) string {
+	// If the string is empty, return it as is.
+	if s == "" {
+		return s
+	}
+
+	// Decode the first rune to handle multi-byte characters.
+	firstRune, size := utf8.DecodeRuneInString(s)
+	if firstRune == utf8.RuneError {
+		return s // no valid first rune found
+	}
+
+	// Return the string without the first rune.
+	return s[size:]
 }
 
 func (w *lintExported) checkRepetitiveNames(id *ast.Ident, thing string) {
@@ -272,6 +318,7 @@ func (w *lintExported) checkValueNames(names []*ast.Ident, nodeToBlame ast.Node,
 
 	return true
 }
+
 func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genDeclMissingComments map[*ast.GenDecl]bool) {
 	kind := "var"
 	if gd.Tok == token.CONST {
