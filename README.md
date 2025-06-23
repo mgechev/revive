@@ -35,8 +35,14 @@ If you disable them in the config file, revive will run over 6x faster than goli
 
 - [revive](#revive)
   - [Installation](#installation)
-  - [Usage](#usage)
+    - [Linux](#linux)
+    - [MacOS](#macos)
+      - [Homebrew](#homebrew)
+      - [MacPorts](#macports)
+    - [Install from Sources](#install-from-sources)
     - [Docker](#docker)
+    - [Manual Binary Download](#manual-binary-download)
+  - [Usage](#usage)
     - [Bazel](#bazel)
     - [Text Editors](#text-editors)
     - [GitHub Actions](#github-actions)
@@ -82,38 +88,88 @@ If you disable them in the config file, revive will run over 6x faster than goli
 
 ## Installation
 
+[<img alt="Repology packaging status" src="https://repology.org/badge/vertical-allrepos/revive.svg">](https://repology.org/project/revive/versions)
+
+### Linux
+
+`revive` is available inside the majority of package managers.
+
+### MacOS
+
+#### Homebrew
+
+Install `revive` using [brew](https://brew.sh/):
+
+```bash
+brew install revive
+```
+
+To upgrade to the latest version:
+
+```bash
+brew upgrade revive
+```
+
+#### MacPorts
+
+Install `revive` using [MacPorts](https://www.macports.org):
+
+```bash
+sudo port install revive
+```
+
+### Install from Sources
+
+Install the latest stable release directly from source:
+
 ```bash
 go install github.com/mgechev/revive@latest
 ```
 
-or get a released executable from the [Releases](https://github.com/mgechev/revive/releases) page.
-
-You can install the main branch (including the last commit) with:
+To install the latest commit from the main branch:
 
 ```bash
-go install github.com/mgechev/revive@master
+go install github.com/mgechev/revive@HEAD
+```
+
+### Docker
+
+You can run `revive` using Docker to avoid installing it directly on your system:
+
+```bash
+docker run -v "$(pwd)":/var/YOUR_REPOSITORY ghcr.io/mgechev/revive:v1.10.0 -config /var/YOUR_REPOSITORY/revive.toml -formatter stylish ./var/YOUR_REPOSITORY/...
+```
+
+_Note_: Replace `YOUR_REPOSITORY` with the path to your repository.
+
+A volume must be mounted to share the current repository with the container.
+For more details, refer to the [bind mounts Docker documentation](https://docs.docker.com/storage/bind-mounts/).
+
+- `-v`: Mounts the current directory (`$(pwd)`) to `/var/YOUR_REPOSITORY` inside the container.
+- `ghcr.io/mgechev/revive:v1.10.0`: Specifies the Docker image and its version.
+- `revive`: The command to run inside the container.
+- Flags like `-config` and `-formatter` are the same as when using the binary directly.
+
+### Manual Binary Download
+
+Download the precompiled binary from the [Releases page](https://github.com/mgechev/revive/releases):
+
+1. Select the appropriate binary for your OS and architecture.
+2. Extract the binary and move it to a directory in your `PATH` (e.g., `/usr/local/bin`).
+3. Verify installation:
+
+```bash
+revive -version
 ```
 
 ## Usage
 
-Since the default behavior of `revive` is compatible with `golint`, without providing any additional flags,the only difference you'd notice is faster execution.
+Since the default behavior of `revive` is compatible with `golint`, without providing any additional flags,
+the only difference you'd notice is faster execution.
 
 `revive` supports a `-config` flag whose value should correspond to a TOML file describing which rules to use for `revive`'s linting.
 If not provided, `revive` will try to use a global config file (assumed to be located at `$HOME/revive.toml`).
 Otherwise, if no configuration TOML file is found then `revive` uses a built-in set of default linting rules.
-
-### Docker
-
-A volume must be mounted to share the current repository with the container.
-Please refer to the [bind mounts Docker documentation](https://docs.docker.com/storage/bind-mounts/)
-
-```bash
-docker run -v "$(pwd)":/var/YOUR_REPOSITORY ghcr.io/mgechev/revive:v1.3.7 -config /var/YOUR_REPOSITORY/revive.toml -formatter stylish ./var/YOUR_REPOSITORY/...
-```
-
-- `-v` is for the volume
-- `ghcr.io/mgechev/revive:v1.3.7` is the image name and its version corresponds to `revive` command
-- The provided flags are the same as the binary usage.
 
 ### Bazel
 
