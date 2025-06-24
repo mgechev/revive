@@ -35,10 +35,7 @@ If you disable them in the config file, revive will run over 6x faster than goli
 
 - [revive](#revive)
   - [Installation](#installation)
-    - [Linux](#linux)
-    - [MacOS](#macos)
-      - [Homebrew](#homebrew)
-      - [MacPorts](#macports)
+    - [Homebrew](#homebrew)
     - [Install from Sources](#install-from-sources)
     - [Docker](#docker)
     - [Manual Binary Download](#manual-binary-download)
@@ -88,15 +85,11 @@ If you disable them in the config file, revive will run over 6x faster than goli
 
 ## Installation
 
-[<img alt="Repology packaging status" src="https://repology.org/badge/vertical-allrepos/revive.svg">](https://repology.org/project/revive/versions)
-
-### Linux
-
 `revive` is available inside the majority of package managers.
 
-### MacOS
+[<img alt="Repology packaging status" src="https://repology.org/badge/vertical-allrepos/revive.svg">](https://repology.org/project/revive/versions)
 
-#### Homebrew
+### Homebrew
 
 Install `revive` using [brew](https://brew.sh/):
 
@@ -108,14 +101,6 @@ To upgrade to the latest version:
 
 ```bash
 brew upgrade revive
-```
-
-#### MacPorts
-
-Install `revive` using [MacPorts](https://www.macports.org):
-
-```bash
-sudo port install revive
 ```
 
 ### Install from Sources
