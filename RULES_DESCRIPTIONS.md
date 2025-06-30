@@ -1238,11 +1238,11 @@ Example:
 ```toml
 [rule.unhandled-error]
 arguments = [
-  'os\.(Create|WriteFile|Chmod)',
-  'fmt\.Print',
+  '^os\.(CreateTemp|WriteFile|Chmod)$',
+  '^fmt\.Print',
   'myFunction',
-  'net\..*',
-  'bytes\.Buffer\.Write',
+  '^net\.',
+  '^(bytes\.Buffer|string\.Writer)\.Write(Byte|Rune|String)?$',
 ]
 ```
 
