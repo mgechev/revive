@@ -17,6 +17,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 		wantBlockList             []string
 		wantAllowUpperCaseConst   bool
 		wantSkipPackageNameChecks bool
+		wantIgnoreCommonInitials  bool
 		wantBadPackageNames       map[string]struct{}
 	}{
 		{
@@ -26,6 +27,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			wantAllowList:             nil,
 			wantBlockList:             nil,
 			wantAllowUpperCaseConst:   false,
+			wantIgnoreCommonInitials:  false,
 			wantSkipPackageNameChecks: false,
 		},
 		{
@@ -44,6 +46,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			wantBlockList:             []string{"VM"},
 			wantAllowUpperCaseConst:   true,
 			wantSkipPackageNameChecks: true,
+			wantIgnoreCommonInitials:  false,
 			wantBadPackageNames:       map[string]struct{}{"helpers": {}, "models": {}},
 		},
 		{
@@ -54,6 +57,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{map[string]any{
 					"uppercaseconst":        true,
 					"skippackagenamechecks": true,
+					"ignorecommoninitials":  true,
 					"extrabadpackagenames":  []any{"helpers", "models"},
 				}},
 			},
@@ -72,6 +76,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{map[string]any{
 					"upper-case-const":         true,
 					"skip-package-name-checks": true,
+					"ignore-common-initials":   true,
 					"extra-bad-package-names":  []any{"helpers", "models"},
 				}},
 			},
@@ -80,6 +85,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			wantBlockList:             []string{"VM"},
 			wantAllowUpperCaseConst:   true,
 			wantSkipPackageNameChecks: true,
+			wantIgnoreCommonInitials:  true,
 			wantBadPackageNames:       map[string]struct{}{"helpers": {}, "models": {}},
 		},
 		{

@@ -36,9 +36,34 @@ func TestName(t *testing.T) {
 		{"IEEE802_16Bit", "IEEE802_16Bit"},
 	}
 	for _, test := range tests {
-		got := Name(test.name, nil, nil)
+		got := Name(test.name, nil, nil, false)
 		if got != test.want {
 			t.Errorf("Name(%q) = %q, want %q", test.name, got, test.want)
+		}
+	}
+}
+
+func TestName_IgnoreCommonInitials(t *testing.T) {
+	tests := []struct {
+		name                 string
+		want                 string
+		ignoreCommonInitials bool
+	}{
+		// Default behavior (modifies based on common initialisms)
+		{"getJson", "getJSON", false},
+		{"userId", "userID", false},
+		{"myHttpClient", "myHTTPClient", false},
+
+		// With ignoreCommonInitials = true
+		{"getJson", "getJson", true},
+		{"userId", "userId", true},
+		{"myHttpClient", "myHttpClient", true},
+	}
+
+	for _, test := range tests {
+		got := Name(test.name, nil, nil, test.ignoreCommonInitials)
+		if got != test.want {
+			t.Errorf("Name(%q, ignoreCommonInitials=%v) = %q, want %q", test.name, test.ignoreCommonInitials, got, test.want)
 		}
 	}
 }
