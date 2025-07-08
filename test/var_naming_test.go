@@ -40,6 +40,13 @@ func TestVarNaming(t *testing.T) {
 			[]any{map[string]any{"skip-package-name-checks": false, "extra-bad-package-names": []any{"helpers"}}},
 		},
 	})
+	testRule(t, "var_naming_ignore_common_initials_true", &rule.VarNamingRule{}, &lint.RuleConfig{
+		Arguments: []any{[]any{}, []any{}, []any{map[string]any{"ignoreCommonInitials": true}}}})
+	testRule(t, "var_naming_ignore_common_initials_false", &rule.VarNamingRule{}, &lint.RuleConfig{})
+
+	testRule(t, "var_naming_ignore_common_initials_true", &rule.VarNamingRule{}, &lint.RuleConfig{
+		Arguments: []any{[]any{}, []any{}, []any{map[string]any{"ignore-common-initials": true}}}})
+
 }
 
 func BenchmarkUpperCaseConstTrue(b *testing.B) {

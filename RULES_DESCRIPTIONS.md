@@ -1,4 +1,5 @@
-# Description of available rules
+[rule.var-naming]
+arguments = [[], [], [{ extra-bad-package-names = ["helpers", "models"] }]]# Description of available rules
 
 List of all available rules.
 
@@ -319,14 +320,15 @@ _Description_: This rule warns on some common mistakes when using `defer` statem
 
 <!-- markdownlint-disable MD013 -->
 
-| name              | description                                                                                                                                                                                     |
-| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| call-chain (callChain, callchain)        | even if deferring call-chains of the form `foo()()` is valid, it does not helps code understanding (only the last call is deferred)                                                             |
-| loop              | deferring inside loops can be misleading (deferred functions are not executed at the end of the loop iteration but of the current function) and it could lead to exhausting the execution stack |
-| method-call (methodCall, methodcall)       | deferring a call to a method can lead to subtle bugs if the method does not have a pointer receiver                                                                                             |
-| recover           | calling `recover` outside a deferred function has no effect                                                                                                                                     |
-| immediate-recover (immediateRecover, immediaterecover) | calling `recover` at the time a defer is registered, rather than as part of the deferred callback.  e.g. `defer recover()` or equivalent.                                                       |
-| return            | returning values form a deferred function has no effect                                                                                                                                         |
+
+| name                                                   | description                                                                                                                                                                                     |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| call-chain (callChain, callchain)                      | even if deferring call-chains of the form`foo()()` is valid, it does not helps code understanding (only the last call is deferred)                                                              |
+| loop                                                   | deferring inside loops can be misleading (deferred functions are not executed at the end of the loop iteration but of the current function) and it could lead to exhausting the execution stack |
+| method-call (methodCall, methodcall)                   | deferring a call to a method can lead to subtle bugs if the method does not have a pointer receiver                                                                                             |
+| recover                                                | calling`recover` outside a deferred function has no effect                                                                                                                                      |
+| immediate-recover (immediateRecover, immediaterecover) | calling`recover` at the time a defer is registered, rather than as part of the deferred callback.  e.g. `defer recover()` or equivalent.                                                        |
+| return                                                 | returning values form a deferred function has no effect                                                                                                                                         |
 
 <!-- markdownlint-enable MD013 -->
 
@@ -415,7 +417,7 @@ _Configuration_: ([]string) rule flags. Available flags are:
 
 - `preserveScope` (`preservescope`, `preserve-scope`): do not suggest refactorings that would increase variable scope
 - `allowJump` (`allowjump`, `allow-jump`): suggest a new jump (`return`, `continue` or `break` statement) if it could unnest multiple statements.
-By default, only relocation of _existing_ jumps (i.e. from the `else` clause) are suggested.
+  By default, only relocation of _existing_ jumps (i.e. from the `else` clause) are suggested.
 
 Examples:
 
@@ -604,9 +606,9 @@ Available flags are:
 
 - `checkPrivateReceivers` (`checkprivatereceivers`, `check-private-receivers`) enables checking public methods of private types
 - `disableStutteringCheck` (`disablestutteringcheck`, `disable-stuttering-check`) disables checking for method names that stutter with the package name
-(i.e. avoid failure messages of the form _type name will be used as x.XY by other packages, and that stutters; consider calling this Y_)
+  (i.e. avoid failure messages of the form _type name will be used as x.XY by other packages, and that stutters; consider calling this Y_)
 - `sayRepetitiveInsteadOfStutters` (`sayrepetitiveinsteadofstutters`, `say-repetitive-instead-of-stutters`) replaces the use of the term _stutters_
-by _repetitive_ in failure messages
+  by _repetitive_ in failure messages
 - `checkPublicInterface` (`checkpublicinterface`, `check-public-interface`) enabled checking public method definitions in public interface types
 - `disableChecksOnConstants` (`disablechecksonconstants`, `disable-checks-on-constants`) disable all checks on constant declarations
 - `disableChecksOnFunctions` (`disablechecksonfunctions`, `disable-checks-on-functions`) disable all checks on function declarations
@@ -1007,20 +1009,18 @@ so it may be desirable to enforce consistent formatting.
 _Configuration_: Each argument is a slice containing 2-3 strings: a scope, a regex, and an optional error message.
 
 1. The first string defines a **scope**. This controls which string literals the regex will apply to, and is defined as a function argument.
-It must contain at least a function name (`core.WriteError`).
-Scopes may optionally contain a number specifying which argument in the function to check (`core.WriteError[1]`),
-as well as a struct field (`core.WriteError[1].Message`, only works for top level fields).
-Function arguments are counted starting at 0, so `[0]` would refer to the first argument, `[1]` would refer to the second, etc.
-If no argument number is provided, the first argument will be used (same as `[0]`).
-You can use multiple scopes to one regex. Split them by `,` (`core.WriteError,fmt.Errorf`).
-
+   It must contain at least a function name (`core.WriteError`).
+   Scopes may optionally contain a number specifying which argument in the function to check (`core.WriteError[1]`),
+   as well as a struct field (`core.WriteError[1].Message`, only works for top level fields).
+   Function arguments are counted starting at 0, so `[0]` would refer to the first argument, `[1]` would refer to the second, etc.
+   If no argument number is provided, the first argument will be used (same as `[0]`).
+   You can use multiple scopes to one regex. Split them by `,` (`core.WriteError,fmt.Errorf`).
 2. The second string is a **regular expression** (beginning and ending with a `/` character), which will be used to check the string literals in the scope.
-The default semantics is "_strings matching the regular expression are OK_".
-If you need to inverse the semantics you can add a `!` just before the first `/`. Examples:
+   The default semantics is "_strings matching the regular expression are OK_".
+   If you need to inverse the semantics you can add a `!` just before the first `/`. Examples:
 
-    - with `"/^[A-Z].*$/"` the rule will **accept** strings starting with capital letters
-    - with `"!/^[A-Z].*$/"` the rule will a **fail** on strings starting with capital letters
-
+   - with `"/^[A-Z].*$/"` the rule will **accept** strings starting with capital letters
+   - with `"!/^[A-Z].*$/"` the rule will a **fail** on strings starting with capital letters
 3. The third string (optional) is a **message** containing the purpose for the regex, which will be used in lint errors.
 
 Example:
@@ -1108,7 +1108,6 @@ _Examples_:
   - 0 for the month or day argument
   - out of bounds argument for the month (12), day (31), hour (23), minute (59), or seconds (59)
   - an invalid date: 31st of June, 29th of February in 2023, ...
-
 - Non-decimal integers are used as arguments
 
   This includes:
@@ -1189,7 +1188,7 @@ _Description_: This rule checks whether a type assertion result is checked (the 
 _Configuration_: list of key-value-pair-map (`[]map[string]any`).
 
 - `acceptIgnoredAssertionResult` (`acceptignoredassertionresult`, `accept-ignored-assertion-result`): (bool) default `false`,
-set it to `true` to accept ignored type assertion results like this:
+  set it to `true` to accept ignored type assertion results like this:
 
 ```golang
 foo, _ := bar(.*Baz).
@@ -1364,6 +1363,11 @@ _Configuration_: This rule accepts two slices of strings and one optional slice 
 (This is because TOML does not support "slice of any," and we maintain backward compatibility with the previous configuration version).
 The first slice is an allowlist, and the second one is a blocklist of initialisms.
 In the map, you can add a boolean `upperCaseConst` (`uppercaseconst`, `upper-case-const`) parameter to allow `UPPER_CASE` for `const`.
+
+You can add a boolean parameter `ignoreCommonInitials` (`ignorecommoninitials` or `ignore-common-initials`) to control how names of `functions`, `variables`, `consts`, and `structs` handle known initials (e.g., JSON, HTTP, etc.) when written in camelCase.
+When ignoreCommonInitials is set to true, the rule allows names like "readJson" (no warning).
+When set to false, the rule expects uppercase initials and will suggest changing readJson to "readJSON". (See [issue](https://github.com/mgechev/revive/issues/1414)).
+
 You can also add a boolean `skipPackageNameChecks` (`skippackagenamechecks`, `skip-package-name-checks`) to skip package name checks.
 When `skipPackageNameChecks` is false (the default), you can configure `extraBadPackageNames` (`extrabadpackagenames`, `extra-bad-package-names`)
 to forbid using the values from the list as package names additionally to the standard meaningless ones:
@@ -1385,6 +1389,11 @@ arguments = [[], [], [{ skipPackageNameChecks = true }]]
 
 ```toml
 [rule.var-naming]
+arguments = [[], [], [{ ignoreCommonInitials = true }]]
+```
+
+```toml
+[rule.var-naming]
 arguments = [[], [], [{ extraBadPackageNames = ["helpers", "models"] }]]
 ```
 
@@ -1400,8 +1409,14 @@ arguments = [[], [], [{ skip-package-name-checks = true }]]
 
 ```toml
 [rule.var-naming]
+arguments = [[], [], [{ ignore-common-initials = true }]]
+```
+
+```toml
+[rule.var-naming]
 arguments = [[], [], [{ extra-bad-package-names = ["helpers", "models"] }]]
 ```
+
 
 ## waitgroup-by-value
 

@@ -36,7 +36,7 @@ func TestName(t *testing.T) {
 		{"IEEE802_16Bit", "IEEE802_16Bit"},
 	}
 	for _, test := range tests {
-		got := Name(test.name, nil, nil, false)
+		got := Name(test.name, nil, nil)
 		if got != test.want {
 			t.Errorf("Name(%q) = %q, want %q", test.name, got, test.want)
 		}
@@ -61,7 +61,7 @@ func TestName_IgnoreCommonInitials(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		got := Name(test.name, nil, nil, test.ignoreCommonInitials)
+		got := InternalName(test.name, nil, nil, test.ignoreCommonInitials)
 		if got != test.want {
 			t.Errorf("Name(%q, ignoreCommonInitials=%v) = %q, want %q", test.name, test.ignoreCommonInitials, got, test.want)
 		}

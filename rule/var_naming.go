@@ -226,7 +226,7 @@ func (w *lintNames) check(id *ast.Ident, thing string) {
 		return
 	}
 
-	should := lint.Name(id.Name, w.allowList, w.blockList, w.ignoreCommonInitials)
+	should := lint.InternalName(id.Name, w.allowList, w.blockList, w.ignoreCommonInitials)
 	if id.Name == should {
 		return
 	}
