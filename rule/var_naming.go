@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"unicode"
 
 	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
@@ -15,6 +16,51 @@ import (
 var knownNameExceptions = map[string]bool{
 	"LastInsertId": true, // must match database/sql
 	"kWh":          true,
+}
+
+// commonInitialisms is a set of common initialisms.
+// Only add entries that are highly unlikely to be non-initialisms.
+// For instance, "ID" is fine (Freudian code is rare), but "AND" is not.
+var commonInitialisms = map[string]bool{
+	"ACL":   true,
+	"API":   true,
+	"ASCII": true,
+	"CPU":   true,
+	"CSS":   true,
+	"DNS":   true,
+	"EOF":   true,
+	"GUID":  true,
+	"HTML":  true,
+	"HTTP":  true,
+	"HTTPS": true,
+	"ID":    true,
+	"IDS":   true,
+	"IP":    true,
+	"JSON":  true,
+	"LHS":   true,
+	"QPS":   true,
+	"RAM":   true,
+	"RHS":   true,
+	"RPC":   true,
+	"SLA":   true,
+	"SMTP":  true,
+	"SQL":   true,
+	"SSH":   true,
+	"TCP":   true,
+	"TLS":   true,
+	"TTL":   true,
+	"UDP":   true,
+	"UI":    true,
+	"UID":   true,
+	"UUID":  true,
+	"URI":   true,
+	"URL":   true,
+	"UTF8":  true,
+	"VM":    true,
+	"XML":   true,
+	"XMPP":  true,
+	"XSRF":  true,
+	"XSS":   true,
 }
 
 // defaultBadPackageNames is the list of "bad" package names from https://go.dev/wiki/CodeReviewComments#package-names
@@ -32,13 +78,13 @@ var defaultBadPackageNames = map[string]struct{}{
 
 // VarNamingRule lints the name of a variable.
 type VarNamingRule struct {
-	allowList               []string
-	blockList               []string
-	allowUpperCaseConst     bool                // if true - allows to use UPPER_SOME_NAMES for constants
-	skipPackageNameChecks   bool                // check for meaningless and user-defined bad package names
-	ignoreCommonInitialisms bool                // disable enforcing capitals of known initials (specifies in Name commonInitialisms)
-	extraBadPackageNames    map[string]struct{} // inactive if skipPackageNameChecks is false
-	pkgNameAlreadyChecked   syncSet             // set of packages names already checked
+	allowList                []string
+	blockList                []string
+	allowUpperCaseConst      bool                // if true - allows to use UPPER_SOME_NAMES for constants
+	skipInitialismNameChecks bool                // if true disable enforcing capitals for common initialisms
+	skipPackageNameChecks    bool                // check for meaningless and user-defined bad package names
+	extraBadPackageNames     map[string]struct{} // inactive if skipPackageNameChecks is false
+	pkgNameAlreadyChecked    syncSet             // set of packages names already checked
 }
 
 // Configure validates the rule configuration, and configures the rule accordingly.
@@ -81,10 +127,10 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 			switch {
 			case isRuleOption(k, "upperCaseConst"):
 				r.allowUpperCaseConst = fmt.Sprint(v) == "true"
+			case isRuleOption(k, "skipInitialismNameChecks"):
+				r.skipInitialismNameChecks = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "skipPackageNameChecks"):
 				r.skipPackageNameChecks = fmt.Sprint(v) == "true"
-			case isRuleOption(k, "ignoreCommonInitialisms"):
-				r.ignoreCommonInitialisms = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "extraBadPackageNames"):
 				extraBadPackageNames, ok := v.([]any)
 				if !ok {
@@ -119,13 +165,13 @@ func (r *VarNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 
 	fileAst := file.AST
 	walker := lintNames{
-		file:                    file,
-		fileAst:                 fileAst,
-		allowList:               r.allowList,
-		blockList:               r.blockList,
-		onFailure:               onFailure,
-		upperCaseConst:          r.allowUpperCaseConst,
-		ignoreCommonInitialisms: r.ignoreCommonInitialisms,
+		file:                 file,
+		fileAst:              fileAst,
+		allowList:            r.allowList,
+		blockList:            r.blockList,
+		onFailure:            onFailure,
+		upperCaseConst:       r.allowUpperCaseConst,
+		skipInitialismChecks: r.skipInitialismNameChecks,
 	}
 
 	ast.Walk(&walker, fileAst)
@@ -181,13 +227,13 @@ func (*VarNamingRule) pkgNameFailure(node ast.Node, msg string, args ...any) lin
 }
 
 type lintNames struct {
-	file                    *lint.File
-	fileAst                 *ast.File
-	onFailure               func(lint.Failure)
-	allowList               []string
-	blockList               []string
-	upperCaseConst          bool
-	ignoreCommonInitialisms bool
+	file                 *lint.File
+	fileAst              *ast.File
+	onFailure            func(lint.Failure)
+	allowList            []string
+	blockList            []string
+	upperCaseConst       bool
+	skipInitialismChecks bool
 }
 
 func (w *lintNames) checkList(fl *ast.FieldList, thing string) {
@@ -226,7 +272,7 @@ func (w *lintNames) check(id *ast.Ident, thing string) {
 		return
 	}
 
-	should := lint.InternalName(id.Name, w.allowList, w.blockList, w.ignoreCommonInitialisms)
+	should := w.name(id.Name, w.allowList, w.blockList, w.skipInitialismChecks)
 	if id.Name == should {
 		return
 	}
@@ -438,4 +484,87 @@ func (sm *syncSet) has(s string) bool {
 
 func (sm *syncSet) add(s string) {
 	sm.elements[s] = struct{}{}
+}
+
+// name returns a different name of struct, var, const, or function if it should be different.
+func (*lintNames) name(name string, allowlist, blocklist []string, skipInitialismNameChecks bool) (should string) {
+	// Fast path for simple cases: "_" and all lowercase.
+	if name == "_" {
+		return name
+	}
+	allLower := true
+	for _, r := range name {
+		if !unicode.IsLower(r) {
+			allLower = false
+			break
+		}
+	}
+	if allLower {
+		return name
+	}
+
+	// Split camelCase at any lower->upper transition, and split on underscores.
+	// Check each word for common initialisms.
+	runes := []rune(name)
+	w, i := 0, 0 // index of start of word, scan
+	for i+1 <= len(runes) {
+		eow := false // whether we hit the end of a word
+		switch {
+		case i+1 == len(runes):
+			eow = true
+		case runes[i+1] == '_':
+			// underscore; shift the remainder forward over any run of underscores
+			eow = true
+			n := 1
+			for i+n+1 < len(runes) && runes[i+n+1] == '_' {
+				n++
+			}
+
+			// Leave at most one underscore if the underscore is between two digits
+			if i+n+1 < len(runes) && unicode.IsDigit(runes[i]) && unicode.IsDigit(runes[i+n+1]) {
+				n--
+			}
+
+			copy(runes[i+1:], runes[i+n+1:])
+			runes = runes[:len(runes)-n]
+		case unicode.IsLower(runes[i]) && !unicode.IsLower(runes[i+1]):
+			// lower->non-lower
+			eow = true
+		}
+		i++
+		if !eow {
+			continue
+		}
+
+		// [w,i) is a word.
+		word := string(runes[w:i])
+		ignoreInitWarnings := map[string]bool{}
+		for _, i := range allowlist {
+			ignoreInitWarnings[i] = true
+		}
+
+		extraInits := map[string]bool{}
+		for _, i := range blocklist {
+			extraInits[i] = true
+		}
+
+		if u := strings.ToUpper(word); !skipInitialismNameChecks && (commonInitialisms[u] || extraInits[u]) && !ignoreInitWarnings[u] {
+			// Keep consistent case, which is lowercase only at the start.
+			if w == 0 && unicode.IsLower(runes[w]) {
+				u = strings.ToLower(u)
+			}
+			// Keep lowercase s for IDs
+			if u == "IDS" {
+				u = "IDs"
+			}
+			// All the common initialisms are ASCII,
+			// so we can replace the bytes exactly.
+			copy(runes[w:], []rune(u))
+		} else if w > 0 && strings.ToLower(word) == word {
+			// already all lowercase, and not the first word, so uppercase the first character.
+			runes[w] = unicode.ToUpper(runes[w])
+		}
+		w = i
+	}
+	return string(runes)
 }

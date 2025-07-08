@@ -11,6 +11,24 @@ func TestVarNaming(t *testing.T) {
 	testRule(t, "var_naming", &rule.VarNamingRule{}, &lint.RuleConfig{
 		Arguments: []any{[]any{"ID"}, []any{"VM"}},
 	})
+	testRule(t, "var_naming_skip_initialism_name_checks_true", &rule.VarNamingRule{}, &lint.RuleConfig{
+		Arguments: []any{
+			[]any{},
+			[]any{},
+			[]any{map[string]any{"skip-initialism-name-checks": true}},
+		}})
+	testRule(t, "var_naming_skip_initialism_name_checks_false", &rule.VarNamingRule{}, &lint.RuleConfig{
+		Arguments: []any{
+			[]any{},
+			[]any{},
+			[]any{map[string]any{"skip-initialism-name-checks": false}},
+		}})
+	testRule(t, "var_naming_allowlist_blocklist_skip_initialism_name_checks", &rule.VarNamingRule{}, &lint.RuleConfig{
+		Arguments: []any{
+			[]any{"ID"},
+			[]any{"VM"},
+			[]any{map[string]any{"skip-initialism-name-checks": true}},
+		}})
 
 	testRule(t, "var_naming_test", &rule.VarNamingRule{}, &lint.RuleConfig{})
 
@@ -40,13 +58,6 @@ func TestVarNaming(t *testing.T) {
 			[]any{map[string]any{"skip-package-name-checks": false, "extra-bad-package-names": []any{"helpers"}}},
 		},
 	})
-	testRule(t, "var_naming_ignore_common_initialisms_true", &rule.VarNamingRule{}, &lint.RuleConfig{
-		Arguments: []any{[]any{}, []any{}, []any{map[string]any{"ignoreCommonInitialisms": true}}}})
-	testRule(t, "var_naming_ignore_common_initialisms_false", &rule.VarNamingRule{}, &lint.RuleConfig{})
-
-	testRule(t, "var_naming_ignore_common_initialisms_true", &rule.VarNamingRule{}, &lint.RuleConfig{
-		Arguments: []any{[]any{}, []any{}, []any{map[string]any{"ignore-common-initialisms": true}}}})
-
 }
 
 func BenchmarkUpperCaseConstTrue(b *testing.B) {

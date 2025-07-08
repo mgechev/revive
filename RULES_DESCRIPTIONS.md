@@ -1363,10 +1363,10 @@ It ignores functions starting with `Example`, `Test`, `Benchmark`, and `Fuzz` in
 _Configuration_: This rule accepts two slices of strings and one optional slice containing a single map with named parameters.
 (This is because TOML does not support "slice of any," and we maintain backward compatibility with the previous configuration version).
 The first slice is an allowlist, and the second one is a blocklist of initialisms.
-In the map, you can add a boolean `upperCaseConst` (`uppercaseconst`, `upper-case-const`) parameter to allow `UPPER_CASE` for `const`.
-You can add a boolean parameter `ignoreCommonInitialisms` (`ignorecommoninitialisms` or `ignore-common-initialisms`) to control how names
+You can add a boolean parameter `skipInitialismNameChecks` (`skipinitialismnamechecks` or `skip-initialism-name-checks`) to control how names
 of functions, variables, consts, and structs handle known initialisms (e.g., JSON, HTTP, etc.) when written in `camelCase`.
 When `ignoreCommonInitialisms` is set to true, the rule allows names like `readJson`, `HttpMethod` etc.
+In the map, you can add a boolean `upperCaseConst` (`uppercaseconst`, `upper-case-const`) parameter to allow `UPPER_CASE` for `const`.
 You can also add a boolean `skipPackageNameChecks` (`skippackagenamechecks`, `skip-package-name-checks`) to skip package name checks.
 When `skipPackageNameChecks` is false (the default), you can configure `extraBadPackageNames` (`extrabadpackagenames`, `extra-bad-package-names`)
 to forbid using the values from the list as package names additionally to the standard meaningless ones:
@@ -1383,7 +1383,7 @@ arguments = [["ID"], ["VM"], [{ upperCaseConst = true }]]
 
 ```toml
 [rule.var-naming]
-arguments = [[], [], [{ ignoreCommonInitialisms = true }]]
+arguments = [[], [], [{ skipInitialismNameChecks = true }]]
 ```
 
 ```toml
@@ -1403,7 +1403,7 @@ arguments = [["ID"], ["VM"], [{ upper-case-const = true }]]
 
 ```toml
 [rule.var-naming]
-arguments = [[], [], [{ ignore-common-initialisms = true }]]
+arguments = [[], [], [{ skip-initialism-name-checks = true }]]
 ```
 
 ```toml

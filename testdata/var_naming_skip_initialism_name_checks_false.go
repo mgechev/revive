@@ -1,5 +1,3 @@
-// should pass if ignoreCommonInitialisms = false
-
 package fixtures
 
 const HTTPRes = 200
