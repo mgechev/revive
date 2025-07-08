@@ -43,27 +43,27 @@ func TestName(t *testing.T) {
 	}
 }
 
-func TestName_IgnoreCommonInitials(t *testing.T) {
+func TestName_IgnoreCommonInitialisms(t *testing.T) {
 	tests := []struct {
-		name                 string
-		want                 string
-		ignoreCommonInitials bool
+		name                    string
+		want                    string
+		ignoreCommonInitialisms bool
 	}{
 		// Default behavior (modifies based on common initialisms)
 		{"getJson", "getJSON", false},
 		{"userId", "userID", false},
 		{"myHttpClient", "myHTTPClient", false},
 
-		// With ignoreCommonInitials = true
+		// With ignoreCommonInitialisms = true
 		{"getJson", "getJson", true},
 		{"userId", "userId", true},
 		{"myHttpClient", "myHttpClient", true},
 	}
 
 	for _, test := range tests {
-		got := InternalName(test.name, nil, nil, test.ignoreCommonInitials)
+		got := InternalName(test.name, nil, nil, test.ignoreCommonInitialisms)
 		if got != test.want {
-			t.Errorf("Name(%q, ignoreCommonInitials=%v) = %q, want %q", test.name, test.ignoreCommonInitials, got, test.want)
+			t.Errorf("Name(%q, ignoreCommonInitialisms=%v) = %q, want %q", test.name, test.ignoreCommonInitialisms, got, test.want)
 		}
 	}
 }

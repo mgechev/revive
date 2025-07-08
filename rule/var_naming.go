@@ -32,13 +32,13 @@ var defaultBadPackageNames = map[string]struct{}{
 
 // VarNamingRule lints the name of a variable.
 type VarNamingRule struct {
-	allowList             []string
-	blockList             []string
-	allowUpperCaseConst   bool                // if true - allows to use UPPER_SOME_NAMES for constants
-	skipPackageNameChecks bool                // check for meaningless and user-defined bad package names
-	ignoreCommonInitials  bool                // disable enforcing capitals of known initials (specifies in Name commonInitialisms)
-	extraBadPackageNames  map[string]struct{} // inactive if skipPackageNameChecks is false
-	pkgNameAlreadyChecked syncSet             // set of packages names already checked
+	allowList               []string
+	blockList               []string
+	allowUpperCaseConst     bool                // if true - allows to use UPPER_SOME_NAMES for constants
+	skipPackageNameChecks   bool                // check for meaningless and user-defined bad package names
+	ignoreCommonInitialisms bool                // disable enforcing capitals of known initials (specifies in Name commonInitialisms)
+	extraBadPackageNames    map[string]struct{} // inactive if skipPackageNameChecks is false
+	pkgNameAlreadyChecked   syncSet             // set of packages names already checked
 }
 
 // Configure validates the rule configuration, and configures the rule accordingly.
@@ -83,8 +83,8 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 				r.allowUpperCaseConst = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "skipPackageNameChecks"):
 				r.skipPackageNameChecks = fmt.Sprint(v) == "true"
-			case isRuleOption(k, "ignoreCommonInitials"):
-				r.ignoreCommonInitials = fmt.Sprint(v) == "true"
+			case isRuleOption(k, "ignoreCommonInitialisms"):
+				r.ignoreCommonInitialisms = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "extraBadPackageNames"):
 				extraBadPackageNames, ok := v.([]any)
 				if !ok {
@@ -119,13 +119,13 @@ func (r *VarNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 
 	fileAst := file.AST
 	walker := lintNames{
-		file:                 file,
-		fileAst:              fileAst,
-		allowList:            r.allowList,
-		blockList:            r.blockList,
-		onFailure:            onFailure,
-		upperCaseConst:       r.allowUpperCaseConst,
-		ignoreCommonInitials: r.ignoreCommonInitials,
+		file:                    file,
+		fileAst:                 fileAst,
+		allowList:               r.allowList,
+		blockList:               r.blockList,
+		onFailure:               onFailure,
+		upperCaseConst:          r.allowUpperCaseConst,
+		ignoreCommonInitialisms: r.ignoreCommonInitialisms,
 	}
 
 	ast.Walk(&walker, fileAst)
@@ -181,13 +181,13 @@ func (*VarNamingRule) pkgNameFailure(node ast.Node, msg string, args ...any) lin
 }
 
 type lintNames struct {
-	file                 *lint.File
-	fileAst              *ast.File
-	onFailure            func(lint.Failure)
-	allowList            []string
-	blockList            []string
-	upperCaseConst       bool
-	ignoreCommonInitials bool
+	file                    *lint.File
+	fileAst                 *ast.File
+	onFailure               func(lint.Failure)
+	allowList               []string
+	blockList               []string
+	upperCaseConst          bool
+	ignoreCommonInitialisms bool
 }
 
 func (w *lintNames) checkList(fl *ast.FieldList, thing string) {
@@ -226,7 +226,7 @@ func (w *lintNames) check(id *ast.Ident, thing string) {
 		return
 	}
 
-	should := lint.InternalName(id.Name, w.allowList, w.blockList, w.ignoreCommonInitials)
+	should := lint.InternalName(id.Name, w.allowList, w.blockList, w.ignoreCommonInitialisms)
 	if id.Name == should {
 		return
 	}

@@ -10,25 +10,25 @@ import (
 
 func TestVarNamingRule_Configure(t *testing.T) {
 	tests := []struct {
-		name                      string
-		arguments                 lint.Arguments
-		wantErr                   error
-		wantAllowList             []string
-		wantBlockList             []string
-		wantAllowUpperCaseConst   bool
-		wantSkipPackageNameChecks bool
-		wantIgnoreCommonInitials  bool
-		wantBadPackageNames       map[string]struct{}
+		name                        string
+		arguments                   lint.Arguments
+		wantErr                     error
+		wantAllowList               []string
+		wantBlockList               []string
+		wantAllowUpperCaseConst     bool
+		wantSkipPackageNameChecks   bool
+		wantIgnoreCommonInitialisms bool
+		wantBadPackageNames         map[string]struct{}
 	}{
 		{
-			name:                      "no arguments",
-			arguments:                 lint.Arguments{},
-			wantErr:                   nil,
-			wantAllowList:             nil,
-			wantBlockList:             nil,
-			wantAllowUpperCaseConst:   false,
-			wantIgnoreCommonInitials:  false,
-			wantSkipPackageNameChecks: false,
+			name:                        "no arguments",
+			arguments:                   lint.Arguments{},
+			wantErr:                     nil,
+			wantAllowList:               nil,
+			wantBlockList:               nil,
+			wantAllowUpperCaseConst:     false,
+			wantIgnoreCommonInitialisms: false,
+			wantSkipPackageNameChecks:   false,
 		},
 		{
 			name: "valid arguments",
@@ -41,13 +41,13 @@ func TestVarNamingRule_Configure(t *testing.T) {
 					"extraBadPackageNames":  []any{"helpers", "models"},
 				}},
 			},
-			wantErr:                   nil,
-			wantAllowList:             []string{"ID"},
-			wantBlockList:             []string{"VM"},
-			wantAllowUpperCaseConst:   true,
-			wantSkipPackageNameChecks: true,
-			wantIgnoreCommonInitials:  false,
-			wantBadPackageNames:       map[string]struct{}{"helpers": {}, "models": {}},
+			wantErr:                     nil,
+			wantAllowList:               []string{"ID"},
+			wantBlockList:               []string{"VM"},
+			wantAllowUpperCaseConst:     true,
+			wantSkipPackageNameChecks:   true,
+			wantIgnoreCommonInitialisms: false,
+			wantBadPackageNames:         map[string]struct{}{"helpers": {}, "models": {}},
 		},
 		{
 			name: "valid lowercased arguments",
@@ -55,10 +55,10 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{"ID"},
 				[]any{"VM"},
 				[]any{map[string]any{
-					"uppercaseconst":        true,
-					"skippackagenamechecks": true,
-					"ignorecommoninitials":  true,
-					"extrabadpackagenames":  []any{"helpers", "models"},
+					"uppercaseconst":          true,
+					"skippackagenamechecks":   true,
+					"ignoreCommonInitialisms": true,
+					"extrabadpackagenames":    []any{"helpers", "models"},
 				}},
 			},
 			wantErr:                   nil,
@@ -74,19 +74,19 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{"ID"},
 				[]any{"VM"},
 				[]any{map[string]any{
-					"upper-case-const":         true,
-					"skip-package-name-checks": true,
-					"ignore-common-initials":   true,
-					"extra-bad-package-names":  []any{"helpers", "models"},
+					"upper-case-const":           true,
+					"skip-package-name-checks":   true,
+					"ignore-common-initialisms ": true,
+					"extra-bad-package-names":    []any{"helpers", "models"},
 				}},
 			},
-			wantErr:                   nil,
-			wantAllowList:             []string{"ID"},
-			wantBlockList:             []string{"VM"},
-			wantAllowUpperCaseConst:   true,
-			wantSkipPackageNameChecks: true,
-			wantIgnoreCommonInitials:  true,
-			wantBadPackageNames:       map[string]struct{}{"helpers": {}, "models": {}},
+			wantErr:                     nil,
+			wantAllowList:               []string{"ID"},
+			wantBlockList:               []string{"VM"},
+			wantAllowUpperCaseConst:     true,
+			wantSkipPackageNameChecks:   true,
+			wantIgnoreCommonInitialisms: true,
+			wantBadPackageNames:         map[string]struct{}{"helpers": {}, "models": {}},
 		},
 		{
 			name:      "invalid allowlist type",

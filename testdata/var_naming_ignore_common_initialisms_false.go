@@ -1,4 +1,4 @@
-// should pass if ignoreCommonInitials = false
+// should pass if ignoreCommonInitialisms = false
 
 package fixtures
 

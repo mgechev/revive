@@ -1,6 +1,3 @@
-[rule.var-naming]
-arguments = [[], [], [{ extra-bad-package-names = ["helpers", "models"] }]]# Description of available rules
-
 List of all available rules.
 
 - [Description of available rules](#description-of-available-rules)
@@ -1364,8 +1361,8 @@ _Configuration_: This rule accepts two slices of strings and one optional slice 
 The first slice is an allowlist, and the second one is a blocklist of initialisms.
 In the map, you can add a boolean `upperCaseConst` (`uppercaseconst`, `upper-case-const`) parameter to allow `UPPER_CASE` for `const`.
 
-You can add a boolean parameter `ignoreCommonInitials` (`ignorecommoninitials` or `ignore-common-initials`) to control how names of `functions`, `variables`, `consts`, and `structs` handle known initials (e.g., JSON, HTTP, etc.) when written in camelCase.
-When ignoreCommonInitials is set to true, the rule allows names like "readJson" (no warning).
+You can add a boolean parameter `ignoreCommonInitialisms` (`ignorecommoninitialisms` or `ignore-common-initialisms`) to control how names of `functions`, `variables`, `consts`, and `structs` handle known initials (e.g., JSON, HTTP, etc.) when written in camelCase.
+When ignoreCommonInitialisms is set to true, the rule allows names like "readJson" (no warning).
 When set to false, the rule expects uppercase initials and will suggest changing readJson to "readJSON". (See [issue](https://github.com/mgechev/revive/issues/1414)).
 
 You can also add a boolean `skipPackageNameChecks` (`skippackagenamechecks`, `skip-package-name-checks`) to skip package name checks.
@@ -1389,7 +1386,7 @@ arguments = [[], [], [{ skipPackageNameChecks = true }]]
 
 ```toml
 [rule.var-naming]
-arguments = [[], [], [{ ignoreCommonInitials = true }]]
+arguments = [[], [], [{ ignoreCommonInitialisms = true }]]
 ```
 
 ```toml
@@ -1409,7 +1406,7 @@ arguments = [[], [], [{ skip-package-name-checks = true }]]
 
 ```toml
 [rule.var-naming]
-arguments = [[], [], [{ ignore-common-initials = true }]]
+arguments = [[], [], [{ ignore-common-initialisms = true }]]
 ```
 
 ```toml

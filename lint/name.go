@@ -5,13 +5,13 @@ import (
 	"unicode"
 )
 
-// Name returns a different name if it should be different considering common initials.
+// Name returns a different name if it should be different considering common initialisms.
 func Name(name string, allowList, blockList []string) string {
 	return InternalName(name, allowList, blockList, false)
 }
 
 // InternalName returns a different name if it should be different
-func InternalName(name string, allowlist, blocklist []string, ignoreCommonInitials bool) (should string) {
+func InternalName(name string, allowlist, blocklist []string, ignoreCommonInitialisms bool) (should string) {
 	// Fast path for simple cases: "_" and all lowercase.
 	if name == "_" {
 		return name
@@ -75,9 +75,9 @@ func InternalName(name string, allowlist, blocklist []string, ignoreCommonInitia
 		u := strings.ToUpper(word)
 
 		// compact the existence of common initial and the flag if needed to ignore it to one bool
-		shouldFlagCommonInitials := commonInitialisms[u] && !ignoreCommonInitials
+		shouldFlagCommonInitialisms := commonInitialisms[u] && !ignoreCommonInitialisms
 
-		if (shouldFlagCommonInitials || extraInits[u]) && !ignoreInitWarnings[u] {
+		if (shouldFlagCommonInitialisms || extraInits[u]) && !ignoreInitWarnings[u] {
 			// Keep consistent case, which is lowercase only at the start.
 			if w == 0 && unicode.IsLower(runes[w]) {
 				u = strings.ToLower(u)
