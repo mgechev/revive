@@ -1378,12 +1378,12 @@ Examples:
 
 ```toml
 [rule.var-naming]
-arguments = [["ID"], ["VM"], [{ upperCaseConst = true }]]
+arguments = [[], [], [{ skipInitialismNameChecks = true }]]
 ```
 
 ```toml
 [rule.var-naming]
-arguments = [[], [], [{ skipInitialismNameChecks = true }]]
+arguments = [["ID"], ["VM"], [{ upperCaseConst = true }]]
 ```
 
 ```toml
@@ -1398,12 +1398,12 @@ arguments = [[], [], [{ extraBadPackageNames = ["helpers", "models"] }]]
 
 ```toml
 [rule.var-naming]
-arguments = [["ID"], ["VM"], [{ upper-case-const = true }]]
+arguments = [[], [], [{ skip-initialism-name-checks = true }]]
 ```
 
 ```toml
 [rule.var-naming]
-arguments = [[], [], [{ skip-initialism-name-checks = true }]]
+arguments = [["ID"], ["VM"], [{ upper-case-const = true }]]
 ```
 
 ```toml

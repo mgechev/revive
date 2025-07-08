@@ -80,11 +80,12 @@ var defaultBadPackageNames = map[string]struct{}{
 type VarNamingRule struct {
 	allowList                []string
 	blockList                []string
-	allowUpperCaseConst      bool                // if true - allows to use UPPER_SOME_NAMES for constants
-	skipInitialismNameChecks bool                // if true disable enforcing capitals for common initialisms
-	skipPackageNameChecks    bool                // check for meaningless and user-defined bad package names
-	extraBadPackageNames     map[string]struct{} // inactive if skipPackageNameChecks is false
-	pkgNameAlreadyChecked    syncSet             // set of packages names already checked
+	skipInitialismNameChecks bool // if true disable enforcing capitals for common initialisms
+
+	allowUpperCaseConst   bool                // if true - allows to use UPPER_SOME_NAMES for constants
+	skipPackageNameChecks bool                // check for meaningless and user-defined bad package names
+	extraBadPackageNames  map[string]struct{} // inactive if skipPackageNameChecks is false
+	pkgNameAlreadyChecked syncSet             // set of packages names already checked
 }
 
 // Configure validates the rule configuration, and configures the rule accordingly.
@@ -125,10 +126,10 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 		}
 		for k, v := range args {
 			switch {
-			case isRuleOption(k, "upperCaseConst"):
-				r.allowUpperCaseConst = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "skipInitialismNameChecks"):
 				r.skipInitialismNameChecks = fmt.Sprint(v) == "true"
+			case isRuleOption(k, "upperCaseConst"):
+				r.allowUpperCaseConst = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "skipPackageNameChecks"):
 				r.skipPackageNameChecks = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "extraBadPackageNames"):
@@ -167,11 +168,11 @@ func (r *VarNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 	walker := lintNames{
 		file:                 file,
 		fileAst:              fileAst,
+		onFailure:            onFailure,
 		allowList:            r.allowList,
 		blockList:            r.blockList,
-		onFailure:            onFailure,
-		upperCaseConst:       r.allowUpperCaseConst,
 		skipInitialismChecks: r.skipInitialismNameChecks,
+		upperCaseConst:       r.allowUpperCaseConst,
 	}
 
 	ast.Walk(&walker, fileAst)
@@ -232,8 +233,8 @@ type lintNames struct {
 	onFailure            func(lint.Failure)
 	allowList            []string
 	blockList            []string
-	upperCaseConst       bool
 	skipInitialismChecks bool
+	upperCaseConst       bool
 }
 
 func (w *lintNames) checkList(fl *ast.FieldList, thing string) {
