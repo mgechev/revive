@@ -46,6 +46,7 @@ linters:
         - name: constant-logical-expr
         - name: context-as-argument
         - name: context-keys-type
+        - name: datarace
         - name: deep-exit
         - name: dot-imports
         - name: empty-block
@@ -73,15 +74,19 @@ linters:
         - name: redefines-builtin-id
         - name: redundant-build-tag
         - name: superfluous-else
+        - name: time-date
+        - name: time-equal
         - name: time-naming
         - name: unexported-naming
         - name: unexported-return
+        - name: unnecessary-format
         - name: unnecessary-stmt
         - name: unreachable-code
         - name: unused-parameter
         - name: unused-receiver
         - name: useless-break
         - name: use-any
+        - name: use-fmt-print
         - name: var-declaration
         - name: var-naming
 
