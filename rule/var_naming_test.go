@@ -45,7 +45,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			wantErr:                      nil,
 			wantAllowList:                []string{"ID"},
 			wantBlockList:                []string{"VM"},
-			wantSkipInitialismNameChecks: false,
+			wantSkipInitialismNameChecks: true,
 			wantAllowUpperCaseConst:      true,
 			wantSkipPackageNameChecks:    true,
 			wantBadPackageNames:          map[string]struct{}{"helpers": {}, "models": {}},
@@ -156,6 +156,9 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			}
 			if rule.skipPackageNameChecks != tt.wantSkipPackageNameChecks {
 				t.Errorf("unexpected skipPackageNameChecks: got = %v, want %v", rule.skipPackageNameChecks, tt.wantSkipPackageNameChecks)
+			}
+			if rule.skipInitialismNameChecks != tt.wantSkipInitialismNameChecks {
+				t.Errorf("unexpected skipInitialismNameChecks: got = %v, want %v", rule.skipInitialismNameChecks, tt.wantSkipInitialismNameChecks)
 			}
 			if !reflect.DeepEqual(rule.extraBadPackageNames, tt.wantBadPackageNames) {
 				t.Errorf("unexpected extraBadPackageNames: got = %v, want %v", rule.extraBadPackageNames, tt.wantBadPackageNames)
