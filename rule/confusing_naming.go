@@ -115,7 +115,7 @@ func checkMethodName(holder string, id *ast.Ident, w *lintConfusingNames) {
 
 	// update the block list
 	if pkgm.methods[holder] == nil {
-		fmt.Fprintln(os.Stderr, "no entry for '", holder, "'")
+		fmt.Fprintf(os.Stderr, "no entry for '%s'\n", holder)
 	}
 	pkgm.methods[holder][name] = &referenceMethod{fileName: w.fileName, id: id}
 }
