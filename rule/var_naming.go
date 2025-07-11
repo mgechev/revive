@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/mgechev/revive/internal/astutils"
+	"github.com/mgechev/revive/internal/rule"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -32,8 +33,10 @@ var defaultBadPackageNames = map[string]struct{}{
 
 // VarNamingRule lints the name of a variable.
 type VarNamingRule struct {
-	allowList             []string
-	blockList             []string
+	allowList                []string
+	blockList                []string
+	skipInitialismNameChecks bool // if true disable enforcing capitals for common initialisms
+
 	allowUpperCaseConst   bool                // if true - allows to use UPPER_SOME_NAMES for constants
 	skipPackageNameChecks bool                // check for meaningless and user-defined bad package names
 	extraBadPackageNames  map[string]struct{} // inactive if skipPackageNameChecks is false
@@ -78,6 +81,8 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 		}
 		for k, v := range args {
 			switch {
+			case isRuleOption(k, "skipInitialismNameChecks"):
+				r.skipInitialismNameChecks = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "upperCaseConst"):
 				r.allowUpperCaseConst = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "skipPackageNameChecks"):
@@ -116,12 +121,13 @@ func (r *VarNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 
 	fileAst := file.AST
 	walker := lintNames{
-		file:           file,
-		fileAst:        fileAst,
-		allowList:      r.allowList,
-		blockList:      r.blockList,
-		onFailure:      onFailure,
-		upperCaseConst: r.allowUpperCaseConst,
+		file:                 file,
+		fileAst:              fileAst,
+		onFailure:            onFailure,
+		allowList:            r.allowList,
+		blockList:            r.blockList,
+		skipInitialismChecks: r.skipInitialismNameChecks,
+		upperCaseConst:       r.allowUpperCaseConst,
 	}
 
 	ast.Walk(&walker, fileAst)
@@ -177,12 +183,13 @@ func (*VarNamingRule) pkgNameFailure(node ast.Node, msg string, args ...any) lin
 }
 
 type lintNames struct {
-	file           *lint.File
-	fileAst        *ast.File
-	onFailure      func(lint.Failure)
-	allowList      []string
-	blockList      []string
-	upperCaseConst bool
+	file                 *lint.File
+	fileAst              *ast.File
+	onFailure            func(lint.Failure)
+	allowList            []string
+	blockList            []string
+	skipInitialismChecks bool
+	upperCaseConst       bool
 }
 
 func (w *lintNames) checkList(fl *ast.FieldList, thing string) {
@@ -221,7 +228,7 @@ func (w *lintNames) check(id *ast.Ident, thing string) {
 		return
 	}
 
-	should := lint.Name(id.Name, w.allowList, w.blockList)
+	should := rule.Name(id.Name, w.allowList, w.blockList, w.skipInitialismChecks)
 	if id.Name == should {
 		return
 	}

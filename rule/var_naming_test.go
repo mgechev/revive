@@ -10,23 +10,25 @@ import (
 
 func TestVarNamingRule_Configure(t *testing.T) {
 	tests := []struct {
-		name                      string
-		arguments                 lint.Arguments
-		wantErr                   error
-		wantAllowList             []string
-		wantBlockList             []string
-		wantAllowUpperCaseConst   bool
-		wantSkipPackageNameChecks bool
-		wantBadPackageNames       map[string]struct{}
+		name                         string
+		arguments                    lint.Arguments
+		wantErr                      error
+		wantAllowList                []string
+		wantBlockList                []string
+		wantSkipInitialismNameChecks bool
+		wantAllowUpperCaseConst      bool
+		wantSkipPackageNameChecks    bool
+		wantBadPackageNames          map[string]struct{}
 	}{
 		{
-			name:                      "no arguments",
-			arguments:                 lint.Arguments{},
-			wantErr:                   nil,
-			wantAllowList:             nil,
-			wantBlockList:             nil,
-			wantAllowUpperCaseConst:   false,
-			wantSkipPackageNameChecks: false,
+			name:                         "no arguments",
+			arguments:                    lint.Arguments{},
+			wantErr:                      nil,
+			wantAllowList:                nil,
+			wantBlockList:                nil,
+			wantSkipInitialismNameChecks: false,
+			wantAllowUpperCaseConst:      false,
+			wantSkipPackageNameChecks:    false,
 		},
 		{
 			name: "valid arguments",
@@ -34,17 +36,19 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{"ID"},
 				[]any{"VM"},
 				[]any{map[string]any{
-					"upperCaseConst":        true,
-					"skipPackageNameChecks": true,
-					"extraBadPackageNames":  []any{"helpers", "models"},
+					"skipInitialismNameChecks": true,
+					"upperCaseConst":           true,
+					"skipPackageNameChecks":    true,
+					"extraBadPackageNames":     []any{"helpers", "models"},
 				}},
 			},
-			wantErr:                   nil,
-			wantAllowList:             []string{"ID"},
-			wantBlockList:             []string{"VM"},
-			wantAllowUpperCaseConst:   true,
-			wantSkipPackageNameChecks: true,
-			wantBadPackageNames:       map[string]struct{}{"helpers": {}, "models": {}},
+			wantErr:                      nil,
+			wantAllowList:                []string{"ID"},
+			wantBlockList:                []string{"VM"},
+			wantSkipInitialismNameChecks: true,
+			wantAllowUpperCaseConst:      true,
+			wantSkipPackageNameChecks:    true,
+			wantBadPackageNames:          map[string]struct{}{"helpers": {}, "models": {}},
 		},
 		{
 			name: "valid lowercased arguments",
@@ -52,17 +56,19 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{"ID"},
 				[]any{"VM"},
 				[]any{map[string]any{
-					"uppercaseconst":        true,
-					"skippackagenamechecks": true,
-					"extrabadpackagenames":  []any{"helpers", "models"},
+					"skipinitialismnamechecks": true,
+					"uppercaseconst":           true,
+					"skippackagenamechecks":    true,
+					"extrabadpackagenames":     []any{"helpers", "models"},
 				}},
 			},
-			wantErr:                   nil,
-			wantAllowList:             []string{"ID"},
-			wantBlockList:             []string{"VM"},
-			wantAllowUpperCaseConst:   true,
-			wantSkipPackageNameChecks: true,
-			wantBadPackageNames:       map[string]struct{}{"helpers": {}, "models": {}},
+			wantErr:                      nil,
+			wantAllowList:                []string{"ID"},
+			wantBlockList:                []string{"VM"},
+			wantSkipInitialismNameChecks: true,
+			wantAllowUpperCaseConst:      true,
+			wantSkipPackageNameChecks:    true,
+			wantBadPackageNames:          map[string]struct{}{"helpers": {}, "models": {}},
 		},
 		{
 			name: "valid kebab-cased arguments",
@@ -70,17 +76,19 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{"ID"},
 				[]any{"VM"},
 				[]any{map[string]any{
-					"upper-case-const":         true,
-					"skip-package-name-checks": true,
-					"extra-bad-package-names":  []any{"helpers", "models"},
+					"skip-initialism-name-checks": true,
+					"upper-case-const":            true,
+					"skip-package-name-checks":    true,
+					"extra-bad-package-names":     []any{"helpers", "models"},
 				}},
 			},
-			wantErr:                   nil,
-			wantAllowList:             []string{"ID"},
-			wantBlockList:             []string{"VM"},
-			wantAllowUpperCaseConst:   true,
-			wantSkipPackageNameChecks: true,
-			wantBadPackageNames:       map[string]struct{}{"helpers": {}, "models": {}},
+			wantErr:                      nil,
+			wantAllowList:                []string{"ID"},
+			wantBlockList:                []string{"VM"},
+			wantSkipInitialismNameChecks: true,
+			wantAllowUpperCaseConst:      true,
+			wantSkipPackageNameChecks:    true,
+			wantBadPackageNames:          map[string]struct{}{"helpers": {}, "models": {}},
 		},
 		{
 			name:      "invalid allowlist type",
@@ -148,6 +156,9 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			}
 			if rule.skipPackageNameChecks != tt.wantSkipPackageNameChecks {
 				t.Errorf("unexpected skipPackageNameChecks: got = %v, want %v", rule.skipPackageNameChecks, tt.wantSkipPackageNameChecks)
+			}
+			if rule.skipInitialismNameChecks != tt.wantSkipInitialismNameChecks {
+				t.Errorf("unexpected skipInitialismNameChecks: got = %v, want %v", rule.skipInitialismNameChecks, tt.wantSkipInitialismNameChecks)
 			}
 			if !reflect.DeepEqual(rule.extraBadPackageNames, tt.wantBadPackageNames) {
 				t.Errorf("unexpected extraBadPackageNames: got = %v, want %v", rule.extraBadPackageNames, tt.wantBadPackageNames)
