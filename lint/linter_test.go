@@ -31,7 +31,7 @@ func TestRetrieveModFile(t *testing.T) {
 	t.Run("go.mod file does not exist", func(t *testing.T) {
 		_, err := retrieveModFile(t.TempDir())
 		if err == nil {
-			t.Fatalf("expected error, got nil")
+			t.Fatal("expected error, got nil")
 		}
 		expectedErrMsg := `did not found "go.mod" file`
 		if err.Error() != expectedErrMsg {
