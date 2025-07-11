@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/fatih/color"
+
 	"github.com/mgechev/revive/config"
 	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/revivelib"

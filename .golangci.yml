@@ -90,6 +90,17 @@ linters:
         - name: var-declaration
         - name: var-naming
 
+formatters:
+  enable:
+    - gci
+    - gofmt
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/mgechev/revive)
+
 issues:
   # Show all issues from a linter.
   max-issues-per-linter: 0

@@ -10,9 +10,10 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/spf13/afero"
+
 	"github.com/mgechev/revive/config"
 	"github.com/mgechev/revive/revivelib"
-	"github.com/spf13/afero"
 )
 
 const (

@@ -5,8 +5,9 @@ import (
 	"go/ast"
 	"go/token"
 
-	"github.com/mgechev/revive/lint"
 	"golang.org/x/tools/go/ast/astutil"
+
+	"github.com/mgechev/revive/lint"
 )
 
 // CognitiveComplexityRule sets restriction for maximum cognitive complexity.
