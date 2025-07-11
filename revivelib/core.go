@@ -126,8 +126,13 @@ func (r *Revive) Format(
 		return "", 0, fmt.Errorf("formatting - getting formatter: %w", err)
 	}
 
+	var (
+		out       string
+		formatErr error
+	)
+
 	go func() {
-		output, err = formatter.Format(formatChan, *conf)
+		out, formatErr = formatter.Format(formatChan, *conf)
 
 		exitChan <- true
 	}()
@@ -155,11 +160,11 @@ func (r *Revive) Format(
 	close(formatChan)
 	<-exitChan
 
-	if err != nil {
-		return "", exitCode, fmt.Errorf("formatting: %w", err)
+	if formatErr != nil {
+		return "", exitCode, fmt.Errorf("formatting: %w", formatErr)
 	}
 
-	return output, exitCode, nil
+	return out, exitCode, nil
 }
 
 func getPackages(includePatterns []string, excludePatterns ArrayFlags) ([][]string, error) {
