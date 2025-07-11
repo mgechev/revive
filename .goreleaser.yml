@@ -1,14 +1,10 @@
-# This is an example goreleaser.yaml file with some sane defaults.
-# Make sure to check the documentation at http://goreleaser.com
+# GoReleaser configuration for revive.
+# Documentation: https://goreleaser.com/
 ---
 version: 2
 archives:
   - id: revive
     name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
-before:
-  hooks:
-    - "go mod download"
-    - "go generate ./..."
 builds:
   -
     env:
@@ -22,7 +18,6 @@ builds:
 changelog:
   filters:
     exclude:
-      - "^docs:"
       - "^test:"
   sort: asc
 checksum:
