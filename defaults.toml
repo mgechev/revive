@@ -1,3 +1,5 @@
+# This file contains the default revive configuration.
+
 ignoreGeneratedHeader = false
 severity = "warning"
 confidence = 0.8

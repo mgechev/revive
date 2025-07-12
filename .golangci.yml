@@ -1,4 +1,4 @@
-# This configuration for golangci-lint.
+# This is the configuration for golangci-lint.
 # See https://golangci-lint.run/usage/configuration/ for details.
 
 version: "2"
