@@ -92,12 +92,15 @@ linters:
 
 formatters:
   enable:
+    - gci
     - gofmt
     - goimports
   settings:
-    goimports:
-      local-prefixes:
-        - github.com/mgechev/revive
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/mgechev/revive)
 
 issues:
   # Show all issues from a linter.
