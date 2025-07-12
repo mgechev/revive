@@ -1,4 +1,5 @@
-# A configuration file for markdownlint-cli2.
+# This is the configuration for markdownlint-cli2.
+# See https://github.com/DavidAnson/markdownlint-cli2#configuration for details.
 
 # Fix any fixable errors
 fix: false

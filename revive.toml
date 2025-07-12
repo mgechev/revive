@@ -1,4 +1,4 @@
-# This configuration for the revive linter used for linting the revive's codebase itself.
+# This is the configuration for the revive linter used for linting the revive's codebase itself.
 # See .github/workflows/lint.yaml.
 
 ignoreGeneratedHeader = false
