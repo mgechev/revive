@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"codeberg.org/chavacava/garif"
+
 	"github.com/mgechev/revive/lint"
 )
 

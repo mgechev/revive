@@ -18,7 +18,10 @@ build:
 
 lint:
 	revive --config revive.toml ./...
+	golangci-lint run
+
+fmt:
+	golangci-lint fmt
 
 test:
 	@go test -v -race ./...
-

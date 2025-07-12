@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/fatih/structtag"
+
 	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
