@@ -4,3 +4,9 @@ vendor
 *.swp
 dist/
 *.log
+
+# Popular golang IDE config dirs
+.vscode/
+.idea/
+.vim/
+.nvim/
