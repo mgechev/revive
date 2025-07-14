@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -57,11 +58,21 @@ func (w lintModifiesParamRule) Visit(node ast.Node) ast.Visitor {
 		}
 	case *ast.AssignStmt:
 		lhs := v.Lhs
-		for _, e := range lhs {
+		for i, e := range lhs {
 			id, ok := e.(*ast.Ident)
 			if ok {
+				if i < len(v.Rhs) {
+					if callExpr, ok := v.Rhs[i].(*ast.CallExpr); ok && isSlicesDelete(callExpr) {
+						w.checkSlicesDelete(callExpr)
+						continue
+					}
+				}
 				checkParam(id, &w)
 			}
+		}
+	case *ast.ExprStmt:
+		if callExpr, ok := v.X.(*ast.CallExpr); ok && isSlicesDelete(callExpr) {
+			w.checkSlicesDelete(callExpr)
 		}
 	}
 
@@ -75,6 +86,31 @@ func checkParam(id *ast.Ident, w *lintModifiesParamRule) {
 			Node:       id,
 			Category:   lint.FailureCategoryBadPractice,
 			Failure:    fmt.Sprintf("parameter '%s' seems to be modified", id),
+		})
+	}
+}
+
+func isSlicesDelete(callExpr *ast.CallExpr) bool {
+	return astutils.IsPkgDotName(callExpr.Fun, "slices", "Delete") ||
+		astutils.IsPkgDotName(callExpr.Fun, "slices", "DeleteFunc")
+}
+
+func (w *lintModifiesParamRule) checkSlicesDelete(callExpr *ast.CallExpr) {
+	if len(callExpr.Args) == 0 {
+		return
+	}
+
+	if id, ok := callExpr.Args[0].(*ast.Ident); ok && w.params[id.Name] {
+		funcName := "function"
+		if sel, ok := callExpr.Fun.(*ast.SelectorExpr); ok {
+			funcName = fmt.Sprintf("%s.%s", sel.X, sel.Sel.Name)
+		}
+
+		w.onFailure(lint.Failure{
+			Confidence: 1, // slices.Delete/DeleteFunc always modifies
+			Node:       callExpr,
+			Category:   lint.FailureCategoryBadPractice,
+			Failure:    fmt.Sprintf("parameter '%s' is modified by %s", id.Name, funcName),
 		})
 	}
 }
