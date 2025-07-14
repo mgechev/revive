@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
+	"strings"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -12,16 +14,48 @@ import (
 type UnexportedNamingRule struct{}
 
 // Apply applies the rule to given file.
-func (*UnexportedNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *UnexportedNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
 
+	r.checkMethods(onFailure, file.AST.Decls)
+
 	ba := &unexportablenamingLinter{onFailure}
 	ast.Walk(ba, file.AST)
 
 	return failures
+}
+
+func (r *UnexportedNamingRule) checkMethods(onFailure func(failure lint.Failure), decls []ast.Decl) {
+	for _, decl := range decls {
+		funcDecl, ok := decl.(*ast.FuncDecl)
+		if !ok {
+			continue
+		}
+
+		if funcDecl.Recv == nil {
+			continue // it's a function not a method
+		}
+
+		methodName := funcDecl.Name.Name
+		if !ast.IsExported(methodName) {
+			continue // it's an unexported method
+		}
+
+		recvTypes := astutils.GetTypeNames(funcDecl.Recv)
+		recvType := strings.TrimLeft(recvTypes[0], "*")
+		if ast.IsExported(recvType) {
+			continue // it's an exported receiver
+		}
+
+		onFailure(lint.Failure{
+			Confidence: 0.8,
+			Failure:    fmt.Sprintf("method %q is exported but it's attached to the unexported type %q", methodName, recvType),
+			Node:       funcDecl.Name,
+		})
+	}
 }
 
 // Name returns the rule name.
