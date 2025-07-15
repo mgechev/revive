@@ -4,12 +4,20 @@ import (
 	"fmt"
 	"go/ast"
 
-	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
 // ModifiesParamRule warns on assignments to function parameters.
 type ModifiesParamRule struct{}
+
+// modifyingParamPositions is a slice of parameter positions (0-indexed) that are modified by a function.
+type modifyingParamPositions = []int
+
+// modifyingFunctions maps function names to the positions of parameters they modify.
+var modifyingFunctions = map[string]modifyingParamPositions{
+	"slices.Delete":     {0},
+	"slices.DeleteFunc": {0},
+}
 
 // Apply applies the rule to given file.
 func (*ModifiesParamRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
@@ -62,8 +70,8 @@ func (w lintModifiesParamRule) Visit(node ast.Node) ast.Visitor {
 			id, ok := e.(*ast.Ident)
 			if ok {
 				if i < len(v.Rhs) {
-					if callExpr, ok := v.Rhs[i].(*ast.CallExpr); ok && isSlicesDelete(callExpr) {
-						w.checkSlicesDelete(callExpr)
+					if callExpr, ok := v.Rhs[i].(*ast.CallExpr); ok && isModifyingFunction(callExpr) {
+						w.checkModifyingFunction(callExpr)
 						continue
 					}
 				}
@@ -71,8 +79,8 @@ func (w lintModifiesParamRule) Visit(node ast.Node) ast.Visitor {
 			}
 		}
 	case *ast.ExprStmt:
-		if callExpr, ok := v.X.(*ast.CallExpr); ok && isSlicesDelete(callExpr) {
-			w.checkSlicesDelete(callExpr)
+		if callExpr, ok := v.X.(*ast.CallExpr); ok && isModifyingFunction(callExpr) {
+			w.checkModifyingFunction(callExpr)
 		}
 	}
 
@@ -90,27 +98,40 @@ func checkParam(id *ast.Ident, w *lintModifiesParamRule) {
 	}
 }
 
-func isSlicesDelete(callExpr *ast.CallExpr) bool {
-	return astutils.IsPkgDotName(callExpr.Fun, "slices", "Delete") ||
-		astutils.IsPkgDotName(callExpr.Fun, "slices", "DeleteFunc")
+func isModifyingFunction(callExpr *ast.CallExpr) bool {
+	funcName := getFunctionName(callExpr)
+	_, found := modifyingFunctions[funcName]
+	return found
 }
 
-func (w *lintModifiesParamRule) checkSlicesDelete(callExpr *ast.CallExpr) {
-	if len(callExpr.Args) == 0 {
+func getFunctionName(callExpr *ast.CallExpr) string {
+	if sel, ok := callExpr.Fun.(*ast.SelectorExpr); ok {
+		if pkg, ok := sel.X.(*ast.Ident); ok {
+			return pkg.Name + "." + sel.Sel.Name
+		}
+	}
+	return ""
+}
+
+func (w *lintModifiesParamRule) checkModifyingFunction(callExpr *ast.CallExpr) {
+	funcName := getFunctionName(callExpr)
+	positions, found := modifyingFunctions[funcName]
+	if !found {
 		return
 	}
 
-	if id, ok := callExpr.Args[0].(*ast.Ident); ok && w.params[id.Name] {
-		funcName := "function"
-		if sel, ok := callExpr.Fun.(*ast.SelectorExpr); ok {
-			funcName = fmt.Sprintf("%s.%s", sel.X, sel.Sel.Name)
+	for _, pos := range positions {
+		if pos >= len(callExpr.Args) {
+			continue
 		}
 
-		w.onFailure(lint.Failure{
-			Confidence: 1, // slices.Delete/DeleteFunc always modifies
-			Node:       callExpr,
-			Category:   lint.FailureCategoryBadPractice,
-			Failure:    fmt.Sprintf("parameter '%s' is modified by %s", id.Name, funcName),
-		})
+		if id, ok := callExpr.Args[pos].(*ast.Ident); ok && w.params[id.Name] {
+			w.onFailure(lint.Failure{
+				Confidence: 0.5, // confidence is low because of shadow variables
+				Node:       callExpr,
+				Category:   lint.FailureCategoryBadPractice,
+				Failure:    fmt.Sprintf("parameter '%s' is modified by %s", id.Name, funcName),
+			})
+		}
 	}
 }
