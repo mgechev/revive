@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -99,22 +100,13 @@ func checkParam(id *ast.Ident, w *lintModifiesParamRule) {
 }
 
 func isModifyingFunction(callExpr *ast.CallExpr) bool {
-	funcName := getFunctionName(callExpr)
+	funcName := astutils.GoFmt(callExpr.Fun)
 	_, found := modifyingFunctions[funcName]
 	return found
 }
 
-func getFunctionName(callExpr *ast.CallExpr) string {
-	if sel, ok := callExpr.Fun.(*ast.SelectorExpr); ok {
-		if pkg, ok := sel.X.(*ast.Ident); ok {
-			return pkg.Name + "." + sel.Sel.Name
-		}
-	}
-	return ""
-}
-
 func (w *lintModifiesParamRule) checkModifyingFunction(callExpr *ast.CallExpr) {
-	funcName := getFunctionName(callExpr)
+	funcName := astutils.GoFmt(callExpr.Fun)
 	positions, found := modifyingFunctions[funcName]
 	if !found {
 		return
