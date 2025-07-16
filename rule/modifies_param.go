@@ -71,18 +71,15 @@ func (w lintModifiesParamRule) Visit(node ast.Node) ast.Visitor {
 			id, ok := e.(*ast.Ident)
 			if ok {
 				if i < len(v.Rhs) {
-					if callExpr, ok := v.Rhs[i].(*ast.CallExpr); ok && isModifyingFunction(callExpr) {
-						w.checkModifyingFunction(callExpr)
-						continue
+					if w.checkModifyingFunction(v.Rhs[i]) {
+						continue // Skip 'checkParam' when we already emitted warning for modifying function
 					}
 				}
 				checkParam(id, &w)
 			}
 		}
 	case *ast.ExprStmt:
-		if callExpr, ok := v.X.(*ast.CallExpr); ok && isModifyingFunction(callExpr) {
-			w.checkModifyingFunction(callExpr)
-		}
+		w.checkModifyingFunction(v.X)
 	}
 
 	return w
@@ -99,22 +96,21 @@ func checkParam(id *ast.Ident, w *lintModifiesParamRule) {
 	}
 }
 
-func isModifyingFunction(callExpr *ast.CallExpr) bool {
-	funcName := astutils.GoFmt(callExpr.Fun)
-	_, found := modifyingFunctions[funcName]
-	return found
-}
+func (w *lintModifiesParamRule) checkModifyingFunction(callNode ast.Node) bool {
+	callExpr, ok := callNode.(*ast.CallExpr)
+	if !ok {
+		return false
+	}
 
-func (w *lintModifiesParamRule) checkModifyingFunction(callExpr *ast.CallExpr) {
 	funcName := astutils.GoFmt(callExpr.Fun)
 	positions, found := modifyingFunctions[funcName]
 	if !found {
-		return
+		return false
 	}
 
 	for _, pos := range positions {
 		if pos >= len(callExpr.Args) {
-			continue
+			return false
 		}
 
 		if id, ok := callExpr.Args[pos].(*ast.Ident); ok && w.params[id.Name] {
@@ -122,8 +118,10 @@ func (w *lintModifiesParamRule) checkModifyingFunction(callExpr *ast.CallExpr) {
 				Confidence: 0.5, // confidence is low because of shadow variables
 				Node:       callExpr,
 				Category:   lint.FailureCategoryBadPractice,
-				Failure:    fmt.Sprintf("parameter '%s' is modified by %s", id.Name, funcName),
+				Failure:    fmt.Sprintf("parameter '%s' seems to be modified by %s", id.Name, funcName),
 			})
+			return true
 		}
 	}
+	return false
 }

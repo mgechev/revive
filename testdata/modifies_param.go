@@ -27,15 +27,16 @@ func issue355(_ *foo) {
 }
 
 func testSlicesDeleteAssigned(s []int) {
-	s = slices.Delete(s, 0, 1)                     // MATCH /parameter 's' is modified by slices.Delete/
-	s = slices.DeleteFunc(s, func(e string) bool { // MATCH /parameter 's' is modified by slices.DeleteFunc/
+	s = slices.Delete(s, 0, 1)                     // MATCH /parameter 's' seems to be modified by slices.Delete/
+	s = slices.DeleteFunc(s, func(e string) bool { // MATCH /parameter 's' seems to be modified by slices.DeleteFunc/
 		return true
 	})
-	_ = slices.Delete(s, 0, 1)                     // MATCH /parameter 's' is modified by slices.Delete/
-	_ = slices.DeleteFunc(s, func(e string) bool { // MATCH /parameter 's' is modified by slices.DeleteFunc/
+	_ = slices.Delete(s, 0, 1)                     // MATCH /parameter 's' seems to be modified by slices.Delete/
+	_ = slices.DeleteFunc(s, func(e string) bool { // MATCH /parameter 's' seems to be modified by slices.DeleteFunc/
 		return true
 	})
-	s, b := slices.Delete(s, 0, 1), 2 // MATCH /parameter 's' is modified by slices.Delete/
+	s, b := slices.Delete(s, 0, 1), 2 // MATCH /parameter 's' seems to be modified by slices.Delete/
+	s := slices.Clone(s)              // MATCH /parameter 's' seems to be modified/
 }
 
 func testSlicesDeleteCloned(s []int) {
@@ -54,10 +55,10 @@ func testSlicesDeleteCopied(s []int) {
 }
 
 func testMultipleParams(a, b, s []int) {
-	a = slices.Delete(a, 0, 1) // MATCH /parameter 'a' is modified by slices.Delete/
-	b = slices.Delete(b, 1, 2) // MATCH /parameter 'b' is modified by slices.Delete/
+	a = slices.Delete(a, 0, 1) // MATCH /parameter 'a' seems to be modified by slices.Delete/
+	b = slices.Delete(b, 1, 2) // MATCH /parameter 'b' seems to be modified by slices.Delete/
 	s = []int{1, 2, 3}         // MATCH /parameter 's' seems to be modified/
-	s = slices.Delete(s, 0, 1) // MATCH /parameter 's' is modified by slices.Delete/
+	s = slices.Delete(s, 0, 1) // MATCH /parameter 's' seems to be modified by slices.Delete/
 }
 
 func testAssignToNewVar(s []int) {
