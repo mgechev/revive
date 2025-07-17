@@ -1,0 +1,4 @@
+package mixed
+
+func Example() {
+}

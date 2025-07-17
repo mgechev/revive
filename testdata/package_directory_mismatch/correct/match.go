@@ -1,0 +1,4 @@
+package correct
+
+func Example() {
+}
