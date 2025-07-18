@@ -59,6 +59,7 @@ List of all available rules.
   - [nested-structs](#nested-structs)
   - [optimize-operands-order](#optimize-operands-order)
   - [package-comments](#package-comments)
+  - [package-directory-mismatch](#package-directory-mismatch)
   - [range-val-address](#range-val-address)
   - [range-val-in-closure](#range-val-in-closure)
   - [range](#range)
@@ -918,6 +919,19 @@ if !config.IgnoreGeneratedHeader && isGenerated(content) {
 _Description_: Packages should have comments. This rule warns on undocumented packages and when packages comments are detached to the `package` keyword.
 
 More [information here](https://go.dev/wiki/CodeReviewComments#package-comments).
+
+_Configuration_: N/A
+
+## package-directory-mismatch
+
+_Description_: It is considered a good practice to name a package after the directory containing the file.
+This rule warns when the package name declared in the file does not match the name of the directory containing the file.
+
+The following cases are excluded from this check:
+
+- Package `main` (executable packages)
+- Test files (files with `_test` suffix)
+- Files in directories named `internal` or `testdata`
 
 _Configuration_: N/A
 
