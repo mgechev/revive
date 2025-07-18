@@ -10,6 +10,14 @@ import (
 // PackageDirectoryMismatchRule detects when package name doesn't match directory name.
 type PackageDirectoryMismatchRule struct{}
 
+var skipDirs = map[string]struct{}{
+	".":        {},
+	"/":        {},
+	"":         {},
+	"internal": {},
+	"testdata": {},
+}
+
 // Apply applies the rule to the given file.
 func (*PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	if file.IsTest() {
@@ -23,12 +31,7 @@ func (*PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) []
 
 	dirPath := filepath.Dir(file.Name)
 	dirName := filepath.Base(dirPath)
-
-	if dirName == "." || dirName == "/" || dirName == "" {
-		return nil
-	}
-
-	if dirName == "internal" || dirName == "testdata" {
+	if _, found := skipDirs[dirName]; found {
 		return nil
 	}
 
