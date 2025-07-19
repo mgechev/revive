@@ -11,7 +11,7 @@ import (
 // ModifiesParamRule warns on assignments to function parameters.
 type ModifiesParamRule struct{}
 
-// modifyingParamPositions is a slice of parameter positions (0-indexed) that are modified by a function.
+// modifyingParamPositions are parameter positions that are modified by a function.
 type modifyingParamPositions = []int
 
 // modifyingFunctions maps function names to the positions of parameters they modify.
