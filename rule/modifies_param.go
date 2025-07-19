@@ -71,9 +71,7 @@ func (w lintModifiesParamRule) Visit(node ast.Node) ast.Visitor {
 			id, ok := e.(*ast.Ident)
 			if ok {
 				if i < len(v.Rhs) {
-					if w.checkModifyingFunction(v.Rhs[i]) {
-						continue // Skip 'checkParam' when we already emitted warning for modifying function
-					}
+					w.checkModifyingFunction(v.Rhs[i])
 				}
 				checkParam(id, &w)
 			}
@@ -96,21 +94,21 @@ func checkParam(id *ast.Ident, w *lintModifiesParamRule) {
 	}
 }
 
-func (w *lintModifiesParamRule) checkModifyingFunction(callNode ast.Node) bool {
+func (w *lintModifiesParamRule) checkModifyingFunction(callNode ast.Node) {
 	callExpr, ok := callNode.(*ast.CallExpr)
 	if !ok {
-		return false
+		return
 	}
 
 	funcName := astutils.GoFmt(callExpr.Fun)
 	positions, found := modifyingFunctions[funcName]
 	if !found {
-		return false
+		return
 	}
 
 	for _, pos := range positions {
 		if pos >= len(callExpr.Args) {
-			return false
+			return
 		}
 
 		if id, ok := callExpr.Args[pos].(*ast.Ident); ok && w.params[id.Name] {
@@ -120,8 +118,6 @@ func (w *lintModifiesParamRule) checkModifyingFunction(callNode ast.Node) bool {
 				Category:   lint.FailureCategoryBadPractice,
 				Failure:    fmt.Sprintf("parameter '%s' seems to be modified by '%s'", id.Name, funcName),
 			})
-			return true
 		}
 	}
-	return false
 }
