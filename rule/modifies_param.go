@@ -118,7 +118,7 @@ func (w *lintModifiesParamRule) checkModifyingFunction(callNode ast.Node) bool {
 				Confidence: 0.5, // confidence is low because of shadow variables
 				Node:       callExpr,
 				Category:   lint.FailureCategoryBadPractice,
-				Failure:    fmt.Sprintf("parameter '%s' seems to be modified by %s", id.Name, funcName),
+				Failure:    fmt.Sprintf("parameter '%s' seems to be modified by '%s'", id.Name, funcName),
 			})
 			return true
 		}
