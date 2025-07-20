@@ -165,21 +165,36 @@ func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
 		return
 	}
 
-	firstCommentLine := firstCommentLine(fn.Doc)
-
-	if firstCommentLine == "" {
-		w.addFailuref(fn, 1, lint.FailureCategoryComments,
+	status := w.checkGoDocStatus(fn.Doc, fn.Name.Name)
+	switch status {
+	case exportedGoDocStatusOK:
+		return // comment is fine
+	case exportedGoDocStatusMissing:
+		w.addFailuref(fn, status.Confidence(), lint.FailureCategoryComments,
 			"exported %s %s should have comment or be unexported", kind, name,
 		)
 		return
 	}
 
-	prefix := fn.Name.Name + " "
-	if !strings.HasPrefix(firstCommentLine, prefix) {
-		w.addFailuref(fn.Doc, 0.8, lint.FailureCategoryComments,
-			`comment on exported %s %s should be of the form "%s..."`, kind, name, prefix,
-		)
+	firstCommentLine := w.firstCommentLine(fn.Doc)
+	w.addFailuref(fn.Doc, status.Confidence(), lint.FailureCategoryComments,
+		`comment on exported %s %s should be of the form "%s ..."%s`, kind, name, fn.Name.Name, status.CorrectionHint(firstCommentLine),
+	)
+}
+
+func (*lintExported) hasPrefixInsensitive(s, prefix string) bool {
+	return strings.HasPrefix(strings.ToLower(s), strings.ToLower(prefix))
+}
+
+func (*lintExported) stripFirstRune(s string) string {
+	// Decode the first rune to handle multi-byte characters.
+	firstRune, size := utf8.DecodeRuneInString(s)
+	if firstRune == utf8.RuneError {
+		return s // no valid first rune found
 	}
+
+	// Return the string without the first rune.
+	return s[size:]
 }
 
 func (w *lintExported) checkRepetitiveNames(id *ast.Ident, thing string) {
@@ -233,24 +248,24 @@ func (w *lintExported) lintTypeDoc(t *ast.TypeSpec, doc *ast.CommentGroup, first
 		return
 	}
 
+	expectedPrefix := typeName
 	for _, a := range articles {
 		if typeName == a {
 			continue
 		}
 		var found bool
 		if firstCommentLine, found = strings.CutPrefix(firstCommentLine, a+" "); found {
+			expectedPrefix = a + " " + typeName
 			break
 		}
 	}
 
-	// if comment starts with name of type and has some text after - it's ok
-	expectedPrefix := typeName + " "
-	if strings.HasPrefix(firstCommentLine, expectedPrefix) {
+	status := w.checkGoDocStatus(doc, expectedPrefix)
+	if status == exportedGoDocStatusOK {
 		return
 	}
-
-	w.addFailuref(doc, 1, lint.FailureCategoryComments,
-		`comment on exported type %v should be of the form "%s..." (with optional leading article)`, t.Name, expectedPrefix,
+	w.addFailuref(doc, status.Confidence(), lint.FailureCategoryComments,
+		`comment on exported type %v should be of the form "%s ..." (with optional leading article)%s`, t.Name, typeName, status.CorrectionHint(firstCommentLine),
 	)
 }
 
@@ -272,6 +287,7 @@ func (w *lintExported) checkValueNames(names []*ast.Ident, nodeToBlame ast.Node,
 
 	return true
 }
+
 func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genDeclMissingComments map[*ast.GenDecl]bool) {
 	kind := "var"
 	if gd.Tok == token.CONST {
@@ -292,8 +308,8 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 		return
 	}
 
-	vsFirstCommentLine := firstCommentLine(vs.Doc)
-	gdFirstCommentLine := firstCommentLine(gd.Doc)
+	vsFirstCommentLine := w.firstCommentLine(vs.Doc)
+	gdFirstCommentLine := w.firstCommentLine(gd.Doc)
 	if vsFirstCommentLine == "" && gdFirstCommentLine == "" {
 		if genDeclMissingComments[gd] {
 			return
@@ -325,20 +341,77 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 	default:
 		doc = gd.Doc
 	}
+	firstCommentLine := w.firstCommentLine(doc)
 
-	prefix := name + " "
-	if !strings.HasPrefix(firstCommentLine(doc), prefix) {
-		w.addFailuref(doc, 1, lint.FailureCategoryComments,
-			`comment on exported %s %s should be of the form "%s..."`, kind, name, prefix,
-		)
+	status := w.checkGoDocStatus(doc, name)
+	if status == exportedGoDocStatusOK {
+		return
 	}
+	w.addFailuref(doc, status.Confidence(), lint.FailureCategoryComments,
+		`comment on exported %s %s should be of the form "%s ..."%s`, kind, name, name, status.CorrectionHint(firstCommentLine),
+	)
+}
+
+type exportedGoDocStatus int
+
+const (
+	exportedGoDocStatusOK exportedGoDocStatus = iota
+	exportedGoDocStatusMissing
+	exportedGoDocStatusCaseMismatch
+	exportedGoDocStatusFirstLetterMismatch
+	exportedGoDocStatusUnexpected
+)
+
+func (gds exportedGoDocStatus) Confidence() float64 {
+	if gds == exportedGoDocStatusUnexpected {
+		return 0.8
+	}
+	return 1
+}
+
+func (gds exportedGoDocStatus) CorrectionHint(firstCommentLine string) string {
+	firstWord := strings.Split(firstCommentLine, " ")[0]
+	switch gds {
+	case exportedGoDocStatusCaseMismatch:
+		return ` by using its correct casing, not "` + firstWord + ` ..."`
+	case exportedGoDocStatusFirstLetterMismatch:
+		return ` to match its exported status, not "` + firstWord + ` ..."`
+	}
+
+	return ""
+}
+
+func (w *lintExported) checkGoDocStatus(comment *ast.CommentGroup, name string) exportedGoDocStatus {
+	firstCommentLine := w.firstCommentLine(comment)
+	if firstCommentLine == "" {
+		return exportedGoDocStatusMissing
+	}
+
+	name = strings.TrimSpace(name)
+	// Make sure the expected prefix has a space at the end.
+	expectedPrefix := name + " "
+	if strings.HasPrefix(firstCommentLine, expectedPrefix) {
+		return exportedGoDocStatusOK
+	}
+
+	if !w.hasPrefixInsensitive(firstCommentLine, expectedPrefix) {
+		return exportedGoDocStatusUnexpected
+	}
+
+	if strings.HasPrefix(w.stripFirstRune(firstCommentLine), w.stripFirstRune(expectedPrefix)) {
+		// Only the first character differs, such as "sendJSON" became "SendJSON".
+		// so we consider the scope has changed.
+		return exportedGoDocStatusFirstLetterMismatch
+	}
+
+	return exportedGoDocStatusCaseMismatch
 }
 
 // firstCommentLine yields the first line of interest in comment group or "" if there is nothing of interest.
 // An "interesting line" is a comment line that is neither a directive (e.g. //go:...) or a deprecation comment
 // (lines from the first line with a prefix // Deprecated: to the end of the comment group)
 // Empty or spaces-only lines are discarded.
-func firstCommentLine(comment *ast.CommentGroup) (result string) {
+func (lintExported) firstCommentLine(comment *ast.CommentGroup) (result string) {
 	if comment == nil {
 		return ""
 	}
@@ -384,10 +457,10 @@ func (w *lintExported) Visit(n ast.Node) ast.Visitor {
 		// inside a GenDecl, which usually has the doc
 		doc := v.Doc
 
-		fcl := firstCommentLine(doc)
+		fcl := w.firstCommentLine(doc)
 		if fcl == "" {
 			doc = w.lastGenDecl.Doc
-			fcl = firstCommentLine(doc)
+			fcl = w.firstCommentLine(doc)
 		}
 		w.lintTypeDoc(v, doc, fcl)
 		w.checkRepetitiveNames(v.Name, "type")
@@ -421,21 +494,23 @@ func (w *lintExported) lintInterfaceMethod(typeName string, m *ast.Field) {
 	if !ast.IsExported(m.Names[0].Name) {
 		return
 	}
+
 	name := m.Names[0].Name
-	firstCommentLine := firstCommentLine(m.Doc)
-	if firstCommentLine == "" {
-		w.addFailuref(m, 1, lint.FailureCategoryComments,
+	status := w.checkGoDocStatus(m.Doc, name)
+	switch status {
+	case exportedGoDocStatusOK:
+		return // comment is fine
+	case exportedGoDocStatusMissing:
+		w.addFailuref(m, status.Confidence(), lint.FailureCategoryComments,
 			"public interface method %s.%s should be commented", typeName, name,
 		)
 		return
 	}
 
-	expectedPrefix := m.Names[0].Name + " "
-	if !strings.HasPrefix(firstCommentLine, expectedPrefix) {
-		w.addFailuref(m.Doc, 0.8, lint.FailureCategoryComments,
-			`comment on exported interface method %s.%s should be of the form "%s..."`, typeName, name, expectedPrefix,
-		)
-	}
+	firstCommentLine := w.firstCommentLine(m.Doc)
+	w.addFailuref(m.Doc, status.Confidence(), lint.FailureCategoryComments,
+		`comment on exported interface method %s.%s should be of the form "%s ..."%s`, typeName, name, name, status.CorrectionHint(firstCommentLine),
+	)
 }
 
 // mustCheckMethod returns true if the method must be checked by this rule, false otherwise.

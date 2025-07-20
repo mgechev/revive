@@ -51,3 +51,7 @@ func TestCheckDeprecationComment(t *testing.T) {
 func TestExportedMainPackage(t *testing.T) {
 	testRule(t, "exported_main", &rule.ExportedRule{}, &lint.RuleConfig{})
 }
+
+func TestCommentVariations(t *testing.T) {
+	testRule(t, "exported_issue_1235", &rule.ExportedRule{}, &lint.RuleConfig{})
+}
