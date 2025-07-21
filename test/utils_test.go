@@ -9,6 +9,7 @@ import (
 	"go/types"
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"testing"
@@ -98,6 +99,13 @@ func assertFailures(t *testing.T, filePath string, rules []lint.Rule, config map
 		failures = append(failures, f)
 	}
 
+	type simplifiedFailure struct {
+		File    string
+		Line    int
+		Failure string
+	}
+	var reportedFailures []simplifiedFailure
+
 	for _, in := range ins {
 		ok := false
 		for i, p := range failures {
@@ -114,13 +122,21 @@ func assertFailures(t *testing.T, filePath string, rules []lint.Rule, config map
 						r = r[:i]
 					}
 					if r != in.Replacement {
-						t.Errorf("Lint failed at %s:%d; got replacement %q, want %q", filePath, in.Line, r, in.Replacement)
+						reportedFailures = append(reportedFailures, simplifiedFailure{
+							File:    filePath,
+							Line:    in.Line,
+							Failure: fmt.Sprintf("Replacement: got %q, want %q", r, in.Replacement),
+						})
 					}
 				}
 
 				if in.Confidence > 0 {
 					if in.Confidence != p.Confidence {
-						t.Errorf("Lint failed at %s:%d; got confidence %f, want %f", filePath, in.Line, p.Confidence, in.Confidence)
+						reportedFailures = append(reportedFailures, simplifiedFailure{
+							File:    filePath,
+							Line:    in.Line,
+							Failure: fmt.Sprintf("Confidence: got %f, want %f", p.Confidence, in.Confidence),
+						})
 					}
 				}
 
@@ -133,12 +149,52 @@ func assertFailures(t *testing.T, filePath string, rules []lint.Rule, config map
 			}
 		}
 		if !ok {
-			t.Errorf("Lint failed at %s:%d; /%v/ did not match", filePath, in.Line, in.Match)
+			reportedFailures = append(reportedFailures, simplifiedFailure{
+				File:    filePath,
+				Line:    in.Line,
+				Failure: "want: " + in.Match,
+			})
 		}
 	}
+
 	for _, p := range failures {
-		t.Errorf("Unexpected problem at %s:%d: %v", filePath, p.Position.Start.Line, p.Failure)
+		reportedFailures = append(reportedFailures, simplifiedFailure{
+			File:    filePath,
+			Line:    p.Position.Start.Line,
+			Failure: "got:  " + p.Failure,
+		})
 	}
+
+	slices.SortFunc(reportedFailures, func(a, b simplifiedFailure) int {
+		if a.File != b.File {
+			return strings.Compare(a.File, b.File)
+		}
+		if a.Line != b.Line {
+			return a.Line - b.Line
+		}
+
+		return strings.Compare(a.Failure, b.Failure)
+	})
+
+	errorMessage := ""
+	lastFileLine := ""
+	for _, p := range reportedFailures {
+		currentFileLine := fmt.Sprintf("%s:%d", p.File, p.Line)
+		if currentFileLine != lastFileLine {
+			if errorMessage != "" {
+				t.Error(errorMessage)
+			}
+			errorMessage = fmt.Sprintf("problem at %s: ", currentFileLine)
+			lastFileLine = currentFileLine
+		}
+
+		errorMessage += "\n" + p.Failure
+	}
+
+	if errorMessage != "" {
+		t.Error(errorMessage)
+	}
+
 	return nil
 }
 
