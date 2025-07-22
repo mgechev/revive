@@ -4,11 +4,21 @@ import (
 	"fmt"
 	"go/ast"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
 // ModifiesParamRule warns on assignments to function parameters.
 type ModifiesParamRule struct{}
+
+// modifyingParamPositions are parameter positions that are modified by a function.
+type modifyingParamPositions = []int
+
+// modifyingFunctions maps function names to the positions of parameters they modify.
+var modifyingFunctions = map[string]modifyingParamPositions{
+	"slices.Delete":     {0},
+	"slices.DeleteFunc": {0},
+}
 
 // Apply applies the rule to given file.
 func (*ModifiesParamRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
@@ -57,12 +67,19 @@ func (w lintModifiesParamRule) Visit(node ast.Node) ast.Visitor {
 		}
 	case *ast.AssignStmt:
 		lhs := v.Lhs
-		for _, e := range lhs {
+		for i, e := range lhs {
 			id, ok := e.(*ast.Ident)
-			if ok {
-				checkParam(id, &w)
+			if !ok {
+				continue
 			}
+
+			if i < len(v.Rhs) {
+				w.checkModifyingFunction(v.Rhs[i])
+			}
+			checkParam(id, &w)
 		}
+	case *ast.ExprStmt:
+		w.checkModifyingFunction(v.X)
 	}
 
 	return w
@@ -75,6 +92,42 @@ func checkParam(id *ast.Ident, w *lintModifiesParamRule) {
 			Node:       id,
 			Category:   lint.FailureCategoryBadPractice,
 			Failure:    fmt.Sprintf("parameter '%s' seems to be modified", id),
+		})
+	}
+}
+
+func (w *lintModifiesParamRule) checkModifyingFunction(callNode ast.Node) {
+	callExpr, ok := callNode.(*ast.CallExpr)
+	if !ok {
+		return
+	}
+
+	funcName := astutils.GoFmt(callExpr.Fun)
+	positions, found := modifyingFunctions[funcName]
+	if !found {
+		return
+	}
+
+	for _, pos := range positions {
+		if pos >= len(callExpr.Args) {
+			return
+		}
+
+		id, ok := callExpr.Args[pos].(*ast.Ident)
+		if !ok {
+			continue
+		}
+
+		_, match := w.params[id.Name]
+		if !match {
+			continue
+		}
+
+		w.onFailure(lint.Failure{
+			Confidence: 0.5, // confidence is low because of shadow variables
+			Node:       callExpr,
+			Category:   lint.FailureCategoryBadPractice,
+			Failure:    fmt.Sprintf("parameter '%s' seems to be modified by '%s'", id.Name, funcName),
 		})
 	}
 }
