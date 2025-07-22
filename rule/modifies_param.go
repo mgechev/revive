@@ -69,12 +69,14 @@ func (w lintModifiesParamRule) Visit(node ast.Node) ast.Visitor {
 		lhs := v.Lhs
 		for i, e := range lhs {
 			id, ok := e.(*ast.Ident)
-			if ok {
-				if i < len(v.Rhs) {
-					w.checkModifyingFunction(v.Rhs[i])
-				}
-				checkParam(id, &w)
+			if !ok {
+				continue
 			}
+
+			if i < len(v.Rhs) {
+				w.checkModifyingFunction(v.Rhs[i])
+			}
+			checkParam(id, &w)
 		}
 	case *ast.ExprStmt:
 		w.checkModifyingFunction(v.X)
@@ -111,13 +113,21 @@ func (w *lintModifiesParamRule) checkModifyingFunction(callNode ast.Node) {
 			return
 		}
 
-		if id, ok := callExpr.Args[pos].(*ast.Ident); ok && w.params[id.Name] {
-			w.onFailure(lint.Failure{
-				Confidence: 0.5, // confidence is low because of shadow variables
-				Node:       callExpr,
-				Category:   lint.FailureCategoryBadPractice,
-				Failure:    fmt.Sprintf("parameter '%s' seems to be modified by '%s'", id.Name, funcName),
-			})
+		id, ok := callExpr.Args[pos].(*ast.Ident)
+		if !ok {
+			continue
 		}
+
+		_, match := w.params[id.Name]
+		if !match {
+			continue
+		}
+
+		w.onFailure(lint.Failure{
+			Confidence: 0.5, // confidence is low because of shadow variables
+			Node:       callExpr,
+			Category:   lint.FailureCategoryBadPractice,
+			Failure:    fmt.Sprintf("parameter '%s' seems to be modified by '%s'", id.Name, funcName),
+		})
 	}
 }
