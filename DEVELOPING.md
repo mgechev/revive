@@ -33,8 +33,7 @@ This will output debug information to `stderr` and to the log file `revive.log` 
 
 ## Coding standards
 
-Follow [`.github/copilot-instructions.md`](.github/copilot-instructions.md) which contains Go coding standards and conventions
-used by both humans and GitHub Copilot.
+Follow [the instructions](.github/instructions/) which contain Go coding standards and conventions used by both humans and GitHub Copilot.
 
 ## Development of rules
 
