@@ -197,7 +197,7 @@ and [Google's Go Style Guide](https://google.github.io/styleguide/go/).
 - Name tests descriptively using `TestStructName_FunctionName`
 - Use subtests with `t.Run` for better organization
 - Test both success and error cases
-- Avoid the use of `assert` libraries to help your tests
+- Avoid the use of `assert` libraries for clearer test failures
 - When you use `t.Run` to create a subtest, the first argument is used as a descriptive name for the test
 - Test outputs should output the actual value that the function returned before printing the value that was expected
 
