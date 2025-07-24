@@ -31,6 +31,11 @@ DEBUG=1 go run main.go
 
 This will output debug information to `stderr` and to the log file `revive.log` created in the current working directory.
 
+## Coding standards
+
+Follow [`.github/copilot-instructions.md`](.github/copilot-instructions.md) which contains Go coding standards and conventions
+used by both humans and GitHub Copilot.
+
 ## Development of rules
 
 If you want to develop a new rule, follow as an example the already existing rules in the [rule package](https://github.com/mgechev/revive/tree/master/rule).
