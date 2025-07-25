@@ -1,4 +1,0 @@
-package mixed
-
-func Example() {
-}

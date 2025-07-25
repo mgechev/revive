@@ -931,9 +931,40 @@ The following cases are excluded from this check:
 
 - Package `main` (executable packages)
 - Test files (files with `_test` suffix)
-- Files in directories named `internal` or `testdata`
+- Files in `testdata` directories (at any level) - by default
+- Files directly in `internal` directories (but files in subdirectories of `internal` are checked)
+- Files in version directories (`v1`, `v2`, etc.) - the parent directory name is used for comparison
 
-_Configuration_: N/A
+The rule normalizes directory and package names before comparison by removing hyphens (`-`), underscores (`_`), and dots (`.`). This allows packages like:
+
+- Directory `foo-bar` with package `foobar`
+- Directory `foo_bar` with package `foobar`
+- Directory `foo.bar` with package `foobar`
+
+_Configuration_: (string) regular expression for filepaths to be excluded. Default: `"testdata"`.
+
+Examples:
+
+Default behavior (excludes paths containing "testdata")
+
+```toml
+[rule.package-directory-mismatch]
+  arguments = ["testdata"]
+```
+
+Exclude specific directories
+
+```toml
+[rule.package-directory-mismatch]
+  arguments = ["(testcases|testinfo)"]
+```
+
+Disable all directory exclusions
+
+```toml
+[rule.package-directory-mismatch]
+  arguments = [""]
+```
 
 ## range-val-address
 

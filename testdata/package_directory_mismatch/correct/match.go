@@ -1,4 +1,0 @@
-package correct
-
-func Example() {
-}
