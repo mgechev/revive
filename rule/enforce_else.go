@@ -11,7 +11,7 @@ import (
 type EnforceElseRule struct{}
 
 // Apply applies the rule to given file.
-func (r *EnforceElseRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*EnforceElseRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
@@ -94,7 +94,7 @@ func (w *lintEnforceElseRule) Visit(node ast.Node) ast.Visitor {
 	return nil // if branches already analyzed
 }
 
-func (w *lintEnforceElseRule) allBranchesEndWithJumpStmt(branches []ast.Node) bool {
+func (*lintEnforceElseRule) allBranchesEndWithJumpStmt(branches []ast.Node) bool {
 	for _, branch := range branches {
 		block, ok := branch.(*ast.BlockStmt)
 		if !ok || len(block.List) == 0 {
