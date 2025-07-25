@@ -22,7 +22,14 @@ func (r *EnforceElseRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failur
 		onFailure: onFailure,
 	}
 
-	ast.Walk(w, file.AST)
+	for _, decl := range file.AST.Decls {
+		fn, ok := decl.(*ast.FuncDecl)
+		if !ok || fn.Body == nil {
+			continue
+		}
+
+		ast.Walk(w, fn.Body)
+	}
 
 	return failures
 }
@@ -46,7 +53,7 @@ func (w *lintEnforceElseRule) addBranchToChain(branch ast.Node) {
 }
 
 func (w *lintEnforceElseRule) inIfChain() bool {
-	return len(w.chain) > 0
+	return len(w.chain) > 1
 }
 
 func (w *lintEnforceElseRule) resetChain() {
