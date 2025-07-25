@@ -949,21 +949,21 @@ Default behavior (excludes paths containing "testdata")
 
 ```toml
 [rule.package-directory-mismatch]
-  arguments = ["testdata"]
+arguments = ["testdata"]
 ```
 
 Exclude specific directories
 
 ```toml
 [rule.package-directory-mismatch]
-  arguments = ["(testcases|testinfo)"]
+arguments = ["(testcases|testinfo)"]
 ```
 
 Disable all directory exclusions
 
 ```toml
 [rule.package-directory-mismatch]
-  arguments = [""]
+arguments = [""]
 ```
 
 ## range-val-address
