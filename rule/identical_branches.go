@@ -22,7 +22,15 @@ func (*IdenticalBranchesRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 	}
 
 	w := &lintIdenticalBranches{file: file, onFailure: onFailure}
-	ast.Walk(w, file.AST)
+	for _, decl := range file.AST.Decls {
+		fn, ok := decl.(*ast.FuncDecl)
+		if !ok || fn.Body == nil {
+			continue
+		}
+
+		w.resetBranches()
+		ast.Walk(w, fn.Body)
+	}
 	return failures
 }
 
@@ -32,11 +40,12 @@ func (*IdenticalBranchesRule) Name() string {
 }
 
 type lintIdenticalBranches struct {
-	file      *lint.File
+	file      *lint.File // only necessary to retrieve the line number of branches
 	onFailure func(lint.Failure)
-	branches  []ast.Stmt
+	branches  []ast.Stmt // hold branches to compare
 }
 
+// addBranch adds a branch to the list of branches to be compared.
 func (w *lintIdenticalBranches) addBranch(branch ast.Stmt) {
 	if branch == nil {
 		return
@@ -49,6 +58,7 @@ func (w *lintIdenticalBranches) addBranch(branch ast.Stmt) {
 	w.branches = append(w.branches, branch)
 }
 
+// resetBranches resets (clears) the list of branches to compare.
 func (w *lintIdenticalBranches) resetBranches() {
 	w.branches = []ast.Stmt{}
 }
@@ -89,6 +99,7 @@ func (w *lintIdenticalBranches) Visit(node ast.Node) ast.Visitor {
 	return nil
 }
 
+// getStmtLines yields the start line number of the given statements.
 func (w *lintIdenticalBranches) getStmtLines(stmts []ast.Stmt) []int {
 	result := []int{}
 	for _, stmt := range stmts {
@@ -98,6 +109,7 @@ func (w *lintIdenticalBranches) getStmtLines(stmts []ast.Stmt) []int {
 	return result
 }
 
+// walkBranch analyzes the given branch.
 func (w *lintIdenticalBranches) walkBranch(branch ast.Stmt) {
 	if branch == nil {
 		return
@@ -111,6 +123,8 @@ func (w *lintIdenticalBranches) walkBranch(branch ast.Stmt) {
 	ast.Walk(walker, branch)
 }
 
+// identicalBranches yields the first two identical branches of the given branches.
+// Returns nil if no identical branches are found.
 func (*lintIdenticalBranches) identicalBranches(branches []ast.Stmt) []ast.Stmt {
 	if len(branches) < 2 {
 		return nil // only one branch to compare thus we return
