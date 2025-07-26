@@ -42,13 +42,12 @@ func (r *PackageDirectoryMismatchRule) Configure(arguments lint.Arguments) error
 	return nil
 }
 
-// normalizeName removes hyphens, underscores, and dots from the name
+// normalizeReplacer removes hyphens, underscores, and dots from the name
 // to allow matching between directory names like "foo-bar.buz" and package names like "foobarbuz".
+var normalizeReplacer = strings.NewReplacer("-", "", "_", "", ".", "")
+
 func normalizeName(name string) string {
-	name = strings.ReplaceAll(name, "-", "")
-	name = strings.ReplaceAll(name, "_", "")
-	name = strings.ReplaceAll(name, ".", "")
-	return name
+	return normalizeReplacer.Replace(name)
 }
 
 // skipDirs contains directory names that should be unconditionally ignored when checking.
@@ -58,8 +57,8 @@ var skipDirs = map[string]struct{}{
 	"":  {},
 }
 
-// isVersionDirectory checks if a directory name is a version directory (v1, v2, etc.)
-func isVersionDirectory(name string) bool {
+// isVersionPath checks if a directory name is a version directory (v1, v2, etc.)
+func isVersionPath(name string) bool {
 	if len(name) < 2 || (name[0] != 'v' && name[0] != 'V') {
 		return false
 	}
@@ -86,8 +85,8 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 		return nil
 	}
 
-	// Use the parent directory for comparison if the immediate directory is a version directory (v1, v2, etc.).
-	if isVersionDirectory(dirName) {
+	if isVersionPath(dirName) {
+		// Use the parent path for comparison when the current path is a version path (v1, v2, etc.).
 		dirName = filepath.Base(filepath.Dir(dirPath))
 	}
 
