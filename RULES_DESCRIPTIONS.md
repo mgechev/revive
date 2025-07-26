@@ -59,6 +59,7 @@ List of all available rules.
   - [nested-structs](#nested-structs)
   - [optimize-operands-order](#optimize-operands-order)
   - [package-comments](#package-comments)
+  - [package-directory-mismatch](#package-directory-mismatch)
   - [range-val-address](#range-val-address)
   - [range-val-in-closure](#range-val-in-closure)
   - [range](#range)
@@ -921,6 +922,50 @@ _Description_: Packages should have comments. This rule warns on undocumented pa
 More [information here](https://go.dev/wiki/CodeReviewComments#package-comments).
 
 _Configuration_: N/A
+
+## package-directory-mismatch
+
+_Description_: It is considered a good practice to name a package after the directory containing the file.
+This rule warns when the package name declared in the file does not match the name of the directory containing the file.
+
+The following cases are excluded from this check:
+
+- Package `main` (executable packages)
+- Test files (files with `_test` suffix)
+- Files in `testdata` directories (at any level) - by default
+- Files directly in `internal` directories (but files in subdirectories of `internal` are checked)
+- Files in version directories (`v1`, `v2`, etc.) - the parent directory name is used for comparison
+
+The rule normalizes directory and package names before comparison by removing hyphens (`-`), underscores (`_`), and dots (`.`). This allows packages like:
+
+- Directory `foo-bar` with package `foobar`
+- Directory `foo_bar` with package `foobar`
+- Directory `foo.bar` with package `foobar`
+
+_Configuration_: (string) regular expression for filepaths to be excluded. Default: `"testdata"`.
+
+Examples:
+
+Default behavior (excludes paths containing "testdata")
+
+```toml
+[rule.package-directory-mismatch]
+arguments = ["testdata"]
+```
+
+Exclude specific directories
+
+```toml
+[rule.package-directory-mismatch]
+arguments = ["(testcases|testinfo)"]
+```
+
+Disable all directory exclusions
+
+```toml
+[rule.package-directory-mismatch]
+arguments = [""]
+```
 
 ## range-val-address
 
