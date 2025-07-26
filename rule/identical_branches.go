@@ -61,7 +61,10 @@ func (w *lintIdenticalBranches) Visit(node ast.Node) ast.Visitor {
 
 	// recursevely analyze the then-branch
 	w.walkBranch(n.Body)
-	w.addBranch(n.Body)
+
+	if n.Init == nil { // only check if without initialization to avoid false positives
+		w.addBranch(n.Body)
+	}
 
 	if n.Else != nil {
 		if chainedIf, ok := n.Else.(*ast.IfStmt); ok {
@@ -102,6 +105,7 @@ func (w *lintIdenticalBranches) walkBranch(branch ast.Stmt) {
 
 	walker := &lintIdenticalBranches{
 		onFailure: w.onFailure,
+		file:      w.file,
 	}
 
 	ast.Walk(walker, branch)
