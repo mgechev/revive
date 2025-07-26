@@ -75,7 +75,7 @@ func identicalBranches() {
 		}
 	}
 
-	// Should not warn because even branches are identical, the err variable is not
+	// Should not warn because even if branches are identical, the err variable is not
 	if err := something(); err != nil {
 		println(err)
 	} else if err := somethingElse(); err != nil {
