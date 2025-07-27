@@ -69,7 +69,7 @@ func (w *lintIdenticalBranches) Visit(node ast.Node) ast.Visitor {
 		return w
 	}
 
-	// recursevely analyze the then-branch
+	// recursively analyze the then-branch
 	w.walkBranch(n.Body)
 
 	if n.Init == nil { // only check if without initialization to avoid false positives
