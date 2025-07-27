@@ -9,6 +9,9 @@ import (
 	_ "net/http"
 	"strings"
 	str "strings"
+	"v1"
+	"math/rand/v2"
+	randv2 "math/rand/v2"
 )
 
 const str = "" // MATCH /The name 'str' shadows an import name/
@@ -42,4 +45,11 @@ func toto() {
 func titi() {
 	v := md5 + bytes
 	return ast
+}
+
+func testVer() {
+	v1 := "" // MATCH /The name 'v1' shadows an import name/
+	v2 := ""
+	rand := "" // MATCH /The name 'rand' shadows an import name/
+	randv2 := "" // MATCH /The name 'randv2' shadows an import name/
 }
