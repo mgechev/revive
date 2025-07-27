@@ -161,14 +161,13 @@ func (w *lintIfChainIdenticalBranches) Visit(node ast.Node) ast.Visitor {
 		}
 	}
 
-	if matching := w.identicalBranches(w.branches); matching != nil {
-		msg := "both branches of the if are identical"
-		if len(w.branches) > 2 {
-			branchLines := w.getStmtLines(matching)
-			msg = fmt.Sprintf("this if...else if chain has identical branches (lines %v)", branchLines)
-		}
+	if matching := w.identicalBranches(w.branches); len(matching) > 0 {
+		for _, match := range matching {
+			branchLines := w.getStmtLines(match)
+			msg := fmt.Sprintf("this if...else if chain has identical branches (lines %v)", branchLines)
 
-		w.rootWalker.newFailure(w.branches[0], msg, 1.0)
+			w.rootWalker.newFailure(w.branches[0], msg, 1.0)
+		}
 	}
 
 	w.resetBranches()
@@ -202,7 +201,7 @@ func (w *lintIfChainIdenticalBranches) walkBranch(branch ast.Stmt) {
 
 // identicalBranches yields the first two identical branches of the given branches.
 // Returns nil if no identical branches are found.
-func (*lintIfChainIdenticalBranches) identicalBranches(branches []ast.Stmt) []ast.Stmt {
+func (*lintIfChainIdenticalBranches) identicalBranches(branches []ast.Stmt) [][]ast.Stmt {
 	if len(branches) < 2 {
 		return nil // only one branch to compare thus we return
 	}
@@ -212,19 +211,20 @@ func (*lintIfChainIdenticalBranches) identicalBranches(branches []ast.Stmt) []as
 		return hex.EncodeToString(binHash[:])
 	}
 
+	result := [][]ast.Stmt{}
 	hashes := map[string]ast.Stmt{}
 	for _, branch := range branches {
 		str := astutils.GoFmt(branch)
 		hash := hasher(str)
 
 		if match, ok := hashes[hash]; ok {
-			return []ast.Stmt{match, branch}
+			result = append(result, []ast.Stmt{match, branch})
 		}
 
 		hashes[hash] = branch
 	}
 
-	return nil
+	return result
 }
 
 func (w *lintIdenticalBranches) newFailure(node ast.Node, msg string, confidence float64) {

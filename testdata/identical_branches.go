@@ -81,4 +81,18 @@ func identicalBranches() {
 	} else if err := somethingElse(); err != nil {
 		println(err)
 	}
+
+	// Multiple identical pair of branches
+	if a {
+		foo()
+	} else if b {
+		bar()
+	} else if c {
+		foo()
+	} else if d {
+		bar()
+	}
+	// MATCH:86 /this if...else if chain has identical branches (lines [86 90])/
+	// MATCH:86 /this if...else if chain has identical branches (lines [88 92])/
+
 }
