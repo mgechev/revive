@@ -74,7 +74,7 @@ func (w *lintIdenticalBranches) Visit(node ast.Node) ast.Visitor {
 	}
 }
 
-func (w *lintIdenticalBranches) isIfElsIf(n *ast.IfStmt) bool {
+func (*lintIdenticalBranches) isIfElsIf(n *ast.IfStmt) bool {
 	if n.Else == nil {
 		return false
 	}
@@ -103,7 +103,7 @@ func (w *lintIdenticalBranches) lintSimpleIf(n *ast.IfStmt) {
 	}
 }
 
-func (w *lintIdenticalBranches) identicalBranches(body *ast.BlockStmt, elseBranch *ast.BlockStmt) bool {
+func (*lintIdenticalBranches) identicalBranches(body *ast.BlockStmt, elseBranch *ast.BlockStmt) bool {
 	if len(body.List) != len(elseBranch.List) {
 		return false // branches don't have the same number of statements
 	}
@@ -209,7 +209,7 @@ func (w *lintIfChainIdenticalBranches) walkBranch(branch ast.Stmt) {
 
 // isComplexCondition returns true if the given expression is "complex", false otherwise.
 // An expression is considered complex if it has a function call.
-func (w *lintIfChainIdenticalBranches) isComplexCondition(expr ast.Expr) bool {
+func (*lintIfChainIdenticalBranches) isComplexCondition(expr ast.Expr) bool {
 	calls := astutils.PickNodes(expr, func(n ast.Node) bool {
 		_, ok := n.(*ast.CallExpr)
 		return ok
