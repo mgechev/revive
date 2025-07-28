@@ -3,6 +3,7 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"go/token"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -58,12 +59,14 @@ func (r *EnforceSwitchStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint
 
 		if !hasDefault && !r.allowNoDefault {
 			// switch without default
-			failures = append(failures, lint.Failure{
-				Confidence: 1,
-				Node:       switchNode,
-				Category:   lint.FailureCategoryStyle,
-				Failure:    "switch must have a default case clause",
-			})
+			if !r.allBranchesEndWithJumpStmt(switchNode) {
+				failures = append(failures, lint.Failure{
+					Confidence: 1,
+					Node:       switchNode,
+					Category:   lint.FailureCategoryStyle,
+					Failure:    "switch must have a default case clause",
+				})
+			}
 
 			return true
 		}
@@ -98,6 +101,31 @@ func (*EnforceSwitchStyleRule) seekDefaultCase(body *ast.BlockStmt) (defaultClau
 	}
 
 	return defaultClause, defaultClause == last
+}
+
+func (*EnforceSwitchStyleRule) allBranchesEndWithJumpStmt(switchStmt *ast.SwitchStmt) bool {
+	for _, stmt := range switchStmt.Body.List {
+		caseClause := stmt.(*ast.CaseClause) // safe to assume stmt is a case clause
+
+		caseBody := caseClause.Body
+		if caseBody == nil {
+			return false
+		}
+
+		lastStmt := caseBody[len(caseBody)-1]
+
+		if _, ok := lastStmt.(*ast.ReturnStmt); ok {
+			continue
+		}
+
+		if jump, ok := lastStmt.(*ast.BranchStmt); ok && jump.Tok == token.BREAK {
+			continue
+		}
+
+		return false
+	}
+
+	return true
 }
 
 // Name returns the rule name.
