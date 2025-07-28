@@ -115,10 +115,11 @@ func (w *lintIdenticalBranches) identicalBranches(body *ast.BlockStmt, elseBranc
 }
 
 type lintIfChainIdenticalBranches struct {
-	file       *lint.File // only necessary to retrieve the line number of branches
-	onFailure  func(lint.Failure)
-	branches   []ast.Stmt             // hold branches to compare
-	rootWalker *lintIdenticalBranches // the walker to use to recursively analize inner branches
+	file                *lint.File // only necessary to retrieve the line number of branches
+	onFailure           func(lint.Failure)
+	branches            []ast.Stmt             // hold branches to compare
+	rootWalker          *lintIdenticalBranches // the walker to use to recursively analize inner branches
+	hasComplexCondition bool                   // indicates if one of the if conditions is "complex"
 }
 
 // addBranch adds a branch to the list of branches to be compared.
@@ -137,6 +138,7 @@ func (w *lintIfChainIdenticalBranches) addBranch(branch ast.Stmt) {
 // resetBranches resets (clears) the list of branches to compare.
 func (w *lintIfChainIdenticalBranches) resetBranches() {
 	w.branches = []ast.Stmt{}
+	w.hasComplexCondition = false
 }
 
 func (w *lintIfChainIdenticalBranches) Visit(node ast.Node) ast.Visitor {
@@ -152,6 +154,10 @@ func (w *lintIfChainIdenticalBranches) Visit(node ast.Node) ast.Visitor {
 		w.addBranch(n.Body)
 	}
 
+	if w.isComplexCondition(n.Cond) {
+		w.hasComplexCondition = true
+	}
+
 	if n.Else != nil {
 		if chainedIf, ok := n.Else.(*ast.IfStmt); ok {
 			w.Visit(chainedIf)
@@ -161,13 +167,15 @@ func (w *lintIfChainIdenticalBranches) Visit(node ast.Node) ast.Visitor {
 		}
 	}
 
-	if matching := w.identicalBranches(w.branches); len(matching) > 0 {
-		for _, match := range matching {
-			branchLines := w.getStmtLines(match)
-			msg := fmt.Sprintf("this if...else if chain has identical branches (lines %v)", branchLines)
-
-			w.rootWalker.newFailure(w.branches[0], msg, 1.0)
+	identicalBranches := w.identicalBranches(w.branches)
+	for _, branchPair := range identicalBranches {
+		branchLines := w.getStmtLines(branchPair)
+		msg := fmt.Sprintf("this if...else if chain has identical branches (lines %v)", branchLines)
+		confidence := 1.0
+		if w.hasComplexCondition {
+			confidence = 0.8
 		}
+		w.rootWalker.newFailure(w.branches[0], msg, confidence)
 	}
 
 	w.resetBranches()
@@ -199,11 +207,22 @@ func (w *lintIfChainIdenticalBranches) walkBranch(branch ast.Stmt) {
 	ast.Walk(walker, branch)
 }
 
-// identicalBranches yields the first two identical branches of the given branches.
-// Returns nil if no identical branches are found.
+// isComplexCondition returns true if the given expression is "complex", false otherwise.
+// An expression is considered complex if it has a function call.
+func (w *lintIfChainIdenticalBranches) isComplexCondition(expr ast.Expr) bool {
+	calls := astutils.PickNodes(expr, func(n ast.Node) bool {
+		_, ok := n.(*ast.CallExpr)
+		return ok
+	})
+
+	return len(calls) > 0
+}
+
+// identicalBranches yields pairs of identical branches from the given branches.
 func (*lintIfChainIdenticalBranches) identicalBranches(branches []ast.Stmt) [][]ast.Stmt {
+	result := [][]ast.Stmt{}
 	if len(branches) < 2 {
-		return nil // only one branch to compare thus we return
+		return result // only one branch to compare thus we return
 	}
 
 	hasher := func(in string) string {
@@ -211,7 +230,6 @@ func (*lintIfChainIdenticalBranches) identicalBranches(branches []ast.Stmt) [][]
 		return hex.EncodeToString(binHash[:])
 	}
 
-	result := [][]ast.Stmt{}
 	hashes := map[string]ast.Stmt{}
 	for _, branch := range branches {
 		str := astutils.GoFmt(branch)

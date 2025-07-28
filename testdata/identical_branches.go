@@ -95,4 +95,22 @@ func identicalBranches() {
 	// MATCH:86 /this if...else if chain has identical branches (lines [86 90])/
 	// MATCH:86 /this if...else if chain has identical branches (lines [88 92])/
 
+	if createFile() { // json:{"MATCH": "this if...else if chain has identical branches (lines [98 102])","Confidence": 0.8}
+		doSomething()
+	} else if !delete() {
+		return new("cannot delete file")
+	} else if createFile() {
+		doSomething()
+	} else {
+		return new("file error")
+	}
+
+	// Multiple identical pair of branches
+	if a { // json:{"MATCH": "this if...else if chain has identical branches (lines [109 111])","Confidence": 1}
+		foo()
+	} else if b {
+		foo()
+	} else {
+		bar()
+	}
 }
