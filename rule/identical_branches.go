@@ -84,10 +84,6 @@ func (*lintIdenticalBranches) isIfElsIf(n *ast.IfStmt) bool {
 	return ok
 }
 
-type lintSimpleIfIdenticalBranches struct {
-	onFailure func(lint.Failure)
-}
-
 func (w *lintIdenticalBranches) lintSimpleIf(n *ast.IfStmt) {
 	if n.Else == nil {
 		return
@@ -103,7 +99,7 @@ func (w *lintIdenticalBranches) lintSimpleIf(n *ast.IfStmt) {
 	}
 }
 
-func (*lintIdenticalBranches) identicalBranches(body *ast.BlockStmt, elseBranch *ast.BlockStmt) bool {
+func (*lintIdenticalBranches) identicalBranches(body, elseBranch *ast.BlockStmt) bool {
 	if len(body.List) != len(elseBranch.List) {
 		return false // branches don't have the same number of statements
 	}
