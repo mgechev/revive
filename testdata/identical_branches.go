@@ -38,7 +38,7 @@ func identicalBranches() {
 		println("else")
 	}
 
-	if true { // MATCH /this if...else if chain has identical branches (lines [41 49])/
+	if true { // MATCH /"if...else if" chain with identical branches (lines [41 49])/
 		print("something")
 	} else if true {
 		print("something else")
@@ -50,7 +50,7 @@ func identicalBranches() {
 		print("something")
 	}
 
-	if true { // MATCH /this if...else if chain has identical branches (lines [53 59])/
+	if true { // MATCH /"if...else if" chain with identical branches (lines [53 59])/
 		print("something")
 	} else if true {
 		print("something else")
@@ -66,7 +66,7 @@ func identicalBranches() {
 		print("something")
 	} else if true {
 		print("something else")
-		if true { // MATCH /this if...else if chain has identical branches (lines [69 71])/
+		if true { // MATCH /"if...else if" chain with identical branches (lines [69 71])/
 			print("something")
 		} else if false {
 			print("something")
@@ -92,10 +92,10 @@ func identicalBranches() {
 	} else if d {
 		bar()
 	}
-	// MATCH:86 /this if...else if chain has identical branches (lines [86 90])/
-	// MATCH:86 /this if...else if chain has identical branches (lines [88 92])/
+	// MATCH:86 /"if...else if" chain with identical branches (lines [86 90])/
+	// MATCH:86 /"if...else if" chain with identical branches (lines [88 92])/
 
-	if createFile() { // json:{"MATCH": "this if...else if chain has identical branches (lines [98 102])","Confidence": 0.8}
+	if createFile() { // json:{"MATCH": "\"if...else if\" chain with identical branches (lines [98 102])","Confidence": 0.8}
 		doSomething()
 	} else if !delete() {
 		return new("cannot delete file")
@@ -105,8 +105,8 @@ func identicalBranches() {
 		return new("file error")
 	}
 
-	// Multiple identical pair of branches
-	if a { // json:{"MATCH": "this if...else if chain has identical branches (lines [109 111])","Confidence": 1}
+	// Test confidence is reset
+	if a { // json:{"MATCH": "\"if...else if\" chain with identical branches (lines [109 111])","Confidence": 1}
 		foo()
 	} else if b {
 		foo()

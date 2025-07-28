@@ -170,7 +170,7 @@ func (w *lintIfChainIdenticalBranches) Visit(node ast.Node) ast.Visitor {
 	identicalBranches := w.identicalBranches(w.branches)
 	for _, branchPair := range identicalBranches {
 		branchLines := w.getStmtLines(branchPair)
-		msg := fmt.Sprintf("this if...else if chain has identical branches (lines %v)", branchLines)
+		msg := fmt.Sprintf(`"if...else if" chain with identical branches (lines %v)`, branchLines)
 		confidence := 1.0
 		if w.hasComplexCondition {
 			confidence = 0.8
