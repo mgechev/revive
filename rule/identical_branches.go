@@ -42,8 +42,8 @@ func (*IdenticalBranchesRule) Name() string {
 // lintIdenticalBranches implements the root or main AST walker of the rule.
 // This walker will activate other walkers depending on the satement under analysis:
 // - simple if ... else ...
-// - if ... else if ... chain
-// - switch (not yet implemented)
+// - if ... else if ... chain,
+// - switch (not yet implemented).
 type lintIdenticalBranches struct {
 	file      *lint.File // only necessary to retrieve the line number of branches
 	onFailure func(lint.Failure)
@@ -52,7 +52,7 @@ type lintIdenticalBranches struct {
 func (w *lintIdenticalBranches) Visit(node ast.Node) ast.Visitor {
 	switch n := node.(type) {
 	case *ast.IfStmt:
-		if w.isIfElsIf(n) {
+		if w.isIfElseIf(n) {
 			walker := &lintIfChainIdenticalBranches{
 				onFailure:  w.onFailure,
 				file:       w.file,
@@ -74,13 +74,8 @@ func (w *lintIdenticalBranches) Visit(node ast.Node) ast.Visitor {
 	}
 }
 
-func (*lintIdenticalBranches) isIfElsIf(n *ast.IfStmt) bool {
-	if n.Else == nil {
-		return false
-	}
-
+func (*lintIdenticalBranches) isIfElseIf(n *ast.IfStmt) bool {
 	_, ok := n.Else.(*ast.IfStmt)
-
 	return ok
 }
 
