@@ -1,6 +1,9 @@
 package rule
 
 import (
+	"crypto/md5"
+	"encoding/hex"
+	"fmt"
 	"go/ast"
 
 	"github.com/mgechev/revive/internal/astutils"
@@ -18,9 +21,16 @@ func (*IdenticalBranchesRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 		failures = append(failures, failure)
 	}
 
-	astFile := file.AST
-	w := &lintIdenticalBranches{astFile, onFailure}
-	ast.Walk(w, astFile)
+	w := &lintIdenticalBranches{file: file, onFailure: onFailure}
+	for _, decl := range file.AST.Decls {
+		fn, ok := decl.(*ast.FuncDecl)
+		if !ok || fn.Body == nil {
+			continue
+		}
+
+		ast.Walk(w, fn.Body)
+	}
+
 	return failures
 }
 
@@ -29,58 +39,206 @@ func (*IdenticalBranchesRule) Name() string {
 	return "identical-branches"
 }
 
+// lintIdenticalBranches implements the root or main AST walker of the rule.
+// This walker will activate other walkers depending on the satement under analysis:
+// - simple if ... else ...
+// - if ... else if ... chain,
+// - switch (not yet implemented).
 type lintIdenticalBranches struct {
-	file      *ast.File
+	file      *lint.File // only necessary to retrieve the line number of branches
 	onFailure func(lint.Failure)
 }
 
 func (w *lintIdenticalBranches) Visit(node ast.Node) ast.Visitor {
+	switch n := node.(type) {
+	case *ast.IfStmt:
+		if w.isIfElseIf(n) {
+			walker := &lintIfChainIdenticalBranches{
+				onFailure:  w.onFailure,
+				file:       w.file,
+				rootWalker: w,
+			}
+
+			ast.Walk(walker, n)
+			return nil // the walker already analyzed inner branches
+		}
+
+		w.lintSimpleIf(n)
+		return w
+
+	case *ast.SwitchStmt:
+		// TODO later
+		return w
+	default:
+		return w
+	}
+}
+
+func (*lintIdenticalBranches) isIfElseIf(n *ast.IfStmt) bool {
+	_, ok := n.Else.(*ast.IfStmt)
+	return ok
+}
+
+func (w *lintIdenticalBranches) lintSimpleIf(n *ast.IfStmt) {
+	if n.Else == nil {
+		return
+	}
+
+	elseBranch, ok := n.Else.(*ast.BlockStmt)
+	if !ok { // if-else-if construction (should never be the case but keep the check for safer refactoring)
+		return
+	}
+
+	if w.identicalBranches(n.Body, elseBranch) {
+		w.newFailure(n, "both branches of the if are identical", 1.0)
+	}
+}
+
+func (*lintIdenticalBranches) identicalBranches(body, elseBranch *ast.BlockStmt) bool {
+	if len(body.List) != len(elseBranch.List) {
+		return false // branches don't have the same number of statements
+	}
+
+	bodyStr := astutils.GoFmt(body)
+	elseStr := astutils.GoFmt(elseBranch)
+
+	return bodyStr == elseStr
+}
+
+type lintIfChainIdenticalBranches struct {
+	file                *lint.File // only necessary to retrieve the line number of branches
+	onFailure           func(lint.Failure)
+	branches            []ast.Stmt             // hold branches to compare
+	rootWalker          *lintIdenticalBranches // the walker to use to recursively analize inner branches
+	hasComplexCondition bool                   // indicates if one of the if conditions is "complex"
+}
+
+// addBranch adds a branch to the list of branches to be compared.
+func (w *lintIfChainIdenticalBranches) addBranch(branch ast.Stmt) {
+	if branch == nil {
+		return
+	}
+
+	if w.branches == nil {
+		w.resetBranches()
+	}
+
+	w.branches = append(w.branches, branch)
+}
+
+// resetBranches resets (clears) the list of branches to compare.
+func (w *lintIfChainIdenticalBranches) resetBranches() {
+	w.branches = []ast.Stmt{}
+	w.hasComplexCondition = false
+}
+
+func (w *lintIfChainIdenticalBranches) Visit(node ast.Node) ast.Visitor {
 	n, ok := node.(*ast.IfStmt)
 	if !ok {
 		return w
 	}
 
-	noElseBranch := n.Else == nil
-	if noElseBranch {
-		return w
+	// recursively analyze the then-branch
+	w.walkBranch(n.Body)
+
+	if n.Init == nil { // only check if without initialization to avoid false positives
+		w.addBranch(n.Body)
 	}
 
-	branches := []*ast.BlockStmt{n.Body}
-
-	elseBranch, ok := n.Else.(*ast.BlockStmt)
-	if !ok { // if-else-if construction
-		return w
-	}
-	branches = append(branches, elseBranch)
-
-	if w.identicalBranches(branches) {
-		w.newFailure(n, "both branches of the if are identical")
+	if w.isComplexCondition(n.Cond) {
+		w.hasComplexCondition = true
 	}
 
-	return w
-}
-
-func (*lintIdenticalBranches) identicalBranches(branches []*ast.BlockStmt) bool {
-	if len(branches) < 2 {
-		return false // only one branch to compare thus we return
-	}
-
-	referenceBranch := astutils.GoFmt(branches[0])
-	referenceBranchSize := len(branches[0].List)
-	for i := 1; i < len(branches); i++ {
-		currentBranch := branches[i]
-		currentBranchSize := len(currentBranch.List)
-		if currentBranchSize != referenceBranchSize || astutils.GoFmt(currentBranch) != referenceBranch {
-			return false
+	if n.Else != nil {
+		if chainedIf, ok := n.Else.(*ast.IfStmt); ok {
+			w.Visit(chainedIf)
+		} else {
+			w.addBranch(n.Else)
+			w.walkBranch(n.Else)
 		}
 	}
 
-	return true
+	identicalBranches := w.identicalBranches(w.branches)
+	for _, branchPair := range identicalBranches {
+		branchLines := w.getStmtLines(branchPair)
+		msg := fmt.Sprintf(`"if...else if" chain with identical branches (lines %v)`, branchLines)
+		confidence := 1.0
+		if w.hasComplexCondition {
+			confidence = 0.8
+		}
+		w.rootWalker.newFailure(w.branches[0], msg, confidence)
+	}
+
+	w.resetBranches()
+	return nil
 }
 
-func (w *lintIdenticalBranches) newFailure(node ast.Node, msg string) {
+// getStmtLines yields the start line number of the given statements.
+func (w *lintIfChainIdenticalBranches) getStmtLines(stmts []ast.Stmt) []int {
+	result := []int{}
+	for _, stmt := range stmts {
+		pos := w.file.ToPosition(stmt.Pos())
+		result = append(result, pos.Line)
+	}
+	return result
+}
+
+// walkBranch analyzes the given branch.
+func (w *lintIfChainIdenticalBranches) walkBranch(branch ast.Stmt) {
+	if branch == nil {
+		return
+	}
+
+	walker := &lintIfChainIdenticalBranches{
+		onFailure:  w.onFailure,
+		file:       w.file,
+		rootWalker: w.rootWalker,
+	}
+
+	ast.Walk(walker, branch)
+}
+
+// isComplexCondition returns true if the given expression is "complex", false otherwise.
+// An expression is considered complex if it has a function call.
+func (*lintIfChainIdenticalBranches) isComplexCondition(expr ast.Expr) bool {
+	calls := astutils.PickNodes(expr, func(n ast.Node) bool {
+		_, ok := n.(*ast.CallExpr)
+		return ok
+	})
+
+	return len(calls) > 0
+}
+
+// identicalBranches yields pairs of identical branches from the given branches.
+func (*lintIfChainIdenticalBranches) identicalBranches(branches []ast.Stmt) [][]ast.Stmt {
+	result := [][]ast.Stmt{}
+	if len(branches) < 2 {
+		return result // only one branch to compare thus we return
+	}
+
+	hasher := func(in string) string {
+		binHash := md5.Sum([]byte(in))
+		return hex.EncodeToString(binHash[:])
+	}
+
+	hashes := map[string]ast.Stmt{}
+	for _, branch := range branches {
+		str := astutils.GoFmt(branch)
+		hash := hasher(str)
+
+		if match, ok := hashes[hash]; ok {
+			result = append(result, []ast.Stmt{match, branch})
+		}
+
+		hashes[hash] = branch
+	}
+
+	return result
+}
+
+func (w *lintIdenticalBranches) newFailure(node ast.Node, msg string, confidence float64) {
 	w.onFailure(lint.Failure{
-		Confidence: 1,
+		Confidence: confidence,
 		Node:       node,
 		Category:   lint.FailureCategoryLogic,
 		Failure:    msg,
