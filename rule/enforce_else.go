@@ -7,7 +7,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// EnforceElseRule enforces else branches in if... else if chains
+// EnforceElseRule enforces else branches in if... else if chains.
 type EnforceElseRule struct{}
 
 // Apply applies the rule to given file.
@@ -68,8 +68,8 @@ func (w *lintEnforceElseRule) Visit(node ast.Node) ast.Visitor {
 
 	w.walkBranch(ifStmt.Body)
 
-	switch {
-	case ifStmt.Else == nil:
+	switch ifStmt.Else {
+	case nil:
 		w.addBranchToChain(ifStmt.Body)
 		mustReport := w.inIfChain() && !w.allBranchesEndWithJumpStmt(w.chain)
 		if mustReport {
