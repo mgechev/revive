@@ -480,8 +480,8 @@ func checkURLTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (messag
 	var delimiter = ""
 	for _, opt := range tag.Options {
 		switch opt {
-		case "int", "omitempty", "numbered", "brackets":
-		case "unix", "unixmilli", "unixnano": // TODO : check that the field is of type time.Time
+		case "int", "omitempty", "numbered", "brackets",
+			"unix", "unixmilli", "unixnano": // TODO : check that the field is of type time.Time
 		case "comma", "semicolon", "space":
 			if delimiter == "" {
 				delimiter = opt
@@ -597,9 +597,7 @@ func typeValueMatch(t ast.Expr, val string) bool {
 	case "int":
 		_, err := strconv.ParseInt(val, 10, 64)
 		typeMatches = err == nil
-	case "string":
-	case "nil":
-	default:
+	default: // "string", "nil", ...
 		// unchecked type
 	}
 
