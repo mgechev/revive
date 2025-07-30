@@ -3,6 +3,8 @@ package astutils
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"go/ast"
 	"go/printer"
@@ -158,4 +160,14 @@ func GoFmt(x any) string {
 	fs := token.NewFileSet()
 	gofmtConfig.Fprint(&buf, fs, x)
 	return buf.String()
+}
+
+// NodeHash yields the MD5 hash of the given AST node.
+func NodeHash(node ast.Node) string {
+	hasher := func(in string) string {
+		binHash := md5.Sum([]byte(in))
+		return hex.EncodeToString(binHash[:])
+	}
+	str := GoFmt(node)
+	return hasher(str)
 }
