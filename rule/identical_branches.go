@@ -51,7 +51,7 @@ func (w *lintIdenticalBranches) Visit(node ast.Node) ast.Visitor {
 	}
 
 	elseBranch, ok := ifStmt.Else.(*ast.BlockStmt)
-	if !ok { // if-else-if construction, the rule only copes with simgle if...else statements
+	if !ok { // if-else-if construction, the rule only copes with single if...else statements
 		return w
 	}
 

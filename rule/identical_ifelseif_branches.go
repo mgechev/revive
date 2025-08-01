@@ -8,7 +8,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// IdenticalIfElseIfBranchesRule warns if...else if chains with identical branches.
+// IdenticalIfElseIfBranchesRule warns on if...else if chains with identical branches.
 type IdenticalIfElseIfBranchesRule struct{}
 
 // Apply applies the rule to given file.
@@ -85,7 +85,7 @@ type lintIfChainIdenticalBranches struct {
 	getStmtLine         func(ast.Stmt) int
 	onFailure           func(lint.Failure)
 	branches            []ast.Stmt                           // hold branches to compare
-	rootWalker          *rootWalkerIfElseIfIdenticalBranches // the walker to use to recursively analize inner branches
+	rootWalker          *rootWalkerIfElseIfIdenticalBranches // the walker to use to recursively analyze inner branches
 	hasComplexCondition bool                                 // indicates if one of the if conditions is "complex"
 }
 
