@@ -168,7 +168,7 @@ func (*lintIfChainIdenticalBranches) isComplexCondition(expr ast.Expr) bool {
 func (w *lintIfChainIdenticalBranches) identicalBranches(branches []ast.Stmt) [][]int {
 	result := [][]int{}
 	if len(branches) < 2 {
-		return result //no other branch to compare thus we return
+		return result // no other branch to compare thus we return
 	}
 
 	hashes := map[string]int{} // branch code hash -> branch line
