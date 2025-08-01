@@ -3,6 +3,7 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"go/token"
 
 	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
@@ -19,7 +20,7 @@ func (*IdenticalSwitchConditionsRule) Apply(file *lint.File, _ lint.Arguments) [
 		failures = append(failures, failure)
 	}
 
-	w := &lintIdenticalSwitchConditions{file: file, onFailure: onFailure}
+	w := &lintIdenticalSwitchConditions{toPosition: file.ToPosition, onFailure: onFailure}
 	for _, decl := range file.AST.Decls {
 		fn, ok := decl.(*ast.FuncDecl)
 		if !ok || fn.Body == nil {
@@ -38,8 +39,8 @@ func (*IdenticalSwitchConditionsRule) Name() string {
 }
 
 type lintIdenticalSwitchConditions struct {
-	file      *lint.File // only necessary to retrieve the line number of branches
-	onFailure func(lint.Failure)
+	toPosition func(token.Pos) token.Position
+	onFailure  func(lint.Failure)
 }
 
 func (w *lintIdenticalSwitchConditions) Visit(node ast.Node) ast.Visitor {
@@ -55,7 +56,7 @@ func (w *lintIdenticalSwitchConditions) Visit(node ast.Node) ast.Visitor {
 	hashes := map[string]int{} // map hash(condition code) -> condition line
 	for _, cc := range switchStmt.Body.List {
 		caseClause := cc.(*ast.CaseClause)
-		caseClauseLine := w.file.ToPosition(caseClause.Pos()).Line
+		caseClauseLine := w.toPosition(caseClause.Pos()).Line
 		for _, expr := range caseClause.List {
 			hash := astutils.NodeHash(expr)
 			if matchLine, ok := hashes[hash]; ok {
