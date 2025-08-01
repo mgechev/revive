@@ -20,7 +20,11 @@ func (*IdenticalSwitchBranchesRule) Apply(file *lint.File, _ lint.Arguments) []l
 		failures = append(failures, failure)
 	}
 
-	w := &lintIdenticalSwitchBranches{file: file, onFailure: onFailure}
+	getStmtLine := func(s ast.Stmt) int {
+		return file.ToPosition(s.Pos()).Line
+	}
+
+	w := &lintIdenticalSwitchBranches{getStmtLine: getStmtLine, onFailure: onFailure}
 	for _, decl := range file.AST.Decls {
 		fn, ok := decl.(*ast.FuncDecl)
 		if !ok || fn.Body == nil {
@@ -39,8 +43,8 @@ func (*IdenticalSwitchBranchesRule) Name() string {
 }
 
 type lintIdenticalSwitchBranches struct {
-	file      *lint.File // only necessary to retrieve the line number of branches
-	onFailure func(lint.Failure)
+	getStmtLine func(ast.Stmt) int
+	onFailure   func(lint.Failure)
 }
 
 func (w *lintIdenticalSwitchBranches) Visit(node ast.Node) ast.Visitor {
@@ -48,6 +52,7 @@ func (w *lintIdenticalSwitchBranches) Visit(node ast.Node) ast.Visitor {
 	if !ok {
 		return w
 	}
+
 	if switchStmt.Tag == nil {
 		return w // do not lint untagged switches (order of case evaluation might be important)
 	}
@@ -71,7 +76,7 @@ func (w *lintIdenticalSwitchBranches) Visit(node ast.Node) ast.Visitor {
 			List: caseClause.Body,
 		}
 		hash := astutils.NodeHash(branch)
-		branchLine := w.file.ToPosition(caseClause.Pos()).Line
+		branchLine := w.getStmtLine(caseClause)
 		if matchLine, ok := hashes[hash]; ok {
 			w.onFailure(lint.Failure{
 				Confidence: 1.0,
