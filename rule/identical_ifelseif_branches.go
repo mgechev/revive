@@ -3,7 +3,6 @@ package rule
 import (
 	"fmt"
 	"go/ast"
-	"go/token"
 
 	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
@@ -20,7 +19,11 @@ func (*IdenticalIfElseIfBranchesRule) Apply(file *lint.File, _ lint.Arguments) [
 		failures = append(failures, failure)
 	}
 
-	w := &rootWalkerIfElseIfIdenticalBranches{file: file, onFailure: onFailure}
+	getStmtLine := func(s ast.Stmt) int {
+		return file.ToPosition(s.Pos()).Line
+	}
+
+	w := &rootWalkerIfElseIfIdenticalBranches{getStmtLine: getStmtLine, onFailure: onFailure}
 	for _, decl := range file.AST.Decls {
 		fn, ok := decl.(*ast.FuncDecl)
 		if !ok || fn.Body == nil {
@@ -39,62 +42,29 @@ func (*IdenticalIfElseIfBranchesRule) Name() string {
 }
 
 type rootWalkerIfElseIfIdenticalBranches struct {
-	file      *lint.File // only necessary to retrieve the line number of branches
-	onFailure func(lint.Failure)
+	getStmtLine func(ast.Stmt) int
+	onFailure   func(lint.Failure)
 }
 
 func (w *rootWalkerIfElseIfIdenticalBranches) Visit(node ast.Node) ast.Visitor {
-	switch n := node.(type) {
-	case *ast.IfStmt:
-		if w.isIfElseIf(n) {
-			walker := &lintIfChainIdenticalBranches{
-				onFailure:  w.onFailure,
-				file:       w.file,
-				rootWalker: w,
-			}
-
-			ast.Walk(walker, n)
-			return nil // the walker already analyzed inner branches
-		}
-
-		return w
-	default:
+	n, ok := node.(*ast.IfStmt)
+	if !ok {
 		return w
 	}
-}
 
-func (w *rootWalkerIfElseIfIdenticalBranches) lintSwitch(switchStmt *ast.SwitchStmt) {
-	doesFallthrough := func(stmts []ast.Stmt) bool {
-		if len(stmts) == 0 {
-			return false
+	_, isIfElseIf := n.Else.(*ast.IfStmt)
+	if isIfElseIf {
+		walker := &lintIfChainIdenticalBranches{
+			onFailure:   w.onFailure,
+			getStmtLine: w.getStmtLine,
+			rootWalker:  w,
 		}
 
-		ft, ok := stmts[len(stmts)-1].(*ast.BranchStmt)
-		return ok && ft.Tok == token.FALLTHROUGH
+		ast.Walk(walker, n)
+		return nil // the walker already analyzed inner branches
 	}
 
-	hashes := map[string]int{} // map hash(branch code) -> branch line
-	for _, cc := range switchStmt.Body.List {
-		caseClause := cc.(*ast.CaseClause)
-		if doesFallthrough(caseClause.Body) {
-			continue // skip fallthrough branches
-		}
-		branch := &ast.BlockStmt{
-			List: caseClause.Body,
-		}
-		hash := astutils.NodeHash(branch)
-		branchLine := w.file.ToPosition(caseClause.Pos()).Line
-		if matchLine, ok := hashes[hash]; ok {
-			w.newFailure(
-				switchStmt,
-				fmt.Sprintf(`"switch" with identical branches (lines %d and %d)`, matchLine, branchLine),
-				1.0,
-			)
-		}
-
-		hashes[hash] = branchLine
-		w.walkBranch(branch)
-	}
+	return w
 }
 
 // walkBranch analyzes the given branch.
@@ -104,55 +74,15 @@ func (w *rootWalkerIfElseIfIdenticalBranches) walkBranch(branch ast.Stmt) {
 	}
 
 	walker := &rootWalkerIfElseIfIdenticalBranches{
-		onFailure: w.onFailure,
-		file:      w.file,
+		onFailure:   w.onFailure,
+		getStmtLine: w.getStmtLine,
 	}
 
 	ast.Walk(walker, branch)
 }
 
-func (*rootWalkerIfElseIfIdenticalBranches) isIfElseIf(node *ast.IfStmt) bool {
-	_, ok := node.Else.(*ast.IfStmt)
-	return ok
-}
-
-func (w *rootWalkerIfElseIfIdenticalBranches) lintSimpleIf(n *ast.IfStmt) {
-	if n.Else == nil {
-		return
-	}
-
-	elseBranch, ok := n.Else.(*ast.BlockStmt)
-	if !ok { // if-else-if construction (should never be the case but keep the check for safer refactoring)
-		return
-	}
-
-	if w.identicalBranches(n.Body, elseBranch) {
-		w.newFailure(n, "both branches of the if are identical", 1.0)
-	}
-}
-
-func (*rootWalkerIfElseIfIdenticalBranches) identicalBranches(body, elseBranch *ast.BlockStmt) bool {
-	if len(body.List) != len(elseBranch.List) {
-		return false // branches don't have the same number of statements
-	}
-
-	bodyStr := astutils.GoFmt(body)
-	elseStr := astutils.GoFmt(elseBranch)
-
-	return bodyStr == elseStr
-}
-
-func (w *rootWalkerIfElseIfIdenticalBranches) newFailure(node ast.Node, msg string, confidence float64) {
-	w.onFailure(lint.Failure{
-		Confidence: confidence,
-		Node:       node,
-		Category:   lint.FailureCategoryLogic,
-		Failure:    msg,
-	})
-}
-
 type lintIfChainIdenticalBranches struct {
-	file                *lint.File // only necessary to retrieve the line number of branches
+	getStmtLine         func(ast.Stmt) int
 	onFailure           func(lint.Failure)
 	branches            []ast.Stmt                           // hold branches to compare
 	rootWalker          *rootWalkerIfElseIfIdenticalBranches // the walker to use to recursively analize inner branches
@@ -211,7 +141,12 @@ func (w *lintIfChainIdenticalBranches) Visit(node ast.Node) ast.Visitor {
 		if w.hasComplexCondition {
 			confidence = 0.8
 		}
-		w.rootWalker.newFailure(w.branches[0], msg, confidence)
+		w.onFailure(lint.Failure{
+			Confidence: confidence,
+			Node:       w.branches[0],
+			Category:   lint.FailureCategoryLogic,
+			Failure:    msg,
+		})
 	}
 
 	w.resetBranches()
@@ -239,7 +174,7 @@ func (w *lintIfChainIdenticalBranches) identicalBranches(branches []ast.Stmt) []
 	hashes := map[string]int{} // branch code hash -> branch line
 	for _, branch := range branches {
 		hash := astutils.NodeHash(branch)
-		branchLine := w.file.ToPosition(branch.Pos()).Line
+		branchLine := w.getStmtLine(branch)
 		if match, ok := hashes[hash]; ok {
 			result = append(result, []int{match, branchLine})
 		}
