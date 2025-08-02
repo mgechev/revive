@@ -45,6 +45,7 @@ List of all available rules.
   - [function-result-limit](#function-result-limit)
   - [get-return](#get-return)
   - [identical-branches](#identical-branches)
+  - [identical-switch-conditions](#identical-switch-conditions)
   - [if-return](#if-return)
   - [import-alias-naming](#import-alias-naming)
   - [import-shadowing](#import-shadowing)
@@ -730,6 +731,13 @@ _Configuration_: N/A
 ## identical-branches
 
 _Description_: An `if-then-else` conditional with identical implementations in both branches is an error.
+
+_Configuration_: N/A
+
+## identical-switch-conditions
+
+_Description_: a `switch` statement with cases with the same condition can lead to
+unreachable code and is a potential source of bugs while making the code harder to read and maintain.
 
 _Configuration_: N/A
 
