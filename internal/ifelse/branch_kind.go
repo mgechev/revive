@@ -54,9 +54,7 @@ func (k BranchKind) Branch() Branch { return Branch{BranchKind: k} }
 // String returns a brief string representation.
 func (k BranchKind) String() string {
 	switch k {
-	case Empty:
-		return ""
-	case Regular:
+	case Empty, Regular:
 		return ""
 	case Return:
 		return "return"

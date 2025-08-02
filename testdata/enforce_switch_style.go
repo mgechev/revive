@@ -15,4 +15,13 @@ func enforceSwitchStyle3() {
 	switch expression { // MATCH /switch must have a default case clause/
 	case condition:
 	}
+
+	// Must not fail when all branches jump
+	switch expression {
+	case condition:
+		break
+	case condition:
+		print()
+		return
+	}
 }
