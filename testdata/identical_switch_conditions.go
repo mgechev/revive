@@ -38,4 +38,18 @@ func enforceSwitchStyle3() {
 		}
 	default:
 	}
+
+	switch {
+	case lnOpts.IsSocketOpts():
+		// ...
+		// check for timeout
+		fallthrough
+	case lnOpts.IsTimeout(), lnOpts.IsSocketOpts(): // MATCH /case clause at line 43 has the same condition/
+		// timeout listener with socket options.
+		// ...
+	case lnOpts.IsTimeout(): // MATCH /case clause at line 47 has the same condition/
+		// ...
+	default:
+		// ...
+	}
 }
