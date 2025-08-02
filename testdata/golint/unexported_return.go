@@ -59,6 +59,15 @@ func ExportedIntReturner() int { // MATCH /exported func ExportedIntReturner ret
 	return int{}
 }
 
+type unexportedInterface interface {
+	UnexportedInterface()
+}
+
+// UnexportedInterfaceReturner returns an unexported interface type from this package.
+func UnexportedInterfaceReturner() unexportedInterface {
+	return nil
+}
+
 type config struct {
 	N int
 }
@@ -81,8 +90,24 @@ type b = A
 type A func(*config)
 
 // WithA ...
-func WithA(n int) b { // MATCH /exported func WithA returns unexported type foo.b, which can be annoying to use/
+func WithA(n int) b {
 	return func(c *config) {
 		c.N = n
 	}
+}
+
+// Check that we allow unexported type aliases if there is an “exported” type
+// that can be used instead of an alias.
+
+type funTypeAlias1 = func()
+
+type funTypeAlias = funTypeAlias1
+
+var funFunc func() func() // unaliased signature
+
+func init() { funFunc = Fun }
+
+// Fun returns an aliased function type.
+func Fun() funTypeAlias {
+	return func() {}
 }

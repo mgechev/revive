@@ -86,8 +86,9 @@ func exportedType(typ types.Type) bool {
 		case obj.Pkg() == nil:
 		case obj.Exported():
 		default:
-			_, ok := t.Underlying().(*types.Interface)
-			return ok
+			// If an alias itself is not exported, recursively check
+			// that the aliased type is exported.
+			return exportedType(t.Rhs())
 		}
 		return true
 	case *types.Named:
