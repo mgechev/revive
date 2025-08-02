@@ -84,7 +84,7 @@ func (w *rootWalkerIfElseIfIdenticalConditions) walkBranch(branch ast.Stmt) {
 type lintIfChainIdenticalConditions struct {
 	getStmtLine func(ast.Stmt) int
 	onFailure   func(lint.Failure)
-	conditions  map[string]int                         // condition hash -> line of the condition                             // hold conditions to compare
+	conditions  map[string]int                         // condition hash -> line of the condition
 	rootWalker  *rootWalkerIfElseIfIdenticalConditions // the walker to use to recursively analyze inner branches
 }
 
