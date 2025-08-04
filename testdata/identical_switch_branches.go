@@ -60,4 +60,18 @@ func identicalSwitchBranches() {
 	default:
 		bar()
 	}
+
+	// skip type switch
+	switch v := value.(type) {
+	case int:
+		println("dup", v)
+	case string:
+		println("dup", v)
+	case bool:
+		println("dup", v)
+	case float64:
+		println("dup", v)
+	default:
+		println("dup", v)
+	}
 }
