@@ -28,6 +28,7 @@ List of all available rules.
   - [early-return](#early-return)
   - [empty-block](#empty-block)
   - [empty-lines](#empty-lines)
+  - [enforce-else](#enforce-else)
   - [enforce-map-style](#enforce-map-style)
   - [enforce-repeated-arg-type-style](#enforce-repeated-arg-type-style)
   - [enforce-slice-style](#enforce-slice-style)
@@ -441,6 +442,14 @@ _Configuration_: N/A
 
 _Description_: Sometimes `gofmt` is not enough to enforce a common formatting of a code-base;
 this rule warns when there are heading or trailing newlines in code blocks.
+
+_Configuration_: N/A
+
+## enforce-else
+
+_Description_: This rule warns if an `if` statement followed by one or more `else if` statements does not have a final `else` statement.
+
+This is consistent with the requirement to have a `default` clause in a `switch` statement (see [`enforce-switch-style` rule](#enforce-switch-style)).
 
 _Configuration_: N/A
 
