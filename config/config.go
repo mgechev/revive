@@ -107,7 +107,7 @@ var allRules = append([]lint.Rule{
 	&rule.EnforceSwitchStyleRule{},
 	&rule.IdenticalSwitchConditionsRule{},
 	&rule.EnforceElseRule{},
-  &rule.IdenticalIfElseIfConditionsRule{},
+	&rule.IdenticalIfElseIfConditionsRule{},
 }, defaultRules...)
 
 // allFormatters is a list of all available formatters to output the linting results.
