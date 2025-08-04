@@ -748,7 +748,8 @@ _Configuration_: N/A
 
 ## identical-ifelseif-branches
 
-_Description_: an `if ... else if` chain with identical branches makes maintenance harder and might be a source of bugs. Duplicated branches should be consolidated in one.
+_Description_: an `if ... else if` chain with identical branches makes maintenance harder
+and might be a source of bugs. Duplicated branches should be consolidated in one.
 
 _Configuration_: N/A
 
@@ -761,7 +762,9 @@ _Configuration_: N/A
 
 ## identical-switch-branches
 
-_Description_: a `switch` with identical branches makes maintenance harder and might be a source of bugs. Duplicated branches should be consolidated in one case clause.
+_Description_: a `switch` with identical branches makes maintenance harder
+and might be a source of bugs. Duplicated branches should be consolidated
+in one case clause.
 
 ## identical-switch-conditions
 
