@@ -552,7 +552,9 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`function-result-limit`](./RULES_DESCRIPTIONS.md#function-result-limit) |  int (defaults to 3)| Specifies the maximum number of results a function can return    |    no    |  no   |
 | [`get-return`](./RULES_DESCRIPTIONS.md#get-return)          |  n/a   | Warns on getters that do not yield any result                    |    no    |  no   |
 | [`identical-branches`](./RULES_DESCRIPTIONS.md#identical-branches)          |  n/a   | Spots if-then-else statements with identical `then` and `else` branches       |    no    |  no   |
+| [`identical-ifelseif-branches`](./RULES_DESCRIPTIONS.md#identical-ifelseif-branches)          |  n/a   | Spots `if ... else if` chains with identical branches.       |    no    |  no   |
 | [`identical-ifelseif-conditions`](./RULES_DESCRIPTIONS.md#identical-ifelseif-conditions)          |  n/a   | Spots identical conditions in  `if ... else if` chains.       |    no    |  no   |
+| [`identical-switch-branches`](./RULES_DESCRIPTIONS.md#identical-switch-branches)          |  n/a   | Spots `switch` with identical branches.
 | [`identical-switch-conditions`](./RULES_DESCRIPTIONS.md#identical-switch-conditions)          |  n/a   | Spots identical conditions in case clauses of `switch` statements.       |    no    |  no   |
 | [`if-return`](./RULES_DESCRIPTIONS.md#if-return)           |  n/a   | Redundant if when returning an error.                            |   no    |  no   |
 | [`import-alias-naming`](./RULES_DESCRIPTIONS.md#import-alias-naming)         | string or map[string]string (defaults to allow regex pattern `^[a-z][a-z0-9]{0,}$`) | Conventions around the naming of import aliases.                              |    no    |  no   |

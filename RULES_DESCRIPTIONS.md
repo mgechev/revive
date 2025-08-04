@@ -46,7 +46,9 @@ List of all available rules.
   - [function-result-limit](#function-result-limit)
   - [get-return](#get-return)
   - [identical-branches](#identical-branches)
+  - [identical-ifelseif-branches](#identical-ifelseif-branches)
   - [identical-ifelseif-conditions](#identical-ifelseif-conditions)
+  - [identical-switch-branches](#identical-switch-branches)
   - [identical-switch-conditions](#identical-switch-conditions)
   - [if-return](#if-return)
   - [import-alias-naming](#import-alias-naming)
@@ -744,12 +746,22 @@ _Description_: An `if-then-else` conditional with identical implementations in b
 
 _Configuration_: N/A
 
+## identical-ifelseif-branches
+
+_Description_: an `if ... else if` chain with identical branches makes maintenance harder and might be a source of bugs. Duplicated branches should be consolidated in one.
+
+_Configuration_: N/A
+
 ## identical-ifelseif-conditions
 
 _Description_: an `if ... else if` chain  with identical conditions can lead to
 unreachable code and is a potential source of bugs while making the code harder to read and maintain.
 
 _Configuration_: N/A
+
+## identical-switch-branches
+
+_Description_: a `switch` with identical branches makes maintenance harder and might be a source of bugs. Duplicated branches should be consolidated in one case clause.
 
 ## identical-switch-conditions
 
