@@ -91,7 +91,7 @@ List of all available rules.
   - [use-errors-new](#use-errors-new)
   - [use-fmt-print](#use-fmt-print)
   - [useless-break](#useless-break)
-  - [useless-falltrhough](#useless-falltrhough)
+  - [useless-fallthrough](#useless-fallthrough)
   - [var-declaration](#var-declaration)
   - [var-naming](#var-naming)
   - [waitgroup-by-value](#waitgroup-by-value)
