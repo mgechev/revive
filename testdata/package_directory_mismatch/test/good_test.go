@@ -1,2 +1,1 @@
-// test files are excluded
-package helpers
+package test_test

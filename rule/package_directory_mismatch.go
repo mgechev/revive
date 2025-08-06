@@ -18,63 +18,62 @@ const defaultIgnoredDirs = "testdata"
 
 // Configure validates the rule configuration, and configures the rule accordingly.
 func (r *PackageDirectoryMismatchRule) Configure(arguments lint.Arguments) error {
-	ignoredDirs := defaultIgnoredDirs
+	r.ignoredDirs = nil
+	if len(arguments) < 1 {
+		return r.buildIgnoreRegex([]string{defaultIgnoredDirs})
+	}
 
-	if len(arguments) > 0 {
-		var ok bool
-		ignoredDirs, ok = arguments[0].(string)
-		if !ok {
-			return fmt.Errorf("invalid argument type for ignored directories: expected string, got %T", arguments[0])
+	args, ok := arguments[0].(map[string]any)
+	if !ok {
+		return fmt.Errorf("invalid argument type: expected map[string]any, got %T", arguments[0])
+	}
+
+	for k, v := range args {
+		if !isRuleOption(k, "ignore-directories") {
+			return fmt.Errorf("unknown argument %s for %s rule", k, r.Name())
 		}
-	}
-
-	if ignoredDirs == "" {
-		r.ignoredDirs = nil
-		return nil
-	}
-
-	var err error
-	r.ignoredDirs, err = regexp.Compile(ignoredDirs)
-	if err != nil {
-		return fmt.Errorf("invalid regex for ignored directories: %w", err)
+		ignoredDirs, ok := v.([]string)
+		if !ok {
+			return fmt.Errorf("invalid value %v for argument %s of rule %s, expected []string value got %T", v, k, r.Name(), v)
+		}
+		return r.buildIgnoreRegex(ignoredDirs)
 	}
 
 	return nil
 }
 
-// normalizeReplacer removes hyphens, underscores, and dots from the name
-// to allow matching between directory names like "foo-bar.buz" and package names like "foobarbuz".
-var normalizeReplacer = strings.NewReplacer("-", "", "_", "", ".", "")
+func (r *PackageDirectoryMismatchRule) buildIgnoreRegex(ignoredDirs []string) error {
+	if len(ignoredDirs) == 0 {
+		r.ignoredDirs = nil
+		return nil
+	}
 
-func normalizeName(name string) string {
-	return normalizeReplacer.Replace(name)
+	patterns := make([]string, len(ignoredDirs))
+	for i, dir := range ignoredDirs {
+		patterns[i] = regexp.QuoteMeta(dir)
+	}
+	pattern := "(" + strings.Join(patterns, "|") + ")"
+
+	var err error
+	r.ignoredDirs, err = regexp.Compile(pattern)
+	if err != nil {
+		return fmt.Errorf("failed to compile regex for ignored directories: %w", err)
+	}
+
+	return nil
 }
 
 // skipDirs contains directory names that should be unconditionally ignored when checking.
+// These entries handle edge cases where filepath.Base might return these values.
 var skipDirs = map[string]struct{}{
-	".": {},
-	"/": {},
-	"":  {},
-}
-
-// isVersionPath checks if a directory name is a version directory (v1, v2, etc.)
-func isVersionPath(name string) bool {
-	if len(name) < 2 || (name[0] != 'v' && name[0] != 'V') {
-		return false
-	}
-
-	for i := 1; i < len(name); i++ {
-		if name[i] < '0' || name[i] > '9' {
-			return false
-		}
-	}
-
-	return true
+	".": {}, // Current directory
+	"/": {}, // Root directory
+	"":  {}, // Empty path
 }
 
 // Apply applies the rule to the given file.
 func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
-	if file.IsTest() || file.Pkg.IsMain() {
+	if file.Pkg.IsMain() {
 		return nil
 	}
 
@@ -85,9 +84,13 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 		return nil
 	}
 
-	if isVersionPath(dirName) {
-		// Use the parent path for comparison when the current path is a version path (v1, v2, etc.).
-		dirName = filepath.Base(filepath.Dir(dirPath))
+	packageName := file.AST.Name.Name
+	normalizedDirName := normalizePath(dirName)
+	normalizedPackageName := normalizePath(packageName)
+
+	// Check if we got an invalid directory.
+	if _, skipDir := skipDirs[dirName]; skipDir {
+		return nil
 	}
 
 	// Files directly in 'internal/' (like 'internal/abcd.go') should not be checked.
@@ -96,19 +99,39 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 		return nil
 	}
 
-	// Check if we got an invalid directory.
-	if _, skipDir := skipDirs[dirName]; skipDir {
+	if normalizedDirName == normalizedPackageName {
 		return nil
 	}
 
-	packageName := file.AST.Name.Name
-	if normalizeName(dirName) == normalizeName(packageName) {
-		return nil
+	if file.IsTest() {
+		// External test package (directory + '_test' suffix)
+		if packageName == normalizedDirName+"_test" {
+			return nil
+		}
+	}
+
+	failure := ""
+
+	// For version directories (v1, v2, etc.), we need to check also the parent directory
+	if isVersionPath(dirName) {
+		parentDirName := filepath.Base(filepath.Dir(dirPath))
+		normalizedParentDirName := normalizePath(parentDirName)
+
+		if normalizedPackageName == normalizedParentDirName {
+			return nil
+		}
+
+		failure = fmt.Sprintf("package name %q does not match directory name %q or parent directory name %q", packageName, dirName, parentDirName)
+	}
+
+	// When no specific message was place, use default one
+	if failure == "" {
+		failure = fmt.Sprintf("package name %q does not match directory name %q", packageName, dirName)
 	}
 
 	return []lint.Failure{
 		{
-			Failure:    fmt.Sprintf("package name %q does not match directory name %q", packageName, dirName),
+			Failure:    failure,
 			Confidence: 1,
 			Node:       file.AST.Name,
 			Category:   lint.FailureCategoryNaming,
