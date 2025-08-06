@@ -56,9 +56,9 @@ type DirectivesConfig = map[string]DirectiveConfig
 
 // Config defines the config of the linter.
 type Config struct {
-	IgnoreGeneratedHeader bool `toml:"ignoreGeneratedHeader"`
-	Confidence            float64
-	Severity              Severity
+	IgnoreGeneratedHeader bool             `toml:"ignoreGeneratedHeader"`
+	Confidence            float64          `toml:"confidence"`
+	Severity              Severity         `toml:"severity"`
 	EnableAllRules        bool             `toml:"enableAllRules"`
 	Rules                 RulesConfig      `toml:"rule"`
 	ErrorCode             int              `toml:"errorCode"`
@@ -67,5 +67,5 @@ type Config struct {
 	Exclude               []string         `toml:"exclude"`
 	// If set, overrides the go language version specified in go.mod of
 	// packages being linted, and assumes this specific language version.
-	GoVersion *goversion.Version
+	GoVersion *goversion.Version `toml:"goVersion"`
 }
