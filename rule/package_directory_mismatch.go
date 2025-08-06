@@ -18,7 +18,6 @@ const defaultIgnoredDirs = "testdata"
 
 // Configure validates the rule configuration, and configures the rule accordingly.
 func (r *PackageDirectoryMismatchRule) Configure(arguments lint.Arguments) error {
-	r.ignoredDirs = nil
 	if len(arguments) < 1 {
 		return r.buildIgnoreRegex([]string{defaultIgnoredDirs})
 	}
@@ -44,7 +43,6 @@ func (r *PackageDirectoryMismatchRule) Configure(arguments lint.Arguments) error
 
 func (r *PackageDirectoryMismatchRule) buildIgnoreRegex(ignoredDirs []string) error {
 	if len(ignoredDirs) == 0 {
-		r.ignoredDirs = nil
 		return nil
 	}
 
@@ -110,6 +108,7 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 		}
 	}
 
+	// to be reported by 'lint.Failure'.
 	failure := ""
 
 	// For version directories (v1, v2, etc.), we need to check also the parent directory
