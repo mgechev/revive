@@ -7,7 +7,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// IdenticalBranchesRule warns on constant logical expressions.
+// IdenticalBranchesRule warns on if...else statements with both branches being the same.
 type IdenticalBranchesRule struct{}
 
 // Apply applies the rule to given file.
@@ -18,9 +18,16 @@ func (*IdenticalBranchesRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 		failures = append(failures, failure)
 	}
 
-	astFile := file.AST
-	w := &lintIdenticalBranches{astFile, onFailure}
-	ast.Walk(w, astFile)
+	w := &lintIdenticalBranches{onFailure: onFailure}
+	for _, decl := range file.AST.Decls {
+		fn, ok := decl.(*ast.FuncDecl)
+		if !ok || fn.Body == nil {
+			continue
+		}
+
+		ast.Walk(w, fn.Body)
+	}
+
 	return failures
 }
 
@@ -30,59 +37,45 @@ func (*IdenticalBranchesRule) Name() string {
 }
 
 type lintIdenticalBranches struct {
-	file      *ast.File
 	onFailure func(lint.Failure)
 }
 
 func (w *lintIdenticalBranches) Visit(node ast.Node) ast.Visitor {
-	n, ok := node.(*ast.IfStmt)
+	ifStmt, ok := node.(*ast.IfStmt)
 	if !ok {
 		return w
 	}
 
-	noElseBranch := n.Else == nil
-	if noElseBranch {
+	if ifStmt.Else == nil {
+		return w // if without else
+	}
+
+	elseBranch, ok := ifStmt.Else.(*ast.BlockStmt)
+	if !ok { // if-else-if construction, the rule only copes with single if...else statements
 		return w
 	}
 
-	branches := []*ast.BlockStmt{n.Body}
-
-	elseBranch, ok := n.Else.(*ast.BlockStmt)
-	if !ok { // if-else-if construction
-		return w
-	}
-	branches = append(branches, elseBranch)
-
-	if w.identicalBranches(branches) {
-		w.newFailure(n, "both branches of the if are identical")
+	if w.identicalBranches(ifStmt.Body, elseBranch) {
+		w.onFailure(lint.Failure{
+			Confidence: 1.0,
+			Node:       ifStmt,
+			Category:   lint.FailureCategoryLogic,
+			Failure:    "both branches of the if are identical",
+		})
 	}
 
-	return w
+	ast.Walk(w, ifStmt.Body)
+	ast.Walk(w, ifStmt.Else)
+	return nil
 }
 
-func (*lintIdenticalBranches) identicalBranches(branches []*ast.BlockStmt) bool {
-	if len(branches) < 2 {
-		return false // only one branch to compare thus we return
+func (*lintIdenticalBranches) identicalBranches(body, elseBranch *ast.BlockStmt) bool {
+	if len(body.List) != len(elseBranch.List) {
+		return false // branches don't have the same number of statements
 	}
 
-	referenceBranch := astutils.GoFmt(branches[0])
-	referenceBranchSize := len(branches[0].List)
-	for i := 1; i < len(branches); i++ {
-		currentBranch := branches[i]
-		currentBranchSize := len(currentBranch.List)
-		if currentBranchSize != referenceBranchSize || astutils.GoFmt(currentBranch) != referenceBranch {
-			return false
-		}
-	}
+	bodyStr := astutils.GoFmt(body)
+	elseStr := astutils.GoFmt(elseBranch)
 
-	return true
-}
-
-func (w *lintIdenticalBranches) newFailure(node ast.Node, msg string) {
-	w.onFailure(lint.Failure{
-		Confidence: 1,
-		Node:       node,
-		Category:   lint.FailureCategoryLogic,
-		Failure:    msg,
-	})
+	return bodyStr == elseStr
 }

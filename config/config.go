@@ -105,6 +105,11 @@ var allRules = append([]lint.Rule{
 	&rule.UnnecessaryFormatRule{},
 	&rule.UseFmtPrintRule{},
 	&rule.EnforceSwitchStyleRule{},
+	&rule.IdenticalSwitchConditionsRule{},
+	&rule.EnforceElseRule{},
+	&rule.IdenticalIfElseIfConditionsRule{},
+	&rule.IdenticalIfElseIfBranchesRule{},
+	&rule.IdenticalSwitchBranchesRule{},
 	&rule.PackageDirectoryMismatchRule{},
 }, defaultRules...)
 

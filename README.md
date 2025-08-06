@@ -2,6 +2,7 @@
 
 [![Build Status](https://github.com/mgechev/revive/actions/workflows/test.yaml/badge.svg)](https://github.com/mgechev/revive/actions/workflows/test.yaml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/mgechev/revive.svg)](https://pkg.go.dev/github.com/mgechev/revive)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/mgechev/revive)
 
 Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in replacement of golint.
 **`Revive` provides a framework for development of custom rules,
@@ -533,6 +534,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`early-return`](./RULES_DESCRIPTIONS.md#early-return)          | []string   | Spots if-then-else statements where the predicate may be inverted to reduce nesting |    no    |  no   |
 | [`empty-block`](./RULES_DESCRIPTIONS.md#empty-block)         |  n/a   | Warns on empty code blocks                                       |    no    |  yes   |
 | [`empty-lines`](./RULES_DESCRIPTIONS.md#empty-lines)   | n/a | Warns when there are heading or trailing newlines in a block              |    no    |  no   |
+| [`enforce-else`](./RULES_DESCRIPTIONS.md#enforce-else) |  n/a  |  Enforces `else` branch at the end of `if...else if` chains. |    no    |  no   |
 | [`enforce-map-style`](./RULES_DESCRIPTIONS.md#enforce-map-style) |  string (defaults to "any")  |  Enforces consistent usage of `make(map[type]type)` or `map[type]type{}` for map initialization. Does not affect `make(map[type]type, size)` constructions. |    no    |  no   |
 | [`enforce-repeated-arg-type-style`](./RULES_DESCRIPTIONS.md#enforce-repeated-arg-type-style) |  string (defaults to "any")  |  Enforces consistent style for repeated argument and/or return value types. |    no    |  no   |
 | [`enforce-slice-style`](./RULES_DESCRIPTIONS.md#enforce-slice-style) |  string (defaults to "any")  |  Enforces consistent usage of `make([]type, 0)` or `[]type{}` for slice initialization. Does not affect `make(map[type]type, non_zero_len, or_non_zero_cap)` constructions. |    no    |  no   |
@@ -550,6 +552,10 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`function-result-limit`](./RULES_DESCRIPTIONS.md#function-result-limit) |  int (defaults to 3)| Specifies the maximum number of results a function can return    |    no    |  no   |
 | [`get-return`](./RULES_DESCRIPTIONS.md#get-return)          |  n/a   | Warns on getters that do not yield any result                    |    no    |  no   |
 | [`identical-branches`](./RULES_DESCRIPTIONS.md#identical-branches)          |  n/a   | Spots if-then-else statements with identical `then` and `else` branches       |    no    |  no   |
+| [`identical-ifelseif-branches`](./RULES_DESCRIPTIONS.md#identical-ifelseif-branches)          |  n/a   | Spots `if ... else if` chains with identical branches.       |    no    |  no   |
+| [`identical-ifelseif-conditions`](./RULES_DESCRIPTIONS.md#identical-ifelseif-conditions)          |  n/a   | Spots identical conditions in  `if ... else if` chains.       |    no    |  no   |
+| [`identical-switch-branches`](./RULES_DESCRIPTIONS.md#identical-switch-branches)          |  n/a   | Spots `switch` with identical branches.       |    no    |  no   |
+| [`identical-switch-conditions`](./RULES_DESCRIPTIONS.md#identical-switch-conditions)          |  n/a   | Spots identical conditions in case clauses of `switch` statements.       |    no    |  no   |
 | [`if-return`](./RULES_DESCRIPTIONS.md#if-return)           |  n/a   | Redundant if when returning an error.                            |   no    |  no   |
 | [`import-alias-naming`](./RULES_DESCRIPTIONS.md#import-alias-naming)         | string or map[string]string (defaults to allow regex pattern `^[a-z][a-z0-9]{0,}$`) | Conventions around the naming of import aliases.                              |    no    |  no   |
 | [`import-shadowing`](./RULES_DESCRIPTIONS.md#import-shadowing)   | n/a    | Spots identifiers that shadow an import    |    no    |  no   |

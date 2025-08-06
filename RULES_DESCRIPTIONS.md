@@ -28,6 +28,7 @@ List of all available rules.
   - [early-return](#early-return)
   - [empty-block](#empty-block)
   - [empty-lines](#empty-lines)
+  - [enforce-else](#enforce-else)
   - [enforce-map-style](#enforce-map-style)
   - [enforce-repeated-arg-type-style](#enforce-repeated-arg-type-style)
   - [enforce-slice-style](#enforce-slice-style)
@@ -45,6 +46,10 @@ List of all available rules.
   - [function-result-limit](#function-result-limit)
   - [get-return](#get-return)
   - [identical-branches](#identical-branches)
+  - [identical-ifelseif-branches](#identical-ifelseif-branches)
+  - [identical-ifelseif-conditions](#identical-ifelseif-conditions)
+  - [identical-switch-branches](#identical-switch-branches)
+  - [identical-switch-conditions](#identical-switch-conditions)
   - [if-return](#if-return)
   - [import-alias-naming](#import-alias-naming)
   - [import-shadowing](#import-shadowing)
@@ -443,6 +448,14 @@ this rule warns when there are heading or trailing newlines in code blocks.
 
 _Configuration_: N/A
 
+## enforce-else
+
+_Description_: This rule warns if an `if` statement followed by one or more `else if` statements does not have a final `else` statement.
+
+This is consistent with the requirement to have a `default` clause in a `switch` statement (see [`enforce-switch-style` rule](#enforce-switch-style)).
+
+_Configuration_: N/A
+
 ## enforce-map-style
 
 _Description_: This rule enforces consistent usage of `make(map[type]type)` or `map[type]type{}` for map initialization.
@@ -734,6 +747,33 @@ _Description_: An `if-then-else` conditional with identical implementations in b
 
 _Configuration_: N/A
 
+## identical-ifelseif-branches
+
+_Description_: an `if ... else if` chain with identical branches makes maintenance harder
+and might be a source of bugs. Duplicated branches should be consolidated in one.
+
+_Configuration_: N/A
+
+## identical-ifelseif-conditions
+
+_Description_: an `if ... else if` chain  with identical conditions can lead to
+unreachable code and is a potential source of bugs while making the code harder to read and maintain.
+
+_Configuration_: N/A
+
+## identical-switch-branches
+
+_Description_: a `switch` with identical branches makes maintenance harder
+and might be a source of bugs. Duplicated branches should be consolidated
+in one case clause.
+
+## identical-switch-conditions
+
+_Description_: a `switch` statement with cases with the same condition can lead to
+unreachable code and is a potential source of bugs while making the code harder to read and maintain.
+
+_Configuration_: N/A
+
 ## if-return
 
 _Description_: Checking if an error is _nil_ to just after return the error or nil is redundant.
@@ -874,7 +914,8 @@ arguments = [3]
 
 _Description_: A function that modifies its parameters can be hard to understand.
 It can also be misleading if the arguments are passed by value by the caller.
-This rule warns when a function modifies one or more of its parameters.
+This rule warns when a function modifies one or more of its parameters or when
+parameters are passed to functions that modify them (e.g. `slices.Delete`).
 
 _Configuration_: N/A
 
