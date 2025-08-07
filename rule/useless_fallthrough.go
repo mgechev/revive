@@ -7,7 +7,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// UselessFallthroughRule warns on useless fallthroughts in switch case clauses.
+// UselessFallthroughRule warns on useless fallthroughs in switch case clauses.
 type UselessFallthroughRule struct{}
 
 // Apply applies the rule to given file.
@@ -54,17 +54,17 @@ func (w *lintUselessFallthrough) Visit(node ast.Node) ast.Visitor {
 	}
 
 	casesCount := len(switchStmt.Body.List)
-	for i := 0; i < casesCount-1; i++ {
+	for i := range casesCount - 1 {
 		caseClause := switchStmt.Body.List[i].(*ast.CaseClause)
 		caseBody := caseClause.Body
 
 		if len(caseBody) != 1 {
-			continue // skip body if is not just only one statement
+			continue // skip if body is not exactly one statement
 		}
 
 		branchStmt, ok := caseBody[0].(*ast.BranchStmt)
 		if !ok || branchStmt.Tok != token.FALLTHROUGH {
-			continue // not a fallthrought
+			continue // not a fallthrough
 		}
 
 		confidence := 1.0
