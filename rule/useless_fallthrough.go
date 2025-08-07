@@ -14,11 +14,13 @@ type UselessFallthroughRule struct{}
 func (*UselessFallthroughRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
+	commentsMap := file.CommentMap()
+
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
 
-	w := &lintUselessFallthrough{onFailure: onFailure}
+	w := &lintUselessFallthrough{onFailure: onFailure, commentsMap: commentsMap}
 	for _, decl := range file.AST.Decls {
 		fn, ok := decl.(*ast.FuncDecl)
 		if !ok || fn.Body == nil {
@@ -37,7 +39,8 @@ func (*UselessFallthroughRule) Name() string {
 }
 
 type lintUselessFallthrough struct {
-	onFailure func(lint.Failure)
+	onFailure   func(lint.Failure)
+	commentsMap ast.CommentMap
 }
 
 func (w *lintUselessFallthrough) Visit(node ast.Node) ast.Visitor {
@@ -68,6 +71,10 @@ func (w *lintUselessFallthrough) Visit(node ast.Node) ast.Visitor {
 		if nextCaseClause := switchStmt.Body.List[i+1].(*ast.CaseClause); nextCaseClause.List == nil {
 			// the next case clause is the default clause, report with lower confidence.
 			confidence = 0.8
+		}
+		if _, ok := w.commentsMap[branchStmt]; ok {
+			// The fallthrough has a comment, report with lower confidence.
+			confidence = 0.5
 		}
 
 		w.onFailure(lint.Failure{
