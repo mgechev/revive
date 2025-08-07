@@ -67,4 +67,13 @@ func uselessFallthrough() {
 	default:
 		return
 	}
+
+	switch a {
+	case 0:
+		//foo:bar
+		fallthrough // json:{"MATCH": "this \"fallthrough\" can be removed by consolidating this case clause with the next one","Confidence": 0.5}
+	default:
+		println()
+	}
+
 }
