@@ -93,6 +93,7 @@ List of all available rules.
   - [use-errors-new](#use-errors-new)
   - [use-fmt-print](#use-fmt-print)
   - [useless-break](#useless-break)
+  - [useless-fallthrough](#useless-fallthrough)
   - [var-declaration](#var-declaration)
   - [var-naming](#var-naming)
   - [waitgroup-by-value](#waitgroup-by-value)
@@ -1386,6 +1387,44 @@ Therefore, inserting a `break` at the end of a case clause has no effect.
 Because `break` statements are rarely used in case clauses, when switch or select statements are inside a for-loop,
 the programmer might wrongly assume that a `break` in a case clause will take the control out of the loop.
 The rule emits a specific warning for such cases.
+
+_Configuration_: N/A
+
+## useless-fallthrough
+
+_Description_: This rule warns on useless `fallthrough` statements in case clauses of switch statements.
+A `fallthrough` is considered _useless_ if it's the single statement of a case clause block.
+
+Go allows `switch` statements with clauses that group multiple cases.
+Thus, for example:
+
+```go
+switch category {
+  case "Lu":
+    fallthrough
+  case "Ll":
+    fallthrough    
+  case "Lt":
+    fallthrough
+  case "Lm": 
+    fallthrough
+  case "Lo":
+    return true
+  default:
+    return false
+}
+```
+
+can be written as
+
+```go
+switch category {
+  case "Lu", "Ll", "Lt", "Lm", "Lo":
+      return true
+  default:
+    return false
+}
+```
 
 _Configuration_: N/A
 
