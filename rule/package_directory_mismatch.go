@@ -16,7 +16,7 @@ type PackageDirectoryMismatchRule struct {
 
 const defaultIgnoredDirs = "testdata"
 
-// Configure validates the rule configuration, and configures the rule accordingly.
+// Configure the rule to exclude certain directories.
 func (r *PackageDirectoryMismatchRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
 		return r.buildIgnoreRegex([]string{defaultIgnoredDirs})
@@ -33,7 +33,7 @@ func (r *PackageDirectoryMismatchRule) Configure(arguments lint.Arguments) error
 		}
 		ignoredDirs, ok := v.([]string)
 		if !ok {
-			return fmt.Errorf("invalid value %v for argument %s of rule %s, expected []string value got %T", v, k, r.Name(), v)
+			return fmt.Errorf("invalid value %v for argument %s of rule %s, expected []string got %T", v, k, r.Name(), v)
 		}
 		return r.buildIgnoreRegex(ignoredDirs)
 	}

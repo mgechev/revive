@@ -965,7 +965,7 @@ _Configuration_: N/A
 
 ## package-directory-mismatch
 
-_Description_: It is considered a good practice to name a package after the directory containing the file.
+_Description_: It is considered a good practice to name a package after the directory containing it.
 This rule warns when the package name declared in the file does not match the name of the directory containing the file.
 
 The following cases are excluded from this check:
@@ -974,7 +974,7 @@ The following cases are excluded from this check:
 - Files in `testdata` directories (at any level) - by default
 - Files directly in `internal` directories (but files in subdirectories of `internal` are checked)
 
-For test files (files with `_test` suffix), package name additionally checked if it matches directory name + `_test` suffix.
+For test files (files with `_test` suffix), package name additionally checked if it matches directory name with  `_test` suffix appended.
 
 The rule normalizes both directory and package names before comparison by removing hyphens (`-`),
 underscores (`_`), and dots (`.`). This allows package `foo_barbuz` be equal with directory `foo-bar.buz`.
@@ -985,7 +985,7 @@ _Configuration_: Named arguments for directory exclusions.
 
 Examples:
 
-Default behavior (excludes paths containing "testdata")
+Default behavior excludes paths containing "testdata"
 
 ```toml
 [rule.package-directory-mismatch]
@@ -998,7 +998,7 @@ Exclude specific directories
 arguments = [{ ignore-directories = ["testcases", "testinfo"] }]
 ```
 
-Disable all directory exclusions
+Disable all exclusions
 
 ```toml
 [rule.package-directory-mismatch]
