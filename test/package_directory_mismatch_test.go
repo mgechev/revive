@@ -16,6 +16,9 @@ func TestPackageDirectoryMismatch(t *testing.T) {
 	testRule(t, "package_directory_mismatch/maincmd/main", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/mixed/good", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/mixed/bad", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/go-good/good1", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/go-good/good2", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/go-good/bad", &rule.PackageDirectoryMismatchRule{}, config)
 
 	// Test normalization cases
 	testRule(t, "package_directory_mismatch/normalization/fo-ob_ar/good", &rule.PackageDirectoryMismatchRule{}, config)
