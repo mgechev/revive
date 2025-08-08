@@ -19,7 +19,7 @@ func (*JSON) Name() string {
 
 // jsonObject defines a JSON object of an failure.
 type jsonObject struct {
-	Severity     lint.Severity
+	Severity     lint.Severity `json:"Severity"`
 	lint.Failure `json:",inline"`
 }
 
