@@ -110,6 +110,7 @@ var allRules = append([]lint.Rule{
 	&rule.IdenticalIfElseIfConditionsRule{},
 	&rule.IdenticalIfElseIfBranchesRule{},
 	&rule.IdenticalSwitchBranchesRule{},
+	&rule.UselessFallthroughRule{},
 	&rule.PackageDirectoryMismatchRule{},
 }, defaultRules...)
 

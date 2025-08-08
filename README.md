@@ -600,6 +600,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`use-errors-new`](./RULES_DESCRIPTIONS.md#use-errors-new) | n/a   | Spots calls to `fmt.Errorf` that can be replaced by `errors.New` |   no    |  no   |
 | [`use-fmt-print`](./RULES_DESCRIPTIONS.md#use-fmt-print) | n/a   | Proposes to replace calls to built-in `print` and `println` with their equivalents from `fmt`. |   no    |  no   |
 | [`useless-break`](./RULES_DESCRIPTIONS.md#useless-break)          |  n/a   |  Warns on useless `break` statements in case clauses |    no    |  no   |
+| [`useless-fallthrough`](./RULES_DESCRIPTIONS.md#useless-fallthrough)  |  n/a   |  Warns on useless `fallthrough` statements in case clauses |    no    |  no   |
 | [`var-declaration`](./RULES_DESCRIPTIONS.md#var-declaration)     |  n/a   | Reduces redundancies around variable declaration.                |   yes    |  yes  |
 | [`var-naming`](./RULES_DESCRIPTIONS.md#var-naming)          |  allowlist & blocklist of initialisms   | Naming rules.                                                    |   yes    |  no   |
 | [`waitgroup-by-value`](./RULES_DESCRIPTIONS.md#waitgroup-by-value)  |  n/a   | Warns on functions taking sync.WaitGroup as a by-value parameter |    no    |  no   |
