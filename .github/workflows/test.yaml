@@ -5,12 +5,16 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  tests-on-unix:
-    name: Tests on Unix
-    runs-on: ubuntu-latest
+  tests:
+    name: Tests on ${{ matrix.os }} (Go ${{ matrix.go-version }})
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
         go-version:
           - oldstable
           - stable
@@ -21,18 +25,5 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
-      - name: Run tests
-        run: go test -race -shuffle=on ./...
-
-  tests-on-windows:
-    name: Tests on Windows
-    runs-on: windows-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: stable
       - name: Run tests
         run: go test -race -shuffle=on ./...
