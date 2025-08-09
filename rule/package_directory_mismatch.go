@@ -71,8 +71,9 @@ var skipDirs = map[string]struct{}{
 
 // semanticallyEqual checks if package and directory names are semantically equal to each other.
 func (PackageDirectoryMismatchRule) semanticallyEqual(packageName, dirName string) bool {
-	return normalizePath(dirName) == normalizePath(packageName) ||
-		normalizePath(dirName) == normalizePath("go"+packageName)
+	normDir := normalizePath(dirName)
+	normPkg := normalizePath(packageName)
+	return normDir == normPkg || normDir == "go"+normPkg
 }
 
 // Apply applies the rule to the given file.
@@ -112,8 +113,8 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 		}
 	}
 
-	// to be reported by 'lint.Failure'.
-	failure := ""
+	// define a default failure message
+	failure := fmt.Sprintf("package name %q does not match directory name %q", packageName, dirName)
 
 	// For version directories (v1, v2, etc.), we need to check also the parent directory
 	if isVersionPath(dirName) {
@@ -123,11 +124,6 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 		}
 
 		failure = fmt.Sprintf("package name %q does not match directory name %q or parent directory name %q", packageName, dirName, parentDirName)
-	}
-
-	// When no specific message was place, use default one
-	if failure == "" {
-		failure = fmt.Sprintf("package name %q does not match directory name %q", packageName, dirName)
 	}
 
 	return []lint.Failure{
