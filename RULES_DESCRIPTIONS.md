@@ -986,20 +986,20 @@ _Configuration_: Named arguments for directory exclusions.
 
 Examples:
 
-Default behavior excludes paths containing "testdata"
+Default behavior excludes paths containing `testdata`
 
 ```toml
 [rule.package-directory-mismatch]
 ```
 
-Exclude specific directories
+Ignore specific directories with `ignore-directories`
 
 ```toml
 [rule.package-directory-mismatch]
 arguments = [{ ignore-directories = ["testcases", "testinfo"] }]
 ```
 
-Disable all exclusions
+Include all directories (`testdata` also)
 
 ```toml
 [rule.package-directory-mismatch]

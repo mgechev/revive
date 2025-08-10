@@ -19,7 +19,9 @@ const defaultIgnoredDirs = "testdata"
 // Configure the rule to exclude certain directories.
 func (r *PackageDirectoryMismatchRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) < 1 {
-		return r.buildIgnoreRegex([]string{defaultIgnoredDirs})
+		var err error
+		r.ignoredDirs, err = r.buildIgnoreRegex([]string{defaultIgnoredDirs})
+		return err
 	}
 
 	args, ok := arguments[0].(map[string]any)
@@ -31,34 +33,46 @@ func (r *PackageDirectoryMismatchRule) Configure(arguments lint.Arguments) error
 		if !isRuleOption(k, "ignore-directories") {
 			return fmt.Errorf("unknown argument %s for %s rule", k, r.Name())
 		}
-		ignoredDirs, ok := v.([]string)
+
+		ignoredAny, ok := v.([]any)
 		if !ok {
 			return fmt.Errorf("invalid value %v for argument %s of rule %s, expected []string got %T", v, k, r.Name(), v)
 		}
-		return r.buildIgnoreRegex(ignoredDirs)
+
+		ignoredDirs := make([]string, len(ignoredAny))
+		for i, item := range ignoredAny {
+			str, ok := item.(string)
+			if !ok {
+				return fmt.Errorf("invalid value in %s argument of rule %s: expected string, got %T", k, r.Name(), item)
+			}
+			ignoredDirs[i] = str
+		}
+
+		var err error
+		r.ignoredDirs, err = r.buildIgnoreRegex(ignoredDirs)
+		return err
 	}
 
 	return nil
 }
 
-func (r *PackageDirectoryMismatchRule) buildIgnoreRegex(ignoredDirs []string) error {
+func (*PackageDirectoryMismatchRule) buildIgnoreRegex(ignoredDirs []string) (*regexp.Regexp, error) {
 	if len(ignoredDirs) == 0 {
-		return nil
+		return nil, nil
 	}
 
 	patterns := make([]string, len(ignoredDirs))
 	for i, dir := range ignoredDirs {
 		patterns[i] = regexp.QuoteMeta(dir)
 	}
-	pattern := "(" + strings.Join(patterns, "|") + ")"
+	pattern := strings.Join(patterns, "|")
 
-	var err error
-	r.ignoredDirs, err = regexp.Compile(pattern)
+	regex, err := regexp.Compile(pattern)
 	if err != nil {
-		return fmt.Errorf("failed to compile regex for ignored directories: %w", err)
+		return nil, fmt.Errorf("failed to compile regex for ignored directories: %w", err)
 	}
 
-	return nil
+	return regex, nil
 }
 
 // skipDirs contains directory names that should be unconditionally ignored when checking.
