@@ -30,7 +30,7 @@ func (r *PackageDirectoryMismatchRule) Configure(arguments lint.Arguments) error
 	}
 
 	for k, v := range args {
-		if !isRuleOption(k, "ignore-directories") {
+		if !isRuleOption(k, "ignoreDirectories") {
 			return fmt.Errorf("unknown argument %s for %s rule", k, r.Name())
 		}
 
