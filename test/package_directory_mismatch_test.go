@@ -29,6 +29,7 @@ func TestPackageDirectoryMismatch(t *testing.T) {
 	testRule(t, "package_directory_mismatch/normalization/go-foo-bar/foo_bar", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/normalization/go-foo-bar/foobar", &rule.PackageDirectoryMismatchRule{}, config)
 
+	// Edge cases that are not logic, but we decided to ignore to have a simpler implementation
 	testRule(t, "package_directory_mismatch/normalization/go-od/go_od", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/normalization/go-od/good", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/normalization/go-od/od", &rule.PackageDirectoryMismatchRule{}, config)
