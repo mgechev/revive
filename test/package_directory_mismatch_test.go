@@ -21,9 +21,17 @@ func TestPackageDirectoryMismatch(t *testing.T) {
 	testRule(t, "package_directory_mismatch/go-good/bad", &rule.PackageDirectoryMismatchRule{}, config)
 
 	// Test normalization cases
-	testRule(t, "package_directory_mismatch/normalization/fo-ob_ar/good", &rule.PackageDirectoryMismatchRule{}, config)
-	testRule(t, "package_directory_mismatch/normalization/foo_bar/good", &rule.PackageDirectoryMismatchRule{}, config)
-	testRule(t, "package_directory_mismatch/normalization/foo.b_ar/good", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/normalization/fo-ob_ar/foobar", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/normalization/foo_bar/foobar", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/normalization/foo.b_ar/foobar", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/normalization/go-foo_bar/foo_bar", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/normalization/go-foo_bar/foobar", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/normalization/go-foo-bar/foo_bar", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/normalization/go-foo-bar/foobar", &rule.PackageDirectoryMismatchRule{}, config)
+
+	testRule(t, "package_directory_mismatch/normalization/go-od/go_od", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/normalization/go-od/good", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/normalization/go-od/od", &rule.PackageDirectoryMismatchRule{}, config)
 
 	// Test version directories (v1, v2, etc.)
 	testRule(t, "package_directory_mismatch/api/v1/api", &rule.PackageDirectoryMismatchRule{}, config)
