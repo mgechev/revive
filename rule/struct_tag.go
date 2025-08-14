@@ -35,6 +35,7 @@ const (
 	keyValidate     tagKey = "validate"
 	keyXML          tagKey = "xml"
 	keyYAML         tagKey = "yaml"
+	keySpanner		tagKey = "spanner"
 )
 
 type tagChecker func(checkCtx *checkContext, tag *structtag.Tag, fieldType ast.Expr) (message string, succeeded bool)
@@ -54,6 +55,7 @@ var tagCheckers = map[tagKey]tagChecker{
 	keyValidate:     checkValidateTag,
 	keyXML:          checkXMLTag,
 	keyYAML:         checkYAMLTag,
+	keySpanner:		 checkSpannerTag,
 }
 
 type checkContext struct {
@@ -198,7 +200,7 @@ func (w lintStructTagRule) checkTagNameIfNeed(checkCtx *checkContext, tag *struc
 
 	key := tagKey(tag.Key)
 	switch key {
-	case keyBSON, keyJSON, keyXML, keyYAML, keyProtobuf:
+	case keyBSON, keyJSON, keyXML, keyYAML, keyProtobuf, keySpanner:
 	default:
 		return "", true
 	}
@@ -555,6 +557,18 @@ func checkYAMLTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (messa
 		}
 	}
 
+	return "", true
+}
+
+func checkSpannerTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
+	if tag.Name == "-" {
+		return "", true
+	}
+	for _, opt := range tag.Options {
+		if !checkCtx.isUserDefined(keySpanner, opt) {
+			return fmt.Sprintf(msgUnknownOption, opt), false
+		}
+	}
 	return "", true
 }
 
