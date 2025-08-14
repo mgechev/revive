@@ -35,7 +35,7 @@ const (
 	keyValidate     tagKey = "validate"
 	keyXML          tagKey = "xml"
 	keyYAML         tagKey = "yaml"
-	keySpanner		tagKey = "spanner"
+	keySpanner      tagKey = "spanner"
 )
 
 type tagChecker func(checkCtx *checkContext, tag *structtag.Tag, fieldType ast.Expr) (message string, succeeded bool)
@@ -55,7 +55,7 @@ var tagCheckers = map[tagKey]tagChecker{
 	keyValidate:     checkValidateTag,
 	keyXML:          checkXMLTag,
 	keyYAML:         checkYAMLTag,
-	keySpanner:		 checkSpannerTag,
+	keySpanner:      checkSpannerTag,
 }
 
 type checkContext struct {
