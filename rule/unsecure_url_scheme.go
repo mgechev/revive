@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
+	"strconv"
 	"strings"
 
 	"github.com/mgechev/revive/lint"
@@ -46,12 +47,12 @@ func (w lintUnsecureURLSchemeRule) Visit(node ast.Node) ast.Visitor {
 		return w // not a string litereal
 	}
 
-	value := n.Value
+	value, _ := strconv.Unquote(n.Value)
 	var scheme string
 	switch {
-	case strings.HasPrefix(value, `"http://`):
+	case strings.HasPrefix(value, `http://`):
 		scheme = "http"
-	case strings.HasPrefix(value, `"ws://`):
+	case strings.HasPrefix(value, `ws://`):
 		scheme = "ws"
 	default:
 		return nil // not an URL or not an unsecure one
