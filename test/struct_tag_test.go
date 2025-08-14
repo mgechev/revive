@@ -21,6 +21,7 @@ func TestStructTagWithUserOptions(t *testing.T) {
 			"mapstructure,myMapstructureOption",
 			"validate,displayName",
 			"toml,unknown",
+			"spanner,mySpannerOption",
 		},
 	})
 }
