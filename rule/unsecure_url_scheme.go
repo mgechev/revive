@@ -44,7 +44,7 @@ type lintUnsecureURLSchemeRule struct {
 func (w lintUnsecureURLSchemeRule) Visit(node ast.Node) ast.Visitor {
 	n, ok := node.(*ast.BasicLit)
 	if !ok || n.Kind != token.STRING {
-		return w // not a string litereal
+		return w // not a string literal
 	}
 
 	value, _ := strconv.Unquote(n.Value) // n.Value has one of the following forms: "..." or `...`
@@ -72,7 +72,7 @@ func (w lintUnsecureURLSchemeRule) Visit(node ast.Node) ast.Visitor {
 
 	w.onFailure(lint.Failure{
 		Confidence: 1,
-		Failure:    fmt.Sprintf("preffer secure protocol %s over %s in %s", scheme+"s", scheme, n.Value),
+		Failure:    fmt.Sprintf("prefer secure protocol %s over %s in %s", scheme+"s", scheme, n.Value),
 		Node:       n,
 	})
 

@@ -92,7 +92,7 @@ List of all available rules.
   - [use-any](#use-any)
   - [use-errors-new](#use-errors-new)
   - [use-fmt-print](#use-fmt-print)
-  - [usecure-url-scheme](#usecure-url-scheme)
+  - [unsecure-url-scheme](#unsecure-url-scheme)
   - [useless-break](#useless-break)
   - [useless-fallthrough](#useless-fallthrough)
   - [var-declaration](#var-declaration)
@@ -1379,7 +1379,7 @@ _Description_: This rule proposes to replace calls to built-in `print` and `prin
 
 _Configuration_: N/A
 
-## usecure-url-scheme
+## unsecure-url-scheme
 
 _Description_: Checks for usage of potentially unsecure URL schemes (`http`, `ws`) in string literals.
 Using unencrypted URL schemes can expose sensitive data during transmission and
