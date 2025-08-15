@@ -3,6 +3,7 @@ package rule
 import (
 	"go/ast"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -36,50 +37,55 @@ type lintDeletemeRule struct {
 }
 
 func (w *lintDeletemeRule) Visit(node ast.Node) ast.Visitor {
-	// we visit the AST looking for "case <- time.After(...)"
-	switch n := node.(type) {
-	case *ast.IfStmt: // is a select case
-		if n.Else == nil {
-			return w
-		}
-		elseBlock, ok := n.Else.(*ast.BlockStmt)
-		if !ok {
-			return w
-		}
-
-		if len(n.Body.List) < 1 || len(n.Body.List) > 1 || len(elseBlock.List) > 1 {
-			return w
-		}
-
-		if !isReturnBoolean(n.Body.List[0]) {
-			return w
-		}
-
-		if !isReturnBoolean(elseBlock.List[0]) {
-			return w
-		}
-
-		w.onFailure(lint.Failure{
-			Confidence: 0.8,
-			Node:       n,
-			Category:   lint.FailureCategoryBadPractice,
-			Failure:    "return condition",
-		})
-	}
-	return w
-}
-
-func isReturnBoolean(stmt ast.Stmt) bool {
-	returnStmt, ok := stmt.(*ast.ReturnStmt)
+	block, ok := node.(*ast.BlockStmt)
 	if !ok {
-		return false
+		return w
 	}
 
-	if len(returnStmt.Results) > 1 || len(returnStmt.Results) < 1 {
-		return false
+	for i, stmt := range block.List {
+		//println(">>>> block stmt:", astutils.GoFmt(stmt))
+		expr, ok := stmt.(*ast.ExprStmt)
+		if !ok {
+			continue
+		}
+		call, ok := expr.X.(*ast.CallExpr)
+		notACallToWgAdd := !ok || !astutils.IsPkgDotName(call.Fun, "wg", "Add")
+		if notACallToWgAdd {
+			//println(">>>> CONTINUE main")
+			continue
+		}
+		//println(">>>> FOUND wg.Add lets check next statements")
+		for i++; i < len(block.List); i++ {
+			stmt := block.List[i]
+			//println(">>>> next stmt:", astutils.GoFmt(stmt))
+			goStmt, ok := stmt.(*ast.GoStmt)
+			if !ok {
+				//println(">>>> CONTINUE not a go stmt")
+				continue
+			}
+			funcLit, ok := goStmt.Call.Fun.(*ast.FuncLit)
+			//println(">>>> funclit:", astutils.GoFmt(funcLit))
+			if !ok {
+				continue
+			}
+			picker := func(n ast.Node) bool {
+				call, ok := n.(*ast.CallExpr)
+				result := ok && astutils.IsPkgDotName(call.Fun, "wg", "Done")
+				//println(">>>> picking on:", astutils.GoFmt(n), result)
+				return result
+			}
+
+			found := astutils.PickNodes(funcLit.Body, picker)
+			if len(found) > 0 {
+				w.onFailure(lint.Failure{
+					Confidence: 1,
+					Node:       call,
+					Category:   lint.FailureCategoryCodeStyle,
+					Failure:    "replace wg.Add()...go {...wg.Done()...} with wg.Go(...)",
+				})
+			}
+		}
 	}
 
-	result := gofmt(returnStmt.Results[0])
-
-	return result == "true" || result == "false"
+	return w
 }
