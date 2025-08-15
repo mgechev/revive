@@ -88,6 +88,12 @@ type TestDuplicatedProtobufTags struct {
 	C int `protobuf:"varint,name=c"` // MATCH /duplicated tag name "c" in protobuf tag/
 }
 
+type SpannerDuplicatedTags struct {
+	A int `spanner:"field_a"`
+	B int `spanner:"field_a"` // MATCH /duplicated tag name "field_a" in spanner tag/
+	C int `spanner:"field_c"`
+}
+
 // test case from
 // sigs.k8s.io/kustomize/api/types/helmchartargs.go
 
@@ -181,4 +187,12 @@ type PropertiesTags struct {
 	Field string            `properties:"date,layout=2006-01-02"` // MATCH /layout option is only applicable to fields of type time.Time in properties tag/
 	Field []string          `properties:",default=a;b;c"`
 	Field map[string]string `properties:"myName,omitempty"` // MATCH /unknown or malformed option "omitempty" in properties tag/
+}
+
+type SpannerUser struct {
+	ID        int       `spanner:"user_id"`
+	Name      string    `spanner:"full_name"`
+	Email     string    `spanner:"-"`                    // Valid: ignore field
+	CreatedAt time.Time `spanner:"created_at"`
+	UpdatedAt time.Time `spanner:"updated_at,unknown"`   // MATCH /unknown option "unknown" in spanner tag/
 }

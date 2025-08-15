@@ -30,6 +30,7 @@ const (
 	keyProperties   tagKey = "properties"
 	keyProtobuf     tagKey = "protobuf"
 	keyRequired     tagKey = "required"
+	keySpanner      tagKey = "spanner"
 	keyTOML         tagKey = "toml"
 	keyURL          tagKey = "url"
 	keyValidate     tagKey = "validate"
@@ -49,6 +50,7 @@ var tagCheckers = map[tagKey]tagChecker{
 	keyProperties:   checkPropertiesTag,
 	keyProtobuf:     checkProtobufTag,
 	keyRequired:     checkRequiredTag,
+	keySpanner:      checkSpannerTag,
 	keyTOML:         checkTOMLTag,
 	keyURL:          checkURLTag,
 	keyValidate:     checkValidateTag,
@@ -198,7 +200,7 @@ func (w lintStructTagRule) checkTagNameIfNeed(checkCtx *checkContext, tag *struc
 
 	key := tagKey(tag.Key)
 	switch key {
-	case keyBSON, keyJSON, keyXML, keyYAML, keyProtobuf:
+	case keyBSON, keyJSON, keyXML, keyYAML, keyProtobuf, keySpanner:
 	default:
 		return "", true
 	}
@@ -555,6 +557,18 @@ func checkYAMLTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (messa
 		}
 	}
 
+	return "", true
+}
+
+func checkSpannerTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
+	if tag.Name == "-" {
+		return "", true
+	}
+	for _, opt := range tag.Options {
+		if !checkCtx.isUserDefined(keySpanner, opt) {
+			return fmt.Sprintf(msgUnknownOption, opt), false
+		}
+	}
 	return "", true
 }
 
