@@ -35,6 +35,7 @@ const (
 	keyValidate     tagKey = "validate"
 	keyXML          tagKey = "xml"
 	keyYAML         tagKey = "yaml"
+	keyCodec        tagKey = "codec"
 )
 
 type tagChecker func(checkCtx *checkContext, tag *structtag.Tag, fieldType ast.Expr) (message string, succeeded bool)
@@ -54,6 +55,7 @@ var tagCheckers = map[tagKey]tagChecker{
 	keyValidate:     checkValidateTag,
 	keyXML:          checkXMLTag,
 	keyYAML:         checkYAMLTag,
+	keyCodec:        checkCodecTag,
 }
 
 type checkContext struct {
@@ -549,6 +551,21 @@ func checkYAMLTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (messa
 		case "flow", "inline", "omitempty":
 		default:
 			if checkCtx.isUserDefined(keyYAML, opt) {
+				continue
+			}
+			return fmt.Sprintf(msgUnknownOption, opt), false
+		}
+	}
+
+	return "", true
+}
+
+func checkCodecTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
+	for _, opt := range tag.Options {
+		switch opt {
+		case "omitempty", "toarray", "int", "uint", "float", "-":
+		default:
+			if checkCtx.isUserDefined(keyCodec, opt) {
 				continue
 			}
 			return fmt.Sprintf(msgUnknownOption, opt), false
