@@ -14,7 +14,7 @@ import (
 type UnsecureURLSchemeRule struct{}
 
 // Apply applied the rule to the given file.
-func (r *UnsecureURLSchemeRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*UnsecureURLSchemeRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	if file.IsTest() {
 		return nil // skip test files
 	}
@@ -47,15 +47,23 @@ func (w lintUnsecureURLSchemeRule) Visit(node ast.Node) ast.Visitor {
 		return w // not a string litereal
 	}
 
-	value, _ := strconv.Unquote(n.Value)
+	value, _ := strconv.Unquote(n.Value) // n.Value has one of the following forms: "..." or `...`
+
 	var scheme string
+	var urlPrefixLen int
 	switch {
-	case strings.HasPrefix(value, `http://`):
+	case strings.HasPrefix(value, `http:/`):
 		scheme = "http"
-	case strings.HasPrefix(value, `ws://`):
+		urlPrefixLen = 7 // http://
+	case strings.HasPrefix(value, `ws:/`):
 		scheme = "ws"
+		urlPrefixLen = 5 // ws://
 	default:
 		return nil // not an URL or not an unsecure one
+	}
+
+	if len(value) == urlPrefixLen {
+		return nil // there is no host part in the string
 	}
 
 	if strings.Contains(value, "localhost") || strings.Contains(value, "127.0.0.1") {
@@ -64,7 +72,7 @@ func (w lintUnsecureURLSchemeRule) Visit(node ast.Node) ast.Visitor {
 
 	w.onFailure(lint.Failure{
 		Confidence: 1,
-		Failure:    fmt.Sprintf("preffer secure protocol %s over %s", scheme+"s", scheme),
+		Failure:    fmt.Sprintf("preffer secure protocol %s over %s in %s", scheme+"s", scheme, n.Value),
 		Node:       n,
 	})
 
