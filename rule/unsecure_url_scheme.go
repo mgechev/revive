@@ -62,7 +62,7 @@ func (w lintUnsecureURLSchemeRule) Visit(node ast.Node) ast.Visitor {
 		return nil // not an URL or not an unsecure one
 	}
 
-	if len(value) == urlPrefixLen {
+	if len(value) <= urlPrefixLen {
 		return nil // there is no host part in the string
 	}
 
