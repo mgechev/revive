@@ -29,12 +29,12 @@ func unsecureURLScheme() {
 	http.Get("ws://json-schema.org/draft-04/schema#/properties/") // MATCH /prefer secure protocol wss over ws in "ws://json-schema.org/draft-04/schema#/properties/"/
 
 	// Must not fail
-	println("http://localhost:8080")
+	println("http://localhost:8080", "http://0.0.0.0:8080")
 	if "http://127.0.0.1:80" == url {
 	}
 
-	println("ws://localhost:8080")
-	if "ws://127.0.0.1:80" == url {
+	println("ws://localhost", "ws://0.0.0.0")
+	if "ws://127.0.0.1" == url {
 	}
 
 	_ = fmt.Sprintf("wss://%s", ipPort)
