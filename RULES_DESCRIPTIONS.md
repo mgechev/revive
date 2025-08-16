@@ -93,6 +93,7 @@ List of all available rules.
   - [use-any](#use-any)
   - [use-errors-new](#use-errors-new)
   - [use-fmt-print](#use-fmt-print)
+  - [unsecure-url-scheme](#unsecure-url-scheme)
   - [useless-break](#useless-break)
   - [useless-fallthrough](#useless-fallthrough)
   - [var-declaration](#var-declaration)
@@ -1420,6 +1421,17 @@ _Description_: This rule proposes to replace calls to built-in `print` and `prin
 [language boostraping and are not guaranteed to stay in the language](https://go.dev/ref/spec#Bootstrapping).
 
 _Configuration_: N/A
+
+## unsecure-url-scheme
+
+_Description_: Checks for usage of potentially unsecure URL schemes (`http`, `ws`) in string literals.
+Using unencrypted URL schemes can expose sensitive data during transmission and
+make applications vulnerable to man-in-the-middle attacks.
+Secure alternatives like `https` should be preferred when possible.
+
+_Configuration_: N/A
+
+The rule will not warn on local URLs (`localhost`, `127.0.0.1`)
 
 ## useless-break
 
