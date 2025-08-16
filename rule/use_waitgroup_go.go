@@ -56,8 +56,8 @@ var wgDonePicker = func(n ast.Node) bool {
 //	   ...
 //	}
 //
-// Warning: the analisys only looks for exactly wg.Add and wg.Done, that means
-// calls to Add and Done on a WaitGroup struct withing a variable named differently than wg will be ignored
+// Warning: the analysis only looks for exactly wg.Add and wg.Done, that means
+// calls to Add and Done on a WaitGroup struct within a variable named differently than wg will be ignored
 // This simplification avoids requiring type information while still makes the rule work in most of the cases.
 // (Who names a wait group differently than wg ?!)
 func (w *lintUseWaitGroupGo) Visit(node ast.Node) ast.Visitor {
