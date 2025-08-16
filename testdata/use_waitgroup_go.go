@@ -4,7 +4,7 @@ import (
 	"sync"
 )
 
-// Rule use-waitgroup-go shall not match because this file is a package with Go version < 1.25
+// Rule use-waitgroup-go shall not match because this file is a apackage with Go version < 1.25
 func useWaitGroupGo() {
 	wg := sync.WaitGroup{}
 

@@ -32,7 +32,6 @@ func useWaitGroupGo() {
 	// from kubernetes/pkg/kubelet/cm/devicemanager/manager_test.go/TestGetTopologyHintsWithUpdates
 	// notice the rule spots a wg.Add(2) (vs wg.Add(1)) therefore using wg.Go is possible but requires
 	// replacing the wg.Add and the next two go statements with two wg.Go
-
 	wg.Add(2) // MATCH /replace wg.Add()...go {...wg.Done()...} with wg.Go(...)/
 
 	go func() {

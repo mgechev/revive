@@ -8,6 +8,6 @@ import (
 )
 
 func TestUseWaitGroupGo(t *testing.T) {
-	testRule(t, "use_waitgroup_go", &rule.UseWaitGroupGoRule{}, &lint.RuleConfig{})
-	testRule(t, "go1.25/use_waitgroup_go", &rule.UseWaitGroupGoRule{}, &lint.RuleConfig{})
+	testRule(t, "use_waitgroup_go", &rule.UseWaitgroupGoRule{}, &lint.RuleConfig{})
+	testRule(t, "go1.25/use_waitgroup_go", &rule.UseWaitgroupGoRule{}, &lint.RuleConfig{})
 }
