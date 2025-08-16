@@ -152,6 +152,40 @@ func (p picker) Visit(node ast.Node) ast.Visitor {
 	return p
 }
 
+func SeekNode[T ast.Node](n ast.Node, selector func(n ast.Node) bool) T {
+	var result T
+
+	if n == nil {
+		return result
+	}
+
+	onSelect := func(n ast.Node) {
+		result, _ = n.(T)
+	}
+	p := seeker{selector: selector, onSelect: onSelect}
+	ast.Walk(p, n)
+
+	return result
+}
+
+type seeker struct {
+	selector func(n ast.Node) bool
+	onSelect func(n ast.Node)
+}
+
+func (s seeker) Visit(node ast.Node) ast.Visitor {
+	if s.selector == nil {
+		return nil
+	}
+
+	if s.selector(node) {
+		s.onSelect(node)
+		return nil // stop visiting
+	}
+
+	return s
+}
+
 var gofmtConfig = &printer.Config{Tabwidth: 8}
 
 // GoFmt returns a string representation of an AST subtree.
