@@ -11,7 +11,7 @@ import (
 type UseWaitgroupGoRule struct{}
 
 // Apply applies the rule to given file.
-func (r *UseWaitgroupGoRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*UseWaitgroupGoRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	if !file.Pkg.IsAtLeastGoVersion(lint.Go125) {
 		return nil // skip analysis if Go version < 1.25
 	}
