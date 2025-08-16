@@ -7,11 +7,11 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// UseWaitgroupGoRule spots Go idoms that might be rewritten using WaitGroup.Go.
-type UseWaitgroupGoRule struct{}
+// UseWaitGroupGoRule spots Go idoms that might be rewritten using WaitGroup.Go.
+type UseWaitGroupGoRule struct{}
 
 // Apply applies the rule to given file.
-func (*UseWaitgroupGoRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*UseWaitGroupGoRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	if !file.Pkg.IsAtLeastGoVersion(lint.Go125) {
 		return nil // skip analysis if Go version < 1.25
 	}
@@ -32,7 +32,7 @@ func (*UseWaitgroupGoRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failu
 }
 
 // Name returns the rule name.
-func (*UseWaitgroupGoRule) Name() string {
+func (*UseWaitGroupGoRule) Name() string {
 	return "use-waitgroup-go"
 }
 
