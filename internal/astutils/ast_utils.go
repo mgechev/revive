@@ -178,7 +178,7 @@ func SeekNode[T ast.Node](n ast.Node, selector func(n ast.Node) bool) T {
 type seeker struct {
 	selector func(n ast.Node) bool
 	onSelect func(n ast.Node)
-	found    *bool
+	found    *bool // needs to be a pointer to let Visit modify its value persistently
 }
 
 func (s seeker) Visit(node ast.Node) ast.Visitor {
