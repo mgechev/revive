@@ -78,9 +78,8 @@ func (w conditionVisitor) Visit(node ast.Node) ast.Visitor {
 		return w.idents[ident.Name] == struct{}{}
 	}
 
-	uses := astutils.PickNodes(ifStmt.Cond, findUsesOfIdents)
-
-	if len(uses) < 1 {
+	uses := astutils.SeekNode[*ast.Ident](ifStmt.Cond, findUsesOfIdents)
+	if uses == nil {
 		return w
 	}
 
@@ -88,7 +87,7 @@ func (w conditionVisitor) Visit(node ast.Node) ast.Visitor {
 		Confidence: 1,
 		Node:       w.fd.Type.Params,
 		Category:   lint.FailureCategoryBadPractice,
-		Failure:    fmt.Sprintf("parameter '%s' seems to be a control flag, avoid control coupling", uses[0]),
+		Failure:    fmt.Sprintf("parameter '%s' seems to be a control flag, avoid control coupling", uses.Name),
 	})
 
 	return nil
