@@ -1421,6 +1421,17 @@ _Description_: This rule proposes to replace calls to built-in `print` and `prin
 
 _Configuration_: N/A
 
+## use-waitgroup-go
+_Description_: since Go 1.25 the `sync` package proposes the `WaitGroup.Go` method.
+This method is a shorter and safer replacement for the idiom `wg.Add ... go { ... wg.Done ... }`.
+The rule proposes to replace these legacy idioms with calls to the new method.
+
+Limitations: the rule doesn't rely on type information but on variable names to identify waitgroups.
+This means the rule search for `wg` (the defacto standard name for wait groups);
+if the waitgroup variable is named differently than `wg` the rule will skip it.
+
+_Configuration_: N/A
+
 ## useless-break
 
 _Description_: This rule warns on useless `break` statements in case clauses of switch and select statements. Go,
