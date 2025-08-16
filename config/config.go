@@ -111,6 +111,7 @@ var allRules = append([]lint.Rule{
 	&rule.IdenticalIfElseIfBranchesRule{},
 	&rule.IdenticalSwitchBranchesRule{},
 	&rule.UselessFallthroughRule{},
+	&rule.PackageDirectoryMismatchRule{},
 	&rule.UnsecureURLSchemeRule{},
 }, defaultRules...)
 

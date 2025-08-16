@@ -46,3 +46,8 @@ type TomlUser struct {
 	Username string `toml:"username,omitempty"`
 	Location string `toml:"location,unknown"`
 }
+
+type SpannerUserOptions struct {
+	ID        int    `spanner:"user_id,mySpannerOption"`
+	Name      string `spanner:"full_name,unknownOption"` // MATCH /unknown option "unknownOption" in spanner tag/
+}
