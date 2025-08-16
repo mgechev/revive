@@ -152,6 +152,8 @@ func (p picker) Visit(node ast.Node) ast.Visitor {
 	return p
 }
 
+// SeekNode yields the first node selected by the given selector function in the AST subtree with root n.
+// The function returns nil if no matching node is found in the subtree.
 func SeekNode[T ast.Node](n ast.Node, selector func(n ast.Node) bool) T {
 	var result T
 
