@@ -48,6 +48,7 @@ type TomlUser struct {
 }
 
 type SpannerUserOptions struct {
-	ID        int    `spanner:"user_id,mySpannerOption"`
-	Name      string `spanner:"full_name,unknownOption"` // MATCH /unknown option "unknownOption" in spanner tag/
+	ID   int    `spanner:"user_id,mySpannerOption"`
+	A    int    `spanner:"-,mySpannerOption"`       // MATCH /useless option(s) mySpannerOption for ignored field in spanner tag/
+	Name string `spanner:"full_name,unknownOption"` // MATCH /unknown option "unknownOption" in spanner tag/
 }
