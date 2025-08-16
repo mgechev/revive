@@ -74,7 +74,7 @@ func (w lintUnsecureURLSchemeRule) Visit(node ast.Node) ast.Visitor {
 		return nil // there is no host part in the string
 	}
 
-	if strings.Contains(value, "localhost") || strings.Contains(value, "127.0.0.1") || strings.Contains(value, "0.0.0.0") {
+	if strings.Contains(value, "localhost") || strings.Contains(value, "127.0.0.1") || strings.Contains(value, "0.0.0.0") || strings.Contains(value, "//::") {
 		return nil // do not fail on local URL
 	}
 

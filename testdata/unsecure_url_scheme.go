@@ -16,16 +16,16 @@ const wsPrefix = "ws://"
 const wsURLPattern = "ws://%s" // MATCH /prefer secure protocol wss over ws in "ws://%s"/
 
 func unsecureURLScheme() {
-	_ = fmt.Sprintf("http://%s", ipPort)                            // MATCH /prefer secure protocol https over http in "http://%s"/
-	_ = fmt.Sprintf("http://%s/echo?msg=%s", ipPort, msg)           // MATCH /prefer secure protocol https over http in "http://%s/echo?msg=%s"/
-	_ = "http://::1"                                                // MATCH /prefer secure protocol https over http in "http://::1"/
-	_ = "http://::/"                                                // MATCH /prefer secure protocol https over http in "http://::/"/
+	_ = fmt.Sprintf("http://%s", ipPort)                  // MATCH /prefer secure protocol https over http in "http://%s"/
+	_ = fmt.Sprintf("http://%s/echo?msg=%s", ipPort, msg) // MATCH /prefer secure protocol https over http in "http://%s/echo?msg=%s"/
+	_ = "http://::1"
+	_ = "http://::/"
 	http.Get("http://json-schema.org/draft-04/schema#/properties/") // MATCH /prefer secure protocol https over http in "http://json-schema.org/draft-04/schema#/properties/"/
 
-	_ = fmt.Sprintf("ws://%s", ipPort)                            // MATCH /prefer secure protocol wss over ws in "ws://%s"/
-	_ = fmt.Sprintf("ws://%s/echo?msg=%s", ipPort, msg)           // MATCH /prefer secure protocol wss over ws in "ws://%s/echo?msg=%s"/
-	_ = "ws://::1"                                                // MATCH /prefer secure protocol wss over ws in "ws://::1"/
-	_ = "ws://::/"                                                // MATCH /prefer secure protocol wss over ws in "ws://::/"/
+	_ = fmt.Sprintf("ws://%s", ipPort)                  // MATCH /prefer secure protocol wss over ws in "ws://%s"/
+	_ = fmt.Sprintf("ws://%s/echo?msg=%s", ipPort, msg) // MATCH /prefer secure protocol wss over ws in "ws://%s/echo?msg=%s"/
+	_ = "ws://::1"
+	_ = "ws://::/"
 	http.Get("ws://json-schema.org/draft-04/schema#/properties/") // MATCH /prefer secure protocol wss over ws in "ws://json-schema.org/draft-04/schema#/properties/"/
 
 	// Must not fail
