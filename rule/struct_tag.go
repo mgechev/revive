@@ -562,13 +562,18 @@ func checkYAMLTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (messa
 
 func checkSpannerTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
 	if tag.Name == "-" {
+		if len(tag.Options) > 0 {
+			return fmt.Sprintf("useless option(s) %s for ignored field", strings.Join(tag.Options, ",")), false
+		}
 		return "", true
 	}
+
 	for _, opt := range tag.Options {
 		if !checkCtx.isUserDefined(keySpanner, opt) {
 			return fmt.Sprintf(msgUnknownOption, opt), false
 		}
 	}
+
 	return "", true
 }
 
