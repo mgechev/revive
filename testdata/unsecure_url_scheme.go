@@ -18,13 +18,13 @@ const wsURLPattern = "ws://%s" // MATCH /prefer secure protocol wss over ws in "
 func unsecureURLScheme() {
 	_ = fmt.Sprintf("http://%s", ipPort)                            // MATCH /prefer secure protocol https over http in "http://%s"/
 	_ = fmt.Sprintf("http://%s/echo?msg=%s", ipPort, msg)           // MATCH /prefer secure protocol https over http in "http://%s/echo?msg=%s"/
-	_ = "http:/::1"                                                 // MATCH /prefer secure protocol https over http in "http:/::1"/
+	_ = "http://::1"                                                // MATCH /prefer secure protocol https over http in "http://::1"/
 	_ = "http://::/"                                                // MATCH /prefer secure protocol https over http in "http://::/"/
 	http.Get("http://json-schema.org/draft-04/schema#/properties/") // MATCH /prefer secure protocol https over http in "http://json-schema.org/draft-04/schema#/properties/"/
 
 	_ = fmt.Sprintf("ws://%s", ipPort)                            // MATCH /prefer secure protocol wss over ws in "ws://%s"/
 	_ = fmt.Sprintf("ws://%s/echo?msg=%s", ipPort, msg)           // MATCH /prefer secure protocol wss over ws in "ws://%s/echo?msg=%s"/
-	_ = "ws:/::1"                                                 // MATCH /prefer secure protocol wss over ws in "ws:/::1"/
+	_ = "ws://::1"                                                // MATCH /prefer secure protocol wss over ws in "ws://::1"/
 	_ = "ws://::/"                                                // MATCH /prefer secure protocol wss over ws in "ws://::/"/
 	http.Get("ws://json-schema.org/draft-04/schema#/properties/") // MATCH /prefer secure protocol wss over ws in "ws://json-schema.org/draft-04/schema#/properties/"/
 
@@ -39,12 +39,12 @@ func unsecureURLScheme() {
 
 	_ = fmt.Sprintf("wss://%s", ipPort)
 	_ = fmt.Sprintf("wss://%s/echo?msg=%s", ipPort, msg)
-	_ = "wss:/::1"
+	_ = "wss://::1"
 	_ = "wss://::/"
 
 	_ = fmt.Sprintf("https://%s", ipPort)
 	_ = fmt.Sprintf("https://%s/echo?msg=%s", ipPort, msg)
-	_ = "https:/::1"
+	_ = "https://::1"
 	_ = "https://::/"
 	http.Get("https://json-schema.org/draft-04/schema#/properties/")
 	_ = "http://" + "http:/" + "http"

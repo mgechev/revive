@@ -41,6 +41,14 @@ type lintUnsecureURLSchemeRule struct {
 	onFailure func(lint.Failure)
 }
 
+const schemeSeparator = "://"
+const schemeHTTP = "http"
+const schemeWS = "ws"
+const urlPrefixHTTP = schemeHTTP + schemeSeparator
+const urlPrefixWS = schemeWS + schemeSeparator
+const lenURLPrefixHTTP = len(urlPrefixHTTP)
+const lenURLPrefixWS = len(urlPrefixWS)
+
 func (w lintUnsecureURLSchemeRule) Visit(node ast.Node) ast.Visitor {
 	n, ok := node.(*ast.BasicLit)
 	if !ok || n.Kind != token.STRING {
@@ -50,19 +58,19 @@ func (w lintUnsecureURLSchemeRule) Visit(node ast.Node) ast.Visitor {
 	value, _ := strconv.Unquote(n.Value) // n.Value has one of the following forms: "..." or `...`
 
 	var scheme string
-	var urlPrefixLen int
+	var lenURLPrefix int
 	switch {
-	case strings.HasPrefix(value, `http:/`):
-		scheme = "http"
-		urlPrefixLen = 7 // http://
-	case strings.HasPrefix(value, `ws:/`):
-		scheme = "ws"
-		urlPrefixLen = 5 // ws://
+	case strings.HasPrefix(value, urlPrefixHTTP):
+		scheme = schemeHTTP
+		lenURLPrefix = lenURLPrefixHTTP
+	case strings.HasPrefix(value, urlPrefixWS):
+		scheme = schemeWS
+		lenURLPrefix = lenURLPrefixWS
 	default:
 		return nil // not an URL or not an unsecure one
 	}
 
-	if len(value) <= urlPrefixLen {
+	if len(value) <= lenURLPrefix {
 		return nil // there is no host part in the string
 	}
 
