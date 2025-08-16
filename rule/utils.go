@@ -55,6 +55,30 @@ func normalizeRuleOption(arg string) string {
 	return strings.ToLower(strings.ReplaceAll(arg, "-", ""))
 }
 
+var normalizePathReplacer = strings.NewReplacer("-", "", "_", "", ".", "")
+
+// normalizePath removes hyphens, underscores, and dots from the name
+//
+// Example: normalizePath("foo.bar-_buz") -> "foobarbuz".
+func normalizePath(name string) string {
+	return normalizePathReplacer.Replace(name)
+}
+
+// isVersionPath checks if a directory name is a version directory (v1, V2, etc.)
+func isVersionPath(name string) bool {
+	if len(name) < 2 || (name[0] != 'v' && name[0] != 'V') {
+		return false
+	}
+
+	for i := 1; i < len(name); i++ {
+		if name[i] < '0' || name[i] > '9' {
+			return false
+		}
+	}
+
+	return true
+}
+
 var directiveCommentRE = regexp.MustCompile("^//(line |extern |export |[a-z0-9]+:[a-z0-9])") // see https://go-review.googlesource.com/c/website/+/442516/1..2/_content/doc/comment.md#494
 
 func isDirectiveComment(line string) bool {
