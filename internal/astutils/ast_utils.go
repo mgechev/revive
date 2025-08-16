@@ -161,10 +161,15 @@ func SeekNode[T ast.Node](n ast.Node, selector func(n ast.Node) bool) T {
 		return result
 	}
 
+	if selector == nil {
+		return result
+	}
+
 	onSelect := func(n ast.Node) {
 		result, _ = n.(T)
 	}
-	p := seeker{selector: selector, onSelect: onSelect}
+	found := false
+	p := seeker{selector: selector, onSelect: onSelect, found: &found}
 	ast.Walk(p, n)
 
 	return result
@@ -173,16 +178,18 @@ func SeekNode[T ast.Node](n ast.Node, selector func(n ast.Node) bool) T {
 type seeker struct {
 	selector func(n ast.Node) bool
 	onSelect func(n ast.Node)
+	found    *bool
 }
 
 func (s seeker) Visit(node ast.Node) ast.Visitor {
-	if s.selector == nil {
-		return nil
+	if *s.found {
+		return nil // stop visiting subtree
 	}
 
 	if s.selector(node) {
 		s.onSelect(node)
-		return nil // stop visiting
+		*s.found = true
+		return nil // skip visiting node children
 	}
 
 	return s
