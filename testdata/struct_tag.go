@@ -23,7 +23,7 @@ type decodeAndValidateRequest struct {
 	OptionalQuery    string          `json:"-" querystring:"queryfoo"`
 	optionalQuery    string          `json:"-" querystring:"queryfoo"` // MATCH /tag on not-exported field optionalQuery/
 	// No-reg test for bug https://github.com/mgechev/revive/issues/208
-	Tiret       string `json:"-,"`
+	Tiret       string `json:"-,"`                   // MATCH /useless empty option for ignored field (remove the comma after -) in json tag/
 	BadTiret    string `json:"other,"`               // MATCH /option can not be empty in json tag/
 	ForOmitzero string `json:"forOmitZero,omitzero"` // MATCH /prior Go 1.24, option "omitzero" is unsupported in json tag/
 	// MATCH:30 /option can not be empty in json tag/
@@ -192,7 +192,7 @@ type PropertiesTags struct {
 type SpannerUser struct {
 	ID        int       `spanner:"user_id"`
 	Name      string    `spanner:"full_name"`
-	Email     string    `spanner:"-"`                    // Valid: ignore field
+	Email     string    `spanner:"-"` // Valid: ignore field
 	CreatedAt time.Time `spanner:"created_at"`
-	UpdatedAt time.Time `spanner:"updated_at,unknown"`   // MATCH /unknown option "unknown" in spanner tag/
+	UpdatedAt time.Time `spanner:"updated_at,unknown"` // MATCH /unknown option "unknown" in spanner tag/
 }

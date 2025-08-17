@@ -180,6 +180,10 @@ func (w lintStructTagRule) checkTaggedField(checkCtx *checkContext, f *ast.Field
 			w.addFailureWithTagKey(f.Tag, msg, tag.Key)
 		}
 
+		if msg, ok := checkOptionsOnIgnoredField(tag); !ok {
+			w.addFailureWithTagKey(f.Tag, msg, tag.Key)
+		}
+
 		checker, ok := w.tagCheckers[tagKey(tag.Key)]
 		if !ok {
 			continue // we don't have a checker for the tag
@@ -561,13 +565,6 @@ func checkYAMLTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (messa
 }
 
 func checkSpannerTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
-	if tag.Name == "-" {
-		if len(tag.Options) > 0 {
-			return fmt.Sprintf("useless option(s) %s for ignored field", strings.Join(tag.Options, ",")), false
-		}
-		return "", true
-	}
-
 	for _, opt := range tag.Options {
 		if !checkCtx.isUserDefined(keySpanner, opt) {
 			return fmt.Sprintf(msgUnknownOption, opt), false
@@ -575,6 +572,26 @@ func checkSpannerTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (me
 	}
 
 	return "", true
+}
+
+func checkOptionsOnIgnoredField(tag *structtag.Tag) (message string, succeeded bool) {
+	if tag.Name != "-" {
+		return "", true
+	}
+
+	switch len(tag.Options) {
+	case 0:
+		return "", true
+	case 1:
+		opt := strings.TrimSpace(tag.Options[0])
+		if opt == "" {
+			return "useless empty option for ignored field (remove the comma after -)", false
+		}
+
+		return fmt.Sprintf("useless option %s for ignored field", opt), false
+	default:
+		return fmt.Sprintf("useless option(s) %s for ignored field", strings.Join(tag.Options, ",")), false
+	}
 }
 
 func checkValidateOptionsAlternatives(checkCtx *checkContext, alternatives []string) (message string, succeeded bool) {
