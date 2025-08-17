@@ -21,14 +21,10 @@ func (*Default) Name() string {
 // Format formats the failures gotten from the lint.
 func (*Default) Format(failures <-chan lint.Failure, _ lint.Config) (string, error) {
 	var buf bytes.Buffer
-	first := true
 	prefix := ""
 	for failure := range failures {
 		fmt.Fprintf(&buf, "%s%v: %s", prefix, failure.Position.Start, failure.Failure)
-		if first {
-			first = false
-			prefix = "\n"
-		}
+		prefix = "\n"
 	}
 	return buf.String(), nil
 }
