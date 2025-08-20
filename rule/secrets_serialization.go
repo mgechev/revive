@@ -92,7 +92,7 @@ func (r *SecretsSerializationRule) getList(arg any, argName string) ([]string, e
 	for _, v := range args {
 		val, ok := v.(string)
 		if !ok {
-			return nil, fmt.Errorf("invalid argument to the secrets-serialization rule: expecting %s of type slice of strings, got slice of type %T", argName, val)
+			return nil, fmt.Errorf("invalid argument to the secrets-serialization rule: expecting %s of type slice of strings, got slice of type %T", argName, v)
 		}
 		list = append(list, val)
 	}
