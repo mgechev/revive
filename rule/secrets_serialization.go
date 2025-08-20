@@ -1,6 +1,7 @@
 package rule
 
 import (
+	"fmt"
 	"go/ast"
 	"go/token"
 	"strings"
@@ -9,7 +10,7 @@ import (
 )
 
 var defaultSecretFieldIndicators = []string{
-	"bearer", "secret", "token", "password", "key", "apikey", "auth", "credential", "credentials",
+	"BearerToken", "Secret", "Token", "Password", "Key", "APIKey", "Auth", "Credential", "ClientSecret", "AccessToken", "AuthToken",
 }
 
 type SecretsSerializationRule struct {
@@ -25,11 +26,9 @@ func (r *SecretsSerializationRule) Configure(arguments lint.Arguments) error {
 		r.secretFieldIndicators = defaultSecretFieldIndicators
 		return nil
 	}
-	list := arguments[0].([]interface{})
-	for _, item := range list {
-		r.secretFieldIndicators = append(r.secretFieldIndicators, item.(string))
-	}
-	return nil
+	var err error
+	r.secretFieldIndicators, err = r.getList(arguments[0], "secretFieldIndicators")
+	return err
 }
 
 func (r *SecretsSerializationRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
@@ -82,4 +81,20 @@ func (r *SecretsSerializationRule) isLikelySecret(name string) bool {
 
 func (r *SecretsSerializationRule) isExported(name string) bool {
 	return name[0] >= 'A' && name[0] <= 'Z'
+}
+
+func (r *SecretsSerializationRule) getList(arg any, argName string) ([]string, error) {
+	args, ok := arg.([]any)
+	if !ok {
+		return nil, fmt.Errorf("invalid argument to the secrets-serialization rule. Expecting a %s of type slice with secret indicators, got %T", argName, arg)
+	}
+	var list []string
+	for _, v := range args {
+		val, ok := v.(string)
+		if !ok {
+			return nil, fmt.Errorf("invalid %v values of the secrets-serialization rule. Expecting slice of strings but got element of type %T", v, arg)
+		}
+		list = append(list, val)
+	}
+	return list, nil
 }
