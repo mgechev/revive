@@ -72,7 +72,7 @@ func (r *SecretsSerializationRule) Apply(file *lint.File, _ lint.Arguments) []li
 
 func (r *SecretsSerializationRule) isLikelySecret(name string) bool {
 	for _, indicator := range r.secretFieldIndicators {
-		if strings.Contains(name, indicator) {
+		if strings.Contains(name, strings.ToLower(indicator)) {
 			return true
 		}
 	}
