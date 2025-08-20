@@ -86,13 +86,13 @@ func (r *SecretsSerializationRule) isExported(name string) bool {
 func (r *SecretsSerializationRule) getList(arg any, argName string) ([]string, error) {
 	args, ok := arg.([]any)
 	if !ok {
-		return nil, fmt.Errorf("invalid argument to the secrets-serialization rule. Expecting a %s of type slice with secret indicators, got %T", argName, arg)
+		return nil, fmt.Errorf("invalid argument to the secrets-serialization rule: expecting %s of type slice of strings, got %T", argName, arg)
 	}
 	var list []string
 	for _, v := range args {
 		val, ok := v.(string)
 		if !ok {
-			return nil, fmt.Errorf("invalid %v values of the secrets-serialization rule. Expecting slice of strings but got element of type %T", v, arg)
+			return nil, fmt.Errorf("invalid argument to the secrets-serialization rule: expecting %s of type slice of strings, got slice of type %T", argName, val)
 		}
 		list = append(list, val)
 	}
