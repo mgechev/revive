@@ -33,6 +33,7 @@ func (r *SecretsSerializationRule) Configure(arguments lint.Arguments) error {
 	} else {
 		indicators, err = r.getSecretFieldIndicatorList(arguments[0], "secretFieldIndicators")
 	}
+	r.secretFieldIndicators = map[string]struct{}{}
 	for _, indicator := range indicators {
 		r.secretFieldIndicators[strings.ToLower(indicator)] = struct{}{}
 	}
