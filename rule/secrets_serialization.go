@@ -14,7 +14,7 @@ var defaultSecretFieldIndicators = []string{
 }
 
 type SecretsSerializationRule struct {
-	secretFieldIndicators []string
+	secretFieldIndicators map[string]struct{}
 }
 
 func (r *SecretsSerializationRule) Name() string {
@@ -22,12 +22,16 @@ func (r *SecretsSerializationRule) Name() string {
 }
 
 func (r *SecretsSerializationRule) Configure(arguments lint.Arguments) error {
-	if len(arguments) < 1 {
-		r.secretFieldIndicators = defaultSecretFieldIndicators
-		return nil
-	}
 	var err error
-	r.secretFieldIndicators, err = r.getList(arguments[0], "secretFieldIndicators")
+	indicators := []string{}
+	if len(arguments) < 1 {
+		indicators = defaultSecretFieldIndicators
+	} else {
+		indicators, err = r.getSecretFieldIndicatorList(arguments[0], "secretFieldIndicators")
+	}
+	for _, indicator := range indicators {
+		r.secretFieldIndicators[strings.ToLower(indicator)] = struct{}{}
+	}
 	return err
 }
 
@@ -49,18 +53,21 @@ func (r *SecretsSerializationRule) Apply(file *lint.File, _ lint.Arguments) []li
 			}
 			for _, field := range structType.Fields.List {
 				for _, fieldName := range field.Names {
-					name := strings.ToLower(fieldName.Name)
-					if r.isLikelySecret(name) && r.isExported(fieldName.Name) {
-						if field.Tag != nil && strings.Contains(field.Tag.Value, `json:"-"`) {
-							continue
-						}
-						failures = append(failures, lint.Failure{
-							Confidence: 1,
-							Node:       field,
-							Category:   "security",
-							Failure:    "Struct field '" + fieldName.Name + "' may contain secrets but is not excluded from JSON serialization (missing `json:\"-\"`)",
-						})
+					if !ast.IsExported(fieldName.Name) {
+						continue
 					}
+					if field.Tag == nil || strings.Contains(field.Tag.Value, `json:"-"`) {
+						continue
+					}
+					if !r.isLikelySecret(fieldName.Name) {
+						continue
+					}
+					failures = append(failures, lint.Failure{
+						Confidence: 0.8,
+						Node:       field,
+						Category:   lint.FailureCategoryBadPractice,
+						Failure:    "Struct field '" + fieldName.Name + "' may contain secrets but is not excluded from JSON serialization (missing `json:\"-\"`)",
+					})
 				}
 			}
 		}
@@ -71,19 +78,11 @@ func (r *SecretsSerializationRule) Apply(file *lint.File, _ lint.Arguments) []li
 }
 
 func (r *SecretsSerializationRule) isLikelySecret(name string) bool {
-	for _, indicator := range r.secretFieldIndicators {
-		if strings.Contains(name, strings.ToLower(indicator)) {
-			return true
-		}
-	}
-	return false
+	_, ok := r.secretFieldIndicators[strings.ToLower(name)]
+	return ok
 }
 
-func (r *SecretsSerializationRule) isExported(name string) bool {
-	return name[0] >= 'A' && name[0] <= 'Z'
-}
-
-func (r *SecretsSerializationRule) getList(arg any, argName string) ([]string, error) {
+func (r *SecretsSerializationRule) getSecretFieldIndicatorList(arg any, argName string) ([]string, error) {
 	args, ok := arg.([]any)
 	if !ok {
 		return nil, fmt.Errorf("invalid argument to the secrets-serialization rule: expecting %s of type slice of strings, got %T", argName, arg)
