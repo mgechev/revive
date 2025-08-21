@@ -17,10 +17,14 @@ type SecretsSerializationRule struct {
 	secretFieldIndicators map[string]struct{}
 }
 
-func (r *SecretsSerializationRule) Name() string {
+// Name returns the rule name.
+func (*SecretsSerializationRule) Name() string {
 	return "secrets-serialization"
 }
 
+// Configure validates the rule configuration, and configures the rule accordingly.
+//
+// Configuration implements the [lint.ConfigurableRule] interface.
 func (r *SecretsSerializationRule) Configure(arguments lint.Arguments) error {
 	var err error
 	indicators := []string{}
@@ -35,6 +39,7 @@ func (r *SecretsSerializationRule) Configure(arguments lint.Arguments) error {
 	return err
 }
 
+// Apply applies the rule to given file.
 func (r *SecretsSerializationRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 	walker := func(node ast.Node) bool {
@@ -82,7 +87,7 @@ func (r *SecretsSerializationRule) isLikelySecret(name string) bool {
 	return ok
 }
 
-func (r *SecretsSerializationRule) getSecretFieldIndicatorList(arg any, argName string) ([]string, error) {
+func (*SecretsSerializationRule) getSecretFieldIndicatorList(arg any, argName string) ([]string, error) {
 	args, ok := arg.([]any)
 	if !ok {
 		return nil, fmt.Errorf("invalid argument to the secrets-serialization rule: expecting %s of type slice of strings, got %T", argName, arg)
