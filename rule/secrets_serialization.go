@@ -62,7 +62,7 @@ func (r *SecretsSerializationRule) Apply(file *lint.File, _ lint.Arguments) []li
 					if !ast.IsExported(fieldName.Name) {
 						continue
 					}
-					if field.Tag == nil || strings.Contains(field.Tag.Value, `json:"-"`) {
+					if field.Tag != nil && strings.Contains(field.Tag.Value, `json:"-"`) {
 						continue
 					}
 					if !r.isLikelySecret(fieldName.Name) {
