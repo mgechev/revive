@@ -73,6 +73,7 @@ List of all available rules.
   - [redundant-build-tag](#redundant-build-tag)
   - [redundant-import-alias](#redundant-import-alias)
   - [redundant-test-main-exit](#redundant-test-main-exit)
+  - [secrets-serialization](#secrets-serialization)
   - [string-format](#string-format)
   - [string-of-int](#string-of-int)
   - [struct-tag](#struct-tag)
@@ -1082,6 +1083,30 @@ as the Go test runner automatically handles program termination starting from Go
 _Configuration_: N/A
 
 _Note_: This rule is irrelevant for Go versions below 1.15.
+
+## secrets-serialization
+
+_Description_: This rule warns on exported struct fields with JSON serialization enabled that have a high chance of containing secrets and
+other sensitive information. This is particular relevant for environments that use structured logging with JSON serialization where
+secrets can inadvertently end up in log files. By default, this rule checks for the following struct field names:
+
+```
+"BearerToken", "Secret", "Token", "Password", "Key", "APIKey", "Auth", "Credential", "ClientSecret", "AccessToken", "AuthToken"
+```
+
+This list can be replaced and customized using a configuration argument to make this rule useful for a broad range of use cases. 
+
+_Configuration_:
+
+```toml
+[rule.secrets-serialization]
+arguments = [
+  [
+    "email",
+    "SSN",
+  ],
+]
+```
 
 ## string-format
 
