@@ -574,6 +574,8 @@ func checkSpannerTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (me
 	return "", true
 }
 
+// checkOptionsOnIgnoredField checks if an ignored struct field (tag name "-") has any options specified.
+// It returns a message and false if there are useless options present, or an empty message and true if valid.
 func checkOptionsOnIgnoredField(tag *structtag.Tag) (message string, succeeded bool) {
 	if tag.Name != "-" {
 		return "", true
@@ -585,12 +587,12 @@ func checkOptionsOnIgnoredField(tag *structtag.Tag) (message string, succeeded b
 	case 1:
 		opt := strings.TrimSpace(tag.Options[0])
 		if opt == "" {
-			return "useless empty option for ignored field (remove the comma after -)", false
+			return "", true // accept "-," as options
 		}
 
 		return fmt.Sprintf("useless option %s for ignored field", opt), false
 	default:
-		return fmt.Sprintf("useless option(s) %s for ignored field", strings.Join(tag.Options, ",")), false
+		return fmt.Sprintf("useless options %s for ignored field", strings.Join(tag.Options, ",")), false
 	}
 }
 

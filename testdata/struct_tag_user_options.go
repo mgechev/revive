@@ -56,36 +56,36 @@ type SpannerUserOptions struct {
 }
 
 type uselessOptions struct {
-	A  int       `bson:"-,"`                                           // MATCH /useless empty option for ignored field (remove the comma after -) in bson tag/
-	B  int       `bson:"-,omitempty"`                                  // MATCH /useless option omitempty for ignored field in bson tag/
-	C  int       `bson:"-,omitempty,omitempty"`                        // MATCH /useless option(s) omitempty,omitempty for ignored field in bson tag/
-	D  int       `datastore:"-,"`                                      // MATCH /useless empty option for ignored field (remove the comma after -) in datastore tag/
-	E  int       `datastore:"-,omitempty"`                             // MATCH /useless option omitempty for ignored field in datastore tag/
-	F  int       `datastore:"-,omitempty,omitempty"`                   // MATCH /useless option(s) omitempty,omitempty for ignored field in datastore tag/
-	G  int       `json:"-,"`                                           // MATCH /useless empty option for ignored field (remove the comma after -) in json tag/
-	H  int       `json:"-,omitempty"`                                  // MATCH /useless option omitempty for ignored field in json tag/
-	I  int       `json:"-,omitempty,omitempty"`                        // MATCH /useless option(s) omitempty,omitempty for ignored field in json tag/
-	J  int       `mapstructure:"-,"`                                   // MATCH /useless empty option for ignored field (remove the comma after -) in mapstructure tag/
-	K  int       `mapstructure:"-,squash"`                             // MATCH /useless option squash for ignored field in mapstructure tag/
-	L  int       `mapstructure:"-,omitempty,omitempty"`                // MATCH /useless option(s) omitempty,omitempty for ignored field in mapstructure tag/
-	M  int       `properties:"-,"`                                     // MATCH /useless empty option for ignored field (remove the comma after -) in properties tag/
+	A  int       `bson:"-,"`
+	B  int       `bson:"-,omitempty"`           // MATCH /useless option omitempty for ignored field in bson tag/
+	C  int       `bson:"-,omitempty,omitempty"` // MATCH /useless options omitempty,omitempty for ignored field in bson tag/
+	D  int       `datastore:"-,"`
+	E  int       `datastore:"-,omitempty"`           // MATCH /useless option omitempty for ignored field in datastore tag/
+	F  int       `datastore:"-,omitempty,omitempty"` // MATCH /useless options omitempty,omitempty for ignored field in datastore tag/
+	G  int       `json:"-,"`
+	H  int       `json:"-,omitempty"`           // MATCH /useless option omitempty for ignored field in json tag/
+	I  int       `json:"-,omitempty,omitempty"` // MATCH /useless options omitempty,omitempty for ignored field in json tag/
+	J  int       `mapstructure:"-,"`
+	K  int       `mapstructure:"-,squash"`              // MATCH /useless option squash for ignored field in mapstructure tag/
+	L  int       `mapstructure:"-,omitempty,omitempty"` // MATCH /useless options omitempty,omitempty for ignored field in mapstructure tag/
+	M  int       `properties:"-,"`
 	N  int       `properties:"-,default=15"`                           // MATCH /useless option default=15 for ignored field in properties tag/
-	O  time.Time `properties:"-,layout=2006-01-02,default=2006-01-02"` // MATCH /useless option(s) layout=2006-01-02,default=2006-01-02 for ignored field in properties tag/
-	P  int       `spanner:"-,"`                                        // MATCH /useless empty option for ignored field (remove the comma after -) in spanner tag/
-	Q  int       `spanner:"-,mySpannerOption"`                         // MATCH /useless option mySpannerOption for ignored field in spanner tag/
-	R  int       `spanner:"-,mySpannerOption,mySpannerOption"`         // MATCH /useless option(s) mySpannerOption,mySpannerOption for ignored field in spanner tag/
-	S  int       `toml:"-,"`                                           // MATCH /useless empty option for ignored field (remove the comma after -) in toml tag/
-	T  int       `toml:"-,omitempty"`                                  // MATCH /useless option omitempty for ignored field in toml tag/
-	U  int       `toml:"-,omitempty,omitempty"`                        // MATCH /useless option(s) omitempty,omitempty for ignored field in toml tag/
-	V  int       `url:"-,"`                                            // MATCH /useless empty option for ignored field (remove the comma after -) in url tag/
-	W  int       `url:"-,omitempty"`                                   // MATCH /useless option omitempty for ignored field in url tag/
-	X  int       `url:"-,omitempty,omitempty"`                         // MATCH /useless option(s) omitempty,omitempty for ignored field in url tag/
-	Y  int       `xml:"-,"`                                            // MATCH /useless empty option for ignored field (remove the comma after -) in xml tag/
-	Z  int       `xml:"-,omitempty"`                                   // MATCH /useless option omitempty for ignored field in xml tag/
-	Aa int       `xml:"-,omitempty,omitempty"`                         // MATCH /useless option(s) omitempty,omitempty for ignored field in xml tag/
-	Ba int       `yaml:"-,"`                                           // MATCH /useless empty option for ignored field (remove the comma after -) in yaml tag/
-	Ca int       `yaml:"-,omitempty"`                                  // MATCH /useless option omitempty for ignored field in yaml tag/
-	Da int       `yaml:"-,omitempty,omitempty"`                        // MATCH /useless option(s) omitempty,omitempty for ignored field in yaml tag/
+	O  time.Time `properties:"-,layout=2006-01-02,default=2006-01-02"` // MATCH /useless options layout=2006-01-02,default=2006-01-02 for ignored field in properties tag/
+	P  int       `spanner:"-,"`
+	Q  int       `spanner:"-,mySpannerOption"`                 // MATCH /useless option mySpannerOption for ignored field in spanner tag/
+	R  int       `spanner:"-,mySpannerOption,mySpannerOption"` // MATCH /useless options mySpannerOption,mySpannerOption for ignored field in spanner tag/
+	S  int       `toml:"-,"`
+	T  int       `toml:"-,omitempty"`           // MATCH /useless option omitempty for ignored field in toml tag/
+	U  int       `toml:"-,omitempty,omitempty"` // MATCH /useless options omitempty,omitempty for ignored field in toml tag/
+	V  int       `url:"-,"`
+	W  int       `url:"-,omitempty"`           // MATCH /useless option omitempty for ignored field in url tag/
+	X  int       `url:"-,omitempty,omitempty"` // MATCH /useless options omitempty,omitempty for ignored field in url tag/
+	Y  int       `xml:"-,"`
+	Z  int       `xml:"-,omitempty"`           // MATCH /useless option omitempty for ignored field in xml tag/
+	Aa int       `xml:"-,omitempty,omitempty"` // MATCH /useless options omitempty,omitempty for ignored field in xml tag/
+	Ba int       `yaml:"-,"`
+	Ca int       `yaml:"-,omitempty"`           // MATCH /useless option omitempty for ignored field in yaml tag/
+	Da int       `yaml:"-,omitempty,omitempty"` // MATCH /useless options omitempty,omitempty for ignored field in yaml tag/
 
 	// MATCH:59 /unknown option "" in bson tag/
 	// MATCH:62 /unknown option "" in datastore tag/

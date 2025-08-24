@@ -21,7 +21,7 @@ type decodeAndValidateRequest struct {
 	OptionalQuery    string          `json:"-" querystring:"queryfoo"`
 	optionalQuery    string          `json:"-" querystring:"queryfoo"` // MATCH /tag on not-exported field optionalQuery/
 	// No-reg test for bug https://github.com/mgechev/revive/issues/208
-	Tiret       string `json:"-,"`                   // MATCH /useless empty option for ignored field (remove the comma after -) in json tag/
+	Tiret       string `json:"-,"`
 	BadTiret    string `json:"other,"`               // MATCH /option can not be empty in json tag/
 	ForOmitzero string `json:"forOmitZero,omitzero"` // Go 1.24 introduces omitzero
 }
