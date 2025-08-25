@@ -40,6 +40,7 @@ warningCode = 1
 [rule.receiver-naming]
 [rule.redefines-builtin-id]
 [rule.redundant-build-tag]
+[rule.secrets-serialization]
 [rule.superfluous-else]
 [rule.time-date]
 [rule.time-equal]
