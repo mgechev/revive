@@ -78,7 +78,7 @@ func (w *lintUseWaitGroupGo) Visit(node ast.Node) ast.Visitor {
 // Warning: the analysis only looks for exactly wg.Add and wg.Done, that means
 // calls to Add and Done on a WaitGroup struct within a variable named differently than wg will be ignored
 // This simplification avoids requiring type information while still makes the rule work in most of the cases.
-// (Who names a wait group differently than wg ?!)
+// This rule assumes the WaitGroup variable is named 'wg', which is the common convention.
 func (w *lintUseWaitGroupGo) analyzeBlock(b *ast.BlockStmt) {
 	// we will iterate over all statements in search for wg.Add()
 	stmts := b.List
