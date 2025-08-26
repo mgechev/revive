@@ -133,10 +133,5 @@ func (w *lintInefficientMapLookup) isRangeOverMapKey(stmt ast.Stmt) bool {
 
 	// Check if we range over a map
 	t := w.file.Pkg.TypeOf(rangeStmt.X)
-	ok = t != nil && strings.HasPrefix(t.String(), "map[")
-	if !ok {
-		return false
-	}
-
-	return true
+	return t != nil && strings.HasPrefix(t.String(), "map[")
 }
