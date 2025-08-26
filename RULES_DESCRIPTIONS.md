@@ -56,6 +56,7 @@ List of all available rules.
   - [imports-blocklist](#imports-blocklist)
   - [increment-decrement](#increment-decrement)
   - [indent-error-flow](#indent-error-flow)
+  - [inefficient-map-lookup](#inefficient-map-lookup)
   - [line-length-limit](#line-length-limit)
   - [max-control-nesting](#max-control-nesting)
   - [max-public-structs](#max-public-structs)
@@ -868,6 +869,29 @@ arguments = ["preserveScope"]
 [rule.indent-error-flow]
 arguments = ["preserve-scope"]
 ```
+
+## inefficient-map-lookup
+
+_Description_: This rule spots code that iteratively search for a map key.
+
+Example:
+
+```golang
+// Inefficient map lookup
+for k := range aMap {
+  if k == aValue {
+    // do something
+  }
+}
+
+// Simpler and efficient version
+if _,ok := aMap[aValue]; ok {
+  // do something
+}
+```
+
+_Configuration_: N/A
+
 
 ## line-length-limit
 
