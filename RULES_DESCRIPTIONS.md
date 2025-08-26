@@ -885,13 +885,12 @@ for k := range aMap {
 }
 
 // Simpler and efficient version
-if _,ok := aMap[aValue]; ok {
+if _, ok := aMap[aValue]; ok {
   // do something
 }
 ```
 
 _Configuration_: N/A
-
 
 ## line-length-limit
 

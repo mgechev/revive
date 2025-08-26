@@ -14,7 +14,7 @@ import (
 type InefficientMapLookupRule struct{}
 
 // Apply applies the rule to given file.
-func (r *InefficientMapLookupRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*InefficientMapLookupRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
