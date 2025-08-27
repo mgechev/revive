@@ -89,11 +89,13 @@ List of all available rules.
   - [unnecessary-format](#unnecessary-format)
   - [unnecessary-stmt](#unnecessary-stmt)
   - [unreachable-code](#unreachable-code)
+  - [unsecure-url-scheme](#unsecure-url-scheme)
   - [unused-parameter](#unused-parameter)
   - [unused-receiver](#unused-receiver)
   - [use-any](#use-any)
   - [use-errors-new](#use-errors-new)
   - [use-fmt-print](#use-fmt-print)
+  - [use-waitgroup-go](#use-waitgroup-go)
   - [useless-break](#useless-break)
   - [useless-fallthrough](#useless-fallthrough)
   - [var-declaration](#var-declaration)
@@ -1394,6 +1396,17 @@ _Configuration_: N/A
 _Description_: This rule spots and proposes to remove [unreachable code](https://en.wikipedia.org/wiki/Unreachable_code).
 
 _Configuration_: N/A
+
+## unsecure-url-scheme
+
+_Description_: Checks for usage of potentially unsecure URL schemes (`http`, `ws`) in string literals.
+Using unencrypted URL schemes can expose sensitive data during transmission and
+make applications vulnerable to man-in-the-middle attacks.
+Secure alternatives like `https` should be preferred when possible.
+
+_Configuration_: N/A
+
+The rule will not warn on local URLs (`localhost`, `127.0.0.1`).
 
 ## unused-parameter
 
