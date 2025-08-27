@@ -1431,7 +1431,7 @@ Secure alternatives like `https` should be preferred when possible.
 
 _Configuration_: N/A
 
-The rule will not warn on local URLs (`localhost`, `127.0.0.1`)
+The rule will not warn on local URLs (`localhost`, `127.0.0.1`).
 
 ## useless-break
 
