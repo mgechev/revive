@@ -874,9 +874,31 @@ arguments = ["preserve-scope"]
 
 _Description_: This rule spots code that iteratively search for a map key.
 
+This inefficiency is usually introduced when refactoring from a slice to a map.
+For example if during refactoring the `elements` slice is transformed into a map.
+
+```
+-       elements             []string
++       elements             map[string]float64
+```
+
+and then a loop across `elements` is changed in an obvious but inefficient way:
+
+```
+-       for _, e := range elements {
++       for e := range elements {
+                if e == someStaticValue {
+                        // do something
+                }
+        }
+```
+
 Example:
 
 ```golang
+aMap := map[string]bool{}{}
+aValue := false
+
 // Inefficient map lookup
 for k := range aMap {
   if k == aValue {
