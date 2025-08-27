@@ -156,12 +156,12 @@ func (w *lintIfChainIdenticalBranches) Visit(node ast.Node) ast.Visitor {
 // isComplexCondition returns true if the given expression is "complex", false otherwise.
 // An expression is considered complex if it has a function call.
 func (*lintIfChainIdenticalBranches) isComplexCondition(expr ast.Expr) bool {
-	calls := astutils.PickNodes(expr, func(n ast.Node) bool {
+	call := astutils.SeekNode[*ast.CallExpr](expr, func(n ast.Node) bool {
 		_, ok := n.(*ast.CallExpr)
 		return ok
 	})
 
-	return len(calls) > 0
+	return call != nil
 }
 
 // identicalBranches yields pairs of (line numbers) of identical branches from the given branches.

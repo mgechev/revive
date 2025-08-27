@@ -594,12 +594,13 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`unnecessary-format`](./RULES_DESCRIPTIONS.md#unnecessary-format)    |  n/a   | Identifies calls to formatting functions where the format string does not contain any formatting verbs          |    no    |  no   |
 | [`unnecessary-stmt`](./RULES_DESCRIPTIONS.md#unnecessary-stmt)    |  n/a   | Suggests removing or simplifying unnecessary statements          |    no    |  no   |
 | [`unreachable-code`](./RULES_DESCRIPTIONS.md#unreachable-code)    |  n/a   | Warns on unreachable code                                        |    no    |  no   |
+| [`unsecure-url-scheme`](./RULES_DESCRIPTIONS.md#unsecure-url-scheme)          |  n/a   |  Checks for usage of potentially unsecure URL schemes. |    no    |  no   |
 | [`unused-parameter`](./RULES_DESCRIPTIONS.md#unused-parameter)    |  n/a   | Suggests to rename or remove unused function parameters          |    no    |  no   |
 | [`unused-receiver`](./RULES_DESCRIPTIONS.md#unused-receiver)   | n/a    | Suggests to rename or remove unused method receivers    |    no    |  no   |
 | [`use-any`](./RULES_DESCRIPTIONS.md#use-any)          |  n/a   |  Proposes to replace `interface{}` with its alias `any` |    no    |  no   |
 | [`use-errors-new`](./RULES_DESCRIPTIONS.md#use-errors-new) | n/a   | Spots calls to `fmt.Errorf` that can be replaced by `errors.New` |   no    |  no   |
 | [`use-fmt-print`](./RULES_DESCRIPTIONS.md#use-fmt-print) | n/a   | Proposes to replace calls to built-in `print` and `println` with their equivalents from `fmt`. |   no    |  no   |
-| [`unsecure-url-scheme`](./RULES_DESCRIPTIONS.md#unsecure-url-scheme)          |  n/a   |  Checks for usage of potentially unsecure URL schemes. |    no    |  no   |
+| [`use-waitgroup-go`](./RULES_DESCRIPTIONS.md#use-waitgroup-go)          |  n/a   |  Proposes to replace `wg.Add ... go {... wg.Done ...}` idiom with `wg.Go` |    no    |  no   |
 | [`useless-break`](./RULES_DESCRIPTIONS.md#useless-break)          |  n/a   |  Warns on useless `break` statements in case clauses |    no    |  no   |
 | [`useless-fallthrough`](./RULES_DESCRIPTIONS.md#useless-fallthrough)  |  n/a   |  Warns on useless `fallthrough` statements in case clauses |    no    |  no   |
 | [`var-declaration`](./RULES_DESCRIPTIONS.md#var-declaration)     |  n/a   | Reduces redundancies around variable declaration.                |   yes    |  yes  |

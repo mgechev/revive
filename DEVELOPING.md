@@ -127,3 +127,6 @@ mdsf verify .
 ```sh
 mdsf format .
 ```
+
+_Note: Use `golang` for Go code snippets that are intentionally non-compilable.
+However, it is recommended to avoid this and use `go` whenever possible._

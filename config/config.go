@@ -112,6 +112,7 @@ var allRules = append([]lint.Rule{
 	&rule.IdenticalSwitchBranchesRule{},
 	&rule.UselessFallthroughRule{},
 	&rule.PackageDirectoryMismatchRule{},
+	&rule.UseWaitGroupGoRule{},
 	&rule.UnsecureURLSchemeRule{},
 }, defaultRules...)
 
