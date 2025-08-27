@@ -594,6 +594,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`unnecessary-format`](./RULES_DESCRIPTIONS.md#unnecessary-format)    |  n/a   | Identifies calls to formatting functions where the format string does not contain any formatting verbs          |    no    |  no   |
 | [`unnecessary-stmt`](./RULES_DESCRIPTIONS.md#unnecessary-stmt)    |  n/a   | Suggests removing or simplifying unnecessary statements          |    no    |  no   |
 | [`unreachable-code`](./RULES_DESCRIPTIONS.md#unreachable-code)    |  n/a   | Warns on unreachable code                                        |    no    |  no   |
+| [`unsecure-url-scheme`](./RULES_DESCRIPTIONS.md#unsecure-url-scheme)          |  n/a   |  Checks for usage of potentially unsecure URL schemes. |    no    |  no   |
 | [`unused-parameter`](./RULES_DESCRIPTIONS.md#unused-parameter)    |  n/a   | Suggests to rename or remove unused function parameters          |    no    |  no   |
 | [`unused-receiver`](./RULES_DESCRIPTIONS.md#unused-receiver)   | n/a    | Suggests to rename or remove unused method receivers    |    no    |  no   |
 | [`use-any`](./RULES_DESCRIPTIONS.md#use-any)          |  n/a   |  Proposes to replace `interface{}` with its alias `any` |    no    |  no   |
