@@ -895,7 +895,7 @@ and then a loop across `elements` is changed in an obvious but inefficient way:
 
 Example:
 
-```golang
+```go
 aMap := map[string]bool{}{}
 aValue := false
 
