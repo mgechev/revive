@@ -115,8 +115,6 @@ func (w *lintInefficientMapLookup) analyzeBlock(b *ast.BlockStmt) {
 			Category:   lint.FailureCategoryCodeStyle,
 			Failure:    "inefficient lookup of map key",
 		})
-
-		break
 	}
 }
 
@@ -127,7 +125,10 @@ func (w *lintInefficientMapLookup) isRangeOverMapKey(stmt ast.Stmt) bool {
 	}
 
 	// Check if we range only on key
-	if rangeStmt.Key == nil || rangeStmt.Value != nil {
+	// for key := range ...
+	// for key, _ := range ...
+	hasValueVariable := rangeStmt.Value != nil && !astutils.IsIdent(rangeStmt.Value, "_")
+	if hasValueVariable {
 		return false // range over both key and value
 	}
 
