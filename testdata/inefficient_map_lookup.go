@@ -21,6 +21,13 @@ func inefficientMapLookup() {
 		}
 	}
 
+	for key, _ := range a.TagIDs { // MATCH /inefficient lookup of map key/
+		if key != someStaticValue {
+			continue
+		}
+		fmt.Println(key)
+	}
+
 	// do not match if the loop body is something else than
 	// just an if on the map key
 	aMap := map[int]int{}
@@ -44,5 +51,13 @@ func inefficientMapLookup() {
 		if i == 1 {
 			fmt.Print(i)
 		}
+	}
+
+	for key, _ := range a.TagIDs {
+		if key != someStaticValue { // do not match does more than continuing
+			fmt.Println(key)
+			continue
+		}
+		fmt.Println(key)
 	}
 }

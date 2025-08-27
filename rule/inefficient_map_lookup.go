@@ -88,25 +88,12 @@ func (w *lintInefficientMapLookup) analyzeBlock(b *ast.BlockStmt) {
 		key := rangeOverMap.Key.(*ast.Ident)
 
 		// Here we have identified a range over the keys of a map
-		// Let's check if the range body is just an if of the form
-		// if <key> == <something>
-		if len(rangeOverMap.Body.List) != 1 {
-			continue // the range body has more than one statement
-		}
-
-		bodyStmt := rangeOverMap.Body.List[0]
-		ifStmt, ok := bodyStmt.(*ast.IfStmt)
-		if !ok {
-			continue // the single statement of the body is not an if
-		}
-
-		binExp, ok := ifStmt.Cond.(*ast.BinaryExpr)
-		if !ok || binExp.Op != token.EQL {
-			continue // the if condition is not ==
-		}
-
-		if !astutils.IsIdent(binExp.X, key.Name) {
-			continue // the if condition is not <key> ==
+		// Let's check if the range body is
+		// { if <key> == <something> { ... } }
+		// or
+		// { if <key> != <something> { continue } ... }
+		if !isKeyLookup(key.Name, rangeOverMap.Body) {
+			continue
 		}
 
 		w.onFailure(lint.Failure{
@@ -116,6 +103,50 @@ func (w *lintInefficientMapLookup) analyzeBlock(b *ast.BlockStmt) {
 			Failure:    "inefficient lookup of map key",
 		})
 	}
+}
+
+func isKeyLookup(keyName string, blockStmt *ast.BlockStmt) bool {
+	blockLen := len(blockStmt.List)
+	if blockLen == 0 {
+		return false // empty
+	}
+
+	firstStmt := blockStmt.List[0]
+	ifStmt, ok := firstStmt.(*ast.IfStmt)
+	if !ok {
+		return false // the first statement of the body is not an if
+	}
+
+	binExp, ok := ifStmt.Cond.(*ast.BinaryExpr)
+	if !ok {
+		return false // the if condition is not a binary expression
+	}
+
+	if !astutils.IsIdent(binExp.X, keyName) {
+		return false // the if condition is not <key> <bin-op> <LHS>
+	}
+
+	switch binExp.Op {
+	case token.EQL:
+		// if key == ... should be the single statement in the block
+		return blockLen == 1
+
+	case token.NEQ:
+		// if key != ...
+		ifBodyStmts := ifStmt.Body.List
+		if len(ifBodyStmts) < 1 {
+			return false // if key != ... { /* empty */ }
+		}
+
+		branchStmt, ok := ifBodyStmts[0].(*ast.BranchStmt)
+		if !ok || branchStmt.Tok != token.CONTINUE {
+			return false // if key != ... { <not a continue> }
+		}
+
+		return true
+	}
+
+	return false
 }
 
 func (w *lintInefficientMapLookup) isRangeOverMapKey(stmt ast.Stmt) bool {
