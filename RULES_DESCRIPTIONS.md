@@ -93,6 +93,7 @@ List of all available rules.
   - [use-any](#use-any)
   - [use-errors-new](#use-errors-new)
   - [use-fmt-print](#use-fmt-print)
+  - [use-waitgroup-go](#use-waitgroup-go)
   - [useless-break](#useless-break)
   - [useless-fallthrough](#useless-fallthrough)
   - [var-declaration](#var-declaration)
