@@ -46,3 +46,8 @@ type TomlUser struct {
 	Username string `toml:"username,omitempty"`
 	Location string `toml:"location,unknown"`
 }
+
+type CodecUserOptions struct {
+	ID   int    `codec:"user_id,myCodecOption"`
+	Name string `codec:"full_name,unknownOption"` // MATCH /unknown option "unknownOption" in codec tag/
+}

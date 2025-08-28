@@ -88,6 +88,12 @@ type TestDuplicatedProtobufTags struct {
 	C int `protobuf:"varint,name=c"` // MATCH /duplicated tag name "c" in protobuf tag/
 }
 
+type TestDuplicatedCodecTags struct {
+	A int `codec:"field_a"`
+	B int `codec:"field_a"` // MATCH /duplicated tag name "field_a" in codec tag/
+	C int `codec:"field_c"`
+}
+
 // test case from
 // sigs.k8s.io/kustomize/api/types/helmchartargs.go
 
@@ -165,6 +171,12 @@ type ValidateUser struct {
 type TomlUser struct {
 	Username string `toml:"username,omitempty"`
 	Location string `toml:"location,unknown"` // MATCH /unknown option "unknown" in toml tag/
+}
+
+type CodecStruct struct {
+	Name    string `codec:"name,omitempty"`
+	Ignored string `codec:"-"`
+	BadOpt  int    `codec:"id,unknown"` // MATCH /unknown option "unknown" in codec tag/
 }
 
 type PropertiesTags struct {

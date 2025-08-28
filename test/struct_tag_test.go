@@ -21,7 +21,7 @@ func TestStructTagWithUserOptions(t *testing.T) {
 			"mapstructure,myMapstructureOption",
 			"validate,displayName",
 			"toml,unknown",
-			"codec,omitempty",
+			"codec,myCodecOption",
 		},
 	})
 }

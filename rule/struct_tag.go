@@ -23,6 +23,7 @@ type tagKey string
 const (
 	keyASN1         tagKey = "asn1"
 	keyBSON         tagKey = "bson"
+	keyCodec        tagKey = "codec"
 	keyDatastore    tagKey = "datastore"
 	keyDefault      tagKey = "default"
 	keyJSON         tagKey = "json"
@@ -35,7 +36,6 @@ const (
 	keyValidate     tagKey = "validate"
 	keyXML          tagKey = "xml"
 	keyYAML         tagKey = "yaml"
-	keyCodec        tagKey = "codec"
 )
 
 type tagChecker func(checkCtx *checkContext, tag *structtag.Tag, fieldType ast.Expr) (message string, succeeded bool)
@@ -43,6 +43,7 @@ type tagChecker func(checkCtx *checkContext, tag *structtag.Tag, fieldType ast.E
 var tagCheckers = map[tagKey]tagChecker{
 	keyASN1:         checkASN1Tag,
 	keyBSON:         checkBSONTag,
+	keyCodec:        checkCodecTag,
 	keyDatastore:    checkDatastoreTag,
 	keyDefault:      checkDefaultTag,
 	keyJSON:         checkJSONTag,
@@ -55,7 +56,6 @@ var tagCheckers = map[tagKey]tagChecker{
 	keyValidate:     checkValidateTag,
 	keyXML:          checkXMLTag,
 	keyYAML:         checkYAMLTag,
-	keyCodec:        checkCodecTag,
 }
 
 type checkContext struct {
