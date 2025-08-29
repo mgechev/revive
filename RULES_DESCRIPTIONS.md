@@ -874,9 +874,9 @@ arguments = ["preserve-scope"]
 
 ## inefficient-map-lookup
 
-_Description_: This rule spots code that iteratively search for a map key.
+_Description_: This rule identifies code that iteratively searches for a key in a map.
 
-This inefficiency is usually introduced when refactoring from a slice to a map.
+This inefficiency is usually introduced when refactoring code from using a slice to a map.
 For example if during refactoring the `elements` slice is transformed into a map.
 
 ```diff
@@ -884,7 +884,7 @@ For example if during refactoring the `elements` slice is transformed into a map
 +       elements             map[string]float64
 ```
 
-and then a loop across `elements` is changed in an obvious but inefficient way:
+and then a loop over `elements` is changed in an obvious but inefficient way:
 
 ```diff
 -       for _, e := range elements {
@@ -908,7 +908,7 @@ for k := range aMap {
   }
 }
 
-// Simpler and efficient version
+// Simpler and more efficient version
 if _, ok := aMap[aValue]; ok {
   // do something
 }

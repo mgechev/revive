@@ -28,8 +28,8 @@ func inefficientMapLookup() {
 		fmt.Println(key)
 	}
 
-	// do not match if the loop body is something else than
-	// just an if on the map key
+	// do not match if the loop body contains more than
+	// just an if statement on the map key
 	aMap := map[int]int{}
 	for k := range aMap {
 		fmt.Println(k)
@@ -45,7 +45,7 @@ func inefficientMapLookup() {
 		fmt.Println(k)
 	}
 
-	// do not match on rages over something else than maps
+	// do not match on ranges over types other than maps
 	slice := []int{}
 	for i, _ := range slice {
 		if i == 1 {
@@ -54,7 +54,7 @@ func inefficientMapLookup() {
 	}
 
 	for key, _ := range a.TagIDs {
-		if key != someStaticValue { // do not match does more than continuing
+		if key != someStaticValue { // do not match if the loop body does more than just continuing
 			fmt.Println(key)
 			continue
 		}
