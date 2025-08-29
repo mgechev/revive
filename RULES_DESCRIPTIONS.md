@@ -56,6 +56,7 @@ List of all available rules.
 - [imports-blocklist](#imports-blocklist)
 - [increment-decrement](#increment-decrement)
 - [indent-error-flow](#indent-error-flow)
+- [inefficient-map-lookup](#inefficient-map-lookup)
 - [line-length-limit](#line-length-limit)
 - [max-control-nesting](#max-control-nesting)
 - [max-public-structs](#max-public-structs)
