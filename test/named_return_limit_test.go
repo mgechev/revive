@@ -7,6 +7,12 @@ import (
 	"github.com/mgechev/revive/rule"
 )
 
-func TestNamedReturnLimit(t *testing.T) {
-	testRule(t, "named_return_limit", &rule.ReturnLimitNamedRule{}, &lint.RuleConfig{})
+func TestNamedReturnLimitDefault(t *testing.T) {
+	testRule(t, "named_return_min", &rule.NamedReturnMinRule{}, &lint.RuleConfig{})
+}
+
+func TestNamedReturnLimitConfigured(t *testing.T) {
+	testRule(t, "named_return_min_configured", &rule.NamedReturnMinRule{}, &lint.RuleConfig{
+		Arguments: []any{int64(1)},
+	})
 }

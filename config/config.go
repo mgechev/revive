@@ -112,7 +112,7 @@ var allRules = append([]lint.Rule{
 	&rule.IdenticalSwitchBranchesRule{},
 	&rule.UselessFallthroughRule{},
 	&rule.PackageDirectoryMismatchRule{},
-	&rule.ReturnLimitNamedRule{},
+	&rule.NamedReturnMinRule{},
 }, defaultRules...)
 
 // allFormatters is a list of all available formatters to output the linting results.
