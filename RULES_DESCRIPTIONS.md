@@ -1539,6 +1539,7 @@ arguments = [[], [], [{ skip-package-name-checks = true }]]
 arguments = [[], [], [{ extra-bad-package-names = ["helpers", "models"] }]]
 ```
 
+
 ## waitgroup-by-value
 
 _Description_: Function parameters that are passed by value, are in fact a copy of the original argument.
@@ -1546,3 +1547,15 @@ Passing a copy of a `sync.WaitGroup` is usually not what the developer wants to 
 This rule warns when a `sync.WaitGroup` expected as a by-value parameter in a function or method.
 
 _Configuration_: N/A
+
+
+## named-return-min
+_Description_: Functions with too many non-named return values can be hard to understand/use.
+
+_Configuration_: (int) the minimum number of named return values to trigger a warning
+
+Example:
+```toml
+[rule.named-return-min]
+arguments = [3]
+```
