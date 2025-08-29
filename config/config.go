@@ -113,6 +113,7 @@ var allRules = append([]lint.Rule{
 	&rule.PackageDirectoryMismatchRule{},
 	&rule.UseWaitGroupGoRule{},
 	&rule.UnsecureURLSchemeRule{},
+	&rule.InefficientMapLookupRule{},
 }, defaultRules...)
 
 // allFormatters is a list of all available formatters to output the linting results.
