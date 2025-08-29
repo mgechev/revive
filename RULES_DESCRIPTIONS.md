@@ -2,102 +2,107 @@
 
 List of all available rules.
 
-- [Description of available rules](#description-of-available-rules)
-  - [add-constant](#add-constant)
-  - [argument-limit](#argument-limit)
-  - [atomic](#atomic)
-  - [banned-characters](#banned-characters)
-  - [bare-return](#bare-return)
-  - [blank-imports](#blank-imports)
-  - [bool-literal-in-expr](#bool-literal-in-expr)
-  - [call-to-gc](#call-to-gc)
-  - [cognitive-complexity](#cognitive-complexity)
-  - [comment-spacings](#comment-spacings)
-  - [comments-density](#comments-density)
-  - [confusing-naming](#confusing-naming)
-  - [confusing-results](#confusing-results)
-  - [constant-logical-expr](#constant-logical-expr)
-  - [context-as-argument](#context-as-argument)
-  - [context-keys-type](#context-keys-type)
-  - [cyclomatic](#cyclomatic)
-  - [datarace](#datarace)
-  - [deep-exit](#deep-exit)
-  - [defer](#defer)
-  - [dot-imports](#dot-imports)
-  - [duplicated-imports](#duplicated-imports)
-  - [early-return](#early-return)
-  - [empty-block](#empty-block)
-  - [empty-lines](#empty-lines)
-  - [enforce-else](#enforce-else)
-  - [enforce-map-style](#enforce-map-style)
-  - [enforce-repeated-arg-type-style](#enforce-repeated-arg-type-style)
-  - [enforce-slice-style](#enforce-slice-style)
-  - [enforce-switch-style](#enforce-switch-style)
-  - [error-naming](#error-naming)
-  - [error-return](#error-return)
-  - [error-strings](#error-strings)
-  - [errorf](#errorf)
-  - [exported](#exported)
-  - [file-header](#file-header)
-  - [file-length-limit](#file-length-limit)
-  - [filename-format](#filename-format)
-  - [flag-parameter](#flag-parameter)
-  - [function-length](#function-length)
-  - [function-result-limit](#function-result-limit)
-  - [get-return](#get-return)
-  - [identical-branches](#identical-branches)
-  - [identical-ifelseif-branches](#identical-ifelseif-branches)
-  - [identical-ifelseif-conditions](#identical-ifelseif-conditions)
-  - [identical-switch-branches](#identical-switch-branches)
-  - [identical-switch-conditions](#identical-switch-conditions)
-  - [if-return](#if-return)
-  - [import-alias-naming](#import-alias-naming)
-  - [import-shadowing](#import-shadowing)
-  - [imports-blocklist](#imports-blocklist)
-  - [increment-decrement](#increment-decrement)
-  - [indent-error-flow](#indent-error-flow)
-  - [line-length-limit](#line-length-limit)
-  - [max-control-nesting](#max-control-nesting)
-  - [max-public-structs](#max-public-structs)
-  - [modifies-parameter](#modifies-parameter)
-  - [modifies-value-receiver](#modifies-value-receiver)
-  - [nested-structs](#nested-structs)
-  - [optimize-operands-order](#optimize-operands-order)
-  - [package-comments](#package-comments)
-  - [package-directory-mismatch](#package-directory-mismatch)
-  - [range-val-address](#range-val-address)
-  - [range-val-in-closure](#range-val-in-closure)
-  - [range](#range)
-  - [receiver-naming](#receiver-naming)
-  - [redefines-builtin-id](#redefines-builtin-id)
-  - [redundant-build-tag](#redundant-build-tag)
-  - [redundant-import-alias](#redundant-import-alias)
-  - [redundant-test-main-exit](#redundant-test-main-exit)
-  - [string-format](#string-format)
-  - [string-of-int](#string-of-int)
-  - [struct-tag](#struct-tag)
-  - [superfluous-else](#superfluous-else)
-  - [time-date](#time-date)
-  - [time-equal](#time-equal)
-  - [time-naming](#time-naming)
-  - [unchecked-type-assertion](#unchecked-type-assertion)
-  - [unconditional-recursion](#unconditional-recursion)
-  - [unexported-naming](#unexported-naming)
-  - [unexported-return](#unexported-return)
-  - [unhandled-error](#unhandled-error)
-  - [unnecessary-format](#unnecessary-format)
-  - [unnecessary-stmt](#unnecessary-stmt)
-  - [unreachable-code](#unreachable-code)
-  - [unused-parameter](#unused-parameter)
-  - [unused-receiver](#unused-receiver)
-  - [use-any](#use-any)
-  - [use-errors-new](#use-errors-new)
-  - [use-fmt-print](#use-fmt-print)
-  - [useless-break](#useless-break)
-  - [useless-fallthrough](#useless-fallthrough)
-  - [var-declaration](#var-declaration)
-  - [var-naming](#var-naming)
-  - [waitgroup-by-value](#waitgroup-by-value)
+<!-- toc -->
+
+- [add-constant](#add-constant)
+- [argument-limit](#argument-limit)
+- [atomic](#atomic)
+- [banned-characters](#banned-characters)
+- [bare-return](#bare-return)
+- [blank-imports](#blank-imports)
+- [bool-literal-in-expr](#bool-literal-in-expr)
+- [call-to-gc](#call-to-gc)
+- [cognitive-complexity](#cognitive-complexity)
+- [comment-spacings](#comment-spacings)
+- [comments-density](#comments-density)
+- [confusing-naming](#confusing-naming)
+- [confusing-results](#confusing-results)
+- [constant-logical-expr](#constant-logical-expr)
+- [context-as-argument](#context-as-argument)
+- [context-keys-type](#context-keys-type)
+- [cyclomatic](#cyclomatic)
+- [datarace](#datarace)
+- [deep-exit](#deep-exit)
+- [defer](#defer)
+- [dot-imports](#dot-imports)
+- [duplicated-imports](#duplicated-imports)
+- [early-return](#early-return)
+- [empty-block](#empty-block)
+- [empty-lines](#empty-lines)
+- [enforce-map-style](#enforce-map-style)
+- [enforce-repeated-arg-type-style](#enforce-repeated-arg-type-style)
+- [enforce-slice-style](#enforce-slice-style)
+- [enforce-switch-style](#enforce-switch-style)
+- [error-naming](#error-naming)
+- [error-return](#error-return)
+- [error-strings](#error-strings)
+- [errorf](#errorf)
+- [exported](#exported)
+- [file-header](#file-header)
+- [file-length-limit](#file-length-limit)
+- [filename-format](#filename-format)
+- [flag-parameter](#flag-parameter)
+- [function-length](#function-length)
+- [function-result-limit](#function-result-limit)
+- [get-return](#get-return)
+- [identical-branches](#identical-branches)
+- [identical-ifelseif-branches](#identical-ifelseif-branches)
+- [identical-ifelseif-conditions](#identical-ifelseif-conditions)
+- [identical-switch-branches](#identical-switch-branches)
+- [identical-switch-conditions](#identical-switch-conditions)
+- [if-return](#if-return)
+- [import-alias-naming](#import-alias-naming)
+- [import-shadowing](#import-shadowing)
+- [imports-blocklist](#imports-blocklist)
+- [increment-decrement](#increment-decrement)
+- [indent-error-flow](#indent-error-flow)
+- [inefficient-map-lookup](#inefficient-map-lookup)
+- [line-length-limit](#line-length-limit)
+- [max-control-nesting](#max-control-nesting)
+- [max-public-structs](#max-public-structs)
+- [modifies-parameter](#modifies-parameter)
+- [modifies-value-receiver](#modifies-value-receiver)
+- [nested-structs](#nested-structs)
+- [optimize-operands-order](#optimize-operands-order)
+- [package-comments](#package-comments)
+- [package-directory-mismatch](#package-directory-mismatch)
+- [range-val-address](#range-val-address)
+- [range-val-in-closure](#range-val-in-closure)
+- [range](#range)
+- [receiver-naming](#receiver-naming)
+- [redefines-builtin-id](#redefines-builtin-id)
+- [redundant-build-tag](#redundant-build-tag)
+- [redundant-import-alias](#redundant-import-alias)
+- [redundant-test-main-exit](#redundant-test-main-exit)
+- [string-format](#string-format)
+- [string-of-int](#string-of-int)
+- [struct-tag](#struct-tag)
+- [superfluous-else](#superfluous-else)
+- [time-date](#time-date)
+- [time-equal](#time-equal)
+- [time-naming](#time-naming)
+- [unchecked-type-assertion](#unchecked-type-assertion)
+- [unconditional-recursion](#unconditional-recursion)
+- [unexported-naming](#unexported-naming)
+- [unexported-return](#unexported-return)
+- [unhandled-error](#unhandled-error)
+- [unnecessary-format](#unnecessary-format)
+- [unnecessary-stmt](#unnecessary-stmt)
+- [unreachable-code](#unreachable-code)
+- [unsecure-url-scheme](#unsecure-url-scheme)
+- [unused-parameter](#unused-parameter)
+- [unused-receiver](#unused-receiver)
+- [use-any](#use-any)
+- [use-errors-new](#use-errors-new)
+- [use-fmt-print](#use-fmt-print)
+- [use-waitgroup-go](#use-waitgroup-go)
+- [useless-break](#useless-break)
+- [useless-fallthrough](#useless-fallthrough)
+- [var-declaration](#var-declaration)
+- [var-naming](#var-naming)
+- [waitgroup-by-value](#waitgroup-by-value)
+
+<!-- tocstop -->
 
 ## add-constant
 
@@ -446,14 +451,6 @@ _Configuration_: N/A
 
 _Description_: Sometimes `gofmt` is not enough to enforce a common formatting of a code-base;
 this rule warns when there are heading or trailing newlines in code blocks.
-
-_Configuration_: N/A
-
-## enforce-else
-
-_Description_: This rule warns if an `if` statement followed by one or more `else if` statements does not have a final `else` statement.
-
-This is consistent with the requirement to have a `default` clause in a `switch` statement (see [`enforce-switch-style` rule](#enforce-switch-style)).
 
 _Configuration_: N/A
 
@@ -868,6 +865,50 @@ arguments = ["preserveScope"]
 [rule.indent-error-flow]
 arguments = ["preserve-scope"]
 ```
+
+## inefficient-map-lookup
+
+_Description_: This rule identifies code that iteratively searches for a key in a map.
+
+This inefficiency is usually introduced when refactoring code from using a slice to a map.
+For example if during refactoring the `elements` slice is transformed into a map.
+
+```diff
+-       elements             []string
++       elements             map[string]float64
+```
+
+and then a loop over `elements` is changed in an obvious but inefficient way:
+
+```diff
+-       for _, e := range elements {
++       for e := range elements {
+                if e == someStaticValue {
+                        // do something
+                }
+        }
+```
+
+Example:
+
+```go
+aMap := map[string]bool{}{}
+aValue := false
+
+// Inefficient map lookup
+for k := range aMap {
+  if k == aValue {
+    // do something
+  }
+}
+
+// Simpler and more efficient version
+if _, ok := aMap[aValue]; ok {
+  // do something
+}
+```
+
+_Configuration_: N/A
 
 ## line-length-limit
 
@@ -1350,6 +1391,17 @@ _Description_: This rule spots and proposes to remove [unreachable code](https:/
 
 _Configuration_: N/A
 
+## unsecure-url-scheme
+
+_Description_: Checks for usage of potentially unsecure URL schemes (`http`, `ws`) in string literals.
+Using unencrypted URL schemes can expose sensitive data during transmission and
+make applications vulnerable to man-in-the-middle attacks.
+Secure alternatives like `https` should be preferred when possible.
+
+_Configuration_: N/A
+
+The rule will not warn on local URLs (`localhost`, `127.0.0.1`).
+
 ## unused-parameter
 
 _Description_: This rule warns on unused parameters. Functions or methods with unused parameters can be a symptom of an unfinished refactoring or a bug.
@@ -1418,6 +1470,18 @@ _Description_: This rule proposes to replace calls to built-in `print` and `prin
 
 `print` and `println` built-in functions are not recommended for use-cases other than
 [language boostraping and are not guaranteed to stay in the language](https://go.dev/ref/spec#Bootstrapping).
+
+_Configuration_: N/A
+
+## use-waitgroup-go
+
+_Description_: Since Go 1.25 the `sync` package proposes the [`WaitGroup.Go`](https://pkg.go.dev/sync#WaitGroup.Go) method.
+This method is a shorter and safer replacement for the idiom `wg.Add ... go { ... wg.Done ... }`.
+The rule proposes to replace these legacy idioms with calls to the new method.
+
+_Limitations_: The rule doesn't rely on type information but on variable names to identify waitgroups.
+This means the rule search for `wg` (the defacto standard name for wait groups);
+if the waitgroup variable is named differently than `wg` the rule will skip it.
 
 _Configuration_: N/A
 

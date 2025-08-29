@@ -106,12 +106,14 @@ var allRules = append([]lint.Rule{
 	&rule.UseFmtPrintRule{},
 	&rule.EnforceSwitchStyleRule{},
 	&rule.IdenticalSwitchConditionsRule{},
-	&rule.EnforceElseRule{},
 	&rule.IdenticalIfElseIfConditionsRule{},
 	&rule.IdenticalIfElseIfBranchesRule{},
 	&rule.IdenticalSwitchBranchesRule{},
 	&rule.UselessFallthroughRule{},
 	&rule.PackageDirectoryMismatchRule{},
+	&rule.UseWaitGroupGoRule{},
+	&rule.UnsecureURLSchemeRule{},
+	&rule.InefficientMapLookupRule{},
 	&rule.NamedReturnMinRule{},
 }, defaultRules...)
 

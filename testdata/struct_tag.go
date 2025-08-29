@@ -192,7 +192,7 @@ type PropertiesTags struct {
 type SpannerUser struct {
 	ID        int       `spanner:"user_id"`
 	Name      string    `spanner:"full_name"`
-	Email     string    `spanner:"-"`                    // Valid: ignore field
+	Email     string    `spanner:"-"` // Valid: ignore field
 	CreatedAt time.Time `spanner:"created_at"`
-	UpdatedAt time.Time `spanner:"updated_at,unknown"`   // MATCH /unknown option "unknown" in spanner tag/
+	UpdatedAt time.Time `spanner:"updated_at,unknown"` // MATCH /unknown option "unknown" in spanner tag/
 }

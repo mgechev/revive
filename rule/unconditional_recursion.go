@@ -198,5 +198,5 @@ func (*lintUnconditionalRecursionRule) hasControlExit(node ast.Node) bool {
 		return false
 	}
 
-	return len(astutils.PickNodes(node, isExit)) != 0
+	return astutils.SeekNode[ast.Node](node, isExit) != nil
 }
