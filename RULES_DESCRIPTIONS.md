@@ -185,6 +185,32 @@ This rule suggests removing Boolean literals from logic expressions.
 
 _Configuration_: N/A
 
+**Examples**
+
+Before (violation):
+
+```go
+if attachRequired == true {
+  // do something
+}
+
+if mustReply == false {
+  // do something
+}
+```
+
+After (fixed):
+
+```go
+if attachRequired {
+  // do something
+}
+
+if !mustReply {
+  // do something
+}
+```
+
 ## call-to-gc
 
 _Description_: Explicitly invoking the garbage collector is, except for specific uses in benchmarking, very dubious.
