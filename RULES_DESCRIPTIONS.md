@@ -185,7 +185,7 @@ This rule suggests removing Boolean literals from logic expressions.
 
 _Configuration_: N/A
 
-**Examples**
+### Examples
 
 Before (violation):
 
