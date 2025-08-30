@@ -183,8 +183,6 @@ _Configuration_: N/A
 _Description_: Using Boolean literals (`true`, `false`) in logic expressions may make the code less readable.
 This rule suggests removing Boolean literals from logic expressions.
 
-_Configuration_: N/A
-
 ### Examples
 
 Before (violation):
@@ -210,6 +208,8 @@ if !mustReply {
   // do something
 }
 ```
+
+_Configuration_: N/A
 
 ## call-to-gc
 
