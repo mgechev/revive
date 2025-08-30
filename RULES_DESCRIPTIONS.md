@@ -257,8 +257,6 @@ _Configuration_: N/A
 
 _Description_: Function or methods that return multiple, no named, values of the same type could induce error.
 
-_Configuration_: N/A
-
 ### Examples
 
 Before (violation):
@@ -274,6 +272,8 @@ After (fixed):
 // getPos yields the geographical position of this tag.
 func (t tag) getPos() (longitude float32, latitude float32)
 ```
+
+_Configuration_: N/A
 
 ## constant-logical-expr
 
