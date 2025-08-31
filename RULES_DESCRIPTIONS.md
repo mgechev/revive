@@ -183,6 +183,32 @@ _Configuration_: N/A
 _Description_: Using Boolean literals (`true`, `false`) in logic expressions may make the code less readable.
 This rule suggests removing Boolean literals from logic expressions.
 
+### Examples
+
+Before (violation):
+
+```go
+if attachRequired == true {
+  // do something
+}
+
+if mustReply == false {
+  // do something
+}
+```
+
+After (fixed):
+
+```go
+if attachRequired {
+  // do something
+}
+
+if !mustReply {
+  // do something
+}
+```
+
 _Configuration_: N/A
 
 ## call-to-gc
