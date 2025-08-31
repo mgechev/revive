@@ -81,6 +81,55 @@ func unnecessaryConditional() bool {
 		return true
 	}
 
+	//// assignments
+	if cond <= id { // MATCH /replace this conditional by: id = cond <= id/
+		id = true
+	} else {
+		id = false
+	}
+
+	if cond <= id { // MATCH /replace this conditional by: id = cond > id/
+		id = false
+	} else {
+		id = true
+	}
+
+	if cond >= id { // MATCH /replace this conditional by: id = cond >= id/
+		id = true
+	} else {
+		id = false
+	}
+
+	if cond >= id { // MATCH /replace this conditional by: id = cond < id/
+		id = false
+	} else {
+		id = true
+	}
+
+	if cond > id { // MATCH /replace this conditional by: id = cond > id/
+		id = true
+	} else {
+		id = false
+	}
+
+	if cond > id { // MATCH /replace this conditional by: id = cond <= id/
+		id = false
+	} else {
+		id = true
+	}
+
+	if cond < id { // MATCH /replace this conditional by: id = cond < id/
+		id = true
+	} else {
+		id = false
+	}
+
+	if cond < id { // MATCH /replace this conditional by: id = cond >= id/
+		id = false
+	} else {
+		id = true
+	}
+
 	// conditionals with initialization
 	if cond := false; cond {
 		return true
