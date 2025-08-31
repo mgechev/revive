@@ -3,6 +3,7 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"go/token"
 
 	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
@@ -41,83 +42,53 @@ type lintUnnecessaryConditional struct {
 	onFailure func(lint.Failure)
 }
 
+// Visit walks the AST looking for if statements of the form
+//
+// if cond { return <bool literal> } else { return <bool literal> }
+//
+// or
+//
+// if cond { <idX> = <bool literal> } else { <idX> = <bool literal> }
 func (w *lintUnnecessaryConditional) Visit(node ast.Node) ast.Visitor {
 	ifStmt, ok := node.(*ast.IfStmt)
 	if !ok {
-		return w
+		return w // not an if statement
 	}
 
-	if ifStmt.Else == nil {
-		return w // if without else
+	//          if without else    or if with initialization
+	mustSkip := ifStmt.Else == nil || ifStmt.Init != nil
+	if mustSkip {
+		return w
 	}
 
 	elseBranch, ok := ifStmt.Else.(*ast.BlockStmt)
-	if !ok { // if-else-if construction, the rule only copes with single if...else statements
-		return w
+	if !ok { // if-else-if construction
+		return w // the rule only copes with single if...else statements
 	}
 
 	thenStmts := ifStmt.Body.List
 	elseStmts := elseBranch.List
 	if len(thenStmts) != 1 || len(elseStmts) != 1 {
-		return w
+		return w // then and else branches do not have just one statement
 	}
 
 	replacement := ""
+	thenBool := false
 	switch thenStmt := thenStmts[0].(type) {
 	case *ast.ReturnStmt:
-		thenBool, ok := w.resultValueIsBooleanLiteral(thenStmt.Results)
-		if !ok {
-			return w
-		}
-
-		elseStmt, ok := elseStmts[0].(*ast.ReturnStmt)
-		if !ok {
-			return w
-		}
-
-		_, ok = w.resultValueIsBooleanLiteral(elseStmt.Results)
-		if !ok {
-			return w
-		}
-
-		cond := astutils.GoFmt(ifStmt.Cond)
-		if thenBool != "true" {
-			cond = "!(" + cond + ")"
-		}
-
-		replacement = "return " + cond
+		replacement, thenBool = w.replacementForReturnStmt(thenStmt, elseStmts)
 	case *ast.AssignStmt:
-		thenBool, ok := w.isBooleanLiteral(thenStmt.Rhs)
-		if !ok {
-			return w
-		}
-
-		thenLhs := astutils.GoFmt(thenStmt.Lhs[0])
-
-		elseStmt, ok := elseStmts[0].(*ast.AssignStmt)
-		if !ok {
-			return w
-		}
-
-		elseLhs := astutils.GoFmt(elseStmt.Lhs[0])
-		if thenLhs != elseLhs {
-			return w
-		}
-
-		_, ok = w.isBooleanLiteral(elseStmt.Rhs)
-		if !ok {
-			return w
-		}
-
-		cond := astutils.GoFmt(ifStmt.Cond)
-		if thenBool != "true" {
-			cond = "!(" + cond + ")"
-		}
-
-		replacement = fmt.Sprintf("%s %s %s", thenLhs, thenStmt.Tok.String(), cond)
+		replacement, thenBool = w.replacementForAssignmentStmt(thenStmt, elseStmts)
 	default:
 		return w
 	}
+
+	if replacement == "" {
+		return w // no replacement found
+	}
+
+	cond := w.condAsString(ifStmt.Cond, thenBool)
+	replacement = replacement + " " + cond
 
 	w.onFailure(lint.Failure{
 		Confidence: 1.0,
@@ -129,20 +100,87 @@ func (w *lintUnnecessaryConditional) Visit(node ast.Node) ast.Visitor {
 	return nil
 }
 
-func (w *lintUnnecessaryConditional) resultValueIsBooleanLiteral(results []ast.Expr) (string, bool) {
-	if len(results) != 1 {
-		return "", false
+func (w *lintUnnecessaryConditional) condAsString(cond ast.Expr, thenBool bool) string {
+	if binExp, ok := cond.(*ast.BinaryExpr); ok {
+		switch binExp.Op {
+		case token.NEQ:
+			if !thenBool {
+				binExp.Op = token.EQL
+			}
+		case token.EQL:
+			if !thenBool {
+				binExp.Op = token.NEQ
+			}
+		}
+
+		return astutils.GoFmt(binExp)
 	}
 
-	ident, ok := results[0].(*ast.Ident)
+	condStr := astutils.GoFmt(cond)
+	if !thenBool {
+		condStr = "!(" + condStr + ")"
+	}
+
+	return condStr
+}
+
+// replacementForAssignmentStmt returns a replacement statement != ""
+// iff both then and else statements are of the form <idX> = <bool literal>
+// If the replacement != "" then the second return value is the Boolean value
+// of <bool literal> in the then-side assignment, false otherwise.
+func (w *lintUnnecessaryConditional) replacementForAssignmentStmt(thenStmt *ast.AssignStmt, elseStmts []ast.Stmt) (replacement string, thenBool bool) {
+	thenBoolStr, ok := w.isSingleBooleanLiteral(thenStmt.Rhs)
 	if !ok {
 		return "", false
 	}
 
-	return ident.Name, (ident.Name == "true" || ident.Name == "false")
+	thenLhs := astutils.GoFmt(thenStmt.Lhs[0])
+
+	elseStmt, ok := elseStmts[0].(*ast.AssignStmt)
+	if !ok {
+		return "", false
+	}
+
+	elseLhs := astutils.GoFmt(elseStmt.Lhs[0])
+	if thenLhs != elseLhs {
+		return "", false
+	}
+
+	_, ok = w.isSingleBooleanLiteral(elseStmt.Rhs)
+	if !ok {
+		return "", false
+	}
+
+	return fmt.Sprintf("%s %s", thenLhs, thenStmt.Tok.String()), thenBoolStr == "true"
 }
 
-func (*lintUnnecessaryConditional) isBooleanLiteral(exprs []ast.Expr) (string, bool) {
+// replacementForReturnStmt returns a replacement statement != ""
+// iff both then and else statements are of the form return <bool literal>
+// If the replacement != "" then the second return value is the string representation
+// of <bool literal> in the then-side assignment, "" otherwise.
+func (w *lintUnnecessaryConditional) replacementForReturnStmt(thenStmt *ast.ReturnStmt, elseStmts []ast.Stmt) (replacement string, thenBool bool) {
+	thenBoolStr, ok := w.isSingleBooleanLiteral(thenStmt.Results)
+	if !ok {
+		return "", false
+	}
+
+	elseStmt, ok := elseStmts[0].(*ast.ReturnStmt)
+	if !ok {
+		return "", false
+	}
+
+	_, ok = w.isSingleBooleanLiteral(elseStmt.Results)
+	if !ok {
+		return "", false
+	}
+
+	return "return", thenBoolStr == "true"
+}
+
+// isSingleBooleanLiteral returns the string representation of <bool literal> and true
+// if the given list of expressions has exactly one element and that element is a bool literal (true or false),
+// otherwise it returns "" and false.
+func (*lintUnnecessaryConditional) isSingleBooleanLiteral(exprs []ast.Expr) (string, bool) {
 	if len(exprs) != 1 {
 		return "", false
 	}
