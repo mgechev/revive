@@ -87,7 +87,7 @@ func (w *lintUnnecessaryConditional) Visit(node ast.Node) ast.Visitor {
 		return w // no replacement found
 	}
 
-	cond := w.condAsString(ifStmt.Cond, thenBool)
+	cond := w.condAsString(ifStmt.Cond, !thenBool)
 	msg := "replace this conditional by: " + replacement + " " + cond
 
 	w.onFailure(lint.Failure{
@@ -100,30 +100,36 @@ func (w *lintUnnecessaryConditional) Visit(node ast.Node) ast.Visitor {
 	return nil
 }
 
+var relationalOppositeOf = map[token.Token]token.Token{
+	token.EQL: token.NEQ, // == !=
+	token.GEQ: token.LSS, // >= <
+	token.GTR: token.LEQ, // > <=
+	token.LEQ: token.GTR, // <= >
+	token.LSS: token.GEQ, // < >=
+	token.NEQ: token.EQL, // != ==
+}
+
 // condAsString yields the string representation of the given condition expression.
 // The method will try to minimize the negations in the resulting expression.
-func (*lintUnnecessaryConditional) condAsString(cond ast.Expr, thenBool bool) string {
-	if binExp, ok := cond.(*ast.BinaryExpr); ok {
-		switch binExp.Op {
-		case token.NEQ:
-			if !thenBool {
-				binExp.Op = token.EQL
-			}
-		case token.EQL:
-			if !thenBool {
-				binExp.Op = token.NEQ
+func (*lintUnnecessaryConditional) condAsString(cond ast.Expr, mustNegate bool) string {
+	result := astutils.GoFmt(cond)
+
+	if mustNegate {
+		result = "!(" + result + ")" // naive negation
+
+		// check if we can build a simpler expression
+		if binExp, ok := cond.(*ast.BinaryExpr); ok {
+			originalOp := binExp.Op
+			opposite, ok := relationalOppositeOf[originalOp]
+			if ok {
+				binExp.Op = opposite
+				result = astutils.GoFmt(binExp) // replace initial result by a simpler one
+				binExp.Op = originalOp
 			}
 		}
-
-		return astutils.GoFmt(binExp)
 	}
 
-	condStr := astutils.GoFmt(cond)
-	if !thenBool {
-		condStr = "!(" + condStr + ")"
-	}
-
-	return condStr
+	return result
 }
 
 // replacementForAssignmentStmt returns a replacement statement != ""
