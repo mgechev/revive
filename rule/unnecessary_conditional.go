@@ -80,7 +80,7 @@ func (w *lintUnnecessaryConditional) Visit(node ast.Node) ast.Visitor {
 	case *ast.AssignStmt:
 		replacement, thenBool = w.replacementForAssignmentStmt(thenStmt, elseStmts)
 	default:
-		return w
+		return w // the then branch is neither a return nor an assignment
 	}
 
 	if replacement == "" {
@@ -88,19 +88,21 @@ func (w *lintUnnecessaryConditional) Visit(node ast.Node) ast.Visitor {
 	}
 
 	cond := w.condAsString(ifStmt.Cond, thenBool)
-	replacement = replacement + " " + cond
+	msg := "replace this conditional by: " + replacement + " " + cond
 
 	w.onFailure(lint.Failure{
 		Confidence: 1.0,
 		Node:       ifStmt,
 		Category:   lint.FailureCategoryLogic,
-		Failure:    "replace this conditional by: " + replacement,
+		Failure:    msg,
 	})
 
 	return nil
 }
 
-func (w *lintUnnecessaryConditional) condAsString(cond ast.Expr, thenBool bool) string {
+// condAsString yields the string representation of the given condition expression.
+// The method will try to minimize the negations in the resulting expression.
+func (*lintUnnecessaryConditional) condAsString(cond ast.Expr, thenBool bool) string {
 	if binExp, ok := cond.(*ast.BinaryExpr); ok {
 		switch binExp.Op {
 		case token.NEQ:
