@@ -26,6 +26,15 @@ func TestStructTagWithUserOptions(t *testing.T) {
 	})
 }
 
+func TestStructTagWithDisabledCheckers(t *testing.T) {
+	testRule(t, "struct_tag_disabled_checkers", &rule.StructTagRule{}, &lint.RuleConfig{
+		Arguments: []any{
+			"validate,disabled",
+			"toml,disabled",
+		},
+	})
+}
+
 func TestStructTagAfterGo1_24(t *testing.T) {
 	testRule(t, "go1.24/struct_tag", &rule.StructTagRule{})
 }

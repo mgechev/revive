@@ -15,7 +15,8 @@ import (
 
 // StructTagRule lints struct tags.
 type StructTagRule struct {
-	userDefined map[tagKey][]string // map: key -> []option
+	userDefined      map[tagKey][]string // map: key -> []option
+	disabledCheckers map[tagKey]bool     // map: key -> disabled
 }
 
 type tagKey string
@@ -59,10 +60,11 @@ var tagCheckers = map[tagKey]tagChecker{
 }
 
 type checkContext struct {
-	userDefined    map[tagKey][]string // map: key -> []option
-	usedTagNbr     map[int]bool        // list of used tag numbers
-	usedTagName    map[string]bool     // list of used tag keys
-	isAtLeastGo124 bool
+	userDefined      map[tagKey][]string // map: key -> []option
+	disabledCheckers map[tagKey]bool     // map: key -> disabled
+	usedTagNbr       map[int]bool        // list of used tag numbers
+	usedTagName      map[string]bool     // list of used tag keys
+	isAtLeastGo124   bool
 }
 
 func (checkCtx checkContext) isUserDefined(key tagKey, opt string) bool {
@@ -88,6 +90,8 @@ func (r *StructTagRule) Configure(arguments lint.Arguments) error {
 	}
 
 	r.userDefined = make(map[tagKey][]string, len(arguments))
+	r.disabledCheckers = make(map[tagKey]bool)
+	
 	for _, arg := range arguments {
 		item, ok := arg.(string)
 		if !ok {
@@ -98,6 +102,13 @@ func (r *StructTagRule) Configure(arguments lint.Arguments) error {
 			return fmt.Errorf("invalid argument to the %s rule. Expecting a string of the form key[,option]+, got %s", r.Name(), item)
 		}
 		key := tagKey(strings.TrimSpace(parts[0]))
+		
+		// Check if this is a disabled checker configuration
+		if len(parts) == 2 && strings.TrimSpace(parts[1]) == "disabled" {
+			r.disabledCheckers[key] = true
+			continue
+		}
+		
 		for i := 1; i < len(parts); i++ {
 			option := strings.TrimSpace(parts[i])
 			r.userDefined[key] = append(r.userDefined[key], option)
@@ -115,10 +126,11 @@ func (r *StructTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 	}
 
 	w := lintStructTagRule{
-		onFailure:      onFailure,
-		userDefined:    r.userDefined,
-		isAtLeastGo124: file.Pkg.IsAtLeastGoVersion(lint.Go124),
-		tagCheckers:    tagCheckers,
+		onFailure:        onFailure,
+		userDefined:      r.userDefined,
+		disabledCheckers: r.disabledCheckers,
+		isAtLeastGo124:   file.Pkg.IsAtLeastGoVersion(lint.Go124),
+		tagCheckers:      tagCheckers,
 	}
 
 	ast.Walk(w, file.AST)
@@ -132,10 +144,11 @@ func (*StructTagRule) Name() string {
 }
 
 type lintStructTagRule struct {
-	onFailure      func(lint.Failure)
-	userDefined    map[tagKey][]string // map: key -> []option
-	isAtLeastGo124 bool
-	tagCheckers    map[tagKey]tagChecker
+	onFailure        func(lint.Failure)
+	userDefined      map[tagKey][]string // map: key -> []option
+	disabledCheckers map[tagKey]bool     // map: key -> disabled
+	isAtLeastGo124   bool
+	tagCheckers      map[tagKey]tagChecker
 }
 
 func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
@@ -146,10 +159,11 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 		}
 
 		checkCtx := &checkContext{
-			userDefined:    w.userDefined,
-			usedTagNbr:     map[int]bool{},
-			usedTagName:    map[string]bool{},
-			isAtLeastGo124: w.isAtLeastGo124,
+			userDefined:      w.userDefined,
+			disabledCheckers: w.disabledCheckers,
+			usedTagNbr:       map[int]bool{},
+			usedTagName:      map[string]bool{},
+			isAtLeastGo124:   w.isAtLeastGo124,
 		}
 
 		for _, f := range n.Fields.List {
@@ -184,7 +198,14 @@ func (w lintStructTagRule) checkTaggedField(checkCtx *checkContext, f *ast.Field
 			w.addFailureWithTagKey(f.Tag, msg, tag.Key)
 		}
 
-		checker, ok := w.tagCheckers[tagKey(tag.Key)]
+		tagKey := tagKey(tag.Key)
+		
+		// Skip checking if this tag checker is disabled
+		if w.disabledCheckers[tagKey] {
+			continue
+		}
+
+		checker, ok := w.tagCheckers[tagKey]
 		if !ok {
 			continue // we don't have a checker for the tag
 		}

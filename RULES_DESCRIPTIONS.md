@@ -1232,14 +1232,28 @@ _Description_: Struct tags are not checked at compile time.
 This rule spots errors in struct tags of the following types:
 asn1, bson, datastore, default, json, mapstructure, properties, protobuf, required, spanner, toml, url, validate, xml, yaml.
 
-_Configuration_: (optional) list of user defined options.
+The `validate` tag checking is based on the [go-playground/validator](https://pkg.go.dev/github.com/go-playground/validator/v10) package syntax.
 
-Configuration example:
-To accept the `inline` option in JSON tags (and `outline` and `gnu` in BSON tags) you must provide the following configuration
+_Configuration_: (optional) list of user defined options and disabled checkers.
 
+Configuration examples:
+
+To accept custom options for specific tag types:
 ```toml
 [rule.struct-tag]
 arguments = ["json,inline", "bson,outline,gnu"]
+```
+
+To disable validation for specific tag types:
+```toml
+[rule.struct-tag]
+arguments = ["validate,disabled", "toml,disabled"]
+```
+
+To combine custom options with disabled checkers:
+```toml
+[rule.struct-tag]
+arguments = ["validate,disabled", "json,custom_option", "bson,outline,gnu"]
 ```
 
 ## superfluous-else
