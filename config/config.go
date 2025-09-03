@@ -114,6 +114,7 @@ var allRules = append([]lint.Rule{
 	&rule.UseWaitGroupGoRule{},
 	&rule.UnsecureURLSchemeRule{},
 	&rule.InefficientMapLookupRule{},
+	&rule.WaitGroupDoneInWaitGroupGoRule{},
 }, defaultRules...)
 
 // allFormatters is a list of all available formatters to output the linting results.
