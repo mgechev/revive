@@ -184,7 +184,7 @@ _Configuration_: N/A
 _Description_: Using Boolean literals (`true`, `false`) in logic expressions may make the code less readable.
 This rule suggests removing Boolean literals from logic expressions.
 
-### Examples (bool-literal-in-expr)
+_Examples_:
 
 Before (violation):
 
@@ -284,7 +284,7 @@ _Configuration_: N/A
 
 _Description_: Function or methods that return multiple, no named, values of the same type could induce error.
 
-### Examples (confusing-results)
+_Examples_:
 
 Before (violation):
 
@@ -1680,7 +1680,7 @@ _Description_: Since Go 1.25, it is possible to create gorutines with the method
 The method takes in charge the addition (`Add`) and removal (`Done`) of tasks in the waitgroup.
 When rewriting legacy code to use the new method, it is possible to accidentally keep the call `waitgroup.Done()` resulting in issues or even panics.
 
-## Example (waitgroup-done-in-waitgroup-do)
+_Example_:
 
 Legacy code:
 
