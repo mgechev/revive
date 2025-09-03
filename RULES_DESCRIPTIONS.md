@@ -183,7 +183,7 @@ _Configuration_: N/A
 _Description_: Using Boolean literals (`true`, `false`) in logic expressions may make the code less readable.
 This rule suggests removing Boolean literals from logic expressions.
 
-### Examples
+### Examples (bool-literal-in-expr)
 
 Before (violation):
 
@@ -283,7 +283,7 @@ _Configuration_: N/A
 
 _Description_: Function or methods that return multiple, no named, values of the same type could induce error.
 
-### Examples
+### Examples (confusing-naming)
 
 Before (violation):
 
