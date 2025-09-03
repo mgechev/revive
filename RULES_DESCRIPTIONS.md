@@ -101,6 +101,7 @@ List of all available rules.
 - [var-declaration](#var-declaration)
 - [var-naming](#var-naming)
 - [waitgroup-by-value](#waitgroup-by-value)
+- [waitgroup-done-in-waitgroup-do](#waitgroup-done-in-waitgroup-do)
 
 <!-- tocstop -->
 
@@ -1670,5 +1671,54 @@ arguments = [[], [], [{ extra-bad-package-names = ["helpers", "models"] }]]
 _Description_: Function parameters that are passed by value, are in fact a copy of the original argument.
 Passing a copy of a `sync.WaitGroup` is usually not what the developer wants to do.
 This rule warns when a `sync.WaitGroup` expected as a by-value parameter in a function or method.
+
+_Configuration_: N/A
+
+## waitgroup-done-in-waitgroup-do
+
+_Description_: Since Go 1.25, it is possible to create gorutines with the method `waitgroup.Go`.
+The method takes in charge the addition (`Add`) and removal (`Done`) of tasks in the waitgroup.
+When rewriting legacy code to use the new method, it is possible to accidentally keep the call `waitgroup.Done()` resulting in issues or even panics.
+
+## Example (waitgroup-done-in-waitgroup-do)
+
+Legacy code:
+
+```go
+wg := sync.WaitGroup{}
+
+wg.Add(1)
+go func() {
+  doSomething()
+  wg.Done()
+}()
+
+wg.Wait
+```
+
+Refactored, incorrect, code:
+
+```go
+wg := sync.WaitGroup{}
+
+wg.Go(func() {
+  doSomething()
+  wg.Done()
+})
+
+wg.Wait
+```
+
+Fixed code:
+
+```go
+wg := sync.WaitGroup{}
+
+wg.Go(func() {
+  doSomething()
+})
+
+wg.Wait
+```
 
 _Configuration_: N/A

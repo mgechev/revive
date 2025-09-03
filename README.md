@@ -605,6 +605,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`var-declaration`](./RULES_DESCRIPTIONS.md#var-declaration)     |  n/a   | Reduces redundancies around variable declaration.                |   yes    |  yes  |
 | [`var-naming`](./RULES_DESCRIPTIONS.md#var-naming)          |  allowlist & blocklist of initialisms   | Naming rules.                                                    |   yes    |  no   |
 | [`waitgroup-by-value`](./RULES_DESCRIPTIONS.md#waitgroup-by-value)  |  n/a   | Warns on functions taking sync.WaitGroup as a by-value parameter |    no    |  no   |
+| [`waitgroup-done-in-waitgroup-do`](./RULES_DESCRIPTIONS.md#waitgroup-done-in-waitgroup-do)  |  n/a   | Warns on wg.Done calls inside calls to wg.Do |    no    |  no   |
 
 ## Configurable rules
 
