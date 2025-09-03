@@ -284,7 +284,7 @@ _Configuration_: N/A
 
 _Description_: Function or methods that return multiple, no named, values of the same type could induce error.
 
-### Examples (confusing-naming)
+### Examples (confusing-results)
 
 Before (violation):
 
