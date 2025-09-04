@@ -82,7 +82,7 @@ func (w *lintWaitGroupDoneInWaitGroupGo) Visit(node ast.Node) ast.Visitor {
 		Confidence: 1,
 		Node:       wgDone,
 		Category:   lint.FailureCategoryErrors,
-		Failure:    "wg.Done not necessary when using wg.Go",
+		Failure:    "do not call wg.Done inside wg.Go",
 	})
 
 	return nil
