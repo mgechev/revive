@@ -94,6 +94,12 @@ type SpannerDuplicatedTags struct {
 	C int `spanner:"field_c"`
 }
 
+type TestDuplicatedCodecTags struct {
+	A int `codec:"field_a"`
+	B int `codec:"field_a"` // MATCH /duplicated tag name "field_a" in codec tag/
+	C int `codec:"field_c"`
+}
+
 // test case from
 // sigs.k8s.io/kustomize/api/types/helmchartargs.go
 
@@ -195,4 +201,10 @@ type SpannerUser struct {
 	Email     string    `spanner:"-"` // Valid: ignore field
 	CreatedAt time.Time `spanner:"created_at"`
 	UpdatedAt time.Time `spanner:"updated_at,unknown"` // MATCH /unknown option "unknown" in spanner tag/
+}
+
+type CodecStruct struct {
+	Name    string `codec:"name,omitempty"`
+	Ignored string `codec:"-"`
+	BadOpt  int    `codec:"id,unknown"` // MATCH /unknown option "unknown" in codec tag/
 }

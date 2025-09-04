@@ -23,6 +23,7 @@ type tagKey string
 const (
 	keyASN1         tagKey = "asn1"
 	keyBSON         tagKey = "bson"
+	keyCodec        tagKey = "codec"
 	keyDatastore    tagKey = "datastore"
 	keyDefault      tagKey = "default"
 	keyJSON         tagKey = "json"
@@ -43,6 +44,7 @@ type tagChecker func(checkCtx *checkContext, tag *structtag.Tag, fieldType ast.E
 var tagCheckers = map[tagKey]tagChecker{
 	keyASN1:         checkASN1Tag,
 	keyBSON:         checkBSONTag,
+	keyCodec:        checkCodecTag,
 	keyDatastore:    checkDatastoreTag,
 	keyDefault:      checkDefaultTag,
 	keyJSON:         checkJSONTag,
@@ -311,6 +313,21 @@ func checkBSONTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (messa
 		case "inline", "minsize", "omitempty":
 		default:
 			if checkCtx.isUserDefined(keyBSON, opt) {
+				continue
+			}
+			return fmt.Sprintf(msgUnknownOption, opt), false
+		}
+	}
+
+	return "", true
+}
+
+func checkCodecTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
+	for _, opt := range tag.Options {
+		switch opt {
+		case "omitempty", "toarray", "int", "uint", "float", "-":
+		default:
+			if checkCtx.isUserDefined(keyCodec, opt) {
 				continue
 			}
 			return fmt.Sprintf(msgUnknownOption, opt), false
