@@ -42,6 +42,7 @@ List of all available rules.
 - [file-length-limit](#file-length-limit)
 - [filename-format](#filename-format)
 - [flag-parameter](#flag-parameter)
+- [forbidden-call-in-wg-go](#forbidden-call-in-wg-go)
 - [function-length](#function-length)
 - [function-result-limit](#function-result-limit)
 - [get-return](#get-return)
@@ -283,7 +284,7 @@ _Configuration_: N/A
 
 _Description_: Function or methods that return multiple, no named, values of the same type could induce error.
 
-### Examples (confusing-naming)
+### Examples (confusing-results)
 
 Before (violation):
 
@@ -744,6 +745,61 @@ arguments = ["^[_a-z][_a-z0-9]*\\.go$"]
 _Description_: If a function controls the flow of another by passing it information on what to do, both functions are said to be [control-coupled](https://en.wikipedia.org/wiki/Coupling_(computer_programming)#Procedural_programming).
 Coupling among functions must be minimized for better maintainability of the code.
 This rule warns on boolean parameters that create a control coupling.
+
+_Configuration_: N/A
+
+## forbidden-call-in-wg-go
+
+_Description_: Since Go 1.25, it is possible to create goroutines with the method `waitgroup.Go`.
+The `Go` method calls a function in a new goroutine and adds (`Add`) that task to the WaitGroup.
+When the function returns, the task is removed (`Done`) from the WaitGroup.
+
+This rule ensures that functions don't panic as is specified
+in the [documentation of `WaitGroup.Go`](https://pkg.go.dev/sync#WaitGroup.Go).
+
+The rule also warns against a common mistake when refactoring legacy code:
+accidentally leaving behind a call to `WaitGroup.Done`, which can cause subtle bugs or panics.
+
+### Examples (forbidden-call-in-wg-go)
+
+Legacy code with a call to `wg.Done`:
+
+```go
+wg := sync.WaitGroup{}
+
+wg.Add(1)
+go func() {
+  doSomething()
+  wg.Done()
+}()
+
+wg.Wait
+```
+
+Refactored, incorrect, code:
+
+```go
+wg := sync.WaitGroup{}
+
+wg.Go(func() {
+  doSomething()
+  wg.Done()
+})
+
+wg.Wait
+```
+
+Fixed code:
+
+```go
+wg := sync.WaitGroup{}
+
+wg.Go(func() {
+  doSomething()
+})
+
+wg.Wait
+```
 
 _Configuration_: N/A
 
