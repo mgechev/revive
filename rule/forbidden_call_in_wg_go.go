@@ -3,6 +3,7 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"strings"
 
 	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
@@ -73,41 +74,40 @@ func (w *lintForbiddenCallInWgGo) Visit(node ast.Node) ast.Visitor {
 		return nil // the argument is not a function literal
 	}
 
-	// search a wg.Done or panic in the body of the function literal
-	wgDoneOrPanic := astutils.SeekNode[*ast.CallExpr](funcLit.Body, w.wgDoneOrPanicPicker)
-	if wgDoneOrPanic == nil {
-		return nil // there is no a call to wg.Done or panic in the call to wg.Go
+	var callee string
+
+	forbiddenCallPicker := func(n ast.Node) bool {
+		call, ok := n.(*ast.CallExpr)
+		if !ok {
+			return false
+		}
+
+		if astutils.IsPkgDotName(call.Fun, "wg", "Done") ||
+			astutils.IsIdent(call.Fun, "panic") ||
+			astutils.IsPkgDotName(call.Fun, "log", "Panic") ||
+			astutils.IsPkgDotName(call.Fun, "log", "Panicf") ||
+			astutils.IsPkgDotName(call.Fun, "log", "Panicln") {
+			callee = astutils.GoFmt(n)
+			callee, _, _ = strings.Cut(callee, "(")
+			return true
+		}
+
+		return false
 	}
 
-	msg := fmt.Sprintf("do not call %s inside wg.Go", w.getCallee(wgDoneOrPanic))
+	// search a forbidden call in the body of the function literal
+	forbiddenCall := astutils.SeekNode[*ast.CallExpr](funcLit.Body, forbiddenCallPicker)
+	if forbiddenCall == nil {
+		return nil // there is no forbidden call in the call to wg.Go
+	}
+
+	msg := fmt.Sprintf("do not call %s inside wg.Go", callee)
 	w.onFailure(lint.Failure{
 		Confidence: 1,
-		Node:       wgDoneOrPanic,
+		Node:       forbiddenCall,
 		Category:   lint.FailureCategoryErrors,
 		Failure:    msg,
 	})
 
 	return nil
-}
-
-// getCallee yields the name of the callee of the given call expression.
-// Hypothesis: the call expression is either a call to panic or a call to wg.Done.
-func (*lintForbiddenCallInWgGo) getCallee(callToWgDoneOrPanic *ast.CallExpr) string {
-	_, ok := callToWgDoneOrPanic.Fun.(*ast.Ident)
-	if !ok {
-		return "wg.Done"
-	}
-
-	return "panic"
-}
-
-// function used when calling astutils.SeekNode that search for calls to wg.Done.
-func (*lintForbiddenCallInWgGo) wgDoneOrPanicPicker(n ast.Node) bool {
-	call, ok := n.(*ast.CallExpr)
-	if !ok {
-		return false
-	}
-
-	return astutils.IsIdent(call.Fun, "panic") ||
-		astutils.IsPkgDotName(call.Fun, "wg", "Done")
 }
