@@ -760,7 +760,7 @@ in the [documentation of `WaitGroup.Go`](https://pkg.go.dev/sync#WaitGroup.Go).
 The rule also warns against a common mistake when refactoring legacy code:
 accidentally leaving behind a call to `WaitGroup.Done`, which can cause subtle bugs or panics.
 
-### Examples (forbidden-call-in-wg-go):
+### Examples (forbidden-call-in-wg-go)
 
 Legacy code with a call to `wg.Done`:
 
