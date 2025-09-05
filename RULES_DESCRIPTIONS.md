@@ -750,7 +750,7 @@ _Configuration_: N/A
 
 ## forbidden-call-in-wg-go
 
-_Description_: Since Go 1.25, it is possible to create gorutines with the method `waitgroup.Go`.
+_Description_: Since Go 1.25, it is possible to create goroutines with the method `waitgroup.Go`.
 The `Go` method calls a function in a new goroutine and adds (`Add`) that task to the WaitGroup.
 When the function returns, the task is removed (`Done`) from the WaitGroup.
 
