@@ -755,7 +755,7 @@ The `Go` method calls a function in a new goroutine and adds (`Add`) that task t
 When the function returns, the task is removed (`Done`) from the WaitGroup.  
 
 This rule ensures that functions do not use `panic` as is specified 
-in the [documentation of `WaitGroup.Do`](https://pkg.go.dev/sync#WaitGroup.Go).
+in the [documentation of `WaitGroup.Go`](https://pkg.go.dev/sync#WaitGroup.Go).
 
 The rule also warns against a common mistake when refactoring legacy code: 
 accidentally leaving behind a call to `WaitGroup.Done`, which can cause subtle bugs or panics.

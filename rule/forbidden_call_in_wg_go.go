@@ -76,7 +76,7 @@ func (w *lintForbiddenCallInWgGo) Visit(node ast.Node) ast.Visitor {
 	// search a wg.Done or panic in the body of the function literal
 	wgDoneOrPanic := astutils.SeekNode[*ast.CallExpr](funcLit.Body, w.wgDoneOrPanicPicker)
 	if wgDoneOrPanic == nil {
-		return nil // there is no a call to wg.Done or panic in the call to wg.Do
+		return nil // there is no a call to wg.Done or panic in the call to wg.Go
 	}
 
 	msg := fmt.Sprintf("do not call %s inside wg.Go", w.getCallee(wgDoneOrPanic))
