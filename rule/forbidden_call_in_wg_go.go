@@ -92,7 +92,7 @@ func (w *lintForbiddenCallInWgGo) Visit(node ast.Node) ast.Visitor {
 
 // getCallee yields the name of the callee of the given call expression.
 // Hypothesis: the call expression is either a call to panic or a call to wg.Done.
-func (w *lintForbiddenCallInWgGo) getCallee(callToWgDoneOrPanic *ast.CallExpr) string {
+func (*lintForbiddenCallInWgGo) getCallee(callToWgDoneOrPanic *ast.CallExpr) string {
 	_, ok := callToWgDoneOrPanic.Fun.(*ast.Ident)
 	if !ok {
 		return "wg.Done"
