@@ -346,10 +346,8 @@ func checkCodecTag(checkCtx *checkContext, tag *structtag.Tag, fieldType ast.Exp
 	for _, opt := range tag.Options {
 		if mustAddToCommonOptions {
 			checkCtx.addCommonOption(opt)
-		} else {
-			if checkCtx.isCommonOption(opt) {
-				return fmt.Sprintf("redundant option %q, already set for all fields", opt), false
-			}
+		} else if checkCtx.isCommonOption(opt) {
+			return fmt.Sprintf("redundant option %q, already set for all fields", opt), false
 		}
 
 		switch opt {
