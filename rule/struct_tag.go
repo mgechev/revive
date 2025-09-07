@@ -370,7 +370,7 @@ func checkBSONTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ 
 	return "", true
 }
 
-func checkCodecTag(checkCtx *checkContext, tag *structtag.Tag, fieldNames []*ast.Ident, fieldType ast.Expr) (message string, succeeded bool) {
+func checkCodecTag(checkCtx *checkContext, tag *structtag.Tag, fieldNames []*ast.Ident, _ ast.Expr) (message string, succeeded bool) {
 	mustAddToCommonOptions := len(fieldNames) == 1 && fieldNames[0].Name == "_struct" // see https://github.com/mgechev/revive/issues/1477#issuecomment-3191493076
 	for _, opt := range tag.Options {
 		if mustAddToCommonOptions {
