@@ -198,8 +198,8 @@ type SpannerUser struct {
 }
 
 type Codec struct {
-	_struct    struct{} `codec:",omitempty,int"` // do not match, _struct has special meaning for codec tag
 	_something struct{} `codec:",omitempty,int"` // MATCH /tag on not-exported field _something/
+	_struct    struct{} `codec:",omitempty,int"` // do not match, _struct has special meaning for codec tag
 	Field1     string   `codec:"-"`
 	Field2     int      `codec:"myName"`
 	Field3     int32    `codec:",omitempty"` // MATCH /redundant option "omitempty", already set for all fields in codec tag/
