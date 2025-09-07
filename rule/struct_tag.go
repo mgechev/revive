@@ -64,6 +64,7 @@ type checkContext struct {
 	userDefined    map[tagKey][]string // map: key -> []option
 	usedTagNbr     map[int]bool        // list of used tag numbers
 	usedTagName    map[string]bool     // list of used tag keys
+	commonOptions  map[string]bool     // list of options defined for all fields
 	isAtLeastGo124 bool
 }
 
@@ -74,6 +75,23 @@ func (checkCtx checkContext) isUserDefined(key tagKey, opt string) bool {
 
 	options := checkCtx.userDefined[key]
 	return slices.Contains(options, opt)
+}
+
+func (checkCtx *checkContext) isCommonOption(opt string) bool {
+	if checkCtx.commonOptions == nil {
+		return false
+	}
+
+	_, ok := checkCtx.commonOptions[opt]
+	return ok
+}
+
+func (checkCtx *checkContext) addCommonOption(opt string) {
+	if checkCtx.commonOptions == nil {
+		checkCtx.commonOptions = map[string]bool{}
+	}
+
+	checkCtx.commonOptions[opt] = true
 }
 
 // Configure validates the rule configuration, and configures the rule accordingly.
@@ -167,7 +185,8 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 // checkTaggedField checks the tag of the given field.
 // precondition: the field has a tag
 func (w lintStructTagRule) checkTaggedField(checkCtx *checkContext, f *ast.Field) {
-	if len(f.Names) > 0 && !f.Names[0].IsExported() {
+	//                                                 do not warn on fields prefixed by _ (used by some tags, like codec)
+	if len(f.Names) > 0 && !f.Names[0].IsExported() && !strings.HasPrefix(f.Names[0].Name, "_") {
 		w.addFailuref(f, "tag on not-exported field %s", f.Names[0].Name)
 	}
 
@@ -206,7 +225,7 @@ func (w lintStructTagRule) checkTagNameIfNeed(checkCtx *checkContext, tag *struc
 
 	key := tagKey(tag.Key)
 	switch key {
-	case keyBSON, keyJSON, keyXML, keyYAML, keyProtobuf, keySpanner:
+	case keyBSON, keyCodec, keyJSON, keyProtobuf, keySpanner, keyXML, keyYAML: // keys that need to check for duplicated tags
 	default:
 		return "", true
 	}
@@ -322,10 +341,19 @@ func checkBSONTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (messa
 	return "", true
 }
 
-func checkCodecTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
+func checkCodecTag(checkCtx *checkContext, tag *structtag.Tag, fieldType ast.Expr) (message string, succeeded bool) {
+	mustAddToCommonOptions := astutils.GoFmt(fieldType) == "struct{}" // see https://github.com/mgechev/revive/issues/1477#issuecomment-3191493076
 	for _, opt := range tag.Options {
+		if mustAddToCommonOptions {
+			checkCtx.addCommonOption(opt)
+		} else {
+			if checkCtx.isCommonOption(opt) {
+				return fmt.Sprintf("redundant option %q, already set for all fields", opt), false
+			}
+		}
+
 		switch opt {
-		case "omitempty", "toarray", "int", "uint", "float", "-":
+		case "omitempty", "toarray", "int", "uint", "float", "-", "omitemptyarray":
 		default:
 			if checkCtx.isUserDefined(keyCodec, opt) {
 				continue

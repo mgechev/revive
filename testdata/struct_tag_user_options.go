@@ -55,11 +55,6 @@ type SpannerUserOptions struct {
 	Name string `spanner:"full_name,unknownOption"` // MATCH /unknown option "unknownOption" in spanner tag/
 }
 
-type CodecUserOptions struct {
-	ID   int    `codec:"user_id,myCodecOption"`
-	Name string `codec:"full_name,unknownOption"` // MATCH /unknown option "unknownOption" in codec tag/
-}
-
 type uselessOptions struct {
 	A  int       `bson:"-,"`
 	B  int       `bson:"-,omitempty"`           // MATCH /useless option omitempty for ignored field in bson tag/
@@ -101,4 +96,9 @@ type uselessOptions struct {
 	// MATCH:80 /unknown option "" in url tag/
 	// MATCH:83 /unknown option "" in xml tag/
 	// MATCH:86 /unknown option "" in yaml tag/
+}
+
+type CodecUserOptions struct {
+	ID   int    `codec:"user_id,myCodecOption"`
+	Name string `codec:"full_name,unknownOption"` // MATCH /unknown option "unknownOption" in codec tag/
 }
