@@ -98,12 +98,13 @@ func (r *StructTagRule) Configure(arguments lint.Arguments) error {
 
 		parts := strings.Split(item, ",")
 		keyStr := strings.TrimSpace(parts[0])
-		if strings.HasPrefix(keyStr, "!") {
-			r.omittedTags[tagKey(strings.TrimLeft(keyStr, "!"))] = struct{}{}
+		keyStr, isOmitted := strings.CutPrefix(keyStr, "!")
+		key := tagKey(keyStr)
+		if isOmitted {
+			r.omittedTags[key] = struct{}{}
 			continue
 		}
 
-		key := tagKey(keyStr)
 		for i := 1; i < len(parts); i++ {
 			option := strings.TrimSpace(parts[i])
 			r.userDefined[key] = append(r.userDefined[key], option)
