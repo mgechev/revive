@@ -185,17 +185,13 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 // checkTaggedField checks the tag of the given field.
 // precondition: the field has a tag
 func (w lintStructTagRule) checkTaggedField(checkCtx *checkContext, f *ast.Field) {
-	//                                                 do not warn on fields prefixed by _ (used by some tags, like codec)
-	if len(f.Names) > 0 && !f.Names[0].IsExported() && !strings.HasPrefix(f.Names[0].Name, "_") {
-		w.addFailuref(f, "tag on not-exported field %s", f.Names[0].Name)
-	}
-
 	tags, err := structtag.Parse(strings.Trim(f.Tag.Value, "`"))
 	if err != nil || tags == nil {
 		w.addFailuref(f.Tag, "malformed tag")
 		return
 	}
 
+	analyzedTags := map[tagKey]struct{}{}
 	for _, tag := range tags.Tags() {
 		if msg, ok := w.checkTagNameIfNeed(checkCtx, tag); !ok {
 			w.addFailureWithTagKey(f.Tag, msg, tag.Key)
@@ -205,7 +201,8 @@ func (w lintStructTagRule) checkTaggedField(checkCtx *checkContext, f *ast.Field
 			w.addFailureWithTagKey(f.Tag, msg, tag.Key)
 		}
 
-		checker, ok := w.tagCheckers[tagKey(tag.Key)]
+		tagKey := tagKey(tag.Key)
+		checker, ok := w.tagCheckers[tagKey]
 		if !ok {
 			continue // we don't have a checker for the tag
 		}
@@ -214,7 +211,39 @@ func (w lintStructTagRule) checkTaggedField(checkCtx *checkContext, f *ast.Field
 		if !ok {
 			w.addFailureWithTagKey(f.Tag, msg, tag.Key)
 		}
+
+		analyzedTags[tagKey] = struct{}{}
 	}
+
+	if w.shallWarnOnUnexportedField(f.Names, analyzedTags) {
+		w.addFailuref(f, "tag on not-exported field %s", f.Names[0].Name)
+	}
+}
+
+// tagKeyToSpecialField maps tag keys to their "special" meaning struct fields.
+var tagKeyToSpecialField = map[tagKey]string{
+	"codec": "_struct",
+}
+
+func (lintStructTagRule) shallWarnOnUnexportedField(fieldNames []*ast.Ident, tags map[tagKey]struct{}) bool {
+	if len(fieldNames) != 1 { // impossible for a struct field declaration
+		return false
+	}
+
+	if fieldNames[0].IsExported() {
+		return false
+	}
+
+	fieldName := fieldNames[0].Name
+
+	for tagKey := range tags {
+		specialField, ok := tagKeyToSpecialField[tagKey]
+		if ok && specialField == fieldName {
+			return false
+		}
+	}
+
+	return true
 }
 
 func (w lintStructTagRule) checkTagNameIfNeed(checkCtx *checkContext, tag *structtag.Tag) (message string, succeeded bool) {
