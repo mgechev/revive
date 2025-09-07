@@ -16,6 +16,7 @@ import (
 // StructTagRule lints struct tags.
 type StructTagRule struct {
 	userDefined map[tagKey][]string // map: key -> []option
+	omittedTags map[tagKey]struct{} // set of tags that must not be analyzed
 }
 
 type tagKey string
@@ -87,17 +88,22 @@ func (r *StructTagRule) Configure(arguments lint.Arguments) error {
 		return err
 	}
 
-	r.userDefined = make(map[tagKey][]string, len(arguments))
+	r.userDefined = map[tagKey][]string{}
+	r.omittedTags = map[tagKey]struct{}{}
 	for _, arg := range arguments {
 		item, ok := arg.(string)
 		if !ok {
 			return fmt.Errorf("invalid argument to the %s rule. Expecting a string, got %v (of type %T)", r.Name(), arg, arg)
 		}
+
 		parts := strings.Split(item, ",")
-		if len(parts) < 2 {
-			return fmt.Errorf("invalid argument to the %s rule. Expecting a string of the form key[,option]+, got %s", r.Name(), item)
+		keyStr := strings.TrimSpace(parts[0])
+		if strings.HasPrefix(keyStr, "!") {
+			r.omittedTags[tagKey(strings.TrimLeft(keyStr, "!"))] = struct{}{}
+			continue
 		}
-		key := tagKey(strings.TrimSpace(parts[0]))
+
+		key := tagKey(keyStr)
 		for i := 1; i < len(parts); i++ {
 			option := strings.TrimSpace(parts[i])
 			r.userDefined[key] = append(r.userDefined[key], option)
@@ -117,6 +123,7 @@ func (r *StructTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 	w := lintStructTagRule{
 		onFailure:      onFailure,
 		userDefined:    r.userDefined,
+		omittedTags:    r.omittedTags,
 		isAtLeastGo124: file.Pkg.IsAtLeastGoVersion(lint.Go124),
 		tagCheckers:    tagCheckers,
 	}
@@ -134,6 +141,7 @@ func (*StructTagRule) Name() string {
 type lintStructTagRule struct {
 	onFailure      func(lint.Failure)
 	userDefined    map[tagKey][]string // map: key -> []option
+	omittedTags    map[tagKey]struct{}
 	isAtLeastGo124 bool
 	tagCheckers    map[tagKey]tagChecker
 }
@@ -176,6 +184,11 @@ func (w lintStructTagRule) checkTaggedField(checkCtx *checkContext, f *ast.Field
 	}
 
 	for _, tag := range tags.Tags() {
+		_, mustOmit := w.omittedTags[tagKey(tag.Key)]
+		if mustOmit {
+			continue
+		}
+
 		if msg, ok := w.checkTagNameIfNeed(checkCtx, tag); !ok {
 			w.addFailureWithTagKey(f.Tag, msg, tag.Key)
 		}
