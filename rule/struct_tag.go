@@ -39,7 +39,7 @@ const (
 	keyYAML         tagKey = "yaml"
 )
 
-type tagChecker func(checkCtx *checkContext, tag *structtag.Tag, fields []*ast.Ident, fieldType ast.Expr) (message string, succeeded bool)
+type tagChecker func(checkCtx *checkContext, tag *structtag.Tag, field *ast.Field) (message string, succeeded bool)
 
 var tagCheckers = map[tagKey]tagChecker{
 	keyASN1:         checkASN1Tag,
@@ -184,45 +184,45 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 
 // checkTaggedField checks the tag of the given field.
 // precondition: the field has a tag
-func (w lintStructTagRule) checkTaggedField(checkCtx *checkContext, f *ast.Field) {
-	tags, err := structtag.Parse(strings.Trim(f.Tag.Value, "`"))
+func (w lintStructTagRule) checkTaggedField(checkCtx *checkContext, field *ast.Field) {
+	tags, err := structtag.Parse(strings.Trim(field.Tag.Value, "`"))
 	if err != nil || tags == nil {
-		w.addFailuref(f.Tag, "malformed tag")
+		w.addFailuref(field.Tag, "malformed tag")
 		return
 	}
 
 	analyzedTags := map[tagKey]struct{}{}
 	for _, tag := range tags.Tags() {
 		if msg, ok := w.checkTagNameIfNeed(checkCtx, tag); !ok {
-			w.addFailureWithTagKey(f.Tag, msg, tag.Key)
+			w.addFailureWithTagKey(field.Tag, msg, tag.Key)
 		}
 
 		if msg, ok := checkOptionsOnIgnoredField(tag); !ok {
-			w.addFailureWithTagKey(f.Tag, msg, tag.Key)
+			w.addFailureWithTagKey(field.Tag, msg, tag.Key)
 		}
 
-		tagKey := tagKey(tag.Key)
-		checker, ok := w.tagCheckers[tagKey]
+		key := tagKey(tag.Key)
+		checker, ok := w.tagCheckers[key]
 		if !ok {
 			continue // we don't have a checker for the tag
 		}
 
-		msg, ok := checker(checkCtx, tag, f.Names, f.Type)
+		msg, ok := checker(checkCtx, tag, field)
 		if !ok {
-			w.addFailureWithTagKey(f.Tag, msg, tag.Key)
+			w.addFailureWithTagKey(field.Tag, msg, tag.Key)
 		}
 
-		analyzedTags[tagKey] = struct{}{}
+		analyzedTags[key] = struct{}{}
 	}
 
-	if w.shallWarnOnUnexportedField(f.Names, analyzedTags) {
-		w.addFailuref(f, "tag on not-exported field %s", f.Names[0].Name)
+	if w.shallWarnOnUnexportedField(field.Names, analyzedTags) {
+		w.addFailuref(field, "tag on not-exported field %s", field.Names[0].Name)
 	}
 }
 
 // tagKeyToSpecialField maps tag keys to their "special" meaning struct fields.
 var tagKeyToSpecialField = map[tagKey]string{
-	"codec": "_struct",
+	"codec": structTagCodecSpecialField,
 }
 
 func (lintStructTagRule) shallWarnOnUnexportedField(fieldNames []*ast.Ident, tags map[tagKey]struct{}) bool {
@@ -236,8 +236,8 @@ func (lintStructTagRule) shallWarnOnUnexportedField(fieldNames []*ast.Ident, tag
 
 	fieldNameStr := fieldNames[0].Name
 
-	for tagKey := range tags {
-		specialField, ok := tagKeyToSpecialField[tagKey]
+	for key := range tags {
+		specialField, ok := tagKeyToSpecialField[key]
 		if ok && specialField == fieldNameStr {
 			return false
 		}
@@ -291,7 +291,8 @@ func (lintStructTagRule) getTagName(tag *structtag.Tag) string {
 	}
 }
 
-func checkASN1Tag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident, fieldType ast.Expr) (message string, succeeded bool) {
+func checkASN1Tag(checkCtx *checkContext, tag *structtag.Tag, field *ast.Field) (message string, succeeded bool) {
+	fieldType := field.Type
 	checkList := slices.Concat(tag.Options, []string{tag.Name})
 	for _, opt := range checkList {
 		switch opt {
@@ -332,7 +333,7 @@ func checkCompoundANS1Option(checkCtx *checkContext, opt string, fieldType ast.E
 	return "", true
 }
 
-func checkDatastoreTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ ast.Expr) (message string, succeeded bool) {
+func checkDatastoreTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "flatten", "noindex", "omitempty":
@@ -347,15 +348,15 @@ func checkDatastoreTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Iden
 	return "", true
 }
 
-func checkDefaultTag(_ *checkContext, tag *structtag.Tag, _ []*ast.Ident, fieldType ast.Expr) (message string, succeeded bool) {
-	if !typeValueMatch(fieldType, tag.Name) {
+func checkDefaultTag(_ *checkContext, tag *structtag.Tag, field *ast.Field) (message string, succeeded bool) {
+	if !typeValueMatch(field.Type, tag.Name) {
 		return msgTypeMismatch, false
 	}
 
 	return "", true
 }
 
-func checkBSONTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ ast.Expr) (message string, succeeded bool) {
+func checkBSONTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "inline", "minsize", "omitempty":
@@ -370,8 +371,11 @@ func checkBSONTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ 
 	return "", true
 }
 
-func checkCodecTag(checkCtx *checkContext, tag *structtag.Tag, fieldNames []*ast.Ident, _ ast.Expr) (message string, succeeded bool) {
-	mustAddToCommonOptions := len(fieldNames) == 1 && fieldNames[0].Name == "_struct" // see https://github.com/mgechev/revive/issues/1477#issuecomment-3191493076
+const structTagCodecSpecialField = "_struct"
+
+func checkCodecTag(checkCtx *checkContext, tag *structtag.Tag, field *ast.Field) (message string, succeeded bool) {
+	fieldNames := field.Names
+	mustAddToCommonOptions := len(fieldNames) == 1 && fieldNames[0].Name == structTagCodecSpecialField // see https://github.com/mgechev/revive/issues/1477#issuecomment-3191493076
 	for _, opt := range tag.Options {
 		if mustAddToCommonOptions {
 			checkCtx.addCommonOption(opt)
@@ -392,7 +396,7 @@ func checkCodecTag(checkCtx *checkContext, tag *structtag.Tag, fieldNames []*ast
 	return "", true
 }
 
-func checkJSONTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ ast.Expr) (message string, succeeded bool) {
+func checkJSONTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "omitempty", "string":
@@ -417,7 +421,7 @@ func checkJSONTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ 
 	return "", true
 }
 
-func checkMapstructureTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ ast.Expr) (message string, succeeded bool) {
+func checkMapstructureTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "omitempty", "reminder", "squash":
@@ -432,13 +436,14 @@ func checkMapstructureTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.I
 	return "", true
 }
 
-func checkPropertiesTag(_ *checkContext, tag *structtag.Tag, _ []*ast.Ident, fieldType ast.Expr) (message string, succeeded bool) {
+func checkPropertiesTag(_ *checkContext, tag *structtag.Tag, field *ast.Field) (message string, succeeded bool) {
 	options := tag.Options
 	if len(options) == 0 {
 		return "", true
 	}
 
 	seenOptions := map[string]bool{}
+	fieldType := field.Type
 	for _, opt := range options {
 		msg, ok := fmt.Sprintf("unknown or malformed option %q", opt), false
 		if key, value, found := strings.Cut(opt, "="); found {
@@ -477,7 +482,7 @@ func checkCompoundPropertiesOption(key, value string, fieldType ast.Expr, seenOp
 	return "", true
 }
 
-func checkProtobufTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ ast.Expr) (message string, succeeded bool) {
+func checkProtobufTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	// check name
 	switch tag.Name {
 	case "bytes", "fixed32", "fixed64", "group", "varint", "zigzag32", "zigzag64":
@@ -530,7 +535,7 @@ func checkProtobufOptions(checkCtx *checkContext, options []string) (message str
 	return "", true
 }
 
-func checkRequiredTag(_ *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ ast.Expr) (message string, succeeded bool) {
+func checkRequiredTag(_ *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	switch tag.Name {
 	case "true", "false":
 		return "", true
@@ -539,7 +544,7 @@ func checkRequiredTag(_ *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ ast
 	}
 }
 
-func checkTOMLTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ ast.Expr) (message string, succeeded bool) {
+func checkTOMLTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "omitempty":
@@ -554,7 +559,7 @@ func checkTOMLTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ 
 	return "", true
 }
 
-func checkURLTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ ast.Expr) (message string, succeeded bool) {
+func checkURLTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	var delimiter = ""
 	for _, opt := range tag.Options {
 		switch opt {
@@ -577,7 +582,7 @@ func checkURLTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ a
 	return "", true
 }
 
-func checkValidateTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ ast.Expr) (message string, succeeded bool) {
+func checkValidateTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	previousOption := ""
 	seenKeysOption := false
 	options := append([]string{tag.Name}, tag.Options...)
@@ -606,7 +611,7 @@ func checkValidateTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident
 	return "", true
 }
 
-func checkXMLTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ ast.Expr) (message string, succeeded bool) {
+func checkXMLTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "any", "attr", "cdata", "chardata", "comment", "innerxml", "omitempty", "typeattr":
@@ -621,7 +626,7 @@ func checkXMLTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ a
 	return "", true
 }
 
-func checkYAMLTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ ast.Expr) (message string, succeeded bool) {
+func checkYAMLTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "flow", "inline", "omitempty":
@@ -636,7 +641,7 @@ func checkYAMLTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ 
 	return "", true
 }
 
-func checkSpannerTag(checkCtx *checkContext, tag *structtag.Tag, _ []*ast.Ident, _ ast.Expr) (message string, succeeded bool) {
+func checkSpannerTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	for _, opt := range tag.Options {
 		if !checkCtx.isUserDefined(keySpanner, opt) {
 			return fmt.Sprintf(msgUnknownOption, opt), false
