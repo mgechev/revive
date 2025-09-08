@@ -97,3 +97,8 @@ type uselessOptions struct {
 	// MATCH:83 /unknown option "" in xml tag/
 	// MATCH:86 /unknown option "" in yaml tag/
 }
+
+type CodecUserOptions struct {
+	ID   int    `codec:"user_id,myCodecOption"`
+	Name string `codec:"full_name,unknownOption"` // MATCH /unknown option "unknownOption" in codec tag/
+}

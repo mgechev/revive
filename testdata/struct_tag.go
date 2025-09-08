@@ -196,3 +196,21 @@ type SpannerUser struct {
 	CreatedAt time.Time `spanner:"created_at"`
 	UpdatedAt time.Time `spanner:"updated_at,unknown"` // MATCH /unknown option "unknown" in spanner tag/
 }
+
+type Codec struct {
+	_something struct{} `codec:",omitempty,int"` // MATCH /tag on not-exported field _something/
+	_struct    struct{} `codec:",omitempty,int"` // do not match, _struct has special meaning for codec tag
+	Field1     string   `codec:"-"`
+	Field2     int      `codec:"myName"`
+	Field3     int32    `codec:",omitempty"` // MATCH /redundant option "omitempty", already set for all fields in codec tag/
+	Field4     bool     `codec:"f4,int"`     // MATCH /redundant option "int", already set for all fields in codec tag/
+	field5     bool     // unexported, so skipped
+	Anon
+}
+
+type TestDuplicatedCodecTags struct {
+	_struct struct{} `json:",omitempty"` // MATCH /tag on not-exported field _struct/
+	A       int      `codec:"field_a"`
+	B       int      `codec:"field_a"` // MATCH /duplicated tag name "field_a" in codec tag/
+	C       int      `codec:"field_c"`
+}

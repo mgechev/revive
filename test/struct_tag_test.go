@@ -22,6 +22,7 @@ func TestStructTagWithUserOptions(t *testing.T) {
 			"validate,displayName",
 			"toml,unknown",
 			"spanner,mySpannerOption",
+			"codec,myCodecOption",
 		},
 	})
 }
