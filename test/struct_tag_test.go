@@ -27,6 +27,20 @@ func TestStructTagWithUserOptions(t *testing.T) {
 	})
 }
 
+func TestStructTagWithOmittedTags(t *testing.T) {
+	testRule(t, "struct_tag_user_options_omit", &rule.StructTagRule{}, &lint.RuleConfig{
+		Arguments: []any{
+			map[string]any{"skip-tags": []any{"validate", "toml"}},
+			"json,inline,outline",
+			"bson,gnu",
+			"url,myURLOption",
+			"datastore,myDatastoreOption",
+			"mapstructure,myMapstructureOption",
+			"spanner,mySpannerOption",
+		},
+	})
+}
+
 func TestStructTagAfterGo1_24(t *testing.T) {
 	testRule(t, "go1.24/struct_tag", &rule.StructTagRule{})
 }

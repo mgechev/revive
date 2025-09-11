@@ -16,6 +16,7 @@ import (
 // StructTagRule lints struct tags.
 type StructTagRule struct {
 	userDefined map[tagKey][]string // map: key -> []option
+	omittedTags map[tagKey]struct{} // set of tags that must not be analyzed
 }
 
 type tagKey string
@@ -107,20 +108,41 @@ func (r *StructTagRule) Configure(arguments lint.Arguments) error {
 		return err
 	}
 
-	r.userDefined = make(map[tagKey][]string, len(arguments))
-	for _, arg := range arguments {
-		item, ok := arg.(string)
-		if !ok {
+	r.userDefined = map[tagKey][]string{}
+	r.omittedTags = map[tagKey]struct{}{}
+	for _, argument := range arguments {
+		switch arg := argument.(type) {
+		case string:
+			parts := strings.Split(arg, ",")
+			keyStr := strings.TrimSpace(parts[0])
+			key := tagKey(keyStr)
+
+			for i := 1; i < len(parts); i++ {
+				option := strings.TrimSpace(parts[i])
+				r.userDefined[key] = append(r.userDefined[key], option)
+			}
+		case map[string]any:
+			for key, value := range arg {
+				if key != "skip-tags" {
+					return fmt.Errorf("invalid argument to the %s rule. Expecting skip-tag, got %v", r.Name(), key)
+				}
+
+				skipList, ok := value.([]any)
+				if !ok {
+					return fmt.Errorf("invalid argument to the %s rule. Expecting a list of tag names ([]string), got %v (of type %T)", r.Name(), value, value)
+				}
+
+				for _, item := range skipList {
+					tagName, ok := item.(string)
+					if !ok {
+						return fmt.Errorf("invalid argument to the %s rule. Expecting a tag name (string), got %v (of type %T)", r.Name(), item, item)
+					}
+					keyStr := strings.TrimSpace(tagName)
+					r.omittedTags[tagKey(keyStr)] = struct{}{}
+				}
+			}
+		default:
 			return fmt.Errorf("invalid argument to the %s rule. Expecting a string, got %v (of type %T)", r.Name(), arg, arg)
-		}
-		parts := strings.Split(item, ",")
-		if len(parts) < 2 {
-			return fmt.Errorf("invalid argument to the %s rule. Expecting a string of the form key[,option]+, got %s", r.Name(), item)
-		}
-		key := tagKey(strings.TrimSpace(parts[0]))
-		for i := 1; i < len(parts); i++ {
-			option := strings.TrimSpace(parts[i])
-			r.userDefined[key] = append(r.userDefined[key], option)
 		}
 	}
 
@@ -137,6 +159,7 @@ func (r *StructTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 	w := lintStructTagRule{
 		onFailure:      onFailure,
 		userDefined:    r.userDefined,
+		omittedTags:    r.omittedTags,
 		isAtLeastGo124: file.Pkg.IsAtLeastGoVersion(lint.Go124),
 		tagCheckers:    tagCheckers,
 	}
@@ -154,6 +177,7 @@ func (*StructTagRule) Name() string {
 type lintStructTagRule struct {
 	onFailure      func(lint.Failure)
 	userDefined    map[tagKey][]string // map: key -> []option
+	omittedTags    map[tagKey]struct{}
 	isAtLeastGo124 bool
 	tagCheckers    map[tagKey]tagChecker
 }
@@ -193,6 +217,11 @@ func (w lintStructTagRule) checkTaggedField(checkCtx *checkContext, field *ast.F
 
 	analyzedTags := map[tagKey]struct{}{}
 	for _, tag := range tags.Tags() {
+		_, mustOmit := w.omittedTags[tagKey(tag.Key)]
+		if mustOmit {
+			continue
+		}
+
 		if msg, ok := w.checkTagNameIfNeed(checkCtx, tag); !ok {
 			w.addFailureWithTagKey(field.Tag, msg, tag.Key)
 		}
