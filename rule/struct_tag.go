@@ -124,7 +124,6 @@ func (r *StructTagRule) Configure(arguments lint.Arguments) error {
 		default:
 			return fmt.Errorf("invalid argument to the %s rule. Expecting a string, got %v (of type %T)", r.Name(), arg, arg)
 		}
-
 	}
 
 	return nil
