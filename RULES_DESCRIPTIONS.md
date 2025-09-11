@@ -1324,7 +1324,7 @@ you can provide the following configuration:
 
 ```toml
 [rule.struct-tag]
-arguments = [{skip-tags=["validate"]}, "bson,outline,gnu"]
+arguments = [{ skip-tags = ["validate"] }, "bson,outline,gnu"]
 ```
 
 ## superfluous-else
