@@ -142,15 +142,15 @@ func (w *lintUnnecessaryConditional) replacementForAssignmentStmt(thenStmt *ast.
 		return "", false
 	}
 
-	thenLhs := astutils.GoFmt(thenStmt.Lhs[0])
+	thenLHS := astutils.GoFmt(thenStmt.Lhs[0])
 
 	elseStmt, ok := elseStmts[0].(*ast.AssignStmt)
 	if !ok {
 		return "", false
 	}
 
-	elseLhs := astutils.GoFmt(elseStmt.Lhs[0])
-	if thenLhs != elseLhs {
+	elseLHS := astutils.GoFmt(elseStmt.Lhs[0])
+	if thenLHS != elseLHS {
 		return "", false
 	}
 
@@ -159,7 +159,7 @@ func (w *lintUnnecessaryConditional) replacementForAssignmentStmt(thenStmt *ast.
 		return "", false
 	}
 
-	return fmt.Sprintf("%s %s", thenLhs, thenStmt.Tok.String()), thenBoolStr == "true"
+	return fmt.Sprintf("%s %s", thenLHS, thenStmt.Tok.String()), thenBoolStr == "true"
 }
 
 // replacementForReturnStmt returns a replacement statement != ""
