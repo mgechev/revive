@@ -42,13 +42,13 @@ type lintUnnecessaryConditional struct {
 	onFailure func(lint.Failure)
 }
 
-// Visit walks the AST looking for if statements of the form
+// Visit walks the AST looking for if statements of the form:
 //
 // if cond { return <bool literal> } else { return <bool literal> }
 //
 // or
 //
-// if cond { <idX> = <bool literal> } else { <idX> = <bool literal> }
+// if cond { <idX> = <bool literal> } else { <idX> = <bool literal> }.
 func (w *lintUnnecessaryConditional) Visit(node ast.Node) ast.Visitor {
 	ifStmt, ok := node.(*ast.IfStmt)
 	if !ok {
