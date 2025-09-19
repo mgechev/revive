@@ -1318,13 +1318,13 @@ To accept the `inline` option in JSON tags (and `outline` and `gnu` in BSON tags
 arguments = ["json,inline", "bson,outline,gnu"]
 ```
 
-To prevent a tag from being checked, add it to the `skip-tags` list.
-For example, to instruct the rule to do not check `validate` tags (and accept `outline` and `gnu` in BSON tags)
-you can provide the following configuration:
+To prevent a tag from being checked, simply add a `!` before its name.
+For example, to instruct the rule to do not check `validate` tags 
+(and accept `outline` and `gnu` in BSON tags) you can provide the following configuration
 
 ```toml
 [rule.struct-tag]
-arguments = [{ skip-tags = ["validate"] }, "bson,outline,gnu"]
+arguments = ["!validate", "bson,outline,gnu"]
 ```
 
 ## superfluous-else

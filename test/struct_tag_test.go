@@ -29,7 +29,8 @@ func TestStructTagWithUserOptions(t *testing.T) {
 func TestStructTagWithOmittedTags(t *testing.T) {
 	testRule(t, "struct_tag_user_options_omit", &rule.StructTagRule{}, &lint.RuleConfig{
 		Arguments: []any{
-			map[string]any{"skip-tags": []any{"validate", "toml"}},
+			"!validate",
+			"!toml",
 			"json,inline,outline",
 			"bson,gnu",
 			"url,myURLOption",
