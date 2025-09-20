@@ -1293,6 +1293,7 @@ The list of [supported tags](https://go.dev/wiki/Well-known-struct-tags):
 | ------------- | ------------------------------------------------------------------------ |
 | `asn1`         | <https://pkg.go.dev/encoding/asn1>                                      |
 | `bson`         | <https://pkg.go.dev/go.mongodb.org/mongo-driver/bson>                   |
+| `cbor`         | <https://pkg.go.dev/github.com/fxamacker/cbor/v2>                   |
 | `datastore`    | <https://pkg.go.dev/cloud.google.com/go/datastore>                      |
 | `default`      | The type of "default" must match the type of the field.                 |
 | `json`         | <https://pkg.go.dev/encoding/json>                                      |
