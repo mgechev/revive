@@ -215,3 +215,24 @@ type TestDuplicatedCodecTags struct {
 	B       int      `codec:"field_a"` // MATCH /duplicated tag name "field_a" in codec tag/
 	C       int      `codec:"field_c"`
 }
+
+type Cbor struct {
+	RepeatedStr string `cbor:"errors"`
+	Repeated    string `cbor:"1,keyasint"`
+	Useless     string `cbor:"-,omitempty"`              // MATCH /useless option omitempty for ignored field in cbor tag/
+	Inputs      string `cbor:",keyasint"`                // MATCH /tag name for option "keyasint" should be an integer in cbor tag/
+	Outputs     string `cbor:"inputs,keyasint"`          // MATCH /tag name for option "keyasint" should be an integer in cbor tag/
+	Errors      string `cbor:"errors,optempty,keyasint"` // MATCH /unknown option "optempty" in cbor tag/
+	Inputs2     string `cbor:"-10,omitempty"`            // MATCH /integer tag names are only allowed in presence of "keyasint" option in cbor tag/
+	Outputs2    string `cbor:"-12,toarray"`              // MATCH /tag name for option "toarray" should be empty in cbor tag/
+	RepeatedInt string `cbor:"1,keyasint"`               // MATCH /duplicated integer key 1 in cbor tag/
+	RepeatedStr string `cbor:"errors,omitempty"`         // MATCH /duplicated tag name errors in cbor tag/
+	Useless     string `cbor:",toarray,omitempty"`       // MATCH /options "omitempty" and "omitzero" are ignored in presence of "toarray" option in cbor tag/
+	Useless2    string `cbor:",omitzero,toarray"`        // MATCH /options "omitempty" and "omitzero" are ignored in presence of "toarray" option in cbor tag/
+	// OK
+	InputsOk   string `cbor:"8,keyasint"`
+	OutputsOk  string `cbor:"-100,keyasint"`
+	ErrorsOk   string `cbor:"-1,keyasint"`
+	InputsOk2  string `cbor:"inputs,omitempty"`
+	OutputsOk2 string `cbor:",toarray"`
+}

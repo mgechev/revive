@@ -24,6 +24,7 @@ type tagKey string
 const (
 	keyASN1         tagKey = "asn1"
 	keyBSON         tagKey = "bson"
+	keyCbor         tagKey = "cbor"
 	keyCodec        tagKey = "codec"
 	keyDatastore    tagKey = "datastore"
 	keyDefault      tagKey = "default"
@@ -45,6 +46,7 @@ type tagChecker func(checkCtx *checkContext, tag *structtag.Tag, field *ast.Fiel
 var tagCheckers = map[tagKey]tagChecker{
 	keyASN1:         checkASN1Tag,
 	keyBSON:         checkBSONTag,
+	keyCbor:         checkCborTag,
 	keyCodec:        checkCodecTag,
 	keyDatastore:    checkDatastoreTag,
 	keyDefault:      checkDefaultTag,
@@ -380,6 +382,66 @@ func checkBSONTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (mes
 			}
 			return fmt.Sprintf(msgUnknownOption, opt), false
 		}
+	}
+
+	return "", true
+}
+
+func checkCborTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
+	hasToArray := false
+	hasOmitEmptyOrZero := false
+	hasKeyAsInt := false
+
+	for _, opt := range tag.Options {
+		switch opt {
+		case "omitempty", "omitzero":
+			hasOmitEmptyOrZero = true
+		case "toarray":
+			if tag.Name != "" {
+				return `tag name for option "toarray" should be empty`, false
+			}
+			hasToArray = true
+		case "keyasint":
+			intKey, err := strconv.Atoi(tag.Name)
+			if err != nil {
+				return `tag name for option "keyasint" should be an integer`, false
+			}
+
+			_, ok := checkCtx.usedTagNbr[intKey]
+			if ok {
+				return fmt.Sprintf("duplicated integer key %d", intKey), false
+			}
+
+			checkCtx.usedTagNbr[intKey] = true
+			hasKeyAsInt = true
+			continue
+
+		default:
+			if !checkCtx.isUserDefined(keyCbor, opt) {
+				return fmt.Sprintf(msgUnknownOption, opt), false
+			}
+		}
+	}
+
+	// Check for duplicated tag names
+	if tag.Name != "" {
+		_, ok := checkCtx.usedTagName[tag.Name]
+		if ok {
+			return fmt.Sprintf("duplicated tag name %s", tag.Name), false
+		}
+		checkCtx.usedTagName[tag.Name] = true
+	}
+
+	// Check for integer tag names without keyasint option
+	if !hasKeyAsInt {
+		_, err := strconv.Atoi(tag.Name)
+		if err == nil {
+			return `integer tag names are only allowed in presence of "keyasint" option`, false
+		}
+	}
+
+	if hasToArray && hasOmitEmptyOrZero {
+		return `options "omitempty" and "omitzero" are ignored in presence of "toarray" option`, false
 	}
 
 	return "", true

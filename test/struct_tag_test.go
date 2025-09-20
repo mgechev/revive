@@ -23,6 +23,7 @@ func TestStructTagWithUserOptions(t *testing.T) {
 			"toml,unknown",
 			"spanner,mySpannerOption",
 			"codec,myCodecOption",
+			"cbor,myCborOption",
 		},
 	})
 }
