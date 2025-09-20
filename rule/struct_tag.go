@@ -843,6 +843,7 @@ var validateSingleOptions = map[string]struct{}{
 	"multibyte":                     {},
 	"number":                        {},
 	"numeric":                       {},
+	"omitempty":                     {},
 	"port":                          {},
 	"postcode_iso3166_alpha2":       {},
 	"postcode_iso3166_alpha2_field": {},

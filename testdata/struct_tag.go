@@ -156,6 +156,7 @@ type MapStruct struct {
 }
 
 type ValidateUser struct {
+	Id          string `validate:"omitempty,min=3,max=32"`
 	Username    string `validate:"required,min=3,max=32"`
 	Email       string `validate:"required,email"`
 	Password    string `validate:"required,min=8,max=32"`
