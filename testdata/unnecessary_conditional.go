@@ -130,6 +130,12 @@ func unnecessaryConditional() bool {
 		id = true
 	}
 
+	if (something > 0) && (!id) || (something+10 <= 0) { // MATCH /replace this conditional by: id = !((something > 0) && (!id) || (something+10 <= 0))/
+		id = false
+	} else {
+		id = true
+	}
+
 	// conditionals with initialization
 	if cond := false; cond {
 		return true
