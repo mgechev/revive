@@ -87,7 +87,7 @@ List of all available rules.
 - [unexported-naming](#unexported-naming)
 - [unexported-return](#unexported-return)
 - [unhandled-error](#unhandled-error)
-- [unnecessary-conditional](#unnecessary-conditional)
+- [unnecessary-if](#unnecessary-if)
 - [unnecessary-format](#unnecessary-format)
 - [unnecessary-stmt](#unnecessary-stmt)
 - [unreachable-code](#unreachable-code)
@@ -1500,14 +1500,14 @@ arguments = [
 ]
 ```
 
-## unnecessary-conditional
+## unnecessary-if
 
 _Description_: Detects unnecessary `if-else` statements that return or assign a boolean value
 based on a condition and suggests a simplified, direct return or assignment.
 The `if-else` block is redundant because the condition itself is already a boolean expression.
 The simplified version is immediately clearer, more idiomatic, and reduces cognitive load for the reader.
 
-### Examples (unnecessary-conditional)
+### Examples (unnecessary-if)
 
 ```go
 if y <= 0 {

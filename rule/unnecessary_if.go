@@ -9,18 +9,18 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// UnnecessaryConditionalRule warns on if...else statements with both branches being the same.
-type UnnecessaryConditionalRule struct{}
+// UnnecessaryIfRule warns on if...else statements that can be replaced by simpler expressions.
+type UnnecessaryIfRule struct{}
 
 // Apply applies the rule to given file.
-func (*UnnecessaryConditionalRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*UnnecessaryIfRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
 
-	w := &lintUnnecessaryConditional{onFailure: onFailure}
+	w := &lintUnnecessaryIf{onFailure: onFailure}
 	for _, decl := range file.AST.Decls {
 		fn, ok := decl.(*ast.FuncDecl)
 		if !ok || fn.Body == nil {
@@ -34,11 +34,11 @@ func (*UnnecessaryConditionalRule) Apply(file *lint.File, _ lint.Arguments) []li
 }
 
 // Name returns the rule name.
-func (*UnnecessaryConditionalRule) Name() string {
-	return "unnecessary-conditional"
+func (*UnnecessaryIfRule) Name() string {
+	return "unnecessary-if"
 }
 
-type lintUnnecessaryConditional struct {
+type lintUnnecessaryIf struct {
 	onFailure func(lint.Failure)
 }
 
@@ -49,7 +49,7 @@ type lintUnnecessaryConditional struct {
 // or
 //
 // if cond { <idX> = <bool literal> } else { <idX> = <bool literal> }.
-func (w *lintUnnecessaryConditional) Visit(node ast.Node) ast.Visitor {
+func (w *lintUnnecessaryIf) Visit(node ast.Node) ast.Visitor {
 	ifStmt, ok := node.(*ast.IfStmt)
 	if !ok {
 		return w // not an if statement
@@ -111,7 +111,7 @@ var relationalOppositeOf = map[token.Token]token.Token{
 
 // condAsString yields the string representation of the given condition expression.
 // The method will try to minimize the negations in the resulting expression.
-func (*lintUnnecessaryConditional) condAsString(cond ast.Expr, mustNegate bool) string {
+func (*lintUnnecessaryIf) condAsString(cond ast.Expr, mustNegate bool) string {
 	result := astutils.GoFmt(cond)
 
 	if mustNegate {
@@ -136,7 +136,7 @@ func (*lintUnnecessaryConditional) condAsString(cond ast.Expr, mustNegate bool) 
 // iff both then and else statements are of the form <idX> = <bool literal>
 // If the replacement != "" then the second return value is the Boolean value
 // of <bool literal> in the then-side assignment, false otherwise.
-func (w *lintUnnecessaryConditional) replacementForAssignmentStmt(thenStmt *ast.AssignStmt, elseStmts []ast.Stmt) (replacement string, thenBool bool) {
+func (w *lintUnnecessaryIf) replacementForAssignmentStmt(thenStmt *ast.AssignStmt, elseStmts []ast.Stmt) (replacement string, thenBool bool) {
 	thenBoolStr, ok := w.isSingleBooleanLiteral(thenStmt.Rhs)
 	if !ok {
 		return "", false
@@ -166,7 +166,7 @@ func (w *lintUnnecessaryConditional) replacementForAssignmentStmt(thenStmt *ast.
 // iff both then and else statements are of the form return <bool literal>
 // If the replacement != "" then the second return value is the string representation
 // of <bool literal> in the then-side assignment, "" otherwise.
-func (w *lintUnnecessaryConditional) replacementForReturnStmt(thenStmt *ast.ReturnStmt, elseStmts []ast.Stmt) (replacement string, thenBool bool) {
+func (w *lintUnnecessaryIf) replacementForReturnStmt(thenStmt *ast.ReturnStmt, elseStmts []ast.Stmt) (replacement string, thenBool bool) {
 	thenBoolStr, ok := w.isSingleBooleanLiteral(thenStmt.Results)
 	if !ok {
 		return "", false
@@ -188,7 +188,7 @@ func (w *lintUnnecessaryConditional) replacementForReturnStmt(thenStmt *ast.Retu
 // isSingleBooleanLiteral returns the string representation of <bool literal> and true
 // if the given list of expressions has exactly one element and that element is a bool literal (true or false),
 // otherwise it returns "" and false.
-func (*lintUnnecessaryConditional) isSingleBooleanLiteral(exprs []ast.Expr) (string, bool) {
+func (*lintUnnecessaryIf) isSingleBooleanLiteral(exprs []ast.Expr) (string, bool) {
 	if len(exprs) != 1 {
 		return "", false
 	}

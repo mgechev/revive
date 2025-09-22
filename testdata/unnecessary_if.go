@@ -1,6 +1,6 @@
 package fixtures
 
-func unnecessaryConditional() bool {
+func unnecessaryIf() bool {
 	var cond bool
 	var id bool
 
