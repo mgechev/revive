@@ -1204,11 +1204,31 @@ _Configuration_: N/A
 
 ## redundant-assignment
 
-_Description_: Detects and warns about unnecessary reassignments of 
+_Description_: Detects and warns about unnecessary reassignments of
 range loop variables to new variables within the loop body.
 Prior to Go 1.22, range variables were instantiated once per loop and reused in each iteration.
 A common idiom to create a per-iteration copy was to reassign the variable inside the block (e.g., `a := a`)
 Since Go 1.22, range variables are per-iteration, making this pattern obsolete.
+
+### Example (redundant-assignment)
+
+```go
+// Bad (redundant and confusing post-Go 1.22)
+for i, v := range slice {
+    i := i   // This assignment is now pointless
+    v := v   // This assignment is now pointless
+    go func() {
+        fmt.Println(i, v)
+    }()
+}
+
+// Good (clear and idiomatic for Go 1.22+)
+for i, v := range slice {
+    go func() {
+        fmt.Println(i, v) // Since Go 1.22, this is safe without the inner assignment.
+    }()
+}
+```
 
 _Configuration_: N/A
 
