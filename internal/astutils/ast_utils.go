@@ -118,6 +118,16 @@ func IsPkgDotName(expr ast.Expr, pkg, name string) bool {
 	return ok && IsIdent(sel.X, pkg) && IsIdent(sel.Sel, name)
 }
 
+// GetIdentName returns the name of the identifier if the given expression is an identifier, false otherwise.
+func GetIdentName(expr ast.Expr) (string, bool) {
+	id, ok := expr.(*ast.Ident)
+	if !ok {
+		return "", false
+	}
+
+	return id.Name, true
+}
+
 // PickNodes yields a list of nodes by picking them from a sub-ast with root node n.
 // Nodes are selected by applying the selector function.
 func PickNodes(n ast.Node, selector func(n ast.Node) bool) []ast.Node {
