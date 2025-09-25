@@ -64,3 +64,15 @@ func mainf() {
 		return nil
 	})()
 }
+
+// Issue #1528
+func issue1528() {
+	var fn func() int
+	defer func() {
+		fn = func() int {
+			return 0
+		}
+	}()
+
+	fn()
+}
