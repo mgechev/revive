@@ -87,7 +87,7 @@ type lintDeferRule struct {
 	onFailure  func(lint.Failure)
 	inALoop    bool
 	inADefer   bool
-	inAFuncLit bool
+	inAFuncLit byte // 0 = not in func lit, 1 = in top-level func lit, >1 = nested func lit
 	allow      map[string]bool
 }
 
@@ -100,10 +100,10 @@ func (w lintDeferRule) Visit(node ast.Node) ast.Visitor {
 		w.visitSubtree(n.Body, w.inADefer, true, w.inAFuncLit)
 		return nil
 	case *ast.FuncLit:
-		w.visitSubtree(n.Body, w.inADefer, false, true)
+		w.visitSubtree(n.Body, w.inADefer, false, w.inAFuncLit+1)
 		return nil
 	case *ast.ReturnStmt:
-		if len(n.Results) != 0 && w.inADefer && w.inAFuncLit {
+		if len(n.Results) != 0 && w.inADefer && w.inAFuncLit == 1 {
 			w.newFailure("return in a defer function has no effect", n, 1.0, lint.FailureCategoryLogic, deferOptionReturn)
 		}
 	case *ast.CallExpr:
@@ -114,7 +114,7 @@ func (w lintDeferRule) Visit(node ast.Node) ast.Visitor {
 			//
 			// confidence is not 1 because recover can be in a function that is deferred elsewhere
 			w.newFailure("recover must be called inside a deferred function", n, 0.8, lint.FailureCategoryLogic, deferOptionRecover)
-		case w.inADefer && !w.inAFuncLit && isCallToRecover:
+		case w.inADefer && w.inAFuncLit == 0 && isCallToRecover:
 			// defer helper(recover())
 			//
 			// confidence is not truly 1 because this could be in a correctly-deferred func,
@@ -130,13 +130,13 @@ func (w lintDeferRule) Visit(node ast.Node) ast.Visitor {
 			// but normally this doesn't suppress a panic, and even if it did it would silently discard the value.
 			w.newFailure("recover must be called inside a deferred function, this is executing recover immediately", n, 1, lint.FailureCategoryLogic, deferOptionImmediateRecover)
 		}
-		w.visitSubtree(n.Call.Fun, true, false, false)
+		w.visitSubtree(n.Call.Fun, true, false, 0)
 		for _, a := range n.Call.Args {
 			switch a.(type) {
 			case *ast.FuncLit:
 				continue // too hard to analyze deferred calls with func literals args
 			default:
-				w.visitSubtree(a, true, false, false) // check arguments, they should not contain recover()
+				w.visitSubtree(a, true, false, 0) // check arguments, they should not contain recover()
 			}
 		}
 
@@ -162,7 +162,7 @@ func (w lintDeferRule) Visit(node ast.Node) ast.Visitor {
 	return w
 }
 
-func (w lintDeferRule) visitSubtree(n ast.Node, inADefer, inALoop, inAFuncLit bool) {
+func (w lintDeferRule) visitSubtree(n ast.Node, inADefer, inALoop bool, inAFuncLit byte) {
 	nw := lintDeferRule{
 		onFailure:  w.onFailure,
 		inADefer:   inADefer,
