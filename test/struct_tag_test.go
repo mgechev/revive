@@ -20,7 +20,7 @@ func TestStructTagWithUserOptions(t *testing.T) {
 			"datastore,myDatastoreOption",
 			"mapstructure,myMapstructureOption",
 			"validate,displayName",
-			"validate,omitnil",
+			"validate,omitnil,omitzero",
 			"validate,omitzero",
 			"toml,unknown",
 			"spanner,mySpannerOption",
