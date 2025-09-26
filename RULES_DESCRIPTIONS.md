@@ -72,6 +72,7 @@ List of all available rules.
 - [range](#range)
 - [receiver-naming](#receiver-naming)
 - [redefines-builtin-id](#redefines-builtin-id)
+- [redundant-assignment](#redundant-assignment)
 - [redundant-build-tag](#redundant-build-tag)
 - [redundant-import-alias](#redundant-import-alias)
 - [redundant-test-main-exit](#redundant-test-main-exit)
@@ -1198,6 +1199,36 @@ arguments = [{ max-length = 2 }]
 _Description_: Constant names like `false`, `true`, `nil`, function names like `append`, `make`,
 and basic type names like `bool`, and `byte` are not reserved words of the language; therefore the can be redefined.
 Even if possible, redefining these built in names can lead to bugs very difficult to detect.
+
+_Configuration_: N/A
+
+## redundant-assignment
+
+_Description_: Detects and warns about unnecessary reassignments of
+range loop variables to new variables within the loop body.
+Prior to Go 1.22, range variables were instantiated once per loop and reused in each iteration.
+A common idiom to create a per-iteration copy was to reassign the variable inside the block (e.g., `a := a`)
+Since Go 1.22, range variables are per-iteration, making this pattern obsolete.
+
+### Example (redundant-assignment)
+
+```go
+// Bad (redundant and confusing post-Go 1.22)
+for i, v := range slice {
+    i := i   // This assignment is now pointless
+    v := v   // This assignment is now pointless
+    go func() {
+        fmt.Println(i, v)
+    }()
+}
+
+// Good (clear and idiomatic for Go 1.22+)
+for i, v := range slice {
+    go func() {
+        fmt.Println(i, v) // Since Go 1.22, this is safe without the inner assignment.
+    }()
+}
+```
 
 _Configuration_: N/A
 
