@@ -93,5 +93,5 @@ type siginfoChild struct {
 	uid    uint32
 	status int32
 
-	_ [25]uint32 // Pad to 128 bytes
+	_ [25]uint32
 }
