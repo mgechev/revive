@@ -171,7 +171,7 @@ func checkStructFields(fields *ast.FieldList, structName string, w *lintConfusin
 			if id.Name == "_" {
 				continue
 			}
-			
+
 			normName := strings.ToUpper(id.Name)
 			if bl[normName] {
 				w.onFailure(lint.Failure{
