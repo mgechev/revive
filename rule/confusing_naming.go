@@ -167,6 +167,11 @@ func checkStructFields(fields *ast.FieldList, structName string, w *lintConfusin
 	bl := make(map[string]bool, len(fields.List))
 	for _, f := range fields.List {
 		for _, id := range f.Names {
+			// Skip blank identifiers
+			if id.Name == "_" {
+				continue
+			}
+
 			normName := strings.ToUpper(id.Name)
 			if bl[normName] {
 				w.onFailure(lint.Failure{
