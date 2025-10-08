@@ -58,6 +58,7 @@ func TestVarNaming(t *testing.T) {
 			[]any{map[string]any{"skip-package-name-checks": false, "extra-bad-package-names": []any{"helpers"}}},
 		},
 	})
+	testRule(t, "var_naming_top_level_pkg", &rule.VarNamingRule{}, &lint.RuleConfig{})
 }
 
 func BenchmarkUpperCaseConstTrue(b *testing.B) {

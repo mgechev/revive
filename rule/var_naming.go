@@ -24,11 +24,34 @@ var knownNameExceptions = map[string]bool{
 // Values in the list should be lowercased.
 var defaultBadPackageNames = map[string]struct{}{
 	"common":     {},
+	"interface":  {},
 	"interfaces": {},
 	"misc":       {},
 	"types":      {},
 	"util":       {},
 	"utils":      {},
+	"tool":       {},
+	"tools":      {},
+	"shared":     {},
+	"config":     {},
+	"configs":    {},
+
+	// standard library packages that would cause confusion and possible collisions
+	"context": {},
+	"time":    {},
+	"errors":  {},
+	"bytes":   {},
+	"io":      {},
+	"fmt":     {},
+	"string":  {},
+	"math":    {},
+	"sort":    {},
+	"hash":    {},
+	"json":    {},
+	"net":     {},
+	"http":    {},
+	"xml":     {},
+	"crypto":  {},
 }
 
 // VarNamingRule lints the name of a variable.
@@ -154,6 +177,15 @@ func (r *VarNamingRule) applyPackageCheckRules(file *lint.File, onFailure func(f
 	pkgNameNode := file.AST.Name
 	pkgName := pkgNameNode.Name
 	pkgNameLower := strings.ToLower(pkgName)
+
+	// Check is top level package
+	if filepath.Base(fileDir) != pkgName {
+		if pkgNameLower == "pkg" {
+			onFailure(r.pkgNameFailure(pkgNameNode, "should not have a root level package called pkg"))
+			return
+		}
+	}
+
 	if _, ok := r.extraBadPackageNames[pkgNameLower]; ok {
 		onFailure(r.pkgNameFailure(pkgNameNode, "avoid bad package names"))
 		return
