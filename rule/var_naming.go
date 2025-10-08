@@ -178,7 +178,7 @@ func (r *VarNamingRule) applyPackageCheckRules(file *lint.File, onFailure func(f
 	pkgName := pkgNameNode.Name
 	pkgNameLower := strings.ToLower(pkgName)
 
-	// Check is top level package
+	// Check if top level package
 	if filepath.Base(fileDir) != pkgName {
 		if pkgNameLower == "pkg" {
 			onFailure(r.pkgNameFailure(pkgNameNode, "avoid a root level package called pkg"))
