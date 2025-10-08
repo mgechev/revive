@@ -35,8 +35,9 @@ var defaultBadPackageNames = map[string]struct{}{
 	"shared":     {},
 	"config":     {},
 	"configs":    {},
+}
 
-	// standard library packages that would cause confusion and possible collisions
+var conflictGoStdLibPkgNames = map[string]struct{}{
 	"context": {},
 	"time":    {},
 	"errors":  {},
@@ -60,10 +61,11 @@ type VarNamingRule struct {
 	blockList                []string
 	skipInitialismNameChecks bool // if true disable enforcing capitals for common initialisms
 
-	allowUpperCaseConst   bool                // if true - allows to use UPPER_SOME_NAMES for constants
-	skipPackageNameChecks bool                // check for meaningless and user-defined bad package names
-	extraBadPackageNames  map[string]struct{} // inactive if skipPackageNameChecks is false
-	pkgNameAlreadyChecked syncSet             // set of packages names already checked
+	allowUpperCaseConst    bool                // if true - allows to use UPPER_SOME_NAMES for constants
+	skipPackageNameChecks  bool                // check for meaningless and user-defined bad package names
+	extraBadPackageNames   map[string]struct{} // inactive if skipPackageNameChecks is false
+	avoidPkgGoStdCollision bool                // if true - avoid using names that conflict with Go standard library package names
+	pkgNameAlreadyChecked  syncSet             // set of packages names already checked
 }
 
 // Configure validates the rule configuration, and configures the rule accordingly.
@@ -125,6 +127,9 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 					}
 					r.extraBadPackageNames[strings.ToLower(n)] = struct{}{}
 				}
+			}
+			if isRuleOption(k, "avoidPkgGoStdCollision") {
+				r.avoidPkgGoStdCollision = true
 			}
 		}
 	}
@@ -192,6 +197,10 @@ func (r *VarNamingRule) applyPackageCheckRules(file *lint.File, onFailure func(f
 	if _, ok := defaultBadPackageNames[pkgNameLower]; ok {
 		onFailure(r.pkgNameFailure(pkgNameNode, "avoid meaningless package names"))
 		return
+	}
+
+	if _, ok := conflictGoStdLibPkgNames[pkgNameLower]; ok && r.avoidPkgGoStdCollision {
+		onFailure(r.pkgNameFailure(pkgNameNode, "avoid package names that conflict with Go standard library package names"))
 	}
 
 	// Package names need slightly different handling than other names.

@@ -59,6 +59,11 @@ func TestVarNaming(t *testing.T) {
 		},
 	})
 	testRule(t, "var_naming_top_level_pkg", &rule.VarNamingRule{}, &lint.RuleConfig{})
+	testRule(t, "var_naming_std_lib_conflict", &rule.VarNamingRule{}, &lint.RuleConfig{
+		Arguments: []any{[]any{}, []any{},
+			[]any{map[string]any{"skip-package-name-checks": false, "avoid-pkg-go-std-collision": []any{"helpers"}}},
+		},
+	})
 }
 
 func BenchmarkUpperCaseConstTrue(b *testing.B) {
