@@ -1,6 +1,7 @@
 package fixtures
 
 import (
+	"flag"
 	"log"
 	"os"
 	"syscall"
@@ -35,4 +36,16 @@ func bar2() {
 func TestMain(m *testing.M) {
 	// must match because this is not a test file
 	os.Exit(m.Run()) // MATCH /calls to os.Exit only in main() or init() functions/
+}
+
+func flagParseOutsideMain() {
+	flag.Parse() // MATCH /calls to flag.Parse only in main() or init() functions/
+}
+
+func flagNewFlagSetExitOnErrorOutsideMain() {
+	flag.NewFlagSet("cmd", flag.ExitOnError) // MATCH /calls to flag.NewFlagSet with exit-triggering argument only in main() or init() functions/
+}
+
+func flagNewFlagSetContinueOnErrorOK() {
+	flag.NewFlagSet("cmd", flag.ContinueOnError)
 }

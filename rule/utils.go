@@ -2,6 +2,7 @@ package rule
 
 import (
 	"fmt"
+	"go/ast"
 	"go/token"
 	"regexp"
 	"strings"
@@ -21,6 +22,7 @@ var exitFunctions = map[string]map[string]bool{
 		"Panicf":  true,
 		"Panicln": true,
 	},
+	"flag": {"Parse": true},
 }
 
 func srcLine(src []byte, p token.Position) string {
@@ -88,6 +90,31 @@ func isDirectiveComment(line string) bool {
 // isCallToExitFunction checks if the function call is a call to an exit function.
 func isCallToExitFunction(pkgName, functionName string) bool {
 	return exitFunctions[pkgName] != nil && exitFunctions[pkgName][functionName]
+}
+
+var conditionalExitFunctions = map[string]map[string]func(*ast.CallExpr) bool{
+    "flag": {
+        "NewFlagSet": func(ce *ast.CallExpr) bool {
+            if len(ce.Args) == 2 {
+                if arg, ok := ce.Args[1].(*ast.SelectorExpr); ok {
+                    if id, ok := arg.X.(*ast.Ident); ok {
+                        return id.Name == "flag" && arg.Sel.Name == "ExitOnError"
+                    }
+                }
+            }
+            return false
+        },
+    },
+}
+
+// isConditionalExitFunction checks if the function call is a call to a conditional exit function.
+func isConditionalExitFunction(pkgName, functionName string, ce *ast.CallExpr) bool {
+	if m, ok := conditionalExitFunctions[pkgName]; ok {
+		if check, ok := m[functionName]; ok {
+			return check(ce)
+		}
+	}
+	return false
 }
 
 // newInternalFailureError returns a slice of Failure with a single internal failure in it.
