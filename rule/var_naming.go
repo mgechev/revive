@@ -23,18 +23,18 @@ var knownNameExceptions = map[string]bool{
 // The rule warns about the usage of any package name in this list if skipPackageNameChecks is false.
 // Values in the list should be lowercased.
 var defaultBadPackageNames = map[string]struct{}{
-	"common":     {},
-	"config":     {},
-	"configs":    {},
-	"interface":  {},
-	"interfaces": {},
-	"misc":       {},
-	"shared":     {},
-	"tool":       {},
-	"tools":      {},
-	"types":      {},
-	"util":       {},
-	"utils":      {},
+	"api":           {},
+	"common":        {},
+	"interface":     {},
+	"interfaces":    {},
+	"misc":          {},
+	"miscellaneous": {},
+	"shared":        {},
+	"type":          {},
+	"types":         {},
+	"util":          {},
+	"utilities":     {},
+	"utils":         {},
 }
 
 var stdLibPackageNames = map[string]struct{}{
