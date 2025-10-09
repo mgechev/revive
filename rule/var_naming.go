@@ -37,7 +37,7 @@ var defaultBadPackageNames = map[string]struct{}{
 	"configs":    {},
 }
 
-var conflictGoStdLibPkgNames = map[string]struct{}{
+var stdLibPackageNames = map[string]struct{}{
 	"context": {},
 	"time":    {},
 	"errors":  {},
