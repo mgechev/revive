@@ -62,9 +62,9 @@ type VarNamingRule struct {
 	blockList []string
 
 	allowUpperCaseConst               bool                // if true - allows to use UPPER_SOME_NAMES for constants
-	skipInitialismNameChecks          bool                // if true disable enforcing capitals for common initialisms
-	skipPackageNameChecks             bool                // if true disable check for meaningless and user-defined bad package names
-	skipPackageNameCollisionWithGoStd bool                // if true disable checks for collisions with Go standard library package names
+	skipInitialismNameChecks          bool                // if true - disable enforcing capitals for common initialisms
+	skipPackageNameChecks             bool                // if true - disable check for meaningless and user-defined bad package names
+	skipPackageNameCollisionWithGoStd bool                // if true - disable checks for collisions with Go standard library package names
 	extraBadPackageNames              map[string]struct{} // inactive if skipPackageNameChecks is false
 	pkgNameAlreadyChecked             syncSet             // set of packages names already checked
 }
