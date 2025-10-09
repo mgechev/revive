@@ -12,7 +12,7 @@ require (
 	github.com/spf13/afero v1.15.0
 	golang.org/x/mod v0.27.0
 	golang.org/x/sync v0.16.0
-	golang.org/x/tools v0.36.0
+	golang.org/x/tools v0.38.0
 )
 
 require (
