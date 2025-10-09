@@ -24,48 +24,49 @@ var knownNameExceptions = map[string]bool{
 // Values in the list should be lowercased.
 var defaultBadPackageNames = map[string]struct{}{
 	"common":     {},
+	"config":     {},
+	"configs":    {},
 	"interface":  {},
 	"interfaces": {},
 	"misc":       {},
+	"shared":     {},
+	"tool":       {},
+	"tools":      {},
 	"types":      {},
 	"util":       {},
 	"utils":      {},
-	"tool":       {},
-	"tools":      {},
-	"shared":     {},
-	"config":     {},
-	"configs":    {},
 }
 
 var stdLibPackageNames = map[string]struct{}{
-	"context": {},
-	"time":    {},
-	"errors":  {},
 	"bytes":   {},
-	"io":      {},
-	"fmt":     {},
-	"string":  {},
-	"math":    {},
-	"sort":    {},
-	"hash":    {},
-	"json":    {},
-	"net":     {},
-	"http":    {},
-	"xml":     {},
+	"context": {},
 	"crypto":  {},
+	"errors":  {},
+	"fmt":     {},
+	"hash":    {},
+	"http":    {},
+	"io":      {},
+	"json":    {},
+	"math":    {},
+	"net":     {},
+	"os":      {},
+	"sort":    {},
+	"string":  {},
+	"time":    {},
+	"xml":     {},
 }
 
 // VarNamingRule lints the name of a variable.
 type VarNamingRule struct {
-	allowList                []string
-	blockList                []string
-	skipInitialismNameChecks bool // if true disable enforcing capitals for common initialisms
+	allowList []string
+	blockList []string
 
-	allowUpperCaseConst    bool                // if true - allows to use UPPER_SOME_NAMES for constants
-	skipPackageNameChecks  bool                // check for meaningless and user-defined bad package names
-	extraBadPackageNames   map[string]struct{} // inactive if skipPackageNameChecks is false
-	avoidPkgGoStdCollision bool                // if true - avoid using names that conflict with Go standard library package names
-	pkgNameAlreadyChecked  syncSet             // set of packages names already checked
+	allowUpperCaseConst               bool                // if true - allows to use UPPER_SOME_NAMES for constants
+	skipInitialismNameChecks          bool                // if true disable enforcing capitals for common initialisms
+	skipPackageNameChecks             bool                // if true disable check for meaningless and user-defined bad package names
+	skipPackageNameCollisionWithGoStd bool                // if true disable checks for collisions with Go standard library package names
+	extraBadPackageNames              map[string]struct{} // inactive if skipPackageNameChecks is false
+	pkgNameAlreadyChecked             syncSet             // set of packages names already checked
 }
 
 // Configure validates the rule configuration, and configures the rule accordingly.
@@ -128,8 +129,8 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 					r.extraBadPackageNames[strings.ToLower(n)] = struct{}{}
 				}
 			}
-			if isRuleOption(k, "avoidPkgGoStdCollision") {
-				r.avoidPkgGoStdCollision = true
+			if isRuleOption(k, "skipPackageNameCollisionWithGoStd") {
+				r.skipPackageNameCollisionWithGoStd = true
 			}
 		}
 	}
@@ -199,7 +200,7 @@ func (r *VarNamingRule) applyPackageCheckRules(file *lint.File, onFailure func(f
 		return
 	}
 
-	if _, ok := conflictGoStdLibPkgNames[pkgNameLower]; ok && r.avoidPkgGoStdCollision {
+	if _, ok := stdLibPackageNames[pkgNameLower]; ok && !r.skipPackageNameCollisionWithGoStd {
 		onFailure(r.pkgNameFailure(pkgNameNode, "avoid package names that conflict with Go standard library package names"))
 	}
 
