@@ -1719,7 +1719,7 @@ In the map, you can add a boolean `upperCaseConst` (`uppercaseconst`, `upper-cas
 You can also add a boolean `skipPackageNameChecks` (`skippackagenamechecks`, `skip-package-name-checks`) to skip package name checks.
 When `skipPackageNameChecks` is false (the default), you can configure `extraBadPackageNames` (`extrabadpackagenames`, `extra-bad-package-names`)
 to forbid using the values from the list as package names additionally to the standard meaningless ones:
-"common", "interfaces", "misc", "types", "util", "utils". Additionally use `avoid-go-std-lib-names` to avoid package names which collide with Go standard library packages.
+"common", "interfaces", "misc", "types", "util", "utils". Additionally use `skip-package-name-collision-with-go-std` to disable checks on package names which collide with Go standard library packages.
 
 By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89)).
 
@@ -1767,7 +1767,7 @@ arguments = [[], [], [{ extra-bad-package-names = ["helpers", "models"] }]]
 
 ```toml
 [rule.var-naming]
-arguments = [[], [], [{ avoid-pkg-go-std-collision = true }]]
+arguments = [[], [], [{ skip-package-name-collision-with-go-std = true }]]
 ```
 
 ## waitgroup-by-value
