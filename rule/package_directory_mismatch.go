@@ -96,7 +96,12 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 		return nil
 	}
 
-	dirPath := filepath.Dir(file.Name)
+	fullPath, err := filepath.Abs(file.Name)
+	if err != nil {
+		// we can't resolve the absolute path, so skip linting this file
+		return nil
+	}
+	dirPath := filepath.Dir(fullPath)
 	dirName := filepath.Base(dirPath)
 
 	if r.ignoredDirs != nil && r.ignoredDirs.MatchString(dirPath) {
@@ -125,6 +130,11 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 		if r.semanticallyEqual(packageName, dirName+"_test") {
 			return nil
 		}
+	}
+
+	if hasGoEntryFiles(dirPath) {
+		// Allow 'main_test' packages in directories that contain Go entry files (e.g., main.go).
+		return nil
 	}
 
 	// define a default failure message
