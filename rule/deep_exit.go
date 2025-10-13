@@ -64,20 +64,12 @@ func (w *lintDeepExit) Visit(node ast.Node) ast.Visitor {
 
 	pkg := id.Name
 	fn := fc.Sel.Name
-	switch {
-	case isCallToExitFunction(pkg, fn):
+	if isCallToExitFunction(pkg, fn, ce.Args) {
 		w.onFailure(lint.Failure{
 			Confidence: 1,
 			Node:       ce,
 			Category:   lint.FailureCategoryBadPractice,
 			Failure:    fmt.Sprintf("calls to %s.%s only in main() or init() functions", pkg, fn),
-		})
-		case isConditionalExitFunction(pkg, fn, ce):
-		w.onFailure(lint.Failure{
-		Confidence: 1,
-		Node:       ce,
-		Category:   lint.FailureCategoryBadPractice,
-		Failure:    fmt.Sprintf("calls to %s.%s with exit-triggering argument only in main() or init() functions", pkg, fn),
 		})
 	}
 
