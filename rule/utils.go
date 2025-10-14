@@ -3,7 +3,6 @@ package rule
 import (
 	"fmt"
 	"go/token"
-	"os"
 	"regexp"
 	"strings"
 
@@ -94,28 +93,4 @@ func isCallToExitFunction(pkgName, functionName string) bool {
 // newInternalFailureError returns a slice of Failure with a single internal failure in it.
 func newInternalFailureError(e error) []lint.Failure {
 	return []lint.Failure{lint.NewInternalFailure(e.Error())}
-}
-
-var goEntryFiles = map[string]struct{}{
-	"main.go": {},
-}
-
-// hasGoEntryFiles reports whether the given directory contains Go entry-point files such as main.go or go.mod.
-func hasGoEntryFiles(dirPath string) bool {
-	entries, err := os.ReadDir(dirPath)
-	if err != nil {
-		return false
-	}
-
-	for _, entry := range entries {
-		if !entry.Type().IsRegular() {
-			continue
-		}
-
-		if _, exists := goEntryFiles[entry.Name()]; exists {
-			return true
-		}
-	}
-
-	return false
 }
