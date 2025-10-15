@@ -17,7 +17,7 @@ type exitFuncChecker func(args []ast.Expr) bool
 var alwaysTrue exitFuncChecker = func([]ast.Expr) bool { return true }
 
 // exitFunctions is a map of std packages and functions that are considered as exit functions.
-var exitFunctions = map[string]map[string]exitFuncChecker {
+var exitFunctions = map[string]map[string]exitFuncChecker{
 	"os":      {"Exit": alwaysTrue},
 	"syscall": {"Exit": alwaysTrue},
 	"log": {
