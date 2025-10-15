@@ -121,6 +121,10 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 	}
 
 	if file.IsTest() {
+		// treat main_test differently because it's a common package name for tests
+		if packageName == "main_test" {
+			return nil
+		}
 		// External test package (directory + '_test' suffix)
 		if r.semanticallyEqual(packageName, dirName+"_test") {
 			return nil

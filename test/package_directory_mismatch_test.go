@@ -53,6 +53,7 @@ func TestPackageDirectoryMismatch(t *testing.T) {
 	testRule(t, "package_directory_mismatch/test/good", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/test/bad_test", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/test/bad", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/test/main_test", &rule.PackageDirectoryMismatchRule{}, config)
 }
 
 func TestPackageDirectoryMismatchWithDefaultConfig(t *testing.T) {
