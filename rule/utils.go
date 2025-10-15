@@ -7,20 +7,26 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
+// exitChecker is a function type that checks whether a function call is an exit function.
+type exitFuncChecker func(args []ast.Expr) bool
+
+var alwaysTrue exitFuncChecker = func([]ast.Expr) bool { return true }
+
 // exitFunctions is a map of std packages and functions that are considered as exit functions.
-var exitFunctions = map[string]map[string]func(args []ast.Expr) bool{
-	"os":      {"Exit": func([]ast.Expr) bool { return true }},
-	"syscall": {"Exit": func([]ast.Expr) bool { return true }},
+var exitFunctions = map[string]map[string]exitFuncChecker {
+	"os":      {"Exit": alwaysTrue},
+	"syscall": {"Exit": alwaysTrue},
 	"log": {
-		"Fatal":   func([]ast.Expr) bool { return true },
-		"Fatalf":  func([]ast.Expr) bool { return true },
-		"Fatalln": func([]ast.Expr) bool { return true },
-		"Panic":   func([]ast.Expr) bool { return true },
-		"Panicf":  func([]ast.Expr) bool { return true },
-		"Panicln": func([]ast.Expr) bool { return true },
+		"Fatal":   alwaysTrue,
+		"Fatalf":  alwaysTrue,
+		"Fatalln": alwaysTrue,
+		"Panic":   alwaysTrue,
+		"Panicf":  alwaysTrue,
+		"Panicln": alwaysTrue,
 	},
 	"flag": {
 		"Parse": func([]ast.Expr) bool { return true },
@@ -28,15 +34,7 @@ var exitFunctions = map[string]map[string]func(args []ast.Expr) bool{
 			if len(args) != 2 {
 				return false
 			}
-			arg, ok := args[1].(*ast.SelectorExpr)
-			if !ok {
-				return false
-			}
-			id, ok := arg.X.(*ast.Ident)
-			if !ok {
-				return false
-			}
-			return id.Name == "flag" && arg.Sel.Name == "ExitOnError"
+			return astutils.IsPkgDotName(args[1], "flag", "ExitOnError")
 		},
 	},
 }
@@ -104,16 +102,18 @@ func isDirectiveComment(line string) bool {
 }
 
 // isCallToExitFunction checks if the function call is a call to an exit function.
-func isCallToExitFunction(pkgName, functionName string, ce []ast.Expr) bool {
+func isCallToExitFunction(pkgName, functionName string, callArgs []ast.Expr) bool {
 	m, ok := exitFunctions[pkgName]
 	if !ok {
 		return false
 	}
+
 	check, ok := m[functionName]
 	if !ok {
 		return false
 	}
-	return check(ce)
+
+	return check(callArgs)
 }
 
 // newInternalFailureError returns a slice of Failure with a single internal failure in it.

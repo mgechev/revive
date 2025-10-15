@@ -43,7 +43,7 @@ func flagParseOutsideMain() {
 }
 
 func flagNewFlagSetExitOnErrorOutsideMain() {
-	flag.NewFlagSet("cmd", flag.ExitOnError) // MATCH /calls to flag.NewFlagSet only in main() or init() functions/
+	flag.NewFlagSet("cmd", flag.ExitOnError) // MATCH /calls to flag.NewFlagSet with flag.ExitOnError only in main() or init() functions/
 }
 
 func flagNewFlagSetContinueOnErrorOK() {
