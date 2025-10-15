@@ -137,6 +137,13 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 			return nil
 		}
 
+		if file.IsTest() {
+			// External test package (directory + '_test' suffix)
+			if r.semanticallyEqual(packageName, parentDirName+"_test") {
+				return nil
+			}
+		}
+
 		failure = fmt.Sprintf("package name %q does not match directory name %q or parent directory name %q", packageName, dirName, parentDirName)
 	}
 
