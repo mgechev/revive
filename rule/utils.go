@@ -98,7 +98,7 @@ func newInternalFailureError(e error) []lint.Failure {
 
 var rootMarkers = map[string]struct{}{
 	"go.mod": {},
-	".git" :  {},
+	".git":   {},
 }
 
 // isRootDir checks if the given directory contains go.mod or .git, indicating it's a root directory.

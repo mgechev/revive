@@ -135,7 +135,7 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 			return nil
 		}
 	}
-	
+
 	// For root directory (contains go.mod or .git), ignore the check
 	if isRootDir(dirPath) {
 		return nil
