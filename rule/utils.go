@@ -3,6 +3,7 @@ package rule
 import (
 	"fmt"
 	"go/token"
+	"os"
 	"regexp"
 	"strings"
 
@@ -93,4 +94,25 @@ func isCallToExitFunction(pkgName, functionName string) bool {
 // newInternalFailureError returns a slice of Failure with a single internal failure in it.
 func newInternalFailureError(e error) []lint.Failure {
 	return []lint.Failure{lint.NewInternalFailure(e.Error())}
+}
+
+var rootMarkers = map[string]struct{}{
+	"go.mod": {},
+	".git" :  {},
+}
+
+// isRootDir checks if the given directory contains go.mod or .git, indicating it's a root directory.
+func isRootDir(dirPath string) bool {
+	entries, err := os.ReadDir(dirPath)
+	if err != nil {
+		return false
+	}
+
+	for _, e := range entries {
+		if _, ok := rootMarkers[e.Name()]; ok {
+			return true
+		}
+	}
+
+	return false
 }

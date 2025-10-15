@@ -54,6 +54,11 @@ func TestPackageDirectoryMismatch(t *testing.T) {
 	testRule(t, "package_directory_mismatch/test/bad_test", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/test/bad", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/test/main_test", &rule.PackageDirectoryMismatchRule{}, config)
+
+	// Test handling of root directories with go.mod or .git
+	testRule(t, "package_directory_mismatch/rootdir/good/v1/client", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/rootdir/good/v2/client", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/rootdir/bad/client", &rule.PackageDirectoryMismatchRule{}, config)
 }
 
 func TestPackageDirectoryMismatchWithDefaultConfig(t *testing.T) {

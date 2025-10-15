@@ -96,7 +96,12 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 		return nil
 	}
 
-	dirPath := filepath.Dir(file.Name)
+	absPath, err := filepath.Abs(file.Name)
+	if err != nil {
+		return nil
+	}
+
+	dirPath := filepath.Dir(absPath)
 	dirName := filepath.Base(dirPath)
 
 	if r.ignoredDirs != nil && r.ignoredDirs.MatchString(dirPath) {
@@ -129,6 +134,11 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 		if r.semanticallyEqual(packageName, dirName+"_test") {
 			return nil
 		}
+	}
+	
+	// For root directory (contains go.mod or .git), ignore the check
+	if isRootDir(dirPath) {
+		return nil
 	}
 
 	// define a default failure message
