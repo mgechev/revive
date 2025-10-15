@@ -23,24 +23,50 @@ var knownNameExceptions = map[string]bool{
 // The rule warns about the usage of any package name in this list if skipPackageNameChecks is false.
 // Values in the list should be lowercased.
 var defaultBadPackageNames = map[string]struct{}{
-	"common":     {},
-	"interfaces": {},
-	"misc":       {},
-	"types":      {},
-	"util":       {},
-	"utils":      {},
+	"api":           {},
+	"common":        {},
+	"interface":     {},
+	"interfaces":    {},
+	"misc":          {},
+	"miscellaneous": {},
+	"shared":        {},
+	"type":          {},
+	"types":         {},
+	"util":          {},
+	"utilities":     {},
+	"utils":         {},
+}
+
+var stdLibPackageNames = map[string]struct{}{
+	"bytes":   {},
+	"context": {},
+	"crypto":  {},
+	"errors":  {},
+	"fmt":     {},
+	"hash":    {},
+	"http":    {},
+	"io":      {},
+	"json":    {},
+	"math":    {},
+	"net":     {},
+	"os":      {},
+	"sort":    {},
+	"string":  {},
+	"time":    {},
+	"xml":     {},
 }
 
 // VarNamingRule lints the name of a variable.
 type VarNamingRule struct {
-	allowList                []string
-	blockList                []string
-	skipInitialismNameChecks bool // if true disable enforcing capitals for common initialisms
+	allowList []string
+	blockList []string
 
-	allowUpperCaseConst   bool                // if true - allows to use UPPER_SOME_NAMES for constants
-	skipPackageNameChecks bool                // check for meaningless and user-defined bad package names
-	extraBadPackageNames  map[string]struct{} // inactive if skipPackageNameChecks is false
-	pkgNameAlreadyChecked syncSet             // set of packages names already checked
+	allowUpperCaseConst               bool                // if true - allows to use UPPER_SOME_NAMES for constants
+	skipInitialismNameChecks          bool                // if true - disable enforcing capitals for common initialisms
+	skipPackageNameChecks             bool                // if true - disable check for meaningless and user-defined bad package names
+	skipPackageNameCollisionWithGoStd bool                // if true - disable checks for collisions with Go standard library package names
+	extraBadPackageNames              map[string]struct{} // inactive if skipPackageNameChecks is false
+	pkgNameAlreadyChecked             syncSet             // set of packages names already checked
 }
 
 // Configure validates the rule configuration, and configures the rule accordingly.
@@ -103,6 +129,9 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 					r.extraBadPackageNames[strings.ToLower(n)] = struct{}{}
 				}
 			}
+			if isRuleOption(k, "skipPackageNameCollisionWithGoStd") {
+				r.skipPackageNameCollisionWithGoStd = true
+			}
 		}
 	}
 	return nil
@@ -154,6 +183,13 @@ func (r *VarNamingRule) applyPackageCheckRules(file *lint.File, onFailure func(f
 	pkgNameNode := file.AST.Name
 	pkgName := pkgNameNode.Name
 	pkgNameLower := strings.ToLower(pkgName)
+
+	// Check if top level package
+	if pkgNameLower == "pkg" && filepath.Base(fileDir) != pkgName {
+		onFailure(r.pkgNameFailure(pkgNameNode, "should not have a root level package called pkg"))
+		return
+	}
+
 	if _, ok := r.extraBadPackageNames[pkgNameLower]; ok {
 		onFailure(r.pkgNameFailure(pkgNameNode, "avoid bad package names"))
 		return
@@ -162,6 +198,10 @@ func (r *VarNamingRule) applyPackageCheckRules(file *lint.File, onFailure func(f
 	if _, ok := defaultBadPackageNames[pkgNameLower]; ok {
 		onFailure(r.pkgNameFailure(pkgNameNode, "avoid meaningless package names"))
 		return
+	}
+
+	if _, ok := stdLibPackageNames[pkgNameLower]; ok && !r.skipPackageNameCollisionWithGoStd {
+		onFailure(r.pkgNameFailure(pkgNameNode, "avoid package names that conflict with Go standard library package names"))
 	}
 
 	// Package names need slightly different handling than other names.

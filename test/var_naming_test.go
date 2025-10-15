@@ -58,6 +58,13 @@ func TestVarNaming(t *testing.T) {
 			[]any{map[string]any{"skip-package-name-checks": false, "extra-bad-package-names": []any{"helpers"}}},
 		},
 	})
+	testRule(t, "var_naming_top_level_pkg", &rule.VarNamingRule{}, &lint.RuleConfig{})
+	testRule(t, "var_naming_std_lib_conflict", &rule.VarNamingRule{}, &lint.RuleConfig{})
+	testRule(t, "var_naming_std_lib_conflict_skip", &rule.VarNamingRule{}, &lint.RuleConfig{
+		Arguments: []any{[]any{}, []any{},
+			[]any{map[string]any{"skip-package-name-collision-with-go-std": true}},
+		},
+	})
 }
 
 func BenchmarkUpperCaseConstTrue(b *testing.B) {

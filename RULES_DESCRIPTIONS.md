@@ -1717,9 +1717,15 @@ of functions, variables, consts, and structs handle known initialisms (e.g., JSO
 When `skipInitialismNameChecks` is set to true, the rule allows names like `readJson`, `HttpMethod` etc.
 In the map, you can add a boolean `upperCaseConst` (`uppercaseconst`, `upper-case-const`) parameter to allow `UPPER_CASE` for `const`.
 You can also add a boolean `skipPackageNameChecks` (`skippackagenamechecks`, `skip-package-name-checks`) to skip package name checks.
-When `skipPackageNameChecks` is false (the default), you can configure `extraBadPackageNames` (`extrabadpackagenames`, `extra-bad-package-names`)
-to forbid using the values from the list as package names additionally to the standard meaningless ones:
-"common", "interfaces", "misc", "types", "util", "utils".
+When `skipPackageNameChecks` is false (the default), you can configure
+`extraBadPackageNames` (`extrabadpackagenames`, `extra-bad-package-names`)
+to forbid using the values from the list as package names additionally
+to the standard meaningless ones: "common", "interfaces", "misc",
+"types", "util", "utils".
+When `skipPackageNameCollisionWithGoStd`
+(`skippackagenamecollisionwithgostd`, `skip-package-name-collision-with-go-std`)
+is set to true, the rule disables checks on package names that collide
+with Go standard library packages.
 
 By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89)).
 
@@ -1763,6 +1769,11 @@ arguments = [[], [], [{ skip-package-name-checks = true }]]
 ```toml
 [rule.var-naming]
 arguments = [[], [], [{ extra-bad-package-names = ["helpers", "models"] }]]
+```
+
+```toml
+[rule.var-naming]
+arguments = [[], [], [{ skip-package-name-collision-with-go-std = true }]]
 ```
 
 ## waitgroup-by-value
