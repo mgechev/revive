@@ -37,7 +37,7 @@ func TestPackageDirectoryMismatch(t *testing.T) {
 	// Test version directories (v1, v2, etc.)
 	testRule(t, "package_directory_mismatch/api/v1/api", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/api/V1/api", &rule.PackageDirectoryMismatchRule{}, config)
-	testRule(t, "package_directory_mismatch/api/v1/api_test", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/api/V1/api_test", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/api/v1v/api", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/api/v2/v2", &rule.PackageDirectoryMismatchRule{}, config)
 
