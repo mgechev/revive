@@ -29,14 +29,14 @@ func uselessFallthrough() {
 
 	switch a {
 	case 0:
-		fallthrough // json:{"MATCH": "this \"fallthrough\" can be removed by consolidating this case clause with the next one","Confidence": 0.8}
+		fallthrough 
 	default:
 		println()
 	}
 
 	switch a {
 	case 0:
-		fallthrough // json:{"MATCH": "this \"fallthrough\" can be removed by consolidating this case clause with the next one","Confidence": 0.8}
+		fallthrough 
 	default:
 		println()
 	case 1:
@@ -47,8 +47,7 @@ func uselessFallthrough() {
 
 	switch a {
 	case 0:
-		// This a comment on the case, the confidence must be 0.5
-		fallthrough // json:{"MATCH": "this \"fallthrough\" can be removed by consolidating this case clause with the next one","Confidence": 0.5}
+		fallthrough 
 	default:
 		println()
 	}
@@ -71,9 +70,10 @@ func uselessFallthrough() {
 	switch a {
 	case 0:
 		//foo:bar
-		fallthrough // json:{"MATCH": "this \"fallthrough\" can be removed by consolidating this case clause with the next one","Confidence": 0.5}
+		fallthrough 
 	default:
 		println()
 	}
+
 
 }
