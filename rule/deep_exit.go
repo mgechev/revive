@@ -7,6 +7,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -64,12 +65,18 @@ func (w *lintDeepExit) Visit(node ast.Node) ast.Visitor {
 
 	pkg := id.Name
 	fn := fc.Sel.Name
-	if isCallToExitFunction(pkg, fn) {
+	if isCallToExitFunction(pkg, fn, ce.Args) {
+		msg := fmt.Sprintf("calls to %s.%s only in main() or init() functions", pkg, fn)
+
+		if pkg == "flag" && fn == "NewFlagSet" &&
+			len(ce.Args) == 2 && astutils.IsPkgDotName(ce.Args[1], "flag", "ExitOnError") {
+			msg = "calls to flag.NewFlagSet with flag.ExitOnError only in main() or init() functions"
+		}
 		w.onFailure(lint.Failure{
 			Confidence: 1,
 			Node:       ce,
 			Category:   lint.FailureCategoryBadPractice,
-			Failure:    fmt.Sprintf("calls to %s.%s only in main() or init() functions", pkg, fn),
+			Failure:    msg,
 		})
 	}
 

@@ -173,7 +173,7 @@ func initConfig() {
 	flag.BoolVar(&versionFlag, "version", false, versionUsage)
 	flag.BoolVar(&setExitStatus, "set_exit_status", false, exitStatusUsage)
 	flag.IntVar(&maxOpenFiles, "max_open_files", 0, maxOpenFilesUsage)
-	flag.Parse()
+	flag.Parse() //revive:disable-line:deep-exit
 }
 
 // getVersion returns build info (version, commit, date, and builtBy).
