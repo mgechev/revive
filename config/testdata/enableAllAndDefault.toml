@@ -1,0 +1,9 @@
+ignoreGeneratedHeader = false
+severity = "warning"
+confidence = 0.8
+errorCode = 0
+warningCode = 0
+
+# Both enabled - should get all rules (no duplicates)
+enableAllRules = true
+enableDefaultRules = true

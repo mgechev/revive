@@ -1,0 +1,11 @@
+ignoreGeneratedHeader = false
+severity = "warning"
+confidence = 0.8
+errorCode = 0
+warningCode = 0
+
+enableAllRules = true
+
+# Explicitly add a rule that's already in allRules
+[rule.cyclomatic]
+    arguments=[10]
