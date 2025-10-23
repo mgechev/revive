@@ -96,6 +96,9 @@ func TestGetConfig(t *testing.T) {
 				if cfg.EnableAllRules != tc.wantConfig.EnableAllRules {
 					t.Errorf("EnableAllRules: expected %v, got %v", tc.wantConfig.EnableAllRules, cfg.EnableAllRules)
 				}
+				if cfg.EnableDefaultRules != tc.wantConfig.EnableDefaultRules {
+					t.Errorf("EnableDefaultRules: expected %v, got %v", tc.wantConfig.EnableDefaultRules, cfg.EnableDefaultRules)
+				}
 				if cfg.ErrorCode != tc.wantConfig.ErrorCode {
 					t.Errorf("ErrorCode: expected %v, got %v", tc.wantConfig.ErrorCode, cfg.ErrorCode)
 				}
@@ -237,6 +240,18 @@ func TestGetLintingRules(t *testing.T) {
 		"enableAllRules with 2 disabled rules": {
 			confPath:       "testdata/enableAllBut2.toml",
 			wantRulesCount: len(allRules) - 2,
+		},
+		"enableDefaultRules without disabled rules": {
+			confPath:       "testdata/enableDefault.toml",
+			wantRulesCount: len(defaultRules),
+		},
+		"enableDefaultRules with 2 disabled rules": {
+			confPath:       "testdata/enableDefaultBut2.toml",
+			wantRulesCount: len(defaultRules) - 2,
+		},
+		"enableDefaultRules plus 1 non-default rule": {
+			confPath:       "testdata/enableDefaultPlus1.toml",
+			wantRulesCount: len(defaultRules) + 1,
 		},
 		"enable 2 rules": {
 			confPath:       "testdata/enable2.toml",

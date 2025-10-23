@@ -222,6 +222,17 @@ func normalizeConfig(config *lint.Config) {
 			config.Rules[ruleName] = lint.RuleConfig{}
 		}
 	}
+	if config.EnableDefaultRules {
+		// Add to the configuration all default rules not yet present in it
+		for _, r := range defaultRules {
+			ruleName := r.Name()
+			_, alreadyInConf := config.Rules[ruleName]
+			if alreadyInConf {
+				continue
+			}
+			config.Rules[ruleName] = lint.RuleConfig{}
+		}
+	}
 
 	severity := config.Severity
 	if severity != "" {
