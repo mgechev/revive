@@ -1,8 +1,6 @@
 package test
 
 import (
-	// "os"
-	// "path/filepath"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
