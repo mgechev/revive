@@ -66,33 +66,26 @@ func (w *lintUselessFallthrough) Visit(node ast.Node) ast.Visitor {
 		if !ok || branchStmt.Tok != token.FALLTHROUGH {
 			continue // not a fallthrough
 		}
-
-		nextCaseClause := switchStmt.Body.List[i+1].(*ast.CaseClause)
-		if nextCaseClause.List == nil {
+		confidence := 1.0
+		if nextCaseClause := switchStmt.Body.List[i+1].(*ast.CaseClause); nextCaseClause.List == nil {
 			// The next clause is 'default:', and this is a valid pattern.
 			// Skip reporting this fallthrough.
 			continue
 		}
-
 		if _, ok := w.commentsMap[branchStmt]; ok {
-			// The fallthrough has a comment, still report with lower confidence.
-			w.onFailure(lint.Failure{
-				Confidence: 0.5,
-				Node:       branchStmt,
-				Category:   lint.FailureCategoryCodeStyle,
-				Failure:    `this "fallthrough" can be removed by consolidating this case clause with the next one`,
-			})
-		} else {
-			w.onFailure(lint.Failure{
-				Confidence: 1.0,
-				Node:       branchStmt,
-				Category:   lint.FailureCategoryCodeStyle,
-				Failure:    `this "fallthrough" can be removed by consolidating this case clause with the next one`,
-			})
+			// The fallthrough has a comment, report with lower confidence.
+			confidence = 0.5
 		}
 
-		ast.Walk(w, caseClause)
-	}
+		w.onFailure(lint.Failure{
+			Confidence: confidence,
+			Node:       branchStmt,
+			Category:   lint.FailureCategoryCodeStyle,
+			Failure:    `this "fallthrough" can be removed by consolidating this case clause with the next one`,
+		})
 
+		ast.Walk(w, caseClause)
+
+	}
 	return nil
 }
