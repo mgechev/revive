@@ -2,6 +2,7 @@ package rule
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -96,7 +97,12 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 		return nil
 	}
 
-	dirPath := filepath.Dir(file.Name)
+	absPath, err := filepath.Abs(file.Name)
+	if err != nil {
+		return nil
+	}
+
+	dirPath := filepath.Dir(absPath)
 	dirName := filepath.Base(dirPath)
 
 	if r.ignoredDirs != nil && r.ignoredDirs.MatchString(dirPath) {
@@ -117,6 +123,10 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 	packageName := file.AST.Name.Name
 
 	if r.semanticallyEqual(packageName, dirName) {
+		return nil
+	}
+
+	if isRootDir(dirPath) {
 		return nil
 	}
 
@@ -159,6 +169,23 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 			Category:   lint.FailureCategoryNaming,
 		},
 	}
+}
+
+// isRootDir checks if the given directory contains go.mod or .git, indicating it's a root directory.
+func isRootDir(dirPath string) bool {
+	entries, err := os.ReadDir(dirPath)
+	if err != nil {
+		return false
+	}
+
+	for _, e := range entries {
+		switch e.Name() {
+		case "go.mod", ".git":
+			return true
+		}
+	}
+
+	return false
 }
 
 // Name returns the rule name.
