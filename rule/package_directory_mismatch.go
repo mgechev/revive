@@ -2,6 +2,7 @@ package rule
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -125,6 +126,10 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 		return nil
 	}
 
+	if isRootDir(dirPath) {
+		return nil
+	}
+
 	if file.IsTest() {
 		// treat main_test differently because it's a common package name for tests
 		if packageName == "main_test" {
@@ -134,11 +139,6 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 		if r.semanticallyEqual(packageName, dirName+"_test") {
 			return nil
 		}
-	}
-
-	// For root directory (contains go.mod or .git), ignore the check
-	if isRootDir(dirPath) {
-		return nil
 	}
 
 	// define a default failure message
@@ -169,6 +169,23 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 			Category:   lint.FailureCategoryNaming,
 		},
 	}
+}
+
+// isRootDir checks if the given directory contains go.mod or .git, indicating it's a root directory.
+func isRootDir(dirPath string) bool {
+	entries, err := os.ReadDir(dirPath)
+	if err != nil {
+		return false
+	}
+
+	for _, e := range entries {
+		switch e.Name() {
+		case "go.mod", ".git":
+			return true
+		}
+	}
+
+	return false
 }
 
 // Name returns the rule name.

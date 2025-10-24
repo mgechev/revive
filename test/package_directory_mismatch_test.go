@@ -61,12 +61,8 @@ func TestPackageDirectoryMismatch(t *testing.T) {
 	testRule(t, "package_directory_mismatch/rootdir/bad/client", &rule.PackageDirectoryMismatchRule{}, config)
 
 	// Test handling of root directories with .git
-	{
-		cleanup := addTempGitDir(t)
-		defer cleanup()
-
-		testRule(t, "package_directory_mismatch/rootdir/withgit/client", &rule.PackageDirectoryMismatchRule{}, config)
-	}
+	mkdirTempDotGit(t, "package_directory_mismatch/rootdir/withgit")
+	testRule(t, "package_directory_mismatch/rootdir/withgit/client", &rule.PackageDirectoryMismatchRule{}, config)
 }
 
 func TestPackageDirectoryMismatchWithDefaultConfig(t *testing.T) {

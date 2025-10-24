@@ -413,21 +413,26 @@ func TestExportedType(t *testing.T) {
 	}
 }
 
-// addTempGitDir adds a temporary .git directory to the given directory for testing purposes.
-func addTempGitDir(t *testing.T) func() {
+// mkdirTempDotGit adds a temporary .git directory to the given root directory in testdata.
+// We can't commit .git directly because of the Git restrictions.
+func mkdirTempDotGit(t *testing.T, root string) {
 	t.Helper()
 
-	relPath := filepath.Join("..", "testdata", "package_directory_mismatch", "rootdir", "withgit")
-	dir, err := filepath.Abs(relPath)
+	baseDir := filepath.Join("..", "testdata", root)
+	dir, err := filepath.Abs(baseDir)
 	if err != nil {
-		t.Fatalf("failed to resolve abs path: %v", err)
+		t.Fatalf("Failed to resolve abs path: %v", err)
 	}
 
 	gitDir := filepath.Join(dir, ".git")
 	if err := os.MkdirAll(gitDir, 0o755); err != nil {
-		t.Errorf("failed to create .git directory: %v", err)
-		return func() {}
+		t.Fatalf("Failed to create .git directory: %v", err)
 	}
 
-	return func() { _ = os.RemoveAll(gitDir) }
+	t.Cleanup(func() {
+		err = os.RemoveAll(gitDir)
+		if err != nil {
+			t.Logf("Failed to remove %v: %v", gitDir, err)
+		}
+	})
 }
