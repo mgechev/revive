@@ -29,14 +29,14 @@ func uselessFallthrough() {
 
 	switch a {
 	case 0:
-		fallthrough 
+		fallthrough
 	default:
 		println()
 	}
 
 	switch a {
 	case 0:
-		fallthrough 
+		fallthrough
 	default:
 		println()
 	case 1:
@@ -47,7 +47,7 @@ func uselessFallthrough() {
 
 	switch a {
 	case 0:
-		fallthrough 
+		fallthrough
 	default:
 		println()
 	}
@@ -70,10 +70,9 @@ func uselessFallthrough() {
 	switch a {
 	case 0:
 		//foo:bar
-		fallthrough 
+		fallthrough
 	default:
 		println()
 	}
-
 
 }
