@@ -66,6 +66,7 @@ func (w *lintUselessFallthrough) Visit(node ast.Node) ast.Visitor {
 		if !ok || branchStmt.Tok != token.FALLTHROUGH {
 			continue // not a fallthrough
 		}
+
 		confidence := 1.0
 		if nextCaseClause := switchStmt.Body.List[i+1].(*ast.CaseClause); nextCaseClause.List == nil {
 			// The next clause is 'default:', and this is a valid pattern.
@@ -86,5 +87,6 @@ func (w *lintUselessFallthrough) Visit(node ast.Node) ast.Visitor {
 
 		ast.Walk(w, caseClause)
 	}
+
 	return nil
 }
