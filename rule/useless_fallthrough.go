@@ -85,7 +85,6 @@ func (w *lintUselessFallthrough) Visit(node ast.Node) ast.Visitor {
 		})
 
 		ast.Walk(w, caseClause)
-
 	}
 	return nil
 }
