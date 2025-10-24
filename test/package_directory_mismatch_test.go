@@ -1,6 +1,8 @@
 package test
 
 import (
+	// "os"
+	// "path/filepath"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
@@ -59,6 +61,14 @@ func TestPackageDirectoryMismatch(t *testing.T) {
 	// Test handling of root directories with go.mod
 	testRule(t, "package_directory_mismatch/rootdir/good/client", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/rootdir/bad/client", &rule.PackageDirectoryMismatchRule{}, config)
+
+	// Test handling of root directories with .git
+	{
+		cleanup := addTempGitDir(t)
+		defer cleanup()
+
+		testRule(t, "package_directory_mismatch/rootdir/withgit/client", &rule.PackageDirectoryMismatchRule{}, config)
+	}
 }
 
 func TestPackageDirectoryMismatchWithDefaultConfig(t *testing.T) {
