@@ -69,8 +69,9 @@ func (w *lintUselessFallthrough) Visit(node ast.Node) ast.Visitor {
 
 		confidence := 1.0
 		if nextCaseClause := switchStmt.Body.List[i+1].(*ast.CaseClause); nextCaseClause.List == nil {
-			// the next case clause is the default clause, report with lower confidence.
-			confidence = 0.8
+			// The next clause is 'default:', and this is a valid pattern.
+			// Skip reporting this fallthrough.
+			continue
 		}
 		if _, ok := w.commentsMap[branchStmt]; ok {
 			// The fallthrough has a comment, report with lower confidence.
