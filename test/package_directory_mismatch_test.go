@@ -37,6 +37,7 @@ func TestPackageDirectoryMismatch(t *testing.T) {
 	// Test version directories (v1, v2, etc.)
 	testRule(t, "package_directory_mismatch/api/v1/api", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/api/V1/api", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/api/V1/api_test", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/api/v1v/api", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/api/v2/v2", &rule.PackageDirectoryMismatchRule{}, config)
 
@@ -54,6 +55,14 @@ func TestPackageDirectoryMismatch(t *testing.T) {
 	testRule(t, "package_directory_mismatch/test/bad_test", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/test/bad", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/test/main_test", &rule.PackageDirectoryMismatchRule{}, config)
+
+	// Test handling of root directories with go.mod
+	testRule(t, "package_directory_mismatch/rootdir/good/client", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/rootdir/bad/client", &rule.PackageDirectoryMismatchRule{}, config)
+
+	// Test handling of root directories with .git
+	mkdirTempDotGit(t, "package_directory_mismatch/rootdir/withgit")
+	testRule(t, "package_directory_mismatch/rootdir/withgit/client", &rule.PackageDirectoryMismatchRule{}, config)
 }
 
 func TestPackageDirectoryMismatchWithDefaultConfig(t *testing.T) {
