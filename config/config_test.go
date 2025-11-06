@@ -230,54 +230,54 @@ func TestGetLintingRules(t *testing.T) {
 		wantErr        string
 	}{
 		"no rules": {
-			confPath:       "testdata/noRules.toml",
+			confPath:       "noRules.toml",
 			wantRulesCount: 0,
 		},
 		"enableAllRules without disabled rules": {
-			confPath:       "testdata/enableAll.toml",
+			confPath:       "enableAll.toml",
 			wantRulesCount: len(allRules),
 		},
 		"enableAllRules with 2 disabled rules": {
-			confPath:       "testdata/enableAllBut2.toml",
+			confPath:       "enableAllBut2.toml",
 			wantRulesCount: len(allRules) - 2,
 		},
 		"enableDefaultRules without disabled rules": {
-			confPath:       "testdata/enableDefault.toml",
+			confPath:       "enableDefault.toml",
 			wantRulesCount: len(defaultRules),
 		},
 		"enableDefaultRules with 2 disabled rules": {
-			confPath:       "testdata/enableDefaultBut2.toml",
+			confPath:       "enableDefaultBut2.toml",
 			wantRulesCount: len(defaultRules) - 2,
 		},
 		"enableDefaultRules plus 1 non-default rule": {
-			confPath:       "testdata/enableDefaultPlus1.toml",
+			confPath:       "enableDefaultPlus1.toml",
 			wantRulesCount: len(defaultRules) + 1,
 		},
 		"enableAllRules and enableDefaultRules both set": {
-			confPath:       "testdata/enableAllAndDefault.toml",
+			confPath:       "enableAllAndDefault.toml",
 			wantRulesCount: len(allRules),
 		},
 		"enableDefaultRules plus rule already in defaults": {
-			confPath:       "testdata/enableDefaultPlusDefaultRule.toml",
+			confPath:       "enableDefaultPlusDefaultRule.toml",
 			wantRulesCount: len(defaultRules),
 		},
 		"enableAllRules plus rule already in all": {
-			confPath:       "testdata/enableAllPlusRule.toml",
+			confPath:       "enableAllPlusRule.toml",
 			wantRulesCount: len(allRules),
 		},
 		"enable 2 rules": {
-			confPath:       "testdata/enable2.toml",
+			confPath:       "enable2.toml",
 			wantRulesCount: 2,
 		},
 		"var-naming configure error": {
-			confPath: "testdata/varNamingConfigureError.toml",
+			confPath: "varNamingConfigureError.toml",
 			wantErr:  `cannot configure rule: "var-naming": invalid argument to the var-naming rule. Expecting a allowlist of type slice with initialisms, got string`,
 		},
 	}
 
 	for name, tc := range tt {
 		t.Run(name, func(t *testing.T) {
-			cfg, err := GetConfig(tc.confPath)
+			cfg, err := GetConfig(filepath.Join("testdata", tc.confPath))
 			if err != nil {
 				t.Fatalf("Unexpected error while loading conf: %v", err)
 			}
