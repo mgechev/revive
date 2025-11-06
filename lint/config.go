@@ -60,6 +60,7 @@ type Config struct {
 	Confidence            float64          `toml:"confidence"`
 	Severity              Severity         `toml:"severity"`
 	EnableAllRules        bool             `toml:"enableAllRules"`
+	EnableDefaultRules    bool             `toml:"enableDefaultRules"`
 	Rules                 RulesConfig      `toml:"rule"`
 	ErrorCode             int              `toml:"errorCode"`
 	WarningCode           int              `toml:"warningCode"`

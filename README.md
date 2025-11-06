@@ -50,7 +50,6 @@ If you disable them in the config file, revive will run over 6x faster than goli
   - [Sample Invocations](#sample-invocations)
   - [Comment Directives](#comment-directives)
   - [Configuration](#configuration)
-  - [Default Configuration](#default-configuration)
   - [Custom Configuration](#custom-configuration)
   - [Recommended Configuration](#recommended-configuration)
   - [Rule-level file excludes](#rule-level-file-excludes)
@@ -360,6 +359,15 @@ severity = "error"
 By default `revive` will enable only the linting rules that are named in the configuration file.
 For example, the previous configuration file makes `revive` to enable only _cyclomatic_ and _package-comments_ linting rules.
 
+To enable default rules you need to use:
+
+```toml
+enableDefaultRules = true
+```
+
+This will enable all rules available in `golint` and use their default configuration (i.e. the way they are hardcoded in `golint`).
+The default configuration of `revive` can be found at `defaults.toml`.
+
 To enable all available rules you need to add:
 
 ```toml
@@ -415,17 +423,6 @@ Arguments = [3]
 [rule.error-strings]
 Arguments = ["mypackage.Error"]
 ```
-
-### Default Configuration
-
-The default configuration of `revive` can be found at `defaults.toml`.
-This will enable all rules available in `golint` and use their default configuration (i.e. the way they are hardcoded in `golint`).
-
-```shell
-revive -config defaults.toml github.com/mgechev/revive
-```
-
-This will use the configuration file `defaults.toml`, the `default` formatter, and will run linting over the `github.com/mgechev/revive` package.
 
 ### Custom Configuration
 

@@ -1,0 +1,4 @@
+enableAllRules = true
+
+# Explicitly add a rule that's already in allRules
+[rule.cyclomatic]

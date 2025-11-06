@@ -1,0 +1,4 @@
+# Enable all rules without duplicates
+
+enableAllRules = true
+enableDefaultRules = true

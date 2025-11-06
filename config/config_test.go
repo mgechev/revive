@@ -72,6 +72,39 @@ func TestGetConfig(t *testing.T) {
 					IgnoreGeneratedHeader: true,
 				},
 			},
+			"config from file enableDefault": {
+				confPath: "enableDefault.toml",
+				wantConfig: lint.Config{
+					Confidence:            0.8,
+					IgnoreGeneratedHeader: false,
+					EnableDefaultRules:    true,
+					Rules: lint.RulesConfig{
+						"blank-imports":        {},
+						"context-as-argument":  {},
+						"context-keys-type":    {},
+						"dot-imports":          {},
+						"empty-block":          {},
+						"error-naming":         {},
+						"error-return":         {},
+						"error-strings":        {},
+						"errorf":               {},
+						"exported":             {},
+						"increment-decrement":  {},
+						"indent-error-flow":    {},
+						"package-comments":     {},
+						"range":                {},
+						"receiver-naming":      {},
+						"redefines-builtin-id": {},
+						"superfluous-else":     {},
+						"time-naming":          {},
+						"unexported-return":    {},
+						"unreachable-code":     {},
+						"unused-parameter":     {},
+						"var-declaration":      {},
+						"var-naming":           {},
+					},
+				},
+			},
 		} {
 			t.Run(name, func(t *testing.T) {
 				var cfgPath string
@@ -95,6 +128,9 @@ func TestGetConfig(t *testing.T) {
 				}
 				if cfg.EnableAllRules != tc.wantConfig.EnableAllRules {
 					t.Errorf("EnableAllRules: expected %v, got %v", tc.wantConfig.EnableAllRules, cfg.EnableAllRules)
+				}
+				if cfg.EnableDefaultRules != tc.wantConfig.EnableDefaultRules {
+					t.Errorf("EnableDefaultRules: expected %v, got %v", tc.wantConfig.EnableDefaultRules, cfg.EnableDefaultRules)
 				}
 				if cfg.ErrorCode != tc.wantConfig.ErrorCode {
 					t.Errorf("ErrorCode: expected %v, got %v", tc.wantConfig.ErrorCode, cfg.ErrorCode)
@@ -227,30 +263,54 @@ func TestGetLintingRules(t *testing.T) {
 		wantErr        string
 	}{
 		"no rules": {
-			confPath:       "testdata/noRules.toml",
+			confPath:       "noRules.toml",
 			wantRulesCount: 0,
 		},
 		"enableAllRules without disabled rules": {
-			confPath:       "testdata/enableAll.toml",
+			confPath:       "enableAll.toml",
 			wantRulesCount: len(allRules),
 		},
 		"enableAllRules with 2 disabled rules": {
-			confPath:       "testdata/enableAllBut2.toml",
+			confPath:       "enableAllBut2.toml",
 			wantRulesCount: len(allRules) - 2,
 		},
+		"enableDefaultRules without disabled rules": {
+			confPath:       "enableDefault.toml",
+			wantRulesCount: len(defaultRules),
+		},
+		"enableDefaultRules with 2 disabled rules": {
+			confPath:       "enableDefaultBut2.toml",
+			wantRulesCount: len(defaultRules) - 2,
+		},
+		"enableDefaultRules plus 1 non-default rule": {
+			confPath:       "enableDefaultPlus1.toml",
+			wantRulesCount: len(defaultRules) + 1,
+		},
+		"enableAllRules and enableDefaultRules both set": {
+			confPath:       "enableAllAndDefault.toml",
+			wantRulesCount: len(allRules),
+		},
+		"enableDefaultRules plus rule already in defaults": {
+			confPath:       "enableDefaultPlusDefaultRule.toml",
+			wantRulesCount: len(defaultRules),
+		},
+		"enableAllRules plus rule already in all": {
+			confPath:       "enableAllWithRule.toml",
+			wantRulesCount: len(allRules),
+		},
 		"enable 2 rules": {
-			confPath:       "testdata/enable2.toml",
+			confPath:       "enable2.toml",
 			wantRulesCount: 2,
 		},
 		"var-naming configure error": {
-			confPath: "testdata/varNamingConfigureError.toml",
+			confPath: "varNamingConfigureError.toml",
 			wantErr:  `cannot configure rule: "var-naming": invalid argument to the var-naming rule. Expecting a allowlist of type slice with initialisms, got string`,
 		},
 	}
 
 	for name, tc := range tt {
 		t.Run(name, func(t *testing.T) {
-			cfg, err := GetConfig(tc.confPath)
+			cfg, err := GetConfig(filepath.Join("testdata", tc.confPath))
 			if err != nil {
 				t.Fatalf("Unexpected error while loading conf: %v", err)
 			}

@@ -210,17 +210,20 @@ func normalizeConfig(config *lint.Config) {
 	if len(config.Rules) == 0 {
 		config.Rules = map[string]lint.RuleConfig{}
 	}
-	if config.EnableAllRules {
-		// Add to the configuration all rules not yet present in it
-		for _, r := range allRules {
+
+	addRules := func(config *lint.Config, rules []lint.Rule) {
+		for _, r := range rules {
 			ruleName := r.Name()
-			_, alreadyInConf := config.Rules[ruleName]
-			if alreadyInConf {
-				continue
+			if _, ok := config.Rules[ruleName]; !ok {
+				config.Rules[ruleName] = lint.RuleConfig{}
 			}
-			// Add the rule with an empty conf for
-			config.Rules[ruleName] = lint.RuleConfig{}
 		}
+	}
+
+	if config.EnableAllRules {
+		addRules(config, allRules)
+	} else if config.EnableDefaultRules {
+		addRules(config, defaultRules)
 	}
 
 	severity := config.Severity

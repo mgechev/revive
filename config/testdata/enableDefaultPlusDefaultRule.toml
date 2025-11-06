@@ -1,0 +1,6 @@
+# Enable default rules
+
+enableDefaultRules = true
+
+# Explicitly add a rule that's already in defaults
+[rule.exported]
