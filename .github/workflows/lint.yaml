@@ -44,7 +44,7 @@ jobs:
     - name: Run golangci-lint
       uses: golangci/golangci-lint-action@v8
       with:
-        version: v2.2.1
+        version: v2.6.1
 
   lint-md:
     name: Lint Markdown
@@ -58,15 +58,15 @@ jobs:
           go-version: stable
 
       - name: Setup mdsf
-        uses: hougesen/mdsf@v0.9.5
+        uses: hougesen/mdsf@v0.10.8
 
       - name: Setup goimports
         # https://pkg.go.dev/golang.org/x/tools/cmd/goimports
-        run: go install golang.org/x/tools/cmd/goimports@v0.33.0
+        run: go install golang.org/x/tools/cmd/goimports@v0.38.0
 
       - name: Setup shfmt
         # https://github.com/mvdan/sh#shfmt
-        run: go install mvdan.cc/sh/v3/cmd/shfmt@v3.11.0
+        run: go install mvdan.cc/sh/v3/cmd/shfmt@v3.12.0
 
       - name: Setup taplo
         # https://taplo.tamasfe.dev/cli/installation/binary.html
