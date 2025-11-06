@@ -206,27 +206,24 @@ func parseConfig(path string, config *lint.Config) error {
 	return nil
 }
 
-func addRulesToConfig(config *lint.Config, rules []lint.Rule) {
-	for _, r := range rules {
-		ruleName := r.Name()
-		if _, alreadyInConf := config.Rules[ruleName]; alreadyInConf {
-			continue
-		}
-		config.Rules[ruleName] = lint.RuleConfig{}
-	}
-}
-
 func normalizeConfig(config *lint.Config) {
 	if len(config.Rules) == 0 {
 		config.Rules = map[string]lint.RuleConfig{}
 	}
-	if config.EnableAllRules {
-		// Add to the configuration all rules not yet present in it
-		addRulesToConfig(config, allRules)
+
+	addRules := func(config *lint.Config, rules []lint.Rule) {
+		for _, r := range rules {
+			ruleName := r.Name()
+			if _, ok := config.Rules[ruleName]; !ok {
+				config.Rules[ruleName] = lint.RuleConfig{}
+			}
+		}
 	}
-	if config.EnableDefaultRules {
-		// Add to the configuration all default rules not yet present in it
-		addRulesToConfig(config, defaultRules)
+
+	if config.EnableAllRules {
+		addRules(config, allRules)
+	} else if config.EnableDefaultRules {
+		addRules(config, defaultRules)
 	}
 
 	severity := config.Severity
