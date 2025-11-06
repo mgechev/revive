@@ -1,12 +1,8 @@
-ignoreGeneratedHeader = false
-severity = "warning"
-confidence = 0.8
-errorCode = 0
-warningCode = 0
+# Enable all rules without 1 default and 1 non-default
 
 enableAllRules = true
 
 [rule.exported]
-    disabled=true
+Disabled = true
 [rule.cyclomatic]
-    disabled=true
+Disabled = true

@@ -262,7 +262,7 @@ func TestGetLintingRules(t *testing.T) {
 			wantRulesCount: len(defaultRules),
 		},
 		"enableAllRules plus rule already in all": {
-			confPath:       "enableAllPlusRule.toml",
+			confPath:       "enableAllWithRule.toml",
 			wantRulesCount: len(allRules),
 		},
 		"enable 2 rules": {

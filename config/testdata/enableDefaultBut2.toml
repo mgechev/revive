@@ -1,12 +1,9 @@
-ignoreGeneratedHeader = false
-severity = "warning"
-confidence = 0.8
-errorCode = 0
-warningCode = 0
+# Enable default without 2 default rules
 
 enableDefaultRules = true
 
+# Disable a few default rules
 [rule.exported]
-    disabled=true
+Disabled = true
 [rule.indent-error-flow]
-    disabled=true
+Disabled = true
