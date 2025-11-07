@@ -1,7 +1,5 @@
 .PHONY: test lint
 
-export GO111MODULE=on
-
 GIT_COMMIT ?= $(shell git rev-parse --verify HEAD)
 GIT_VERSION ?= $(shell git describe --tags --always --dirty="-dev")
 DATE ?= $(shell date -u '+%Y-%m-%d %H:%M UTC')
@@ -13,7 +11,10 @@ all: test lint build
 install:
 	@go mod vendor
 
-build:
+tidy:
+	@go mod tidy -diff
+
+build: tidy
 	@go build -ldflags='$(VERSION_FLAGS)'
 
 lint:
