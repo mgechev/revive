@@ -110,7 +110,7 @@ func (w confusingEpoch) check(name *ast.Ident, value ast.Expr) {
 			Confidence: 0.9,
 			Node:       name,
 			Category:   lint.FailureCategoryTime,
-			Failure:    fmt.Sprintf("variable '%s' initialized with %s() should have a name containing one of %v", varName, methodName, displaySuffixes),
+			Failure:    fmt.Sprintf("variable '%s' initialized with %s() should have a name end with one of %v", varName, methodName, displaySuffixes),
 		})
 	}
 }
