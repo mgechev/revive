@@ -16,6 +16,7 @@ List of all available rules.
 - [comment-spacings](#comment-spacings)
 - [comments-density](#comments-density)
 - [confusing-naming](#confusing-naming)
+- [confusing-epoch](#confusing-epoch)
 - [confusing-results](#confusing-results)
 - [constant-logical-expr](#constant-logical-expr)
 - [context-as-argument](#context-as-argument)
@@ -278,6 +279,42 @@ arguments = [15]
 ## confusing-naming
 
 _Description_: Methods or fields of `struct` that have names different only by capitalization could be confusing.
+
+_Configuration_: N/A
+
+## confusing-epoch
+
+_Description_: Variables initialized with epoch time methods (`time.Now().Unix()`, `time.Now().UnixMilli()`, `time.Now().UnixMicro()`, `time.Now().UnixNano()`) should have names that clearly indicate their time unit to prevent confusion and potential bugs when working with different time scales.
+
+This rule enforces that variable names contain appropriate suffixes based on the method used:
+- `Unix()`: variable name should contain "Sec", "Second" or "Seconds"
+- `UnixMilli()`: variable name should contain "Milli" or "Ms"
+- `UnixMicro()`: variable name should contain "Micro", "Microsecond", "Microseconds" or "Us"
+- `UnixNano()`: variable name should contain "Nano" or "Ns"
+
+The rule checks variable declarations, short variable declarations (`:=`), and regular assignments (`=`). The suffix matching is case-insensitive and must appear at the end of the variable name.
+
+### Examples (confusing-epoch)
+
+Before (violation):
+
+```go
+timestamp := time.Now().Unix()           // unclear which unit
+createdAt := time.Now().UnixMilli()      // missing unit indicator
+t := time.Now().UnixNano()               // too short, unclear
+```
+
+After (fixed):
+
+```go
+timestampSec := time.Now().Unix()        // clearly seconds
+createdAtMs := time.Now().UnixMilli()    // clearly milliseconds
+tNano := time.Now().UnixNano()           // clearly nanoseconds
+
+// Alternative valid names
+createdSeconds := time.Now().Unix()      // full word is fine
+updatedMicro := time.Now().UnixMicro()   // microseconds
+```
 
 _Configuration_: N/A
 
