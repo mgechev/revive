@@ -6,7 +6,18 @@
   "packageRules": [
     {
       "matchManagers": ["gomod"],
+      "matchFileNames": ["go.mod"],
       "matchDepTypes": ["indirect"],
+      "groupName": "gomod",
+      "extends": ["schedule:weekly"],
+      "enabled": true
+    },
+    {
+      "matchManagers": ["gomod"],
+      "matchFileNames": ["tools/go.mod"],
+      "matchDepTypes": ["indirect"],
+      "groupName": "tools gomod",
+      "extends": ["schedule:monthly"],
       "enabled": true
     }
   ],
