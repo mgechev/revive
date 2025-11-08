@@ -113,7 +113,7 @@ func (w *lintUseWaitGroupGo) analyzeBlock(b *ast.BlockStmt) {
 			w.onFailure(lint.Failure{
 				Confidence: 1,
 				Node:       call,
-				Category:   lint.FailureCategoryCodeStyle,
+				Category:   lint.FailureCategoryStyle,
 				Failure:    "replace wg.Add()...go {...wg.Done()...} with wg.Go(...)",
 			})
 

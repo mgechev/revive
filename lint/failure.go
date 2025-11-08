@@ -10,8 +10,6 @@ const (
 	FailureCategoryArgOrder FailureCategory = "arg-order"
 	// FailureCategoryBadPractice indicates bad practice issues.
 	FailureCategoryBadPractice FailureCategory = "bad practice"
-	// FailureCategoryCodeStyle indicates code style issues.
-	FailureCategoryCodeStyle FailureCategory = "code-style"
 	// FailureCategoryComments indicates comment issues.
 	FailureCategoryComments FailureCategory = "comments"
 	// FailureCategoryComplexity indicates complexity issues.
