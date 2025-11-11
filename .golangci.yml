@@ -12,6 +12,7 @@ linters:
     - govet
     - ineffassign
     - misspell
+    - musttag
     - nolintlint
     - revive
     - thelper

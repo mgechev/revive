@@ -190,13 +190,11 @@ func (*lintUnconditionalRecursionRule) hasControlExit(node ast.Node) bool {
 
 			functionName := se.Sel.Name
 			pkgName := id.Name
-			if isCallToExitFunction(pkgName, functionName) {
-				return true
-			}
+			return isCallToExitFunction(pkgName, functionName, n.Args)
 		}
 
 		return false
 	}
 
-	return len(astutils.PickNodes(node, isExit)) != 0
+	return astutils.SeekNode[ast.Node](node, isExit) != nil
 }

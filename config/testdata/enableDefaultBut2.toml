@@ -1,0 +1,9 @@
+# Enable default without 2 default rules
+
+enableDefaultRules = true
+
+# Disable a few default rules
+[rule.exported]
+Disabled = true
+[rule.indent-error-flow]
+Disabled = true

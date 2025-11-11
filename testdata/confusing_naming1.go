@@ -81,3 +81,17 @@ type b[T any] struct{}
 
 func (x *b[T]) method() {
 }
+
+// Multiple blank identifiers should be allowed (for padding/alignment)
+type siginfoChild struct {
+	signo    int32
+	errno    int32
+	exitCode int32
+	_        int32
+
+	pid    int32
+	uid    uint32
+	status int32
+
+	_ [25]uint32
+}

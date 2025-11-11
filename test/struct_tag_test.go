@@ -21,6 +21,24 @@ func TestStructTagWithUserOptions(t *testing.T) {
 			"mapstructure,myMapstructureOption",
 			"validate,displayName",
 			"toml,unknown",
+			"spanner,mySpannerOption",
+			"codec,myCodecOption",
+			"cbor,myCborOption",
+		},
+	})
+}
+
+func TestStructTagWithOmittedTags(t *testing.T) {
+	testRule(t, "struct_tag_user_options_omit", &rule.StructTagRule{}, &lint.RuleConfig{
+		Arguments: []any{
+			"!validate",
+			"!toml",
+			"json,inline,outline",
+			"bson,gnu",
+			"url,myURLOption",
+			"datastore,myDatastoreOption",
+			"mapstructure,myMapstructureOption",
+			"spanner,mySpannerOption",
 		},
 	})
 }

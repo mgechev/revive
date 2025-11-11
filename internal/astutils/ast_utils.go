@@ -3,6 +3,8 @@ package astutils
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"go/ast"
 	"go/printer"
@@ -150,6 +152,49 @@ func (p picker) Visit(node ast.Node) ast.Visitor {
 	return p
 }
 
+// SeekNode yields the first node selected by the given selector function in the AST subtree with root n.
+// The function returns nil if no matching node is found in the subtree.
+func SeekNode[T ast.Node](n ast.Node, selector func(n ast.Node) bool) T {
+	var result T
+
+	if n == nil {
+		return result
+	}
+
+	if selector == nil {
+		return result
+	}
+
+	onSelect := func(n ast.Node) {
+		result, _ = n.(T)
+	}
+
+	p := &seeker{selector: selector, onSelect: onSelect, found: false}
+	ast.Walk(p, n)
+
+	return result
+}
+
+type seeker struct {
+	selector func(n ast.Node) bool
+	onSelect func(n ast.Node)
+	found    bool
+}
+
+func (s *seeker) Visit(node ast.Node) ast.Visitor {
+	if s.found {
+		return nil // stop visiting subtree
+	}
+
+	if s.selector(node) {
+		s.onSelect(node)
+		s.found = true
+		return nil // skip visiting node children
+	}
+
+	return s
+}
+
 var gofmtConfig = &printer.Config{Tabwidth: 8}
 
 // GoFmt returns a string representation of an AST subtree.
@@ -158,4 +203,14 @@ func GoFmt(x any) string {
 	fs := token.NewFileSet()
 	gofmtConfig.Fprint(&buf, fs, x)
 	return buf.String()
+}
+
+// NodeHash yields the MD5 hash of the given AST node.
+func NodeHash(node ast.Node) string {
+	hasher := func(in string) string {
+		binHash := md5.Sum([]byte(in))
+		return hex.EncodeToString(binHash[:])
+	}
+	str := GoFmt(node)
+	return hasher(str)
 }

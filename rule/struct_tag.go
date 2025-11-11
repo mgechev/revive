@@ -16,6 +16,7 @@ import (
 // StructTagRule lints struct tags.
 type StructTagRule struct {
 	userDefined map[tagKey][]string // map: key -> []option
+	omittedTags map[tagKey]struct{} // set of tags that must not be analyzed
 }
 
 type tagKey string
@@ -23,6 +24,8 @@ type tagKey string
 const (
 	keyASN1         tagKey = "asn1"
 	keyBSON         tagKey = "bson"
+	keyCbor         tagKey = "cbor"
+	keyCodec        tagKey = "codec"
 	keyDatastore    tagKey = "datastore"
 	keyDefault      tagKey = "default"
 	keyJSON         tagKey = "json"
@@ -30,6 +33,7 @@ const (
 	keyProperties   tagKey = "properties"
 	keyProtobuf     tagKey = "protobuf"
 	keyRequired     tagKey = "required"
+	keySpanner      tagKey = "spanner"
 	keyTOML         tagKey = "toml"
 	keyURL          tagKey = "url"
 	keyValidate     tagKey = "validate"
@@ -37,11 +41,13 @@ const (
 	keyYAML         tagKey = "yaml"
 )
 
-type tagChecker func(checkCtx *checkContext, tag *structtag.Tag, fieldType ast.Expr) (message string, succeeded bool)
+type tagChecker func(checkCtx *checkContext, tag *structtag.Tag, field *ast.Field) (message string, succeeded bool)
 
 var tagCheckers = map[tagKey]tagChecker{
 	keyASN1:         checkASN1Tag,
 	keyBSON:         checkBSONTag,
+	keyCbor:         checkCborTag,
+	keyCodec:        checkCodecTag,
 	keyDatastore:    checkDatastoreTag,
 	keyDefault:      checkDefaultTag,
 	keyJSON:         checkJSONTag,
@@ -49,6 +55,7 @@ var tagCheckers = map[tagKey]tagChecker{
 	keyProperties:   checkPropertiesTag,
 	keyProtobuf:     checkProtobufTag,
 	keyRequired:     checkRequiredTag,
+	keySpanner:      checkSpannerTag,
 	keyTOML:         checkTOMLTag,
 	keyURL:          checkURLTag,
 	keyValidate:     checkValidateTag,
@@ -60,6 +67,7 @@ type checkContext struct {
 	userDefined    map[tagKey][]string // map: key -> []option
 	usedTagNbr     map[int]bool        // list of used tag numbers
 	usedTagName    map[string]bool     // list of used tag keys
+	commonOptions  map[string]bool     // list of options defined for all fields
 	isAtLeastGo124 bool
 }
 
@@ -70,6 +78,23 @@ func (checkCtx checkContext) isUserDefined(key tagKey, opt string) bool {
 
 	options := checkCtx.userDefined[key]
 	return slices.Contains(options, opt)
+}
+
+func (checkCtx *checkContext) isCommonOption(opt string) bool {
+	if checkCtx.commonOptions == nil {
+		return false
+	}
+
+	_, ok := checkCtx.commonOptions[opt]
+	return ok
+}
+
+func (checkCtx *checkContext) addCommonOption(opt string) {
+	if checkCtx.commonOptions == nil {
+		checkCtx.commonOptions = map[string]bool{}
+	}
+
+	checkCtx.commonOptions[opt] = true
 }
 
 // Configure validates the rule configuration, and configures the rule accordingly.
@@ -85,17 +110,23 @@ func (r *StructTagRule) Configure(arguments lint.Arguments) error {
 		return err
 	}
 
-	r.userDefined = make(map[tagKey][]string, len(arguments))
+	r.userDefined = map[tagKey][]string{}
+	r.omittedTags = map[tagKey]struct{}{}
 	for _, arg := range arguments {
 		item, ok := arg.(string)
 		if !ok {
 			return fmt.Errorf("invalid argument to the %s rule. Expecting a string, got %v (of type %T)", r.Name(), arg, arg)
 		}
+
 		parts := strings.Split(item, ",")
-		if len(parts) < 2 {
-			return fmt.Errorf("invalid argument to the %s rule. Expecting a string of the form key[,option]+, got %s", r.Name(), item)
+		keyStr := strings.TrimSpace(parts[0])
+		keyStr, isOmitted := strings.CutPrefix(keyStr, "!")
+		key := tagKey(keyStr)
+		if isOmitted {
+			r.omittedTags[key] = struct{}{}
+			continue
 		}
-		key := tagKey(strings.TrimSpace(parts[0]))
+
 		for i := 1; i < len(parts); i++ {
 			option := strings.TrimSpace(parts[i])
 			r.userDefined[key] = append(r.userDefined[key], option)
@@ -115,6 +146,7 @@ func (r *StructTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 	w := lintStructTagRule{
 		onFailure:      onFailure,
 		userDefined:    r.userDefined,
+		omittedTags:    r.omittedTags,
 		isAtLeastGo124: file.Pkg.IsAtLeastGoVersion(lint.Go124),
 		tagCheckers:    tagCheckers,
 	}
@@ -132,6 +164,7 @@ func (*StructTagRule) Name() string {
 type lintStructTagRule struct {
 	onFailure      func(lint.Failure)
 	userDefined    map[tagKey][]string // map: key -> []option
+	omittedTags    map[tagKey]struct{}
 	isAtLeastGo124 bool
 	tagCheckers    map[tagKey]tagChecker
 }
@@ -162,32 +195,71 @@ func (w lintStructTagRule) Visit(node ast.Node) ast.Visitor {
 
 // checkTaggedField checks the tag of the given field.
 // precondition: the field has a tag
-func (w lintStructTagRule) checkTaggedField(checkCtx *checkContext, f *ast.Field) {
-	if len(f.Names) > 0 && !f.Names[0].IsExported() {
-		w.addFailuref(f, "tag on not-exported field %s", f.Names[0].Name)
-	}
-
-	tags, err := structtag.Parse(strings.Trim(f.Tag.Value, "`"))
+func (w lintStructTagRule) checkTaggedField(checkCtx *checkContext, field *ast.Field) {
+	tags, err := structtag.Parse(strings.Trim(field.Tag.Value, "`"))
 	if err != nil || tags == nil {
-		w.addFailuref(f.Tag, "malformed tag")
+		w.addFailuref(field.Tag, "malformed tag")
 		return
 	}
 
+	analyzedTags := map[tagKey]struct{}{}
 	for _, tag := range tags.Tags() {
-		if msg, ok := w.checkTagNameIfNeed(checkCtx, tag); !ok {
-			w.addFailureWithTagKey(f.Tag, msg, tag.Key)
+		_, mustOmit := w.omittedTags[tagKey(tag.Key)]
+		if mustOmit {
+			continue
 		}
 
-		checker, ok := w.tagCheckers[tagKey(tag.Key)]
+		if msg, ok := w.checkTagNameIfNeed(checkCtx, tag); !ok {
+			w.addFailureWithTagKey(field.Tag, msg, tag.Key)
+		}
+
+		if msg, ok := checkOptionsOnIgnoredField(tag); !ok {
+			w.addFailureWithTagKey(field.Tag, msg, tag.Key)
+		}
+
+		key := tagKey(tag.Key)
+		checker, ok := w.tagCheckers[key]
 		if !ok {
 			continue // we don't have a checker for the tag
 		}
 
-		msg, ok := checker(checkCtx, tag, f.Type)
+		msg, ok := checker(checkCtx, tag, field)
 		if !ok {
-			w.addFailureWithTagKey(f.Tag, msg, tag.Key)
+			w.addFailureWithTagKey(field.Tag, msg, tag.Key)
+		}
+
+		analyzedTags[key] = struct{}{}
+	}
+
+	if w.shallWarnOnUnexportedField(field.Names, analyzedTags) {
+		w.addFailuref(field, "tag on not-exported field %s", field.Names[0].Name)
+	}
+}
+
+// tagKeyToSpecialField maps tag keys to their "special" meaning struct fields.
+var tagKeyToSpecialField = map[tagKey]string{
+	"codec": structTagCodecSpecialField,
+}
+
+func (lintStructTagRule) shallWarnOnUnexportedField(fieldNames []*ast.Ident, tags map[tagKey]struct{}) bool {
+	if len(fieldNames) != 1 { // only handle the case of single field  name (99.999% of cases)
+		return false
+	}
+
+	if fieldNames[0].IsExported() {
+		return false
+	}
+
+	fieldNameStr := fieldNames[0].Name
+
+	for key := range tags {
+		specialField, ok := tagKeyToSpecialField[key]
+		if ok && specialField == fieldNameStr {
+			return false
 		}
 	}
+
+	return true
 }
 
 func (w lintStructTagRule) checkTagNameIfNeed(checkCtx *checkContext, tag *structtag.Tag) (message string, succeeded bool) {
@@ -198,7 +270,7 @@ func (w lintStructTagRule) checkTagNameIfNeed(checkCtx *checkContext, tag *struc
 
 	key := tagKey(tag.Key)
 	switch key {
-	case keyBSON, keyJSON, keyXML, keyYAML, keyProtobuf:
+	case keyBSON, keyCodec, keyJSON, keyProtobuf, keySpanner, keyXML, keyYAML: // keys that need to check for duplicated tags
 	default:
 		return "", true
 	}
@@ -235,7 +307,8 @@ func (lintStructTagRule) getTagName(tag *structtag.Tag) string {
 	}
 }
 
-func checkASN1Tag(checkCtx *checkContext, tag *structtag.Tag, fieldType ast.Expr) (message string, succeeded bool) {
+func checkASN1Tag(checkCtx *checkContext, tag *structtag.Tag, field *ast.Field) (message string, succeeded bool) {
+	fieldType := field.Type
 	checkList := slices.Concat(tag.Options, []string{tag.Name})
 	for _, opt := range checkList {
 		switch opt {
@@ -276,7 +349,7 @@ func checkCompoundANS1Option(checkCtx *checkContext, opt string, fieldType ast.E
 	return "", true
 }
 
-func checkDatastoreTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
+func checkDatastoreTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "flatten", "noindex", "omitempty":
@@ -291,15 +364,15 @@ func checkDatastoreTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (
 	return "", true
 }
 
-func checkDefaultTag(_ *checkContext, tag *structtag.Tag, fieldType ast.Expr) (message string, succeeded bool) {
-	if !typeValueMatch(fieldType, tag.Name) {
+func checkDefaultTag(_ *checkContext, tag *structtag.Tag, field *ast.Field) (message string, succeeded bool) {
+	if !typeValueMatch(field.Type, tag.Name) {
 		return msgTypeMismatch, false
 	}
 
 	return "", true
 }
 
-func checkBSONTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
+func checkBSONTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "inline", "minsize", "omitempty":
@@ -314,7 +387,92 @@ func checkBSONTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (messa
 	return "", true
 }
 
-func checkJSONTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
+func checkCborTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
+	hasToArray := false
+	hasOmitEmptyOrZero := false
+	hasKeyAsInt := false
+
+	for _, opt := range tag.Options {
+		switch opt {
+		case "omitempty", "omitzero":
+			hasOmitEmptyOrZero = true
+		case "toarray":
+			if tag.Name != "" {
+				return `tag name for option "toarray" should be empty`, false
+			}
+			hasToArray = true
+		case "keyasint":
+			intKey, err := strconv.Atoi(tag.Name)
+			if err != nil {
+				return `tag name for option "keyasint" should be an integer`, false
+			}
+
+			_, ok := checkCtx.usedTagNbr[intKey]
+			if ok {
+				return fmt.Sprintf("duplicated integer key %d", intKey), false
+			}
+
+			checkCtx.usedTagNbr[intKey] = true
+			hasKeyAsInt = true
+			continue
+
+		default:
+			if !checkCtx.isUserDefined(keyCbor, opt) {
+				return fmt.Sprintf(msgUnknownOption, opt), false
+			}
+		}
+	}
+
+	// Check for duplicated tag names
+	if tag.Name != "" {
+		_, ok := checkCtx.usedTagName[tag.Name]
+		if ok {
+			return fmt.Sprintf("duplicated tag name %s", tag.Name), false
+		}
+		checkCtx.usedTagName[tag.Name] = true
+	}
+
+	// Check for integer tag names without keyasint option
+	if !hasKeyAsInt {
+		_, err := strconv.Atoi(tag.Name)
+		if err == nil {
+			return `integer tag names are only allowed in presence of "keyasint" option`, false
+		}
+	}
+
+	if hasToArray && hasOmitEmptyOrZero {
+		return `options "omitempty" and "omitzero" are ignored in presence of "toarray" option`, false
+	}
+
+	return "", true
+}
+
+const structTagCodecSpecialField = "_struct"
+
+func checkCodecTag(checkCtx *checkContext, tag *structtag.Tag, field *ast.Field) (message string, succeeded bool) {
+	fieldNames := field.Names
+	mustAddToCommonOptions := len(fieldNames) == 1 && fieldNames[0].Name == structTagCodecSpecialField // see https://github.com/mgechev/revive/issues/1477#issuecomment-3191493076
+	for _, opt := range tag.Options {
+		if mustAddToCommonOptions {
+			checkCtx.addCommonOption(opt)
+		} else if checkCtx.isCommonOption(opt) {
+			return fmt.Sprintf("redundant option %q, already set for all fields", opt), false
+		}
+
+		switch opt {
+		case "omitempty", "toarray", "int", "uint", "float", "-", "omitemptyarray":
+		default:
+			if checkCtx.isUserDefined(keyCodec, opt) {
+				continue
+			}
+			return fmt.Sprintf(msgUnknownOption, opt), false
+		}
+	}
+
+	return "", true
+}
+
+func checkJSONTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "omitempty", "string":
@@ -339,7 +497,7 @@ func checkJSONTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (messa
 	return "", true
 }
 
-func checkMapstructureTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
+func checkMapstructureTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "omitempty", "reminder", "squash":
@@ -354,13 +512,14 @@ func checkMapstructureTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr
 	return "", true
 }
 
-func checkPropertiesTag(_ *checkContext, tag *structtag.Tag, fieldType ast.Expr) (message string, succeeded bool) {
+func checkPropertiesTag(_ *checkContext, tag *structtag.Tag, field *ast.Field) (message string, succeeded bool) {
 	options := tag.Options
 	if len(options) == 0 {
 		return "", true
 	}
 
 	seenOptions := map[string]bool{}
+	fieldType := field.Type
 	for _, opt := range options {
 		msg, ok := fmt.Sprintf("unknown or malformed option %q", opt), false
 		if key, value, found := strings.Cut(opt, "="); found {
@@ -399,7 +558,7 @@ func checkCompoundPropertiesOption(key, value string, fieldType ast.Expr, seenOp
 	return "", true
 }
 
-func checkProtobufTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
+func checkProtobufTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	// check name
 	switch tag.Name {
 	case "bytes", "fixed32", "fixed64", "group", "varint", "zigzag32", "zigzag64":
@@ -452,7 +611,7 @@ func checkProtobufOptions(checkCtx *checkContext, options []string) (message str
 	return "", true
 }
 
-func checkRequiredTag(_ *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
+func checkRequiredTag(_ *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	switch tag.Name {
 	case "true", "false":
 		return "", true
@@ -461,7 +620,7 @@ func checkRequiredTag(_ *checkContext, tag *structtag.Tag, _ ast.Expr) (message 
 	}
 }
 
-func checkTOMLTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
+func checkTOMLTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "omitempty":
@@ -476,12 +635,12 @@ func checkTOMLTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (messa
 	return "", true
 }
 
-func checkURLTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
+func checkURLTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	var delimiter = ""
 	for _, opt := range tag.Options {
 		switch opt {
-		case "int", "omitempty", "numbered", "brackets":
-		case "unix", "unixmilli", "unixnano": // TODO : check that the field is of type time.Time
+		case "int", "omitempty", "numbered", "brackets",
+			"unix", "unixmilli", "unixnano": // TODO : check that the field is of type time.Time
 		case "comma", "semicolon", "space":
 			if delimiter == "" {
 				delimiter = opt
@@ -499,7 +658,7 @@ func checkURLTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (messag
 	return "", true
 }
 
-func checkValidateTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
+func checkValidateTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	previousOption := ""
 	seenKeysOption := false
 	options := append([]string{tag.Name}, tag.Options...)
@@ -528,7 +687,7 @@ func checkValidateTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (m
 	return "", true
 }
 
-func checkXMLTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
+func checkXMLTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "any", "attr", "cdata", "chardata", "comment", "innerxml", "omitempty", "typeattr":
@@ -543,7 +702,7 @@ func checkXMLTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (messag
 	return "", true
 }
 
-func checkYAMLTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (message string, succeeded bool) {
+func checkYAMLTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
 	for _, opt := range tag.Options {
 		switch opt {
 		case "flow", "inline", "omitempty":
@@ -556,6 +715,38 @@ func checkYAMLTag(checkCtx *checkContext, tag *structtag.Tag, _ ast.Expr) (messa
 	}
 
 	return "", true
+}
+
+func checkSpannerTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
+	for _, opt := range tag.Options {
+		if !checkCtx.isUserDefined(keySpanner, opt) {
+			return fmt.Sprintf(msgUnknownOption, opt), false
+		}
+	}
+
+	return "", true
+}
+
+// checkOptionsOnIgnoredField checks if an ignored struct field (tag name "-") has any options specified.
+// It returns a message and false if there are useless options present, or an empty message and true if valid.
+func checkOptionsOnIgnoredField(tag *structtag.Tag) (message string, succeeded bool) {
+	if tag.Name != "-" {
+		return "", true
+	}
+
+	switch len(tag.Options) {
+	case 0:
+		return "", true
+	case 1:
+		opt := strings.TrimSpace(tag.Options[0])
+		if opt == "" {
+			return "", true // accept "-," as options
+		}
+
+		return fmt.Sprintf("useless option %s for ignored field", opt), false
+	default:
+		return fmt.Sprintf("useless options %s for ignored field", strings.Join(tag.Options, ",")), false
+	}
 }
 
 func checkValidateOptionsAlternatives(checkCtx *checkContext, alternatives []string) (message string, succeeded bool) {
@@ -597,9 +788,7 @@ func typeValueMatch(t ast.Expr, val string) bool {
 	case "int":
 		_, err := strconv.ParseInt(val, 10, 64)
 		typeMatches = err == nil
-	case "string":
-	case "nil":
-	default:
+	default: // "string", "nil", ...
 		// unchecked type
 	}
 
@@ -655,10 +844,14 @@ var validateSingleOptions = map[string]struct{}{
 	"cidr":                          {},
 	"cidrv4":                        {},
 	"cidrv6":                        {},
+	"contains":                      {},
+	"containsany":                   {},
+	"containsrune":                  {},
 	"credit_card":                   {},
 	"cron":                          {},
 	"cve":                           {},
 	"datauri":                       {},
+	"datetime":                      {},
 	"dir":                           {},
 	"dirpath":                       {},
 	"dive":                          {},
@@ -666,11 +859,34 @@ var validateSingleOptions = map[string]struct{}{
 	"e164":                          {},
 	"ein":                           {},
 	"email":                         {},
+	"endsnotwith":                   {},
+	"endswith":                      {},
+	"eq":                            {},
+	"eq_ignore_case":                {},
+	"eqcsfield":                     {},
+	"eqfield":                       {},
 	"eth_addr":                      {},
 	"eth_addr_checksum":             {},
+	"excluded_if":                   {},
+	"excluded_unless":               {},
+	"excluded_with":                 {},
+	"excluded_with_all":             {},
+	"excluded_without":              {},
+	"excluded_without_all":          {},
+	"excludes":                      {},
+	"excludesall":                   {},
+	"excludesrune":                  {},
+	"fieldcontains":                 {},
+	"fieldexcludes":                 {},
 	"file":                          {},
 	"filepath":                      {},
 	"fqdn":                          {},
+	"gt":                            {},
+	"gtcsfield":                     {},
+	"gte":                           {},
+	"gtecsfield":                    {},
+	"gtefield":                      {},
+	"gtfield":                       {},
 	"hexadecimal":                   {},
 	"hexcolor":                      {},
 	"hostname":                      {},
@@ -683,21 +899,21 @@ var validateSingleOptions = map[string]struct{}{
 	"http_url":                      {},
 	"image":                         {},
 	"ip":                            {},
-	"ip_addr":                       {},
 	"ip4_addr":                      {},
 	"ip6_addr":                      {},
+	"ip_addr":                       {},
 	"ipv4":                          {},
 	"ipv6":                          {},
 	"isbn":                          {},
 	"isbn10":                        {},
 	"isbn13":                        {},
 	"isdefault":                     {},
-	"iso3166_1_alpha_numeric":       {},
-	"iso3166_1_alpha_numeric_eu":    {},
 	"iso3166_1_alpha2":              {},
 	"iso3166_1_alpha2_eu":           {},
 	"iso3166_1_alpha3":              {},
 	"iso3166_1_alpha3_eu":           {},
+	"iso3166_1_alpha_numeric":       {},
+	"iso3166_1_alpha_numeric_eu":    {},
 	"iso3166_2":                     {},
 	"iso4217":                       {},
 	"iso4217_numeric":               {},
@@ -705,22 +921,46 @@ var validateSingleOptions = map[string]struct{}{
 	"json":                          {},
 	"jwt":                           {},
 	"latitude":                      {},
+	"len":                           {},
 	"longitude":                     {},
 	"lowercase":                     {},
+	"lt":                            {},
+	"ltcsfield":                     {},
+	"lte":                           {},
+	"ltecsfield":                    {},
+	"ltefield":                      {},
+	"ltfield":                       {},
 	"luhn_checksum":                 {},
 	"mac":                           {},
+	"max":                           {},
 	"md4":                           {},
 	"md5":                           {},
+	"min":                           {},
 	"mongodb":                       {},
 	"mongodb_connection_string":     {},
 	"multibyte":                     {},
+	"ne":                            {},
+	"ne_ignore_case":                {},
+	"necsfield":                     {},
+	"nefield":                       {},
 	"number":                        {},
 	"numeric":                       {},
+	"omitempty":                     {},
+	"omitnil":                       {},
+	"omitzero":                      {},
+	"oneof":                         {},
+	"oneofci":                       {},
 	"port":                          {},
 	"postcode_iso3166_alpha2":       {},
 	"postcode_iso3166_alpha2_field": {},
 	"printascii":                    {},
 	"required":                      {},
+	"required_if":                   {},
+	"required_unless":               {},
+	"required_with":                 {},
+	"required_with_all":             {},
+	"required_without":              {},
+	"required_without_all":          {},
 	"rgb":                           {},
 	"rgba":                          {},
 	"ripemd128":                     {},
@@ -729,18 +969,23 @@ var validateSingleOptions = map[string]struct{}{
 	"sha256":                        {},
 	"sha384":                        {},
 	"sha512":                        {},
+	"skip_unless":                   {},
+	"spicedb":                       {},
 	"ssn":                           {},
-	"tcp_addr":                      {},
+	"startsnotwith":                 {},
+	"startswith":                    {},
 	"tcp4_addr":                     {},
 	"tcp6_addr":                     {},
+	"tcp_addr":                      {},
 	"tiger128":                      {},
 	"tiger160":                      {},
 	"tiger192":                      {},
 	"timezone":                      {},
-	"udp_addr":                      {},
 	"udp4_addr":                     {},
 	"udp6_addr":                     {},
+	"udp_addr":                      {},
 	"ulid":                          {},
+	"unique":                        {},
 	"unix_addr":                     {},
 	"uppercase":                     {},
 	"uri":                           {},
@@ -748,13 +993,14 @@ var validateSingleOptions = map[string]struct{}{
 	"url_encoded":                   {},
 	"urn_rfc2141":                   {},
 	"uuid":                          {},
-	"uuid_rfc4122":                  {},
 	"uuid3":                         {},
 	"uuid3_rfc4122":                 {},
 	"uuid4":                         {},
 	"uuid4_rfc4122":                 {},
 	"uuid5":                         {},
 	"uuid5_rfc4122":                 {},
+	"uuid_rfc4122":                  {},
+	"validateFn":                    {},
 }
 
 // These are options that are used in expressions of the form:
