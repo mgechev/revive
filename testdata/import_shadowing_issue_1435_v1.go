@@ -5,6 +5,6 @@ import (
 )
 
 func testVer() {
-	// Do not warn on this rare case.
-	v1 := ""
+	v1 := "" // Do not warn on this rare case.
+	core := "" // MATCH /The name 'core' shadows an import name/
 }
