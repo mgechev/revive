@@ -56,6 +56,7 @@ func (w confusingEpoch) Visit(node ast.Node) ast.Visitor {
 			if i >= len(v.Values) {
 				continue
 			}
+
 			w.check(name, v.Values[i])
 		}
 	case *ast.AssignStmt:
