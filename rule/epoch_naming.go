@@ -10,14 +10,14 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ConfusingEpochRule lints epoch time declarations.
-type ConfusingEpochRule struct{}
+// EpochNamingRule lints epoch time variable naming.
+type EpochNamingRule struct{}
 
 // Apply applies the rule to given file.
-func (*ConfusingEpochRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (*EpochNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
-	walker := confusingEpoch{
+	walker := lintEpochNaming{
 		file: file,
 		onFailure: func(failure lint.Failure) {
 			failures = append(failures, failure)
@@ -31,11 +31,11 @@ func (*ConfusingEpochRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failu
 }
 
 // Name returns the rule name.
-func (*ConfusingEpochRule) Name() string {
-	return "confusing-epoch"
+func (*EpochNamingRule) Name() string {
+	return "epoch-naming"
 }
 
-type confusingEpoch struct {
+type lintEpochNaming struct {
 	file      *lint.File
 	onFailure func(lint.Failure)
 }
@@ -47,16 +47,15 @@ var epochUnits = map[string][]string{
 	"UnixNano":  {"Nano", "Ns"},
 }
 
-func (w confusingEpoch) Visit(node ast.Node) ast.Visitor {
+func (w lintEpochNaming) Visit(node ast.Node) ast.Visitor {
 	switch v := node.(type) {
 	case *ast.ValueSpec:
 		// Handle var declarations
+		valuesLen := len(v.Values)
 		for i, name := range v.Names {
-			// Skip if no initialization value
-			if i >= len(v.Values) {
-				continue
+			if i >= valuesLen {
+				break
 			}
-
 			w.check(name, v.Values[i])
 		}
 	case *ast.AssignStmt:
@@ -65,14 +64,15 @@ func (w confusingEpoch) Visit(node ast.Node) ast.Visitor {
 			return w
 		}
 
+		rhsLen := len(v.Rhs)
 		for i, lhs := range v.Lhs {
-			if i >= len(v.Rhs) {
+			if i >= rhsLen {
+				break
+			}
+			ident, ok := lhs.(*ast.Ident)
+			if !ok || ident.Name == "_" {
 				continue
 			}
-			if ident, ok := lhs.(*ast.Ident); !ok || ident.Name == "_" {
-					continue
-			}
-			
 			w.check(ident, v.Rhs[i])
 		}
 	}
@@ -80,7 +80,7 @@ func (w confusingEpoch) Visit(node ast.Node) ast.Visitor {
 	return w
 }
 
-func (w confusingEpoch) check(name *ast.Ident, value ast.Expr) {
+func (w lintEpochNaming) check(name *ast.Ident, value ast.Expr) {
 	call, ok := value.(*ast.CallExpr)
 	if !ok {
 		return
@@ -105,12 +105,11 @@ func (w confusingEpoch) check(name *ast.Ident, value ast.Expr) {
 
 	varName := name.Name
 	if !hasAnySuffix(varName, suffixes) {
-		displaySuffixes := epochUnits[methodName]
 		w.onFailure(lint.Failure{
 			Confidence: 0.9,
 			Node:       name,
-			Category:   lint.FailureCategoryTime,
-			Failure:    fmt.Sprintf("variable '%s' initialized with %s() should have a name end with one of %v", varName, methodName, displaySuffixes),
+			Category:   lint.FailureCategoryNaming,
+			Failure:    fmt.Sprintf("var %s should have a suffix %s", varName, strings.Join(suffixes, ", ")),
 		})
 	}
 }
@@ -121,8 +120,8 @@ func isTime(typ types.Type) bool {
 		return false
 	}
 
-    obj := named.Obj()
-    pkg := obj.Pkg()
+	obj := named.Obj()
+	pkg := obj.Pkg()
 	return pkg != nil && pkg.Path() == "time" && obj.Name() == "Time"
 }
 

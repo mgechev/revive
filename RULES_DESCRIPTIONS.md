@@ -16,7 +16,6 @@ List of all available rules.
 - [comment-spacings](#comment-spacings)
 - [comments-density](#comments-density)
 - [confusing-naming](#confusing-naming)
-- [confusing-epoch](#confusing-epoch)
 - [confusing-results](#confusing-results)
 - [constant-logical-expr](#constant-logical-expr)
 - [context-as-argument](#context-as-argument)
@@ -30,6 +29,7 @@ List of all available rules.
 - [early-return](#early-return)
 - [empty-block](#empty-block)
 - [empty-lines](#empty-lines)
+- [epoch-naming](#epoch-naming)
 - [enforce-map-style](#enforce-map-style)
 - [enforce-repeated-arg-type-style](#enforce-repeated-arg-type-style)
 - [enforce-slice-style](#enforce-slice-style)
@@ -282,7 +282,7 @@ _Description_: Methods or fields of `struct` that have names different only by c
 
 _Configuration_: N/A
 
-## confusing-epoch
+## epoch-naming
 
 _Description_: Variables initialized with epoch time methods (`time.Now().Unix()`, `time.Now().UnixMilli()`,
 `time.Now().UnixMicro()`, `time.Now().UnixNano()`) should have names that clearly indicate their time unit to
@@ -298,7 +298,7 @@ This rule enforces that variable names contain appropriate suffixes based on the
 The rule checks variable declarations, short variable declarations (`:=`), and regular assignments (`=`).
 The suffix matching is case-insensitive and must appear at the end of the variable name.
 
-### Examples (confusing-epoch)
+### Examples (epoch-naming)
 
 Before (violation):
 

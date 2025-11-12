@@ -116,7 +116,7 @@ var allRules = append([]lint.Rule{
 	&rule.InefficientMapLookupRule{},
 	&rule.ForbiddenCallInWgGoRule{},
 	&rule.UnnecessaryIfRule{},
-	&rule.ConfusingEpochRule{},
+	&rule.EpochNamingRule{},
 }, defaultRules...)
 
 // allFormatters is a list of all available formatters to output the linting results.
