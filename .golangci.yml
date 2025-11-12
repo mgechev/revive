@@ -9,6 +9,7 @@ linters:
     - dupword
     - gocritic
     - godot
+    - godoclint
     - govet
     - ineffassign
     - misspell
@@ -19,12 +20,32 @@ linters:
     - staticcheck
     - unused
 
+  exclusions:
+    warn-unused: true
+    rules:
+      - path: '(.+)_test\.go'
+        linters:
+          - godoclint
+      - linters:
+          - godoclint
+        text: 'symbol should have a godoc \("Visit"\)'
+
   settings:
     gocritic:
       enable-all: true
       disabled-checks:
         - hugeParam
         - rangeValCopy
+    godoclint:
+      default: all
+      options:
+        max-len:
+          length: 120
+        require-doc:
+          ignore-exported: false
+          ignore-unexported: true
+        start-with-name:
+          include-unexported: true
     govet:
       enable-all: true
       disable:

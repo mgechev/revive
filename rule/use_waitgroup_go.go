@@ -150,7 +150,7 @@ func (*lintUseWaitGroupGo) isCallToWgAdd(stmt ast.Stmt) bool {
 	return ok && astutils.IsPkgDotName(call.Fun, "wg", "Add")
 }
 
-// function used when calling astutils.SeekNode that search for calls to wg.Done.
+// wgDonePicker is used when calling astutils.SeekNode that search for calls to wg.Done.
 func wgDonePicker(n ast.Node) bool {
 	call, ok := n.(*ast.CallExpr)
 	result := ok && astutils.IsPkgDotName(call.Fun, "wg", "Done")

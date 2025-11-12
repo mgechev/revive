@@ -1003,7 +1003,7 @@ var validateSingleOptions = map[string]struct{}{
 	"validateFn":                    {},
 }
 
-// These are options that are used in expressions of the form:
+// validateLHS are options that are used in expressions of the form:
 //
 //	<option> = <RHS>
 var validateLHS = map[string]struct{}{

@@ -170,15 +170,15 @@ func (w *lintExported) lintFuncDoc(fn *ast.FuncDecl) {
 	case exportedGoDocStatusOK:
 		return // comment is fine
 	case exportedGoDocStatusMissing:
-		w.addFailuref(fn, status.Confidence(), lint.FailureCategoryComments,
+		w.addFailuref(fn, status.confidence(), lint.FailureCategoryComments,
 			"exported %s %s should have comment or be unexported", kind, name,
 		)
 		return
 	}
 
 	firstCommentLine := w.firstCommentLine(fn.Doc)
-	w.addFailuref(fn.Doc, status.Confidence(), lint.FailureCategoryComments,
-		`comment on exported %s %s should be of the form "%s ..."%s`, kind, name, fn.Name.Name, status.CorrectionHint(firstCommentLine),
+	w.addFailuref(fn.Doc, status.confidence(), lint.FailureCategoryComments,
+		`comment on exported %s %s should be of the form "%s ..."%s`, kind, name, fn.Name.Name, status.correctionHint(firstCommentLine),
 	)
 }
 
@@ -264,8 +264,8 @@ func (w *lintExported) lintTypeDoc(t *ast.TypeSpec, doc *ast.CommentGroup, first
 	if status == exportedGoDocStatusOK {
 		return
 	}
-	w.addFailuref(doc, status.Confidence(), lint.FailureCategoryComments,
-		`comment on exported type %v should be of the form "%s ..." (with optional leading article)%s`, t.Name, typeName, status.CorrectionHint(firstCommentLine),
+	w.addFailuref(doc, status.confidence(), lint.FailureCategoryComments,
+		`comment on exported type %v should be of the form "%s ..." (with optional leading article)%s`, t.Name, typeName, status.correctionHint(firstCommentLine),
 	)
 }
 
@@ -347,8 +347,8 @@ func (w *lintExported) lintValueSpecDoc(vs *ast.ValueSpec, gd *ast.GenDecl, genD
 	if status == exportedGoDocStatusOK {
 		return
 	}
-	w.addFailuref(doc, status.Confidence(), lint.FailureCategoryComments,
-		`comment on exported %s %s should be of the form "%s ..."%s`, kind, name, name, status.CorrectionHint(firstCommentLine),
+	w.addFailuref(doc, status.confidence(), lint.FailureCategoryComments,
+		`comment on exported %s %s should be of the form "%s ..."%s`, kind, name, name, status.correctionHint(firstCommentLine),
 	)
 }
 
@@ -362,14 +362,14 @@ const (
 	exportedGoDocStatusUnexpected
 )
 
-func (gds exportedGoDocStatus) Confidence() float64 {
+func (gds exportedGoDocStatus) confidence() float64 {
 	if gds == exportedGoDocStatusUnexpected {
 		return 0.8
 	}
 	return 1
 }
 
-func (gds exportedGoDocStatus) CorrectionHint(firstCommentLine string) string {
+func (gds exportedGoDocStatus) correctionHint(firstCommentLine string) string {
 	firstWord := strings.Split(firstCommentLine, " ")[0]
 	switch gds {
 	case exportedGoDocStatusCaseMismatch:
@@ -501,15 +501,15 @@ func (w *lintExported) lintInterfaceMethod(typeName string, m *ast.Field) {
 	case exportedGoDocStatusOK:
 		return // comment is fine
 	case exportedGoDocStatusMissing:
-		w.addFailuref(m, status.Confidence(), lint.FailureCategoryComments,
+		w.addFailuref(m, status.confidence(), lint.FailureCategoryComments,
 			"public interface method %s.%s should be commented", typeName, name,
 		)
 		return
 	}
 
 	firstCommentLine := w.firstCommentLine(m.Doc)
-	w.addFailuref(m.Doc, status.Confidence(), lint.FailureCategoryComments,
-		`comment on exported interface method %s.%s should be of the form "%s ..."%s`, typeName, name, name, status.CorrectionHint(firstCommentLine),
+	w.addFailuref(m.Doc, status.confidence(), lint.FailureCategoryComments,
+		`comment on exported interface method %s.%s should be of the form "%s ..."%s`, typeName, name, name, status.correctionHint(firstCommentLine),
 	)
 }
 
