@@ -67,13 +67,11 @@ func (w confusingEpoch) Visit(node ast.Node) ast.Visitor {
 			if i >= len(v.Rhs) {
 				continue
 			}
-			if ident, ok := lhs.(*ast.Ident); ok {
-				// Skip blank identifier
-				if ident.Name == "_" {
+			if ident, ok := lhs.(*ast.Ident); !ok || ident.Name == "_" {
 					continue
-				}
-				w.check(ident, v.Rhs[i])
 			}
+			
+			w.check(ident, v.Rhs[i])
 		}
 	}
 
