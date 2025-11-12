@@ -63,6 +63,7 @@ func (w confusingEpoch) Visit(node ast.Node) ast.Visitor {
 		if v.Tok != token.DEFINE && v.Tok != token.ASSIGN {
 			return w
 		}
+
 		for i, lhs := range v.Lhs {
 			if i >= len(v.Rhs) {
 				continue
