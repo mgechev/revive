@@ -305,7 +305,7 @@ Before (violation):
 ```go
 timestamp := time.Now().Unix()           // unclear which unit
 createdAt := time.Now().UnixMilli()      // missing unit indicator
-t := time.Now().UnixNano()               // too short, unclear
+t := time.Now().UnixNano()               // lacks required suffix
 ```
 
 After (fixed):
