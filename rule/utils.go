@@ -11,7 +11,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// exitChecker is a function type that checks whether a function call is an exit function.
+// exitFuncChecker is a function type that checks whether a function call is an exit function.
 type exitFuncChecker func(args []ast.Expr) bool
 
 var alwaysTrue exitFuncChecker = func([]ast.Expr) bool { return true }

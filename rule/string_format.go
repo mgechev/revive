@@ -81,7 +81,7 @@ type stringFormatSubruleScope struct {
 	field    string // (optional) If the argument to be checked is a struct, which member of the struct is checked against the rule (top level members only)
 }
 
-// Regex inserted to match valid function/struct field identifiers.
+// identRegex matches valid function/struct field identifiers.
 const identRegex = "[_A-Za-z][_A-Za-z0-9]*"
 
 var parseStringFormatScope = regexp.MustCompile(
@@ -165,17 +165,18 @@ func (r *StringFormatRule) parseArgument(argument any, ruleNum int) (scopes stri
 	return scopes, regex, negated, errorMessage, nil
 }
 
-// Report an invalid config, this is specifically the user's fault.
+// configError reports an invalid config, this is specifically the user's fault.
 func (*StringFormatRule) configError(msg string, ruleNum, option int) error {
 	return fmt.Errorf("invalid configuration for string-format: %s [argument %d, option %d]", msg, ruleNum, option)
 }
 
-// Report a general config parsing failure, this may be the user's fault, but it isn't known for certain.
+// parseError reports a general config parsing failure, this may be the user's fault, but it isn't known for certain.
 func (*StringFormatRule) parseError(msg string, ruleNum, option int) error {
 	return fmt.Errorf("failed to parse configuration for string-format: %s [argument %d, option %d]", msg, ruleNum, option)
 }
 
-// Report a general scope config parsing failure, this may be the user's fault, but it isn't known for certain.
+// parseScopeError reports a general scope config parsing failure, this may be the user's fault,
+// but it isn't known for certain.
 func (*StringFormatRule) parseScopeError(msg string, ruleNum, option, scopeNum int) error {
 	return fmt.Errorf("failed to parse configuration for string-format: %s [argument %d, option %d, scope index %d]", msg, ruleNum, option, scopeNum)
 }
@@ -204,7 +205,7 @@ func (w *lintStringFormatRule) Visit(node ast.Node) ast.Visitor {
 	return w
 }
 
-// Return the name of a call expression in the form of package.Func or Func.
+// getCallName returns the name of a call expression in the form of package.Func or Func.
 func (*lintStringFormatRule) getCallName(call *ast.CallExpr) (callName string, ok bool) {
 	if ident, ok := call.Fun.(*ast.Ident); ok {
 		// Local function call
@@ -227,7 +228,8 @@ func (*lintStringFormatRule) getCallName(call *ast.CallExpr) (callName string, o
 	return "", false
 }
 
-// apply a single format rule to a call expression (should be done after verifying the that the call expression matches the rule's scope).
+// apply a single format rule to a call expression
+// (should be done after verifying the that the call expression matches the rule's scope).
 func (r *stringFormatSubrule) apply(call *ast.CallExpr, scope *stringFormatSubruleScope) {
 	if len(call.Args) <= scope.argument {
 		return

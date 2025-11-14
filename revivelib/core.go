@@ -198,6 +198,7 @@ func normalizeSplit(strs []string) []string {
 // ArrayFlags type for string list.
 type ArrayFlags []string
 
+// String returns the space-separated representation of the ArrayFlags.
 func (i *ArrayFlags) String() string {
 	return strings.Join([]string(*i), " ")
 }
