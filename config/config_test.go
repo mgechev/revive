@@ -1,12 +1,14 @@
-package config
+package config_test
 
 import (
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
 	goversion "github.com/hashicorp/go-version"
 
+	"github.com/mgechev/revive/config"
 	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/rule"
 )
@@ -18,11 +20,89 @@ func TestGetConfig(t *testing.T) {
 			wantConfig lint.Config
 		}{
 			"default config": {
-				wantConfig: func() lint.Config {
-					c := defaultConfig()
-					normalizeConfig(c)
-					return *c
-				}(),
+				wantConfig: lint.Config{
+					IgnoreGeneratedHeader: false,
+					Confidence:            0.8,
+					Severity:              lint.SeverityWarning,
+					EnableAllRules:        false,
+					EnableDefaultRules:    false,
+					Rules: lint.RulesConfig{
+						"blank-imports": {
+							Severity: lint.SeverityWarning,
+						},
+						"context-as-argument": {
+							Severity: lint.SeverityWarning,
+						},
+						"context-keys-type": {
+							Severity: lint.SeverityWarning,
+						},
+						"dot-imports": {
+							Severity: lint.SeverityWarning,
+						},
+						"empty-block": {
+							Severity: lint.SeverityWarning,
+						},
+						"error-naming": {
+							Severity: lint.SeverityWarning,
+						},
+						"error-return": {
+							Severity: lint.SeverityWarning,
+						},
+						"error-strings": {
+							Severity: lint.SeverityWarning,
+						},
+						"errorf": {
+							Severity: lint.SeverityWarning,
+						},
+						"exported": {
+							Severity: lint.SeverityWarning,
+						},
+						"increment-decrement": {
+							Severity: lint.SeverityWarning,
+						},
+						"indent-error-flow": {
+							Severity: lint.SeverityWarning,
+						},
+						"package-comments": {
+							Severity: lint.SeverityWarning,
+						},
+						"range": {
+							Severity: lint.SeverityWarning,
+						},
+						"receiver-naming": {
+							Severity: lint.SeverityWarning,
+						},
+						"redefines-builtin-id": {
+							Severity: lint.SeverityWarning,
+						},
+						"superfluous-else": {
+							Severity: lint.SeverityWarning,
+						},
+						"time-naming": {
+							Severity: lint.SeverityWarning,
+						},
+						"unexported-return": {
+							Severity: lint.SeverityWarning,
+						},
+						"unreachable-code": {
+							Severity: lint.SeverityWarning,
+						},
+						"unused-parameter": {
+							Severity: lint.SeverityWarning,
+						},
+						"var-declaration": {
+							Severity: lint.SeverityWarning,
+						},
+						"var-naming": {
+							Severity: lint.SeverityWarning,
+						},
+					},
+					ErrorCode:   0,
+					WarningCode: 0,
+					Directives:  lint.DirectivesConfig{},
+					Exclude:     []string{},
+					GoVersion:   nil,
+				},
 			},
 			"non-reg issue #470": {
 				confPath: "issue-470.toml",
@@ -105,6 +185,100 @@ func TestGetConfig(t *testing.T) {
 					},
 				},
 			},
+			"config with non-defaults": {
+				confPath: "non-defaults.toml",
+				wantConfig: lint.Config{
+					Confidence:            0.5,
+					Severity:              lint.SeverityError,
+					IgnoreGeneratedHeader: true,
+					EnableDefaultRules:    true,
+					ErrorCode:             2,
+					WarningCode:           1,
+					Rules: lint.RulesConfig{
+						"argument-limit": {
+							Severity: lint.SeverityWarning,
+							Exclude:  []string{"excluded/file.go"},
+							Arguments: lint.Arguments{
+								[]any{4},
+							},
+						},
+						"blank-imports": {
+							Disabled: true,
+							Severity: lint.SeverityError,
+						},
+						"context-as-argument": {
+							Severity: lint.SeverityError,
+						},
+						"context-keys-type": {
+							Severity: lint.SeverityError,
+						},
+						"dot-imports": {
+							Severity: lint.SeverityError,
+						},
+						"empty-block": {
+							Severity: lint.SeverityError,
+						},
+						"error-naming": {
+							Severity: lint.SeverityError,
+						},
+						"error-return": {
+							Severity: lint.SeverityError,
+						},
+						"error-strings": {
+							Severity: lint.SeverityError,
+						},
+						"errorf": {
+							Severity: lint.SeverityError,
+						},
+						"exported": {
+							Severity: lint.SeverityError,
+							Arguments: lint.Arguments{
+								"check-private-receivers", "disable-stuttering-check",
+							},
+							Exclude: []string{"excluded/file-exported.go"},
+						},
+						"increment-decrement": {
+							Severity: lint.SeverityError,
+						},
+						"indent-error-flow": {
+							Severity: lint.SeverityError,
+						},
+						"package-comments": {
+							Severity: lint.SeverityError,
+						},
+						"range": {
+							Severity: lint.SeverityError,
+						},
+						"receiver-naming": {
+							Severity: lint.SeverityError,
+						},
+						"redefines-builtin-id": {
+							Severity: lint.SeverityError,
+						},
+						"superfluous-else": {
+							Severity: lint.SeverityError,
+						},
+						"time-naming": {
+							Severity: lint.SeverityError,
+						},
+						"unexported-return": {
+							Severity: lint.SeverityError,
+						},
+						"unreachable-code": {
+							Severity: lint.SeverityError,
+						},
+						"unused-parameter": {
+							Severity: lint.SeverityError,
+						},
+						"var-declaration": {
+							Severity: lint.SeverityError,
+						},
+						"var-naming": {
+							Severity: lint.SeverityError,
+						},
+					},
+				},
+			},
 		} {
 			t.Run(name, func(t *testing.T) {
 				var cfgPath string
@@ -112,7 +286,7 @@ func TestGetConfig(t *testing.T) {
 					cfgPath = filepath.Join("testdata", tc.confPath)
 				}
 
-				cfg, err := GetConfig(cfgPath)
+				cfg, err := config.GetConfig(cfgPath)
 
 				if err != nil {
 					t.Fatalf("Unexpected error %v", err)
@@ -210,7 +384,7 @@ func TestGetConfig(t *testing.T) {
 		}
 
 		t.Run("rule-level file filter excludes", func(t *testing.T) {
-			cfg, err := GetConfig("testdata/rule-level-exclude-850.toml")
+			cfg, err := config.GetConfig("testdata/rule-level-exclude-850.toml")
 			if err != nil {
 				t.Fatal("should be valid config")
 			}
@@ -244,9 +418,13 @@ func TestGetConfig(t *testing.T) {
 				confPath:  "malformed.toml",
 				wantError: "cannot parse the config file",
 			},
+			"invalid exclude pattern": {
+				confPath:  "invalidExcludePattern.toml",
+				wantError: "error in config of rule [var-naming]",
+			},
 		} {
 			t.Run(name, func(t *testing.T) {
-				_, err := GetConfig(filepath.Join("testdata", tc.confPath))
+				_, err := config.GetConfig(filepath.Join("testdata", tc.confPath))
 
 				if err != nil && !strings.Contains(err.Error(), tc.wantError) {
 					t.Errorf("Unexpected error: want %q, got: %q", tc.wantError, err)
@@ -257,50 +435,139 @@ func TestGetConfig(t *testing.T) {
 }
 
 func TestGetLintingRules(t *testing.T) {
+	const (
+		// len of defaultRules
+		defaultRulesCount = 23
+		// len of allRules: update this when adding new rules
+		allRulesCount = 99
+	)
+
 	tt := map[string]struct {
-		confPath       string
-		wantRulesCount int
-		wantErr        string
+		confPath          string
+		wantRulesCount    int
+		wantEnabledRules  []string
+		wantDisabledRules []string
+		wantErr           string
 	}{
 		"no rules": {
 			confPath:       "noRules.toml",
 			wantRulesCount: 0,
+			wantDisabledRules: []string{
+				"var-declaration",  // default rule
+				"package-comments", // default rule
+				"deep-exit",        // non-default rule
+			},
 		},
 		"enableAllRules without disabled rules": {
 			confPath:       "enableAll.toml",
-			wantRulesCount: len(allRules),
+			wantRulesCount: allRulesCount,
+			wantEnabledRules: []string{
+				"var-declaration",  // default rule
+				"package-comments", // default rule
+				"deep-exit",        // non-default rule
+			},
 		},
 		"enableAllRules with 2 disabled rules": {
 			confPath:       "enableAllBut2.toml",
-			wantRulesCount: len(allRules) - 2,
+			wantRulesCount: allRulesCount - 2,
+			wantEnabledRules: []string{
+				"var-declaration",  // default rule
+				"package-comments", // default rule
+				"deep-exit",        // non-default rule
+			},
+			wantDisabledRules: []string{
+				"exported",   // default rule
+				"cyclomatic", // non-default rule
+			},
 		},
 		"enableDefaultRules without disabled rules": {
 			confPath:       "enableDefault.toml",
-			wantRulesCount: len(defaultRules),
+			wantRulesCount: defaultRulesCount,
+			wantEnabledRules: []string{
+				"var-declaration",  // default rule
+				"package-comments", // default rule
+			},
+			wantDisabledRules: []string{
+				"deep-exit", // non-default rule
+			},
 		},
 		"enableDefaultRules with 2 disabled rules": {
 			confPath:       "enableDefaultBut2.toml",
-			wantRulesCount: len(defaultRules) - 2,
+			wantRulesCount: defaultRulesCount - 2,
+			wantEnabledRules: []string{
+				"var-declaration",  // default rule
+				"package-comments", // default rule
+			},
+			wantDisabledRules: []string{
+				"exported",          // default rule
+				"indent-error-flow", // default rule
+			},
 		},
 		"enableDefaultRules plus 1 non-default rule": {
 			confPath:       "enableDefaultPlus1.toml",
-			wantRulesCount: len(defaultRules) + 1,
+			wantRulesCount: defaultRulesCount + 1,
+			wantEnabledRules: []string{
+				"var-declaration",  // default rule
+				"package-comments", // default rule
+				"cyclomatic",       // non-default rule
+			},
+			wantDisabledRules: []string{
+				"deep-exit", // non-default rule
+			},
 		},
 		"enableAllRules and enableDefaultRules both set": {
 			confPath:       "enableAllAndDefault.toml",
-			wantRulesCount: len(allRules),
+			wantRulesCount: allRulesCount,
+			wantEnabledRules: []string{
+				"var-declaration",  // default rule
+				"package-comments", // default rule
+				"deep-exit",        // non-default rule
+			},
 		},
 		"enableDefaultRules plus rule already in defaults": {
 			confPath:       "enableDefaultPlusDefaultRule.toml",
-			wantRulesCount: len(defaultRules),
+			wantRulesCount: defaultRulesCount,
+			wantEnabledRules: []string{
+				"var-declaration",  // default rule
+				"package-comments", // default rule
+				"exported",         // default rule
+			},
+			wantDisabledRules: []string{
+				"deep-exit", // non-default rule
+			},
 		},
 		"enableAllRules plus rule already in all": {
 			confPath:       "enableAllWithRule.toml",
-			wantRulesCount: len(allRules),
+			wantRulesCount: allRulesCount,
+			wantEnabledRules: []string{
+				"var-declaration",  // default rule
+				"package-comments", // default rule
+				"deep-exit",        // non-default rule
+				"cyclomatic",       // non-default rule
+			},
 		},
 		"enable 2 rules": {
 			confPath:       "enable2.toml",
 			wantRulesCount: 2,
+			wantEnabledRules: []string{
+				"exported",   // default rule
+				"cyclomatic", // non-default rule
+			},
+			wantDisabledRules: []string{
+				"var-declaration",  // default rule
+				"package-comments", // default rule
+				"deep-exit",        // non-default rule
+			},
+		},
+		"enable imports-blocklist rule": {
+			confPath:       "issue-969.toml",
+			wantRulesCount: 1,
+			wantEnabledRules: []string{
+				"imports-blocklist", // non-default renamed rule
+			},
+			wantDisabledRules: []string{
+				"imports-blacklist", // non-default deprecated rule name
+			},
 		},
 		"var-naming configure error": {
 			confPath: "varNamingConfigureError.toml",
@@ -310,11 +577,11 @@ func TestGetLintingRules(t *testing.T) {
 
 	for name, tc := range tt {
 		t.Run(name, func(t *testing.T) {
-			cfg, err := GetConfig(filepath.Join("testdata", tc.confPath))
+			cfg, err := config.GetConfig(filepath.Join("testdata", tc.confPath))
 			if err != nil {
 				t.Fatalf("Unexpected error while loading conf: %v", err)
 			}
-			rules, err := GetLintingRules(cfg, []lint.Rule{})
+			rules, err := config.GetLintingRules(cfg, []lint.Rule{})
 			if tc.wantErr != "" {
 				if err == nil || err.Error() != tc.wantErr {
 					t.Fatalf("Expected error %q, got %q", tc.wantErr, err)
@@ -322,11 +589,28 @@ func TestGetLintingRules(t *testing.T) {
 				return
 			}
 
-			switch {
-			case err != nil:
+			if err != nil {
 				t.Fatalf("Unexpected error\n\t%v", err)
-			case len(rules) != tc.wantRulesCount:
-				t.Fatalf("Expected %v enabled linting rules got: %v", tc.wantRulesCount, len(rules))
+			}
+
+			ruleNames := make([]string, len(rules))
+			for i, rule := range rules {
+				ruleNames[i] = rule.Name()
+			}
+			slices.Sort(ruleNames)
+
+			if len(rules) != tc.wantRulesCount {
+				t.Errorf("Expected %v enabled linting rules got: %v. Got rules: %v", tc.wantRulesCount, len(rules), ruleNames)
+			}
+			for _, wantEnabledRule := range tc.wantEnabledRules {
+				if !slices.Contains(ruleNames, wantEnabledRule) {
+					t.Errorf("Expected enabled rule %q not found. Got enabled rules: %v", wantEnabledRule, ruleNames)
+				}
+			}
+			for _, wantDisabledRule := range tc.wantDisabledRules {
+				if slices.Contains(ruleNames, wantDisabledRule) {
+					t.Errorf("Expected disabled rule %q not found. Got enabled rules: %v", wantDisabledRule, ruleNames)
+				}
 			}
 		})
 	}
@@ -355,11 +639,11 @@ func TestGetGlobalSeverity(t *testing.T) {
 
 	for name, tc := range tt {
 		t.Run(name, func(t *testing.T) {
-			cfg, err := GetConfig(tc.confPath)
+			cfg, err := config.GetConfig(tc.confPath)
 			if err != nil {
 				t.Fatalf("Unexpected error while loading conf: %v", err)
 			}
-			rules, err := GetLintingRules(cfg, []lint.Rule{})
+			rules, err := config.GetLintingRules(cfg, []lint.Rule{})
 			if err != nil {
 				t.Fatalf("Unexpected error while loading conf: %v", err)
 			}
@@ -384,7 +668,7 @@ func TestGetGlobalSeverity(t *testing.T) {
 
 func TestGetFormatter(t *testing.T) {
 	t.Run("default formatter", func(t *testing.T) {
-		formatter, err := GetFormatter("")
+		formatter, err := config.GetFormatter("")
 		if err != nil {
 			t.Fatalf("Unexpected error %q", err)
 		}
@@ -393,13 +677,13 @@ func TestGetFormatter(t *testing.T) {
 		}
 	})
 	t.Run("unknown formatter", func(t *testing.T) {
-		_, err := GetFormatter("unknown")
+		_, err := config.GetFormatter("unknown")
 		if err == nil || err.Error() != "unknown formatter unknown" {
 			t.Errorf("Expected error %q, got: %q", "unknown formatter unknown", err)
 		}
 	})
 	t.Run("checkstyle formatter", func(t *testing.T) {
-		formatter, err := GetFormatter("checkstyle")
+		formatter, err := config.GetFormatter("checkstyle")
 		if err != nil {
 			t.Fatalf("Unexpected error: %q", err)
 		}
