@@ -16,6 +16,7 @@ linters:
     - musttag
     - nolintlint
     - revive
+    - testpackage
     - thelper
     - staticcheck
     - unparam
@@ -30,6 +31,18 @@ linters:
       - linters:
           - godoclint
         text: 'symbol should have a godoc \("Visit"\)'
+      - linters:
+          - testpackage
+        text: 'package should be `rule_test` instead of `rule`'
+      - linters:
+          - testpackage
+        text: 'package should be `lint_test` instead of `lint`'
+      - linters:
+          - testpackage
+        text: 'package should be `cli_test` instead of `cli`'
+      - linters:
+          - testpackage
+        text: 'package should be `formatter_test` instead of `formatter`'
 
   settings:
     gocritic:
