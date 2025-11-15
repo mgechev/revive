@@ -57,8 +57,10 @@ func (f *Friendly) printFriendlyFailure(sb *strings.Builder, failure lint.Failur
 	sb.WriteString("\n\n")
 }
 
-var errorEmoji = color.RedString("✘")
-var warningEmoji = color.YellowString("⚠")
+var (
+	errorEmoji   = color.RedString("✘")
+	warningEmoji = color.YellowString("⚠")
+)
 
 func (*Friendly) printHeaderRow(sb *strings.Builder, failure lint.Failure, severity lint.Severity) {
 	emoji := warningEmoji

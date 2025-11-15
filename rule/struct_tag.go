@@ -631,7 +631,7 @@ func checkTOMLTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (mes
 }
 
 func checkURLTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (message string, succeeded bool) {
-	var delimiter = ""
+	var delimiter string
 	for _, opt := range tag.Options {
 		switch opt {
 		case "int", "omitempty", "numbered", "brackets",
