@@ -42,13 +42,15 @@ type lintUnsecureURLSchemeRule struct {
 	onFailure func(lint.Failure)
 }
 
-const schemeSeparator = "://"
-const schemeHTTP = "http"
-const schemeWS = "ws"
-const urlPrefixHTTP = schemeHTTP + schemeSeparator
-const urlPrefixWS = schemeWS + schemeSeparator
-const lenURLPrefixHTTP = len(urlPrefixHTTP)
-const lenURLPrefixWS = len(urlPrefixWS)
+const (
+	schemeSeparator  = "://"
+	schemeHTTP       = "http"
+	schemeWS         = "ws"
+	urlPrefixHTTP    = schemeHTTP + schemeSeparator
+	urlPrefixWS      = schemeWS + schemeSeparator
+	lenURLPrefixHTTP = len(urlPrefixHTTP)
+	lenURLPrefixWS   = len(urlPrefixWS)
+)
 
 func (w lintUnsecureURLSchemeRule) Visit(node ast.Node) ast.Visitor {
 	n, ok := node.(*ast.BasicLit)

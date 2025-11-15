@@ -12,7 +12,6 @@ func TestGetLogger(t *testing.T) {
 		t.Setenv("DEBUG", "")
 
 		logger, err := logging.GetLogger()
-
 		if err != nil {
 			t.Fatalf("expected no error, got %v", err)
 		}
@@ -27,7 +26,6 @@ func TestGetLogger(t *testing.T) {
 		t.Cleanup(func() { os.Remove("revive.log") })
 
 		logger, err := logging.GetLogger()
-
 		if err != nil {
 			t.Fatalf("expected no error, got %v", err)
 		}
