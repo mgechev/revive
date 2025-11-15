@@ -85,7 +85,7 @@ var skipDirs = map[string]struct{}{
 }
 
 // semanticallyEqual checks if package and directory names are semantically equal to each other.
-func (PackageDirectoryMismatchRule) semanticallyEqual(packageName, dirName string) bool {
+func (*PackageDirectoryMismatchRule) semanticallyEqual(packageName, dirName string) bool {
 	normDir := normalizePath(dirName)
 	normPkg := normalizePath(packageName)
 	return normDir == normPkg || normDir == "go"+normPkg

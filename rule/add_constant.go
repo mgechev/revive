@@ -25,8 +25,7 @@ func newAllowList() allowList {
 }
 
 func (wl allowList) add(kind, list string) {
-	elems := strings.Split(list, ",")
-	for _, e := range elems {
+	for e := range strings.SplitSeq(list, ",") {
 		wl[kind][e] = true
 	}
 }
@@ -247,7 +246,7 @@ func (r *AddConstantRule) Configure(arguments lint.Arguments) error {
 				return fmt.Errorf("invalid argument to the ignoreFuncs parameter of add-constant rule, string expected. Got '%v' (%T)", v, v)
 			}
 
-			for _, exclude := range strings.Split(excludes, ",") {
+			for exclude := range strings.SplitSeq(excludes, ",") {
 				exclude = strings.Trim(exclude, " ")
 				if exclude == "" {
 					return errors.New("invalid argument to the ignoreFuncs parameter of add-constant rule, expected regular expression must not be empty")

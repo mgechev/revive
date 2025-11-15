@@ -72,8 +72,8 @@ func (w *lintUnnecessaryIf) Visit(node ast.Node) ast.Visitor {
 		return w // then and else branches do not have just one statement
 	}
 
-	replacement := ""
-	thenBool := false
+	var replacement string
+	var thenBool bool
 	switch thenStmt := thenStmts[0].(type) {
 	case *ast.ReturnStmt:
 		replacement, thenBool = w.replacementForReturnStmt(thenStmt, elseStmts)

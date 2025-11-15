@@ -39,6 +39,7 @@ func (*Sarif) Format(failures <-chan lint.Failure, cfg lint.Config) (string, err
 
 type reviveRunLog struct {
 	*garif.LogFile
+
 	run   *garif.Run
 	rules map[string]lint.RuleConfig
 }

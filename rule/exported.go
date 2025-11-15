@@ -411,14 +411,13 @@ func (w *lintExported) checkGoDocStatus(comment *ast.CommentGroup, name string) 
 // An "interesting line" is a comment line that is neither a directive (e.g. //go:...) or a deprecation comment
 // (lines from the first line with a prefix // Deprecated: to the end of the comment group)
 // Empty or spaces-only lines are discarded.
-func (lintExported) firstCommentLine(comment *ast.CommentGroup) (result string) {
+func (*lintExported) firstCommentLine(comment *ast.CommentGroup) (result string) {
 	if comment == nil {
 		return ""
 	}
 
 	commentWithoutDirectives := comment.Text() // removes directives from the comment block
-	lines := strings.Split(commentWithoutDirectives, "\n")
-	for _, line := range lines {
+	for line := range strings.SplitSeq(commentWithoutDirectives, "\n") {
 		line := strings.TrimSpace(line)
 		if line == "" {
 			continue // ignore empty lines
