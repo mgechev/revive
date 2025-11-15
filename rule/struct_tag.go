@@ -105,11 +105,6 @@ func (r *StructTagRule) Configure(arguments lint.Arguments) error {
 		return nil
 	}
 
-	err := checkNumberOfArguments(1, arguments, r.Name())
-	if err != nil {
-		return err
-	}
-
 	r.userDefined = map[tagKey][]string{}
 	r.omittedTags = map[tagKey]struct{}{}
 	for _, arg := range arguments {

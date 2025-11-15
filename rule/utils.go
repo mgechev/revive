@@ -1,7 +1,6 @@
 package rule
 
 import (
-	"fmt"
 	"go/ast"
 	"go/token"
 	"regexp"
@@ -49,14 +48,6 @@ func srcLine(src []byte, p token.Position) string {
 		hi++
 	}
 	return string(src[lo:hi])
-}
-
-// checkNumberOfArguments fails if the given number of arguments is not, at least, the expected one.
-func checkNumberOfArguments(expected int, args lint.Arguments, ruleName string) error {
-	if len(args) < expected {
-		return fmt.Errorf("not enough arguments for %s rule, expected %d, got %d. Please check the rule's documentation", ruleName, expected, len(args))
-	}
-	return nil
 }
 
 // isRuleOption returns true if arg and name are the same after normalization.
