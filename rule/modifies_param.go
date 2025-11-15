@@ -29,7 +29,7 @@ func (*ModifiesParamRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failur
 	}
 
 	w := lintModifiesParamRule{onFailure: onFailure}
-	ast.Walk(w, file.AST)
+	ast.Walk(&w, file.AST)
 	return failures
 }
 
@@ -57,13 +57,13 @@ func retrieveParamNames(pl []*ast.Field) map[string]bool {
 	return result
 }
 
-func (w lintModifiesParamRule) Visit(node ast.Node) ast.Visitor {
+func (w *lintModifiesParamRule) Visit(node ast.Node) ast.Visitor {
 	switch v := node.(type) {
 	case *ast.FuncDecl:
 		w.params = retrieveParamNames(v.Type.Params.List)
 	case *ast.IncDecStmt:
 		if id, ok := v.X.(*ast.Ident); ok {
-			checkParam(id, &w)
+			checkParam(id, w)
 		}
 	case *ast.AssignStmt:
 		lhs := v.Lhs
@@ -76,7 +76,7 @@ func (w lintModifiesParamRule) Visit(node ast.Node) ast.Visitor {
 			if i < len(v.Rhs) {
 				w.checkModifyingFunction(v.Rhs[i])
 			}
-			checkParam(id, &w)
+			checkParam(id, w)
 		}
 	case *ast.ExprStmt:
 		w.checkModifyingFunction(v.X)

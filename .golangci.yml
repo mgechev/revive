@@ -7,20 +7,27 @@ linters:
   default: none
   enable:
     - dupword
+    - embeddedstructfieldcheck
     - gocritic
-    - godot
     - godoclint
+    - godot
     - govet
     - ineffassign
     - misspell
+    - modernize
     - musttag
     - nolintlint
+    - recvcheck
     - revive
+    - sloglint
+    - staticcheck
     - testpackage
     - thelper
-    - staticcheck
+    - thelper
+    - unconvert
     - unparam
     - unused
+    - wastedassign
 
   exclusions:
     warn-unused: true

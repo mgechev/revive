@@ -43,7 +43,7 @@ func (*Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string
 		if currentType == lint.SeverityError {
 			totalErrors++
 		}
-		result = append(result, formatFailure(f, lint.Severity(currentType)))
+		result = append(result, formatFailure(f, currentType))
 	}
 
 	fileReport := map[string][][]string{}

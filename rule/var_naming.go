@@ -471,6 +471,7 @@ func getList(arg any, argName string) ([]string, error) {
 
 type syncSet struct {
 	sync.Mutex
+
 	elements map[string]struct{}
 }
 

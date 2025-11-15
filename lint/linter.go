@@ -37,7 +37,7 @@ func New(reader ReadFile, maxOpenFiles int) Linter {
 	}
 }
 
-func (l Linter) readFile(path string) (result []byte, err error) {
+func (l *Linter) readFile(path string) (result []byte, err error) {
 	if l.fileReadTokens != nil {
 		// "take" a token by writing to the channel.
 		// It will block if no more space in the channel's buffer

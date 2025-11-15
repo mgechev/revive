@@ -235,9 +235,8 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, fa
 				continue
 			}
 			ruleNames := []string{}
-			tempNames := strings.Split(match[rulesPos], ",")
 
-			for _, name := range tempNames {
+			for name := range strings.SplitSeq(match[rulesPos], ",") {
 				name = strings.Trim(name, "\n")
 				if name != "" {
 					ruleNames = append(ruleNames, name)
@@ -274,7 +273,7 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, fa
 	return getEnabledDisabledIntervals()
 }
 
-func (File) filterFailures(failures []Failure, disabledIntervals disabledIntervalsMap) []Failure {
+func (*File) filterFailures(failures []Failure, disabledIntervals disabledIntervalsMap) []Failure {
 	result := []Failure{}
 	for _, failure := range failures {
 		fStart := failure.Position.Start.Line

@@ -71,7 +71,7 @@ type checkContext struct {
 	isAtLeastGo124 bool
 }
 
-func (checkCtx checkContext) isUserDefined(key tagKey, opt string) bool {
+func (checkCtx *checkContext) isUserDefined(key tagKey, opt string) bool {
 	if checkCtx.userDefined == nil {
 		return false
 	}
@@ -803,8 +803,7 @@ func (w lintStructTagRule) addFailuref(n ast.Node, msg string, args ...any) {
 }
 
 func areValidateOpts(opts string) (string, bool) {
-	parts := strings.Split(opts, "|")
-	for _, opt := range parts {
+	for opt := range strings.SplitSeq(opts, "|") {
 		_, ok := validateSingleOptions[opt]
 		if !ok {
 			return opt, false
