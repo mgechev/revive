@@ -70,9 +70,9 @@ func foo() {
 	invalidMilliTime := time.Now().UnixMilli()                      // MATCH /var invalidMilliTime should have a suffix Milli, Ms/
 	goodSec, goodMs := time.Now().Unix(), time.Now().UnixMilli()    // Both should pass
 	badNanoValue := time.Now().UnixNano()                           // MATCH /var badNanoValue should have a suffix Nano, Ns/
-	badMicroValue := time.Now().UnixMicro()                         // MATCH /var badMicroValue should have a suffix Micro, Microsecond, Microseconds, Us/
+	badMicroValue2 := time.Now().UnixMicro()                        // MATCH /var badMicroValue2 should have a suffix Micro, Microsecond, Microseconds, Us/
 	goodNs, goodUs := time.Now().UnixNano(), time.Now().UnixMicro() // Both should pass
-	println(invalidTime, invalidMilliTime, goodSec, goodMs, badNanoValue, badMicroValue, goodNs, goodUs)
+	println(invalidTime, invalidMilliTime, goodSec, goodMs, badNanoValue, badMicroValue2, goodNs, goodUs)
 }
 
 func bar(input int64) {}
