@@ -7,17 +7,49 @@ linters:
   default: none
   enable:
     - dupword
+    - embeddedstructfieldcheck
     - gocritic
+    - godoclint
     - godot
     - govet
     - ineffassign
     - misspell
+    - modernize
     - musttag
     - nolintlint
+    - recvcheck
     - revive
-    - thelper
+    - sloglint
     - staticcheck
+    - testpackage
+    - thelper
+    - thelper
+    - unconvert
+    - unparam
     - unused
+    - wastedassign
+
+  exclusions:
+    warn-unused: true
+    rules:
+      - path: '(.+)_test\.go'
+        linters:
+          - godoclint
+      - linters:
+          - godoclint
+        text: 'symbol should have a godoc \("Visit"\)'
+      - linters:
+          - testpackage
+        text: 'package should be `rule_test` instead of `rule`'
+      - linters:
+          - testpackage
+        text: 'package should be `lint_test` instead of `lint`'
+      - linters:
+          - testpackage
+        text: 'package should be `cli_test` instead of `cli`'
+      - linters:
+          - testpackage
+        text: 'package should be `formatter_test` instead of `formatter`'
 
   settings:
     gocritic:
@@ -25,6 +57,16 @@ linters:
       disabled-checks:
         - hugeParam
         - rangeValCopy
+    godoclint:
+      default: all
+      options:
+        max-len:
+          length: 120
+        require-doc:
+          ignore-exported: false
+          ignore-unexported: true
+        start-with-name:
+          include-unexported: true
     govet:
       enable-all: true
       disable:
@@ -95,6 +137,7 @@ formatters:
   enable:
     - gci
     - gofmt
+    - gofumpt
     - goimports
   settings:
     gci:

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"unicode"
 
 	"github.com/mgechev/revive/lint"
@@ -31,16 +32,16 @@ func (r *FilenameFormatRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 }
 
 func (*FilenameFormatRule) getMsgForNonASCIIChars(str string) string {
-	result := ""
+	var result strings.Builder
 	for _, c := range str {
 		if c <= unicode.MaxASCII {
 			continue
 		}
 
-		result += fmt.Sprintf(" Non ASCII character %c (%U) found.", c, c)
+		result.WriteString(fmt.Sprintf(" Non ASCII character %c (%U) found.", c, c))
 	}
 
-	return result
+	return result.String()
 }
 
 // Name returns the rule name.

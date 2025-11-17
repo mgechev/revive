@@ -99,7 +99,7 @@ func (w *lintInefficientMapLookup) analyzeBlock(b *ast.BlockStmt) {
 		w.onFailure(lint.Failure{
 			Confidence: 1,
 			Node:       rangeOverMap,
-			Category:   lint.FailureCategoryCodeStyle,
+			Category:   lint.FailureCategoryStyle,
 			Failure:    "inefficient lookup of map key",
 		})
 	}

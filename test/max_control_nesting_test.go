@@ -1,4 +1,4 @@
-package test
+package test_test
 
 import (
 	"testing"
@@ -13,6 +13,7 @@ func TestMaxControlNestingDefault(t *testing.T) {
 
 func TestMaxControlNesting(t *testing.T) {
 	testRule(t, "max_control_nesting", &rule.MaxControlNestingRule{}, &lint.RuleConfig{
-		Arguments: []any{int64(2)}},
+		Arguments: []any{int64(2)},
+	},
 	)
 }

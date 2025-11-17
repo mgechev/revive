@@ -9,7 +9,8 @@ import (
 // Branch contains information about a branch within an if-else chain.
 type Branch struct {
 	BranchKind
-	Call  // The function called at the end for kind Panic or Exit.
+	Call // The function called at the end for kind Panic or Exit.
+
 	block []ast.Stmt
 }
 

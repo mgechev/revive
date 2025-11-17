@@ -9,18 +9,16 @@ on:
 
 jobs:
   go-mod:
-    name: Check go.mod
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version: stable
-      - name: Check go.mod
+      - name: Check tools/go.mod
+        working-directory: tools
         run: |
-          go mod tidy
-          git diff --exit-code go.mod
-          git diff --exit-code go.sum
+          go mod tidy -diff
 
   lint-go:
     name: Lint Go
@@ -41,10 +39,16 @@ jobs:
     - name: Run revive
       run: revive --config revive.toml ./...
 
+    - id: golangci-lint-version
+      working-directory: tools
+      run: |
+          echo "GOLANGCI_LINT_VERSION=$(go list -m -f '{{.Version}}' github.com/golangci/golangci-lint/v2)" >> $GITHUB_OUTPUT
+
     - name: Run golangci-lint
       uses: golangci/golangci-lint-action@v8
       with:
-        version: v2.2.1
+        version: ${{ steps.golangci-lint-version.outputs.GOLANGCI_LINT_VERSION }}
+        args: --verbose
 
   lint-md:
     name: Lint Markdown
@@ -58,15 +62,17 @@ jobs:
           go-version: stable
 
       - name: Setup mdsf
-        uses: hougesen/mdsf@v0.9.5
+        uses: hougesen/mdsf@v0.10.8
 
       - name: Setup goimports
+        working-directory: tools
         # https://pkg.go.dev/golang.org/x/tools/cmd/goimports
-        run: go install golang.org/x/tools/cmd/goimports@v0.33.0
+        run: go install golang.org/x/tools/cmd/goimports
 
       - name: Setup shfmt
+        working-directory: tools
         # https://github.com/mvdan/sh#shfmt
-        run: go install mvdan.cc/sh/v3/cmd/shfmt@v3.11.0
+        run: go install mvdan.cc/sh/v3/cmd/shfmt
 
       - name: Setup taplo
         # https://taplo.tamasfe.dev/cli/installation/binary.html

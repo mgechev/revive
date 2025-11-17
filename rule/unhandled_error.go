@@ -151,8 +151,8 @@ func (*lintUnhandledErrors) isTypeError(t *types.Named) bool {
 }
 
 func (w *lintUnhandledErrors) returnsAnError(tt *types.Tuple) bool {
-	for i := range tt.Len() {
-		nt, ok := tt.At(i).Type().(*types.Named)
+	for v := range tt.Variables() {
+		nt, ok := v.Type().(*types.Named)
 		if ok && w.isTypeError(nt) {
 			return true
 		}

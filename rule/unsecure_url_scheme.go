@@ -10,7 +10,8 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// UnsecureURLSchemeRule checks if a file contains string literals with unsecure URL schemes (for example: http://... in place of https://...).
+// UnsecureURLSchemeRule checks if a file contains string literals with unsecure URL schemes.
+// For example: http://... in place of https://....
 type UnsecureURLSchemeRule struct{}
 
 // Apply applied the rule to the given file.
@@ -41,13 +42,15 @@ type lintUnsecureURLSchemeRule struct {
 	onFailure func(lint.Failure)
 }
 
-const schemeSeparator = "://"
-const schemeHTTP = "http"
-const schemeWS = "ws"
-const urlPrefixHTTP = schemeHTTP + schemeSeparator
-const urlPrefixWS = schemeWS + schemeSeparator
-const lenURLPrefixHTTP = len(urlPrefixHTTP)
-const lenURLPrefixWS = len(urlPrefixWS)
+const (
+	schemeSeparator  = "://"
+	schemeHTTP       = "http"
+	schemeWS         = "ws"
+	urlPrefixHTTP    = schemeHTTP + schemeSeparator
+	urlPrefixWS      = schemeWS + schemeSeparator
+	lenURLPrefixHTTP = len(urlPrefixHTTP)
+	lenURLPrefixWS   = len(urlPrefixWS)
+)
 
 func (w lintUnsecureURLSchemeRule) Visit(node ast.Node) ast.Visitor {
 	n, ok := node.(*ast.BasicLit)

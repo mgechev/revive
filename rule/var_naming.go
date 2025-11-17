@@ -372,7 +372,8 @@ func (w *lintNames) Visit(n ast.Node) ast.Visitor {
 	return w
 }
 
-// isUpperCaseConst checks if a string is in constant name format like `SOME_CONST`, `SOME_CONST_2`, `X123_3`, `_SOME_PRIVATE_CONST`.
+// isUpperCaseConst checks if a string is in constant name format like `SOME_CONST`, `SOME_CONST_2`,
+// `X123_3`, `_SOME_PRIVATE_CONST`.
 // See #851, #865.
 func isUpperCaseConst(s string) bool {
 	if s == "" {
@@ -418,7 +419,7 @@ func isUpperOrDigit(r rune) bool {
 	return isUpper(r) || isDigit(r)
 }
 
-// isUpper checks if rune is a simple digit.
+// isDigit checks if rune is a simple digit.
 //
 // We don't use unicode.IsDigit as it returns true for a large variety of digits that are not 0-9.
 func isDigit(r rune) bool {
@@ -470,6 +471,7 @@ func getList(arg any, argName string) ([]string, error) {
 
 type syncSet struct {
 	sync.Mutex
+
 	elements map[string]struct{}
 }
 
