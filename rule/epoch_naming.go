@@ -94,6 +94,9 @@ func (w lintEpochNaming) check(name *ast.Ident, value ast.Expr) {
 
 	// Check if the receiver is of type time.Time
 	receiverType := w.file.Pkg.TypeOf(selector.X)
+	if receiverType == nil {
+		return
+	}
 	if !isTime(receiverType) {
 		return
 	}
