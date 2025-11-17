@@ -10,7 +10,7 @@ var (
 	m               = time.Now().UnixMilli() // MATCH /var m should have a suffix Milli, Ms/
 	t               = time.Now().UnixNano()  // MATCH /var t should have a suffix Nano, Ns/
 	tNano           = time.Now().UnixNano()
-	epochNano       = time.Now().UnixNano() // OK - "Nano" suffix at end makes this valid
+	epochNano       = time.Now().UnixNano()
 
 	// Very short but valid names
 	sec         = time.Now().Unix()
@@ -49,8 +49,8 @@ var (
 	explicitSec     int64 = time.Now().Unix()
 	explicitSeconds int64 = time.Now().Unix()
 	// Edge case 6b: Suffix in middle vs end (suffix must be at the end)
-	secInMiddle     int64 = time.Now().Unix()     // MATCH /var secInMiddle should have a suffix Sec, Second, Seconds/
-	nanoInMiddle    int64 = time.Now().UnixNano() // MATCH /var nanoInMiddle should have a suffix Nano, Ns/
+	secInMiddle  int64 = time.Now().Unix()     // MATCH /var secInMiddle should have a suffix Sec, Second, Seconds/
+	nanoInMiddle int64 = time.Now().UnixNano() // MATCH /var nanoInMiddle should have a suffix Nano, Ns/
 )
 
 func foo() {
