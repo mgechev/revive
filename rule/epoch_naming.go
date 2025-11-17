@@ -123,7 +123,7 @@ func isTime(typ types.Type) bool {
 
 	obj := named.Obj()
 	pkg := obj.Pkg()
-	return pkg != nil && pkg.Path() == "time" && obj.Name() == "Time"
+	return obj != nil && pkg != nil && pkg.Path() == "time" && obj.Name() == "Time"
 }
 
 func hasAnySuffix(s string, suffixes []string) bool {
