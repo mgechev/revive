@@ -66,6 +66,7 @@ func (w lintEpochNaming) Visit(node ast.Node) ast.Visitor {
 		}
 
 		rhsLen := len(v.Rhs)
+
 		for i, lhs := range v.Lhs {
 			if i >= rhsLen {
 				break
