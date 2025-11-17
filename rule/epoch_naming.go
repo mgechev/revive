@@ -113,7 +113,7 @@ func (w lintEpochNaming) check(name *ast.Ident, value ast.Expr) {
 			Confidence: 0.9,
 			Node:       name,
 			Category:   lint.FailureCategoryNaming,
-			Failure:    fmt.Sprintf("var %s should have a suffix %s", varName, strings.Join(suffixes, ", ")),
+			Failure:    fmt.Sprintf("var %s should have one of these suffixes: %s", varName, strings.Join(suffixes, ", ")),
 		})
 	}
 }
