@@ -43,11 +43,12 @@ var (
 	timeSec     = time.Now().Unix()      // OK - Sec is valid suffix
 	timeSeconds = time.Now().Unix()      // OK - Seconds is valid suffix
 
-	// Edge case 6: Suffix in middle vs end (suffix must be at the end)
+	// Edge case 6a: Explicit type declarations
 	badExplicit     int64 = time.Now().Unix() // MATCH /var badExplicit should have a suffix Sec, Second, Seconds/
 	goodSecExplicit int64 = time.Now().Unix() // MATCH /var goodSecExplicit should have a suffix Sec, Second, Seconds/
 	explicitSec     int64 = time.Now().Unix()
 	explicitSeconds int64 = time.Now().Unix()
+	// Edge case 6b: Suffix in middle vs end (suffix must be at the end)
 	secInMiddle     int64 = time.Now().Unix()     // MATCH /var secInMiddle should have a suffix Sec, Second, Seconds/
 	nanoInMiddle    int64 = time.Now().UnixNano() // MATCH /var nanoInMiddle should have a suffix Nano, Ns/
 )
