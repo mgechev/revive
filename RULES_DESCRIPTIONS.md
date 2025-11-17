@@ -282,7 +282,6 @@ _Description_: Methods or fields of `struct` that have names different only by c
 
 _Configuration_: N/A
 
-
 ## confusing-results
 
 _Description_: Function or methods that return multiple, no named, values of the same type could induce error.
