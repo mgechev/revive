@@ -56,6 +56,7 @@ func (w lintEpochNaming) Visit(node ast.Node) ast.Visitor {
 			if i >= valuesLen {
 				break
 			}
+
 			w.check(name, v.Values[i])
 		}
 	case *ast.AssignStmt:
