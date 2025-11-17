@@ -287,7 +287,6 @@ func TestGetConfig(t *testing.T) {
 				}
 
 				cfg, err := config.GetConfig(cfgPath)
-
 				if err != nil {
 					t.Fatalf("Unexpected error %v", err)
 				}
