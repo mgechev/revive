@@ -65,9 +65,7 @@ func TestAll(t *testing.T) {
 
 			ins := parseInstructions(t, filePath, src)
 
-			if err := assertFailures(t, filePath, rules, map[string]lint.RuleConfig{}, ins); err != nil {
-				t.Errorf("Linting %s: %v", fi.Name(), err)
-			}
+			assertFailures(t, filePath, rules, map[string]lint.RuleConfig{}, ins)
 		})
 	}
 }
