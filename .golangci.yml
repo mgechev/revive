@@ -98,9 +98,6 @@ linters:
           ignore-unexported: true
         start-with-name:
           include-unexported: true
-    gosec:
-      excludes:
-        - G304 # Potential file inclusion via variable
     govet:
       enable-all: true
       disable:

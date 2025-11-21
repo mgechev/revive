@@ -97,7 +97,7 @@ func (r *Revive) Lint(patterns ...*LintPattern) (<-chan lint.Failure, error) {
 	}
 
 	revive := lint.New(func(file string) ([]byte, error) {
-		contents, err := os.ReadFile(file)
+		contents, err := os.ReadFile(file) //nolint:gosec // ignore G304: potential file inclusion via variable
 		if err != nil {
 			return nil, fmt.Errorf("reading file %v: %w", file, err)
 		}

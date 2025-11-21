@@ -162,7 +162,7 @@ func detectGoMod(dir string) (rootDir string, ver *goversion.Version, err error)
 		return "", nil, fmt.Errorf("%q doesn't seem to be part of a Go module", dir)
 	}
 
-	mod, err := os.ReadFile(modFileName)
+	mod, err := os.ReadFile(modFileName) //nolint:gosec // ignore G304: potential file inclusion via variable
 	if err != nil {
 		return "", nil, fmt.Errorf("failed to read %q, got %w", modFileName, err)
 	}

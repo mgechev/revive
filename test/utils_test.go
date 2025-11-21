@@ -39,7 +39,7 @@ func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.Rul
 	baseDir := filepath.Join("..", "testdata", filepath.Dir(filename))
 	filename = filepath.Base(filename) + ".go"
 	fullFilePath := filepath.Join(baseDir, filename)
-	src, err := os.ReadFile(fullFilePath)
+	src, err := os.ReadFile(fullFilePath) //nolint:gosec // ignore G304: potential file inclusion via variable
 	if err != nil {
 		t.Fatalf("Bad filename path in test for %s: %v", rule.Name(), err)
 	}
