@@ -39,7 +39,7 @@ func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.Rul
 	baseDir := filepath.Join("..", "testdata", filepath.Dir(filename))
 	filename = filepath.Base(filename) + ".go"
 	fullFilePath := filepath.Join(baseDir, filename)
-	src, err := os.ReadFile(fullFilePath)
+	src, err := os.ReadFile(fullFilePath) //nolint:gosec // ignore G304: potential file inclusion via variable
 	if err != nil {
 		t.Fatalf("Bad filename path in test for %s: %v", rule.Name(), err)
 	}
@@ -60,7 +60,7 @@ func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.Rul
 	assertFailures(t, fullFilePath, []lint.Rule{rule}, c, ins)
 }
 
-func assertSuccess(t *testing.T, filePath string, rules []lint.Rule, config map[string]lint.RuleConfig) error {
+func assertSuccess(t *testing.T, filePath string, rules []lint.Rule, config map[string]lint.RuleConfig) {
 	t.Helper()
 
 	l := lint.New(os.ReadFile, 0)
@@ -69,7 +69,8 @@ func assertSuccess(t *testing.T, filePath string, rules []lint.Rule, config map[
 		Rules: config,
 	})
 	if err != nil {
-		return err
+		t.Errorf("Linting %s: %v", filePath, err)
+		return
 	}
 
 	failures := ""
@@ -79,10 +80,9 @@ func assertSuccess(t *testing.T, filePath string, rules []lint.Rule, config map[
 	if failures != "" {
 		t.Errorf("Expected the rule to pass but got the following failures: %s", failures)
 	}
-	return nil
 }
 
-func assertFailures(t *testing.T, filePath string, rules []lint.Rule, config map[string]lint.RuleConfig, ins []instruction) error {
+func assertFailures(t *testing.T, filePath string, rules []lint.Rule, config map[string]lint.RuleConfig, ins []instruction) {
 	t.Helper()
 
 	l := lint.New(os.ReadFile, 0)
@@ -91,7 +91,8 @@ func assertFailures(t *testing.T, filePath string, rules []lint.Rule, config map
 		Rules: config,
 	})
 	if err != nil {
-		return err
+		t.Errorf("Linting %s: %v", filePath, err)
+		return
 	}
 
 	failures := []lint.Failure{}
@@ -194,8 +195,6 @@ func assertFailures(t *testing.T, filePath string, rules []lint.Rule, config map
 	if errorMessage != "" {
 		t.Error(errorMessage)
 	}
-
-	return nil
 }
 
 type instruction struct {
@@ -425,7 +424,7 @@ func mkdirTempDotGit(t *testing.T, root string) {
 	}
 
 	gitDir := filepath.Join(dir, ".git")
-	if err := os.MkdirAll(gitDir, 0o755); err != nil {
+	if err := os.MkdirAll(gitDir, 0o750); err != nil {
 		t.Fatalf("Failed to create .git directory: %v", err)
 	}
 

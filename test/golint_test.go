@@ -58,16 +58,14 @@ func TestAll(t *testing.T) {
 		}
 		t.Run(fi.Name(), func(t *testing.T) {
 			filePath := filepath.Join(baseDir, fi.Name())
-			src, err := os.ReadFile(filePath)
+			src, err := os.ReadFile(filePath) //nolint:gosec // ignore G304: potential file inclusion via variable
 			if err != nil {
 				t.Fatalf("Failed reading %s: %v", fi.Name(), err)
 			}
 
 			ins := parseInstructions(t, filePath, src)
 
-			if err := assertFailures(t, filePath, rules, map[string]lint.RuleConfig{}, ins); err != nil {
-				t.Errorf("Linting %s: %v", fi.Name(), err)
-			}
+			assertFailures(t, filePath, rules, map[string]lint.RuleConfig{}, ins)
 		})
 	}
 }

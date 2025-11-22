@@ -23,7 +23,14 @@ func TestGetLogger(t *testing.T) {
 
 	t.Run("debug", func(t *testing.T) {
 		t.Setenv("DEBUG", "1")
-		t.Cleanup(func() { os.Remove("revive.log") })
+		t.Cleanup(func() {
+			if err := logging.Close(); err != nil {
+				t.Error(err)
+			}
+			if err := os.Remove("revive.log"); err != nil {
+				t.Error(err)
+			}
+		})
 
 		logger, err := logging.GetLogger()
 		if err != nil {
@@ -35,24 +42,14 @@ func TestGetLogger(t *testing.T) {
 		if _, err := os.Stat("revive.log"); os.IsNotExist(err) {
 			t.Error("expected revive.log file to be created")
 		}
-	})
-
-	t.Run("reuse logger", func(t *testing.T) {
-		t.Setenv("DEBUG", "1")
-		t.Cleanup(func() { os.Remove("revive.log") })
-
-		logger1, err := logging.GetLogger()
-		if err != nil {
-			t.Fatalf("expected no error, got %v", err)
-		}
 
 		logger2, err := logging.GetLogger()
 		if err != nil {
 			t.Fatalf("expected no error, got %v", err)
 		}
 
-		if logger1 != logger2 {
-			t.Errorf("expected the same logger instance to be returned: logger1=%+v, logger2=%+v", logger1, logger2)
+		if logger != logger2 {
+			t.Errorf("expected the same logger instance to be returned: logger1=%+v, logger2=%+v", logger, logger2)
 		}
 	})
 }
