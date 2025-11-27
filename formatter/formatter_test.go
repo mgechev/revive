@@ -4,7 +4,6 @@ import (
 	"go/token"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -155,8 +154,7 @@ err.go:33:4: [use-errors-new] replace fmt.Errorf by errors.New
 `,
 		},
 	} {
-  t.Run(name, func(t *testing.T) {
-			dir := t.TempDir()
+		t.Run(name, func(t *testing.T) {
 			realStdout := os.Stdout
 			fakeStdout, err := os.Create(filepath.Join(t.TempDir(), "fakeStdout"))
 			if err != nil {
