@@ -8,6 +8,9 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+
 jobs:
   validate-renovate-config:
     name: Validate renovate.json
