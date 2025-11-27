@@ -224,7 +224,7 @@ err.go:33:4: [use-errors-new] replace fmt.Errorf by errors.New
 				t.Errorf("formatter wrote to stdout: %q", stdout)
 			}
 			got := output
-			if diff := cmp.Diff(got, td.want); diff != "" {
+			if diff := cmp.Diff(td.want, got); diff != "" {
 				t.Errorf("Diff:\n%s", diff)
 			}
 		})
