@@ -3,7 +3,7 @@ package astutils
 
 import (
 	"bytes"
-	"crypto/md5"
+	"crypto/md5" //nolint:gosec // G501: Blocklisted import crypto/md5: weak cryptographic primitive
 	"encoding/hex"
 	"fmt"
 	"go/ast"
@@ -201,14 +201,14 @@ var gofmtConfig = &printer.Config{Tabwidth: 8}
 func GoFmt(x any) string {
 	buf := bytes.Buffer{}
 	fs := token.NewFileSet()
-	gofmtConfig.Fprint(&buf, fs, x)
+	_ = gofmtConfig.Fprint(&buf, fs, x)
 	return buf.String()
 }
 
 // NodeHash yields the MD5 hash of the given AST node.
 func NodeHash(node ast.Node) string {
 	hasher := func(in string) string {
-		binHash := md5.Sum([]byte(in))
+		binHash := md5.Sum([]byte(in)) //nolint:gosec // G401: Weak cryptographic primitive
 		return hex.EncodeToString(binHash[:])
 	}
 	str := GoFmt(node)

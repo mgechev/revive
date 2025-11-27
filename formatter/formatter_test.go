@@ -3,6 +3,8 @@ package formatter_test
 import (
 	"go/token"
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -153,10 +155,10 @@ err.go:33:4: [use-errors-new] replace fmt.Errorf by errors.New
 `,
 		},
 	} {
-		t.Run(name, func(t *testing.T) {
+  t.Run(name, func(t *testing.T) {
 			dir := t.TempDir()
 			realStdout := os.Stdout
-			fakeStdout, err := os.Create(dir + "/fakeStdout")
+			fakeStdout, err := os.Create(filepath.Join(t.TempDir(), "fakeStdout"))
 			if err != nil {
 				t.Fatal(err)
 			}
