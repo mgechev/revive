@@ -66,13 +66,14 @@ func TestVarNamingRule_Configure(t *testing.T) {
 					"skippackagenamecollisionwithgostd": true,
 				}},
 			},
-			wantErr:                      nil,
-			wantAllowList:                []string{"ID"},
-			wantBlockList:                []string{"VM"},
-			wantSkipInitialismNameChecks: true,
-			wantAllowUpperCaseConst:      true,
-			wantSkipPackageNameChecks:    true,
-			wantBadPackageNames:          map[string]struct{}{"helpers": {}, "models": {}},
+			wantErr:                               nil,
+			wantAllowList:                         []string{"ID"},
+			wantBlockList:                         []string{"VM"},
+			wantSkipInitialismNameChecks:          true,
+			wantAllowUpperCaseConst:               true,
+			wantSkipPackageNameChecks:             true,
+			wantBadPackageNames:                   map[string]struct{}{"helpers": {}, "models": {}},
+			wantSkipPackageNameCollisionWithGoStd: true,
 		},
 		{
 			name: "valid kebab-cased arguments",
@@ -87,13 +88,14 @@ func TestVarNamingRule_Configure(t *testing.T) {
 					"skip-package-name-collision-with-go-std": true,
 				}},
 			},
-			wantErr:                      nil,
-			wantAllowList:                []string{"ID"},
-			wantBlockList:                []string{"VM"},
-			wantSkipInitialismNameChecks: true,
-			wantAllowUpperCaseConst:      true,
-			wantSkipPackageNameChecks:    true,
-			wantBadPackageNames:          map[string]struct{}{"helpers": {}, "models": {}},
+			wantErr:                               nil,
+			wantAllowList:                         []string{"ID"},
+			wantBlockList:                         []string{"VM"},
+			wantSkipInitialismNameChecks:          true,
+			wantAllowUpperCaseConst:               true,
+			wantSkipPackageNameChecks:             true,
+			wantBadPackageNames:                   map[string]struct{}{"helpers": {}, "models": {}},
+			wantSkipPackageNameCollisionWithGoStd: true,
 		},
 		{
 			name:      "invalid allowlist type",
@@ -167,6 +169,9 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			}
 			if !reflect.DeepEqual(rule.extraBadPackageNames, tt.wantBadPackageNames) {
 				t.Errorf("unexpected extraBadPackageNames: got = %v, want %v", rule.extraBadPackageNames, tt.wantBadPackageNames)
+			}
+			if rule.skipPackageNameCollisionWithGoStd != tt.wantSkipPackageNameCollisionWithGoStd {
+				t.Errorf("unexpected skipPackageNameCollisionWithGoStd: got = %v, want %v", rule.skipPackageNameCollisionWithGoStd, tt.wantSkipPackageNameCollisionWithGoStd)
 			}
 		})
 	}
