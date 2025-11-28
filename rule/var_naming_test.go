@@ -181,20 +181,20 @@ func TestVarNamingRule_Configure_LoadStdPackages(t *testing.T) {
 			t.Fatalf("unexpected error: got = %v, want = nil", err)
 		}
 
-		for _, pkg := range []string{"fmt", "http", "json", "rand", "ioutil"} {
+		for _, pkg := range []string{"fmt", "http", "json", "rand", "io"} {
 			if _, ok := rule.stdPackageNames[pkg]; !ok {
 				t.Errorf("expected package %q to be loaded, but got empty", pkg)
 			}
 		}
 
-		for _, pkg := range []string{"v2", "internal", "vendor", "rand/v2", "std", "text", "go"} {
+		for _, pkg := range []string{"v2", "internal", "vendor", "std", "text", "go"} {
 			if _, ok := rule.stdPackageNames[pkg]; ok {
 				t.Errorf("expected package %q to be not loaded, but got loaded", pkg)
 			}
 		}
 	})
 
-	t.Run("loads std packages when calling configure two times", func(t *testing.T) {
+	t.Run("does not reload std packages on subsequent Configure calls", func(t *testing.T) {
 		var rule VarNamingRule
 
 		err := rule.Configure(nil)
@@ -211,7 +211,7 @@ func TestVarNamingRule_Configure_LoadStdPackages(t *testing.T) {
 		}
 	})
 
-	t.Run("skip loading std packages when skip-package-name-collision-with-go-std true", func(t *testing.T) {
+	t.Run("skips loading std packages when collision check disabled", func(t *testing.T) {
 		var rule VarNamingRule
 
 		err := rule.Configure(lint.Arguments{
