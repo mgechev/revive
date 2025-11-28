@@ -36,19 +36,19 @@ err.go:33:4: replace fmt.Errorf by errors.New`,
 		},
 		"friendly": {
 			formatter: &formatter.Friendly{},
-			want: `  ⚠  https://revive.run/r#error-naming  error var Exp should have name of the form ErrFoo  
+			want: `  ⚠  https://revive.run/r#error-naming  error var Exp should have name of the form ErrFoo
   file.go:2:5
 
-  ✘  https://revive.run/r#use-errors-new  replace fmt.Errorf by errors.New  
+  ✘  https://revive.run/r#use-errors-new  replace fmt.Errorf by errors.New
   err.go:33:4
 
 ✘ 2 problems (1 error, 1 warning)
 
 Errors:
-  1  use-errors-new  
+  1  use-errors-new
 
 Warnings:
-  1  error-naming  
+  1  error-naming
 
 `,
 		},
@@ -137,10 +137,10 @@ err.go:33:4: replace fmt.Errorf by errors.New https://revive.run/r#use-errors-ne
 		"stylish": {
 			formatter: &formatter.Stylish{},
 			want: `file.go
-  (2, 5)  https://revive.run/r#error-naming  error var Exp should have name of the form ErrFoo  
+  (2, 5)  https://revive.run/r#error-naming  error var Exp should have name of the form ErrFoo
 
 err.go
-  (33, 4)  https://revive.run/r#use-errors-new  replace fmt.Errorf by errors.New  
+  (33, 4)  https://revive.run/r#use-errors-new  replace fmt.Errorf by errors.New
 
 
  ✖ 2 problems (1 error) (1 warning)`,

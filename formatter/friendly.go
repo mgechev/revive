@@ -131,8 +131,11 @@ func table(rows [][]string) string {
 	tw := tabwriter.NewWriter(&buf, 0, 0, 2, ' ', 0)
 	for _, row := range rows {
 		_, _ = tw.Write([]byte{'\t'})
-		for _, col := range row {
-			_, _ = tw.Write(append([]byte(col), '\t'))
+		for i, col := range row {
+			_, _ = tw.Write([]byte(col))
+			if i < len(row)-1 {
+				_, _ = tw.Write([]byte{'\t'})
+			}
 		}
 		_, _ = tw.Write([]byte{'\n'})
 	}
