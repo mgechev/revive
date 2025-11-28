@@ -67,7 +67,6 @@ type VarNamingRule struct {
 	skipPackageNameChecks             bool                // if true - disable check for meaningless and user-defined bad package names
 	skipPackageNameCollisionWithGoStd bool                // if true - disable checks for collisions with Go standard library package names
 	extraBadPackageNames              map[string]struct{} // inactive if skipPackageNameChecks is false
-	extraPackageRegexps               []string            // inactive if skipPackageNameChecks is false
 	validPackageNameRegex             *regexp.Regexp      // if set, package names must match this regex pattern
 	pkgNameAlreadyChecked             syncSet             // set of packages names already checked
 }
