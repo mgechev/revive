@@ -280,7 +280,7 @@ file.go
 				t.Errorf("formatter wrote to stdout: %q", stdout)
 			}
 			if td.want != output {
-				t.Errorf("want:\n%s\ngot:\n%s\n", td.want, output)
+				t.Errorf("got:\n%s\nwant:\n%s\n", output, td.want)
 			}
 		})
 	}

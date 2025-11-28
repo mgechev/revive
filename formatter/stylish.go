@@ -48,7 +48,7 @@ func (*Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string
 	}
 
 	fileReport := map[string][][]string{}
-	files := make([]string, 0, len(result))
+	var files []string
 
 	for _, row := range result {
 		if _, ok := fileReport[row[0]]; !ok {
