@@ -24,7 +24,11 @@ func (*EpochNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 		},
 	}
 
-	file.Pkg.TypeCheck()
+	if err := file.Pkg.TypeCheck(); err != nil {
+		return []lint.Failure{
+			lint.NewInternalFailure(fmt.Sprintf("Unable to type check file %q: %v", file.Name, err)),
+		}
+	}
 	ast.Walk(walker, file.AST)
 
 	return failures

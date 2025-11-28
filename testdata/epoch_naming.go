@@ -56,8 +56,7 @@ var (
 func foo() {
 	anotherInvalid := time.Now().Unix() // MATCH /var anotherInvalid should have one of these suffixes: Sec, Second, Seconds/
 	anotherValidSec := time.Now().Unix()
-	_ = time.Now().Unix()  // assignment to blank identifier - ignored
-	_ := time.Now().Unix() // short declaration with blank identifier - should be ignored
+	_ = time.Now().Unix() // assignment to blank identifier - ignored
 	println(anotherInvalid, anotherValidSec)
 
 	// Edge cases that should NOT be flagged (no variable declaration)
@@ -88,6 +87,7 @@ type Config struct {
 
 func structTest() {
 	c := Config{timestamp: time.Now().Unix()} // struct field - OK (no variable for the timestamp value itself)
+	_ = c
 }
 
 // Regular assignment (=) should be checked
