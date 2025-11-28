@@ -611,15 +611,30 @@ Here you can find how you can configure some existing rules:
 
 ### `var-naming`
 
-This rule accepts two slices of strings, an allowlist and a blocklist of initialisms. By default, the rule behaves exactly as the alternative
-in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
+This rule accepts two slices of strings, an allowlist and a blocklist of
+initialisms. By default, the rule behaves exactly as the alternative
+in `golint` but optionally, you can relax it
+(see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
 
 ```toml
 [rule.var-naming]
 arguments = [["ID"], ["VM"]]
 ```
 
-This way, revive will not warn for an identifier called `customId` but will warn that `customVm` should be called `customVM`.
+This way, revive will not warn for an identifier called `customId` but will
+warn that `customVm` should be called `customVM`.
+
+You can also enforce custom package naming conventions using a regex pattern:
+
+```toml
+[rule.var-naming]
+arguments = [[], [], [{ "valid-package-rule" = "^[a-z][a-zA-Z0-9]*$" }]]
+```
+
+This enforces that package names must start with a lowercase letter followed
+by any combination of letters and digits (allowing camelCase but disallowing
+underscores). When a regex pattern is set, it takes precedence over the
+default package naming checks.
 
 ## Available Formatters
 

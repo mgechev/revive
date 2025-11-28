@@ -1710,16 +1710,25 @@ _Configuration_: N/A
 
 _Description_: This rule warns when [initialism](https://go.dev/wiki/CodeReviewComments#initialisms), [variable](https://go.dev/wiki/CodeReviewComments#variable-names)
 or [package](https://go.dev/wiki/CodeReviewComments#package-names) naming conventions are not followed.
-It ignores functions starting with `Example`, `Test`, `Benchmark`, and `Fuzz` in test files, preserving `golint` original behavior.
+It ignores functions starting with `Example`, `Test`, `Benchmark`, and `Fuzz`
+in test files, preserving `golint` original behavior.
 
-_Configuration_: This rule accepts two slices of strings and one optional slice containing a single map with named parameters.
-(This is because TOML does not support "slice of any," and we maintain backward compatibility with the previous configuration version).
-The first slice is an allowlist, and the second one is a blocklist of initialisms.
-You can add a boolean parameter `skipInitialismNameChecks` (`skipinitialismnamechecks` or `skip-initialism-name-checks`) to control how names
-of functions, variables, consts, and structs handle known initialisms (e.g., JSON, HTTP, etc.) when written in `camelCase`.
-When `skipInitialismNameChecks` is set to true, the rule allows names like `readJson`, `HttpMethod` etc.
-In the map, you can add a boolean `upperCaseConst` (`uppercaseconst`, `upper-case-const`) parameter to allow `UPPER_CASE` for `const`.
-You can also add a boolean `skipPackageNameChecks` (`skippackagenamechecks`, `skip-package-name-checks`) to skip package name checks.
+_Configuration_: This rule accepts two slices of strings and one optional
+slice containing a single map with named parameters.
+(This is because TOML does not support "slice of any," and we maintain
+backward compatibility with the previous configuration version).
+The first slice is an allowlist, and the second one is a blocklist of
+initialisms.
+You can add a boolean parameter `skipInitialismNameChecks`
+(`skipinitialismnamechecks` or `skip-initialism-name-checks`) to control
+how names of functions, variables, consts, and structs handle known
+initialisms (e.g., JSON, HTTP, etc.) when written in `camelCase`.
+When `skipInitialismNameChecks` is set to true, the rule allows names like
+`readJson`, `HttpMethod` etc.
+In the map, you can add a boolean `upperCaseConst` (`uppercaseconst`,
+`upper-case-const`) parameter to allow `UPPER_CASE` for `const`.
+You can also add a boolean `skipPackageNameChecks` (`skippackagenamechecks`,
+`skip-package-name-checks`) to skip package name checks.
 When `skipPackageNameChecks` is false (the default), you can configure
 `extraBadPackageNames` (`extrabadpackagenames`, `extra-bad-package-names`)
 to forbid using the values from the list as package names additionally
@@ -1729,8 +1738,13 @@ When `skipPackageNameCollisionWithGoStd`
 (`skippackagenamecollisionwithgostd`, `skip-package-name-collision-with-go-std`)
 is set to true, the rule disables checks on package names that collide
 with Go standard library packages.
+You can also add a string parameter `validPackageRule` (`validpackagerule`,
+`valid-package-rule`) to enforce custom package naming conventions using a
+regex pattern. When set, the regex pattern takes precedence over the default
+package naming checks (including bad package names and stdlib conflicts).
 
-By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89)).
+By default, the rule behaves exactly as the alternative in `golint` but
+optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89)).
 
 Configuration examples:
 
@@ -1777,6 +1791,19 @@ arguments = [[], [], [{ extra-bad-package-names = ["helpers", "models"] }]]
 ```toml
 [rule.var-naming]
 arguments = [[], [], [{ skip-package-name-collision-with-go-std = true }]]
+```
+
+Enforce custom package naming with regex (allows camelCase, disallows
+underscores):
+
+```toml
+[rule.var-naming]
+arguments = [[], [], [{ "valid-package-rule" = "^[a-z][a-zA-Z0-9]*$" }]]
+```
+
+```toml
+[rule.var-naming]
+arguments = [[], [], [{ "validPackageRule" = "^[a-z][a-zA-Z0-9]*$" }]]
 ```
 
 ## waitgroup-by-value

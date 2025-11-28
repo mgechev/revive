@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -66,6 +67,8 @@ type VarNamingRule struct {
 	skipPackageNameChecks             bool                // if true - disable check for meaningless and user-defined bad package names
 	skipPackageNameCollisionWithGoStd bool                // if true - disable checks for collisions with Go standard library package names
 	extraBadPackageNames              map[string]struct{} // inactive if skipPackageNameChecks is false
+	extraPackageRegexps               []string            // inactive if skipPackageNameChecks is false
+	validPackageNameRegex             *regexp.Regexp      // if set, package names must match this regex pattern
 	pkgNameAlreadyChecked             syncSet             // set of packages names already checked
 }
 
@@ -128,6 +131,16 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 					}
 					r.extraBadPackageNames[strings.ToLower(n)] = struct{}{}
 				}
+			case isRuleOption(k, "validPackageRule"):
+				pattern, ok := v.(string)
+				if !ok {
+					return fmt.Errorf("invalid third argument to the var-naming rule. Expecting validPackageRule to be a string regex pattern, but got %T", v)
+				}
+				regex, err := regexp.Compile(pattern)
+				if err != nil {
+					return fmt.Errorf("invalid validPackageRule regex pattern %q: %w", pattern, err)
+				}
+				r.validPackageNameRegex = regex
 			}
 			if isRuleOption(k, "skipPackageNameCollisionWithGoStd") {
 				r.skipPackageNameCollisionWithGoStd = true
@@ -183,6 +196,16 @@ func (r *VarNamingRule) applyPackageCheckRules(file *lint.File, onFailure func(f
 	pkgNameNode := file.AST.Name
 	pkgName := pkgNameNode.Name
 	pkgNameLower := strings.ToLower(pkgName)
+
+	// Check against custom regex pattern if configured
+	if r.validPackageNameRegex != nil {
+		if !r.validPackageNameRegex.MatchString(pkgName) {
+			onFailure(r.pkgNameFailure(pkgNameNode, "package name %q does not match the required pattern %q", pkgName, r.validPackageNameRegex.String()))
+			return
+		}
+		// If regex matches, skip other checks as the regex is the primary validator
+		return
+	}
 
 	// Check if top level package
 	if pkgNameLower == "pkg" && filepath.Base(fileDir) != pkgName {
