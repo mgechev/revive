@@ -6,8 +6,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
-
 	"github.com/mgechev/revive/formatter"
 	"github.com/mgechev/revive/lint"
 )
@@ -223,8 +221,8 @@ err.go:33:4: [use-errors-new] replace fmt.Errorf by errors.New
 			if len(stdout) > 0 {
 				t.Errorf("formatter wrote to stdout: %q", stdout)
 			}
-			if diff := cmp.Diff(td.want, output); diff != "" {
-				t.Errorf("Diff:\n%s", diff)
+			if td.want != output {
+				t.Errorf("want:\n%s\ngot:\n%s\n", td.want, output)
 			}
 		})
 	}
