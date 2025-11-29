@@ -85,7 +85,7 @@ func TestVarNaming(t *testing.T) {
 		Arguments: []any{
 			[]any{},
 			[]any{},
-			[]any{map[string]any{"valid-package-rule": "^[a-z][a-zA-Z0-9]*$"}}, // regex pattern to disallow underscores
+			[]any{map[string]any{"valid-package-rule": "^[a-z][a-zA-Z0-9]*$"}}, // tests that the pattern rejects names with underscores
 		},
 	})
 }
