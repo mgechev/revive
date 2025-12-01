@@ -2,6 +2,7 @@ package formatter
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/fatih/color"
 
@@ -47,20 +48,23 @@ func (*Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string
 	}
 
 	fileReport := map[string][][]string{}
+	var files []string
 
 	for _, row := range result {
 		if _, ok := fileReport[row[0]]; !ok {
 			fileReport[row[0]] = [][]string{}
+			files = append(files, row[0])
 		}
 
 		fileReport[row[0]] = append(fileReport[row[0]], []string{row[1], row[2], row[3]})
 	}
+	slices.Sort(files)
 
 	output := ""
-	for filename, val := range fileReport {
+	for _, filename := range files {
 		c := color.New(color.Underline)
 		output += c.SprintfFunc()(filename + "\n")
-		output += table(val) + "\n"
+		output += table(fileReport[filename]) + "\n"
 	}
 
 	problemsLabel := "problems"

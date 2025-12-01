@@ -49,9 +49,6 @@ linters:
           - testpackage
         text: 'package should be `cli_test` instead of `cli`'
       - linters:
-          - testpackage
-        text: 'package should be `formatter_test` instead of `formatter`'
-      - linters:
           - gosec
         path: rule/context_keys_type.go
       - linters:
