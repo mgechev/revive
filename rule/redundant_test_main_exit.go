@@ -66,6 +66,12 @@ func (w *lintRedundantTestMainExit) Visit(node ast.Node) ast.Visitor {
 
 	pkg := id.Name
 	fn := fc.Sel.Name
+
+	// skip flag.Parse() calls because they can be used in TestMain functions for `testing.Short`
+	if pkg == "flag" {
+		return w
+	}
+
 	if isCallToExitFunction(pkg, fn, ce.Args) {
 		w.onFailure(lint.Failure{
 			Confidence: 1,

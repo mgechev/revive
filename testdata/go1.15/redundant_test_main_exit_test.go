@@ -1,6 +1,7 @@
 package fixtures
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"syscall"
@@ -8,6 +9,11 @@ import (
 )
 
 func TestMain(m *testing.M) {
+	flag.Parse() // must not match
+	if testing.Short() {
+		m.Run()
+		return
+	}
 	setup()
 	i := m.Run()
 	teardown()
