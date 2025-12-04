@@ -13,6 +13,7 @@ import (
 	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/internal/rule"
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/logging"
 )
 
 var knownNameExceptions = map[string]bool{
@@ -115,6 +116,20 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 						return fmt.Errorf("invalid third argument to the var-naming rule: expected element %d of extraBadPackageNames to be a string, but got %v(%T)", i, name, name)
 					}
 					r.extraBadPackageNames[strings.ToLower(n)] = struct{}{}
+				}
+			case isRuleOption(k, "skipPackageNameCollisionWithGoStd"):
+				r.checkPackageNameCollisionWithGoStd = fmt.Sprint(v) != "true"
+
+				slogger, err := logging.GetLogger()
+				if err == nil {
+					slogger.Warn(
+						"an option in the configuration is deprecated, attempting to interpret it and continue",
+						"deprecated_option", k,
+						"suggestion", "instead, use its inverse, checkPackageNameCollisionWithGoStd",
+						"interpreted_as", map[string]any{
+							"checkPackageNameCollisionWithGoStd": r.checkPackageNameCollisionWithGoStd,
+						},
+					)
 				}
 			case isRuleOption(k, "checkPackageNameCollisionWithGoStd"):
 				r.checkPackageNameCollisionWithGoStd = fmt.Sprint(v) == "true"
