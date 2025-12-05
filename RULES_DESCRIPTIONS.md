@@ -1770,8 +1770,8 @@ When `skipPackageNameCollisionWithGoStd`
 (`skippackagenamecollisionwithgostd`, `skip-package-name-collision-with-go-std`)
 is set to true, the rule disables checks on package names that collide
 with Go standard library packages.
-You can also add a string parameter `packageNamePattern` (`packageNamePattern`,`valid-package-rule`) to enforce custom package naming 
-conventions using a regex pattern. When set, the regex pattern takes precedence over the default package naming checks (including bad 
+You can also add a string parameter `packageNamePattern` (`packageNamePattern`,`valid-package-rule`) to enforce custom package naming
+conventions using a regex pattern. When set, the regex pattern takes precedence over the default package naming checks (including bad
 package names and stdlib conflicts).
 
 By default, the rule behaves exactly as the alternative in `golint` but

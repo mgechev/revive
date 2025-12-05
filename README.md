@@ -630,7 +630,8 @@ You can also enforce custom package naming conventions using a regex pattern:
 arguments = [[], [], [{ "valid-package-rule" = "^[a-z][a-zA-Z0-9]*$" }]]
 ```
 
-This enforces that package names must start with a lowercase letter followed by any combination of letters and digits(allowing camelCase but disallowing underscores). When a regex pattern is set, it takes precedence over the default package naming checks.
+This enforces that package names must start with a lowercase letter followed by any combination of letters and digits(allowing camelCase but disallowing underscores). 
+When a regex pattern is set, it takes precedence over the default package naming checks.
 
 ## Available Formatters
 
