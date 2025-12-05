@@ -627,7 +627,7 @@ You can also enforce custom package naming conventions using a regex pattern:
 
 ```toml
 [rule.var-naming]
-arguments = [[], [], [{ "valid-package-rule" = "^[a-z][a-zA-Z0-9]*$" }]]
+arguments = [[], [], [{ "packageNamePattern" = "^[a-z][a-zA-Z0-9]*$" }]]
 ```
 
 This enforces that package names must start with a lowercase letter followed by any combination of letters and digits

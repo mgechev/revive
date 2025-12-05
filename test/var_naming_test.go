@@ -78,14 +78,14 @@ func TestVarNaming(t *testing.T) {
 		Arguments: []any{
 			[]any{},
 			[]any{},
-			[]any{map[string]any{"valid-package-rule": "^[a-z][a-zA-Z0-9]*$"}}, // regex pattern to allow camel case package names
+			[]any{map[string]any{"packageNamePattern": "^[a-z][a-zA-Z0-9]*$"}}, // regex pattern to allow camel case package names
 		},
 	})
 	testRule(t, "var_naming_invalid_package_name_by_regex", &rule.VarNamingRule{}, &lint.RuleConfig{
 		Arguments: []any{
 			[]any{},
 			[]any{},
-			[]any{map[string]any{"valid-package-rule": "^[a-z][a-zA-Z0-9]*$"}}, // tests that the pattern rejects names with underscores
+			[]any{map[string]any{"packageNamePattern": "^[a-z][a-zA-Z0-9]*$"}}, // tests that the pattern rejects names with underscores
 		},
 	})
 }
