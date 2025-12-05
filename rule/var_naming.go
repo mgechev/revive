@@ -212,11 +212,12 @@ func (r *VarNamingRule) applyPackageCheckRules(file *lint.File, onFailure func(f
 	pkgNameLower := strings.ToLower(pkgName)
 
 	// Check against custom regex pattern if configured
+	if r.validPackageNameRegex != nil && !r.validPackageNameRegex.MatchString(pkgName) {
+		onFailure(r.pkgNameFailure(pkgNameNode, "package name %q does not match the required pattern %q", pkgName, r.validPackageNameRegex.String()))
+	}
+
+	// If regex is configured, skip other checks as the regex is the primary validator
 	if r.validPackageNameRegex != nil {
-		if !r.validPackageNameRegex.MatchString(pkgName) {
-			onFailure(r.pkgNameFailure(pkgNameNode, "package name %q does not match the required pattern %q", pkgName, r.validPackageNameRegex.String()))
-		}
-		// If regex is configured, skip other checks as the regex is the primary validator
 		return
 	}
 
