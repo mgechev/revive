@@ -11,6 +11,7 @@ linters:
     - gocritic
     - godoclint
     - godot
+    - gosec
     - govet
     - ineffassign
     - misspell
@@ -48,8 +49,32 @@ linters:
           - testpackage
         text: 'package should be `cli_test` instead of `cli`'
       - linters:
-          - testpackage
-        text: 'package should be `formatter_test` instead of `formatter`'
+          - gosec
+        path: rule/context_keys_type.go
+      - linters:
+          - gosec
+        path: rule/errorf.go
+      - linters:
+          - gosec
+        path: rule/modifies_value_receiver.go
+      - linters:
+          - gosec
+        path: rule/range_val_address.go
+      - linters:
+          - gosec
+        path: rule/string_of_int.go
+      - linters:
+          - gosec
+        path: rule/time_naming.go
+      - linters:
+          - gosec
+        path: rule/unexported_return.go
+      - linters:
+          - gosec
+        path: rule/unhandled_error.go
+      - linters:
+          - gosec
+        path: rule/var_declarations.go
 
   settings:
     gocritic:

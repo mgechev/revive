@@ -7,6 +7,9 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+
 jobs:
   tests:
     name: Tests on ${{ matrix.os }} (Go ${{ matrix.go-version }})

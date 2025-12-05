@@ -29,6 +29,7 @@ List of all available rules.
 - [early-return](#early-return)
 - [empty-block](#empty-block)
 - [empty-lines](#empty-lines)
+- [epoch-naming](#epoch-naming)
 - [enforce-map-style](#enforce-map-style)
 - [enforce-repeated-arg-type-style](#enforce-repeated-arg-type-style)
 - [enforce-slice-style](#enforce-slice-style)
@@ -495,6 +496,46 @@ _Configuration_: N/A
 
 _Description_: Sometimes `gofmt` is not enough to enforce a common formatting of a code-base;
 this rule warns when there are heading or trailing newlines in code blocks.
+
+_Configuration_: N/A
+
+## epoch-naming
+
+_Description_: Variables initialized with epoch time methods (`time.Now().Unix()`, `time.Now().UnixMilli()`,
+`time.Now().UnixMicro()`, `time.Now().UnixNano()`) should have names that clearly indicate their time unit to
+prevent confusion and potential bugs when working with different time scales.
+
+This rule enforces that variable names contain appropriate suffixes based on the method used:
+
+- `Unix()`: variable name should end with "Sec", "Second" or "Seconds"
+- `UnixMilli()`: variable name should end with "Milli" or "Ms"
+- `UnixMicro()`: variable name should end with "Micro", "Microsecond", "Microseconds" or "Us"
+- `UnixNano()`: variable name should end with "Nano" or "Ns"
+
+The rule checks variable declarations, short variable declarations (`:=`), and regular assignments (`=`).
+The suffix matching is case-insensitive and must appear at the end of the variable name.
+
+### Examples (epoch-naming)
+
+Before (violation):
+
+```go
+timestamp := time.Now().Unix()           // unclear which unit
+createdAt := time.Now().UnixMilli()      // missing unit indicator
+t := time.Now().UnixNano()               // lacks required suffix
+```
+
+After (fixed):
+
+```go
+timestampSec := time.Now().Unix()        // clearly seconds
+createdAtMs := time.Now().UnixMilli()    // clearly milliseconds
+tNano := time.Now().UnixNano()           // clearly nanoseconds
+
+// Alternative valid names
+createdSeconds := time.Now().Unix()      // full word is fine
+updatedMicro := time.Now().UnixMicro()   // microseconds
+```
 
 _Configuration_: N/A
 

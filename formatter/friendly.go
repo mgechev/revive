@@ -130,12 +130,15 @@ func table(rows [][]string) string {
 	var buf bytes.Buffer
 	tw := tabwriter.NewWriter(&buf, 0, 0, 2, ' ', 0)
 	for _, row := range rows {
-		tw.Write([]byte{'\t'})
-		for _, col := range row {
-			tw.Write(append([]byte(col), '\t'))
+		_, _ = tw.Write([]byte{'\t'})
+		for i, col := range row {
+			_, _ = tw.Write([]byte(col))
+			if i < len(row)-1 {
+				_, _ = tw.Write([]byte{'\t'})
+			}
 		}
-		tw.Write([]byte{'\n'})
+		_, _ = tw.Write([]byte{'\n'})
 	}
-	tw.Flush()
+	_ = tw.Flush()
 	return buf.String()
 }

@@ -116,6 +116,7 @@ var allRules = append([]lint.Rule{
 	&rule.InefficientMapLookupRule{},
 	&rule.ForbiddenCallInWgGoRule{},
 	&rule.UnnecessaryIfRule{},
+	&rule.EpochNamingRule{},
 }, defaultRules...)
 
 // allFormatters is a list of all available formatters to output the linting results.
@@ -186,12 +187,8 @@ func actualRuleName(name string) string {
 	}
 }
 
-func parseConfig(path string, config *lint.Config) error {
-	file, err := os.ReadFile(path)
-	if err != nil {
-		return errors.New("cannot read the config file")
-	}
-	err = toml.Unmarshal(file, config)
+func parseConfig(data []byte, config *lint.Config) error {
+	err := toml.Unmarshal(data, config)
 	if err != nil {
 		return fmt.Errorf("cannot parse the config file: %w", err)
 	}
@@ -251,7 +248,11 @@ func GetConfig(configPath string) (*lint.Config, error) {
 	switch {
 	case configPath != "":
 		config.Confidence = defaultConfidence
-		err := parseConfig(configPath, config)
+		data, err := os.ReadFile(configPath) //nolint:gosec // ignore G304: potential file inclusion via variable
+		if err != nil {
+			return nil, errors.New("cannot read the config file")
+		}
+		err = parseConfig(data, config)
 		if err != nil {
 			return nil, err
 		}

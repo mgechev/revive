@@ -29,7 +29,9 @@ func TestFileExcludeFilterAtRuleLevel(t *testing.T) {
 	t.Run("is called if exclude not match", func(t *testing.T) {
 		rule := &TestFileFilterRule{}
 		cfg := &lint.RuleConfig{Exclude: []string{"no_matched.go"}}
-		cfg.Initialize()
+		if err := cfg.Initialize(); err != nil {
+			t.Fatal(err)
+		}
 		testRule(t, "file_to_exclude", rule, cfg)
 		if !rule.WasApplied {
 			t.Fatal("should call rule if no excludes")
@@ -39,7 +41,9 @@ func TestFileExcludeFilterAtRuleLevel(t *testing.T) {
 	t.Run("not called if exclude not match", func(t *testing.T) {
 		rule := &TestFileFilterRule{}
 		cfg := &lint.RuleConfig{Exclude: []string{"../testdata/file_to_exclude.go"}}
-		cfg.Initialize()
+		if err := cfg.Initialize(); err != nil {
+			t.Fatal(err)
+		}
 		testRule(t, "file_to_exclude", rule, cfg)
 		if rule.WasApplied {
 			t.Fatal("should not call rule if excluded")

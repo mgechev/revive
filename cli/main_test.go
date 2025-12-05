@@ -25,13 +25,21 @@ func TestXDGConfigDirIsPreferredFirst(t *testing.T) {
 
 	xdgDirPath := filepath.FromSlash("/tmp-iofs/xdg/config")
 	homeDirPath := filepath.FromSlash("/tmp-iofs/home/tester")
-	AppFs.MkdirAll(xdgDirPath, 0o755)
-	AppFs.MkdirAll(homeDirPath, 0o755)
+	if err := AppFs.MkdirAll(xdgDirPath, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := AppFs.MkdirAll(homeDirPath, 0o755); err != nil {
+		t.Fatal(err)
+	}
 
-	afero.WriteFile(AppFs, filepath.Join(xdgDirPath, "revive.toml"), []byte("\n"), 0o644)
+	if err := afero.WriteFile(AppFs, filepath.Join(xdgDirPath, "revive.toml"), []byte("\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	t.Setenv("XDG_CONFIG_HOME", xdgDirPath)
 
-	afero.WriteFile(AppFs, filepath.Join(homeDirPath, "revive.toml"), []byte("\n"), 0o644)
+	if err := afero.WriteFile(AppFs, filepath.Join(homeDirPath, "revive.toml"), []byte("\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	setHome(t, homeDirPath)
 
 	got := buildDefaultConfigPath()
@@ -45,9 +53,13 @@ func TestXDGConfigDirIsPreferredFirst(t *testing.T) {
 func TestHomeConfigDir(t *testing.T) {
 	t.Cleanup(func() { AppFs = afero.NewMemMapFs() })
 	homeDirPath := filepath.FromSlash("/tmp-iofs/home/tester")
-	AppFs.MkdirAll(homeDirPath, 0o755)
+	if err := AppFs.MkdirAll(homeDirPath, 0o755); err != nil {
+		t.Fatal(err)
+	}
 
-	afero.WriteFile(AppFs, filepath.Join(homeDirPath, "revive.toml"), []byte("\n"), 0o644)
+	if err := afero.WriteFile(AppFs, filepath.Join(homeDirPath, "revive.toml"), []byte("\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	setHome(t, homeDirPath)
 
 	got := buildDefaultConfigPath()
@@ -71,9 +83,13 @@ func setHome(t *testing.T, dir string) {
 func TestXDGConfigDir(t *testing.T) {
 	t.Cleanup(func() { AppFs = afero.NewMemMapFs() })
 	xdgDirPath := filepath.FromSlash("/tmp-iofs/xdg/config")
-	AppFs.MkdirAll(xdgDirPath, 0o755)
+	if err := AppFs.MkdirAll(xdgDirPath, 0o755); err != nil {
+		t.Fatal(err)
+	}
 
-	afero.WriteFile(AppFs, filepath.Join(xdgDirPath, "revive.toml"), []byte("\n"), 0o644)
+	if err := afero.WriteFile(AppFs, filepath.Join(xdgDirPath, "revive.toml"), []byte("\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	t.Setenv("XDG_CONFIG_HOME", xdgDirPath)
 
 	got := buildDefaultConfigPath()
