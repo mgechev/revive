@@ -133,7 +133,7 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 			case isRuleOption(k, "validPackageRule"):
 				pattern, ok := v.(string)
 				if !ok {
-					return fmt.Errorf("invalid third argument to the var-naming rule. Expecting validPackageRule to be a string regex pattern, but got %T", v)
+					return fmt.Errorf("invalid argument to the var-naming rule. Expecting validPackageRule to be a string regex pattern, but got %T", v)
 				}
 				regex, err := regexp.Compile(pattern)
 				if err != nil {
