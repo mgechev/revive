@@ -1827,7 +1827,6 @@ arguments = [[], [], [{ skip-package-name-collision-with-go-std = true }]]
 Enforce custom package naming with regex (allows camelCase, disallows
 underscores):
 
-
 ```toml
 [rule.var-naming]
 arguments = [[], [], [{ "packageNamePattern" = "^[a-z][a-zA-Z0-9]*$" }]]
