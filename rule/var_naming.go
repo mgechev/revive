@@ -50,7 +50,7 @@ type VarNamingRule struct {
 	skipPackageNameChecks    bool                // if true - disable check for meaningless and user-defined bad package names
 	extraBadPackageNames     map[string]struct{} // inactive if skipPackageNameChecks is false
 	pkgNameAlreadyChecked    syncSet             // set of packages names already checked
-	validPackageNameRegex             *regexp.Regexp      // if set, package names must match this regex pattern
+	validPackageNameRegex    *regexp.Regexp      // if set, package names must match this regex pattern
 
 	skipPackageNameCollisionWithGoStd bool // if true - disable checks for collisions with Go standard library package names
 	// stdPackageNames holds the names of standard library packages excluding internal and vendor.
@@ -130,9 +130,9 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 					return fmt.Errorf("invalid validPackageRule regex pattern %q: %w", pattern, err)
 				}
 				r.validPackageNameRegex = regex
-				}
+			}
 		}
-		}
+	}
 	if !r.skipPackageNameCollisionWithGoStd && r.stdPackageNames == nil {
 		pkgs, err := gopackages.Load(nil, "std")
 		if err != nil {
@@ -143,8 +143,9 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 		for _, pkg := range pkgs {
 			if isInternalOrVendorPackage(pkg.PkgPath) {
 				continue
-			r.stdPackageNames[pkg.Name] = struct{}{}
-	}
+				r.stdPackageNames[pkg.Name] = struct{}{}
+			}
+		}
 	}
 
 	return nil
