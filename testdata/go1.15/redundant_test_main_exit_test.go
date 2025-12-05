@@ -9,16 +9,31 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	flag.Parse() // must not match
-	if testing.Short() {
-		m.Run()
-		return
-	}
 	setup()
 	i := m.Run()
 	teardown()
 	os.Exit(i)      // MATCH /redundant call to os.Exit in TestMain function, the test runner will handle it automatically as of Go 1.15/
 	syscall.Exit(i) // MATCH /redundant call to syscall.Exit in TestMain function, the test runner will handle it automatically as of Go 1.15/
+}
+
+func TestMain(m *testing.M) {
+	flag.Parse() // must not match
+	if testing.Short() {
+		m.Run()
+		return
+	}
+}
+
+var testBackend string
+
+func TestMain(m *testing.M) {
+	flag.StringVar(&testBackend, "backend", "", "selects backend")
+	flag.Parse() // must not match
+}
+
+func TestMain(m *testing.M) {
+	fs := flag.NewFlagSet("fs", flag.ExitOnError) // must not match
+	fs.Parse()
 }
 
 func setup() {
