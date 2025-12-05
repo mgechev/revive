@@ -120,14 +120,14 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 				}
 			case isRuleOption(k, "skipPackageNameCollisionWithGoStd"):
 				r.skipPackageNameCollisionWithGoStd = fmt.Sprint(v) == "true"
-			case isRuleOption(k, "validPackageRule"):
+			case isRuleOption(k, "packageNamePattern"):
 				pattern, ok := v.(string)
 				if !ok {
-					return fmt.Errorf("invalid argument to the var-naming rule. Expecting validPackageRule to be a string regex pattern, but got %T", v)
+					return fmt.Errorf("invalid argument to the var-naming rule. Expecting packageNamePattern to be a string regex pattern, but got %T", v)
 				}
 				regex, err := regexp.Compile(pattern)
 				if err != nil {
-					return fmt.Errorf("invalid validPackageRule regex pattern %q: %w", pattern, err)
+					return fmt.Errorf("invalid packageNamePattern regex pattern %q: %w", pattern, err)
 				}
 				r.validPackageNameRegex = regex
 			}
@@ -213,10 +213,10 @@ func (r *VarNamingRule) applyPackageCheckRules(file *lint.File, onFailure func(f
 
 	// Check against custom regex pattern if configured
 	if r.validPackageNameRegex != nil && !r.validPackageNameRegex.MatchString(pkgName) {
-	  onFailure(r.pkgNameFailure(pkgNameNode, "package name %q does not match the required pattern %q", pkgName, r.validPackageNameRegex.String()))
-	  return
+		onFailure(r.pkgNameFailure(pkgNameNode, "package name %q does not match the required pattern %q", pkgName, r.validPackageNameRegex.String()))
+		return
 	}
-	
+
 	// If regex matches, skip other checks as the regex is the primary validator
 	return
 
