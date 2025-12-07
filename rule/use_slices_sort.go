@@ -41,15 +41,11 @@ func (w lintSort) Visit(n ast.Node) ast.Visitor {
 		return w // not a function call
 	}
 
-	isCallToSort, sortMethod := isCallToSort(funcCall.Fun)
+	isCallToSort, sortMethod, sliceMethod := findCallToSortReplacement(funcCall.Fun)
 	if !isCallToSort {
 		return w
 	}
 
-	sliceMethod := "Sort"
-	if sortMethod == "Sort" {
-		sliceMethod = "SortFunc"
-	}
 	w.onFailure(lint.Failure{
 		Category:   lint.FailureCategoryMaintenance,
 		Node:       n,
@@ -60,20 +56,36 @@ func (w lintSort) Visit(n ast.Node) ast.Visitor {
 	return nil
 }
 
-func isCallToSort(expr ast.Expr) (bool, string) {
+// findCallToSortReplacement returns true if the given function call is a call to a sort method that
+// can be replaced with a call to a slices packet method, false otherwise.
+// Alongside with the boolean, the function returns the sort method name and the name of its
+// replacement method from the slices packet.
+func findCallToSortReplacement(expr ast.Expr) (bool, string, string) {
 	sel, ok := expr.(*ast.SelectorExpr)
 	if !ok {
-		return false, ""
+		return false, "", ""
 	}
 
 	if !astutils.IsIdent(sel.X, "sort") {
-		return false, ""
+		return false, "", ""
 	}
 
-	switch sel.Sel.Name {
-	case "Float64s", "Ints", "Sort", "Strings":
-		return true, sel.Sel.Name
+	sortMethod := sel.Sel.Name
+	slicesMethod := ""
+	switch sortMethod {
+	case "Float64s", "Ints", "Strings":
+		slicesMethod = "Sort"
+	case "Slice", "Sort":
+		slicesMethod = "SortFunc"
+	case "SliceStable", "Stable":
+		slicesMethod = "SortStableFunc"
+	case "Float64sAreSorted", "IntsAreSorted", "StringsAreSorted":
+		slicesMethod = "IsSorted"
+	case "IsSorted", "SliceIsSorted":
+		slicesMethod = "IsSortedFunc"
 	default:
-		return false, ""
+		return false, "", ""
 	}
+
+	return true, sortMethod, slicesMethod
 }
