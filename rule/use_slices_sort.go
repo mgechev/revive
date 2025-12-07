@@ -8,7 +8,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// UseSlicesSort spots calls to sort.* that can be replaced by slices.Sort
+// UseSlicesSort spots calls to sort.* that can be replaced by slices.Sort.
 type UseSlicesSort struct{}
 
 // Apply applies the rule to given file.
@@ -64,7 +64,7 @@ func (w lintSort) Visit(n ast.Node) ast.Visitor {
 // can be replaced with a call to a slices packet method, false otherwise.
 // Alongside with the boolean, the function returns the sort method name and the name of its
 // replacement method from the slices packet.
-func findCallToSortReplacement(expr ast.Expr) (bool, string, string) {
+func findCallToSortReplacement(expr ast.Expr) (isCallToSort bool, sortMethod string, slicesMethod string) {
 	sel, ok := expr.(*ast.SelectorExpr)
 	if !ok {
 		return false, "", ""
@@ -74,8 +74,7 @@ func findCallToSortReplacement(expr ast.Expr) (bool, string, string) {
 		return false, "", ""
 	}
 
-	sortMethod := sel.Sel.Name
-	slicesMethod := ""
+	sortMethod = sel.Sel.Name
 	switch sortMethod {
 	case "Float64s", "Ints", "Strings":
 		slicesMethod = "Sort"
