@@ -41,32 +41,26 @@ func (w lintSort) Visit(n ast.Node) ast.Visitor {
 		return w // not a function call
 	}
 
-	isSortSort := astutils.IsPkgDotName(funcCall.Fun, "sort", "Sort")
-	if isSortSort {
-		w.onFailure(lint.Failure{
-			Category:   lint.FailureCategoryMaintenance,
-			Node:       n,
-			Confidence: 1,
-			Failure:    "replace sort.Sort by slices.SortFunc",
-		})
-		return nil
+	isCallToSort, sortMethod := isCallToSort(funcCall.Fun)
+	if !isCallToSort {
+		return w
 	}
 
-	isSortType, basicType := isSortType(funcCall.Fun)
-	if isSortType {
-		w.onFailure(lint.Failure{
-			Category:   lint.FailureCategoryMaintenance,
-			Node:       n,
-			Confidence: 1,
-			Failure:    fmt.Sprintf("replace sort.%s by slices.Sort", basicType),
-		})
-		return nil
+	sliceMethod := "Sort"
+	if sortMethod == "Sort" {
+		sliceMethod = "SortFunc"
 	}
+	w.onFailure(lint.Failure{
+		Category:   lint.FailureCategoryMaintenance,
+		Node:       n,
+		Confidence: 1,
+		Failure:    fmt.Sprintf("replace sort.%s by slices.%s", sortMethod, sliceMethod),
+	})
 
-	return w
+	return nil
 }
 
-func isSortType(expr ast.Expr) (bool, string) {
+func isCallToSort(expr ast.Expr) (bool, string) {
 	sel, ok := expr.(*ast.SelectorExpr)
 	if !ok {
 		return false, ""
@@ -77,7 +71,7 @@ func isSortType(expr ast.Expr) (bool, string) {
 	}
 
 	switch sel.Sel.Name {
-	case "Float64s", "Ints", "Strings":
+	case "Float64s", "Ints", "Sort", "Strings":
 		return true, sel.Sel.Name
 	default:
 		return false, ""
