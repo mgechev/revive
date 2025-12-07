@@ -64,7 +64,7 @@ func (w lintSort) Visit(n ast.Node) ast.Visitor {
 // can be replaced with a call to a slices packet method, false otherwise.
 // Alongside with the boolean, the function returns the sort method name and the name of its
 // replacement method from the slices packet.
-func findCallToSortReplacement(expr ast.Expr) (isCallToSort bool, sortMethod string, slicesMethod string) {
+func findCallToSortReplacement(expr ast.Expr) (isCallToSort bool, sortMethod, slicesMethod string) {
 	sel, ok := expr.(*ast.SelectorExpr)
 	if !ok {
 		return false, "", ""
