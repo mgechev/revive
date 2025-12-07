@@ -1682,9 +1682,8 @@ _Configuration_: N/A
 
 ## use-slices-sort
 
-_Description_: Since Go 1.21 the `slices` package proposes [`Sort`](https://pkg.go.dev/slices#Sort)
-and [`SortFunc`](https://pkg.go.dev/slices#SortFunc) methods.
-These methods are slightly faster and easier to use than their equivalents in `sort`package.
+_Description_: Since Go 1.21 the `slices` package proposes methods that are faster and easier to use
+than their equivalents in `sort` package.
 The rule proposes to replace these legacy idioms with calls to the new methods.
 
 ### Examples (use-slices-sort)
