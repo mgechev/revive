@@ -13,6 +13,10 @@ type UseSlicesSort struct{}
 
 // Apply applies the rule to given file.
 func (*UseSlicesSort) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+	if !file.Pkg.IsAtLeastGoVersion(lint.Go121) {
+		return nil // nothing to do, the package slices was added in version 1.21
+	}
+
 	var failures []lint.Failure
 
 	walker := lintSort{
