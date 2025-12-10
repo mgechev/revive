@@ -10,16 +10,16 @@ import (
 
 func TestVarNamingRule_Configure(t *testing.T) {
 	tests := []struct {
-		name                                  string
-		arguments                             lint.Arguments
-		wantErr                               error
-		wantAllowList                         []string
-		wantBlockList                         []string
-		wantSkipInitialismNameChecks          bool
-		wantAllowUpperCaseConst               bool
-		wantSkipPackageNameChecks             bool
-		wantBadPackageNames                   map[string]struct{}
-		wantSkipPackageNameCollisionWithGoStd bool
+		name                                   string
+		arguments                              lint.Arguments
+		wantErr                                error
+		wantAllowList                          []string
+		wantBlockList                          []string
+		wantSkipInitialismNameChecks           bool
+		wantAllowUpperCaseConst                bool
+		wantSkipPackageNameChecks              bool
+		wantBadPackageNames                    map[string]struct{}
+		wantCheckPackageNameCollisionWithGoStd bool
 	}{
 		{
 			name:                         "no arguments",
@@ -37,21 +37,21 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{"ID"},
 				[]any{"VM"},
 				[]any{map[string]any{
-					"skipInitialismNameChecks":          true,
-					"upperCaseConst":                    true,
-					"skipPackageNameChecks":             true,
-					"extraBadPackageNames":              []any{"helpers", "models"},
-					"skipPackageNameCollisionWithGoStd": true,
+					"skipInitialismNameChecks":           true,
+					"upperCaseConst":                     true,
+					"skipPackageNameChecks":              true,
+					"extraBadPackageNames":               []any{"helpers", "models"},
+					"checkPackageNameCollisionWithGoStd": true,
 				}},
 			},
-			wantErr:                               nil,
-			wantAllowList:                         []string{"ID"},
-			wantBlockList:                         []string{"VM"},
-			wantSkipInitialismNameChecks:          true,
-			wantAllowUpperCaseConst:               true,
-			wantSkipPackageNameChecks:             true,
-			wantBadPackageNames:                   map[string]struct{}{"helpers": {}, "models": {}},
-			wantSkipPackageNameCollisionWithGoStd: true,
+			wantErr:                                nil,
+			wantAllowList:                          []string{"ID"},
+			wantBlockList:                          []string{"VM"},
+			wantSkipInitialismNameChecks:           true,
+			wantAllowUpperCaseConst:                true,
+			wantSkipPackageNameChecks:              true,
+			wantBadPackageNames:                    map[string]struct{}{"helpers": {}, "models": {}},
+			wantCheckPackageNameCollisionWithGoStd: true,
 		},
 		{
 			name: "valid lowercased arguments",
@@ -59,21 +59,21 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{"ID"},
 				[]any{"VM"},
 				[]any{map[string]any{
-					"skipinitialismnamechecks":          true,
-					"uppercaseconst":                    true,
-					"skippackagenamechecks":             true,
-					"extrabadpackagenames":              []any{"helpers", "models"},
-					"skippackagenamecollisionwithgostd": true,
+					"skipinitialismnamechecks":           true,
+					"uppercaseconst":                     true,
+					"skippackagenamechecks":              true,
+					"extrabadpackagenames":               []any{"helpers", "models"},
+					"checkpackagenamecollisionwithgostd": true,
 				}},
 			},
-			wantErr:                               nil,
-			wantAllowList:                         []string{"ID"},
-			wantBlockList:                         []string{"VM"},
-			wantSkipInitialismNameChecks:          true,
-			wantAllowUpperCaseConst:               true,
-			wantSkipPackageNameChecks:             true,
-			wantBadPackageNames:                   map[string]struct{}{"helpers": {}, "models": {}},
-			wantSkipPackageNameCollisionWithGoStd: true,
+			wantErr:                                nil,
+			wantAllowList:                          []string{"ID"},
+			wantBlockList:                          []string{"VM"},
+			wantSkipInitialismNameChecks:           true,
+			wantAllowUpperCaseConst:                true,
+			wantSkipPackageNameChecks:              true,
+			wantBadPackageNames:                    map[string]struct{}{"helpers": {}, "models": {}},
+			wantCheckPackageNameCollisionWithGoStd: true,
 		},
 		{
 			name: "valid kebab-cased arguments",
@@ -81,21 +81,21 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{"ID"},
 				[]any{"VM"},
 				[]any{map[string]any{
-					"skip-initialism-name-checks":             true,
-					"upper-case-const":                        true,
-					"skip-package-name-checks":                true,
-					"extra-bad-package-names":                 []any{"helpers", "models"},
-					"skip-package-name-collision-with-go-std": true,
+					"skip-initialism-name-checks":              true,
+					"upper-case-const":                         true,
+					"skip-package-name-checks":                 true,
+					"extra-bad-package-names":                  []any{"helpers", "models"},
+					"check-package-name-collision-with-go-std": true,
 				}},
 			},
-			wantErr:                               nil,
-			wantAllowList:                         []string{"ID"},
-			wantBlockList:                         []string{"VM"},
-			wantSkipInitialismNameChecks:          true,
-			wantAllowUpperCaseConst:               true,
-			wantSkipPackageNameChecks:             true,
-			wantBadPackageNames:                   map[string]struct{}{"helpers": {}, "models": {}},
-			wantSkipPackageNameCollisionWithGoStd: true,
+			wantErr:                                nil,
+			wantAllowList:                          []string{"ID"},
+			wantBlockList:                          []string{"VM"},
+			wantSkipInitialismNameChecks:           true,
+			wantAllowUpperCaseConst:                true,
+			wantSkipPackageNameChecks:              true,
+			wantBadPackageNames:                    map[string]struct{}{"helpers": {}, "models": {}},
+			wantCheckPackageNameCollisionWithGoStd: true,
 		},
 		{
 			name:      "invalid allowlist type",
@@ -170,18 +170,47 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			if !reflect.DeepEqual(rule.extraBadPackageNames, tt.wantBadPackageNames) {
 				t.Errorf("unexpected extraBadPackageNames: got = %v, want %v", rule.extraBadPackageNames, tt.wantBadPackageNames)
 			}
-			if rule.skipPackageNameCollisionWithGoStd != tt.wantSkipPackageNameCollisionWithGoStd {
-				t.Errorf("unexpected skipPackageNameCollisionWithGoStd: got = %v, want %v", rule.skipPackageNameCollisionWithGoStd, tt.wantSkipPackageNameCollisionWithGoStd)
+			if rule.checkPackageNameCollisionWithGoStd != tt.wantCheckPackageNameCollisionWithGoStd {
+				t.Errorf("unexpected checkPackageNameCollisionWithGoStd: got = %v, want %v", rule.checkPackageNameCollisionWithGoStd, tt.wantCheckPackageNameCollisionWithGoStd)
 			}
 		})
 	}
 }
 
 func TestVarNamingRule_Configure_LoadStdPackages(t *testing.T) {
-	t.Run("loads std packages", func(t *testing.T) {
+	checkGoStdConfig := lint.Arguments{
+		[]any(nil),
+		[]any(nil),
+		[]any{map[string]any{
+			"checkPackageNameCollisionWithGoStd": true,
+		}},
+	}
+
+	t.Run("nil config defaults to golint behavior and skips std packages", func(t *testing.T) {
 		var rule VarNamingRule
 
 		err := rule.Configure(nil)
+		if err != nil {
+			t.Fatalf("unexpected error: got = %v, want = nil", err)
+		}
+
+		for _, pkg := range []string{"fmt", "http", "json", "rand", "io"} {
+			if _, ok := rule.stdPackageNames[pkg]; ok {
+				t.Errorf("expected package %q to be not loaded, but got loaded", pkg)
+			}
+		}
+
+		for _, pkg := range []string{"v2", "internal", "vendor", "std", "text", "go"} {
+			if _, ok := rule.stdPackageNames[pkg]; ok {
+				t.Errorf("expected package %q to be not loaded, but got loaded", pkg)
+			}
+		}
+	})
+
+	t.Run("loads std packages", func(t *testing.T) {
+		var rule VarNamingRule
+
+		err := rule.Configure(checkGoStdConfig)
 		if err != nil {
 			t.Fatalf("unexpected error: got = %v, want = nil", err)
 		}
@@ -202,12 +231,12 @@ func TestVarNamingRule_Configure_LoadStdPackages(t *testing.T) {
 	t.Run("does not reload std packages on subsequent Configure calls", func(t *testing.T) {
 		var rule VarNamingRule
 
-		err := rule.Configure(nil)
+		err := rule.Configure(checkGoStdConfig)
 		if err != nil {
 			t.Fatalf("unexpected error: got = %v, want = nil", err)
 		}
 		firstLoadLen := len(rule.stdPackageNames)
-		err = rule.Configure(nil)
+		err = rule.Configure(checkGoStdConfig)
 		if err != nil {
 			t.Fatalf("unexpected error: got = %v, want = nil", err)
 		}
@@ -223,7 +252,7 @@ func TestVarNamingRule_Configure_LoadStdPackages(t *testing.T) {
 			[]any{},
 			[]any{},
 			[]any{map[string]any{
-				"skip-package-name-collision-with-go-std": true,
+				"check-package-name-collision-with-go-std": false,
 			}},
 		})
 		if err != nil {

@@ -1766,9 +1766,9 @@ When `skipPackageNameChecks` is false (the default), you can configure
 to forbid using the values from the list as package names additionally
 to the standard meaningless ones: "common", "interfaces", "misc",
 "types", "util", "utils".
-When `skipPackageNameCollisionWithGoStd`
-(`skippackagenamecollisionwithgostd`, `skip-package-name-collision-with-go-std`)
-is set to true, the rule disables checks on package names that collide
+When `checkPackageNameCollisionWithGoStd`
+(`checkpackagenamecollisionwithgostd`, `check-package-name-collision-with-go-std`)
+is set to true, the rule checks for package names that collide
 with Go standard library packages.
 
 By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89)).
@@ -1817,7 +1817,7 @@ arguments = [[], [], [{ extra-bad-package-names = ["helpers", "models"] }]]
 
 ```toml
 [rule.var-naming]
-arguments = [[], [], [{ skip-package-name-collision-with-go-std = true }]]
+arguments = [[], [], [{ check-package-name-collision-with-go-std = true }]]
 ```
 
 ## waitgroup-by-value
