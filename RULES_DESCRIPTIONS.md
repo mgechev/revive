@@ -1693,18 +1693,22 @@ sort.Float64s(temperatures)
 sort.Ints(years)
 sort.Strings(names)
 sort.Slice(cfg.Dependencies, func(i, j int) bool {
-		return cfg.Dependencies[i].Name < cfg.Dependencies[j].Name
+	return cfg.Dependencies[i].Name < cfg.Dependencies[j].Name
+})
 ```
 
 Fixed code:
 
 ```go
-sort.Sort(temperatures)
-sort.Sort(years)
-sort.Sort(names)
+slices.Sort(temperatures)
+slices.Sort(years)
+slices.Sort(names)
 slices.SortFunc(cfg.Dependencies, func(a, b config.Dependency) int {
-		return cmp.Compare(a.Name, b.Name)
+	return cmp.Compare(a.Name, b.Name)
+})
 ```
+
+_Configuration_: N/A
 
 ## use-waitgroup-go
 
