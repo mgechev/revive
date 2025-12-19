@@ -98,6 +98,7 @@ List of all available rules.
 - [use-any](#use-any)
 - [use-errors-new](#use-errors-new)
 - [use-fmt-print](#use-fmt-print)
+- [use-slices-sort](#use-slices-sort)
 - [use-waitgroup-go](#use-waitgroup-go)
 - [useless-break](#useless-break)
 - [useless-fallthrough](#useless-fallthrough)
@@ -1676,6 +1677,36 @@ _Description_: This rule proposes to replace calls to built-in `print` and `prin
 
 `print` and `println` built-in functions are not recommended for use-cases other than
 [language bootstrapping and are not guaranteed to stay in the language](https://go.dev/ref/spec#Bootstrapping).
+
+_Configuration_: N/A
+
+## use-slices-sort
+
+_Description_: Since Go 1.21 the `slices` package proposes methods that are faster and easier to use
+than their equivalents in `sort` package.
+The rule proposes to replace these legacy idioms with calls to the new methods.
+
+### Examples (use-slices-sort)
+
+```go
+sort.Float64s(temperatures)
+sort.Ints(years)
+sort.Strings(names)
+sort.Slice(cfg.Dependencies, func(i, j int) bool {
+	return cfg.Dependencies[i].Name < cfg.Dependencies[j].Name
+})
+```
+
+Fixed code:
+
+```go
+slices.Sort(temperatures)
+slices.Sort(years)
+slices.Sort(names)
+slices.SortFunc(cfg.Dependencies, func(a, b config.Dependency) int {
+	return cmp.Compare(a.Name, b.Name)
+})
+```
 
 _Configuration_: N/A
 
