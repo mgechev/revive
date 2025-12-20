@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -49,6 +50,7 @@ type VarNamingRule struct {
 	skipPackageNameChecks    bool                // if true - disable check for meaningless and user-defined bad package names
 	extraBadPackageNames     map[string]struct{} // inactive if skipPackageNameChecks is false
 	pkgNameAlreadyChecked    syncSet             // set of packages names already checked
+	validPackageNameRegex    *regexp.Regexp      // if set, package names must match this regex pattern
 
 	skipPackageNameCollisionWithGoStd bool // if true - disable checks for collisions with Go standard library package names
 	// stdPackageNames holds the names of standard library packages excluding internal and vendor.
@@ -118,6 +120,16 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 				}
 			case isRuleOption(k, "skipPackageNameCollisionWithGoStd"):
 				r.skipPackageNameCollisionWithGoStd = fmt.Sprint(v) == "true"
+			case isRuleOption(k, "packageNamePattern"):
+				pattern, ok := v.(string)
+				if !ok {
+					return fmt.Errorf("invalid argument to the var-naming rule. Expecting packageNamePattern to be a string regex pattern, but got %T", v)
+				}
+				regex, err := regexp.Compile(pattern)
+				if err != nil {
+					return fmt.Errorf("invalid packageNamePattern regex pattern %q: %w", pattern, err)
+				}
+				r.validPackageNameRegex = regex
 			}
 		}
 	}
@@ -198,6 +210,16 @@ func (r *VarNamingRule) applyPackageCheckRules(file *lint.File, onFailure func(f
 	pkgNameNode := file.AST.Name
 	pkgName := pkgNameNode.Name
 	pkgNameLower := strings.ToLower(pkgName)
+
+	// Check against custom regex pattern if configured
+	if r.validPackageNameRegex != nil && !r.validPackageNameRegex.MatchString(pkgName) {
+		onFailure(r.pkgNameFailure(pkgNameNode, "package name %q does not match the required pattern %q", pkgName, r.validPackageNameRegex.String()))
+	}
+
+	// If regex is configured, skip other checks as the regex is the primary validator
+	if r.validPackageNameRegex != nil {
+		return
+	}
 
 	// Check if top level package
 	if pkgNameLower == "pkg" && filepath.Base(fileDir) != pkgName {
