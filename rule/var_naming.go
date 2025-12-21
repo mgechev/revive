@@ -209,11 +209,11 @@ func (r *VarNamingRule) applyPackageCheckRules(file *lint.File, onFailure func(f
 
 	// Protect pkgsWithNameFailure from concurrent modifications
 	r.pkgNameAlreadyChecked.Lock()
+	defer r.pkgNameAlreadyChecked.Unlock()
 	if r.pkgNameAlreadyChecked.has(fileDir) {
 		return
 	}
 	r.pkgNameAlreadyChecked.add(fileDir) // mark this package as already checked
-	r.pkgNameAlreadyChecked.Unlock()
 
 	pkgNameNode := file.AST.Name
 	pkgName := pkgNameNode.Name
