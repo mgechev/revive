@@ -438,14 +438,14 @@ func isUpperOrDigit(r rune) bool {
 
 // isDigit checks if rune is a simple digit.
 //
-// We don't use unicode.IsDigit as it returns true for a large variety of digits that are not 0-9.
+// We don't use [unicode.IsDigit] as it returns true for a large variety of digits that are not 0-9.
 func isDigit(r rune) bool {
 	return r >= '0' && r <= '9'
 }
 
 // isUpper checks if rune is ASCII upper case letter
 //
-// We restrict to A-Z because unicode.IsUpper returns true for a large variety of letters.
+// We restrict to A-Z because [unicode.IsUpper] returns true for a large variety of letters.
 func isUpper(r rune) bool {
 	return r >= 'A' && r <= 'Z'
 }

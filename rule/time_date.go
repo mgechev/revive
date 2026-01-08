@@ -14,7 +14,7 @@ import (
 	"github.com/mgechev/revive/logging"
 )
 
-// TimeDateRule lints the way time.Date is used.
+// TimeDateRule lints the way [time.Date] is used.
 type TimeDateRule struct{}
 
 // Apply applies the rule to given file.
@@ -41,7 +41,7 @@ type lintTimeDate struct {
 	onFailure func(lint.Failure)
 }
 
-// timeDateArgument is a type for the arguments of time.Date function.
+// timeDateArgument is a type for the arguments of [time.Date] function.
 type timeDateArgument string
 
 const (
@@ -56,7 +56,7 @@ const (
 )
 
 var (
-	// timeDateArgumentNames are the names of the arguments of time.Date.
+	// timeDateArgumentNames are the names of the arguments of [time.Date].
 	timeDateArgumentNames = []timeDateArgument{
 		timeDateArgYear,
 		timeDateArgMonth,
@@ -68,7 +68,7 @@ var (
 		timeDateArgTimezone,
 	}
 
-	// timeDateArity is the number of arguments of time.Date.
+	// timeDateArity is the number of arguments of [time.Date].
 	timeDateArity = len(timeDateArgumentNames)
 )
 
