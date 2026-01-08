@@ -7,7 +7,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// UseErrorsNewRule spots calls to fmt.Errorf that can be replaced by errors.New.
+// UseErrorsNewRule spots calls to [fmt.Errorf] that can be replaced by [errors.New].
 type UseErrorsNewRule struct{}
 
 // Apply applies the rule to given file.

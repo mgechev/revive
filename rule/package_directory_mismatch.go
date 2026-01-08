@@ -77,7 +77,7 @@ func (*PackageDirectoryMismatchRule) buildIgnoreRegex(ignoredDirs []string) (*re
 }
 
 // skipDirs contains directory names that should be unconditionally ignored when checking.
-// These entries handle edge cases where filepath.Base might return these values.
+// These entries handle edge cases where [filepath.Base] might return these values.
 var skipDirs = map[string]struct{}{
 	".": {}, // Current directory
 	"/": {}, // Root directory
