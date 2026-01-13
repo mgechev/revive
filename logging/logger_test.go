@@ -10,6 +10,11 @@ import (
 func TestGetLogger(t *testing.T) {
 	t.Run("no debug", func(t *testing.T) {
 		t.Setenv("DEBUG", "")
+		t.Cleanup(func() {
+			if err := logging.Close(); err != nil {
+				t.Error(err)
+			}
+		})
 
 		logger, err := logging.GetLogger()
 		if err != nil {
