@@ -44,11 +44,9 @@ func (w lintEmptyBlock) Visit(node ast.Node) ast.Visitor {
 		w.ignore[n.Body] = true
 		return w
 	case *ast.ForStmt:
-		if len(n.Body.List) == 0 && n.Init == nil && n.Post == nil && n.Cond != nil {
-			if _, isCall := n.Cond.(*ast.CallExpr); isCall {
-				w.ignore[n.Body] = true
-				return w
-			}
+		if len(n.Body.List) == 0 && (hasCallExpr(n.Init) || hasCallExpr(n.Cond) || hasCallExpr(n.Post)) {
+			w.ignore[n.Body] = true
+			return w
 		}
 	case *ast.RangeStmt:
 		if len(n.Body.List) == 0 {
@@ -72,4 +70,26 @@ func (w lintEmptyBlock) Visit(node ast.Node) ast.Visitor {
 	}
 
 	return w
+}
+
+func hasCallExpr(node ast.Node) bool {
+	if node == nil {
+		return false
+	}
+
+	found := false
+	ast.Inspect(node, func(n ast.Node) bool {
+		if found || n == nil {
+			return !found
+		}
+
+		if _, ok := n.(*ast.CallExpr); ok {
+			found = true
+			return false
+		}
+
+		return true
+	})
+
+	return found
 }

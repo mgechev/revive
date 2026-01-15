@@ -91,3 +91,16 @@ type iterator struct{}
 func (it *iterator) next() bool {
 	return false
 }
+
+var count int
+
+func step() (int, bool) {
+	// This could have all kinds of functionality.
+	count++
+	return count, count < 5
+}
+
+func emptyForWithControlCalls() {
+	for _, c := step(); c; _, c = step() { // Must not match
+	}
+}
