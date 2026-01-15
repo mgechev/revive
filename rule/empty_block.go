@@ -79,8 +79,8 @@ func hasCallExpr(node ast.Node) bool {
 
 	found := false
 	ast.Inspect(node, func(n ast.Node) bool {
-		if found || n == nil {
-			return !found
+		if found {
+			return false
 		}
 
 		if _, ok := n.(*ast.CallExpr); ok {
