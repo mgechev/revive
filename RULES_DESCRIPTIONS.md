@@ -495,7 +495,8 @@ _Configuration_: N/A
 
 ### Limitations
 
-The `empty-block` rule has limited support for detecting intentionally empty `for` loops where the loop body is empty but the loop controls (`Init`, `Cond`, or `Post`) contain function calls that perform the actual work.
+The `empty-block` rule has limited support for detecting intentionally empty `for` loops where the loop body is empty but the
+loop controls (`Init`, `Cond`, or `Post`) contain function calls that perform the actual work.
 
 Currently, the rule only recognizes a narrow pattern:
 
@@ -519,7 +520,8 @@ for p := 0; bar(p); p++ {
 }
 ```
 
-**Workaround**: If you have intentionally empty `for` loops with function calls in the loop controls, you can disable the rule in-place using a directive comment:
+**Workaround**: If you have intentionally empty `for` loops with function calls in the loop controls, you can disable the rule
+in-place using a directive comment:
 
 ```go
 //revive:disable:empty-block
@@ -529,7 +531,9 @@ for _, c := step(); c; _, c = step() {
 //revive:enable:empty-block
 ```
 
-The reason for this limitation is that properly detecting whether a `for` loop is intentionally empty requires understanding the **semantics** of the called functions (whether they have side effects, modify state, etc.), which is beyond the scope of static analysis that this rule performs.
+The reason for this limitation is that properly detecting whether a `for` loop is intentionally empty requires understanding the
+**semantics** of the called functions (whether they have side effects, modify state, etc.), which is beyond the scope of static
+analysis that this rule performs.
 
 ## empty-lines
 
