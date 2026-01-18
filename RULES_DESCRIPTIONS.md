@@ -540,8 +540,9 @@ The reason for this limitation is that properly detecting whether a `for` loop i
 analysis that this rule performs.
 
 For more details, see:
-- https://github.com/mgechev/revive/issues/1622
-- https://github.com/mgechev/revive/issues/386
+
+- <https://github.com/mgechev/revive/issues/1622>
+- <https://github.com/mgechev/revive/issues/386>
 
 ## empty-lines
 
