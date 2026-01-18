@@ -504,6 +504,10 @@ Currently, the rule only recognizes a narrow pattern:
 for process() {
     // Intentionally empty - process() does the work
 }
+
+for range processChan {
+    // Intentionally empty - draining the channel
+}
 ```
 
 However, it will produce **false positives** for more complex patterns such as:
@@ -534,6 +538,10 @@ for _, c := step(); c; _, c = step() {
 The reason for this limitation is that properly detecting whether a `for` loop is intentionally empty requires understanding the
 **semantics** of the called functions (whether they have side effects, modify state, etc.), which is beyond the scope of static
 analysis that this rule performs.
+
+For more details, see:
+- https://github.com/mgechev/revive/issues/1622
+- https://github.com/mgechev/revive/issues/386
 
 ## empty-lines
 
