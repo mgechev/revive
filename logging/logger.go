@@ -21,19 +21,30 @@ func GetLogger() (*slog.Logger, error) {
 		return logger, nil
 	}
 
+	// By default, suppress all logging output below level WARN,
+	// and only log to stderr.
+	leveler := new(slog.LevelVar)
+	leveler.Set(slog.LevelWarn)
+	opts := &slog.HandlerOptions{Level: leveler}
+
+	var out io.Writer = os.Stderr
+
 	debugModeEnabled := os.Getenv("DEBUG") != ""
-	if !debugModeEnabled {
-		// by default, suppress all logging output
-		return slog.New(slog.DiscardHandler), nil
+	if debugModeEnabled {
+		// In DEBUG mode, log all levels of output at level DEBUG and higher,
+		// to both stderr and the logFile.
+		leveler.Set(slog.LevelDebug)
+
+		var err error
+		loggerFile, err = os.Create(logFile)
+		if err != nil {
+			return nil, err
+		}
+
+		out = io.MultiWriter(os.Stderr, loggerFile)
 	}
 
-	var err error
-	loggerFile, err = os.Create(logFile)
-	if err != nil {
-		return nil, err
-	}
-
-	logger = slog.New(slog.NewTextHandler(io.MultiWriter(os.Stderr, loggerFile), nil))
+	logger = slog.New(slog.NewTextHandler(out, opts))
 
 	logger.Info("Logger initialized", "logFile", logFile)
 
@@ -42,6 +53,7 @@ func GetLogger() (*slog.Logger, error) {
 
 // Close closes the logger file if it was opened.
 func Close() error {
+	logger = nil
 	if loggerFile == nil {
 		return nil
 	}
