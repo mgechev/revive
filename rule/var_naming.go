@@ -48,7 +48,8 @@ type VarNamingRule struct {
 	skipInitialismNameChecks bool                // if true - disable enforcing capitals for common initialisms
 	skipPackageNameChecks    bool                // if true - disable check for meaningless and user-defined bad package names
 	extraBadPackageNames     map[string]struct{} // inactive if skipPackageNameChecks is false
-	pkgNameAlreadyChecked    syncSet             // set of packages names already checked
+	acceptedPackageNames     map[string]struct{}
+	pkgNameAlreadyChecked    syncSet // set of packages names already checked
 
 	skipPackageNameCollisionWithGoStd bool // if true - disable checks for collisions with Go standard library package names
 	// stdPackageNames holds the names of standard library packages excluding internal and vendor.
@@ -101,20 +102,21 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 				r.allowUpperCaseConst = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "skipPackageNameChecks"):
 				r.skipPackageNameChecks = fmt.Sprint(v) == "true"
-			case isRuleOption(k, "extraBadPackageNames"):
-				extraBadPackageNames, ok := v.([]any)
-				if !ok {
-					return fmt.Errorf("invalid third argument to the var-naming rule. Expecting extraBadPackageNames of type slice of strings, but %T", v)
+			case isRuleOption(k, "acceptedPackageNames"):
+				if r.acceptedPackageNames == nil {
+					r.acceptedPackageNames = map[string]struct{}{}
 				}
-				for i, name := range extraBadPackageNames {
-					if r.extraBadPackageNames == nil {
-						r.extraBadPackageNames = map[string]struct{}{}
-					}
-					n, ok := name.(string)
-					if !ok {
-						return fmt.Errorf("invalid third argument to the var-naming rule: expected element %d of extraBadPackageNames to be a string, but got %v(%T)", i, name, name)
-					}
-					r.extraBadPackageNames[strings.ToLower(n)] = struct{}{}
+				err := r.loadPkgNames("acceptedPackageNames", v, r.acceptedPackageNames)
+				if err != nil {
+					return err
+				}
+			case isRuleOption(k, "extraBadPackageNames"):
+				if r.extraBadPackageNames == nil {
+					r.extraBadPackageNames = map[string]struct{}{}
+				}
+				err := r.loadPkgNames("extraBadPackageNames", v, r.extraBadPackageNames)
+				if err != nil {
+					return err
 				}
 			case isRuleOption(k, "skipPackageNameCollisionWithGoStd"):
 				r.skipPackageNameCollisionWithGoStd = fmt.Sprint(v) == "true"
@@ -134,6 +136,24 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 			}
 			r.stdPackageNames[pkg.Name] = struct{}{}
 		}
+	}
+
+	return nil
+}
+
+func (*VarNamingRule) loadPkgNames(configKey string, configValue any, target map[string]struct{}) error {
+	values, ok := configValue.([]any)
+	if !ok {
+		return fmt.Errorf("invalid argument to the var-naming rule. Expecting %s of type slice of strings, but %T", configKey, configValue)
+	}
+
+	for i, name := range values {
+		n, ok := name.(string)
+		if !ok {
+			return fmt.Errorf("invalid argument to the var-naming rule: expected element %d of %s to be a string, but got %v(%T)", i, configKey, name, name)
+		}
+
+		target[strings.ToLower(n)] = struct{}{}
 	}
 
 	return nil
@@ -198,6 +218,10 @@ func (r *VarNamingRule) applyPackageCheckRules(file *lint.File, onFailure func(f
 	pkgNameNode := file.AST.Name
 	pkgName := pkgNameNode.Name
 	pkgNameLower := strings.ToLower(pkgName)
+
+	if _, ok := r.acceptedPackageNames[pkgNameLower]; ok {
+		return // nothing to say, the user expressively accepts this package name
+	}
 
 	// Check if top level package
 	if pkgNameLower == "pkg" && filepath.Base(fileDir) != pkgName {
