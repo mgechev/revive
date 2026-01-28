@@ -98,6 +98,7 @@ List of all available rules.
 - [use-any](#use-any)
 - [use-errors-new](#use-errors-new)
 - [use-fmt-print](#use-fmt-print)
+- [use-slices-sort](#use-slices-sort)
 - [use-waitgroup-go](#use-waitgroup-go)
 - [useless-break](#useless-break)
 - [useless-fallthrough](#useless-fallthrough)
@@ -491,6 +492,57 @@ arguments = ["preserve-scope", "allow-jump"]
 _Description_: Empty blocks make code less readable and could be a symptom of a bug or unfinished refactoring.
 
 _Configuration_: N/A
+
+### Limitations
+
+The `empty-block` rule has limited support for detecting intentionally empty `for` loops where the loop body is empty but the
+loop controls (`Init`, `Cond`, or `Post`) contain function calls that perform the actual work.
+
+Currently, the rule only recognizes a narrow pattern:
+
+```go
+for process() {
+    // Intentionally empty - process() does the work
+}
+
+for range processChan {
+    // Intentionally empty - draining the channel
+}
+```
+
+However, it will produce **false positives** for more complex patterns such as:
+
+```go
+// False positive: rule will warn even though this is intentional
+for _, c := step(); c; _, c = step() {
+    // Loop body is intentionally empty; step() does the work
+}
+
+// False positive: rule will warn even though this is intentional
+for p := 0; bar(p); p++ {
+    // Loop body is intentionally empty; bar(p) does the work
+}
+```
+
+**Workaround**: If you have intentionally empty `for` loops with function calls in the loop controls, you can disable the rule
+in-place using a directive comment:
+
+```go
+//revive:disable:empty-block
+for _, c := step(); c; _, c = step() {
+    // Intentionally empty - step() does the work
+}
+//revive:enable:empty-block
+```
+
+The reason for this limitation is that properly detecting whether a `for` loop is intentionally empty requires understanding the
+**semantics** of the called functions (whether they have side effects, modify state, etc.), which is beyond the scope of static
+analysis that this rule performs.
+
+For more details, see:
+
+- <https://github.com/mgechev/revive/issues/1622>
+- <https://github.com/mgechev/revive/issues/386>
 
 ## empty-lines
 
@@ -1676,6 +1728,36 @@ _Description_: This rule proposes to replace calls to built-in `print` and `prin
 
 `print` and `println` built-in functions are not recommended for use-cases other than
 [language bootstrapping and are not guaranteed to stay in the language](https://go.dev/ref/spec#Bootstrapping).
+
+_Configuration_: N/A
+
+## use-slices-sort
+
+_Description_: Since Go 1.21 the `slices` package proposes methods that are faster and easier to use
+than their equivalents in `sort` package.
+The rule proposes to replace these legacy idioms with calls to the new methods.
+
+### Examples (use-slices-sort)
+
+```go
+sort.Float64s(temperatures)
+sort.Ints(years)
+sort.Strings(names)
+sort.Slice(cfg.Dependencies, func(i, j int) bool {
+	return cfg.Dependencies[i].Name < cfg.Dependencies[j].Name
+})
+```
+
+Fixed code:
+
+```go
+slices.Sort(temperatures)
+slices.Sort(years)
+slices.Sort(names)
+slices.SortFunc(cfg.Dependencies, func(a, b config.Dependency) int {
+	return cmp.Compare(a.Name, b.Name)
+})
+```
 
 _Configuration_: N/A
 

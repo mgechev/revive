@@ -15,9 +15,15 @@
     {
       "matchManagers": ["gomod"],
       "matchFileNames": ["tools/go.mod"],
-      "matchDepTypes": ["indirect"],
+      "matchDepTypes": ["direct"],
       "groupName": "tools gomod",
       "extends": ["schedule:monthly"],
+      "enabled": true
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions",
+      "extends": ["schedule:weekly"],
       "enabled": true
     }
   ],

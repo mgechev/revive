@@ -142,7 +142,7 @@ func (p *Package) TypeCheck() error {
 	return err
 }
 
-// check function encapsulates the call to go/types.Config.Check method and
+// check function encapsulates the call to [go/types.Config.Check] method and
 // recovers if the called method panics (see issue #59).
 func check(config *types.Config, n string, fset *token.FileSet, astFiles []*ast.File, info *types.Info) (p *types.Package, err error) {
 	defer func() {

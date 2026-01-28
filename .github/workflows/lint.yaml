@@ -1,8 +1,16 @@
-name: Lint
+name: Lint Go
 on:
   workflow_dispatch:
   pull_request:
     types: [opened, synchronize, reopened]
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'tools/**'
+      - '.golangci.yml'
+      - 'revive.toml'
+      - '.github/workflows/lint.yaml'
   push:
     branches:
       - master
@@ -52,59 +60,3 @@ jobs:
       with:
         version: ${{ steps.golangci-lint-version.outputs.GOLANGCI_LINT_VERSION }}
         args: --verbose
-
-  lint-md:
-    name: Lint Markdown
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: stable
-
-      - name: Setup mdsf
-        uses: hougesen/mdsf@v0.10.8
-
-      - name: Setup goimports
-        working-directory: tools
-        # https://pkg.go.dev/golang.org/x/tools/cmd/goimports
-        run: go install golang.org/x/tools/cmd/goimports
-
-      - name: Setup shfmt
-        working-directory: tools
-        # https://github.com/mvdan/sh#shfmt
-        run: go install mvdan.cc/sh/v3/cmd/shfmt
-
-      - name: Setup taplo
-        # https://taplo.tamasfe.dev/cli/installation/binary.html
-        run: curl -fsSL https://github.com/tamasfe/taplo/releases/download/0.10.0/taplo-linux-x86_64.gz | gzip -d - | install -m 755 /dev/stdin /usr/local/bin/taplo
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install markdown-toc
-        run: npm install -g markdown-toc
-
-      - name: Verify files format using markdownlint-cli2
-        uses: DavidAnson/markdownlint-cli2-action@v20
-        with:
-          config: .markdownlint-cli2.yaml
-
-      - name: Verify TOC in markdown files
-        run: |
-          markdown-toc --maxdepth 4 --no-first1 --bullets "-" -i README.md && git diff --exit-code README.md
-          markdown-toc --maxdepth 2 --no-first1 --bullets "-" -i RULES_DESCRIPTIONS.md && git diff --exit-code RULES_DESCRIPTIONS.md
-
-      - name: Verify code snippets using mdsf
-        id: verify_snippets
-        run: mdsf verify --on-missing-language-definition ignore --on-missing-tool-binary fail-fast .
-
-      - name: Show diff when mdsf failed
-        if: failure() && steps.verify_snippets.outcome == 'failure'
-        run: |
-          mdsf format --debug --on-missing-language-definition ignore --on-missing-tool-binary fail-fast .
-          git diff --exit-code

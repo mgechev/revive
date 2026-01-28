@@ -3,6 +3,12 @@ on:
   workflow_dispatch:
   pull_request:
     types: [opened, synchronize, reopened]
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'tools/**'
+      - '.github/workflows/test.yaml'
   push:
     branches:
       - master
