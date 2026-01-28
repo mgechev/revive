@@ -74,6 +74,20 @@ func TestVarNaming(t *testing.T) {
 			[]any{map[string]any{"skip-package-name-collision-with-go-std": true}},
 		},
 	})
+	testRule(t, "var_naming_valid_package_name_by_regex", &rule.VarNamingRule{}, &lint.RuleConfig{
+		Arguments: []any{
+			[]any{},
+			[]any{},
+			[]any{map[string]any{"packageNamePattern": "^[a-z][a-zA-Z0-9]*$"}}, // regex pattern to allow camel case package names
+		},
+	})
+	testRule(t, "var_naming_invalid_package_name_by_regex", &rule.VarNamingRule{}, &lint.RuleConfig{
+		Arguments: []any{
+			[]any{},
+			[]any{},
+			[]any{map[string]any{"packageNamePattern": "^[a-z][a-zA-Z0-9]*$"}}, // tests that the pattern rejects names with underscores
+		},
+	})
 }
 
 func BenchmarkUpperCaseConstTrue(b *testing.B) {
