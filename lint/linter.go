@@ -202,7 +202,7 @@ func retrieveModFile(dir string) (string, error) {
 }
 
 // isGenerated reports whether the source file is generated code
-// according the rules from https://go.dev/s/generatedcode.
+// according to the rules from https://go.dev/s/generatedcode.
 // This is inherited from the original go lint.
 func isGenerated(src []byte) bool {
 	sc := bufio.NewScanner(bytes.NewReader(src))
