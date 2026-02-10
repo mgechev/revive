@@ -680,7 +680,7 @@ The tool can be extended with custom rules or formatters. This section contains 
 To extend the linter with a custom rule you can push it to this repository or use `revive` as a library (see below)
 
 To add a custom formatter you'll have to push it to this repository or fork it.
-This is due to the limited `-buildmode=plugin` support which [works only on Linux (with known issues)](https://golang.org/pkg/plugin/).
+This is due to the limited `-buildmode=plugin` support which [works only on Linux (with known issues)](https://pkg.go.dev/plugin).
 
 ### Writing a Custom Rule
 
