@@ -16,18 +16,15 @@ jobs:
       contents: write
 
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      -
-        name: Set up Go
+      - name: Set up Go
         uses: actions/setup-go@v6
         with:
           go-version: stable
-      -
-        name: Run GoReleaser
+      - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           version: latest
@@ -50,7 +47,6 @@ jobs:
       id-token: write
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v6
 
