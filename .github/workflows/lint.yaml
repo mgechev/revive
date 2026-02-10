@@ -22,8 +22,8 @@ jobs:
   go-mod:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
         with:
           go-version: stable
       - name: Check tools/go.mod
@@ -37,10 +37,10 @@ jobs:
     steps:
 
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Setup Go and register problem matcher
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version: stable
 
@@ -56,7 +56,7 @@ jobs:
           echo "GOLANGCI_LINT_VERSION=$(go list -m -f '{{.Version}}' github.com/golangci/golangci-lint/v2)" >> $GITHUB_OUTPUT
 
     - name: Run golangci-lint
-      uses: golangci/golangci-lint-action@v8
+      uses: golangci/golangci-lint-action@v9
       with:
         version: ${{ steps.golangci-lint-version.outputs.GOLANGCI_LINT_VERSION }}
         args: --verbose
