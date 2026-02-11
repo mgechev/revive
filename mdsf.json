@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/hougesen/mdsf/HEAD/schemas/v0.10.8/mdsf.schema.json",
+  "$schema": "https://raw.githubusercontent.com/hougesen/mdsf/HEAD/schemas/v0.11.1/mdsf.schema.json",
   "format_finished_document": false,
   "languages": {
     "go": "goimports",

@@ -20,15 +20,15 @@ jobs:
     name: Lint Markdown
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: stable
 
       - name: Setup mdsf
-        uses: hougesen/mdsf@v0.10.8
+        uses: hougesen/mdsf@v0.11.1
 
       - name: Setup goimports
         working-directory: tools
@@ -45,15 +45,15 @@ jobs:
         run: curl -fsSL https://github.com/tamasfe/taplo/releases/download/0.10.0/taplo-linux-x86_64.gz | gzip -d - | install -m 755 /dev/stdin /usr/local/bin/taplo
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install markdown-toc
         run: npm install -g markdown-toc
 
       - name: Verify files format using markdownlint-cli2
-        uses: DavidAnson/markdownlint-cli2-action@v20
+        uses: DavidAnson/markdownlint-cli2-action@v22
         with:
           config: .markdownlint-cli2.yaml
 
@@ -71,4 +71,3 @@ jobs:
         run: |
           mdsf format --debug --on-missing-language-definition ignore --on-missing-tool-binary fail-fast .
           git diff --exit-code
-
