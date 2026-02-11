@@ -13,6 +13,7 @@ import (
 	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/internal/rule"
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/logging"
 )
 
 var knownNameExceptions = map[string]bool{
@@ -50,9 +51,9 @@ type VarNamingRule struct {
 	extraBadPackageNames     map[string]struct{} // inactive if skipPackageNameChecks is false
 	pkgNameAlreadyChecked    syncSet             // set of packages names already checked
 
-	skipPackageNameCollisionWithGoStd bool // if true - disable checks for collisions with Go standard library package names
+	checkPackageNameCollisionWithGoStd bool // if true - checks for collisions with Go standard library package names
 	// stdPackageNames holds the names of standard library packages excluding internal and vendor.
-	// populated only if skipPackageNameCollisionWithGoStd is false.
+	// populated only if checkPackageNameCollisionWithGoStd is true.
 	// E.g., `net/http` stored as `http`, `math/rand/v2` - `rand` etc.
 	stdPackageNames map[string]struct{}
 }
@@ -117,11 +118,25 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 					r.extraBadPackageNames[strings.ToLower(n)] = struct{}{}
 				}
 			case isRuleOption(k, "skipPackageNameCollisionWithGoStd"):
-				r.skipPackageNameCollisionWithGoStd = fmt.Sprint(v) == "true"
+				r.checkPackageNameCollisionWithGoStd = fmt.Sprint(v) != "true"
+
+				slogger, err := logging.GetLogger()
+				if err == nil {
+					slogger.Warn(
+						"an option in the configuration is deprecated, attempting to interpret it and continue",
+						"deprecated_option", k,
+						"suggestion", "instead, use its inverse, checkPackageNameCollisionWithGoStd",
+						"interpreted_as", map[string]any{
+							"checkPackageNameCollisionWithGoStd": r.checkPackageNameCollisionWithGoStd,
+						},
+					)
+				}
+			case isRuleOption(k, "checkPackageNameCollisionWithGoStd"):
+				r.checkPackageNameCollisionWithGoStd = fmt.Sprint(v) == "true"
 			}
 		}
 	}
-	if !r.skipPackageNameCollisionWithGoStd && r.stdPackageNames == nil {
+	if r.checkPackageNameCollisionWithGoStd && r.stdPackageNames == nil {
 		pkgs, err := gopackages.Load(nil, "std")
 		if err != nil {
 			return fmt.Errorf("load std packages: %w", err)
@@ -215,7 +230,7 @@ func (r *VarNamingRule) applyPackageCheckRules(file *lint.File, onFailure func(f
 		return
 	}
 
-	if !r.skipPackageNameCollisionWithGoStd {
+	if r.checkPackageNameCollisionWithGoStd {
 		if _, ok := r.stdPackageNames[pkgNameLower]; ok {
 			onFailure(r.pkgNameFailure(pkgNameNode, "avoid package names that conflict with Go standard library package names"))
 		}
