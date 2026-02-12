@@ -1852,8 +1852,12 @@ When `skipPackageNameCollisionWithGoStd`
 (`skippackagenamecollisionwithgostd`, `skip-package-name-collision-with-go-std`)
 is set to true, the rule disables checks on package names that collide
 with Go standard library packages.
+You can also add a string parameter `packageNamePattern` to enforce custom package naming
+conventions using a regex pattern. When set, the regex pattern takes precedence over the default package naming checks (including bad
+package names and stdlib conflicts).
 
-By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89)).
+By default, the rule behaves exactly as the alternative in `golint` but
+optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89)).
 
 Configuration examples:
 
@@ -1900,6 +1904,14 @@ arguments = [[], [], [{ extra-bad-package-names = ["helpers", "models"] }]]
 ```toml
 [rule.var-naming]
 arguments = [[], [], [{ skip-package-name-collision-with-go-std = true }]]
+```
+
+Enforce custom package naming with regex (allows camelCase, disallows
+underscores):
+
+```toml
+[rule.var-naming]
+arguments = [[], [], [{ "packageNamePattern" = "^[a-z][a-zA-Z0-9]*$" }]]
 ```
 
 ## waitgroup-by-value
