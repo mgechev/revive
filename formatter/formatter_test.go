@@ -10,7 +10,6 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-//nolint:revive // line-length-limit
 //revive:disable:line-length-limit
 func TestFormatter(t *testing.T) {
 	for name, td := range map[string]struct {
