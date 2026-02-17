@@ -87,6 +87,7 @@ const identRegex = "[_A-Za-z][_A-Za-z0-9]*"
 var parseStringFormatScope = regexp.MustCompile(
 	fmt.Sprintf("^(%s(?:\\.%s)?)(?:\\[([0-9]+)\\](?:\\.(%s))?)?$", identRegex, identRegex, identRegex))
 
+//revive:disable-next-line // 5 arguments is fine for this function
 func (r *StringFormatRule) parseArgument(argument any, ruleNum int) (scopes stringFormatSubruleScopes, regex *regexp.Regexp, negated bool, errorMessage string, err error) {
 	g, ok := argument.([]any) // Cast to generic slice first
 	if !ok {

@@ -65,7 +65,6 @@ func (*DataRaceRule) extractReturnIDs(fields []*ast.Field) map[nodeUID]struct{} 
 }
 
 type lintFunctionForDataRaces struct {
-	_         struct{}
 	onFailure func(failure lint.Failure)
 	returnIDs map[nodeUID]struct{}
 	rangeIDs  map[nodeUID]struct{}
