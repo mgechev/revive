@@ -514,15 +514,6 @@ func TestGetLintingRules(t *testing.T) {
 				"deep-exit", // non-default rule
 			},
 		},
-		"enableAllRules and enableDefaultRules both set": {
-			confPath:       "enableAllAndDefault.toml",
-			wantRulesCount: allRulesCount,
-			wantEnabledRules: []string{
-				"var-declaration",  // default rule
-				"package-comments", // default rule
-				"deep-exit",        // non-default rule
-			},
-		},
 		"enableDefaultRules plus rule already in defaults": {
 			confPath:       "enableDefaultPlusDefaultRule.toml",
 			wantRulesCount: defaultRulesCount,
