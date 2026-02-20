@@ -204,7 +204,7 @@ func (i *ArrayFlags) String() string {
 }
 
 // Set value for array flags.
-func (i *ArrayFlags) Set(value string) error {
+func (i *ArrayFlags) Set(value string) error { //nolint:unparam // always returns nil
 	*i = append(*i, value)
 
 	return nil

@@ -24,7 +24,10 @@ func (*Unix) Name() string {
 func (*Unix) Format(failures <-chan lint.Failure, _ lint.Config) (string, error) {
 	var sb strings.Builder
 	for failure := range failures {
-		fmt.Fprintf(&sb, "%v: [%s] %s\n", failure.Position.Start, failure.RuleName, failure.Failure)
+		_, err := fmt.Fprintf(&sb, "%v: [%s] %s\n", failure.Position.Start, failure.RuleName, failure.Failure)
+		if err != nil {
+			return "", err
+		}
 	}
 	return sb.String(), nil
 }

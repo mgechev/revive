@@ -34,7 +34,9 @@ func (f *Friendly) Format(failures <-chan lint.Failure, config lint.Config) (str
 	totalWarnings := 0
 	for failure := range failures {
 		sev := severity(config, failure)
-		f.printFriendlyFailure(&buf, failure, sev)
+		if err := f.printFriendlyFailure(&buf, failure, sev); err != nil {
+			return "", err
+		}
 		switch sev {
 		case lint.SeverityWarning:
 			warningMap[failure.RuleName]++
@@ -45,16 +47,25 @@ func (f *Friendly) Format(failures <-chan lint.Failure, config lint.Config) (str
 		}
 	}
 
-	f.printSummary(&buf, totalErrors, totalWarnings)
-	f.printStatistics(&buf, color.RedString("Errors:"), errorMap)
-	f.printStatistics(&buf, color.YellowString("Warnings:"), warningMap)
+	if err := f.printSummary(&buf, totalErrors, totalWarnings); err != nil {
+		return "", err
+	}
+	if err := f.printStatistics(&buf, color.RedString("Errors:"), errorMap); err != nil {
+		return "", err
+	}
+	if err := f.printStatistics(&buf, color.YellowString("Warnings:"), warningMap); err != nil {
+		return "", err
+	}
 	return buf.String(), nil
 }
 
-func (f *Friendly) printFriendlyFailure(sb *strings.Builder, failure lint.Failure, severity lint.Severity) {
+func (f *Friendly) printFriendlyFailure(sb *strings.Builder, failure lint.Failure, severity lint.Severity) error {
 	f.printHeaderRow(sb, failure, severity)
-	f.printFilePosition(sb, failure)
-	sb.WriteString("\n\n")
+	if err := f.printFilePosition(sb, failure); err != nil {
+		return err
+	}
+	_, err := sb.WriteString("\n\n")
+	return err
 }
 
 var (
@@ -70,8 +81,9 @@ func (*Friendly) printHeaderRow(sb *strings.Builder, failure lint.Failure, sever
 	sb.WriteString(table([][]string{{emoji, ruleDescriptionURL(failure.RuleName), color.GreenString(failure.Failure)}}))
 }
 
-func (*Friendly) printFilePosition(sb *strings.Builder, failure lint.Failure) {
-	fmt.Fprintf(sb, "  %s:%d:%d", failure.Filename(), failure.Position.Start.Line, failure.Position.Start.Column)
+func (*Friendly) printFilePosition(sb *strings.Builder, failure lint.Failure) error {
+	_, err := fmt.Fprintf(sb, "  %s:%d:%d", failure.Filename(), failure.Position.Start.Line, failure.Position.Start.Column)
+	return err
 }
 
 type statEntry struct {
@@ -79,7 +91,7 @@ type statEntry struct {
 	failures int
 }
 
-func (*Friendly) printSummary(w io.Writer, errors, warnings int) {
+func (*Friendly) printSummary(w io.Writer, errors, warnings int) error {
 	emoji := warningEmoji
 	if errors > 0 {
 		emoji = errorEmoji
@@ -98,18 +110,19 @@ func (*Friendly) printSummary(w io.Writer, errors, warnings int) {
 	}
 	str := fmt.Sprintf("%d %s (%d %s, %d %s)", errors+warnings, problemsLabel, errors, errorsLabel, warnings, warningsLabel)
 	if errors > 0 {
-		fmt.Fprintf(w, "%s %s\n\n", emoji, color.RedString(str))
-		return
+		_, err := fmt.Fprintf(w, "%s %s\n\n", emoji, color.RedString(str))
+		return err
 	}
 	if warnings > 0 {
-		fmt.Fprintf(w, "%s %s\n\n", emoji, color.YellowString(str))
-		return
+		_, err := fmt.Fprintf(w, "%s %s\n\n", emoji, color.YellowString(str))
+		return err
 	}
+	return nil
 }
 
-func (*Friendly) printStatistics(w io.Writer, header string, stats map[string]int) {
+func (*Friendly) printStatistics(w io.Writer, header string, stats map[string]int) error {
 	if len(stats) == 0 {
-		return
+		return nil
 	}
 	data := make([]statEntry, 0, len(stats))
 	for name, total := range stats {
@@ -122,8 +135,13 @@ func (*Friendly) printStatistics(w io.Writer, header string, stats map[string]in
 	for _, entry := range data {
 		formatted = append(formatted, []string{color.GreenString(fmt.Sprintf("%d", entry.failures)), entry.name})
 	}
-	fmt.Fprintln(w, header)
-	fmt.Fprintln(w, table(formatted))
+	if _, err := fmt.Fprintln(w, header); err != nil {
+		return err
+	}
+	if _, err := fmt.Fprintln(w, table(formatted)); err != nil {
+		return err
+	}
+	return nil
 }
 
 func table(rows [][]string) string {
