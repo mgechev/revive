@@ -223,6 +223,8 @@ linters:
         - name: var-declaration
         - name: var-naming
         - name: waitgroup-by-value
+    unparam:
+      check-exported: true
 
 formatters:
   enable:

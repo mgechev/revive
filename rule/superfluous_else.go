@@ -16,7 +16,7 @@ type SuperfluousElseRule struct {
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
-func (e *SuperfluousElseRule) Configure(arguments lint.Arguments) error {
+func (e *SuperfluousElseRule) Configure(arguments lint.Arguments) error { //nolint:unparam // always returns nil
 	for _, arg := range arguments {
 		sarg, ok := arg.(string)
 		if !ok {
