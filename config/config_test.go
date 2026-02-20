@@ -421,6 +421,10 @@ func TestGetConfig(t *testing.T) {
 				confPath:  "invalidExcludePattern.toml",
 				wantError: "error in config of rule [var-naming]",
 			},
+			"enableAllRules and enableDefaultRules both set": {
+				confPath:  "enableAllAndDefault.toml",
+				wantError: "config options enableAllRules and enableDefaultRules cannot be combined",
+			},
 		} {
 			t.Run(name, func(t *testing.T) {
 				_, err := config.GetConfig(filepath.Join("testdata", tc.confPath))
