@@ -13,12 +13,12 @@ func TestDotImportsDefault(t *testing.T) {
 
 func TestDotImports(t *testing.T) {
 	testRule(t, "dot_imports", &rule.DotImportsRule{}, &lint.RuleConfig{
-		Arguments: []any{map[string]any{
+		Arguments: lint.Arguments{map[string]any{
 			"allowedPackages": []any{"errors", "context", "github.com/BurntSushi/toml"},
 		}},
 	})
 	testRule(t, "dot_imports", &rule.DotImportsRule{}, &lint.RuleConfig{
-		Arguments: []any{map[string]any{
+		Arguments: lint.Arguments{map[string]any{
 			"allowed-packages": []any{"errors", "context", "github.com/BurntSushi/toml"},
 		}},
 	})

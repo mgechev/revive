@@ -13,35 +13,35 @@ func TestEnforceRepeatedArgTypeStyleDefault(t *testing.T) {
 
 func TestEnforceRepeatedArgTypeStyleShort(t *testing.T) {
 	testRule(t, "enforce_repeated_arg_type_style_short_args", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{"short"},
+		Arguments: lint.Arguments{"short"},
 	})
 	testRule(t, "enforce_repeated_arg_type_style_short_return", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{"short"},
+		Arguments: lint.Arguments{"short"},
 	})
 
 	testRule(t, "enforce_repeated_arg_type_style_short_args", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{
+		Arguments: lint.Arguments{
 			map[string]any{
 				"funcArgStyle": `short`,
 			},
 		},
 	})
 	testRule(t, "enforce_repeated_arg_type_style_short_args", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{
+		Arguments: lint.Arguments{
 			map[string]any{
 				"func-arg-style": `short`,
 			},
 		},
 	})
 	testRule(t, "enforce_repeated_arg_type_style_short_return", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{
+		Arguments: lint.Arguments{
 			map[string]any{
 				"funcRetValStyle": `short`,
 			},
 		},
 	})
 	testRule(t, "enforce_repeated_arg_type_style_short_return", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{
+		Arguments: lint.Arguments{
 			map[string]any{
 				"func-ret-val-style": `short`,
 			},
@@ -51,21 +51,21 @@ func TestEnforceRepeatedArgTypeStyleShort(t *testing.T) {
 
 func TestEnforceRepeatedArgTypeStyleFull(t *testing.T) {
 	testRule(t, "enforce_repeated_arg_type_style_full_args", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{"full"},
+		Arguments: lint.Arguments{"full"},
 	})
 	testRule(t, "enforce_repeated_arg_type_style_full_return", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{"full"},
+		Arguments: lint.Arguments{"full"},
 	})
 
 	testRule(t, "enforce_repeated_arg_type_style_full_args", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{
+		Arguments: lint.Arguments{
 			map[string]any{
 				"funcArgStyle": `full`,
 			},
 		},
 	})
 	testRule(t, "enforce_repeated_arg_type_style_full_return", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{
+		Arguments: lint.Arguments{
 			map[string]any{
 				"funcRetValStyle": `full`,
 			},
@@ -75,14 +75,14 @@ func TestEnforceRepeatedArgTypeStyleFull(t *testing.T) {
 
 func TestEnforceRepeatedArgTypeStyleMixed(t *testing.T) {
 	testRule(t, "enforce_repeated_arg_type_style_full_args", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{
+		Arguments: lint.Arguments{
 			map[string]any{
 				"funcArgStyle": `full`,
 			},
 		},
 	})
 	testRule(t, "enforce_repeated_arg_type_style_full_args", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{
+		Arguments: lint.Arguments{
 			map[string]any{
 				"funcArgStyle":    `full`,
 				"funcRetValStyle": `any`,
@@ -90,7 +90,7 @@ func TestEnforceRepeatedArgTypeStyleMixed(t *testing.T) {
 		},
 	})
 	testRule(t, "enforce_repeated_arg_type_style_full_args", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{
+		Arguments: lint.Arguments{
 			map[string]any{
 				"funcArgStyle":    `full`,
 				"funcRetValStyle": `short`,
@@ -99,14 +99,14 @@ func TestEnforceRepeatedArgTypeStyleMixed(t *testing.T) {
 	})
 
 	testRule(t, "enforce_repeated_arg_type_style_full_return", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{
+		Arguments: lint.Arguments{
 			map[string]any{
 				"funcRetValStyle": `full`,
 			},
 		},
 	})
 	testRule(t, "enforce_repeated_arg_type_style_full_return", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{
+		Arguments: lint.Arguments{
 			map[string]any{
 				"funcArgStyle":    `any`,
 				"funcRetValStyle": `full`,
@@ -114,7 +114,7 @@ func TestEnforceRepeatedArgTypeStyleMixed(t *testing.T) {
 		},
 	})
 	testRule(t, "enforce_repeated_arg_type_style_full_return", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{
+		Arguments: lint.Arguments{
 			map[string]any{
 				"funcArgStyle":    `short`,
 				"funcRetValStyle": `full`,
@@ -123,7 +123,7 @@ func TestEnforceRepeatedArgTypeStyleMixed(t *testing.T) {
 	})
 
 	testRule(t, "enforce_repeated_arg_type_style_mixed_full_short", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{
+		Arguments: lint.Arguments{
 			map[string]any{
 				"funcArgStyle":    `full`,
 				"funcRetValStyle": `short`,
@@ -131,7 +131,7 @@ func TestEnforceRepeatedArgTypeStyleMixed(t *testing.T) {
 		},
 	})
 	testRule(t, "enforce_repeated_arg_type_style_mixed_short_full", &rule.EnforceRepeatedArgTypeStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{
+		Arguments: lint.Arguments{
 			map[string]any{
 				"funcArgStyle":    `short`,
 				"funcRetValStyle": `full`,

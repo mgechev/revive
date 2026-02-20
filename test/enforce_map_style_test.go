@@ -13,12 +13,12 @@ func TestEnforceMapStyle_any(t *testing.T) {
 
 func TestEnforceMapStyle_make(t *testing.T) {
 	testRule(t, "enforce_map_style_make", &rule.EnforceMapStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{"make"},
+		Arguments: lint.Arguments{"make"},
 	})
 }
 
 func TestEnforceMapStyle_literal(t *testing.T) {
 	testRule(t, "enforce_map_style_literal", &rule.EnforceMapStyleRule{}, &lint.RuleConfig{
-		Arguments: []any{"literal"},
+		Arguments: lint.Arguments{"literal"},
 	})
 }

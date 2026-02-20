@@ -13,7 +13,7 @@ func TestArgumentsLimitDefault(t *testing.T) {
 
 func TestArgumentsLimit(t *testing.T) {
 	testRule(t, "argument_limit", &rule.ArgumentsLimitRule{}, &lint.RuleConfig{
-		Arguments: []any{int64(3)},
+		Arguments: lint.Arguments{int64(3)},
 	})
 }
 

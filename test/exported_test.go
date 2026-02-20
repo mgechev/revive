@@ -8,35 +8,27 @@ import (
 )
 
 func TestExportedWithDisableStutteringCheck(t *testing.T) {
-	args := []any{"disableStutteringCheck"}
-
-	testRule(t, "exported_issue_555", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: args})
+	testRule(t, "exported_issue_555", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: lint.Arguments{"disableStutteringCheck"}})
 }
 
 func TestExportedWithChecksOnMethodsOfPrivateTypes(t *testing.T) {
-	args := []any{"checkPrivateReceivers"}
-
-	testRule(t, "exported_issue_552", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: args})
+	testRule(t, "exported_issue_552", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: lint.Arguments{"checkPrivateReceivers"}})
 }
 
 func TestExportedReplacingStuttersByRepetitive(t *testing.T) {
-	args := []any{"sayRepetitiveInsteadOfStutters"}
-
-	testRule(t, "exported_issue_519", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: args})
+	testRule(t, "exported_issue_519", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: lint.Arguments{"sayRepetitiveInsteadOfStutters"}})
 }
 
 func TestCheckPublicInterfaceOption(t *testing.T) {
-	args := []any{"checkPublicInterface"}
-
-	testRule(t, "exported_issue_1002", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: args})
+	testRule(t, "exported_issue_1002", &rule.ExportedRule{}, &lint.RuleConfig{Arguments: lint.Arguments{"checkPublicInterface"}})
 }
 
 func TestCheckDisablingOnDeclarationTypes(t *testing.T) {
 	testRule(t, "exported_issue_1045", &rule.ExportedRule{}, &lint.RuleConfig{
-		Arguments: []any{"disableChecksOnConstants", "disableChecksOnFunctions", "disableChecksOnMethods", "disableChecksOnTypes", "disableChecksOnVariables"},
+		Arguments: lint.Arguments{"disableChecksOnConstants", "disableChecksOnFunctions", "disableChecksOnMethods", "disableChecksOnTypes", "disableChecksOnVariables"},
 	})
 	testRule(t, "exported_issue_1045", &rule.ExportedRule{}, &lint.RuleConfig{
-		Arguments: []any{"disable-checks-on-constants", "disable-checks-on-functions", "disable-checks-on-methods", "disable-checks-on-types", "disable-checks-on-variables"},
+		Arguments: lint.Arguments{"disable-checks-on-constants", "disable-checks-on-functions", "disable-checks-on-methods", "disable-checks-on-types", "disable-checks-on-variables"},
 	})
 }
 

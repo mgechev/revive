@@ -12,5 +12,5 @@ func TestLintFilenameFormat(t *testing.T) {
 
 	testRule(t, "filenamе_with_non_ascii_char", &rule.FilenameFormatRule{}, &lint.RuleConfig{})
 
-	testRule(t, "filename_with_underscores", &rule.FilenameFormatRule{}, &lint.RuleConfig{Arguments: []any{"^[A-Za-z][A-Za-z0-9]*.go$"}})
+	testRule(t, "filename_with_underscores", &rule.FilenameFormatRule{}, &lint.RuleConfig{Arguments: lint.Arguments{"^[A-Za-z][A-Za-z0-9]*.go$"}})
 }

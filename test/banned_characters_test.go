@@ -16,6 +16,6 @@ func TestBannedCharactersDefault(t *testing.T) {
 // One banned character from the list is not present in the fixture file.
 func TestBannedCharacters(t *testing.T) {
 	testRule(t, "banned_characters", &rule.BannedCharsRule{}, &lint.RuleConfig{
-		Arguments: []any{"Ω", "Σ", "σ", "1"},
+		Arguments: lint.Arguments{"Ω", "Σ", "σ", "1"},
 	})
 }
