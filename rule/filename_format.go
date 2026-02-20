@@ -38,7 +38,7 @@ func (*FilenameFormatRule) getMsgForNonASCIIChars(str string) string {
 			continue
 		}
 
-		result.WriteString(fmt.Sprintf(" Non ASCII character %c (%U) found.", c, c))
+		fmt.Fprintf(&result, " Non ASCII character %c (%U) found.", c, c)
 	}
 
 	return result.String()
