@@ -4,11 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
-	"path/filepath"
 	"strings"
-	"sync"
-
-	gopackages "golang.org/x/tools/go/packages"
 
 	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/internal/rule"
@@ -20,49 +16,19 @@ var knownNameExceptions = map[string]bool{
 	"kWh":          true,
 }
 
-// defaultBadPackageNames is the list of "bad" package names from https://go.dev/wiki/CodeReviewComments#package-names
-// and https://go.dev/blog/package-names#bad-package-names.
-// The rule warns about the usage of any package name in this list if skipPackageNameChecks is false.
-// Values in the list should be lowercased.
-var defaultBadPackageNames = map[string]struct{}{
-	"api":           {},
-	"common":        {},
-	"interface":     {},
-	"interfaces":    {},
-	"misc":          {},
-	"miscellaneous": {},
-	"shared":        {},
-	"type":          {},
-	"types":         {},
-	"util":          {},
-	"utilities":     {},
-	"utils":         {},
-}
-
 // VarNamingRule lints the name of a variable.
 type VarNamingRule struct {
 	allowList []string
 	blockList []string
 
-	allowUpperCaseConst      bool                // if true - allows to use UPPER_SOME_NAMES for constants
-	skipInitialismNameChecks bool                // if true - disable enforcing capitals for common initialisms
-	skipPackageNameChecks    bool                // if true - disable check for meaningless and user-defined bad package names
-	extraBadPackageNames     map[string]struct{} // inactive if skipPackageNameChecks is false
-	pkgNameAlreadyChecked    syncSet             // set of packages names already checked
-
-	skipPackageNameCollisionWithGoStd bool // if true - disable checks for collisions with Go standard library package names
-	// stdPackageNames holds the names of standard library packages excluding internal and vendor.
-	// populated only if skipPackageNameCollisionWithGoStd is false.
-	// E.g., `net/http` stored as `http`, `math/rand/v2` - `rand` etc.
-	stdPackageNames map[string]struct{}
+	allowUpperCaseConst      bool // if true - allows to use UPPER_SOME_NAMES for constants
+	skipInitialismNameChecks bool // if true - disable enforcing capitals for common initialisms
 }
 
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
 func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
-	r.pkgNameAlreadyChecked = syncSet{elements: map[string]struct{}{}}
-
 	if len(arguments) >= 1 {
 		list, err := getList(arguments[0], "allowlist")
 		if err != nil {
@@ -99,57 +65,15 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 				r.skipInitialismNameChecks = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "upperCaseConst"):
 				r.allowUpperCaseConst = fmt.Sprint(v) == "true"
-			case isRuleOption(k, "skipPackageNameChecks"):
-				r.skipPackageNameChecks = fmt.Sprint(v) == "true"
-			case isRuleOption(k, "extraBadPackageNames"):
-				extraBadPackageNames, ok := v.([]any)
-				if !ok {
-					return fmt.Errorf("invalid third argument to the var-naming rule. Expecting extraBadPackageNames of type slice of strings, but %T", v)
-				}
-				for i, name := range extraBadPackageNames {
-					if r.extraBadPackageNames == nil {
-						r.extraBadPackageNames = map[string]struct{}{}
-					}
-					n, ok := name.(string)
-					if !ok {
-						return fmt.Errorf("invalid third argument to the var-naming rule: expected element %d of extraBadPackageNames to be a string, but got %v(%T)", i, name, name)
-					}
-					r.extraBadPackageNames[strings.ToLower(n)] = struct{}{}
-				}
-			case isRuleOption(k, "skipPackageNameCollisionWithGoStd"):
-				r.skipPackageNameCollisionWithGoStd = fmt.Sprint(v) == "true"
+			case isRuleOption(k, "skipPackageNameChecks"),
+				isRuleOption(k, "extraBadPackageNames"),
+				isRuleOption(k, "skipPackageNameCollisionWithGoStd"):
+				// these options moved to package-name rule, ignore them here for backward compatibility
 			}
-		}
-	}
-	if !r.skipPackageNameCollisionWithGoStd && r.stdPackageNames == nil {
-		pkgs, err := gopackages.Load(nil, "std")
-		if err != nil {
-			return fmt.Errorf("load std packages: %w", err)
-		}
-
-		r.stdPackageNames = map[string]struct{}{}
-		for _, pkg := range pkgs {
-			if isInternalOrVendorPackage(pkg.PkgPath) {
-				continue
-			}
-			r.stdPackageNames[pkg.Name] = struct{}{}
 		}
 	}
 
 	return nil
-}
-
-// isInternalOrVendorPackage reports whether the path represents an internal or vendor directory.
-//
-// Borrowed and modified from
-// https://github.com/golang/pkgsite/blob/84333735ffe124f7bd904805fd488b93841de49f/internal/postgres/search.go#L1009-L1016
-func isInternalOrVendorPackage(path string) bool {
-	for p := range strings.SplitSeq(path, "/") {
-		if p == "internal" || p == "vendor" {
-			return true
-		}
-	}
-	return false
 }
 
 // Apply applies the rule to given file.
@@ -157,10 +81,6 @@ func (r *VarNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 	var failures []lint.Failure
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
-	}
-
-	if !r.skipPackageNameChecks {
-		r.applyPackageCheckRules(file, onFailure)
 	}
 
 	fileAst := file.AST
@@ -182,61 +102,6 @@ func (r *VarNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 // Name returns the rule name.
 func (*VarNamingRule) Name() string {
 	return "var-naming"
-}
-
-func (r *VarNamingRule) applyPackageCheckRules(file *lint.File, onFailure func(failure lint.Failure)) {
-	fileDir := filepath.Dir(file.Name)
-
-	// Protect pkgsWithNameFailure from concurrent modifications
-	r.pkgNameAlreadyChecked.Lock()
-	defer r.pkgNameAlreadyChecked.Unlock()
-	if r.pkgNameAlreadyChecked.has(fileDir) {
-		return
-	}
-	r.pkgNameAlreadyChecked.add(fileDir) // mark this package as already checked
-
-	pkgNameNode := file.AST.Name
-	pkgName := pkgNameNode.Name
-	pkgNameLower := strings.ToLower(pkgName)
-
-	// Check if top level package
-	if pkgNameLower == "pkg" && filepath.Base(fileDir) != pkgName {
-		onFailure(r.pkgNameFailure(pkgNameNode, "should not have a root level package called pkg"))
-		return
-	}
-
-	if _, ok := r.extraBadPackageNames[pkgNameLower]; ok {
-		onFailure(r.pkgNameFailure(pkgNameNode, "avoid bad package names"))
-		return
-	}
-
-	if _, ok := defaultBadPackageNames[pkgNameLower]; ok {
-		onFailure(r.pkgNameFailure(pkgNameNode, "avoid meaningless package names"))
-		return
-	}
-
-	if !r.skipPackageNameCollisionWithGoStd {
-		if _, ok := r.stdPackageNames[pkgNameLower]; ok {
-			onFailure(r.pkgNameFailure(pkgNameNode, "avoid package names that conflict with Go standard library package names"))
-		}
-	}
-
-	// Package names need slightly different handling than other names.
-	if strings.Contains(pkgName, "_") && !strings.HasSuffix(pkgName, "_test") {
-		onFailure(r.pkgNameFailure(pkgNameNode, "don't use an underscore in package name"))
-	}
-	if hasUpperCaseLetter(pkgName) {
-		onFailure(r.pkgNameFailure(pkgNameNode, "don't use MixedCaps in package names; %s should be %s", pkgName, pkgNameLower))
-	}
-}
-
-func (*VarNamingRule) pkgNameFailure(node ast.Node, msg string, args ...any) lint.Failure {
-	return lint.Failure{
-		Failure:    fmt.Sprintf(msg, args...),
-		Confidence: 1,
-		Node:       node,
-		Category:   lint.FailureCategoryNaming,
-	}
 }
 
 type lintNames struct {
@@ -386,7 +251,7 @@ func (w *lintNames) Visit(n ast.Node) ast.Visitor {
 			}
 		}
 	}
-	return w
+return w
 }
 
 // isUpperCaseConst checks if a string is in constant name format like `SOME_CONST`, `SOME_CONST_2`,
@@ -484,19 +349,4 @@ func getList(arg any, argName string) ([]string, error) {
 		list = append(list, val)
 	}
 	return list, nil
-}
-
-type syncSet struct {
-	sync.Mutex
-
-	elements map[string]struct{}
-}
-
-func (sm *syncSet) has(s string) bool {
-	_, result := sm.elements[s]
-	return result
-}
-
-func (sm *syncSet) add(s string) {
-	sm.elements[s] = struct{}{}
 }
