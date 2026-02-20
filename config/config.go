@@ -204,6 +204,13 @@ func parseConfig(data []byte, config *lint.Config) error {
 	return nil
 }
 
+func validateConfig(config *lint.Config) error {
+	if config.EnableAllRules && config.EnableDefaultRules {
+		return errors.New("config options enableAllRules and enableDefaultRules cannot be combined")
+	}
+	return nil
+}
+
 func normalizeConfig(config *lint.Config) {
 	if len(config.Rules) == 0 {
 		config.Rules = map[string]lint.RuleConfig{}
@@ -260,6 +267,10 @@ func GetConfig(configPath string) (*lint.Config, error) {
 
 	default: // no configuration provided
 		config = defaultConfig()
+	}
+
+	if err := validateConfig(config); err != nil {
+		return nil, err
 	}
 
 	normalizeConfig(config)

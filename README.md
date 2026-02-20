@@ -376,6 +376,8 @@ enableAllRules = true
 
 This will enable all available rules no matter what rules are named in the configuration file.
 
+Options `enableAllRules` and `enableDefaultRules` cannot be combined.
+
 To disable a rule, you simply mark it as disabled in the configuration.
 For example:
 

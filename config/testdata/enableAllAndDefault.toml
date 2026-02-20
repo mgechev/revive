@@ -1,4 +1,4 @@
-# Enable all rules without duplicates
+# Invalid configuration file for testing error handling of config loading.
 
 enableAllRules = true
 enableDefaultRules = true
