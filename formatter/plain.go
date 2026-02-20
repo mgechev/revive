@@ -22,7 +22,7 @@ func (*Plain) Name() string {
 func (*Plain) Format(failures <-chan lint.Failure, _ lint.Config) (string, error) {
 	var sb strings.Builder
 	for failure := range failures {
-		sb.WriteString(fmt.Sprintf("%v: %s %s\n", failure.Position.Start, failure.Failure, ruleDescriptionURL(failure.RuleName)))
+		fmt.Fprintf(&sb, "%v: %s %s\n", failure.Position.Start, failure.Failure, ruleDescriptionURL(failure.RuleName))
 	}
 	return sb.String(), nil
 }
