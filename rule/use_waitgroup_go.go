@@ -7,7 +7,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// UseWaitGroupGoRule spots Go idioms that might be rewritten using WaitGroup.Go.
+// UseWaitGroupGoRule spots Go idioms that might be rewritten using [sync.WaitGroup.Go].
 type UseWaitGroupGoRule struct{}
 
 // Apply applies the rule to given file.

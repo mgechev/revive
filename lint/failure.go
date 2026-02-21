@@ -72,19 +72,18 @@ type FailurePosition struct {
 
 // Failure defines a struct for a linting failure.
 type Failure struct {
-	Failure    string          `json:"Failure"`
-	RuleName   string          `json:"RuleName"`
-	Category   FailureCategory `json:"Category"`
-	Position   FailurePosition `json:"Position"`
-	Node       ast.Node        `json:"-"`
-	Confidence float64         `json:"Confidence"`
-	// For future use
-	ReplacementLine string `json:"ReplacementLine"`
+	Failure         string          `json:"Failure"`
+	RuleName        string          `json:"RuleName"`
+	Category        FailureCategory `json:"Category"`
+	Position        FailurePosition `json:"Position"`
+	Node            ast.Node        `json:"-"`
+	Confidence      float64         `json:"Confidence"`
+	ReplacementLine string          `json:"ReplacementLine"`
 }
 
 // GetFilename returns the filename.
 //
-// Deprecated: Use [Filename].
+// Deprecated: Use [Failure.Filename] instead.
 func (f *Failure) GetFilename() string {
 	return f.Filename()
 }

@@ -14,8 +14,8 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// Friendly is an implementation of the Formatter interface
-// which formats the errors to JSON.
+// Friendly is an implementation of the [lint.Formatter] interface
+// which formats the errors to a friendly, human-readable format.
 type Friendly struct {
 	Metadata lint.FormatterMetadata
 }

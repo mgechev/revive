@@ -10,7 +10,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// Sarif is an implementation of the Formatter interface
+// Sarif is an implementation of the [lint.Formatter] interface
 // which formats revive failures into SARIF format.
 type Sarif struct {
 	Metadata lint.FormatterMetadata

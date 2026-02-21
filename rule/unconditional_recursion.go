@@ -79,7 +79,7 @@ type lintUnconditionalRecursionRule struct {
 }
 
 // Visit will traverse function's body we search for calls to the function itself.
-// We do not search inside conditional control structures (if, for, switch, ...)
+// We do not search inside conditional control structures (if, for, switch etc.)
 // because any recursive call inside them is conditioned.
 // We do search inside conditional control structures are statements
 // that will take the control out of the function (return, exit, panic).

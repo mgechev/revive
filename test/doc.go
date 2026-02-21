@@ -1,2 +1,2 @@
-// Package test implements rule tests.
+// Package test contains integration tests for rules.
 package test

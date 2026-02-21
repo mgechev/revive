@@ -8,7 +8,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// UseSlicesSort spots calls to sort.* that can be replaced by slices package methods.
+// UseSlicesSort spots calls to sort.* that can be replaced by [slices] package methods.
 type UseSlicesSort struct{}
 
 // Apply applies the rule to given file.

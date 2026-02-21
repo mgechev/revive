@@ -6,7 +6,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// JSON is an implementation of the Formatter interface
+// JSON is an implementation of the [lint.Formatter] interface
 // which formats the errors to JSON.
 type JSON struct {
 	Metadata lint.FormatterMetadata

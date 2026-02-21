@@ -7,8 +7,8 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// CommentSpacingsRule check whether there is a space between
-// the comment symbol( // ) and the start of the comment text.
+// CommentSpacingsRule checks whether there is a space between
+// the comment symbol // and the start of the comment text.
 type CommentSpacingsRule struct {
 	allowList []string
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// Default is an implementation of the Formatter interface
+// Default is an implementation of the [lint.Formatter] interface
 // which formats the errors to text.
 type Default struct {
 	Metadata lint.FormatterMetadata

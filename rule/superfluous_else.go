@@ -13,10 +13,12 @@ type SuperfluousElseRule struct {
 	preserveScope bool
 }
 
+var _ lint.ConfigurableRule = (*SuperfluousElseRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
-func (e *SuperfluousElseRule) Configure(arguments lint.Arguments) error { //nolint:unparam // always returns nil
+func (e *SuperfluousElseRule) Configure(arguments lint.Arguments) error {
 	for _, arg := range arguments {
 		sarg, ok := arg.(string)
 		if !ok {

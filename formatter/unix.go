@@ -7,8 +7,8 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// Unix is an implementation of the Formatter interface
-// which formats the errors to a simple line based error format
+// Unix is an implementation of the [lint.Formatter] interface
+// which formats the errors to a simple line based error format:
 //
 //	main.go:24:9: [errorf] should replace errors.New(fmt.Sprintf(...)) with fmt.Errorf(...)
 type Unix struct {
