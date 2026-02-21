@@ -68,15 +68,10 @@ func (f *Friendly) printFriendlyFailure(sb *strings.Builder, failure lint.Failur
 	return err
 }
 
-var (
-	errorEmoji   = color.RedString("✘")
-	warningEmoji = color.YellowString("⚠")
-)
-
 func (*Friendly) printHeaderRow(sb *strings.Builder, failure lint.Failure, severity lint.Severity) {
-	emoji := warningEmoji
+	emoji := color.YellowString("⚠")
 	if severity == lint.SeverityError {
-		emoji = errorEmoji
+		emoji = color.RedString("✘")
 	}
 	sb.WriteString(table([][]string{{emoji, ruleDescriptionURL(failure.RuleName), color.GreenString(failure.Failure)}}))
 }
@@ -92,9 +87,9 @@ type statEntry struct {
 }
 
 func (*Friendly) printSummary(w io.Writer, errors, warnings int) error {
-	emoji := warningEmoji
+	emoji := color.YellowString("⚠")
 	if errors > 0 {
-		emoji = errorEmoji
+		emoji = color.RedString("✘")
 	}
 	problemsLabel := "problems"
 	if errors+warnings == 1 {
