@@ -6,8 +6,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/fatih/color"
-
 	"github.com/mgechev/revive/formatter"
 	"github.com/mgechev/revive/lint"
 )
@@ -195,18 +193,16 @@ file.go
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
-			previousNoColor := color.NoColor
-			color.NoColor = true
+			t.Setenv("NO_COLOR", "true")
 			realStdout := os.Stdout
 			fakeStdout, err := os.Create(filepath.Join(t.TempDir(), "fakeStdout"))
 			if err != nil {
 				t.Fatal(err)
 			}
 			os.Stdout = fakeStdout
-			t.Cleanup(func() {
+			defer func() {
 				os.Stdout = realStdout
-				color.NoColor = previousNoColor
-			})
+			}()
 			failures := make(chan lint.Failure, 10)
 			failures <- lint.Failure{
 				Failure:  "error var Exp should have name of the form ErrFoo",
