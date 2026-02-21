@@ -208,7 +208,7 @@ func (i *ArrayFlags) String() string {
 }
 
 // Set value for array flags.
-func (i *ArrayFlags) Set(value string) error { //nolint:unparam // can't remove error return value because of the interface
+func (i *ArrayFlags) Set(value string) error {
 	*i = append(*i, value)
 
 	return nil
