@@ -9,9 +9,9 @@ import (
 
 func TestEarlyReturn(t *testing.T) {
 	testRule(t, "early_return", &rule.EarlyReturnRule{})
-	testRule(t, "early_return_scope", &rule.EarlyReturnRule{}, &lint.RuleConfig{Arguments: []any{"preserveScope"}})
-	testRule(t, "early_return_scope", &rule.EarlyReturnRule{}, &lint.RuleConfig{Arguments: []any{"preserve-scope"}})
-	testRule(t, "early_return_jump", &rule.EarlyReturnRule{}, &lint.RuleConfig{Arguments: []any{"allowJump"}})
-	testRule(t, "early_return_jump", &rule.EarlyReturnRule{}, &lint.RuleConfig{Arguments: []any{"allow-jump"}})
-	testRule(t, "early_return_jump_scope", &rule.EarlyReturnRule{}, &lint.RuleConfig{Arguments: []any{"allow-jump", "preserve-scope"}})
+	testRule(t, "early_return_scope", &rule.EarlyReturnRule{}, &lint.RuleConfig{Arguments: lint.Arguments{"preserveScope"}})
+	testRule(t, "early_return_scope", &rule.EarlyReturnRule{}, &lint.RuleConfig{Arguments: lint.Arguments{"preserve-scope"}})
+	testRule(t, "early_return_jump", &rule.EarlyReturnRule{}, &lint.RuleConfig{Arguments: lint.Arguments{"allowJump"}})
+	testRule(t, "early_return_jump", &rule.EarlyReturnRule{}, &lint.RuleConfig{Arguments: lint.Arguments{"allow-jump"}})
+	testRule(t, "early_return_jump_scope", &rule.EarlyReturnRule{}, &lint.RuleConfig{Arguments: lint.Arguments{"allow-jump", "preserve-scope"}})
 }

@@ -9,7 +9,7 @@ import (
 
 func TestPackageDirectoryMismatch(t *testing.T) {
 	// Configure rule to ignore no directories so our tests in 'testdata/' can run
-	config := &lint.RuleConfig{Arguments: []any{map[string]any{"ignore-directories": []any{}}}}
+	config := &lint.RuleConfig{Arguments: lint.Arguments{map[string]any{"ignore-directories": []any{}}}}
 
 	testRule(t, "package_directory_mismatch/good/good", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/bad/bad", &rule.PackageDirectoryMismatchRule{}, config)
@@ -72,7 +72,7 @@ func TestPackageDirectoryMismatchWithDefaultConfig(t *testing.T) {
 
 func TestPackageDirectoryMismatchWithTestDirectories(t *testing.T) {
 	// Test with new format that excludes specific test directories
-	config := &lint.RuleConfig{Arguments: []any{map[string]any{"ignore-directories": []any{"testinfo", "testutils"}}}}
+	config := &lint.RuleConfig{Arguments: lint.Arguments{map[string]any{"ignore-directories": []any{"testinfo", "testutils"}}}}
 
 	testRule(t, "package_directory_mismatch/testinfo/good", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/testutils/good", &rule.PackageDirectoryMismatchRule{}, config)
@@ -80,7 +80,7 @@ func TestPackageDirectoryMismatchWithTestDirectories(t *testing.T) {
 
 func TestPackageDirectoryMismatchWithMultipleDirectories(t *testing.T) {
 	// Test with new named argument format that excludes both "testutils" and "testinfo"
-	config := &lint.RuleConfig{Arguments: []any{map[string]any{"ignoreDirectories": []any{"testutils", "testinfo"}}}}
+	config := &lint.RuleConfig{Arguments: lint.Arguments{map[string]any{"ignoreDirectories": []any{"testutils", "testinfo"}}}}
 
 	testRule(t, "package_directory_mismatch/testutils/good", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/testinfo/good", &rule.PackageDirectoryMismatchRule{}, config)

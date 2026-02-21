@@ -9,6 +9,6 @@ import (
 
 func TestIndentErrorFlow(t *testing.T) {
 	testRule(t, "indent_error_flow", &rule.IndentErrorFlowRule{})
-	testRule(t, "indent_error_flow_scope", &rule.IndentErrorFlowRule{}, &lint.RuleConfig{Arguments: []any{"preserveScope"}})
-	testRule(t, "indent_error_flow_scope", &rule.IndentErrorFlowRule{}, &lint.RuleConfig{Arguments: []any{"preserve-scope"}})
+	testRule(t, "indent_error_flow_scope", &rule.IndentErrorFlowRule{}, &lint.RuleConfig{Arguments: lint.Arguments{"preserveScope"}})
+	testRule(t, "indent_error_flow_scope", &rule.IndentErrorFlowRule{}, &lint.RuleConfig{Arguments: lint.Arguments{"preserve-scope"}})
 }

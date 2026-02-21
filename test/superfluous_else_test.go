@@ -9,6 +9,6 @@ import (
 
 func TestSuperfluousElse(t *testing.T) {
 	testRule(t, "superfluous_else", &rule.SuperfluousElseRule{})
-	testRule(t, "superfluous_else_scope", &rule.SuperfluousElseRule{}, &lint.RuleConfig{Arguments: []any{"preserveScope"}})
-	testRule(t, "superfluous_else_scope", &rule.SuperfluousElseRule{}, &lint.RuleConfig{Arguments: []any{"preserve-scope"}})
+	testRule(t, "superfluous_else_scope", &rule.SuperfluousElseRule{}, &lint.RuleConfig{Arguments: lint.Arguments{"preserveScope"}})
+	testRule(t, "superfluous_else_scope", &rule.SuperfluousElseRule{}, &lint.RuleConfig{Arguments: lint.Arguments{"preserve-scope"}})
 }

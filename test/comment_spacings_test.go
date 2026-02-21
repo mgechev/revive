@@ -9,7 +9,7 @@ import (
 
 func TestCommentSpacings(t *testing.T) {
 	testRule(t, "comment_spacings", &rule.CommentSpacingsRule{}, &lint.RuleConfig{
-		Arguments: []any{"myOwnDirective:", "+optional"},
+		Arguments: lint.Arguments{"myOwnDirective:", "+optional"},
 	},
 	)
 }

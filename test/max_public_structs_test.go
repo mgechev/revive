@@ -9,7 +9,7 @@ import (
 
 func TestMaxPublicStructs(t *testing.T) {
 	testRule(t, "max_public_structs", &rule.MaxPublicStructsRule{}, &lint.RuleConfig{
-		Arguments: []any{int64(1)},
+		Arguments: lint.Arguments{int64(1)},
 	})
 }
 

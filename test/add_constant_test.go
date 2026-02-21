@@ -13,7 +13,7 @@ func TestAddConstantWithDefaultArguments(t *testing.T) {
 
 func TestAddConstantWithArguments(t *testing.T) {
 	testRule(t, "add_constant", &rule.AddConstantRule{}, &lint.RuleConfig{
-		Arguments: []any{map[string]any{
+		Arguments: lint.Arguments{map[string]any{
 			"maxLitCount": "2",
 			"allowStrs":   "\"\"",
 			"allowInts":   "0,1,2",
@@ -22,7 +22,7 @@ func TestAddConstantWithArguments(t *testing.T) {
 		}},
 	})
 	testRule(t, "add_constant", &rule.AddConstantRule{}, &lint.RuleConfig{
-		Arguments: []any{map[string]any{
+		Arguments: lint.Arguments{map[string]any{
 			"max-lit-count": "2",
 			"allow-strs":    `""`,
 			"allow-ints":    "0,1,2",

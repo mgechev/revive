@@ -14,9 +14,9 @@ func TestCyclomaticDefault(t *testing.T) {
 func TestCyclomatic(t *testing.T) {
 	testRule(t, "cyclomatic_default", &rule.CyclomaticRule{}, &lint.RuleConfig{})
 	testRule(t, "cyclomatic", &rule.CyclomaticRule{}, &lint.RuleConfig{
-		Arguments: []any{int64(1)},
+		Arguments: lint.Arguments{int64(1)},
 	})
 	testRule(t, "cyclomatic_2", &rule.CyclomaticRule{}, &lint.RuleConfig{
-		Arguments: []any{int64(3)},
+		Arguments: lint.Arguments{int64(3)},
 	})
 }
