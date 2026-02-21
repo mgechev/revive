@@ -195,6 +195,7 @@ file.go
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
+			previousNoColor := color.NoColor
 			color.NoColor = true
 			realStdout := os.Stdout
 			fakeStdout, err := os.Create(filepath.Join(t.TempDir(), "fakeStdout"))
@@ -202,9 +203,10 @@ file.go
 				t.Fatal(err)
 			}
 			os.Stdout = fakeStdout
-			defer func() {
+			t.Cleanup(func() {
 				os.Stdout = realStdout
-			}()
+				color.NoColor = previousNoColor
+			})
 			failures := make(chan lint.Failure, 10)
 			failures <- lint.Failure{
 				Failure:  "error var Exp should have name of the form ErrFoo",
