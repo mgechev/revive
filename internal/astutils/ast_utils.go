@@ -1,4 +1,4 @@
-// Package astutils provides utility functions for working with AST nodes
+// Package astutils provides utility functions for working with AST nodes.
 package astutils
 
 import (
@@ -16,8 +16,13 @@ import (
 // FuncSignatureIs returns true if the given func decl satisfies a signature characterized
 // by the given name, parameters types and return types; false otherwise.
 //
-// Example: to check if a function declaration has the signature Foo(int, string) (bool,error)
-// call to FuncSignatureIs(funcDecl,"Foo",[]string{"int","string"},[]string{"bool","error"}).
+// Example: To check if a function declaration has the signature
+//
+//	Foo(int, string) (bool, error)
+//
+// call to
+//
+//	FuncSignatureIs(funcDecl, "Foo", []string{"int", "string"}, []string{"bool", "error"})
 func FuncSignatureIs(funcDecl *ast.FuncDecl, wantName string, wantParametersTypes, wantResultsTypes []string) bool {
 	if wantName != funcDecl.Name.String() {
 		return false // func name doesn't match expected one

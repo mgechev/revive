@@ -9,7 +9,8 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// UseFmtPrintRule lints calls to print and println.
+// UseFmtPrintRule proposes to replace calls to built-in `print` and `println`
+// with their equivalents from [fmt] package.
 type UseFmtPrintRule struct{}
 
 // Apply applies the rule to given file.

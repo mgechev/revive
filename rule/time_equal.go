@@ -9,7 +9,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// TimeEqualRule shows where "==" and "!=" used for equality check [time.Time].
+// TimeEqualRule flags where "==" and "!=" are used for equality checks on [time.Time].
 type TimeEqualRule struct{}
 
 // Apply applies the rule to given file.

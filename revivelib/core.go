@@ -25,7 +25,7 @@ type Revive struct {
 	maxOpenFiles int
 }
 
-// New creates a new instance of Revive lint runner.
+// New creates a new instance of [Revive] lint runner.
 func New(
 	conf *lint.Config,
 	setExitStatus bool,
@@ -113,7 +113,7 @@ func (r *Revive) Lint(patterns ...*LintPattern) (<-chan lint.Failure, error) {
 	return failures, nil
 }
 
-// Format gets the output for a given failures channel from Lint.
+// Format gets the output for a given failures channel from [Revive.Lint].
 func (r *Revive) Format(
 	formatterName string,
 	failuresChan <-chan lint.Failure,
@@ -196,6 +196,7 @@ func normalizeSplit(strs []string) []string {
 }
 
 // ArrayFlags type for string list.
+// Implements [flag.Value] interface, to be used in command line arguments.
 type ArrayFlags []string
 
 // String returns the space-separated representation of the ArrayFlags.
@@ -204,7 +205,7 @@ func (i *ArrayFlags) String() string {
 }
 
 // Set value for array flags.
-func (i *ArrayFlags) Set(value string) error { //nolint:unparam // always returns nil
+func (i *ArrayFlags) Set(value string) error { //nolint:unparam // can't remove error return value because of the interface
 	*i = append(*i, value)
 
 	return nil

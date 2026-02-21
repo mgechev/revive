@@ -78,13 +78,13 @@ type Failure struct {
 	Position   FailurePosition `json:"Position"`
 	Node       ast.Node        `json:"-"`
 	Confidence float64         `json:"Confidence"`
-	// For future use
+	// ReplacementLine is for future use.
 	ReplacementLine string `json:"ReplacementLine"`
 }
 
 // GetFilename returns the filename.
 //
-// Deprecated: Use [Filename].
+// Deprecated: Use [Failure.Filename] instead.
 func (f *Failure) GetFilename() string {
 	return f.Filename()
 }

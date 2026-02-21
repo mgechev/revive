@@ -7,8 +7,8 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// Plain is an implementation of the Formatter interface
-// which formats the errors to JSON.
+// Plain is an implementation of the [lint.Formatter] interface
+// which formats the errors to plain text.
 type Plain struct {
 	Metadata lint.FormatterMetadata
 }

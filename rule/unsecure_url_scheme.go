@@ -11,7 +11,7 @@ import (
 )
 
 // UnsecureURLSchemeRule checks if a file contains string literals with unsecure URL schemes.
-// For example: http://... in place of https://....
+// For example: "http://" in place of "https://".
 type UnsecureURLSchemeRule struct{}
 
 // Apply applied the rule to the given file.

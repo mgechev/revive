@@ -11,7 +11,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// StringFormatRule lints strings and/or comments according to a set of regular expressions given as Arguments.
+// StringFormatRule lints strings and/or comments according to a set of regular expressions given as arguments.
 type StringFormatRule struct {
 	rules []stringFormatSubrule
 }

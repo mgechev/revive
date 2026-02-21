@@ -9,8 +9,8 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// Stylish is an implementation of the Formatter interface
-// which formats the errors to JSON.
+// Stylish is an implementation of the [lint.Formatter] interface
+// which formats the errors to a stylish, human-readable format.
 type Stylish struct {
 	Metadata lint.FormatterMetadata
 }
@@ -33,7 +33,7 @@ func formatFailure(failure lint.Failure, severity lint.Severity) []string {
 }
 
 // Format formats the failures gotten from the lint.
-func (*Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string, error) { //nolint:unparam // always returns nil error
+func (*Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string, error) { //nolint:unparam // can't remove error return value because of the interface
 	var result [][]string
 	totalErrors := 0
 	total := 0

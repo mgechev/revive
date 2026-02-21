@@ -408,8 +408,8 @@ func (w *lintExported) checkGoDocStatus(comment *ast.CommentGroup, name string) 
 }
 
 // firstCommentLine yields the first line of interest in comment group or "" if there is nothing of interest.
-// An "interesting line" is a comment line that is neither a directive (e.g. //go:...) or a deprecation comment
-// (lines from the first line with a prefix // Deprecated: to the end of the comment group)
+// An "interesting line" is a comment line that is neither a directive (e.g. `//go:“) or a deprecation comment
+// (lines from the first line with a prefix `// Deprecated:` to the end of the comment group).
 // Empty or spaces-only lines are discarded.
 func (*lintExported) firstCommentLine(comment *ast.CommentGroup) (result string) {
 	if comment == nil {

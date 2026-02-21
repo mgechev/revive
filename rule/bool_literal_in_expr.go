@@ -7,7 +7,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// BoolLiteralRule warns when logic expressions contains Boolean literals.
+// BoolLiteralRule warns when logic expressions contain boolean literals.
 type BoolLiteralRule struct{}
 
 // Apply applies the rule to given file.

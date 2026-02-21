@@ -36,6 +36,7 @@ linters:
       - path: '(.+)_test\.go'
         linters:
           - godoclint
+          - godot
       - linters:
           - testpackage
         text: 'package should be `rule_test` instead of `rule`'
@@ -89,6 +90,8 @@ linters:
           ignore-unexported: true
         start-with-name:
           include-unexported: true
+    godot:
+      scope: toplevel
     govet:
       enable-all: true
       disable:

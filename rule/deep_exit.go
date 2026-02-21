@@ -11,7 +11,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// DeepExitRule lints program exit at functions other than main or init.
+// DeepExitRule lints program exit in functions other than main or init.
 type DeepExitRule struct{}
 
 // Apply applies the rule to given file.
