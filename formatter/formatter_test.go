@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/fatih/color"
+
 	"github.com/mgechev/revive/formatter"
 	"github.com/mgechev/revive/lint"
 )
@@ -193,6 +195,7 @@ file.go
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
+			color.NoColor = true
 			realStdout := os.Stdout
 			fakeStdout, err := os.Create(filepath.Join(t.TempDir(), "fakeStdout"))
 			if err != nil {

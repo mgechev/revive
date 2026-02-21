@@ -20,9 +20,8 @@ func TestImportsBlocklist(t *testing.T) {
 }
 
 func BenchmarkImportsBlocklist(b *testing.B) {
-	var t *testing.T
-	for i := 0; i <= b.N; i++ {
-		testRule(t, "imports_blocklist", &rule.ImportsBlocklistRule{}, &lint.RuleConfig{
+	for b.Loop() {
+		testRule(b, "imports_blocklist", &rule.ImportsBlocklistRule{}, &lint.RuleConfig{
 			Arguments: lint.Arguments{"github.com/full/match", "wildcard/**/between", "wildcard/backward/**", "**/wildcard/forward", "full"},
 		})
 	}

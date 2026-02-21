@@ -18,8 +18,7 @@ func TestArgumentsLimit(t *testing.T) {
 }
 
 func BenchmarkArgumentsLimit(b *testing.B) {
-	var t *testing.T
-	for i := 0; i <= b.N; i++ {
-		testRule(t, "argument_limit_default", &rule.ArgumentsLimitRule{}, &lint.RuleConfig{})
+	for b.Loop() {
+		testRule(b, "argument_limit_default", &rule.ArgumentsLimitRule{}, &lint.RuleConfig{})
 	}
 }
