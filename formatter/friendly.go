@@ -32,9 +32,15 @@ func (f *Friendly) Format(failures <-chan lint.Failure, config lint.Config) (str
 	warningMap := map[string]int{}
 	totalErrors := 0
 	totalWarnings := 0
+	warningEmoji := color.YellowString("⚠")
+	errorEmoji := color.RedString("✘")
 	for failure := range failures {
 		sev := severity(config, failure)
-		if err := f.printFriendlyFailure(&buf, failure, sev); err != nil {
+		firstCol := warningEmoji
+		if sev == lint.SeverityError {
+			firstCol = errorEmoji
+		}
+		if err := f.printFriendlyFailure(&buf, firstCol, failure); err != nil {
 			return "", err
 		}
 		switch sev {
@@ -47,7 +53,11 @@ func (f *Friendly) Format(failures <-chan lint.Failure, config lint.Config) (str
 		}
 	}
 
-	if err := f.printSummary(&buf, totalErrors, totalWarnings); err != nil {
+	emoji := warningEmoji
+	if totalErrors > 0 {
+		emoji = errorEmoji
+	}
+	if err := f.printSummary(&buf, emoji, totalErrors, totalWarnings); err != nil {
 		return "", err
 	}
 	if err := f.printStatistics(&buf, color.RedString("Errors:"), errorMap); err != nil {
@@ -59,8 +69,8 @@ func (f *Friendly) Format(failures <-chan lint.Failure, config lint.Config) (str
 	return buf.String(), nil
 }
 
-func (f *Friendly) printFriendlyFailure(sb *strings.Builder, failure lint.Failure, severity lint.Severity) error {
-	f.printHeaderRow(sb, failure, severity)
+func (f *Friendly) printFriendlyFailure(sb *strings.Builder, firstColumn string, failure lint.Failure) error {
+	f.printHeaderRow(sb, firstColumn, failure)
 	if err := f.printFilePosition(sb, failure); err != nil {
 		return err
 	}
@@ -68,12 +78,8 @@ func (f *Friendly) printFriendlyFailure(sb *strings.Builder, failure lint.Failur
 	return err
 }
 
-func (*Friendly) printHeaderRow(sb *strings.Builder, failure lint.Failure, severity lint.Severity) {
-	emoji := color.YellowString("⚠")
-	if severity == lint.SeverityError {
-		emoji = color.RedString("✘")
-	}
-	sb.WriteString(table([][]string{{emoji, ruleDescriptionURL(failure.RuleName), color.GreenString(failure.Failure)}}))
+func (*Friendly) printHeaderRow(sb *strings.Builder, firstColumn string, failure lint.Failure) {
+	sb.WriteString(table([][]string{{firstColumn, ruleDescriptionURL(failure.RuleName), color.GreenString(failure.Failure)}}))
 }
 
 func (*Friendly) printFilePosition(sb *strings.Builder, failure lint.Failure) error {
@@ -86,11 +92,7 @@ type statEntry struct {
 	failures int
 }
 
-func (*Friendly) printSummary(w io.Writer, errors, warnings int) error {
-	emoji := color.YellowString("⚠")
-	if errors > 0 {
-		emoji = color.RedString("✘")
-	}
+func (*Friendly) printSummary(w io.Writer, firstColumn string, errors, warnings int) error {
 	problemsLabel := "problems"
 	if errors+warnings == 1 {
 		problemsLabel = "problem"
@@ -105,11 +107,11 @@ func (*Friendly) printSummary(w io.Writer, errors, warnings int) error {
 	}
 	str := fmt.Sprintf("%d %s (%d %s, %d %s)", errors+warnings, problemsLabel, errors, errorsLabel, warnings, warningsLabel)
 	if errors > 0 {
-		_, err := fmt.Fprintf(w, "%s %s\n\n", emoji, color.RedString(str))
+		_, err := fmt.Fprintf(w, "%s %s\n\n", firstColumn, color.RedString(str))
 		return err
 	}
 	if warnings > 0 {
-		_, err := fmt.Fprintf(w, "%s %s\n\n", emoji, color.YellowString(str))
+		_, err := fmt.Fprintf(w, "%s %s\n\n", firstColumn, color.YellowString(str))
 		return err
 	}
 	return nil
