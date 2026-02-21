@@ -22,8 +22,7 @@ func TestUnusedReceiver(t *testing.T) {
 }
 
 func BenchmarkUnusedReceiver(b *testing.B) {
-	var t *testing.T
-	for i := 0; i <= b.N; i++ {
-		testRule(t, "unused_receiver", &rule.UnusedReceiverRule{})
+	for b.Loop() {
+		testRule(b, "unused_receiver", &rule.UnusedReceiverRule{})
 	}
 }

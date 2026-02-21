@@ -77,9 +77,8 @@ func TestVarNaming(t *testing.T) {
 }
 
 func BenchmarkUpperCaseConstTrue(b *testing.B) {
-	var t *testing.T
 	for b.Loop() {
-		testRule(t, "var_naming_upper_case_const_true", &rule.VarNamingRule{}, &lint.RuleConfig{
+		testRule(b, "var_naming_upper_case_const_true", &rule.VarNamingRule{}, &lint.RuleConfig{
 			Arguments: lint.Arguments{[]any{}, []any{}, []any{map[string]any{"upperCaseConst": true}}},
 		})
 	}
