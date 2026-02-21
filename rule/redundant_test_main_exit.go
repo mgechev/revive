@@ -7,7 +7,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// RedundantTestMainExitRule suggests removing [os.Exit] calls in TestMain function for test files.
+// RedundantTestMainExitRule suggests removing redundant [os.Exit] or [syscall.Exit] calls in TestMain function.
 type RedundantTestMainExitRule struct{}
 
 // Apply applies the rule to given file.

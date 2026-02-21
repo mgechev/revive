@@ -2,6 +2,7 @@
 package revivelib
 
 import (
+	"flag"
 	"fmt"
 	"log/slog"
 	"maps"
@@ -198,6 +199,8 @@ func normalizeSplit(strs []string) []string {
 // ArrayFlags type for string list.
 // Implements [flag.Value] interface, to be used in command line arguments.
 type ArrayFlags []string
+
+var _ flag.Value = (*ArrayFlags)(nil)
 
 // String returns the space-separated representation of the ArrayFlags.
 func (i *ArrayFlags) String() string {
