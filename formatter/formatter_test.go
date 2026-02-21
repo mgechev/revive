@@ -193,7 +193,6 @@ file.go
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
-			t.Setenv("NO_COLOR", "true")
 			realStdout := os.Stdout
 			fakeStdout, err := os.Create(filepath.Join(t.TempDir(), "fakeStdout"))
 			if err != nil {
