@@ -18,6 +18,7 @@ linters:
     - modernize
     - musttag
     - nolintlint
+    - reassign
     - recvcheck
     - revive
     - sloglint
@@ -103,6 +104,9 @@ linters:
       allow-unused: false
       require-explanation: true
       require-specific: true
+    reassign:
+      patterns:
+        - .*
     # The following settings should match revive.toml
     revive:
       severity: warning

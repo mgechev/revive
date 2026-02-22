@@ -41,7 +41,9 @@ func fail(err string) {
 func RunRevive(extraRules ...revivelib.ExtraRule) {
 	// Move parsing flags outside of init(); otherwise, tests don't work properly.
 	// More info: https://github.com/golang/go/issues/46869#issuecomment-865695953
-	initConfig()
+	if err := initConfig(); err != nil {
+		fail(err.Error())
+	}
 
 	if versionFlag {
 		fmt.Print(getVersion(builtBy, date, commit, version))
@@ -144,10 +146,13 @@ func buildDefaultConfigPath() string {
 	return result
 }
 
-func initConfig() {
+func initConfig() error {
 	// Force colorizing for no TTY environments
 	if os.Getenv("REVIVE_FORCE_COLOR") == "1" {
-		color.NoColor = false
+		// https://github.com/fatih/color#disableenable-color
+		if err := os.Setenv("NO_COLOR", ""); err != nil {
+			return err
+		}
 	}
 
 	flag.Usage = func() {
@@ -174,6 +179,7 @@ func initConfig() {
 	flag.BoolVar(&setExitStatus, "set_exit_status", false, exitStatusUsage)
 	flag.IntVar(&maxOpenFiles, "max_open_files", 0, maxOpenFilesUsage)
 	flag.Parse() //revive:disable-line:deep-exit
+	return nil
 }
 
 // getVersion returns build info (version, commit, date, and builtBy).
