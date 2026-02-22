@@ -1848,6 +1848,9 @@ When `skipPackageNameChecks` is false (the default), you can configure
 to forbid using the values from the list as package names additionally
 to the standard meaningless ones: "common", "interfaces", "misc",
 "types", "util", "utils".
+You can also configure `acceptedPackageNames` (`acceptedpackagenames`, `accepted-package-names`)
+to allow using the values from the list as package names that the rule will accept as good names
+even if they are, by defult, considered bad ones.
 When `skipPackageNameCollisionWithGoStd`
 (`skippackagenamecollisionwithgostd`, `skip-package-name-collision-with-go-std`)
 is set to true, the rule disables checks on package names that collide

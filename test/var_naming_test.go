@@ -74,6 +74,13 @@ func TestVarNaming(t *testing.T) {
 			[]any{map[string]any{"skip-package-name-collision-with-go-std": true}},
 		},
 	})
+	testRule(t, "var_naming_skip_package_name_checks_true", &rule.VarNamingRule{}, &lint.RuleConfig{
+		Arguments: []any{
+			[]any{},
+			[]any{},
+			[]any{map[string]any{"skip-package-name-checks": false, "accepted-package-names": []any{"pkg_with_underscores"}}},
+		},
+	})
 }
 
 func BenchmarkUpperCaseConstTrue(b *testing.B) {
