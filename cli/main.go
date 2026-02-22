@@ -155,7 +155,7 @@ func initConfig() error {
 		}
 	}
 
-	flag.Usage = func() {
+	flag.Usage = func() { //nolint:reassign // We want to reassign the default usage function to print our banner.
 		fmt.Println(banner())
 		originalUsage()
 	}

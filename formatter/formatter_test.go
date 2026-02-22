@@ -192,6 +192,7 @@ file.go
 				"\n",
 		},
 	} {
+		//nolint:reassign // reassigning os.Stdout is necessary to test that formatters don't write to stdout.
 		t.Run(name, func(t *testing.T) {
 			t.Setenv("NO_COLOR", "true")
 			realStdout := os.Stdout
