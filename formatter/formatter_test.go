@@ -192,16 +192,16 @@ file.go
 				"\n",
 		},
 	} {
+		//nolint:reassign // reassigning os.Stdout is necessary to test that formatters don't write to stdout.
 		t.Run(name, func(t *testing.T) {
+			t.Setenv("NO_COLOR", "true")
 			realStdout := os.Stdout
 			fakeStdout, err := os.Create(filepath.Join(t.TempDir(), "fakeStdout"))
 			if err != nil {
 				t.Fatal(err)
 			}
 			os.Stdout = fakeStdout
-			defer func() {
-				os.Stdout = realStdout
-			}()
+			t.Cleanup(func() { os.Stdout = realStdout })
 			failures := make(chan lint.Failure, 10)
 			failures <- lint.Failure{
 				Failure:  "error var Exp should have name of the form ErrFoo",
