@@ -41,9 +41,7 @@ func fail(err string) {
 func RunRevive(extraRules ...revivelib.ExtraRule) {
 	// Move parsing flags outside of init(); otherwise, tests don't work properly.
 	// More info: https://github.com/golang/go/issues/46869#issuecomment-865695953
-	if err := initConfig(); err != nil {
-		fail(err.Error())
-	}
+	initConfig()
 
 	if versionFlag {
 		fmt.Print(getVersion(builtBy, date, commit, version))
@@ -146,7 +144,7 @@ func buildDefaultConfigPath() string {
 	return result
 }
 
-func initConfig() error {
+func initConfig() {
 	if os.Getenv("REVIVE_FORCE_COLOR") == "1" {
 		color.NoColor = false //nolint:reassign // We want to reassign the default value of NoColor to force colorizing for non-TTY environments.
 	}
@@ -175,7 +173,6 @@ func initConfig() error {
 	flag.BoolVar(&setExitStatus, "set_exit_status", false, exitStatusUsage)
 	flag.IntVar(&maxOpenFiles, "max_open_files", 0, maxOpenFilesUsage)
 	flag.Parse() //revive:disable-line:deep-exit
-	return nil
 }
 
 // getVersion returns build info (version, commit, date, and builtBy).
