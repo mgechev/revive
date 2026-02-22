@@ -147,12 +147,8 @@ func buildDefaultConfigPath() string {
 }
 
 func initConfig() error {
-	// Force colorizing for no TTY environments
 	if os.Getenv("REVIVE_FORCE_COLOR") == "1" {
-		// https://github.com/fatih/color#disableenable-color
-		if err := os.Setenv("NO_COLOR", ""); err != nil {
-			return err
-		}
+		color.NoColor = false //nolint:reassign // We want to reassign the default value of NoColor to force colorizing for non-TTY environments.
 	}
 
 	flag.Usage = func() { //nolint:reassign // We want to reassign the default usage function to print our banner.
