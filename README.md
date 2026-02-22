@@ -625,6 +625,16 @@ arguments = [["ID"], ["VM"]]
 
 This way, revive will not warn for an identifier called `customId` but will warn that `customVm` should be called `customVM`.
 
+You can also enforce custom package naming conventions using a regex pattern:
+
+```toml
+[rule.var-naming]
+arguments = [[], [], [{ "packageNamePattern" = "^[a-z][a-zA-Z0-9]*$" }]]
+```
+
+This enforces that package names must start with a lowercase letter followed by any combination of letters and digits
+(allowing camelCase but disallowing underscores). When a regex pattern is set, it takes precedence over the default package naming checks.
+
 ## Available Formatters
 
 This section lists all the available formatters and provides a screenshot for each one.
