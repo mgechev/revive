@@ -294,17 +294,4 @@ func TestPackageNamingRule_Configure_LoadStdPackages(t *testing.T) {
 			t.Errorf("expected allStdNames to be nil, but got %v", rule.allStdNames)
 		}
 	})
-
-	t.Run("initializes alreadyCheckedNames", func(t *testing.T) {
-		var rule PackageNamingRule
-
-		err := rule.Configure(nil)
-		if err != nil {
-			t.Fatalf("unexpected error: got = %v, want = nil", err)
-		}
-
-		if rule.alreadyCheckedNames.elements == nil {
-			t.Error("expected alreadyCheckedNames to be initialized, but got nil")
-		}
-	})
 }

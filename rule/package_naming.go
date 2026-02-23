@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"sync"
 
 	gopackages "golang.org/x/tools/go/packages"
 
+	"github.com/mgechev/revive/internal/syncset"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -86,14 +86,14 @@ type PackageNamingRule struct {
 	// Populated only if checkCollisionWithAllStd is true. `net/http` stored as `http`, `math/rand/v2` as `rand` etc.
 	allStdNames map[string]string
 
-	alreadyCheckedNames syncSet // set of packages names already checked
+	alreadyCheckedNames *syncset.Set // set of packages names already checked
 }
 
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
 func (r *PackageNamingRule) Configure(arguments lint.Arguments) error {
-	r.alreadyCheckedNames = syncSet{elements: map[string]struct{}{}}
+	r.alreadyCheckedNames = syncset.New()
 
 	if len(arguments) == 1 {
 		args, ok := arguments[0].(map[string]any)
@@ -189,12 +189,10 @@ func (r *PackageNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 
 	fileDir := filepath.Dir(file.Name)
 
-	r.alreadyCheckedNames.Lock()
-	defer r.alreadyCheckedNames.Unlock()
-	if r.alreadyCheckedNames.has(fileDir) {
+	if r.alreadyCheckedNames.Has(fileDir) {
 		return failures
 	}
-	r.alreadyCheckedNames.add(fileDir) // mark this package as already checked
+	r.alreadyCheckedNames.Set(fileDir) // mark this package as already checked
 
 	node := file.AST.Name
 	pkgName := node.Name
@@ -273,19 +271,4 @@ func (*PackageNamingRule) pkgNameFailure(node ast.Node, msg string, args ...any)
 		Node:       node,
 		Category:   lint.FailureCategoryNaming,
 	}
-}
-
-type syncSet struct {
-	sync.Mutex
-
-	elements map[string]struct{}
-}
-
-func (sm *syncSet) has(s string) bool {
-	_, result := sm.elements[s]
-	return result
-}
-
-func (sm *syncSet) add(s string) {
-	sm.elements[s] = struct{}{}
 }
