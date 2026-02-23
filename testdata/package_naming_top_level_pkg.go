@@ -1,6 +1,1 @@
-package pkg // MATCH /should not have a root level package called pkg/
-
-const (
-	Foo = "bar"
-	Bar = "foo"
-)
+package pkg // MATCH /don't use "pkg" as a root level package name/
