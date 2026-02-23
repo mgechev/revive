@@ -75,10 +75,6 @@ func Parse(tag string) ([]*Tag, error) {
 		tag = tag[i:]
 	}
 
-	if len(tags) == 0 {
-		return nil, nil
-	}
-
 	return tags, nil
 }
 
