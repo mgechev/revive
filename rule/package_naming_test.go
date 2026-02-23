@@ -239,16 +239,17 @@ func TestPackageNamingRule_Configure_LoadStdPackages(t *testing.T) {
 			t.Fatalf("unexpected error: got = %v, want = nil", err)
 		}
 
-		if rule.allStdNames == nil {
-			t.Fatal("expected allStdNames to be loaded, but got nil")
-		}
 		if len(rule.allStdNames) == 0 {
 			t.Fatal("expected allStdNames to be populated, but got empty")
 		}
 
-		for _, pkg := range []string{"fmt", "http", "json", "rand", "io"} {
-			if _, ok := rule.allStdNames[pkg]; !ok {
-				t.Errorf("expected package %q to be loaded, but got empty", pkg)
+		for pkgName, pkgPath := range map[string]string{"http": "net/http", "version": "go/version", "runtime": "runtime", "metrics": "runtime/metrics"} {
+			std, ok := rule.allStdNames[pkgName]
+			if !ok {
+				t.Errorf("expected package %q to be loaded, but got empty", pkgName)
+			}
+			if std != pkgPath {
+				t.Errorf("unexpected std package path for %q: got = %q, want = %q", pkgName, std, pkgPath)
 			}
 		}
 	})
