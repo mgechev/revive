@@ -67,6 +67,7 @@ List of all available rules.
 - [nested-structs](#nested-structs)
 - [optimize-operands-order](#optimize-operands-order)
 - [package-comments](#package-comments)
+- [package-naming](#package-naming)
 - [package-directory-mismatch](#package-directory-mismatch)
 - [range-val-address](#range-val-address)
 - [range-val-in-closure](#range-val-in-closure)
@@ -1200,6 +1201,78 @@ More [information here](https://go.dev/wiki/CodeReviewComments#package-comments)
 
 _Configuration_: N/A
 
+## package-naming
+
+_Description_: This rule checks that package names follow [Go conventions](https://go.dev/blog/package-names) and best practices.
+It helps prevent using bad package names and enforces consistent naming patterns.
+By default, it checks for:
+
+- Package name conventions (no underscores except for test packages, no MixedCaps).
+- Bad package names from the official Go blog (e.g., `common`, `util`, `misc`, `types`, `interfaces`).
+- Package names that conflict with common Go standard library packages (e.g., `http`, `json`, `fmt`).
+
+_Configuration_: (optional) list of key-value-pair-map (`[]map[string]any`).
+
+- `skipConventionNameCheck` (`skipconventionnamecheck`, `skip-convention-name-check`): (bool)
+If `true`, skip checks for package name conventions (underscores, MixedCaps, etc.). Default: `false`.
+- `conventionNameCheckRegex` (`conventionnamecheck`, `convention-name-check-regex`): (string)
+Custom regex pattern to validate package names. If set, package names must match this pattern.
+- `skipTopLevelCheck` (`skiptoplevelcheck`, `skip-top-level-check`): (bool)
+If `true`, skip checks for top-level package names (e.g., `pkg`). Default: `false`.
+- `skipDefaultBadNameCheck` (`skipdefaultbadnamecheck`, `skip-default-bad-name-check`): (bool)
+If `true`, skip checks for default bad package names. Default: `false`.
+- `checkExtraBadName` (`checkextrabadname`, `check-extra-bad-name`): (bool)
+If `true`, enable checks for extra bad package names (e.g., `helpers`, `models`, `shared`, `utilities`). Default: `false`.
+- `userDefinedBadNames` (`userdefinedbadbad`, `user-defined-bad-names`): ([]string) List of user-defined bad package names to check for.
+- `skipCollisionWithCommonStd` (`skipcollisionwithcommonstd`, `skip-collision-with-common-std`): (bool)
+If `true`, skip checks for collisions with the most common Go standard library packages. Default: `false`.
+- `checkCollisionWithAllStd` (`checkcollisionwithallstd`, `check-collision-with-all-std`): (bool)
+If `true`, enable checks for collisions with all packages from Go standard library. Default: `false`.
+
+Configuration examples:
+
+Default settings (check for name conventions, top level packages, common bad names, and collision with common Go standard library packages):
+
+```toml
+[rule.package-naming]
+```
+
+Custom naming convention with regex:
+
+```toml
+[rule.package-naming]
+arguments = [{ convention-name-check-regex = "^[a-z]+$" }]
+```
+
+Skip convention checks, but check for bad names:
+
+```toml
+[rule.package-naming]
+arguments = [{ skip-convention-name-check = true }]
+```
+
+Enable collision checks with the most common standard library packages:
+
+```toml
+arguments = [{ skip-collision-with-common-std = false }]
+```
+
+Strict mode with user-defined bad names:
+
+```toml
+[rule.package-naming]
+arguments = [{ user-defined-bad-names = ["foo", "bar"] }]
+```
+
+Enable collision checks with all standard library [packages](https://pkg.go.dev/std) excluding `internal` and `vendor`:
+
+```toml
+[rule.package-naming]
+arguments = [{ check-collision-with-all-std = true }]
+```
+
+_Note_: This rule arose from package naming checks in `var-naming`.
+
 ## package-directory-mismatch
 
 _Description_: It is considered a good practice to name a package after the directory containing it.
@@ -1832,7 +1905,7 @@ _Configuration_: N/A
 ## var-naming
 
 _Description_: This rule warns when [initialism](https://go.dev/wiki/CodeReviewComments#initialisms), [variable](https://go.dev/wiki/CodeReviewComments#variable-names)
-or [package](https://go.dev/wiki/CodeReviewComments#package-names) naming conventions are not followed.
+naming conventions are not followed.
 It ignores functions starting with `Example`, `Test`, `Benchmark`, and `Fuzz` in test files, preserving `golint` original behavior.
 
 _Configuration_: This rule accepts two slices of strings and one optional slice containing a single map with named parameters.
@@ -1842,16 +1915,6 @@ You can add a boolean parameter `skipInitialismNameChecks` (`skipinitialismnamec
 of functions, variables, consts, and structs handle known initialisms (e.g., JSON, HTTP, etc.) when written in `camelCase`.
 When `skipInitialismNameChecks` is set to true, the rule allows names like `readJson`, `HttpMethod` etc.
 In the map, you can add a boolean `upperCaseConst` (`uppercaseconst`, `upper-case-const`) parameter to allow `UPPER_CASE` for `const`.
-You can also add a boolean `skipPackageNameChecks` (`skippackagenamechecks`, `skip-package-name-checks`) to skip package name checks.
-When `skipPackageNameChecks` is false (the default), you can configure
-`extraBadPackageNames` (`extrabadpackagenames`, `extra-bad-package-names`)
-to forbid using the values from the list as package names additionally
-to the standard meaningless ones: "common", "interfaces", "misc",
-"types", "util", "utils".
-When `skipPackageNameCollisionWithGoStd`
-(`skippackagenamecollisionwithgostd`, `skip-package-name-collision-with-go-std`)
-is set to true, the rule disables checks on package names that collide
-with Go standard library packages.
 
 By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89)).
 
@@ -1869,16 +1932,6 @@ arguments = [["ID"], ["VM"], [{ upperCaseConst = true }]]
 
 ```toml
 [rule.var-naming]
-arguments = [[], [], [{ skipPackageNameChecks = true }]]
-```
-
-```toml
-[rule.var-naming]
-arguments = [[], [], [{ extraBadPackageNames = ["helpers", "models"] }]]
-```
-
-```toml
-[rule.var-naming]
 arguments = [[], [], [{ skip-initialism-name-checks = true }]]
 ```
 
@@ -1887,20 +1940,7 @@ arguments = [[], [], [{ skip-initialism-name-checks = true }]]
 arguments = [["ID"], ["VM"], [{ upper-case-const = true }]]
 ```
 
-```toml
-[rule.var-naming]
-arguments = [[], [], [{ skip-package-name-checks = true }]]
-```
-
-```toml
-[rule.var-naming]
-arguments = [[], [], [{ extra-bad-package-names = ["helpers", "models"] }]]
-```
-
-```toml
-[rule.var-naming]
-arguments = [[], [], [{ skip-package-name-collision-with-go-std = true }]]
-```
+_Note_: Package-related checks have been moved to [package-naming](#package-naming) rule.
 
 ## waitgroup-by-value
 
