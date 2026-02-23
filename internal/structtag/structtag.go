@@ -3,7 +3,6 @@ package structtag
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 )
@@ -117,18 +116,4 @@ func parseTagValue(value string) (name string, options []string) {
 		options = parts[1:]
 	}
 	return name, options
-}
-
-// Value returns the raw value of the tag, i.e. if the tag is
-// `json:"foo,omitempty"`, the Value is "foo,omitempty".
-func (t *Tag) Value() string {
-	if len(t.Options) == 0 {
-		return t.Name
-	}
-	return t.Name + "," + strings.Join(t.Options, ",")
-}
-
-// String reassembles the tag into a valid tag field representation.
-func (t *Tag) String() string {
-	return fmt.Sprintf(`%s:%q`, t.Key, t.Value())
 }
