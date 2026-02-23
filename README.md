@@ -40,7 +40,6 @@ If you disable them in the config file, revive will run over 6x faster than goli
   - [Docker](#docker)
   - [Manual Binary Download](#manual-binary-download)
 - [Usage](#usage)
-  - [Bazel](#bazel)
   - [Text Editors](#text-editors)
   - [GitHub Actions](#github-actions)
   - [Continuous Integration](#continuous-integration)
@@ -155,10 +154,6 @@ the only difference you'd notice is faster execution.
 If not provided, `revive` will try to use a global config file (assumed to be located at `$HOME/revive.toml`).
 Otherwise, if no configuration TOML file is found then `revive` uses a built-in set of default linting rules.
 
-### Bazel
-
-If you want to use revive with Bazel, look at the [rules](https://github.com/atlassian/bazel-tools/tree/master/gorevive) that Atlassian maintains.
-
 ### Text Editors
 
 - Support for VSCode via [vscode-go](https://code.visualstudio.com/docs/languages/go#_build-and-diagnose) by changing the `go.lintTool` setting to `revive`:
@@ -176,16 +171,6 @@ If you want to use revive with Bazel, look at the [rules](https://github.com/atl
   let g:ale_linters = {
   \   'go': ['revive'],
   \}
-  ```
-
-- Support for Neovim via [null-ls.nvim](https://github.com/jose-elias-alvarez/null-ls.nvim).
-
-  ```lua
-  require("null-ls").setup({
-      sources = {
-          require("null-ls").builtins.diagnostics.revive
-      },
-  })
   ```
 
 ### GitHub Actions
