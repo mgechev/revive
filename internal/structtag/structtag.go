@@ -33,8 +33,10 @@ func Parse(tag string) ([]*Tag, error) {
 	var tags []*Tag
 
 	for tag != "" {
-		// Skip leading space.
-		tag = strings.TrimLeft(tag, " ")
+		// Skip leading ASCII whitespace to match scanKey's delimiter rules.
+		for tag != "" && tag[0] <= ' ' {
+			tag = tag[1:]
+		}
 		if tag == "" {
 			break
 		}

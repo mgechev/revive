@@ -26,6 +26,20 @@ func TestParse(t *testing.T) {
 			want: nil,
 		},
 		{
+			name: "tag with leading tabs and newlines",
+			tag:  "\tjson:\"foo\"\n\txml:\"bar\"",
+			want: []*structtag.Tag{
+				{
+					Key:  "json",
+					Name: "foo",
+				},
+				{
+					Key:  "xml",
+					Name: "bar",
+				},
+			},
+		},
+		{
 			name: "tag with one key (valid)",
 			tag:  `json:""`,
 			want: []*structtag.Tag{
