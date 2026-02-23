@@ -16,7 +16,6 @@ type ModifiesValRecRule struct{}
 func (r *ModifiesValRecRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
-	file.Pkg.TypeCheck()
 	for _, decl := range file.AST.Decls {
 		funcDecl, ok := decl.(*ast.FuncDecl)
 		isAMethod := ok && funcDecl.Recv != nil
