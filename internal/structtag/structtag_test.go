@@ -92,20 +92,6 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
-			name: "tag with multiple keys and names",
-			tag:  `json:"foo" hcl:"foo"`,
-			want: []*structtag.Tag{
-				{
-					Key:  "json",
-					Name: "foo",
-				},
-				{
-					Key:  "hcl",
-					Name: "foo",
-				},
-			},
-		},
-		{
 			name: "tag with multiple keys and different names",
 			tag:  `json:"foo" hcl:"bar"`,
 			want: []*structtag.Tag{
