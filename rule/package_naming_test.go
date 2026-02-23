@@ -13,9 +13,9 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 		name                           string
 		arguments                      lint.Arguments
 		wantErr                        error
-		wantSkipConventionChecks       bool
-		wantSkipTopLevelChecks         bool
-		wantSkipDefaultBadNameChecks   bool
+		wantSkipConventionNameCheck    bool
+		wantSkipTopLevelCheck          bool
+		wantSkipDefaultBadNameCheck    bool
 		wantUserDefinedBadNames        map[string]struct{}
 		wantSkipCollisionWithCommonStd bool
 		wantCheckCollisionWithAllStd   bool
@@ -29,18 +29,18 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 			name: "valid arguments - camelCase",
 			arguments: lint.Arguments{
 				map[string]any{
-					"skipConventionChecks":       true,
-					"skipTopLevelChecks":         true,
-					"skipDefaultBadNameChecks":   true,
+					"skipConventionNameCheck":    true,
+					"skipTopLevelCheck":          true,
+					"skipDefaultBadNameCheck":    true,
 					"userDefinedBadNames":        []any{"helpers", "models"},
 					"skipCollisionWithCommonStd": true,
 					"checkCollisionWithAllStd":   true,
 				},
 			},
 			wantErr:                        nil,
-			wantSkipConventionChecks:       true,
-			wantSkipTopLevelChecks:         true,
-			wantSkipDefaultBadNameChecks:   true,
+			wantSkipConventionNameCheck:    true,
+			wantSkipTopLevelCheck:          true,
+			wantSkipDefaultBadNameCheck:    true,
 			wantUserDefinedBadNames:        map[string]struct{}{"helpers": {}, "models": {}},
 			wantSkipCollisionWithCommonStd: true,
 			wantCheckCollisionWithAllStd:   true,
@@ -49,18 +49,18 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 			name: "valid arguments - lowercase",
 			arguments: lint.Arguments{
 				map[string]any{
-					"skipconventionchecks":       true,
-					"skiptoplevelchecks":         true,
-					"skipdefaultbadnamechecks":   true,
+					"skipconventionnamecheck":    true,
+					"skiptoplevelcheck":          true,
+					"skipdefaultbadnamecheck":    true,
 					"userdefinedbadnames":        []any{"helpers", "models"},
 					"skipcollisionwithcommonstd": true,
 					"checkcollisionwithallstd":   true,
 				},
 			},
 			wantErr:                        nil,
-			wantSkipConventionChecks:       true,
-			wantSkipTopLevelChecks:         true,
-			wantSkipDefaultBadNameChecks:   true,
+			wantSkipConventionNameCheck:    true,
+			wantSkipTopLevelCheck:          true,
+			wantSkipDefaultBadNameCheck:    true,
 			wantUserDefinedBadNames:        map[string]struct{}{"helpers": {}, "models": {}},
 			wantSkipCollisionWithCommonStd: true,
 			wantCheckCollisionWithAllStd:   true,
@@ -69,18 +69,18 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 			name: "valid arguments - kebab-case",
 			arguments: lint.Arguments{
 				map[string]any{
-					"skip-convention-checks":         true,
-					"skip-top-level-checks":          true,
-					"skip-default-bad-name-checks":   true,
+					"skip-convention-name-check":     true,
+					"skip-top-level-check":           true,
+					"skip-default-bad-name-check":    true,
 					"user-defined-bad-names":         []any{"helpers", "models"},
 					"skip-collision-with-common-std": true,
 					"check-collision-with-all-std":   true,
 				},
 			},
 			wantErr:                        nil,
-			wantSkipConventionChecks:       true,
-			wantSkipTopLevelChecks:         true,
-			wantSkipDefaultBadNameChecks:   true,
+			wantSkipConventionNameCheck:    true,
+			wantSkipTopLevelCheck:          true,
+			wantSkipDefaultBadNameCheck:    true,
 			wantUserDefinedBadNames:        map[string]struct{}{"helpers": {}, "models": {}},
 			wantSkipCollisionWithCommonStd: true,
 			wantCheckCollisionWithAllStd:   true,
@@ -89,13 +89,13 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 			name: "partial arguments",
 			arguments: lint.Arguments{
 				map[string]any{
-					"skip-convention-checks": true,
-					"user-defined-bad-names": []any{"custom"},
+					"skip-convention-name-check": true,
+					"user-defined-bad-names":     []any{"custom"},
 				},
 			},
-			wantErr:                  nil,
-			wantSkipConventionChecks: true,
-			wantUserDefinedBadNames:  map[string]struct{}{"custom": {}},
+			wantErr:                     nil,
+			wantSkipConventionNameCheck: true,
+			wantUserDefinedBadNames:     map[string]struct{}{"custom": {}},
 		},
 		{
 			name: "invalid argument type",
@@ -141,6 +141,43 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 			wantErr:                 nil,
 			wantUserDefinedBadNames: map[string]struct{}{"helpers": {}, "models": {}},
 		},
+		{
+			name: "valid conventionNameCheckRegex",
+			arguments: lint.Arguments{
+				map[string]any{
+					"convention-name-check-regex": "^[a-z][a-z0-9_]*$",
+				},
+			},
+			wantErr: nil,
+		},
+		{
+			name: "invalid conventionNameCheckRegex type",
+			arguments: lint.Arguments{
+				map[string]any{
+					"convention-name-check-regex": 42,
+				},
+			},
+			wantErr: errors.New("invalid argument to the package-naming rule: expecting conventionNameCheckRegex to be a string, but got int"),
+		},
+		{
+			name: "invalid conventionNameCheckRegex pattern",
+			arguments: lint.Arguments{
+				map[string]any{
+					"convention-name-check-regex": "[",
+				},
+			},
+			wantErr: errors.New("invalid argument to the package-naming rule: invalid regex for conventionNameCheckRegex: error parsing regexp: missing closing ]: `[`"),
+		},
+		{
+			name: "skipConventionNameCheck with conventionNameCheckRegex",
+			arguments: lint.Arguments{
+				map[string]any{
+					"skip-convention-name-check":  true,
+					"convention-name-check-regex": "^[a-z]+$",
+				},
+			},
+			wantErr: errors.New("invalid configuration for package-naming rule: skipConventionNameCheck and overrideConventionNameCheck cannot be both set"),
+		},
 	}
 
 	for _, tt := range tests {
@@ -162,14 +199,14 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 			if err != nil {
 				t.Errorf("unexpected error: got = %v, want = nil", err)
 			}
-			if rule.skipConventionChecks != tt.wantSkipConventionChecks {
-				t.Errorf("unexpected skipConventionChecks: got = %v, want %v", rule.skipConventionChecks, tt.wantSkipConventionChecks)
+			if rule.skipConventionNameCheck != tt.wantSkipConventionNameCheck {
+				t.Errorf("unexpected skipConventionNameCheck: got = %v, want %v", rule.skipConventionNameCheck, tt.wantSkipConventionNameCheck)
 			}
-			if rule.skipTopLevelChecks != tt.wantSkipTopLevelChecks {
-				t.Errorf("unexpected skipTopLevelChecks: got = %v, want %v", rule.skipTopLevelChecks, tt.wantSkipTopLevelChecks)
+			if rule.skipTopLevelCheck != tt.wantSkipTopLevelCheck {
+				t.Errorf("unexpected skipTopLevelCheck: got = %v, want %v", rule.skipTopLevelCheck, tt.wantSkipTopLevelCheck)
 			}
-			if rule.skipDefaultBadNameChecks != tt.wantSkipDefaultBadNameChecks {
-				t.Errorf("unexpected skipDefaultBadNameChecks: got = %v, want %v", rule.skipDefaultBadNameChecks, tt.wantSkipDefaultBadNameChecks)
+			if rule.skipDefaultBadNameCheck != tt.wantSkipDefaultBadNameCheck {
+				t.Errorf("unexpected skipDefaultBadNameCheck: got = %v, want %v", rule.skipDefaultBadNameCheck, tt.wantSkipDefaultBadNameCheck)
 			}
 			if !reflect.DeepEqual(rule.userDefinedBadNames, tt.wantUserDefinedBadNames) {
 				t.Errorf("unexpected userDefinedBadNames: got = %v, want %v", rule.userDefinedBadNames, tt.wantUserDefinedBadNames)
@@ -179,6 +216,11 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 			}
 			if rule.checkCollisionWithAllStd != tt.wantCheckCollisionWithAllStd {
 				t.Errorf("unexpected checkCollisionWithAllStd: got = %v, want %v", rule.checkCollisionWithAllStd, tt.wantCheckCollisionWithAllStd)
+			}
+			if tt.wantErr == nil && rule.conventionNameCheckRegex != nil {
+				if rule.conventionNameCheckRegex.String() == "" {
+					t.Error("unexpected conventionNameCheckRegex: got empty string")
+				}
 			}
 		})
 	}

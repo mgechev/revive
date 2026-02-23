@@ -1,9 +1,11 @@
 package rule
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -68,19 +70,21 @@ var commonStdNames = map[string]string{
 
 // PackageNamingRule is a rule that checks package names.
 type PackageNamingRule struct {
-	skipConventionChecks bool // if true - skip checks for package name conventions (e.g., no underscores, no MixedCaps etc.)
-	skipTopLevelChecks   bool // if true - skip checks for top level package names (e.g., "pkg")
+	skipConventionNameCheck  bool           // if true - skip checks for package name conventions (e.g., no underscores, no MixedCaps etc.)
+	conventionNameCheckRegex *regexp.Regexp // the regex used to check package name conventions
 
-	skipDefaultBadNameChecks bool                // if true - enable check for default bad package names (e.g., "util", "misc" etc.)
-	checkExtraBadNames       bool                // if true - enable check for extra bad package names (e.g., "helpers", "models" etc.)
-	userDefinedBadNames      map[string]struct{} // set of user defined bad package names
+	skipTopLevelCheck bool // if true - skip checks for top level package names (e.g., "pkg")
+
+	skipDefaultBadNameCheck bool                // if true - enable check for default bad package names (e.g., "util", "misc" etc.)
+	checkExtraBadName       bool                // if true - enable check for extra bad package names (e.g., "helpers", "models" etc.)
+	userDefinedBadNames     map[string]struct{} // set of user defined bad package names
 
 	skipCollisionWithCommonStd bool // if true - skip checks for collisions with common Go standard library package names (e.g., "http", "json", "rand" etc.)
 
 	checkCollisionWithAllStd bool // if true - enable checks for collisions with all Go standard library package names (including "version", "metrics" etc.)
-	// allStdNames holds the names of standard library packages excluding internal and vendor.
+	// allStdNames holds name -> path of standard library packages excluding internal and vendor.
 	// Populated only if checkCollisionWithAllStd is true. `net/http` stored as `http`, `math/rand/v2` as `rand` etc.
-	allStdNames map[string]string // name -> path
+	allStdNames map[string]string
 
 	alreadyCheckedNames syncSet // set of packages names already checked
 }
@@ -99,12 +103,22 @@ func (r *PackageNamingRule) Configure(arguments lint.Arguments) error {
 
 		for k, v := range args {
 			switch {
-			case isRuleOption(k, "skipConventionChecks"):
-				r.skipConventionChecks = fmt.Sprint(v) == "true"
-			case isRuleOption(k, "skipTopLevelChecks"):
-				r.skipTopLevelChecks = fmt.Sprint(v) == "true"
-			case isRuleOption(k, "skipDefaultBadNameChecks"):
-				r.skipDefaultBadNameChecks = fmt.Sprint(v) == "true"
+			case isRuleOption(k, "skipConventionNameCheck"):
+				r.skipConventionNameCheck = fmt.Sprint(v) == "true"
+			case isRuleOption(k, "conventionNameCheckRegex"):
+				regexStr, ok := v.(string)
+				if !ok {
+					return fmt.Errorf("invalid argument to the package-naming rule: expecting conventionNameCheckRegex to be a string, but got %T", v)
+				}
+				regex, err := regexp.Compile(regexStr)
+				if err != nil {
+					return fmt.Errorf("invalid argument to the package-naming rule: invalid regex for conventionNameCheckRegex: %w", err)
+				}
+				r.conventionNameCheckRegex = regex
+			case isRuleOption(k, "skipTopLevelCheck"):
+				r.skipTopLevelCheck = fmt.Sprint(v) == "true"
+			case isRuleOption(k, "skipDefaultBadNameCheck"):
+				r.skipDefaultBadNameCheck = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "userDefinedBadNames"):
 				userDefinedBadNames, ok := v.([]any)
 				if !ok {
@@ -129,6 +143,10 @@ func (r *PackageNamingRule) Configure(arguments lint.Arguments) error {
 				r.checkCollisionWithAllStd = fmt.Sprint(v) == "true"
 			}
 		}
+	}
+
+	if r.skipConventionNameCheck && r.conventionNameCheckRegex != nil {
+		return errors.New("invalid configuration for package-naming rule: skipConventionNameCheck and overrideConventionNameCheck cannot be both set")
 	}
 
 	if r.checkCollisionWithAllStd && r.allStdNames == nil {
@@ -178,58 +196,65 @@ func (r *PackageNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 	}
 	r.alreadyCheckedNames.add(fileDir) // mark this package as already checked
 
-	pkgNameNode := file.AST.Name
-	pkgName := pkgNameNode.Name
-	pkgNameLower := strings.ToLower(pkgName)
+	node := file.AST.Name
+	pkgName := node.Name
 
-	if !r.skipConventionChecks {
+	if r.conventionNameCheckRegex != nil {
+		if !r.conventionNameCheckRegex.MatchString(pkgName) {
+			onFailure(r.pkgNameFailure(node, "package name %q doesn't match the convention defined by conventionNameCheckRegex", pkgName))
+			return failures
+		}
+	} else if !r.skipConventionNameCheck {
 		// Package names need slightly different handling than other names.
 		if strings.Contains(pkgName, "_") && !strings.HasSuffix(pkgName, "_test") {
-			onFailure(r.pkgNameFailure(pkgNameNode, "don't use package name %q that contains an underscore", pkgName))
+			onFailure(r.pkgNameFailure(node, "don't use package name %q that contains an underscore", pkgName))
+			return failures
 		}
 		if hasUpperCaseLetter(pkgName) {
-			onFailure(r.pkgNameFailure(pkgNameNode, "don't use package name %q that contains MixedCaps", pkgName))
+			onFailure(r.pkgNameFailure(node, "don't use package name %q that contains MixedCaps", pkgName))
+			return failures
 		}
 	}
 
-	if !r.skipTopLevelChecks {
+	pkgNameLower := strings.ToLower(pkgName)
+	if !r.skipTopLevelCheck {
 		// Check if top level package
 		if pkgNameLower == "pkg" && filepath.Base(fileDir) != pkgName {
-			onFailure(r.pkgNameFailure(pkgNameNode, "don't use %q as a root level package name", pkgName))
+			onFailure(r.pkgNameFailure(node, "don't use %q as a root level package name", pkgName))
 			return failures
 		}
 	}
 
-	if !r.skipDefaultBadNameChecks {
+	if !r.skipDefaultBadNameCheck {
 		if _, ok := defaultBadNames[pkgNameLower]; ok {
-			onFailure(r.pkgNameFailure(pkgNameNode, "don't use %q because it is a bad package name according to https://go.dev/blog/package-names#bad-package-names", pkgName))
+			onFailure(r.pkgNameFailure(node, "don't use %q because it is a bad package name according to https://go.dev/blog/package-names#bad-package-names", pkgName))
 			return failures
 		}
 	}
 
-	if r.checkExtraBadNames {
+	if r.checkExtraBadName {
 		if _, ok := extraBadNames[pkgNameLower]; ok {
-			onFailure(r.pkgNameFailure(pkgNameNode, "don't use %q because it is a bad package name (extra)", pkgName))
+			onFailure(r.pkgNameFailure(node, "don't use %q because it is a bad package name (extra)", pkgName))
 			return failures
 		}
 	}
 
 	if r.userDefinedBadNames != nil {
 		if _, ok := r.userDefinedBadNames[pkgNameLower]; ok {
-			onFailure(r.pkgNameFailure(pkgNameNode, "don't use %q because it is a bad package name (user-defined)", pkgName))
+			onFailure(r.pkgNameFailure(node, "don't use %q because it is a bad package name (user-defined)", pkgName))
 			return failures
 		}
 	}
 
 	if !r.skipCollisionWithCommonStd {
 		if std, ok := commonStdNames[pkgNameLower]; ok {
-			onFailure(r.pkgNameFailure(pkgNameNode, "don't use %q because it conflicts with common Go standard library package %q", pkgName, std))
+			onFailure(r.pkgNameFailure(node, "don't use %q because it conflicts with common Go standard library package %q", pkgName, std))
 		}
 	}
 
 	if r.checkCollisionWithAllStd {
 		if std, ok := r.allStdNames[pkgNameLower]; ok {
-			onFailure(r.pkgNameFailure(pkgNameNode, "don't use %q because it conflicts with Go standard library package %q", pkgName, std))
+			onFailure(r.pkgNameFailure(node, "don't use %q because it conflicts with Go standard library package %q", pkgName, std))
 		}
 	}
 
