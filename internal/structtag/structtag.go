@@ -81,7 +81,8 @@ func Parse(tag string) ([]*Tag, error) {
 }
 
 // scanKey finds the position of the colon that ends the tag key.
-// Returns 0 if the key is invalid (contains space, quote, or control character).
+// It returns the index of the first invalid character (space, colon, quote, or control character),
+// or len(tag) if all characters are valid.
 func scanKey(tag string) int {
 	for i := 0; i < len(tag); i++ {
 		if tag[i] <= ' ' || tag[i] == ':' || tag[i] == '"' || tag[i] == 0x7f {
