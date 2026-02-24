@@ -91,6 +91,7 @@ func scanKey(tag string) int {
 }
 
 // scanValue scans a quoted string value and returns its index and quoted content.
+// The tag string must start with a double-quote character.
 func scanValue(tag string) (idx int, qvalue string, err error) {
 	// Find closing quote, handling escapes.
 	i := 1

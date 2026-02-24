@@ -120,7 +120,7 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
-			name: "tag with multiple keys, different names and options",
+			name: "tag with multiple keys, names, and options",
 			tag:  `json:"foo,omitempty" structs:"bar,omitnested"`,
 			want: []*structtag.Tag{
 				{
@@ -136,7 +136,7 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
-			name: "tag with multiple keys, different names and options",
+			name: "tag with multiple keys, names, options, and dash",
 			tag:  `json:"foo" structs:"bar,omitnested" hcl:"-"`,
 			want: []*structtag.Tag{
 				{
