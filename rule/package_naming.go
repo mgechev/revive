@@ -37,35 +37,33 @@ var extraBadNames = map[string]struct{}{
 }
 
 // commonStdNames is the list of standard library package names that are commonly used in Go programs.
+// This list is based on the most popular standard library packages according to importedby tab in pkg.go.dev.
+// For example, "http" imported by 1,705,800 times https://pkg.go.dev/net/http?tab=importedby
 var commonStdNames = map[string]string{
-	"atomic":   "sync/atomic",
 	"bytes":    "bytes",
+	"bufio":    "bufio",
+	"flag":     "flag",
 	"context":  "context",
-	"crypto":   "crypto",
 	"errors":   "errors",
 	"filepath": "path/filepath",
 	"fmt":      "fmt",
 	"http":     "net/http",
 	"io":       "io",
+	"ioutil":   "io/ioutil",
 	"json":     "encoding/json",
 	"log":      "log",
-	"maps":     "maps",
 	"math":     "math",
 	"net":      "net",
 	"os":       "os",
-	"path":     "path",
+	"strconv":  "strconv",
 	"reflect":  "reflect",
 	"regexp":   "regexp",
 	"runtime":  "runtime",
-	"slices":   "slices",
-	"slog":     "log/slog",
 	"sort":     "sort",
 	"strings":  "strings",
 	"sync":     "sync",
-	"testing":  "testing",
 	"time":     "time",
 	"url":      "net/url",
-	"xml":      "encoding/xml",
 }
 
 // PackageNamingRule is a rule that checks package names.
