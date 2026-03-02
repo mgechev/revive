@@ -8,11 +8,11 @@ Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in r
 **`Revive` provides a framework for development of custom rules,
 and lets you define a strict preset for enhancing your development & code review processes**.
 
-<div style="text-align: center;">
+<p align="center">
   <img src="./assets/logo.png" alt="" width="300">
   <br>
   Logo by <a href="https://github.com/hawkgs">Georgi Serev</a>
-</div>
+</p>
 
 Here's how `revive` is different from `golint`:
 
@@ -28,9 +28,9 @@ If you disable them in the config file, revive will run over 6x faster than goli
 - _Everyone can extend it easily with custom rules or formatters._
 - `Revive` provides more rules compared to `golint`.
 
-<div style="text-align: center;">
+<p align="center">
   <img src="./assets/demo.svg" alt="" width="700">
-</div>
+</p>
 
 <!-- toc -->
 
