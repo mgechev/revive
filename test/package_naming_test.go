@@ -52,6 +52,20 @@ func TestPackageNaming_conventionName(t *testing.T) {
 			},
 		},
 	})
+	testRule(t, "package_naming_convention_name_regex_skip", &rule.PackageNamingRule{}, &lint.RuleConfig{
+		Arguments: lint.Arguments{
+			map[string]any{
+				"convention-name-check-regex": "^[a-z][a-zA-Z0-9]*$", // allow camel case
+			},
+		},
+	})
+	testRule(t, "package_naming_convention_name_regex_test_skip", &rule.PackageNamingRule{}, &lint.RuleConfig{
+		Arguments: lint.Arguments{
+			map[string]any{
+				"convention-name-check-regex": "^[a-z][a-zA-Z0-9]*$", // allow camel case
+			},
+		},
+	})
 }
 
 func TestPackageNaming_topLevel(t *testing.T) {
