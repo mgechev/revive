@@ -14,10 +14,64 @@ import (
 func TestFormatter(t *testing.T) {
 	for name, td := range map[string]struct {
 		formatter lint.Formatter
+		failures  []lint.Failure
 		want      string
 	}{
 		"checkstyle": {
 			formatter: &formatter.Checkstyle{},
+			failures: []lint.Failure{
+				{
+					Failure:  "error var Exp should have name of the form ErrFoo",
+					RuleName: "error-naming",
+					Category: lint.FailureCategoryNaming,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   5,
+						},
+						End: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   10,
+						},
+					},
+				},
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   8,
+						},
+					},
+				},
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   9,
+						},
+					},
+				},
+			},
 			want: `<?xml version='1.0' encoding='UTF-8'?>
 <checkstyle version="5.0">
     <file name="err.go">
@@ -31,14 +85,160 @@ func TestFormatter(t *testing.T) {
 		},
 		"default": {
 			formatter: &formatter.Default{},
+			failures: []lint.Failure{
+				{
+					Failure:  "error var Exp should have name of the form ErrFoo",
+					RuleName: "error-naming",
+					Category: lint.FailureCategoryNaming,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   5,
+						},
+						End: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   10,
+						},
+					},
+				},
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   8,
+						},
+					},
+				},
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   9,
+						},
+					},
+				},
+			},
 			want: `file.go:2:5: error var Exp should have name of the form ErrFoo
 err.go:33:4: replace fmt.Errorf by errors.New
 err.go:38:4: replace fmt.Errorf by errors.New`,
 		},
 		"friendly": {
 			formatter: &formatter.Friendly{},
+			failures: []lint.Failure{
+				{
+					Failure:  "error var Exp should have name of the form ErrFoo",
+					RuleName: "error-naming",
+					Category: lint.FailureCategoryNaming,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   5,
+						},
+						End: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   10,
+						},
+					},
+				},
+				{
+					Failure:  "since Go 1.18 'interface{}' can be replaced by 'any'",
+					RuleName: "use-any",
+					Category: lint.FailureCategoryNaming,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "any.go",
+							Line:     4,
+							Column:   6,
+						},
+						End: token.Position{
+							Filename: "any.go",
+							Line:     4,
+							Column:   10,
+						},
+					},
+				},
+				{
+					Failure:  "since Go 1.18 'interface{}' can be replaced by 'any'",
+					RuleName: "use-any",
+					Category: lint.FailureCategoryNaming,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "any.go",
+							Line:     8,
+							Column:   16,
+						},
+						End: token.Position{
+							Filename: "any.go",
+							Line:     8,
+							Column:   20,
+						},
+					},
+				},
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   8,
+						},
+					},
+				},
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   9,
+						},
+					},
+				},
+			},
 			want: `  ⚠  https://revive.run/r#error-naming  error var Exp should have name of the form ErrFoo
   file.go:2:5
+
+  ⚠  https://revive.run/r#use-any  since Go 1.18 'interface{}' can be replaced by 'any'
+  any.go:4:6
+
+  ⚠  https://revive.run/r#use-any  since Go 1.18 'interface{}' can be replaced by 'any'
+  any.go:8:16
 
   ✘  https://revive.run/r#use-errors-new  replace fmt.Errorf by errors.New
   err.go:33:4
@@ -46,10 +246,78 @@ err.go:38:4: replace fmt.Errorf by errors.New`,
   ✘  https://revive.run/r#use-errors-new  replace fmt.Errorf by errors.New
   err.go:38:4
 
-✘ 3 problems (2 errors, 1 warning)
+✘ 5 problems (2 errors, 3 warnings)
 
 Errors:
   2  use-errors-new
+
+Warnings:
+  2  use-any
+  1  error-naming
+
+`,
+		},
+		"friendly no failures": {
+			formatter: &formatter.Friendly{},
+			failures:  []lint.Failure{},
+			want:      "",
+		},
+		"friendly error": {
+			formatter: &formatter.Friendly{},
+			failures: []lint.Failure{
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   8,
+						},
+					},
+				},
+			},
+			want: `  ✘  https://revive.run/r#use-errors-new  replace fmt.Errorf by errors.New
+  err.go:33:4
+
+✘ 1 problem (1 error, 0 warnings)
+
+Errors:
+  1  use-errors-new
+
+`,
+		},
+		"friendly warning": {
+			formatter: &formatter.Friendly{},
+			failures: []lint.Failure{
+				{
+					Failure:  "error var Exp should have name of the form ErrFoo",
+					RuleName: "error-naming",
+					Category: lint.FailureCategoryNaming,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   5,
+						},
+						End: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   10,
+						},
+					},
+				},
+			},
+			want: `  ⚠  https://revive.run/r#error-naming  error var Exp should have name of the form ErrFoo
+  file.go:2:5
+
+⚠ 1 problem (0 errors, 1 warning)
 
 Warnings:
   1  error-naming
@@ -58,6 +326,59 @@ Warnings:
 		},
 		"json": {
 			formatter: &formatter.JSON{},
+			failures: []lint.Failure{
+				{
+					Failure:  "error var Exp should have name of the form ErrFoo",
+					RuleName: "error-naming",
+					Category: lint.FailureCategoryNaming,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   5,
+						},
+						End: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   10,
+						},
+					},
+				},
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   8,
+						},
+					},
+				},
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   9,
+						},
+					},
+				},
+			},
 			want: "[" +
 				`{"Severity":"warning","Failure":"error var Exp should have name of the form ErrFoo","RuleName":"error-naming","Category":"naming","Position":{"Start":{"Filename":"file.go","Offset":0,"Line":2,"Column":5},"End":{"Filename":"file.go","Offset":0,"Line":2,"Column":10}},"Confidence":0,"ReplacementLine":""}` +
 				"," +
@@ -68,6 +389,59 @@ Warnings:
 		},
 		"ndjson": {
 			formatter: &formatter.NDJSON{},
+			failures: []lint.Failure{
+				{
+					Failure:  "error var Exp should have name of the form ErrFoo",
+					RuleName: "error-naming",
+					Category: lint.FailureCategoryNaming,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   5,
+						},
+						End: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   10,
+						},
+					},
+				},
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   8,
+						},
+					},
+				},
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   9,
+						},
+					},
+				},
+			},
 			want: `{"Severity":"warning","Failure":"error var Exp should have name of the form ErrFoo","RuleName":"error-naming","Category":"naming","Position":{"Start":{"Filename":"file.go","Offset":0,"Line":2,"Column":5},"End":{"Filename":"file.go","Offset":0,"Line":2,"Column":10}},"Confidence":0,"ReplacementLine":""}` +
 				"\n" +
 				`{"Severity":"error","Failure":"replace fmt.Errorf by errors.New","RuleName":"use-errors-new","Category":"errors","Position":{"Start":{"Filename":"err.go","Offset":0,"Line":33,"Column":4},"End":{"Filename":"err.go","Offset":0,"Line":33,"Column":8}},"Confidence":0,"ReplacementLine":""}` +
@@ -77,6 +451,59 @@ Warnings:
 		},
 		"plain": {
 			formatter: &formatter.Plain{},
+			failures: []lint.Failure{
+				{
+					Failure:  "error var Exp should have name of the form ErrFoo",
+					RuleName: "error-naming",
+					Category: lint.FailureCategoryNaming,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   5,
+						},
+						End: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   10,
+						},
+					},
+				},
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   8,
+						},
+					},
+				},
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   9,
+						},
+					},
+				},
+			},
 			want: `file.go:2:5: error var Exp should have name of the form ErrFoo https://revive.run/r#error-naming` +
 				"\n" +
 				`err.go:33:4: replace fmt.Errorf by errors.New https://revive.run/r#use-errors-new` +
@@ -86,6 +513,59 @@ Warnings:
 		},
 		"sarif": {
 			formatter: &formatter.Sarif{},
+			failures: []lint.Failure{
+				{
+					Failure:  "error var Exp should have name of the form ErrFoo",
+					RuleName: "error-naming",
+					Category: lint.FailureCategoryNaming,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   5,
+						},
+						End: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   10,
+						},
+					},
+				},
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   8,
+						},
+					},
+				},
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   9,
+						},
+					},
+				},
+			},
 			want: `{
   "runs": [
     {
@@ -172,6 +652,59 @@ Warnings:
 		},
 		"stylish": {
 			formatter: &formatter.Stylish{},
+			failures: []lint.Failure{
+				{
+					Failure:  "error var Exp should have name of the form ErrFoo",
+					RuleName: "error-naming",
+					Category: lint.FailureCategoryNaming,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   5,
+						},
+						End: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   10,
+						},
+					},
+				},
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   8,
+						},
+					},
+				},
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   9,
+						},
+					},
+				},
+			},
 			want: `err.go
   (33, 4)  https://revive.run/r#use-errors-new  replace fmt.Errorf by errors.New
   (38, 4)  https://revive.run/r#use-errors-new  replace fmt.Errorf by errors.New
@@ -182,8 +715,120 @@ file.go
 
  ✖ 3 problems (2 errors) (1 warning)`,
 		},
+		"stylish no failures": {
+			formatter: &formatter.Stylish{},
+			failures:  []lint.Failure{},
+			want:      "",
+		},
+		"stylish error": {
+			formatter: &formatter.Stylish{},
+			failures: []lint.Failure{
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   9,
+						},
+					},
+				},
+			},
+			want: `err.go
+  (38, 4)  https://revive.run/r#use-errors-new  replace fmt.Errorf by errors.New
+
+
+ ✖ 1 problem (1 error) (0 warnings)`,
+		},
+		"stylish warning": {
+			formatter: &formatter.Stylish{},
+			failures: []lint.Failure{
+				{
+					Failure:  "error var Exp should have name of the form ErrFoo",
+					RuleName: "error-naming",
+					Category: lint.FailureCategoryNaming,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   5,
+						},
+						End: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   10,
+						},
+					},
+				},
+			},
+			want: `file.go
+  (2, 5)  https://revive.run/r#error-naming  error var Exp should have name of the form ErrFoo
+
+
+ ✖ 1 problem (0 errors) (1 warning)`,
+		},
 		"unix": {
 			formatter: &formatter.Unix{},
+			failures: []lint.Failure{
+				{
+					Failure:  "error var Exp should have name of the form ErrFoo",
+					RuleName: "error-naming",
+					Category: lint.FailureCategoryNaming,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   5,
+						},
+						End: token.Position{
+							Filename: "file.go",
+							Line:     2,
+							Column:   10,
+						},
+					},
+				},
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     33,
+							Column:   8,
+						},
+					},
+				},
+				{
+					Failure:  "replace fmt.Errorf by errors.New",
+					RuleName: "use-errors-new",
+					Category: lint.FailureCategoryErrors,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   4,
+						},
+						End: token.Position{
+							Filename: "err.go",
+							Line:     38,
+							Column:   9,
+						},
+					},
+				},
+			},
 			want: "file.go:2:5: [error-naming] error var Exp should have name of the form ErrFoo" +
 				"\n" +
 				"err.go:33:4: [use-errors-new] replace fmt.Errorf by errors.New" +
@@ -202,57 +847,9 @@ file.go
 			}
 			os.Stdout = fakeStdout
 			t.Cleanup(func() { os.Stdout = realStdout })
-			failures := make(chan lint.Failure, 10)
-			failures <- lint.Failure{
-				Failure:  "error var Exp should have name of the form ErrFoo",
-				RuleName: "error-naming",
-				Category: lint.FailureCategoryNaming,
-				Position: lint.FailurePosition{
-					Start: token.Position{
-						Filename: "file.go",
-						Line:     2,
-						Column:   5,
-					},
-					End: token.Position{
-						Filename: "file.go",
-						Line:     2,
-						Column:   10,
-					},
-				},
-			}
-			failures <- lint.Failure{
-				Failure:  "replace fmt.Errorf by errors.New",
-				RuleName: "use-errors-new",
-				Category: lint.FailureCategoryErrors,
-				Position: lint.FailurePosition{
-					Start: token.Position{
-						Filename: "err.go",
-						Line:     33,
-						Column:   4,
-					},
-					End: token.Position{
-						Filename: "err.go",
-						Line:     33,
-						Column:   8,
-					},
-				},
-			}
-			failures <- lint.Failure{
-				Failure:  "replace fmt.Errorf by errors.New",
-				RuleName: "use-errors-new",
-				Category: lint.FailureCategoryErrors,
-				Position: lint.FailurePosition{
-					Start: token.Position{
-						Filename: "err.go",
-						Line:     38,
-						Column:   4,
-					},
-					End: token.Position{
-						Filename: "err.go",
-						Line:     38,
-						Column:   9,
-					},
-				},
+			failures := make(chan lint.Failure, len(td.failures))
+			for _, f := range td.failures {
+				failures <- f
 			}
 			close(failures)
 			output, err := td.formatter.Format(failures, lint.Config{
