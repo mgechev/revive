@@ -1208,7 +1208,7 @@ It helps prevent using bad package names and enforces consistent naming patterns
 By default, it checks for:
 
 - Package name conventions (no underscores except for test packages, no MixedCaps).
-- Bad package names from the official Go blog (e.g., `common`, `util`, `misc`, `types`, `interfaces`).
+- Bad package names from the official Go blog (e.g., `common`, `util`, `utils`, `misc`, `interfaces`, `types`).
 - Package names that conflict with common Go standard library packages (e.g., `http`, `json`, `fmt`).
 
 _Configuration_: (optional) single key-value-pair map (`map[string]any`), provided as the single configuration argument in the rule's arguments array.
@@ -1220,7 +1220,7 @@ Custom regex pattern to validate package names. If set, package names must match
 - `skipTopLevelCheck` (`skiptoplevelcheck`, `skip-top-level-check`): (bool)
 If `true`, skip checks for top-level package names (e.g., `pkg`). Default: `false`.
 - `skipDefaultBadNameCheck` (`skipdefaultbadnamecheck`, `skip-default-bad-name-check`): (bool)
-If `true`, skip checks for default bad package names. Default: `false`.
+If `true`, skip checks for default bad package names (e.g., `common`, `utils`). Default: `false`.
 - `checkExtraBadName` (`checkextrabadname`, `check-extra-bad-name`): (bool)
 If `true`, enable checks for extra bad package names (e.g., `helpers`, `models`, `shared`, `utilities`). Default: `false`.
 - `userDefinedBadNames` (`userdefinedbadnames`, `user-defined-bad-names`): ([]string) List of user-defined bad package names to check for.
