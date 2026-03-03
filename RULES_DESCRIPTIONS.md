@@ -1205,6 +1205,8 @@ _Configuration_: N/A
 
 _Description_: This rule checks that package names follow [Go conventions](https://go.dev/blog/package-names) and best practices.
 It helps prevent using bad package names and enforces consistent naming patterns.
+This rule arose from package naming checks in `var-naming`.
+
 By default, it checks for:
 
 - Package name conventions (no underscores except for test packages, no MixedCaps).
@@ -1215,8 +1217,10 @@ _Configuration_: (optional) single map of options (`map[string]any`), provided a
 
 - `skipConventionNameCheck` (`skipconventionnamecheck`, `skip-convention-name-check`): (bool)
 If `true`, skip checks for package name conventions (underscores, MixedCaps, etc.). Default: `false`.
+This option is mutually exclusive with `conventionNameCheckRegex`; setting both results in a configuration error.
 - `conventionNameCheckRegex` (`conventionnamecheckregex`, `convention-name-check-regex`): (string)
 Custom regex pattern to validate package names. If set, package names must match this pattern.
+The value must be a non-empty string, and this option is mutually exclusive with `skipConventionNameCheck`; setting both results in a configuration error.
 - `skipTopLevelCheck` (`skiptoplevelcheck`, `skip-top-level-check`): (bool)
 If `true`, skip checks for top-level package names (e.g., `pkg`). Default: `false`.
 - `skipDefaultBadNameCheck` (`skipdefaultbadnamecheck`, `skip-default-bad-name-check`): (bool)
@@ -1271,8 +1275,6 @@ Enable collision checks with all standard library [packages](https://pkg.go.dev/
 [rule.package-naming]
 arguments = [{ check-collision-with-all-std = true }]
 ```
-
-_Note_: This rule arose from package naming checks in `var-naming`.
 
 ## package-directory-mismatch
 
@@ -1917,7 +1919,8 @@ of functions, variables, consts, and structs handle known initialisms (e.g., JSO
 When `skipInitialismNameChecks` is set to true, the rule allows names like `readJson`, `HttpMethod` etc.
 In the map, you can add a boolean `upperCaseConst` (`uppercaseconst`, `upper-case-const`) parameter to allow `UPPER_CASE` for `const`.
 
-By default, the rule behaves exactly as the alternative in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89)).
+By default, the rule behaves exactly as the alternative in `golint` for non-package identifiers;
+`golint`-equivalent package-name warnings nowrequire enabling the [`package-naming`](#package-naming) rule.
 
 Configuration examples:
 
@@ -1940,8 +1943,6 @@ arguments = [[], [], [{ skip-initialism-name-checks = true }]]
 [rule.var-naming]
 arguments = [["ID"], ["VM"], [{ upper-case-const = true }]]
 ```
-
-_Note_: Package-related checks have been moved to [package-naming](#package-naming) rule.
 
 ## waitgroup-by-value
 
