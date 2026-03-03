@@ -84,7 +84,7 @@ type PackageNamingRule struct {
 
 	skipTopLevelCheck bool // if true - skip checks for top level package names (e.g., "pkg")
 
-	skipDefaultBadNameCheck bool                // if true - skip check for default bad package names (e.g., "util", "misc" etc.)
+	skipDefaultBadNameCheck bool                // if true - skip checks for default bad package names (e.g., "util", "misc" etc.)
 	checkExtraBadName       bool                // if true - enable check for extra bad package names (e.g., "helpers", "models" etc.)
 	userDefinedBadNames     map[string]struct{} // set of user defined bad package names
 

@@ -19,6 +19,11 @@ func (s *Set) AddIfAbsent(str string) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if s.elements == nil {
+		s.elements = map[string]struct{}{str: {}}
+		return false
+	}
+
 	_, exists := s.elements[str]
 	if !exists {
 		s.elements[str] = struct{}{}
