@@ -1211,7 +1211,7 @@ By default, it checks for:
 - Bad package names from the official Go blog (e.g., `common`, `util`, `utils`, `misc`, `interfaces`, `types`).
 - Package names that conflict with common Go standard library packages (e.g., `http`, `json`, `fmt`).
 
-_Configuration_: (optional) single key-value-pair map (`map[string]any`), provided as the single configuration argument in the rule's arguments array.
+_Configuration_: (optional) single map of options (`map[string]any`), provided as the single configuration argument in the rule's arguments array.
 
 - `skipConventionNameCheck` (`skipconventionnamecheck`, `skip-convention-name-check`): (bool)
 If `true`, skip checks for package name conventions (underscores, MixedCaps, etc.). Default: `false`.
