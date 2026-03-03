@@ -21,7 +21,7 @@ func (s *Set) AddIfAbsent(str string) bool {
 
 	if s.elements == nil {
 		s.elements = map[string]struct{}{str: {}}
-		return false
+		return true
 	}
 
 	_, exists := s.elements[str]
