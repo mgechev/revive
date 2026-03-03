@@ -198,7 +198,9 @@ func (r *PackageNamingRule) Configure(arguments lint.Arguments) error {
 			if isNonPublicPackage(pkg.PkgPath) {
 				continue
 			}
-			r.allStdNames[pkg.Name] = pkg.PkgPath
+			if existingPath, ok := r.allStdNames[pkg.Name]; !ok || pkg.PkgPath < existingPath {
+				r.allStdNames[pkg.Name] = pkg.PkgPath
+			}
 		}
 	}
 
