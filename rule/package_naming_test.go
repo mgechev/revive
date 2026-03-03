@@ -255,7 +255,7 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 				map[string]any{"skip-convention-name-check": true},
 				map[string]any{"skip-top-level-check": true},
 			},
-			wantErr: nil,
+			wantErr: errors.New("invalid arguments to the package-naming rule: expected at most 1 argument, but got 2"),
 		},
 		{
 			name: "unknown option key is silently ignored",

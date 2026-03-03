@@ -65,7 +65,7 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 				r.skipInitialismNameChecks = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "upperCaseConst"):
 				r.allowUpperCaseConst = fmt.Sprint(v) == "true"
-			//nolint:staticcheck // these options moved to package-name rule, ignore them here for backward compatibility
+			//nolint:staticcheck // these options moved to package-naming rule, ignore them here for backward compatibility
 			case isRuleOption(k, "skipPackageNameChecks"),
 				isRuleOption(k, "extraBadPackageNames"),
 				isRuleOption(k, "skipPackageNameCollisionWithGoStd"):

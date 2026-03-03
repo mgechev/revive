@@ -84,7 +84,7 @@ type PackageNamingRule struct {
 
 	skipTopLevelCheck bool // if true - skip checks for top level package names (e.g., "pkg")
 
-	skipDefaultBadNameCheck bool                // if true - enable check for default bad package names (e.g., "util", "misc" etc.)
+	skipDefaultBadNameCheck bool                // if true - skip check for default bad package names (e.g., "util", "misc" etc.)
 	checkExtraBadName       bool                // if true - enable check for extra bad package names (e.g., "helpers", "models" etc.)
 	userDefinedBadNames     map[string]struct{} // set of user defined bad package names
 
@@ -104,72 +104,81 @@ type PackageNamingRule struct {
 func (r *PackageNamingRule) Configure(arguments lint.Arguments) error {
 	r.alreadyCheckedNames = syncset.New()
 
-	if len(arguments) == 1 {
-		args, ok := arguments[0].(map[string]any)
-		if !ok {
-			return fmt.Errorf("invalid argument to the package-naming rule: expecting a k,v map, but got %T", arguments[0])
-		}
+	if len(arguments) == 0 {
+		return nil
+	}
 
-		for k, v := range args {
-			switch {
-			case isRuleOption(k, "skipConventionNameCheck"):
-				r.skipConventionNameCheck, ok = v.(bool)
+	if len(arguments) > 1 {
+		return fmt.Errorf("invalid arguments to the package-naming rule: expected at most 1 argument, but got %d", len(arguments))
+	}
+
+	args, ok := arguments[0].(map[string]any)
+	if !ok {
+		return fmt.Errorf("invalid argument to the package-naming rule: expecting a k,v map, but got %T", arguments[0])
+	}
+
+	for k, v := range args {
+		switch {
+		case isRuleOption(k, "skipConventionNameCheck"):
+			r.skipConventionNameCheck, ok = v.(bool)
+			if !ok {
+				return fmt.Errorf("invalid argument to the package-naming rule: expecting skipConventionNameCheck to be a boolean, but got %T", v)
+			}
+		case isRuleOption(k, "conventionNameCheckRegex"):
+			regexStr, ok := v.(string)
+			if !ok {
+				return fmt.Errorf("invalid argument to the package-naming rule: expecting conventionNameCheckRegex to be a string, but got %T", v)
+			}
+			if regexStr == "" {
+				return errors.New("invalid argument to the package-naming rule: conventionNameCheckRegex cannot be an empty string")
+			}
+			regex, err := regexp.Compile(regexStr)
+			if err != nil {
+				return fmt.Errorf("invalid argument to the package-naming rule: invalid regex for conventionNameCheckRegex: %w", err)
+			}
+			r.conventionNameCheckRegex = regex
+		case isRuleOption(k, "skipTopLevelCheck"):
+			r.skipTopLevelCheck, ok = v.(bool)
+			if !ok {
+				return fmt.Errorf("invalid argument to the package-naming rule: expecting skipTopLevelCheck to be a boolean, but got %T", v)
+			}
+		case isRuleOption(k, "skipDefaultBadNameCheck"):
+			r.skipDefaultBadNameCheck, ok = v.(bool)
+			if !ok {
+				return fmt.Errorf("invalid argument to the package-naming rule: expecting skipDefaultBadNameCheck to be a boolean, but got %T", v)
+			}
+		case isRuleOption(k, "checkExtraBadName"):
+			r.checkExtraBadName, ok = v.(bool)
+			if !ok {
+				return fmt.Errorf("invalid argument to the package-naming rule: expecting checkExtraBadName to be a boolean, but got %T", v)
+			}
+		case isRuleOption(k, "userDefinedBadNames"):
+			userDefinedBadNames, ok := v.([]any)
+			if !ok {
+				return fmt.Errorf("invalid argument to the package-naming rule: expecting userDefinedBadNames of type slice of strings, but got %T", v)
+			}
+			for i, name := range userDefinedBadNames {
+				if r.userDefinedBadNames == nil {
+					r.userDefinedBadNames = map[string]struct{}{}
+				}
+				n, ok := name.(string)
 				if !ok {
-					return fmt.Errorf("invalid argument to the package-naming rule: expecting skipConventionNameCheck to be a boolean, but got %T", v)
+					return fmt.Errorf("invalid argument to the package-naming rule: expecting element %d of userDefinedBadNames to be a string, but got %v(%T)", i, name, name)
 				}
-			case isRuleOption(k, "conventionNameCheckRegex"):
-				regexStr, ok := v.(string)
-				if !ok {
-					return fmt.Errorf("invalid argument to the package-naming rule: expecting conventionNameCheckRegex to be a string, but got %T", v)
+				if n == "" {
+					return fmt.Errorf("invalid argument to the package-naming rule: userDefinedBadNames cannot contain empty string (index %d)", i)
 				}
-				regex, err := regexp.Compile(regexStr)
-				if err != nil {
-					return fmt.Errorf("invalid argument to the package-naming rule: invalid regex for conventionNameCheckRegex: %w", err)
-				}
-				r.conventionNameCheckRegex = regex
-			case isRuleOption(k, "skipTopLevelCheck"):
-				r.skipTopLevelCheck, ok = v.(bool)
-				if !ok {
-					return fmt.Errorf("invalid argument to the package-naming rule: expecting skipTopLevelCheck to be a boolean, but got %T", v)
-				}
-			case isRuleOption(k, "skipDefaultBadNameCheck"):
-				r.skipDefaultBadNameCheck, ok = v.(bool)
-				if !ok {
-					return fmt.Errorf("invalid argument to the package-naming rule: expecting skipDefaultBadNameCheck to be a boolean, but got %T", v)
-				}
-			case isRuleOption(k, "checkExtraBadName"):
-				r.checkExtraBadName, ok = v.(bool)
-				if !ok {
-					return fmt.Errorf("invalid argument to the package-naming rule: expecting checkExtraBadName to be a boolean, but got %T", v)
-				}
-			case isRuleOption(k, "userDefinedBadNames"):
-				userDefinedBadNames, ok := v.([]any)
-				if !ok {
-					return fmt.Errorf("invalid argument to the package-naming rule: expecting userDefinedBadNames of type slice of strings, but got %T", v)
-				}
-				for i, name := range userDefinedBadNames {
-					if r.userDefinedBadNames == nil {
-						r.userDefinedBadNames = map[string]struct{}{}
-					}
-					n, ok := name.(string)
-					if !ok {
-						return fmt.Errorf("invalid argument to the package-naming rule: expecting element %d of userDefinedBadNames to be a string, but got %v(%T)", i, name, name)
-					}
-					if n == "" {
-						return fmt.Errorf("invalid argument to the package-naming rule: userDefinedBadNames cannot contain empty string (index %d)", i)
-					}
-					r.userDefinedBadNames[strings.ToLower(n)] = struct{}{}
-				}
-			case isRuleOption(k, "skipCollisionWithCommonStd"):
-				r.skipCollisionWithCommonStd, ok = v.(bool)
-				if !ok {
-					return fmt.Errorf("invalid argument to the package-naming rule: expecting skipCollisionWithCommonStd to be a boolean, but got %T", v)
-				}
-			case isRuleOption(k, "checkCollisionWithAllStd"):
-				r.checkCollisionWithAllStd, ok = v.(bool)
-				if !ok {
-					return fmt.Errorf("invalid argument to the package-naming rule: expecting checkCollisionWithAllStd to be a boolean, but got %T", v)
-				}
+				r.userDefinedBadNames[strings.ToLower(n)] = struct{}{}
+			}
+		case isRuleOption(k, "skipCollisionWithCommonStd"):
+			r.skipCollisionWithCommonStd, ok = v.(bool)
+			if !ok {
+				return fmt.Errorf("invalid argument to the package-naming rule: expecting skipCollisionWithCommonStd to be a boolean, but got %T", v)
+			}
+		case isRuleOption(k, "checkCollisionWithAllStd"):
+			r.checkCollisionWithAllStd, ok = v.(bool)
+			if !ok {
+				return fmt.Errorf("invalid argument to the package-naming rule: expecting checkCollisionWithAllStd to be a boolean, but got %T", v)
 			}
 		}
 	}
