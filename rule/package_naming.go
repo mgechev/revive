@@ -66,6 +66,17 @@ var commonStdNames = map[string]string{
 	"url":      "net/url",
 }
 
+// nonPublicPackageSegments are package path segments that indicate the std package is not public.
+var nonPublicPackageSegments = map[string]struct{}{
+	"internal": {},
+	"vendor":   {},
+}
+
+// forbiddenTopLevelNames is the set of forbidden top level package names.
+var forbiddenTopLevelNames = map[string]struct{}{
+	"pkg": {},
+}
+
 // PackageNamingRule is a rule that checks package names.
 type PackageNamingRule struct {
 	skipConventionNameCheck  bool           // if true - skip checks for package name conventions (e.g., no underscores, no MixedCaps etc.)
@@ -170,7 +181,7 @@ func (r *PackageNamingRule) Configure(arguments lint.Arguments) error {
 
 		r.allStdNames = map[string]string{}
 		for _, pkg := range pkgs {
-			if isInternalOrVendorPackage(pkg.PkgPath) {
+			if isNonPublicPackage(pkg.PkgPath) {
 				continue
 			}
 			r.allStdNames[pkg.Name] = pkg.PkgPath
@@ -180,13 +191,10 @@ func (r *PackageNamingRule) Configure(arguments lint.Arguments) error {
 	return nil
 }
 
-// isInternalOrVendorPackage reports whether the path represents an internal or vendor directory.
-//
-// Borrowed and modified from
-// https://github.com/golang/pkgsite/blob/84333735ffe124f7bd904805fd488b93841de49f/internal/postgres/search.go#L1009-L1016
-func isInternalOrVendorPackage(path string) bool {
+// isNonPublicPackage reports whether the path represents an internal or vendor directory.
+func isNonPublicPackage(path string) bool {
 	for p := range strings.SplitSeq(path, "/") {
-		if p == "internal" || p == "vendor" {
+		if _, ok := nonPublicPackageSegments[p]; ok {
 			return true
 		}
 	}
@@ -229,8 +237,7 @@ func (r *PackageNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 
 	pkgNameLower := strings.ToLower(pkgName)
 	if !r.skipTopLevelCheck {
-		// Check if top level package
-		if pkgNameLower == "pkg" && filepath.Base(fileDir) != pkgName {
+		if _, ok := forbiddenTopLevelNames[pkgNameLower]; ok && filepath.Base(fileDir) != pkgName {
 			onFailure(r.pkgNameFailure(node, "don't use %q as a root level package name", pkgName))
 			return failures
 		}
