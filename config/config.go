@@ -118,6 +118,7 @@ var allRules = append([]lint.Rule{
 	&rule.UnnecessaryIfRule{},
 	&rule.EpochNamingRule{},
 	&rule.UseSlicesSort{},
+	&rule.PackageNamingRule{},
 }, defaultRules...)
 
 // allFormatters is a list of all available formatters to output the linting results.

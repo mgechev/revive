@@ -137,6 +137,11 @@ func (r *PackageNamingRule) Configure(arguments lint.Arguments) error {
 				if !ok {
 					return fmt.Errorf("invalid argument to the package-naming rule: expecting skipDefaultBadNameCheck to be a boolean, but got %T", v)
 				}
+			case isRuleOption(k, "checkExtraBadName"):
+				r.checkExtraBadName, ok = v.(bool)
+				if !ok {
+					return fmt.Errorf("invalid argument to the package-naming rule: expecting checkExtraBadName to be a boolean, but got %T", v)
+				}
 			case isRuleOption(k, "userDefinedBadNames"):
 				userDefinedBadNames, ok := v.([]any)
 				if !ok {
@@ -170,7 +175,7 @@ func (r *PackageNamingRule) Configure(arguments lint.Arguments) error {
 	}
 
 	if r.skipConventionNameCheck && r.conventionNameCheckRegex != nil {
-		return errors.New("invalid configuration for package-naming rule: skipConventionNameCheck and overrideConventionNameCheck cannot be both set")
+		return errors.New("invalid configuration for package-naming rule: skipConventionNameCheck and conventionNameCheckRegex cannot be both set")
 	}
 
 	if r.checkCollisionWithAllStd && r.allStdNames == nil {
@@ -210,10 +215,9 @@ func (r *PackageNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 
 	fileDir := filepath.Dir(file.Name)
 
-	if r.alreadyCheckedNames.Has(fileDir) {
+	if !r.alreadyCheckedNames.AddIfAbsent(fileDir) {
 		return failures
 	}
-	r.alreadyCheckedNames.Set(fileDir) // mark this package as already checked
 
 	node := file.AST.Name
 	pkgName := node.Name
@@ -264,15 +268,14 @@ func (r *PackageNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 		}
 	}
 
-	if !r.skipCollisionWithCommonStd {
-		if std, ok := commonStdNames[pkgNameLower]; ok {
-			onFailure(r.pkgNameFailure(node, "don't use %q because it conflicts with common Go standard library package %q", pkgName, std))
-		}
-	}
-
 	if r.checkCollisionWithAllStd {
+		// all std names are also common std names, so no need to check separately
 		if std, ok := r.allStdNames[pkgNameLower]; ok {
 			onFailure(r.pkgNameFailure(node, "don't use %q because it conflicts with Go standard library package %q", pkgName, std))
+		}
+	} else if !r.skipCollisionWithCommonStd {
+		if std, ok := commonStdNames[pkgNameLower]; ok {
+			onFailure(r.pkgNameFailure(node, "don't use %q because it conflicts with common Go standard library package %q", pkgName, std))
 		}
 	}
 

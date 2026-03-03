@@ -14,19 +14,14 @@ func New() *Set {
 	return &Set{elements: map[string]struct{}{}}
 }
 
-// Has reports whether str is present in the set.
-func (s *Set) Has(str string) bool {
+// AddIfAbsent adds str to the set if it is not already present, and reports whether it was added.
+func (s *Set) AddIfAbsent(str string) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	_, result := s.elements[str]
-	return result
-}
-
-// Set adds str to the set.
-func (s *Set) Set(str string) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.elements[str] = struct{}{}
+	_, exists := s.elements[str]
+	if !exists {
+		s.elements[str] = struct{}{}
+	}
+	return !exists
 }

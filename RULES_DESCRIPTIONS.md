@@ -1215,7 +1215,7 @@ _Configuration_: (optional) list of key-value-pair-map (`[]map[string]any`).
 
 - `skipConventionNameCheck` (`skipconventionnamecheck`, `skip-convention-name-check`): (bool)
 If `true`, skip checks for package name conventions (underscores, MixedCaps, etc.). Default: `false`.
-- `conventionNameCheckRegex` (`conventionnamecheck`, `convention-name-check-regex`): (string)
+- `conventionNameCheckRegex` (`conventionnamecheckregex`, `convention-name-check-regex`): (string)
 Custom regex pattern to validate package names. If set, package names must match this pattern.
 - `skipTopLevelCheck` (`skiptoplevelcheck`, `skip-top-level-check`): (bool)
 If `true`, skip checks for top-level package names (e.g., `pkg`). Default: `false`.
@@ -1223,7 +1223,7 @@ If `true`, skip checks for top-level package names (e.g., `pkg`). Default: `fals
 If `true`, skip checks for default bad package names. Default: `false`.
 - `checkExtraBadName` (`checkextrabadname`, `check-extra-bad-name`): (bool)
 If `true`, enable checks for extra bad package names (e.g., `helpers`, `models`, `shared`, `utilities`). Default: `false`.
-- `userDefinedBadNames` (`userdefinedbadbad`, `user-defined-bad-names`): ([]string) List of user-defined bad package names to check for.
+- `userDefinedBadNames` (`userdefinedbadnames`, `user-defined-bad-names`): ([]string) List of user-defined bad package names to check for.
 - `skipCollisionWithCommonStd` (`skipcollisionwithcommonstd`, `skip-collision-with-common-std`): (bool)
 If `true`, skip checks for collisions with the most common Go standard library packages. Default: `false`.
 - `checkCollisionWithAllStd` (`checkcollisionwithallstd`, `check-collision-with-all-std`): (bool)
@@ -1254,6 +1254,7 @@ arguments = [{ skip-convention-name-check = true }]
 Enable collision checks with the most common standard library packages:
 
 ```toml
+[rule.package-naming]
 arguments = [{ skip-collision-with-common-std = false }]
 ```
 

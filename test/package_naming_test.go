@@ -116,6 +116,11 @@ func TestPackageNaming_stdLibConflict(t *testing.T) {
 			map[string]any{"check-collision-with-all-std": true},
 		},
 	})
+	testRule(t, "package_naming_std_all_common", &rule.PackageNamingRule{}, &lint.RuleConfig{
+		Arguments: lint.Arguments{
+			map[string]any{"check-collision-with-all-std": true},
+		},
+	})
 	testRule(t, "package_naming_std_all_conflict_skip", &rule.PackageNamingRule{}, &lint.RuleConfig{})
 	testRule(t, "package_naming_std_all_conflict_skip", &rule.PackageNamingRule{}, &lint.RuleConfig{
 		Arguments: lint.Arguments{

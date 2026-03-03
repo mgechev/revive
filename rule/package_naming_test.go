@@ -16,6 +16,7 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 		wantSkipConventionNameCheck    bool
 		wantSkipTopLevelCheck          bool
 		wantSkipDefaultBadNameCheck    bool
+		wantCheckExtraBadName          bool
 		wantUserDefinedBadNames        map[string]struct{}
 		wantSkipCollisionWithCommonStd bool
 		wantCheckCollisionWithAllStd   bool
@@ -176,7 +177,7 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 					"convention-name-check-regex": "^[a-z]+$",
 				},
 			},
-			wantErr: errors.New("invalid configuration for package-naming rule: skipConventionNameCheck and overrideConventionNameCheck cannot be both set"),
+			wantErr: errors.New("invalid configuration for package-naming rule: skipConventionNameCheck and conventionNameCheckRegex cannot be both set"),
 		},
 		{
 			name: "invalid skipTopLevelCheck type",
@@ -213,6 +214,35 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 				},
 			},
 			wantErr: errors.New("invalid argument to the package-naming rule: expecting checkCollisionWithAllStd to be a boolean, but got float64"),
+		},
+		{
+			name: "valid checkExtraBadName set to true",
+			arguments: lint.Arguments{
+				map[string]any{
+					"check-extra-bad-name": true,
+				},
+			},
+			wantErr:               nil,
+			wantCheckExtraBadName: true,
+		},
+		{
+			name: "valid checkExtraBadName set to false",
+			arguments: lint.Arguments{
+				map[string]any{
+					"check-extra-bad-name": false,
+				},
+			},
+			wantErr:               nil,
+			wantCheckExtraBadName: false,
+		},
+		{
+			name: "invalid checkExtraBadName type",
+			arguments: lint.Arguments{
+				map[string]any{
+					"check-extra-bad-name": "not-a-bool",
+				},
+			},
+			wantErr: errors.New("invalid argument to the package-naming rule: expecting checkExtraBadName to be a boolean, but got string"),
 		},
 		{
 			name:      "empty arguments slice",
@@ -255,6 +285,7 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 					"skip-convention-name-check":     true,
 					"skip-top-level-check":           true,
 					"skip-default-bad-name-check":    true,
+					"check-extra-bad-name":           true,
 					"skip-collision-with-common-std": true,
 					"check-collision-with-all-std":   false,
 				},
@@ -263,6 +294,7 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 			wantSkipConventionNameCheck:    true,
 			wantSkipTopLevelCheck:          true,
 			wantSkipDefaultBadNameCheck:    true,
+			wantCheckExtraBadName:          true,
 			wantSkipCollisionWithCommonStd: true,
 			wantCheckCollisionWithAllStd:   false,
 		},
@@ -304,6 +336,9 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 			}
 			if rule.skipDefaultBadNameCheck != tt.wantSkipDefaultBadNameCheck {
 				t.Errorf("unexpected skipDefaultBadNameCheck: got = %v, want %v", rule.skipDefaultBadNameCheck, tt.wantSkipDefaultBadNameCheck)
+			}
+			if rule.checkExtraBadName != tt.wantCheckExtraBadName {
+				t.Errorf("unexpected checkExtraBadName: got = %v, want %v", rule.checkExtraBadName, tt.wantCheckExtraBadName)
 			}
 			if !reflect.DeepEqual(rule.userDefinedBadNames, tt.wantUserDefinedBadNames) {
 				t.Errorf("unexpected userDefinedBadNames: got = %v, want %v", rule.userDefinedBadNames, tt.wantUserDefinedBadNames)
