@@ -230,19 +230,20 @@ func (r *PackageNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 
 	node := file.AST.Name
 	pkgName := node.Name
+	pkgNameWithoutTestSuffix := strings.TrimSuffix(pkgName, "_test")
 
 	if r.conventionNameCheckRegex != nil {
-		if !r.conventionNameCheckRegex.MatchString(pkgName) {
+		if !r.conventionNameCheckRegex.MatchString(pkgNameWithoutTestSuffix) {
 			onFailure(r.pkgNameFailure(node, "package name %q doesn't match the convention defined by conventionNameCheckRegex", pkgName))
 			return failures
 		}
 	} else if !r.skipConventionNameCheck {
 		// Package names need slightly different handling than other names.
-		if strings.Contains(pkgName, "_") && !strings.HasSuffix(pkgName, "_test") {
+		if strings.Contains(pkgNameWithoutTestSuffix, "_") {
 			onFailure(r.pkgNameFailure(node, "don't use package name %q that contains an underscore", pkgName))
 			return failures
 		}
-		if hasUpperCaseLetter(pkgName) {
+		if hasUpperCaseLetter(pkgNameWithoutTestSuffix) {
 			onFailure(r.pkgNameFailure(node, "don't use package name %q that contains MixedCaps", pkgName))
 			return failures
 		}
