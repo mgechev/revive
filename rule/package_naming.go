@@ -102,7 +102,10 @@ func (r *PackageNamingRule) Configure(arguments lint.Arguments) error {
 		for k, v := range args {
 			switch {
 			case isRuleOption(k, "skipConventionNameCheck"):
-				r.skipConventionNameCheck = fmt.Sprint(v) == "true"
+				r.skipConventionNameCheck, ok = v.(bool)
+				if !ok {
+					return fmt.Errorf("invalid argument to the package-naming rule: expecting skipConventionNameCheck to be a boolean, but got %T", v)
+				}
 			case isRuleOption(k, "conventionNameCheckRegex"):
 				regexStr, ok := v.(string)
 				if !ok {
@@ -114,9 +117,15 @@ func (r *PackageNamingRule) Configure(arguments lint.Arguments) error {
 				}
 				r.conventionNameCheckRegex = regex
 			case isRuleOption(k, "skipTopLevelCheck"):
-				r.skipTopLevelCheck = fmt.Sprint(v) == "true"
+				r.skipTopLevelCheck, ok = v.(bool)
+				if !ok {
+					return fmt.Errorf("invalid argument to the package-naming rule: expecting skipTopLevelCheck to be a boolean, but got %T", v)
+				}
 			case isRuleOption(k, "skipDefaultBadNameCheck"):
-				r.skipDefaultBadNameCheck = fmt.Sprint(v) == "true"
+				r.skipDefaultBadNameCheck, ok = v.(bool)
+				if !ok {
+					return fmt.Errorf("invalid argument to the package-naming rule: expecting skipDefaultBadNameCheck to be a boolean, but got %T", v)
+				}
 			case isRuleOption(k, "userDefinedBadNames"):
 				userDefinedBadNames, ok := v.([]any)
 				if !ok {
@@ -136,9 +145,15 @@ func (r *PackageNamingRule) Configure(arguments lint.Arguments) error {
 					r.userDefinedBadNames[strings.ToLower(n)] = struct{}{}
 				}
 			case isRuleOption(k, "skipCollisionWithCommonStd"):
-				r.skipCollisionWithCommonStd = fmt.Sprint(v) == "true"
+				r.skipCollisionWithCommonStd, ok = v.(bool)
+				if !ok {
+					return fmt.Errorf("invalid argument to the package-naming rule: expecting skipCollisionWithCommonStd to be a boolean, but got %T", v)
+				}
 			case isRuleOption(k, "checkCollisionWithAllStd"):
-				r.checkCollisionWithAllStd = fmt.Sprint(v) == "true"
+				r.checkCollisionWithAllStd, ok = v.(bool)
+				if !ok {
+					return fmt.Errorf("invalid argument to the package-naming rule: expecting checkCollisionWithAllStd to be a boolean, but got %T", v)
+				}
 			}
 		}
 	}

@@ -178,6 +178,103 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 			},
 			wantErr: errors.New("invalid configuration for package-naming rule: skipConventionNameCheck and overrideConventionNameCheck cannot be both set"),
 		},
+		{
+			name: "invalid skipTopLevelCheck type",
+			arguments: lint.Arguments{
+				map[string]any{
+					"skip-top-level-check": "should-be-bool",
+				},
+			},
+			wantErr: errors.New("invalid argument to the package-naming rule: expecting skipTopLevelCheck to be a boolean, but got string"),
+		},
+		{
+			name: "invalid skipDefaultBadNameCheck type",
+			arguments: lint.Arguments{
+				map[string]any{
+					"skip-default-bad-name-check": 42,
+				},
+			},
+			wantErr: errors.New("invalid argument to the package-naming rule: expecting skipDefaultBadNameCheck to be a boolean, but got int"),
+		},
+		{
+			name: "invalid skipCollisionWithCommonStd type",
+			arguments: lint.Arguments{
+				map[string]any{
+					"skip-collision-with-common-std": []string{"invalid"},
+				},
+			},
+			wantErr: errors.New("invalid argument to the package-naming rule: expecting skipCollisionWithCommonStd to be a boolean, but got []string"),
+		},
+		{
+			name: "invalid checkCollisionWithAllStd type",
+			arguments: lint.Arguments{
+				map[string]any{
+					"check-collision-with-all-std": 123.45,
+				},
+			},
+			wantErr: errors.New("invalid argument to the package-naming rule: expecting checkCollisionWithAllStd to be a boolean, but got float64"),
+		},
+		{
+			name:      "empty arguments slice",
+			arguments: lint.Arguments{},
+			wantErr:   nil,
+		},
+		{
+			name: "multiple arguments (more than 1)",
+			arguments: lint.Arguments{
+				map[string]any{"skip-convention-name-check": true},
+				map[string]any{"skip-top-level-check": true},
+			},
+			wantErr: nil,
+		},
+		{
+			name: "unknown option key is silently ignored",
+			arguments: lint.Arguments{
+				map[string]any{
+					"unknown-option":  true,
+					"another-unknown": "value",
+				},
+			},
+			wantErr: nil,
+		},
+		{
+			name: "mixed known and unknown options",
+			arguments: lint.Arguments{
+				map[string]any{
+					"skip-convention-name-check": true,
+					"unknown-option":             "value",
+				},
+			},
+			wantErr:                     nil,
+			wantSkipConventionNameCheck: true,
+		},
+		{
+			name: "all boolean options together",
+			arguments: lint.Arguments{
+				map[string]any{
+					"skip-convention-name-check":     true,
+					"skip-top-level-check":           true,
+					"skip-default-bad-name-check":    true,
+					"skip-collision-with-common-std": true,
+					"check-collision-with-all-std":   false,
+				},
+			},
+			wantErr:                        nil,
+			wantSkipConventionNameCheck:    true,
+			wantSkipTopLevelCheck:          true,
+			wantSkipDefaultBadNameCheck:    true,
+			wantSkipCollisionWithCommonStd: true,
+			wantCheckCollisionWithAllStd:   false,
+		},
+		{
+			name: "conventional names with empty userDefinedBadNames",
+			arguments: lint.Arguments{
+				map[string]any{
+					"user-defined-bad-names": []any{},
+				},
+			},
+			wantErr: nil,
+		},
 	}
 
 	for _, tt := range tests {
