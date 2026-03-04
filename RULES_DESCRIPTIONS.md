@@ -1920,7 +1920,7 @@ When `skipInitialismNameChecks` is set to true, the rule allows names like `read
 In the map, you can add a boolean `upperCaseConst` (`uppercaseconst`, `upper-case-const`) parameter to allow `UPPER_CASE` for `const`.
 
 By default, the rule behaves exactly as the alternative in `golint` for non-package identifiers;
-`golint`-equivalent package-name warnings nowrequire enabling the [`package-naming`](#package-naming) rule.
+`golint`-equivalent package-name warnings now require enabling the [`package-naming`](#package-naming) rule.
 
 Configuration examples:
 
