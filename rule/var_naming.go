@@ -9,6 +9,7 @@ import (
 	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/internal/rule"
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/logging"
 )
 
 var knownNameExceptions = map[string]bool{
@@ -65,10 +66,22 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 				r.skipInitialismNameChecks = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "upperCaseConst"):
 				r.allowUpperCaseConst = fmt.Sprint(v) == "true"
-			//nolint:staticcheck // these options moved to package-naming rule, ignore them here for backward compatibility
-			case isRuleOption(k, "skipPackageNameChecks"),
-				isRuleOption(k, "extraBadPackageNames"),
-				isRuleOption(k, "skipPackageNameCollisionWithGoStd"):
+			case isRuleOption(k, "skipPackageNameChecks"):
+				logger, err := logging.GetLogger()
+				if err == nil {
+					logger.Warn("The option var-naming.skipPackageNameChecks is no longer supported and will be ignored; use package-naming rule instead")
+				}
+			case isRuleOption(k, "extraBadPackageNames"):
+				logger, err := logging.GetLogger()
+				if err == nil {
+					logger.Warn("The option var-naming.extraBadPackageNames is no longer supported and will be ignored; use package-naming.userDefinedBadNames instead")
+				}
+			case isRuleOption(k, "skipPackageNameCollisionWithGoStd"):
+				logger, err := logging.GetLogger()
+				if err == nil {
+					logger.Warn("The option var-naming.skipPackageNameCollisionWithGoStd is no longer supported and will be ignored; " +
+						"use package-naming.checkCollisionWithAllStd option instead")
+				}
 			}
 		}
 	}
