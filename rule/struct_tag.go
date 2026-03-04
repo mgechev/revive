@@ -7,9 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/fatih/structtag"
-
 	"github.com/mgechev/revive/internal/astutils"
+	"github.com/mgechev/revive/internal/structtag"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -198,7 +197,7 @@ func (w lintStructTagRule) checkTaggedField(checkCtx *checkContext, field *ast.F
 	}
 
 	analyzedTags := map[tagKey]struct{}{}
-	for _, tag := range tags.Tags() {
+	for _, tag := range tags {
 		_, mustOmit := w.omittedTags[tagKey(tag.Key)]
 		if mustOmit {
 			continue
