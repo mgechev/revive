@@ -5,6 +5,10 @@ version: 2
 archives:
   - id: revive
     name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    files:
+      - THIRD_PARTY_NOTICES
+      - LICENSE
+      - README.md
 builds:
   -
     env:
