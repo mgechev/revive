@@ -21,15 +21,21 @@ make build
 
 The command will produce the `revive` binary in the root of the project.
 
-## Debug
+## Logging
 
-To enable debug logging, set the `DEBUG` environment variable:
+You can customize the log level using the `REVIVE_LOG_LEVEL` environment variable.
+Supported values are:
+
+- `debug`: log all messages including debug-level information
+- `info`: log informational messages and above
+- `warn`: log warnings and errors (default)
+- `error`: log errors only
+
+Logs are output to stderr:
 
 ```sh
-DEBUG=1 go run main.go
+REVIVE_LOG_LEVEL=debug go run main.go
 ```
-
-This will output debug information to `stderr` and to the log file `revive.log` created in the current working directory.
 
 ## Coding standards
 
