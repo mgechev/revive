@@ -80,7 +80,7 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 				logger, err := logging.GetLogger()
 				if err == nil {
 					logger.Warn("The option var-naming.skipPackageNameCollisionWithGoStd is no longer supported and will be ignored; " +
-						"use package-naming.checkCollisionWithAllStd option instead")
+						"use package-naming.skipCollisionWithCommonStd instead (or package-naming.checkCollisionWithAllStd for the old 'all std' behavior)")
 				}
 			}
 		}
