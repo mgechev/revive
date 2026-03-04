@@ -6,6 +6,7 @@ require (
 	codeberg.org/chavacava/garif v0.2.0
 	github.com/BurntSushi/toml v1.6.0
 	github.com/fatih/color v1.18.0
+	github.com/fatih/structtag v1.2.0
 	github.com/hashicorp/go-version v1.8.0
 	github.com/mgechev/dots v1.0.0
 	github.com/spf13/afero v1.15.0
