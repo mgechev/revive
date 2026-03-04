@@ -1,4 +1,6 @@
-// From https://github.com/fatih/structtag/blob/v1.2.0/tags.go
+// Derived from https://github.com/fatih/structtag/blob/v1.2.0/tags.go.
+// Upstream license: https://github.com/fatih/structtag/blob/v1.2.0/LICENSE.
+// This file may have been modified from the upstream version; see this repository's history for details.
 /*
 Copyright (c) 2017, Fatih Arslan
 All rights reserved.
