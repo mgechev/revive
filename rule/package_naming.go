@@ -95,7 +95,9 @@ type PackageNamingRule struct {
 	// Populated only if checkCollisionWithAllStd is true. `net/http` stored as `http`, `math/rand/v2` as `rand` etc.
 	allStdNames map[string]string
 
-	alreadyCheckedNames *syncset.Set // set of packages names already checked
+	// alreadyCheckedNames is keyed by fileDir (package directory path) to track which package directories
+	// have already been checked and avoid duplicate checks across files in the same package.
+	alreadyCheckedNames *syncset.Set
 }
 
 // Configure validates the rule configuration, and configures the rule accordingly.
