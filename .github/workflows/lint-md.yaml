@@ -28,7 +28,7 @@ jobs:
           go-version: stable
 
       - name: Setup mdsf
-        uses: hougesen/mdsf@v0.11.1
+        uses: hougesen/mdsf@v0.12.0
 
       - name: Setup goimports
         working-directory: tools
