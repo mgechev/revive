@@ -189,6 +189,10 @@ func (r *PackageNamingRule) Configure(arguments lint.Arguments) error {
 		return errors.New("invalid configuration for package-naming rule: skipConventionNameCheck and conventionNameCheckRegex cannot be both set")
 	}
 
+	if r.skipCollisionWithCommonStd && r.checkCollisionWithAllStd {
+		return errors.New("invalid configuration for package-naming rule: skipCollisionWithCommonStd and checkCollisionWithAllStd cannot be both set")
+	}
+
 	if r.checkCollisionWithAllStd && r.allStdNames == nil {
 		pkgs, err := gopackages.Load(nil, "std")
 		if err != nil {

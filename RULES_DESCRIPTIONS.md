@@ -1232,6 +1232,7 @@ If `true`, enable checks for extra bad package names (e.g., `helpers`, `models`,
 If `true`, skip checks for collisions with the most common Go standard library packages. Default: `false`.
 - `checkCollisionWithAllStd` (`checkcollisionwithallstd`, `check-collision-with-all-std`): (bool)
 If `true`, enable checks for collisions with all packages from Go standard library. Default: `false`.
+This option is mutually exclusive with `skipCollisionWithCommonStd`; setting both results in a configuration error.
 
 Configuration examples:
 

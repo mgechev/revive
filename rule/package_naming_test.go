@@ -35,7 +35,7 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 					"skipDefaultBadNameCheck":    true,
 					"userDefinedBadNames":        []any{"helpers", "models"},
 					"skipCollisionWithCommonStd": true,
-					"checkCollisionWithAllStd":   true,
+					"checkCollisionWithAllStd":   false,
 				},
 			},
 			wantErr:                        nil,
@@ -44,7 +44,7 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 			wantSkipDefaultBadNameCheck:    true,
 			wantUserDefinedBadNames:        map[string]struct{}{"helpers": {}, "models": {}},
 			wantSkipCollisionWithCommonStd: true,
-			wantCheckCollisionWithAllStd:   true,
+			wantCheckCollisionWithAllStd:   false,
 		},
 		{
 			name: "valid arguments - lowercase",
@@ -55,7 +55,7 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 					"skipdefaultbadnamecheck":    true,
 					"userdefinedbadnames":        []any{"helpers", "models"},
 					"skipcollisionwithcommonstd": true,
-					"checkcollisionwithallstd":   true,
+					"checkcollisionwithallstd":   false,
 				},
 			},
 			wantErr:                        nil,
@@ -64,7 +64,7 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 			wantSkipDefaultBadNameCheck:    true,
 			wantUserDefinedBadNames:        map[string]struct{}{"helpers": {}, "models": {}},
 			wantSkipCollisionWithCommonStd: true,
-			wantCheckCollisionWithAllStd:   true,
+			wantCheckCollisionWithAllStd:   false,
 		},
 		{
 			name: "valid arguments - kebab-case",
@@ -75,7 +75,7 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 					"skip-default-bad-name-check":    true,
 					"user-defined-bad-names":         []any{"helpers", "models"},
 					"skip-collision-with-common-std": true,
-					"check-collision-with-all-std":   true,
+					"check-collision-with-all-std":   false,
 				},
 			},
 			wantErr:                        nil,
@@ -84,7 +84,7 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 			wantSkipDefaultBadNameCheck:    true,
 			wantUserDefinedBadNames:        map[string]struct{}{"helpers": {}, "models": {}},
 			wantSkipCollisionWithCommonStd: true,
-			wantCheckCollisionWithAllStd:   true,
+			wantCheckCollisionWithAllStd:   false,
 		},
 		{
 			name: "partial arguments",
@@ -178,6 +178,16 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 				},
 			},
 			wantErr: errors.New("invalid configuration for package-naming rule: skipConventionNameCheck and conventionNameCheckRegex cannot be both set"),
+		},
+		{
+			name: "skipCollisionWithCommonStd with checkCollisionWithAllStd",
+			arguments: lint.Arguments{
+				map[string]any{
+					"skip-collision-with-common-std": true,
+					"check-collision-with-all-std":   true,
+				},
+			},
+			wantErr: errors.New("invalid configuration for package-naming rule: skipCollisionWithCommonStd and checkCollisionWithAllStd cannot be both set"),
 		},
 		{
 			name: "invalid skipTopLevelCheck type",
