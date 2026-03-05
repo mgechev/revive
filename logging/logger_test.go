@@ -12,7 +12,7 @@ func TestGetLogger(t *testing.T) {
 	t.Run("default WARN level", func(t *testing.T) {
 		t.Setenv("REVIVE_LOG_LEVEL", "")
 		var buf bytes.Buffer
-		logging.InitForTesting(&buf)
+		logging.InitForTesting(t, &buf)
 
 		logger, err := logging.GetLogger()
 		if err != nil {
@@ -43,7 +43,7 @@ func TestGetLogger(t *testing.T) {
 	t.Run("REVIVE_LOG_LEVEL debug", func(t *testing.T) {
 		t.Setenv("REVIVE_LOG_LEVEL", "debug")
 		var buf bytes.Buffer
-		logging.InitForTesting(&buf)
+		logging.InitForTesting(t, &buf)
 
 		logger, err := logging.GetLogger()
 		if err != nil {
@@ -80,7 +80,7 @@ func TestGetLogger(t *testing.T) {
 	t.Run("REVIVE_LOG_LEVEL invalid defaults to warn", func(t *testing.T) {
 		t.Setenv("REVIVE_LOG_LEVEL", "invalid")
 		var buf bytes.Buffer
-		logging.InitForTesting(&buf)
+		logging.InitForTesting(t, &buf)
 
 		logger, err := logging.GetLogger()
 		if err != nil {
@@ -105,7 +105,7 @@ func TestGetLogger(t *testing.T) {
 	t.Run("same logger instance returned", func(t *testing.T) {
 		t.Setenv("REVIVE_LOG_LEVEL", "info")
 		var buf bytes.Buffer
-		logging.InitForTesting(&buf)
+		logging.InitForTesting(t, &buf)
 
 		logger1, err := logging.GetLogger()
 		if err != nil {

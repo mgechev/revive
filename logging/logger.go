@@ -6,23 +6,22 @@ import (
 	"log/slog"
 	"os"
 	"sync"
+	"testing"
 )
 
 // GetLogger retrieves an instance of an application logger.
 // The log level can be configured via the REVIVE_LOG_LEVEL environment variable.
 // If REVIVE_LOG_LEVEL is not set, it defaults to WARN level.
+//
+//nolint:unparam // err is always nil, but is included in the signature for future extensibility.
 func GetLogger() (*slog.Logger, error) {
-	logger, err := getLogger()
-	if err != nil {
-		return nil, err
-	}
-	return logger, nil
+	return getLogger(), nil
 }
 
-var getLogger = sync.OnceValues(initLogger(os.Stderr))
+var getLogger = sync.OnceValue(initLogger(os.Stderr))
 
-func initLogger(out io.Writer) func() (*slog.Logger, error) {
-	return func() (*slog.Logger, error) {
+func initLogger(out io.Writer) func() *slog.Logger {
+	return func() *slog.Logger {
 		leveler := &slog.LevelVar{}
 		opts := &slog.HandlerOptions{Level: leveler}
 
@@ -35,7 +34,7 @@ func initLogger(out io.Writer) func() (*slog.Logger, error) {
 
 			logger.Info("Logger initialized", "logLevel", logLevel)
 
-			return logger, nil
+			return logger
 		}
 
 		// Default to WARN level
@@ -44,12 +43,13 @@ func initLogger(out io.Writer) func() (*slog.Logger, error) {
 
 		logger.Info("Logger initialized", "logLevel", slog.LevelWarn)
 
-		return logger, nil
+		return logger
 	}
 }
 
 // InitForTesting initializes the logger singleton cache for testing purposes.
 // This function should only be called in tests.
-func InitForTesting(w io.Writer) {
-	getLogger = sync.OnceValues(initLogger(w))
+func InitForTesting(tb testing.TB, w io.Writer) {
+	tb.Helper()
+	getLogger = sync.OnceValue(initLogger(w))
 }
