@@ -9,7 +9,7 @@ import (
 )
 
 func TestGetLogger(t *testing.T) {
-	t.Run("default WARN level", func(t *testing.T) {
+	t.Run("default logging disabled", func(t *testing.T) {
 		t.Setenv("REVIVE_LOG_LEVEL", "")
 		var buf bytes.Buffer
 		logging.InitForTesting(t, &buf)
@@ -29,14 +29,8 @@ func TestGetLogger(t *testing.T) {
 
 		got := buf.String()
 
-		if strings.Contains(got, "level=DEBUG") || strings.Contains(got, "level=INFO") {
-			t.Errorf("unexpected output: got %q", got)
-		}
-		if want := `level=WARN msg="warn message"`; !strings.Contains(got, want) {
-			t.Errorf("expected output to contains %q, got %q", want, got)
-		}
-		if want := `level=ERROR msg="error message"`; !strings.Contains(got, want) {
-			t.Errorf("expected output to contains %q, got %q", want, got)
+		if got != "" {
+			t.Errorf("expected no output, got %q", got)
 		}
 	})
 

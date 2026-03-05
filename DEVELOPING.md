@@ -23,12 +23,13 @@ The command will produce the `revive` binary in the root of the project.
 
 ## Logging
 
-You can customize the log level using the `REVIVE_LOG_LEVEL` environment variable.
+By default, any logging output is disabled when `REVIVE_LOG_LEVEL` is unset or empty.
+You can enable and customize the log level using the `REVIVE_LOG_LEVEL` environment variable.
 Supported values are:
 
 - `debug`: log all messages including debug-level information
 - `info`: log informational messages and above
-- `warn`: log warnings and errors (default)
+- `warn`: log warnings and errors; also used as a fallback when `REVIVE_LOG_LEVEL` is set to an invalid value
 - `error`: log errors only
 
 Logs are output to stderr:

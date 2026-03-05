@@ -1922,6 +1922,10 @@ In the map, you can add a boolean `upperCaseConst` (`uppercaseconst`, `upper-cas
 
 By default, the rule behaves exactly as the alternative in `golint` for non-package identifiers;
 `golint`-equivalent package-name warnings now require enabling the [`package-naming`](#package-naming) rule.
+The legacy package-related options `skipPackageNameChecks`, `extraBadPackageNames`, and `skipPackageNameCollisionWithGoStd` are deprecated
+and are now treated as no-ops by `var-naming` (they are ignored, apart from an optional warning when logging is enabled).
+Package-name checks should be configured via the [`package-naming`](#package-naming) rule instead,
+and these options should be removed from `var-naming` configurations to avoid confusion.
 
 Configuration examples:
 
