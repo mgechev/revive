@@ -1,3 +1,1 @@
-module example.com/project
-
-go 1.24.13
+module "example.com/project"
