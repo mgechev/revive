@@ -868,7 +868,7 @@ file.go
 			if err != nil {
 				t.Fatal(err)
 			}
-			stdout, err := os.ReadFile(fakeStdout.Name()) //nolint:gosec // ignore G703: Path traversal via taint analysis
+			stdout, err := os.ReadFile(fakeStdout.Name())
 			if err != nil {
 				t.Fatal(err)
 			}
