@@ -1,15 +1,18 @@
 package logging_test
 
 import (
-	"os"
+	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/mgechev/revive/logging"
 )
 
 func TestGetLogger(t *testing.T) {
-	t.Run("no debug", func(t *testing.T) {
-		t.Setenv("DEBUG", "")
+	t.Run("default logging disabled", func(t *testing.T) {
+		t.Setenv("REVIVE_LOG_LEVEL", "")
+		var buf bytes.Buffer
+		logging.InitForTesting(t, &buf)
 
 		logger, err := logging.GetLogger()
 		if err != nil {
@@ -18,19 +21,23 @@ func TestGetLogger(t *testing.T) {
 		if logger == nil {
 			t.Fatal("expected logger to be non-nil")
 		}
-		logger.Info("msg") // no output
+
+		logger.Debug("debug message")
+		logger.Info("info message")
+		logger.Warn("warn message")
+		logger.Error("error message")
+
+		got := buf.String()
+
+		if got != "" {
+			t.Errorf("expected no output, got %q", got)
+		}
 	})
 
-	t.Run("debug", func(t *testing.T) {
-		t.Setenv("DEBUG", "1")
-		t.Cleanup(func() {
-			if err := logging.Close(); err != nil {
-				t.Error(err)
-			}
-			if err := os.Remove("revive.log"); err != nil {
-				t.Error(err)
-			}
-		})
+	t.Run("REVIVE_LOG_LEVEL debug", func(t *testing.T) {
+		t.Setenv("REVIVE_LOG_LEVEL", "debug")
+		var buf bytes.Buffer
+		logging.InitForTesting(t, &buf)
 
 		logger, err := logging.GetLogger()
 		if err != nil {
@@ -39,8 +46,64 @@ func TestGetLogger(t *testing.T) {
 		if logger == nil {
 			t.Fatal("expected logger to be non-nil")
 		}
-		if _, err := os.Stat("revive.log"); os.IsNotExist(err) {
-			t.Error("expected revive.log file to be created")
+
+		logger.Debug("debug message")
+		logger.Info("info message")
+		logger.Warn("warn message")
+		logger.Error("error message")
+
+		got := buf.String()
+
+		if want := `level=INFO msg="Logger initialized" logLevel=debug`; !strings.Contains(got, want) {
+			t.Errorf("expected output to contains %q, got %q", want, got)
+		}
+		if want := `level=DEBUG msg="debug message"`; !strings.Contains(got, want) {
+			t.Errorf("expected output to contains %q, got %q", want, got)
+		}
+		if want := `level=INFO msg="info message"`; !strings.Contains(got, want) {
+			t.Errorf("expected output to contains %q, got %q", want, got)
+		}
+		if want := `level=WARN msg="warn message"`; !strings.Contains(got, want) {
+			t.Errorf("expected output to contains %q, got %q", want, got)
+		}
+		if want := `level=ERROR msg="error message"`; !strings.Contains(got, want) {
+			t.Errorf("expected output to contains %q, got %q", want, got)
+		}
+	})
+
+	t.Run("REVIVE_LOG_LEVEL invalid defaults to warn", func(t *testing.T) {
+		t.Setenv("REVIVE_LOG_LEVEL", "invalid")
+		var buf bytes.Buffer
+		logging.InitForTesting(t, &buf)
+
+		logger, err := logging.GetLogger()
+		if err != nil {
+			t.Fatalf("expected no error, got %v", err)
+		}
+		if logger == nil {
+			t.Fatal("expected logger to be non-nil")
+		}
+
+		logger.Warn("warn message")
+
+		got := buf.String()
+
+		if strings.Contains(got, "level=DEBUG") || strings.Contains(got, "level=INFO") {
+			t.Errorf("unexpected output: got %q", got)
+		}
+		if want := `level=WARN msg="warn message"`; !strings.Contains(got, want) {
+			t.Errorf("expected output to contains %q, got %q", want, got)
+		}
+	})
+
+	t.Run("same logger instance returned", func(t *testing.T) {
+		t.Setenv("REVIVE_LOG_LEVEL", "info")
+		var buf bytes.Buffer
+		logging.InitForTesting(t, &buf)
+
+		logger1, err := logging.GetLogger()
+		if err != nil {
+			t.Fatalf("expected no error, got %v", err)
 		}
 
 		logger2, err := logging.GetLogger()
@@ -48,8 +111,8 @@ func TestGetLogger(t *testing.T) {
 			t.Fatalf("expected no error, got %v", err)
 		}
 
-		if logger != logger2 {
-			t.Errorf("expected the same logger instance to be returned: logger1=%+v, logger2=%+v", logger, logger2)
+		if logger1 != logger2 {
+			t.Errorf("expected the same logger instance to be returned: logger1=%+v, logger2=%+v", logger1, logger2)
 		}
 	})
 }

@@ -5,45 +5,46 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"sync"
+	"testing"
 )
 
-const logFile = "revive.log"
-
-var (
-	logger     *slog.Logger
-	loggerFile *os.File
-)
-
-// GetLogger retrieves an instance of an application logger which outputs
-// to a file if the debug flag is enabled.
+// GetLogger retrieves an instance of an application logger.
+// The log level can be configured via the REVIVE_LOG_LEVEL environment variable.
+// If REVIVE_LOG_LEVEL is unset or empty, logging is disabled.
+// If it is set to an invalid value, the log level defaults to WARN.
+//
+//nolint:unparam // err is always nil, but is included in the signature for future extensibility.
 func GetLogger() (*slog.Logger, error) {
-	if logger != nil {
-		return logger, nil
-	}
-
-	debugModeEnabled := os.Getenv("DEBUG") != ""
-	if !debugModeEnabled {
-		// by default, suppress all logging output
-		return slog.New(slog.DiscardHandler), nil
-	}
-
-	var err error
-	loggerFile, err = os.Create(logFile)
-	if err != nil {
-		return nil, err
-	}
-
-	logger = slog.New(slog.NewTextHandler(io.MultiWriter(os.Stderr, loggerFile), nil))
-
-	logger.Info("Logger initialized", "logFile", logFile)
-
-	return logger, nil
+	return getLogger(), nil
 }
 
-// Close closes the logger file if it was opened.
-func Close() error {
-	if loggerFile == nil {
-		return nil
+var getLogger = sync.OnceValue(initLogger(os.Stderr))
+
+func initLogger(out io.Writer) func() *slog.Logger {
+	return func() *slog.Logger {
+		logLevel := os.Getenv("REVIVE_LOG_LEVEL")
+		if logLevel == "" {
+			return slog.New(slog.DiscardHandler)
+		}
+
+		leveler := &slog.LevelVar{}
+		opts := &slog.HandlerOptions{Level: leveler}
+
+		level := slog.LevelWarn
+		_ = level.UnmarshalText([]byte(logLevel)) // Ignore error and default to WARN if invalid
+		leveler.Set(level)
+		logger := slog.New(slog.NewTextHandler(out, opts))
+
+		logger.Info("Logger initialized", "logLevel", logLevel)
+
+		return logger
 	}
-	return loggerFile.Close()
+}
+
+// InitForTesting initializes the logger singleton cache for testing purposes.
+// This function should only be called in tests.
+func InitForTesting(tb testing.TB, out io.Writer) {
+	tb.Helper()
+	getLogger = sync.OnceValue(initLogger(out))
 }
