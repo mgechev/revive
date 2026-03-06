@@ -1,3 +1,1 @@
 module github.com/mgechev/revive/testdata
-
-go 1.24.13
