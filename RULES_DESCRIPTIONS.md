@@ -1220,7 +1220,8 @@ _Configuration_: (optional) single map of options (`map[string]any`), provided a
   This option is mutually exclusive with `conventionNameCheckRegex`; setting both results in a configuration error.
 - `conventionNameCheckRegex` (`conventionnamecheckregex`, `convention-name-check-regex`): (string)
   Custom regex pattern to validate package names. If set, package names must match this pattern.
-  The value must be a non-empty string, and this option is mutually exclusive with `skipConventionNameCheck`; setting both results in a configuration error.
+  The value must be a non-empty string, and this option is mutually exclusive with `skipConventionNameCheck`;
+  setting both results in a configuration error.
 - `skipTopLevelCheck` (`skiptoplevelcheck`, `skip-top-level-check`): (bool)
   If `true`, skip checks for top-level package names (e.g., `pkg`). Default: `false`.
 - `skipDefaultBadNameCheck` (`skipdefaultbadnamecheck`, `skip-default-bad-name-check`): (bool)
