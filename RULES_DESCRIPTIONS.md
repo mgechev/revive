@@ -380,12 +380,12 @@ _Description_: This rule warns on some common mistakes when using `defer` statem
 
 | name              | description                                                                                                                                                                                     |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| call-chain (callChain, callchain)        | even if deferring call-chains of the form `foo()()` is valid, it does not helps code understanding (only the last call is deferred)                                                             |
+| call-chain (callChain, callchain)        | even if deferring call-chains of the form `foo()()` is valid, it does not help code understanding (only the last call is deferred)                                                             |
 | loop              | deferring inside loops can be misleading (deferred functions are not executed at the end of the loop iteration but of the current function) and it could lead to exhausting the execution stack |
 | method-call (methodCall, methodcall)       | deferring a call to a method can lead to subtle bugs if the method does not have a pointer receiver                                                                                             |
 | recover           | calling `recover` outside a deferred function has no effect                                                                                                                                     |
 | immediate-recover (immediateRecover, immediaterecover) | calling `recover` at the time a defer is registered, rather than as part of the deferred callback.  e.g. `defer recover()` or equivalent.                                                       |
-| return            | returning values form a deferred function has no effect                                                                                                                                         |
+| return            | returning values from a deferred function has no effect                                                                                                                                         |
 
 <!-- markdownlint-enable MD013 -->
 
@@ -415,7 +415,7 @@ More [information here](https://go.dev/wiki/CodeReviewComments#import-dot).
 
 _Configuration_:
 
-- `allowedPackages` (`allowedpackages`, `allowed-packages`): (list of strings) comma-separated list of allowed dot import packages
+- `allowedPackages` (`allowedpackages`, `allowed-packages`): (list of strings) list of allowed dot import packages
 
 Configuration examples:
 
@@ -757,12 +757,12 @@ Available flags are:
 (i.e. avoid failure messages of the form _type name will be used as x.XY by other packages, and that stutters; consider calling this Y_)
 - `sayRepetitiveInsteadOfStutters` (`sayrepetitiveinsteadofstutters`, `say-repetitive-instead-of-stutters`) replaces the use of the term _stutters_
 by _repetitive_ in failure messages
-- `checkPublicInterface` (`checkpublicinterface`, `check-public-interface`) enabled checking public method definitions in public interface types
-- `disableChecksOnConstants` (`disablechecksonconstants`, `disable-checks-on-constants`) disable all checks on constant declarations
-- `disableChecksOnFunctions` (`disablechecksonfunctions`, `disable-checks-on-functions`) disable all checks on function declarations
-- `disableChecksOnMethods` (`disablechecksonmethods`, `disable-checks-on-methods`) disable all checks on method declarations
-- `disableChecksOnTypes` (`disablechecksontypes`, `disable-checks-on-types`) disable all checks on type declarations
-- `disableChecksOnVariables` (`disablechecksonvariables`, `disable-checks-on-variables`) disable all checks on variable declarations
+- `checkPublicInterface` (`checkpublicinterface`, `check-public-interface`) enables checking public method definitions in public interface types
+- `disableChecksOnConstants` (`disablechecksonconstants`, `disable-checks-on-constants`) disables all checks on constant declarations
+- `disableChecksOnFunctions` (`disablechecksonfunctions`, `disable-checks-on-functions`) disables all checks on function declarations
+- `disableChecksOnMethods` (`disablechecksonmethods`, `disable-checks-on-methods`) disables all checks on method declarations
+- `disableChecksOnTypes` (`disablechecksontypes`, `disable-checks-on-types`) disables all checks on type declarations
+- `disableChecksOnVariables` (`disablechecksonvariables`, `disable-checks-on-variables`) disables all checks on variable declarations
 
 Configuration examples:
 
@@ -1216,23 +1216,24 @@ By default, it checks for:
 _Configuration_: (optional) single map of options (`map[string]any`), provided as the single configuration argument in the rule's arguments array.
 
 - `skipConventionNameCheck` (`skipconventionnamecheck`, `skip-convention-name-check`): (bool)
-If `true`, skip checks for package name conventions (underscores, MixedCaps, etc.). Default: `false`.
-This option is mutually exclusive with `conventionNameCheckRegex`; setting both results in a configuration error.
+  If `true`, skip checks for package name conventions (underscores, MixedCaps, etc.). Default: `false`.
+  This option is mutually exclusive with `conventionNameCheckRegex`; setting both results in a configuration error.
 - `conventionNameCheckRegex` (`conventionnamecheckregex`, `convention-name-check-regex`): (string)
-Custom regex pattern to validate package names. If set, package names must match this pattern.
-The value must be a non-empty string, and this option is mutually exclusive with `skipConventionNameCheck`; setting both results in a configuration error.
+  Custom regex pattern to validate package names. If set, package names must match this pattern.
+  The value must be a non-empty string, and this option is mutually exclusive with `skipConventionNameCheck`;
+  setting both results in a configuration error.
 - `skipTopLevelCheck` (`skiptoplevelcheck`, `skip-top-level-check`): (bool)
-If `true`, skip checks for top-level package names (e.g., `pkg`). Default: `false`.
+  If `true`, skip checks for top-level package names (e.g., `pkg`). Default: `false`.
 - `skipDefaultBadNameCheck` (`skipdefaultbadnamecheck`, `skip-default-bad-name-check`): (bool)
-If `true`, skip checks for default bad package names (e.g., `common`, `utils`). Default: `false`.
+  If `true`, skip checks for default bad package names (e.g., `common`, `utils`). Default: `false`.
 - `checkExtraBadName` (`checkextrabadname`, `check-extra-bad-name`): (bool)
-If `true`, enable checks for extra bad package names (e.g., `helpers`, `models`, `shared`, `utilities`). Default: `false`.
+  If `true`, enable checks for extra bad package names (e.g., `helpers`, `models`, `shared`, `utilities`). Default: `false`.
 - `userDefinedBadNames` (`userdefinedbadnames`, `user-defined-bad-names`): ([]string) List of user-defined bad package names to check for.
 - `skipCollisionWithCommonStd` (`skipcollisionwithcommonstd`, `skip-collision-with-common-std`): (bool)
-If `true`, skip checks for collisions with the most common Go standard library packages. Default: `false`.
+  If `true`, skip checks for collisions with the most common Go standard library packages. Default: `false`.
 - `checkCollisionWithAllStd` (`checkcollisionwithallstd`, `check-collision-with-all-std`): (bool)
-If `true`, enable checks for collisions with all packages from Go standard library. Default: `false`.
-This option is mutually exclusive with `skipCollisionWithCommonStd`; setting both results in a configuration error.
+  If `true`, enable checks for collisions with all packages from Go standard library. Default: `false`.
+  This option is mutually exclusive with `skipCollisionWithCommonStd`; setting both results in a configuration error.
 
 Configuration examples:
 
@@ -1741,8 +1742,8 @@ The rule will not warn on local URLs (`localhost`, `127.0.0.1`).
 
 _Description_: This rule warns on unused parameters. Functions or methods with unused parameters can be a symptom of an unfinished refactoring or a bug.
 
-_Configuration_: Supports arguments with single of `map[string]any` with option `allowRegex` (`allowregex`, `allow-regex`) to provide additional
-to `_` mask to allowed unused parameter names.
+_Configuration_: Supports a single `map[string]any` argument with an `allowRegex` (`allowregex`, `allow-regex`) option to
+specify additional allowed patterns for unused parameter names beyond the default `_`.
 
 Configuration examples:
 
@@ -1767,7 +1768,7 @@ arguments = [{ allow-regex = "^_" }]
 _Description_: This rule warns on unused method receivers. Methods with unused receivers can be a symptom of an unfinished refactoring or a bug.
 
 _Configuration_:
-Supports arguments with single of `map[string]any` with option `allowRegex` to provide additional to `_` mask to allowed unused receiver names.
+Supports a single `map[string]any` argument with an `allow-regex` option to specify additional allowed unused receiver name patterns beyond `_`.
 
 Configuration examples:
 
