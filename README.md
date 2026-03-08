@@ -598,7 +598,10 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 
 ## Configurable rules
 
-Here you can find how you can configure some existing rules:
+Here you can find how you can configure some existing rules.
+Rule configuration options are documented using the `kebab-case` format (e.g., `max-lit-count`, `allow-strs`, `skip-comments`), and this format is preferred.
+For backward compatibility, `camelCase` (e.g., `maxLitCount`, `allowStrs`, `skipComments`)
+and `lowercase` (e.g., `maxlitcount`, `allowstrs`, `skipcomments`) formats are still supported but are deprecated.
 
 ### `var-naming`
 
