@@ -2,7 +2,7 @@ module github.com/mgechev/revive/tools
 
 go 1.25.0
 
-require github.com/golangci/golangci-lint/v2 v2.11.1
+require github.com/golangci/golangci-lint/v2 v2.11.2
 
 require (
 	4d63.com/gocheckcompilerdirectives v1.3.0 // indirect
