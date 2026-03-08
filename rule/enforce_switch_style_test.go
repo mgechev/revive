@@ -37,6 +37,16 @@ func TestEnforceSwitchStyleRule_Configure(t *testing.T) {
 			wantAllowDefaultNotLast: true,
 		},
 		{
+			name: "valid kebab-cased arguments",
+			arguments: lint.Arguments{
+				"allow-default-not-last",
+				"allow-no-default",
+			},
+			wantErr:                 nil,
+			wantAllowNoDefault:      true,
+			wantAllowDefaultNotLast: true,
+		},
+		{
 			name: "valid lowercased arguments",
 			arguments: lint.Arguments{
 				"allowdefaultnotlast",
