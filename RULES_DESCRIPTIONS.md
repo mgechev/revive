@@ -112,7 +112,7 @@ List of all available rules.
 
 ## Configuration options format
 
-All rule configuration options use the `kebab-case` format (e.g., `max-lit-count`, `allow-strs`, `skip-comments`).
+By convention, rule configuration options are documented using the `kebab-case` format (e.g., `max-lit-count`, `allow-strs`, `skip-comments`).
 For backward compatibility, `camelCase` (e.g., `maxLitCount`, `allowStrs`, `skipComments`)
 and `lowercase` (e.g., `maxlitcount`, `allowstrs`, `skipcomments`) formats are still supported but are deprecated.
 
