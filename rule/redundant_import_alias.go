@@ -43,14 +43,8 @@ func (*RedundantImportAlias) Name() string {
 }
 
 func getImportPackageName(imp *ast.ImportSpec, typesInfo *types.Info) string {
-	if typesInfo != nil {
-		if obj, ok := typesInfo.Defs[imp.Name]; ok {
-			if pkgName, ok := obj.(*types.PkgName); ok {
-				if imported := pkgName.Imported(); imported != nil && imported.Name() != "" {
-					return imported.Name()
-				}
-			}
-		}
+	if name := importPackageNameFromTypes(imp, typesInfo); name != "" {
+		return name
 	}
 
 	const pathSep = "/"
@@ -63,4 +57,27 @@ func getImportPackageName(imp *ast.ImportSpec, typesInfo *types.Info) string {
 	}
 
 	return strings.Trim(path[i+1:], strDelim)
+}
+
+func importPackageNameFromTypes(imp *ast.ImportSpec, typesInfo *types.Info) string {
+	if typesInfo == nil || imp.Name == nil {
+		return ""
+	}
+
+	obj, ok := typesInfo.Defs[imp.Name]
+	if !ok {
+		return ""
+	}
+
+	pkgName, ok := obj.(*types.PkgName)
+	if !ok {
+		return ""
+	}
+
+	imported := pkgName.Imported()
+	if imported == nil {
+		return ""
+	}
+
+	return imported.Name()
 }

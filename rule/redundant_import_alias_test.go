@@ -15,6 +15,7 @@ func TestGetImportPackageNameUsesImportedPackageNameWhenTypeInfoAvailable(t *tes
 	}
 
 	typesInfo := &types.Info{Defs: map[*ast.Ident]types.Object{}}
+	// github.com/enetx/utls intentionally exposes package name "tls".
 	typesInfo.Defs[alias] = types.NewPkgName(token.NoPos, nil, alias.Name, types.NewPackage("github.com/enetx/utls", "tls"))
 
 	got := getImportPackageName(imp, typesInfo)
