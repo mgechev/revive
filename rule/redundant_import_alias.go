@@ -3,6 +3,7 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"go/types"
 	"strings"
 
 	"github.com/mgechev/revive/lint"
@@ -15,12 +16,15 @@ type RedundantImportAlias struct{}
 func (*RedundantImportAlias) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
+	_ = file.Pkg.TypeCheck()
+	typesInfo := file.Pkg.TypesInfo()
+
 	for _, imp := range file.AST.Imports {
 		if imp.Name == nil {
 			continue
 		}
 
-		if getImportPackageName(imp) == imp.Name.Name {
+		if getImportPackageName(imp, typesInfo) == imp.Name.Name {
 			failures = append(failures, lint.Failure{
 				Confidence: 1,
 				Failure:    fmt.Sprintf("Import alias %q is redundant", imp.Name.Name),
@@ -38,7 +42,17 @@ func (*RedundantImportAlias) Name() string {
 	return "redundant-import-alias"
 }
 
-func getImportPackageName(imp *ast.ImportSpec) string {
+func getImportPackageName(imp *ast.ImportSpec, typesInfo *types.Info) string {
+	if typesInfo != nil {
+		if obj, ok := typesInfo.Defs[imp.Name]; ok {
+			if pkgName, ok := obj.(*types.PkgName); ok {
+				if imported := pkgName.Imported(); imported != nil && imported.Name() != "" {
+					return imported.Name()
+				}
+			}
+		}
+	}
+
 	const pathSep = "/"
 	const strDelim = `"`
 
