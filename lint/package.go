@@ -112,7 +112,7 @@ func (p *Package) TypeCheck() error {
 	config := &types.Config{
 		// By setting a no-op error reporter, the type checker does as much work as possible.
 		Error:    func(error) {},
-		Importer: importer.Default(),
+		Importer: importer.ForCompiler(p.fset, "source", nil),
 	}
 	info := &types.Info{
 		Types:  map[ast.Expr]types.TypeAndValue{},
