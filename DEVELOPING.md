@@ -47,6 +47,9 @@ GitHub Copilot.
 
 If you want to develop a new rule, follow as an example the already existing rules in the [rule package](https://github.com/mgechev/revive/tree/master/rule).
 
+When adding a new rule that does not require type information (for example, a rule that does not call `file.Pkg.TypeCheck()` and works purely on syntax/AST),
+add its name to `untyped.toml` and keep that file in sync with any such rules.
+
 Each rule needs to implement the `lint.Rule` interface:
 
 ```go
