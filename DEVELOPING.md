@@ -47,6 +47,8 @@ GitHub Copilot.
 
 If you want to develop a new rule, follow as an example the already existing rules in the [rule package](https://github.com/mgechev/revive/tree/master/rule).
 
+When adding a new untyped rule to the repository, add it to `untyped.toml`.
+
 Each rule needs to implement the `lint.Rule` interface:
 
 ```go
