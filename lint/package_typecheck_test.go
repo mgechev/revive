@@ -2,6 +2,7 @@ package lint
 
 import (
 	"go/ast"
+	"go/build"
 	"go/parser"
 	"go/token"
 	"os"
@@ -61,10 +62,12 @@ func TestEnsureSourceImporterGOROOTUsesGoEnvFallback(t *testing.T) {
 
 	prevCmd := sourceImporterGOROOTCmd
 	prevResolved := sourceImporterGOROOT
+	prevBuildGOROOT := build.Default.GOROOT
 	t.Cleanup(func() {
 		sourceImporterGOROOTCmd = prevCmd
 		sourceImporterGOROOT = prevResolved
 		sourceImporterGOROOTOnce = sync.Once{}
+		build.Default.GOROOT = prevBuildGOROOT
 	})
 
 	sourceImporterGOROOTOnce = sync.Once{}
@@ -72,10 +75,14 @@ func TestEnsureSourceImporterGOROOTUsesGoEnvFallback(t *testing.T) {
 	sourceImporterGOROOTCmd = func() (string, error) {
 		return "C:/go-fallback\n", nil
 	}
+	build.Default.GOROOT = ""
 
 	ensureSourceImporterGOROOT("")
 
 	if got := os.Getenv("GOROOT"); got != "C:/go-fallback" {
 		t.Fatalf("expected GOROOT to be set from go env fallback, got %q", got)
+	}
+	if got := build.Default.GOROOT; got != "C:/go-fallback" {
+		t.Fatalf("expected build.Default.GOROOT to be set from go env fallback, got %q", got)
 	}
 }

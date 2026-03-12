@@ -3,6 +3,7 @@ package lint
 import (
 	"errors"
 	"go/ast"
+	"go/build"
 	"go/importer"
 	"go/token"
 	"go/types"
@@ -81,6 +82,9 @@ func ensureSourceImporterGOROOT(runtimeGOROOT string) {
 
 	if goroot != "" {
 		_ = os.Setenv("GOROOT", goroot)
+		if build.Default.GOROOT == "" {
+			build.Default.GOROOT = goroot
+		}
 	}
 }
 
