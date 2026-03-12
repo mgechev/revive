@@ -6,6 +6,10 @@ import (
 	"go/importer"
 	"go/token"
 	"go/types"
+	"os"
+	"os/exec"
+	"runtime"
+	"strings"
 	"sync"
 
 	goversion "github.com/hashicorp/go-version"
@@ -45,6 +49,40 @@ var (
 	// Go125 is a constant representing the Go version 1.25.
 	Go125 = goversion.Must(goversion.NewVersion("1.25"))
 )
+
+var (
+	sourceImporterGOROOTOnce = sync.Once{}
+	sourceImporterGOROOT     string
+	sourceImporterGOROOTCmd  = func() (string, error) {
+		out, err := exec.Command("go", "env", "GOROOT").Output()
+		if err != nil {
+			return "", err
+		}
+		return strings.TrimSpace(string(out)), nil
+	}
+)
+
+func ensureSourceImporterGOROOT(runtimeGOROOT string) {
+	if os.Getenv("GOROOT") != "" {
+		return
+	}
+
+	goroot := runtimeGOROOT
+	if goroot == "" {
+		sourceImporterGOROOTOnce.Do(func() {
+			resolved, err := sourceImporterGOROOTCmd()
+			if err != nil {
+				return
+			}
+			sourceImporterGOROOT = strings.TrimSpace(resolved)
+		})
+		goroot = sourceImporterGOROOT
+	}
+
+	if goroot != "" {
+		_ = os.Setenv("GOROOT", goroot)
+	}
+}
 
 // Files return package's files.
 func (p *Package) Files() map[string]*File {
@@ -108,6 +146,8 @@ func (p *Package) TypeCheck() error {
 	if alreadyTypeChecked {
 		return nil
 	}
+
+	ensureSourceImporterGOROOT(runtime.GOROOT())
 
 	config := &types.Config{
 		// By setting a no-op error reporter, the type checker does as much work as possible.

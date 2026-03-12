@@ -4,6 +4,8 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"os"
+	"sync"
 	"testing"
 )
 
@@ -51,5 +53,29 @@ func f() { fmt.Println("ok") }
 	}
 	if got := pkg.TypeOf(printCall.Fun); got == nil {
 		t.Fatal("expected type info for fmt.Println call")
+	}
+}
+
+func TestEnsureSourceImporterGOROOTUsesGoEnvFallback(t *testing.T) {
+	t.Setenv("GOROOT", "")
+
+	prevCmd := sourceImporterGOROOTCmd
+	prevResolved := sourceImporterGOROOT
+	t.Cleanup(func() {
+		sourceImporterGOROOTCmd = prevCmd
+		sourceImporterGOROOT = prevResolved
+		sourceImporterGOROOTOnce = sync.Once{}
+	})
+
+	sourceImporterGOROOTOnce = sync.Once{}
+	sourceImporterGOROOT = ""
+	sourceImporterGOROOTCmd = func() (string, error) {
+		return "C:/go-fallback\n", nil
+	}
+
+	ensureSourceImporterGOROOT("")
+
+	if got := os.Getenv("GOROOT"); got != "C:/go-fallback" {
+		t.Fatalf("expected GOROOT to be set from go env fallback, got %q", got)
 	}
 }
