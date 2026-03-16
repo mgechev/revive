@@ -1,9 +1,11 @@
-package rule
+package astutils_test
 
 import (
 	"fmt"
 	"go/ast"
 	"testing"
+
+	"github.com/mgechev/revive/internal/astutils"
 )
 
 func TestIsCallToExitFunction(t *testing.T) {
@@ -41,8 +43,8 @@ func TestIsCallToExitFunction(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%s.%s", tt.pkgName, tt.functionName), func(t *testing.T) {
-			if got := isCallToExitFunction(tt.pkgName, tt.functionName, tt.functionArgs); got != tt.expected {
-				t.Errorf("isCallToExitFunction(%s, %s, %v) = %v; want %v", tt.pkgName, tt.functionName, tt.functionArgs, got, tt.expected)
+			if got := astutils.IsCallToExitFunction(tt.pkgName, tt.functionName, tt.functionArgs); got != tt.expected {
+				t.Errorf("IsCallToExitFunction(%s, %s, %v) = %v; want %v", tt.pkgName, tt.functionName, tt.functionArgs, got, tt.expected)
 			}
 		})
 	}

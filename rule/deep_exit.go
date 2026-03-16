@@ -65,7 +65,7 @@ func (w *lintDeepExit) Visit(node ast.Node) ast.Visitor {
 
 	pkg := id.Name
 	fn := fc.Sel.Name
-	if isCallToExitFunction(pkg, fn, ce.Args) {
+	if astutils.IsCallToExitFunction(pkg, fn, ce.Args) {
 		msg := fmt.Sprintf("calls to %s.%s only in main() or init() functions", pkg, fn)
 
 		if pkg == "flag" && fn == "NewFlagSet" &&

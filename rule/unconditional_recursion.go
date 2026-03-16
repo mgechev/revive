@@ -193,7 +193,7 @@ func (*lintUnconditionalRecursionRule) hasControlExit(node ast.Node) bool {
 
 			functionName := se.Sel.Name
 			pkgName := id.Name
-			return isCallToExitFunction(pkgName, functionName, n.Args)
+			return astutils.IsCallToExitFunction(pkgName, functionName, n.Args)
 		}
 
 		return false

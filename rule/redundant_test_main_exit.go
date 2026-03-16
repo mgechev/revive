@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 
+	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -71,7 +72,7 @@ func (w *lintRedundantTestMainExit) Visit(node ast.Node) ast.Visitor {
 	}
 
 	fn := fc.Sel.Name
-	if isCallToExitFunction(pkg, fn, ce.Args) {
+	if astutils.IsCallToExitFunction(pkg, fn, ce.Args) {
 		w.onFailure(lint.Failure{
 			Confidence: 1,
 			Node:       ce,
