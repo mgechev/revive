@@ -1759,6 +1759,47 @@ _Limitations_: The rule doesn't rely on type information but on variable names t
 This means the rule search for `wg` (the defacto standard name for wait groups);
 if the waitgroup variable is named differently than `wg` the rule will skip it.
 
+### Examples (use-waitgroup-go)
+
+Before (violation):
+
+```go
+import "sync"
+
+func concurrentProcess(jobs int) {
+	wg := sync.WaitGroup{}
+
+	wg.Add(jobs)
+
+	for range jobs {
+		go func() {
+			defer wg.Done()
+			// do something
+		}()
+	}
+
+	wg.Wait()
+}
+```
+
+After (fixed):
+
+```go
+import "sync"
+
+func concurrentProcess(jobs int) {
+	wg := sync.WaitGroup{}
+
+	for range jobs {
+		wg.Go(func() {
+			// do something
+		})
+	}
+
+	wg.Wait()
+}
+```
+
 _Configuration_: N/A
 
 ## useless-break
