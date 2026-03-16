@@ -124,3 +124,12 @@ Built		2024-11-15 10:52 UTC by builder
 		t.Errorf("getVersion() = %q, want %q", got, want)
 	}
 }
+
+func TestGetDevelopmentVersion(t *testing.T) {
+	got := getVersion(defaultBuilder, defaultDate, defaultCommit, defaultVersion)
+	want := "version (devel)\n"
+
+	if got != want {
+		t.Errorf("getVersion() = %q, want %q", got, want)
+	}
+}
