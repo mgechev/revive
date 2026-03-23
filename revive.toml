@@ -85,6 +85,7 @@ warningCode = 1
 [rule.optimize-operands-order]
 [rule.package-comments]
 [rule.package-directory-mismatch]
+[rule.package-naming]
 [rule.range]
 [rule.range-val-address]
 [rule.range-val-in-closure]
