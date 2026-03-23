@@ -190,6 +190,7 @@ linters:
         - name: optimize-operands-order
         - name: package-comments
         - name: package-directory-mismatch
+        - name: package-naming
         - name: range
         - name: range-val-address
         - name: range-val-in-closure

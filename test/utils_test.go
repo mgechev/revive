@@ -73,12 +73,12 @@ func assertSuccess(tb testing.TB, filePath string, rules []lint.Rule, config map
 		return
 	}
 
-	failures := ""
+	var failures []string
 	for p := range ps {
-		failures += p.Failure
+		failures = append(failures, p.Failure)
 	}
-	if failures != "" {
-		tb.Errorf("Expected the rule to pass but got the following failures: %s", failures)
+	if len(failures) > 0 {
+		tb.Errorf("Expected the rule to pass but got the following failures: %s", strings.Join(failures, ", "))
 	}
 }
 
