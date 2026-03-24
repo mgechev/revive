@@ -8,4 +8,5 @@ import (
 
 func TestUseErrorsNew(t *testing.T) {
 	testRule(t, "use_errors_new", &rule.UseErrorsNewRule{})
+	testRule(t, "go1.26/use_errors_new", &rule.UseErrorsNewRule{})
 }

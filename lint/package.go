@@ -44,6 +44,8 @@ var (
 	Go124 = goversion.Must(goversion.NewVersion("1.24"))
 	// Go125 is a constant representing the Go version 1.25.
 	Go125 = goversion.Must(goversion.NewVersion("1.25"))
+	// Go126 is a constant representing the Go version 1.26.
+	Go126 = goversion.Must(goversion.NewVersion("1.26"))
 )
 
 // Files return package's files.

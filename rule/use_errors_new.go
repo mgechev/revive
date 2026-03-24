@@ -12,6 +12,11 @@ type UseErrorsNewRule struct{}
 
 // Apply applies the rule to given file.
 func (*UseErrorsNewRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+	if file.Pkg.IsAtLeastGoVersion(lint.Go126) {
+		// For unformatted strings in Go 1.26, fmt.Errorf mathes the behavior of errors.New, so we can skip the analysis.
+		return nil
+	}
+
 	var failures []lint.Failure
 
 	walker := lintFmtErrorf{
