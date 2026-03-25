@@ -36,6 +36,8 @@ var (
 
 	// Go115 is a constant representing the Go version 1.15.
 	Go115 = goversion.Must(goversion.NewVersion("1.15"))
+	// Go118 is a constant representing the Go version 1.18.
+	Go118 = goversion.Must(goversion.NewVersion("1.18"))
 	// Go121 is a constant representing the Go version 1.21.
 	Go121 = goversion.Must(goversion.NewVersion("1.21"))
 	// Go122 is a constant representing the Go version 1.22.

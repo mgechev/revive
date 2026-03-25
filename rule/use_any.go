@@ -11,6 +11,10 @@ type UseAnyRule struct{}
 
 // Apply applies the rule to given file.
 func (*UseAnyRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+	if !file.Pkg.IsAtLeastGoVersion(lint.Go118) {
+		return nil // nothing to do, the alias any was added in version 1.18
+	}
+
 	var failures []lint.Failure
 
 	walker := lintUseAny{
