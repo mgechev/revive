@@ -879,7 +879,7 @@ _Configuration_: N/A
 
 _Description_: Functions too long (with many statements and/or lines) can be hard to understand.
 
-_Configuration_: (int, int) the maximum allowed statements and lines. Set to `0` to disable the check. Default: `50`, `75`.
+_Configuration_: (int, int) the maximum allowed statements and lines. Set a value to `0` to disable that specific check; if both values are `0`, the rule is disabled. Default: `50`, `75`.
 
 Configuration example:
 
@@ -926,7 +926,7 @@ _Configuration_: N/A
 
 ## identical-ifelseif-conditions
 
-_Description_: An `if ... else if` chain  with identical conditions can lead to
+_Description_: An `if ... else if` chain with identical conditions can lead to
 unreachable code and is a potential source of bugs while making the code harder to read and maintain.
 
 _Configuration_: N/A
@@ -1574,8 +1574,8 @@ var _ = time.Date(2023, 01, 02, 03, 04, 00, 0, time.UTC)
 
 **_Typed_**
 
-_Description_: This rule warns when using `==` and `!=` for equality check `time.Time` and suggest to `time.time.Equal` method,
-for about information follow [this link](https://pkg.go.dev/time#Time)
+_Description_: This rule warns when using `==` and `!=` for equality checks on `time.Time` and suggests using the `time.Time.Equal` method.
+For more information, see [this link](https://pkg.go.dev/time#Time).
 
 _Configuration_: N/A
 

@@ -487,7 +487,7 @@ You can use the following exclude patterns
 
 ## Available Rules
 
-See [RULES_DESCRIPTIONS.md](./RULES_DESCRIPTIONS.md#description-of-available-rules) for the list of all available rules and its configuration.
+See [RULES_DESCRIPTIONS.md](./RULES_DESCRIPTIONS.md#description-of-available-rules) for the list of all available rules and their configuration options.
 
 ## Available Formatters
 
