@@ -221,7 +221,7 @@ Note that while `revive` configuration is in TOML, that of `golangci-lint` is in
 See the [golangci-lint website](https://golangci-lint.run/usage/linters/#revive) for more information about configuring `revive`.
 
 Please notice that if no particular configuration is provided, `revive` will behave as `golint` does, i.e. all `golint` rules are enabled
-(the [Available Rules table](#available-rules) details what are the `golint` rules).
+(see [defaults.toml](./defaults.toml) for the list of rules in the default configuration).
 When a configuration is provided, only rules in the configuration are enabled.
 
 ### Command Line Flags
@@ -487,7 +487,7 @@ You can use the following exclude patterns
 
 ## Available Rules
 
-See [RULES_DESCRIPTIONS.md](./RULES_DESCRIPTIONS.md#description-of-available-rules) for the list of all available rules and their configuration options.
+See [RULES_DESCRIPTIONS.md](./RULES_DESCRIPTIONS.md) for the list of all available rules and their configuration options.
 
 ## Available Formatters
 
