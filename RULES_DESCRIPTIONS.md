@@ -1708,6 +1708,9 @@ _Configuration_: N/A
 
 _Description_: This rule identifies calls to `fmt.Errorf` that can be safely replaced by, the more efficient, `errors.New`.
 
+_Note_: This rule is irrelevant for Go 1.26+.
+For unformatted strings, `fmt.Errorf("x")` generally [matches](https://go.dev/doc/go1.26#fmtpkgfmt) the allocations for `errors.New("x")`.
+
 _Configuration_: N/A
 
 ## use-fmt-print
