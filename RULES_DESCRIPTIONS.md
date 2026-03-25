@@ -143,7 +143,7 @@ arguments = [
 _Description_: Warns when a function receives more parameters than the maximum set by the rule's configuration.
 Enforcing a maximum number of parameters helps to keep the code readable and maintainable.
 
-_Configuration_: (int) the maximum number of parameters allowed per function.
+_Configuration_: (int) the maximum number of parameters allowed per function. Default: `8`.
 
 Configuration example:
 
@@ -154,13 +154,13 @@ arguments = [4]
 
 ## atomic
 
-_Description_: Check for commonly mistaken usages of the `sync/atomic` package
+_Description_: Check for commonly mistaken usages of the `sync/atomic` package.
 
 _Configuration_: N/A
 
 ## banned-characters
 
-_Description_: Checks given banned characters in identifiers(func, var, const). Comments are not checked.
+_Description_: Checks given banned characters in identifiers (func, var, const). Comments are not checked.
 
 _Configuration_: This rule requires a slice of strings, the characters to ban.
 
@@ -173,11 +173,13 @@ arguments = ["Ω", "Σ", "σ"]
 
 ## bare-return
 
-_Description_: Warns on bare (a.k.a. naked) returns
+_Description_: Warns on bare (a.k.a. naked) returns.
 
 _Configuration_: N/A
 
 ## blank-imports
+
+**_Ported from golint_**
 
 _Description_: Blank import should be only in a main or test package, or have a comment justifying it.
 
@@ -231,7 +233,7 @@ While cyclomatic complexity is good to measure "testability" of the code,
 cognitive complexity aims to provide a more precise measure of the difficulty of understanding the code.
 Enforcing a maximum complexity per function helps to keep code readable and maintainable.
 
-_Configuration_: (int) the maximum function complexity
+_Configuration_: (int) the maximum function complexity. Default: `7`.
 
 Configuration example:
 
@@ -242,7 +244,8 @@ arguments = [7]
 
 ## comment-spacings
 
-_Description_: Spots comments of the form:
+_Description_: Warns on malformed comments.
+Spots comments of the form:
 
 ```go
 //This is a malformed comment: no space between // and the start of the sentence
@@ -269,7 +272,7 @@ arguments = ["mypragma:", "+optional"]
 _Description_: Spots files not respecting a minimum value for the [_comments lines density_](https://docs.sonarsource.com/sonarqube/latest/user-guide/metric-definitions/)
 metric = _comment lines / (lines of code + comment lines) * 100_
 
-_Configuration_: (int) the minimum expected comments lines density.
+_Configuration_: (int) the minimum expected comments lines density. Default: `0`.
 
 Configuration example:
 
@@ -314,6 +317,8 @@ _Configuration_: N/A
 
 ## context-as-argument
 
+**_Ported from golint_**
+
 _Description_: By [convention](https://go.dev/wiki/CodeReviewComments#contexts), `context.Context` should be the first parameter of a function.
 This rule spots function declarations that do not follow the convention.
 
@@ -332,6 +337,10 @@ arguments = [
 
 ## context-keys-type
 
+**_Ported from golint_**
+
+**_Typed_**
+
 _Description_: Basic types should not be used as a key in `context.WithValue`.
 
 _Configuration_: N/A
@@ -341,7 +350,7 @@ _Configuration_: N/A
 _Description_: [Cyclomatic complexity](https://en.wikipedia.org/wiki/Cyclomatic_complexity) is a measure of code complexity.
 Enforcing a maximum complexity per function helps to keep code readable and maintainable.
 
-_Configuration_: (int) the maximum function complexity
+_Configuration_: (int) the maximum function complexity. Default: `10`.
 
 Configuration example:
 
@@ -395,6 +404,8 @@ arguments = [["call-chain", "loop"]]
 ```
 
 ## dot-imports
+
+**_Ported from golint_**
 
 _Description_: Importing with `.` makes the programs much harder to understand because it is unclear whether names belong to the current package or
 to an imported package.
@@ -526,6 +537,8 @@ this rule warns when there are heading or trailing newlines in code blocks.
 _Configuration_: N/A
 
 ## epoch-naming
+
+**_Typed_**
 
 _Description_: Variables initialized with epoch time methods (`time.Now().Unix()`, `time.Now().UnixMilli()`,
 `time.Now().UnixMicro()`, `time.Now().UnixNano()`) should have names that clearly indicate their time unit to
@@ -675,17 +688,23 @@ Notice that a configuration including both options will effectively deactivate t
 
 ## error-naming
 
+**_Ported from golint_**
+
 _Description_: By convention, for the sake of readability, variables of type `error` must be named with the prefix `err`.
 
 _Configuration_: N/A
 
 ## error-return
 
+**_Ported from golint_**
+
 _Description_: By convention, for the sake of readability, the errors should be last in the list of returned values by a function.
 
 _Configuration_: N/A
 
 ## error-strings
+
+**_Ported from golint_**
 
 _Description_: By convention, for better readability, error messages should not be capitalized or end with punctuation or a newline.
 By default, the rule analyzes functions for creating errors from `fmt`, `errors`, and `github.com/pkg/errors`.
@@ -705,12 +724,18 @@ arguments = ["xerrors.Errorf"]
 
 ## errorf
 
+**_Ported from golint_**
+
+**_Typed_**
+
 _Description_: It is possible to get a simpler program by replacing `errors.New(fmt.Sprintf())` with `fmt.Errorf()`.
 This rule spots that kind of simplification opportunities.
 
 _Configuration_: N/A
 
 ## exported
+
+**_Ported from golint_**
 
 _Description_: Exported function and methods should have comments. This warns on undocumented exported functions and methods.
 
@@ -775,7 +800,7 @@ arguments = [{ max = 100, skip-comments = true, skip-blank-lines = true }]
 
 ## filename-format
 
-_Description_: enforces conventions on source file names. By default, the rule enforces filenames of the form `^[_A-Za-z0-9][_A-Za-z0-9-]*\.go$`.
+_Description_: Enforces conventions on source file names. By default, the rule enforces filenames of the form `^[_A-Za-z0-9][_A-Za-z0-9-]*\.go$`.
 Optionally, the rule can be configured to enforce other forms.
 
 _Configuration_: (string) regular expression for source filenames.
@@ -854,7 +879,7 @@ _Configuration_: N/A
 
 _Description_: Functions too long (with many statements and/or lines) can be hard to understand.
 
-_Configuration_: (int,int) the maximum allowed statements and lines. Must be non-negative integers. Set to 0 to disable the check
+_Configuration_: (int, int) the maximum allowed statements and lines. Set to `0` to disable the check. Default: `50`, `75`.
 
 Configuration example:
 
@@ -867,9 +892,10 @@ Will check for functions exceeding 10 statements and will not check the number o
 
 ## function-result-limit
 
-_Description_: Functions returning too many results can be hard to understand/use.
+_Description_: Specifies the maximum number of results a function can return.
+Functions returning too many results can be hard to understand/use.
 
-_Configuration_: (int) the maximum allowed return values
+_Configuration_: (int) the maximum allowed return values. Default: `3`.
 
 Configuration example:
 
@@ -880,7 +906,8 @@ arguments = [3]
 
 ## get-return
 
-_Description_: Typically, functions with names prefixed with _Get_ are supposed to return a value.
+_Description_: Warns on getters that do not yield any result.
+Typically, functions with names prefixed with _Get_ are supposed to return a value.
 
 _Configuration_: N/A
 
@@ -892,27 +919,27 @@ _Configuration_: N/A
 
 ## identical-ifelseif-branches
 
-_Description_: an `if ... else if` chain with identical branches makes maintenance harder
+_Description_: An `if ... else if` chain with identical branches makes maintenance harder
 and might be a source of bugs. Duplicated branches should be consolidated in one.
 
 _Configuration_: N/A
 
 ## identical-ifelseif-conditions
 
-_Description_: an `if ... else if` chain  with identical conditions can lead to
+_Description_: An `if ... else if` chain  with identical conditions can lead to
 unreachable code and is a potential source of bugs while making the code harder to read and maintain.
 
 _Configuration_: N/A
 
 ## identical-switch-branches
 
-_Description_: a `switch` with identical branches makes maintenance harder
+_Description_: A `switch` with identical branches makes maintenance harder
 and might be a source of bugs. Duplicated branches should be consolidated
 in one case clause.
 
 ## identical-switch-conditions
 
-_Description_: a `switch` statement with cases with the same condition can lead to
+_Description_: A `switch` statement with cases with the same condition can lead to
 unreachable code and is a potential source of bugs while making the code harder to read and maintain.
 
 _Configuration_: N/A
@@ -981,12 +1008,16 @@ arguments = ["crypto/md5", "crypto/sha1", "crypto/**/pkix"]
 
 ## increment-decrement
 
+**_Ported from golint_**
+
 _Description_: By convention, for better readability, incrementing an integer variable by 1 is recommended to be done using the `++` operator.
 This rule spots expressions like `i += 1` and `i -= 1` and proposes to change them into `i++` and `i--`.
 
 _Configuration_: N/A
 
 ## indent-error-flow
+
+**_Ported from golint_**
 
 _Description_: To improve the readability of code, it is recommended to reduce the indentation as much as possible.
 This rule highlights redundant _else-blocks_ that can be eliminated from the code.
@@ -1005,6 +1036,8 @@ arguments = ["preserve-scope"]
 ```
 
 ## inefficient-map-lookup
+
+**_Typed_**
 
 _Description_: This rule identifies code that iteratively searches for a key in a map.
 
@@ -1052,7 +1085,7 @@ _Configuration_: N/A
 
 _Description_: Warns in the presence of code lines longer than a configured maximum.
 
-_Configuration_: (int) maximum line length in characters.
+_Configuration_: (int) maximum line length in characters. Default: `80`.
 
 Configuration example:
 
@@ -1065,7 +1098,7 @@ arguments = [80]
 
 _Description_: Warns if nesting level of control structures (`if-then-else`, `for`, `switch`) exceeds a given maximum.
 
-_Configuration_: (int) maximum accepted nesting level of control structures (defaults to 5)
+_Configuration_: (int) maximum accepted nesting level of control structures. Default: `5`.
 
 Configuration example:
 
@@ -1081,7 +1114,7 @@ and could be a symptom of bad design.
 
 This rule warns on files declaring more than a configured, maximum number of public structs.
 
-_Configuration_: (int) the maximum allowed public structs
+_Configuration_: (int) the maximum allowed public structs. Default: `5`.
 
 Configuration example:
 
@@ -1100,6 +1133,8 @@ parameters are passed to functions that modify them (e.g. `slices.Delete`).
 _Configuration_: N/A
 
 ## modifies-value-receiver
+
+**_Typed_**
 
 _Description_: A method that modifies its receiver value can have undesired behavior.
 The modification can be also the root of a bug because the actual value receiver could be a copy of that used at the calling site.
@@ -1136,6 +1171,8 @@ if !config.IgnoreGeneratedHeader && isGenerated(content) {
 ```
 
 ## package-comments
+
+**_Ported from golint_**
 
 _Description_: Packages should have comments. This rule warns on undocumented packages and when packages comments are detached to the `package` keyword.
 
@@ -1257,6 +1294,8 @@ arguments = [{ ignore-directories = [] }]
 
 ## range-val-address
 
+**_Typed_**
+
 _Description_: Range variables in a loop are reused at each iteration.
 This rule warns when assigning the address of the variable, passing the address to append() or using it in a map.
 
@@ -1276,11 +1315,15 @@ _Note_: This rule is irrelevant for Go 1.22+.
 
 ## range
 
+**_Ported from golint_**
+
 _Description_: This rule suggests a shorter way of writing ranges that do not use the second value.
 
 _Configuration_: N/A
 
 ## receiver-naming
+
+**_Ported from golint_**
 
 _Description_: By convention, receiver names in a method should reflect their identity.
 For example, if the receiver is of type `Parts`, `p` is an adequate name for it.
@@ -1307,10 +1350,13 @@ _Configuration_: N/A
 
 ## redundant-build-tag
 
-_Description_: This rule warns about redundant build tag comments `// +build` when `//go:build` is present.
+_Description_: This rule warns about redundant [build tag comments](https://pkg.go.dev/cmd/go@go1.17.0#hdr-Build_constraints) `// +build`
+when `//go:build` is present.
 `gofmt` in Go 1.17+ automatically adds the `//go:build` constraint, making the `// +build` comment unnecessary.
 
 _Configuration_: N/A
+
+_Note_: This rule is irrelevant for Go 1.16-.
 
 ## redundant-import-alias
 
@@ -1325,7 +1371,7 @@ as the Go test runner automatically handles program termination starting from Go
 
 _Configuration_: N/A
 
-_Note_: This rule is irrelevant for Go versions below 1.15.
+_Note_: This rule is irrelevant for Go 1.14-.
 
 ## string-format
 
@@ -1381,6 +1427,8 @@ arguments = [
 ```
 
 ## string-of-int
+
+**_Typed_**
 
 _Description_: Explicit type conversion `string(i)` where `i` has an integer type other than `rune` might behave not as expected by the developer
 (e.g. `string(42)` is not `"42"`). This rule spot that kind of suspicious conversions.
@@ -1524,12 +1572,18 @@ var _ = time.Date(2023, 01, 02, 03, 04, 00, 0, time.UTC)
 
 ## time-equal
 
+**_Typed_**
+
 _Description_: This rule warns when using `==` and `!=` for equality check `time.Time` and suggest to `time.time.Equal` method,
 for about information follow [this link](https://pkg.go.dev/time#Time)
 
 _Configuration_: N/A
 
 ## time-naming
+
+**_Ported from golint_**
+
+**_Typed_**
 
 _Description_: Using unit-specific suffix like "Secs", "Mins", ... when naming variables of type `time.Duration` can be misleading,
 this rule highlights those cases.
@@ -1572,11 +1626,17 @@ _Configuration_: N/A
 
 ## unexported-return
 
+**_Ported from golint_**
+
+**_Typed_**
+
 _Description_: This rule warns when an exported function or method returns a value of an un-exported type.
 
 _Configuration_: N/A
 
 ## unhandled-error
+
+**_Typed_**
 
 _Description_: This rule warns when errors returned by a function are not explicitly handled on the caller side.
 
@@ -1700,18 +1760,20 @@ arguments = [{ allow-regex = "^_" }]
 
 ## use-any
 
-_Description_: Since Go 1.18, `interface{}` has an alias: `any`. This rule proposes to replace instances of `interface{}` with `any`.
+_Description_: This rule proposes to replace instances of `interface{}` with its alias [`any`](https://pkg.go.dev/builtin@go1.18.0#any).
 
 _Configuration_: N/A
+
+_Note_: This rule is irrelevant for Go 1.17-.
 
 ## use-errors-new
 
 _Description_: This rule identifies calls to `fmt.Errorf` that can be safely replaced by, the more efficient, `errors.New`.
 
+_Configuration_: N/A
+
 _Note_: This rule is irrelevant for Go 1.26+.
 For unformatted strings, `fmt.Errorf("x")` generally [matches](https://go.dev/doc/go1.26#fmtpkgfmt) the allocations for `errors.New("x")`.
-
-_Configuration_: N/A
 
 ## use-fmt-print
 
@@ -1751,6 +1813,8 @@ slices.SortFunc(cfg.Dependencies, func(a, b config.Dependency) int {
 ```
 
 _Configuration_: N/A
+
+_Note_: This rule is irrelevant for Go 1.20-.
 
 ## use-waitgroup-go
 
@@ -1805,6 +1869,8 @@ func concurrentProcess(jobs int) {
 
 _Configuration_: N/A
 
+_Note_: This rule is irrelevant for Go 1.24-.
+
 ## useless-break
 
 _Description_: This rule warns on useless `break` statements in case clauses of switch and select statements. Go,
@@ -1857,11 +1923,17 @@ _Configuration_: N/A
 
 ## var-declaration
 
+**_Ported from golint_**
+
+**_Typed_**
+
 _Description_: This rule proposes simplifications of variable declarations.
 
 _Configuration_: N/A
 
 ## var-naming
+
+**_Ported from golint_**
 
 _Description_: This rule warns when [initialism](https://go.dev/wiki/CodeReviewComments#initialisms), [variable](https://go.dev/wiki/CodeReviewComments#variable-names)
 naming conventions are not followed.
