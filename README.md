@@ -597,8 +597,8 @@ List of all [available rules](./RULES_DESCRIPTIONS.md).
 
  The rules ported from `golint` are left unchanged and indicated in the "golint" column.
 
- The rules from the "Typed" column uses type system that depends on `GOROOT` and `GOPATH` environment variables.
- Therefore, if `revive` binary is build with `-trimpath` or run on GitHub Actions these rules may not work as expected.
+ The rules in the "Typed" column use the type system, which depends on the `GOROOT` and `GOPATH` environment variables.
+ Therefore, if `revive` binary is built with `-trimpath` or run on GitHub Actions, these rules may not work as expected.
  See [#1277](https://github.com/mgechev/revive/issues/1277) for details.
 
 ## Configurable rules
