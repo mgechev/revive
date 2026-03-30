@@ -7,7 +7,7 @@ require (
 	github.com/BurntSushi/toml v1.6.0
 	github.com/fatih/color v1.19.0
 	github.com/fatih/structtag v1.2.0
-	github.com/hashicorp/go-version v1.8.0
+	github.com/hashicorp/go-version v1.9.0
 	github.com/mgechev/dots v1.0.0
 	github.com/spf13/afero v1.15.0
 	golang.org/x/mod v0.34.0
