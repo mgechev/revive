@@ -63,6 +63,7 @@ List of all available rules.
 - [line-length-limit](#line-length-limit)
 - [max-control-nesting](#max-control-nesting)
 - [max-public-structs](#max-public-structs)
+- [marshal-receiver](#marshal-receiver)
 - [modifies-parameter](#modifies-parameter)
 - [modifies-value-receiver](#modifies-value-receiver)
 - [nested-structs](#nested-structs)
@@ -1089,6 +1090,13 @@ Configuration example:
 [rule.max-public-structs]
 arguments = [3]
 ```
+
+## marshal-receiver
+
+_Description_: `MarshalJSON` and `MarshalYAML` methods should use value receivers so that marshaling works on both pointer and value types.
+`UnmarshalJSON` and `UnmarshalYAML` methods should use pointer receivers so that they can modify the receiver.
+
+_Configuration_: N/A
 
 ## modifies-parameter
 
