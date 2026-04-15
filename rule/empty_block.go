@@ -55,7 +55,8 @@ func (w lintEmptyBlock) Visit(node ast.Node) ast.Visitor {
 			if n.Key == nil && n.Value == nil {
 				// Conservatively skip bare for-range loops; this pattern is commonly
 				// used for channel draining and we avoid false positives.
-				return nil
+				w.ignore[n.Body] = true
+				return w
 			}
 
 			w.onFailure(lint.Failure{
