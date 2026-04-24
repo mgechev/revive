@@ -480,22 +480,34 @@ _Configuration_: N/A
 
 ### Limitations
 
-The `empty-block` rule has limited support for detecting intentionally empty `for` loops where the loop body is empty but the
-loop controls (`Init`, `Cond`, or `Post`) contain function calls that perform the actual work.
+The `empty-block` rule skips certain empty `for` loops to avoid false positives, but this may introduce false negatives.
 
-Currently, the rule only recognizes a narrow pattern:
+The rule skips the following patterns without flagging them:
 
 ```go
+// for loop whose only clause is a function-call condition (no Init or Post)
 for process() {
     // Intentionally empty - process() does the work
 }
 
-for range processChan {
+// bare for-range loop with no key or value variables
+for range ch {
     // Intentionally empty - draining the channel
 }
 ```
 
-However, it will produce **false positives** for more complex patterns such as:
+Note that **all** bare `for range` loops (with no key or value variables) are skipped, not only channel-draining
+ones. This means the rule produces **false negatives** for non-channel iterables:
+
+```go
+for range s { // not flagged even though the body is empty (false negative)
+}
+```
+
+A `for range` that assigns the blank identifier (e.g., `for _ = range s {}`) is **not** bare and **will** be flagged.
+
+However, the rule will produce **false positives** for intentionally empty `for` loops that have `Init` or `Post`
+clauses, such as:
 
 ```go
 // False positive: rule will warn even though this is intentional
@@ -509,7 +521,7 @@ for p := 0; bar(p); p++ {
 }
 ```
 
-**Workaround**: If you have intentionally empty `for` loops with function calls in the loop controls, you can disable the rule
+**Workaround**: If you have intentionally empty `for` loops that the rule flags, you can disable the rule
 in-place using a directive comment:
 
 ```go
