@@ -263,7 +263,7 @@ You need to add both `"mypragma:"` and `"+optional"` in the configuration
 The following comment prefixes are allowed by default:
 
 - `//#nosec` — [gosec](https://github.com/securego/gosec) security scanner directive
-- Go directive comments matching `//[a-z0-9]+:[a-z0-9]` (e.g. `//nolint:linter`, `//go:generate`, `//revive:disable:rule`)
+- Go directive comments matching `//[a-z0-9]+:[a-z0-9]` (e.g. `//nolint:linter`, `//go:generate`, `//revive:disable:rule`), as well as comments starting with `//line `, `//extern `, and `//export `
 
 Configuration example:
 
