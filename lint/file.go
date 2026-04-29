@@ -2,7 +2,6 @@ package lint
 
 import (
 	"bytes"
-	"errors"
 	"go/ast"
 	"go/parser"
 	"go/printer"
@@ -124,9 +123,16 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 			continue
 		}
 		currentFailures := currentRule.Apply(f, ruleConfig.Arguments)
+		// An internal failure from a single rule (e.g. a type-check error
+		// surfaced by epoch-naming or inefficient-map-lookup) must not abort
+		// the remaining rules for this file. Rules are iterated in the order
+		// of a Go map, so aborting here would non-deterministically swallow
+		// reports from any rule iterated after the offending one (e.g.
+		// struct-tag) depending on process startup.
+		filtered := currentFailures[:0]
 		for idx, failure := range currentFailures {
 			if failure.IsInternal() {
-				return errors.New(failure.Failure)
+				continue
 			}
 
 			if failure.RuleName == "" {
@@ -136,8 +142,9 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 				failure.Position = ToFailurePosition(failure.Node.Pos(), failure.Node.End(), f)
 			}
 			currentFailures[idx] = failure
+			filtered = append(filtered, currentFailures[idx])
 		}
-		currentFailures = f.filterFailures(currentFailures, disabledIntervals)
+		currentFailures = f.filterFailures(filtered, disabledIntervals)
 		for _, failure := range currentFailures {
 			if failure.Confidence >= config.Confidence {
 				failures <- failure

@@ -6,6 +6,83 @@ import (
 	"testing"
 )
 
+// fakeRule implements Rule and returns a fixed list of failures on every Apply.
+type fakeRule struct {
+	name     string
+	failures []Failure
+}
+
+func (r *fakeRule) Name() string { return r.name }
+func (r *fakeRule) Apply(*File, Arguments) []Failure {
+	out := make([]Failure, len(r.failures))
+	copy(out, r.failures)
+	return out
+}
+
+// TestFile_lint_internalFailureDoesNotAbortOtherRules guards against a
+// non-deterministic regression observed in golangci-lint v2 where a single
+// rule returning an internal failure (e.g. on type-check errors from
+// epoch-naming or inefficient-map-lookup) caused File.lint to abort and
+// silently drop reports from any rule iterated after it. Because the rule
+// list is built from a Go map (random iteration order), whether an
+// unrelated rule like struct-tag fired or not depended on process startup.
+//
+// Expectation: an internal failure from one rule is skipped; subsequent
+// rules still run and their failures still reach the failures channel.
+func TestFile_lint_internalFailureDoesNotAbortOtherRules(t *testing.T) {
+	const otherRuleName = "other-rule"
+
+	rules := []Rule{
+		&fakeRule{
+			name: "internal-failure-rule",
+			failures: []Failure{
+				NewInternalFailure("simulated type-check failure"),
+			},
+		},
+		&fakeRule{
+			name: otherRuleName,
+			failures: []Failure{
+				{
+					Confidence: 1,
+					Failure:    "must reach the channel",
+				},
+			},
+		},
+	}
+
+	cfg := Config{
+		Confidence: 0.8,
+		Rules: RulesConfig{
+			"internal-failure-rule": {},
+			otherRuleName:           {},
+		},
+	}
+
+	f := &File{
+		Name: "test.go",
+		Pkg:  &Package{fset: token.NewFileSet()},
+		AST:  &ast.File{},
+	}
+
+	failures := make(chan Failure, 4)
+	if err := f.lint(rules, cfg, failures); err != nil {
+		t.Fatalf("File.lint returned error: %v", err)
+	}
+	close(failures)
+
+	var got []Failure
+	for fl := range failures {
+		got = append(got, fl)
+	}
+
+	if len(got) != 1 {
+		t.Fatalf("expected exactly 1 failure to be reported, got %d: %+v", len(got), got)
+	}
+	if got[0].RuleName != otherRuleName {
+		t.Fatalf("expected failure from %q, got %q", otherRuleName, got[0].RuleName)
+	}
+}
+
 func TestFile_disabledIntervals(t *testing.T) {
 	buildCommentGroups := func(comments ...string) []*ast.CommentGroup {
 		commentGroups := make([]*ast.CommentGroup, 0, len(comments))
