@@ -102,3 +102,12 @@ func tagsInStructLiteralsShouldBeOK() {
 
 	_, _, _, _, _, _, _ = a, b, c, d, e, f, g
 }
+
+func _() {
+	_ = ""
+	_ = ""
+	_ = ""
+	_ = ``
+	_ = ``
+	_ = ``
+}
