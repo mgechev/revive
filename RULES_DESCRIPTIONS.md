@@ -260,6 +260,11 @@ _Configuration_: ([]string) list of exceptions. For example, to accept comments 
 
 You need to add both `"mypragma:"` and `"+optional"` in the configuration
 
+The following comment prefixes are allowed by default:
+
+- `//#nosec` — [gosec](https://github.com/securego/gosec) security scanner directive
+- Go directive comments matching `//[a-z0-9]+:[a-z0-9]` (e.g. `//nolint:linter`, `//go:generate`, `//revive:disable:rule`)
+
 Configuration example:
 
 ```toml
