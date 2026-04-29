@@ -90,6 +90,7 @@ var allRules = append([]lint.Rule{
 	&rule.DataRaceRule{},
 	&rule.CommentSpacingsRule{},
 	&rule.IfReturnRule{},
+	&rule.MultilineIfInitRule{},
 	&rule.RedundantImportAlias{},
 	&rule.ImportAliasNamingRule{},
 	&rule.EnforceMapStyleRule{},

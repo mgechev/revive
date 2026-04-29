@@ -1155,6 +1155,16 @@ This rule warns when a method modifies its receiver.
 
 _Configuration_: N/A
 
+## multiline-if-init
+
+_Description_: Flags `if` statements whose init clause spans multiple lines.
+The if-init idiom exists for tight one-liners. When the init wraps across
+lines, the reader has to visually parse a struct literal or call chain to
+find where the initialization ends and the condition begins. Extract the
+initialization to a separate statement instead.
+
+_Configuration_: N/A
+
 ## nested-structs
 
 _Description_: Packages declaring structs that contain other inline struct definitions can be hard to understand/read for other developers.
