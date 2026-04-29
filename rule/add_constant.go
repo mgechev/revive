@@ -166,7 +166,11 @@ func (w *lintAddConstantRule) checkStrLit(n *ast.BasicLit) {
 	mustCheck := count > ignoreMarker
 	if mustCheck {
 		w.strLits[n.Value] = count + 1
-		if n.Value != "``" && w.strLits[n.Value] > w.strLitLimit {
+		val, _ := strconv.Unquote(n.Value)
+		if val == "" {
+			return
+		}
+		if w.strLits[n.Value] > w.strLitLimit {
 			w.onFailure(lint.Failure{
 				Confidence: 1,
 				Node:       n,
