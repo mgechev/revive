@@ -8,8 +8,8 @@ import (
 )
 
 func TestCommentSpacings(t *testing.T) {
-	testRule(t, "comment_spacings", &rule.CommentSpacingsRule{}, &lint.RuleConfig{
+	testRule(t, "comment_spacings", &rule.CommentSpacingsRule{}, &lint.RuleConfig{})
+	testRule(t, "comment_spacings_custom_directive", &rule.CommentSpacingsRule{}, &lint.RuleConfig{
 		Arguments: lint.Arguments{"myOwnDirective:", "+optional"},
-	},
-	)
+	})
 }

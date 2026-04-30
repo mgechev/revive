@@ -7,8 +7,13 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
+// defaultAllowList is a set of comment prefixes that are allowed to not have a space after the comment delimiter.
+var defaultAllowList = []string{
+	"//#nosec",
+}
+
 // CommentSpacingsRule checks whether there is a space between
-// the comment symbol // and the start of the comment text.
+// the comment symbol `//` and the start of the comment text.
 type CommentSpacingsRule struct {
 	allowList []string
 }
@@ -17,7 +22,7 @@ type CommentSpacingsRule struct {
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
 func (r *CommentSpacingsRule) Configure(arguments lint.Arguments) error {
-	r.allowList = []string{}
+	r.allowList = defaultAllowList
 	for _, arg := range arguments {
 		allow, ok := arg.(string) // Alt. non panicking version
 		if !ok {
