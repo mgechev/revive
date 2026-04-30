@@ -123,14 +123,10 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 			continue
 		}
 		currentFailures := currentRule.Apply(f, ruleConfig.Arguments)
-		// An internal failure from a single rule (e.g. a type-check error
-		// surfaced by epoch-naming or inefficient-map-lookup) must not abort
-		// the remaining rules for this file. Rules are iterated in the order
-		// of a Go map, so aborting here would non-deterministically swallow
-		// reports from any rule iterated after the offending one (e.g.
-		// struct-tag) depending on process startup.
+		// Skip internal failures: they signal a rule could not run on this
+		// file, but other rules can still produce useful reports.
 		filtered := currentFailures[:0]
-		for idx, failure := range currentFailures {
+		for _, failure := range currentFailures {
 			if failure.IsInternal() {
 				continue
 			}
@@ -141,8 +137,7 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 			if failure.Node != nil {
 				failure.Position = ToFailurePosition(failure.Node.Pos(), failure.Node.End(), f)
 			}
-			currentFailures[idx] = failure
-			filtered = append(filtered, currentFailures[idx])
+			filtered = append(filtered, failure)
 		}
 		currentFailures = f.filterFailures(filtered, disabledIntervals)
 		for _, failure := range currentFailures {

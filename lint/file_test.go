@@ -19,16 +19,9 @@ func (r *fakeRule) Apply(*File, Arguments) []Failure {
 	return out
 }
 
-// TestFile_lint_internalFailureDoesNotAbortOtherRules guards against a
-// non-deterministic regression observed in golangci-lint v2 where a single
-// rule returning an internal failure (e.g. on type-check errors from
-// epoch-naming or inefficient-map-lookup) caused File.lint to abort and
-// silently drop reports from any rule iterated after it. Because the rule
-// list is built from a Go map (random iteration order), whether an
-// unrelated rule like struct-tag fired or not depended on process startup.
-//
-// Expectation: an internal failure from one rule is skipped; subsequent
-// rules still run and their failures still reach the failures channel.
+// TestFile_lint_internalFailureDoesNotAbortOtherRules ensures that an
+// internal failure from one rule does not abort File.lint and thus does
+// not suppress reports from other rules running on the same file.
 func TestFile_lint_internalFailureDoesNotAbortOtherRules(t *testing.T) {
 	const otherRuleName = "other-rule"
 
