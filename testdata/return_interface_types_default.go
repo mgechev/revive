@@ -1,8 +1,7 @@
 package fixtures
 
-
 func foo() error { // MATCH /foo returns interface type: error/
-	var a int
+	return nil
 }
 
 func bar() DummyReader { // MATCH /bar returns interface type: fixtures.DummyReader/
@@ -15,4 +14,4 @@ func (a A) B() DummyReader { // MATCH /fixtures.A.B returns interface type: fixt
 	return nil
 }
 
-type DummyReader interface {}
+type DummyReader interface{}

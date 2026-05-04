@@ -19,7 +19,12 @@ type ReturnInterfaceTypesRule struct {
 func (r *ReturnInterfaceTypesRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
-	file.Pkg.TypeCheck()
+	if err := file.Pkg.TypeCheck(); err != nil {
+		return []lint.Failure{
+			lint.NewInternalFailure(fmt.Sprintf("Unable to type check file %q: %v", file.Name, err)),
+		}
+	}
+
 	info := file.Pkg.TypesInfo()
 
 	for _, decl := range file.AST.Decls {
@@ -41,8 +46,8 @@ func (r *ReturnInterfaceTypesRule) Apply(file *lint.File, _ lint.Arguments) []li
 		signature := funcObj.Type().(*types.Signature)
 
 		results := signature.Results()
-		for i := 0; i < results.Len(); i++ {
-			res := results.At(i)
+
+		for res := range results.Variables() {
 			typ := res.Type()
 
 			if r.userDefinedIgnoredNames.isIgnored(typ.String()) {
@@ -82,7 +87,7 @@ func (r *ReturnInterfaceTypesRule) Configure(arguments lint.Arguments) error {
 
 	args, ok := arguments[0].(map[string]any)
 	if !ok {
-		return fmt.Errorf("invalid argument to the return-interace-types rule. Expecting a k,v map, got %T", arguments[0])
+		return fmt.Errorf("invalid argument to the return-interface-types rule. Expecting a k,v map, got %T", arguments[0])
 	}
 
 	for k, v := range args {

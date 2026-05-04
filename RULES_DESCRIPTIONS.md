@@ -1395,11 +1395,13 @@ _Note_: This rule is irrelevant for Go 1.14-.
 
 ## return-interface-types
 
-_Description_: This rule spots functions/methods returning an interface types. If we have large codebase, we can use `[]string` list to most common or weird cases
+_Description_: This rule spots functions/methods returning an interface types. If we have large codebase,
+we can use `[]string` list to most common or weird cases
 
 _Configuration_: Rule have two optional arguments: `stop-on-first`, and `user-defined-ignored-names`
 
-- `stop-on-first`: (bool) default `false`, set it to `true` to stop processing on first founded interface type - in case when functions/methods have more then one return
+- `stop-on-first`: (bool) default `false`, set it to `true` to stop processing on first founded interface type
+(in case when functions/methods have more then one return)
 - `user-defined-ignored-names`: (`[]string`) default `{}`, set of user defined ignored interface names
 
 Configuration example:
@@ -1409,8 +1411,7 @@ Configuration example:
 arguments = [{ stop-on-first: true, user-defined-ignored-names = ["error","go/ast.Visitor"] }]
 ```
 
-
-_Note_: 
+_Note_:  N/A
 
 ## string-format
 
