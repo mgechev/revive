@@ -9,9 +9,9 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ReturnInterfaceTypesRule spot functions/methods returning an interface type.
+// ReturnInterfaceTypesRule spots functions/methods returning an interface type.
 type ReturnInterfaceTypesRule struct {
-	stopOnFirst             bool         // stop on first founded interface type in function/method
+	stopOnFirst             bool         // stop on first found interface type in function/method
 	userDefinedIgnoredNames ignoredNames // set of user defined ignored interface names
 }
 

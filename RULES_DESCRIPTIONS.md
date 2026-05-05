@@ -1395,20 +1395,20 @@ _Note_: This rule is irrelevant for Go 1.14-.
 
 ## return-interface-types
 
-_Description_: This rule spots functions/methods returning an interface types. If we have large codebase,
-we can use `[]string` list to most common or weird cases
+_Description_: This rule spots functions and methods that return interface types. In a large codebase,
+you can use the `[]string` list to ignore common or special-case interface names.
 
-_Configuration_: Rule have two optional arguments: `stop-on-first`, and `user-defined-ignored-names`
+_Configuration_: This rule has two optional arguments: `stop-on-first` and `user-defined-ignored-names`
 
-- `stop-on-first`: (bool) default `false`, set it to `true` to stop processing on first founded interface type
-(in case when functions/methods have more then one return)
-- `user-defined-ignored-names`: (`[]string`) default `{}`, set of user defined ignored interface names
+- `stop-on-first`: (bool) default `false`, set it to `true` to stop processing on the first encountered interface type
+(in cases where functions or methods have more than one return value)
+- `user-defined-ignored-names`: (`[]string`) default `{}`, a set of user-defined ignored interface names
 
 Configuration example:
 
 ```toml
 [rule.return-interface-types]
-arguments = [{ stop-on-first: true, user-defined-ignored-names = ["error","go/ast.Visitor"] }]
+arguments = [{ stop-on-first = true, user-defined-ignored-names = [] }]
 ```
 
 _Note_:  N/A
