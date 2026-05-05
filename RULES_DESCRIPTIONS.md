@@ -78,6 +78,7 @@ List of all available rules.
 - [redundant-build-tag](#redundant-build-tag)
 - [redundant-import-alias](#redundant-import-alias)
 - [redundant-test-main-exit](#redundant-test-main-exit)
+- [return-interface-types](#return-interface-types)
 - [string-format](#string-format)
 - [string-of-int](#string-of-int)
 - [struct-tag](#struct-tag)
@@ -1391,6 +1392,26 @@ as the Go test runner automatically handles program termination starting from Go
 _Configuration_: N/A
 
 _Note_: This rule is irrelevant for Go 1.14-.
+
+## return-interface-types
+
+_Description_: This rule spots functions and methods that return interface types (`error` is special case and is ignored by default).
+In a large codebase, you can use the `[]string` list to ignore common or special-case interface names.
+
+_Configuration_: This rule has two optional arguments: `stop-on-first` and `user-defined-ignored-names`
+
+- `stop-on-first`: (bool) default `false`, set it to `true` to stop processing on the first encountered interface type
+(in cases where functions or methods have more than one return value)
+- `user-defined-ignored-names`: (`[]string`) default `{}`, a set of user-defined ignored interface names
+
+Configuration example:
+
+```toml
+[rule.return-interface-types]
+arguments = [{ stop-on-first = true, user-defined-ignored-names = [] }]
+```
+
+_Note_:  N/A
 
 ## string-format
 
