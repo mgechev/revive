@@ -8,7 +8,7 @@ func skipDummy() DummyResults {
 	return nil
 }
 
-func skipDummyFirst() (DummyResults, error) { // MATCH /skipDummyFirst returns interface type: error/
+func skipDummyFirst() (DummyResults, error) {
 	return nil, nil
 }
 

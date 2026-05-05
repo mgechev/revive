@@ -1,6 +1,6 @@
 package fixtures
 
-func foo() error { // MATCH /foo returns interface type: error/
+func foo() error {
 	return nil
 }
 

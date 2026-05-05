@@ -50,7 +50,7 @@ func (r *ReturnInterfaceTypesRule) Apply(file *lint.File, _ lint.Arguments) []li
 		for res := range results.Variables() {
 			typ := res.Type()
 
-			if r.userDefinedIgnoredNames.isIgnored(typ.String()) {
+			if r.isErrorType(typ) || r.userDefinedIgnoredNames.isIgnored(typ.String()) {
 				continue
 			}
 
@@ -117,6 +117,7 @@ func (r *ReturnInterfaceTypesRule) Configure(arguments lint.Arguments) error {
 	return nil
 }
 
+// returnName helper function to return name (with package name if defined).
 func (*ReturnInterfaceTypesRule) returnName(functionName string, signature *types.Signature) string {
 	returnName := functionName
 
@@ -126,6 +127,15 @@ func (*ReturnInterfaceTypesRule) returnName(functionName string, signature *type
 	}
 
 	return returnName
+}
+
+// isErrorType helper function to check if type is 'error' to ignore them.
+func (*ReturnInterfaceTypesRule) isErrorType(t types.Type) bool {
+	if named, ok := t.(*types.Named); ok {
+		obj := named.Obj()
+		return obj.Pkg() == nil && obj.Name() == "error"
+	}
+	return false
 }
 
 type ignoredNames map[string]struct{}

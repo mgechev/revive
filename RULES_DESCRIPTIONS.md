@@ -1395,8 +1395,8 @@ _Note_: This rule is irrelevant for Go 1.14-.
 
 ## return-interface-types
 
-_Description_: This rule spots functions and methods that return interface types. In a large codebase,
-you can use the `[]string` list to ignore common or special-case interface names.
+_Description_: This rule spots functions and methods that return interface types (`error` is special case and is ignored by default).
+In a large codebase, you can use the `[]string` list to ignore common or special-case interface names.
 
 _Configuration_: This rule has two optional arguments: `stop-on-first` and `user-defined-ignored-names`
 
