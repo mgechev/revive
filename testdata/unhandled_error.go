@@ -3,6 +3,7 @@ package fixtures
 import (
 	"bytes"
 	"fmt"
+	fmt2 "fmt"
 	"os"
 	"strings"
 )
@@ -20,7 +21,7 @@ func unhandledError2() error {
 	fmt.Fprintf(&sb, "formatted string: %v", 1)
 
 	var bb bytes.Buffer
-	fmt.Fprintf(&bb, "formatted string: %v", 1)
+	fmt2.Fprintf(&bb, "formatted string: %v", 1)
 
 	fmt.Fprintf(os.Stdout, "") // MATCH /Unhandled error in call to function fmt.Fprintf/
 	os.Chdir("..")             // MATCH /Unhandled error in call to function os.Chdir/
