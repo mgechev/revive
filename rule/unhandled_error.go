@@ -112,6 +112,10 @@ func (w *lintUnhandledErrors) addFailure(n *ast.CallExpr) {
 		return
 	}
 
+	if w.isSafeFprintfToBuffer(n) {
+		return
+	}
+
 	w.onFailure(lint.Failure{
 		Category:   lint.FailureCategoryBadPractice,
 		Confidence: 1,
@@ -172,4 +176,22 @@ func (w *lintUnhandledErrors) getFunc(call *ast.CallExpr) (*types.Func, bool) {
 	}
 
 	return fn, true
+}
+
+func (w *lintUnhandledErrors) isSafeFprintfToBuffer(call *ast.CallExpr) bool {
+	if len(call.Args) == 0 {
+		return false
+	}
+
+	fn, ok := w.getFunc(call)
+	if !ok || fn.FullName() != "fmt.Fprintf" {
+		return false
+	}
+
+	argType := w.pkg.TypeOf(call.Args[0])
+	if argType == nil {
+		return false
+	}
+
+	return astutils.IsPointerToPkgDotType(argType, "bytes", "Buffer") || astutils.IsPointerToPkgDotType(argType, "strings", "Builder")
 }
