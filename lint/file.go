@@ -2,7 +2,6 @@ package lint
 
 import (
 	"bytes"
-	"errors"
 	"go/ast"
 	"go/parser"
 	"go/printer"
@@ -124,9 +123,12 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 			continue
 		}
 		currentFailures := currentRule.Apply(f, ruleConfig.Arguments)
-		for idx, failure := range currentFailures {
+		// Skip internal failures: they signal a rule could not run on this
+		// file, but other rules can still produce useful reports.
+		filtered := currentFailures[:0]
+		for _, failure := range currentFailures {
 			if failure.IsInternal() {
-				return errors.New(failure.Failure)
+				continue
 			}
 
 			if failure.RuleName == "" {
@@ -135,9 +137,9 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 			if failure.Node != nil {
 				failure.Position = ToFailurePosition(failure.Node.Pos(), failure.Node.End(), f)
 			}
-			currentFailures[idx] = failure
+			filtered = append(filtered, failure)
 		}
-		currentFailures = f.filterFailures(currentFailures, disabledIntervals)
+		currentFailures = f.filterFailures(filtered, disabledIntervals)
 		for _, failure := range currentFailures {
 			if failure.Confidence >= config.Confidence {
 				failures <- failure
