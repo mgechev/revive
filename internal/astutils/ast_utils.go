@@ -7,9 +7,9 @@ import (
 	"encoding/hex"
 	"fmt"
 	"go/ast"
-	"go/types"
 	"go/printer"
 	"go/token"
+	"go/types"
 	"regexp"
 	"slices"
 )
