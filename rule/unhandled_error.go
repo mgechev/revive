@@ -183,7 +183,8 @@ func (w *lintUnhandledErrors) isSafeFprintfToBuffer(call *ast.CallExpr) bool {
 		return false
 	}
 
-	if !astutils.IsPkgDotName(call.Fun, "fmt", "Fprintf") {
+	fn, ok := w.getFunc(call)
+	if !ok || fn.FullName() != "fmt.Fprintf" {
 		return false
 	}
 
