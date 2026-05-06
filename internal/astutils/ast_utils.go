@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"go/ast"
+	"go/types"
 	"go/printer"
 	"go/token"
 	"regexp"
@@ -121,6 +122,22 @@ func IsIdent(expr ast.Expr, ident string) bool {
 func IsPkgDotName(expr ast.Expr, pkg, name string) bool {
 	sel, ok := expr.(*ast.SelectorExpr)
 	return ok && IsIdent(sel.X, pkg) && IsIdent(sel.Sel, name)
+}
+
+// IsPointerToPkgDotType returns true if typ is a pointer to the named type pkgPath.typeName.
+func IsPointerToPkgDotType(typ types.Type, pkgPath, typeName string) bool {
+	ptrType, ok := typ.(*types.Pointer)
+	if !ok {
+		return false
+	}
+
+	namedType, ok := ptrType.Elem().(*types.Named)
+	if !ok {
+		return false
+	}
+
+	obj := namedType.Obj()
+	return obj != nil && obj.Pkg() != nil && obj.Pkg().Path() == pkgPath && obj.Name() == typeName
 }
 
 // PickNodes yields a list of nodes by picking them from a sub-ast with root node n.
