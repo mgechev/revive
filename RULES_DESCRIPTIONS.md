@@ -65,6 +65,7 @@ List of all available rules.
 - [max-public-structs](#max-public-structs)
 - [modifies-parameter](#modifies-parameter)
 - [modifies-value-receiver](#modifies-value-receiver)
+- [multiline-if-init](#multiline-if-init)
 - [nested-structs](#nested-structs)
 - [optimize-operands-order](#optimize-operands-order)
 - [package-comments](#package-comments)
