@@ -1158,10 +1158,41 @@ _Configuration_: N/A
 ## multiline-if-init
 
 _Description_: Flags `if` statements whose init clause spans multiple lines.
-The if-init idiom exists for tight one-liners. When the init wraps across
-lines, the reader has to visually parse a struct literal or call chain to
-find where the initialization ends and the condition begins. Extract the
-initialization to a separate statement instead.
+The if-init idiom exists for tight one-liners.
+When the init wraps across lines, the reader has to visually parse a struct literal or
+call chain to find where the initialization ends and the condition begins.
+Extract the initialization to a separate statement instead.
+
+### Examples (multiline-if-init)
+
+Before (violation):
+
+```go
+if r, err := rec(
+	ctx,
+	mgr.GetClient(),
+	mgr.GetFieldIndexer(),
+	mgr.GetEventRecorderFor(fmt.Sprintf("%s-%s-controller", name, options.ManagerName)),
+	opts...,
+); err != nil {
+	return err
+}
+```
+
+After (fixed):
+
+```go
+r, err := rec(
+	ctx,
+	mgr.GetClient(),
+	mgr.GetFieldIndexer(),
+	mgr.GetEventRecorderFor(fmt.Sprintf("%s-%s-controller", name, options.ManagerName)),
+	opts...,
+)
+if err != nil {
+	return err
+}
+```
 
 _Configuration_: N/A
 

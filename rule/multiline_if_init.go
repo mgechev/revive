@@ -6,10 +6,9 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// MultilineIfInitRule flags if statements whose init clause spans
-// multiple lines.  A multi-line init defeats the purpose of the
-// if-init idiom, which exists for tight one-liners.  When it wraps,
-// the reader has to visually parse a struct literal or call chain to
+// MultilineIfInitRule flags if statements whose init clause spans multiple lines.
+// A multi-line init defeats the purpose of the if-init idiom, which exists for tight one-liners.
+// When it wraps, the reader has to visually parse a struct literal or call chain to
 // find where the init ends and the condition begins.
 type MultilineIfInitRule struct{}
 
@@ -52,7 +51,7 @@ func (w lintMultilineIfInit) Visit(n ast.Node) ast.Visitor {
 			Confidence: 1,
 			Node:       ifStmt,
 			Category:   lint.FailureCategoryStyle,
-			Failure:    "if-init statement spans multiple lines; extract the initialization to a separate statement",
+			Failure:    "if-init statement should not span multiple lines",
 		})
 	}
 
