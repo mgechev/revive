@@ -10,9 +10,9 @@ require (
 	github.com/hashicorp/go-version v1.9.0
 	github.com/mgechev/dots v1.0.0
 	github.com/spf13/afero v1.15.0
-	golang.org/x/mod v0.35.0
+	golang.org/x/mod v0.36.0
 	golang.org/x/sync v0.20.0
-	golang.org/x/tools v0.44.0
+	golang.org/x/tools v0.45.0
 )
 
 require (
