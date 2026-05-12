@@ -25,29 +25,31 @@ func (*MarshalReceiverRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 		}
 
 		name := fn.Name.Name
-		if !isMarshalOrUnmarshalMethod(name) {
+		isMarshall := isMarshalMethod(name)
+		isUnmarshall := !isMarshall && isUnmarshalMethod(name)
+		if !(isMarshall || isUnmarshall) {
 			continue
 		}
 
 		recv := fn.Recv.List[0]
 		_, isPtr := recv.Type.(*ast.StarExpr)
 
+		msg := ""
 		switch {
-		case isMarshalMethod(name) && isPtr:
-			failures = append(failures, lint.Failure{
-				Node:       decl,
-				Confidence: 1,
-				Category:   lint.FailureCategoryBadPractice,
-				Failure:    name + " method should use a value receiver, not a pointer receiver",
-			})
-		case isUnmarshalMethod(name) && !isPtr:
-			failures = append(failures, lint.Failure{
-				Node:       decl,
-				Confidence: 1,
-				Category:   lint.FailureCategoryBadPractice,
-				Failure:    name + " method should use a pointer receiver, not a value receiver",
-			})
+		case isMarshal && isPtr:
+			msg = " method should use a value receiver, not a pointer receiver"
+		case isUnmarshal && !isPtr:
+			msg = " method should use a pointer receiver, not a value receiver"
+		default:
+			continue // nothing to say about the method declaration
 		}
+
+		failures = append(failures, lint.Failure{
+			Node:       decl,
+			Confidence: 1,
+			Category:   lint.FailureCategoryBadPractice,
+			Failure:    name + msg
+		})
 	}
 
 	return failures
