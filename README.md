@@ -54,7 +54,6 @@ If you disable them in the config file, revive will run over 6x faster than goli
   - [Rule-level file excludes](#rule-level-file-excludes)
 - [Available Rules](#available-rules)
 - [Configurable rules](#configurable-rules)
-  - [`var-naming`](#var-naming)
 - [Available Formatters](#available-formatters)
   - [Friendly](#friendly)
   - [Stylish](#stylish)
@@ -489,7 +488,7 @@ You can use the following exclude patterns
 
 ## Available Rules
 
-List of all available rules. The rules ported from `golint` are left unchanged and indicated in the `golint` column.
+List of all [available rules](./RULES_DESCRIPTIONS.md).
 
 | Name                  | Config | Description                                                      | `golint` | Typed |
 | --------------------- | :----: | :--------------------------------------------------------------- | :------: | :---: |
@@ -596,24 +595,15 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`var-naming`](./RULES_DESCRIPTIONS.md#var-naming)          |  allowlist & blocklist of initialisms   | Naming rules.                                                    |   yes    |  no   |
 | [`waitgroup-by-value`](./RULES_DESCRIPTIONS.md#waitgroup-by-value)  |  n/a   | Warns on functions taking sync.WaitGroup as a by-value parameter |    no    |  no   |
 
+ The rules ported from `golint` are left unchanged and indicated in the "golint" column.
+
+ The rules in the "Typed" column use the type system, which depends on the `GOROOT` and `GOPATH` environment variables.
+ Therefore, if `revive` binary is built with `-trimpath` or run on GitHub Actions, these rules may not work as expected.
+ See [#1277](https://github.com/mgechev/revive/issues/1277) for details.
+
 ## Configurable rules
 
-Here you can find how you can configure some existing rules.
-Rule configuration options are documented using the `kebab-case` format (e.g., `max-lit-count`, `allow-strs`, `skip-comments`), and this format is preferred.
-For backward compatibility, `camelCase` (e.g., `maxLitCount`, `allowStrs`, `skipComments`)
-and `lowercase` (e.g., `maxlitcount`, `allowstrs`, `skipcomments`) formats are still supported but are deprecated.
-
-### `var-naming`
-
-This rule accepts two slices of strings, an allowlist and a blocklist of initialisms. By default, the rule behaves exactly as the alternative
-in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
-
-```toml
-[rule.var-naming]
-arguments = [["ID"], ["VM"]]
-```
-
-This way, revive will not warn for an identifier called `customId` but will warn that `customVm` should be called `customVM`.
+A lot of rules can be configured. See [RULES_DESCRIPTIONS.md](./RULES_DESCRIPTIONS.md) for the list of all configurable rules and their options.
 
 ## Available Formatters
 

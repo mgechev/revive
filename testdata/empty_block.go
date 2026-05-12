@@ -2,7 +2,10 @@
 
 package fixtures
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
 func f(x int) {} // Must not match
 
@@ -46,13 +49,24 @@ func g(f func() bool) {
 
 	}
 
+	for _ = range "abc" { // MATCH /this block is empty, you can remove it/
+
+	}
+
+	for _, c := range "abc" { // should not match
+		_ = c
+	}
+
 	// issue 386, then overwritten by issue 416
 	var c = make(chan int)
-	for range c { // MATCH /this block is empty, you can remove it/
+	for range c { // Must not match
 	}
 
 	var s = "a string"
-	for range s { // MATCH /this block is empty, you can remove it/
+	for range s { // Must not match: we can live with false negatives in this case, as it's not a common pattern and we avoid false positives.
+	}
+
+	for range makeChan() { // Must not match
 	}
 
 	select {
@@ -90,4 +104,11 @@ type iterator struct{}
 
 func (it *iterator) next() bool {
 	return false
+}
+
+func makeChan() chan int {
+	ch := make(chan int)
+	close(ch)
+
+	return ch
 }
