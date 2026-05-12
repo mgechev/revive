@@ -3,17 +3,19 @@ package fixtures
 import "encoding/json"
 
 // Good: MarshalJSON with value receiver.
-type A struct{}
+type GoodMarshalRecv struct{}
 
-func (A) MarshalJSON() ([]byte, error)  { return json.Marshal(nil) }
-func (*A) UnmarshalJSON([]byte) error   { return nil }
-func (A) MarshalYAML() (any, error)     { return nil, nil }
-func (*A) UnmarshalYAML(func(any) error) error { return nil }
+func (GoodMarshalRecv) MarshalJSON() ([]byte, error)  { return json.Marshal(nil) }
+func (GoodMarshalRecv) MarshalText() (text []byte, err error)  { return json.Marshal(nil) }
+func (*GoodMarshalRecv) UnmarshalJSON([]byte) error   { return nil }
+func (GoodMarshalRecv) MarshalYAML() (any, error)     { var v any; return v, nil }
+func (*GoodMarshalRecv) UnmarshalYAML(func(any) error) error { return nil }
 
 // Bad: MarshalJSON with pointer receiver.
-type B struct{}
+type BadMarshalRecv struct{}
 
-func (*B) MarshalJSON() ([]byte, error)  { return json.Marshal(nil) } // MATCH /MarshalJSON method should use a value receiver, not a pointer receiver/
-func (B) UnmarshalJSON([]byte) error     { return nil }               // MATCH /UnmarshalJSON method should use a pointer receiver, not a value receiver/
-func (*B) MarshalYAML() (any, error)     { return nil, nil }          // MATCH /MarshalYAML method should use a value receiver, not a pointer receiver/
-func (B) UnmarshalYAML(func(any) error) error { return nil }          // MATCH /UnmarshalYAML method should use a pointer receiver, not a value receiver/
+func (*BadMarshalRecv) MarshalJSON() ([]byte, error)  { return json.Marshal(nil) } // MATCH /MarshalJSON method should use a value receiver, not a pointer receiver/
+func (BadMarshalRecv) UnmarshalText(text []byte) error     { return nil }               // MATCH /UnmarshalText method should use a pointer receiver, not a value receiver/
+func (BadMarshalRecv) UnmarshalJSON([]byte) error     { return nil }               // MATCH /UnmarshalJSON method should use a pointer receiver, not a value receiver/
+func (*BadMarshalRecv) MarshalYAML() (any, error)     { var v any; return v, nil }          // MATCH /MarshalYAML method should use a value receiver, not a pointer receiver/
+func (BadMarshalRecv) UnmarshalYAML(func(any) error) error { return nil }          // MATCH /UnmarshalYAML method should use a pointer receiver, not a value receiver/

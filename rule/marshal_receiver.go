@@ -25,9 +25,9 @@ func (*MarshalReceiverRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 		}
 
 		name := fn.Name.Name
-		isMarshall := isMarshalMethod(name)
-		isUnmarshall := !isMarshall && isUnmarshalMethod(name)
-		if !(isMarshall || isUnmarshall) {
+		isMarshal := isMarshalMethod(name)
+		isUnmarshal := !isMarshal && isUnmarshalMethod(name)
+		if !isMarshal && !isUnmarshal {
 			continue
 		}
 
@@ -48,21 +48,27 @@ func (*MarshalReceiverRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 			Node:       decl,
 			Confidence: 1,
 			Category:   lint.FailureCategoryBadPractice,
-			Failure:    name + msg
+			Failure:    name + msg,
 		})
 	}
 
 	return failures
 }
 
-func isMarshalOrUnmarshalMethod(name string) bool {
-	return isMarshalMethod(name) || isUnmarshalMethod(name)
-}
-
 func isMarshalMethod(name string) bool {
-	return name == "MarshalJSON" || name == "MarshalYAML"
+	switch name {
+	case "MarshalJSON", "MarshalText", "MarshalYAML":
+		return true
+	default:
+		return false
+	}
 }
 
 func isUnmarshalMethod(name string) bool {
-	return name == "UnmarshalJSON" || name == "UnmarshalYAML"
+	switch name {
+	case "UnmarshalJSON", "UnmarshalText", "UnmarshalYAML":
+		return true
+	default:
+		return false
+	}
 }

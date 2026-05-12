@@ -61,9 +61,9 @@ List of all available rules.
 - [indent-error-flow](#indent-error-flow)
 - [inefficient-map-lookup](#inefficient-map-lookup)
 - [line-length-limit](#line-length-limit)
+- [marshal-receiver](#marshal-receiver)
 - [max-control-nesting](#max-control-nesting)
 - [max-public-structs](#max-public-structs)
-- [marshal-receiver](#marshal-receiver)
 - [modifies-parameter](#modifies-parameter)
 - [modifies-value-receiver](#modifies-value-receiver)
 - [multiline-if-init](#multiline-if-init)
@@ -1115,6 +1115,80 @@ Configuration example:
 arguments = [80]
 ```
 
+## marshal-receiver
+
+_Description_: Checks receiver type consistency for common marshal/unmarshal methods.
+The rule inspects only methods whose names exactly match: `MarshalJSON`, `MarshalText`, `MarshalYAML`, `UnmarshalJSON`, `UnmarshalText`, and `UnmarshalYAML`.
+For these methods, it enforces receiver kind only:
+
+- `Marshal*` methods should use a value receiver, and are reported when declared with a pointer receiver.
+- `Unmarshal*` methods should use a pointer receiver, and are reported when declared with a value receiver.
+
+This is a name-based, syntactic check.
+It does not validate method signatures (parameters or return values) and does not verify whether a method satisfies a specific marshaling interface.
+
+### Examples (marshal-receiver)
+
+Before (violation):
+
+```go
+import "encoding/json"
+
+type Person struct {
+	Name string
+	Age  int
+}
+
+func (p *Person) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]any{
+		"name": p.Name,
+		"age":  p.Age,
+	})
+}
+
+func (p Person) UnmarshalJSON(data []byte) error {
+	var raw map[string]any
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	p.Name = raw["name"].(string)
+	p.Age = int(raw["age"].(float64))
+	return nil
+}
+```
+
+After (fixed):
+
+```go
+import "encoding/json"
+
+type Person struct {
+	Name string
+	Age  int
+}
+
+// Value receiver — safe, works whether you have Person or *Person.
+func (p Person) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]any{
+		"name": p.Name,
+		"age":  p.Age,
+	})
+}
+
+// Pointer receiver — required, must mutate p.
+func (p *Person) UnmarshalJSON(data []byte) error {
+	var raw map[string]any
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	p.Name = raw["name"].(string)
+	p.Age = int(raw["age"].(float64))
+	return nil
+}
+```
+
+_Configuration_: N/A
+
 ## max-control-nesting
 
 _Description_: Warns if nesting level of control structures (`if-then-else`, `for`, `switch`) exceeds a given maximum.
@@ -1143,13 +1217,6 @@ Configuration example:
 [rule.max-public-structs]
 arguments = [3]
 ```
-
-## marshal-receiver
-
-_Description_: `MarshalJSON` and `MarshalYAML` methods should use value receivers so that marshaling works on both pointer and value types.
-`UnmarshalJSON` and `UnmarshalYAML` methods should use pointer receivers so that they can modify the receiver.
-
-_Configuration_: N/A
 
 ## modifies-parameter
 
