@@ -50,7 +50,7 @@ func (r *ReturnInterfaceTypesRule) Apply(file *lint.File, _ lint.Arguments) []li
 		for res := range results.Variables() {
 			typ := res.Type()
 
-			if r.isErrorType(typ) || r.userDefinedIgnoredNames.isIgnored(typ.String()) {
+			if r.isIgnoredByDefault(typ) || r.userDefinedIgnoredNames.isIgnored(typ.String()) {
 				continue
 			}
 
@@ -129,13 +129,34 @@ func (*ReturnInterfaceTypesRule) returnName(functionName string, signature *type
 	return returnName
 }
 
-// isErrorType helper function to check if type is 'error' to ignore them.
-func (*ReturnInterfaceTypesRule) isErrorType(t types.Type) bool {
-	if named, ok := t.(*types.Named); ok {
-		obj := named.Obj()
-		return obj.Pkg() == nil && obj.Name() == "error"
+var ignoredTypesNames = map[string]struct{}{
+	"error":       {},
+	"any":         {},
+	"interface{}": {},
+}
+
+// isIgnoredByDefault helper function to check if type ignored by default.
+func (r *ReturnInterfaceTypesRule) isIgnoredByDefault(t types.Type) bool {
+	if name, ok := r.getNameFortype(t); ok {
+		_, ignored := ignoredTypesNames[name]
+		return ignored
 	}
 	return false
+}
+
+// getNameFortype helper function to get name from type and bool which
+// decide if type should be processed/checked in ignoredTypesName map.
+func (*ReturnInterfaceTypesRule) getNameFortype(t types.Type) (string, bool) {
+	switch tt := t.(type) {
+	case *types.Named:
+		return tt.Obj().Name(), true
+	case *types.Alias:
+		return tt.Obj().Name(), true
+	case *types.Interface:
+		iface, _ := t.(*types.Interface)
+		return t.String(), iface.NumMethods() == 0
+	}
+	return "", false
 }
 
 type ignoredNames map[string]struct{}

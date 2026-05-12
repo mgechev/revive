@@ -8,6 +8,22 @@ func bar() DummyReader { // MATCH /bar returns interface type: fixtures.DummyRea
 	return nil
 }
 
+func barEmptyInterface() interface{} {
+	return nil
+}
+
+func fix() Reader { // MATCH /fix returns interface type: fixtures.Reader/
+	return nil
+}
+
+func smile() interface{} {
+	return S{}
+}
+
+type S struct{}
+
+func (S) Do() {}
+
 type A struct{}
 
 func (a A) B() DummyReader { // MATCH /fixtures.A.B returns interface type: fixtures.DummyReader/
@@ -15,3 +31,7 @@ func (a A) B() DummyReader { // MATCH /fixtures.A.B returns interface type: fixt
 }
 
 type DummyReader interface{}
+
+type Reader interface {
+	Read([]byte) (int, error)
+}
