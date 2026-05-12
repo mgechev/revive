@@ -3,6 +3,7 @@ package rule
 import (
 	"go/ast"
 
+	"github.com/mgechev/revive/internal/typeparams"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -25,6 +26,7 @@ func (*MarshalReceiverRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 		}
 
 		name := fn.Name.Name
+		qualifiedName := typeparams.ReceiverType(fn) + "." + name
 		isMarshal := isMarshalMethod(name)
 		isUnmarshal := !isMarshal && isUnmarshalMethod(name)
 		if !isMarshal && !isUnmarshal {
@@ -34,7 +36,7 @@ func (*MarshalReceiverRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 		recv := fn.Recv.List[0]
 		_, isPtr := recv.Type.(*ast.StarExpr)
 
-		msg := ""
+		var msg string
 		switch {
 		case isMarshal && isPtr:
 			msg = " method should use a value receiver, not a pointer receiver"
@@ -48,7 +50,7 @@ func (*MarshalReceiverRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 			Node:       decl,
 			Confidence: 1,
 			Category:   lint.FailureCategoryBadPractice,
-			Failure:    name + msg,
+			Failure:    qualifiedName + msg,
 		})
 	}
 
