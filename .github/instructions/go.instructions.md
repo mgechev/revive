@@ -409,8 +409,8 @@ for it := range ch { /* ... */ }
 Do:
 
 ```go
-func Items(source []T) iter.Seq[Item] {
-    return func(yield func(Item) bool) {
+func Items[T any](source []T) iter.Seq[T] {
+    return func(yield func(T) bool) {
         for _, it := range source {
             if !yield(it) {
                 return
@@ -445,13 +445,13 @@ type Config struct {
 Don't (re-declaring instead of aliasing):
 
 ```go
-type StringSet struct{ inner sets.Set[string] }
+type Vec[T any] []T
 ```
 
 Do:
 
 ```go
-type Set[T comparable] = sets.Set[T]
+type VecAlias[T any] = []T
 ```
 
 ### `testing/synctest` for time-dependent tests (Go 1.25)
