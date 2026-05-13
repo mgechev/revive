@@ -4,10 +4,15 @@ import (
 	"fmt"
 	"go/ast"
 	"go/types"
-	"strconv"
 
 	"github.com/mgechev/revive/lint"
 )
+
+var ignoredTypesNames = map[string]struct{}{
+	"error":       {},
+	"any":         {},
+	"interface{}": {},
+}
 
 // ReturnInterfaceTypesRule spots functions/methods returning an interface type.
 type ReturnInterfaceTypesRule struct {
@@ -87,14 +92,14 @@ func (r *ReturnInterfaceTypesRule) Configure(arguments lint.Arguments) error {
 
 	args, ok := arguments[0].(map[string]any)
 	if !ok {
-		return fmt.Errorf("invalid argument to the return-interface-types rule. Expecting a k,v map, got %T", arguments[0])
+		return fmt.Errorf("invalid argument '%v' for 'return-interface-types' rule. Expecting a k,v map, got %T", arguments[0], arguments[0])
 	}
 
 	for k, v := range args {
 		if isRuleOption(k, "stopOnFirst") {
 			stop, ok := v.(bool)
 			if !ok {
-				return fmt.Errorf("invalid argument to the return-interface-types rule, expecting bool value. Got '%v' (%T)", v, v)
+				return fmt.Errorf("invalid argument '%v' for 'return-interface-types' rule, expecting bool value. Got '%v' (%T)", k, v, v)
 			}
 			r.stopOnFirst = stop
 		}
@@ -103,17 +108,16 @@ func (r *ReturnInterfaceTypesRule) Configure(arguments lint.Arguments) error {
 		}
 		names, ok := v.([]any)
 		if !ok {
-			return fmt.Errorf("invalid argument to the return-interface-types rule, []string expected. Got '%v' (%T)", v, v)
+			return fmt.Errorf("invalid format '%v' for 'return-interface-types' rule []string expected. Got '%v' (%T)", k, v, v)
 		}
-		for _, value := range names {
-			typ, ok := value.(string)
+		for _, p := range names {
+			name, ok := p.(string)
 			if !ok {
-				return fmt.Errorf("invalid argument to the return-interface-types rule, string expected. Got '%v' (%T)", value, value)
+				return fmt.Errorf("invalid value in '%v' for 'return-interface-types' rule string expected Got '%v' (%T)", k, p, p)
 			}
-			r.userDefinedIgnoredNames.add(typ)
+			r.userDefinedIgnoredNames.add(name)
 		}
 	}
-
 	return nil
 }
 
@@ -127,12 +131,6 @@ func (*ReturnInterfaceTypesRule) returnName(functionName string, signature *type
 	}
 
 	return returnName
-}
-
-var ignoredTypesNames = map[string]struct{}{
-	"error":       {},
-	"any":         {},
-	"interface{}": {},
 }
 
 // isIgnoredByDefault helper function to check if type ignored by default.
@@ -161,10 +159,10 @@ func (*ReturnInterfaceTypesRule) getNameForType(t types.Type) (string, bool) {
 type ignoredNames map[string]struct{}
 
 func (in ignoredNames) add(name string) {
-	in[strconv.Quote(name)] = struct{}{}
+	in[name] = struct{}{}
 }
 
 func (in ignoredNames) isIgnored(name string) bool {
-	_, ignored := in[strconv.Quote(name)]
+	_, ignored := in[name]
 	return ignored
 }

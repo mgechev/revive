@@ -1448,14 +1448,18 @@ _Configuration_: This rule has two optional arguments: `stop-on-first` and `user
 (in cases where functions or methods have more than one return value)
 - `user-defined-ignored-names`: (`[]string`) default `[]`, a set of user-defined ignored interface names
 
-Configuration example:
+### Examples (return-interface-types)
 
 ```toml
 [rule.return-interface-types]
-arguments = [{ stop-on-first = true, user-defined-ignored-names = [] }]
+arguments = [
+  { stop-on-first = true,
+    user-defined-ignored-names = [
+    "dot.Dummy",
+    "dot.Reader",
+  ] },
+]
 ```
-
-_Note_:  N/A
 
 ## string-format
 

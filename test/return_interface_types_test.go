@@ -14,8 +14,10 @@ func TestReturnInterfaceTypesDefault(t *testing.T) {
 func TestReturnInterfaceTypesSkip(t *testing.T) {
 	testRule(t, "return_interface_types_skip", &rule.ReturnInterfaceTypesRule{}, &lint.RuleConfig{
 		Arguments: lint.Arguments{map[string]any{
-			"stopOnFirst":             true,
-			"userDefinedIgnoredNames": []any{"fixtures.DummyResults"},
+			"stopOnFirst": true,
+			"userDefinedIgnoredNames": []any{
+				"fixtures.DummyResults",
+			},
 		}},
 	})
 }
