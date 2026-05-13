@@ -137,24 +137,23 @@ var ignoredTypesNames = map[string]struct{}{
 
 // isIgnoredByDefault helper function to check if type ignored by default.
 func (r *ReturnInterfaceTypesRule) isIgnoredByDefault(t types.Type) bool {
-	if name, ok := r.getNameFortype(t); ok {
+	if name, ok := r.getNameForType(t); ok {
 		_, ignored := ignoredTypesNames[name]
 		return ignored
 	}
 	return false
 }
 
-// getNameFortype helper function to get name from type and bool which
+// getNameForType helper function to get name from type and bool which
 // decide if type should be processed/checked in ignoredTypesName map.
-func (*ReturnInterfaceTypesRule) getNameFortype(t types.Type) (string, bool) {
+func (*ReturnInterfaceTypesRule) getNameForType(t types.Type) (string, bool) {
 	switch tt := t.(type) {
 	case *types.Named:
 		return tt.Obj().Name(), true
 	case *types.Alias:
 		return tt.Obj().Name(), true
 	case *types.Interface:
-		iface, _ := t.(*types.Interface)
-		return t.String(), iface.NumMethods() == 0
+		return t.String(), tt.NumMethods() == 0
 	}
 	return "", false
 }
