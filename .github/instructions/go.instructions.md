@@ -16,7 +16,8 @@ and [Google's Go Style Guide](https://google.github.io/styleguide/go/).
 - Always determine the project's Go version from the `go` directive in `go.mod` before suggesting changes.
 - Do **not** propose rewrites that replace modern standard-library features (Go 1.21+) with hand-rolled equivalents.
 - Do **not** flag, downgrade, or "polyfill" the following modern features when the `go.mod` permits them:
-  - Go 1.21: built-ins `min`, `max`, `clear`; stdlib packages `slices`, `maps`, `cmp`; structured logging `log/slog`; `errors.Join`.
+  - Go 1.20: `errors.Join`.
+  - Go 1.21: built-ins `min`, `max`, `clear`; stdlib packages `slices`, `maps`, `cmp`; structured logging `log/slog`.
   - Go 1.22: range-over-integer (`for i := range n`); per-iteration loop variable scoping; `math/rand/v2`; enhanced `http.ServeMux` patterns; `cmp.Or`.
   - Go 1.23: range-over-function iterators (`iter.Seq`, `iter.Seq2`); `unique` package; `slices.Sorted`, `slices.Collect`, etc.
   - Go 1.24: generic type aliases; `omitzero` JSON tag; `weak` package; `testing.B.Loop`; `os.Root`.
