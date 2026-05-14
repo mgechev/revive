@@ -21,7 +21,7 @@ func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 			if ver, ok := strings.CutPrefix(comment.Text, "//go:build "); ok {
 				hasGoBuild = true
 
-				// Starting from the Go 1.21, the go version in go.mod is a hard requirement.
+				// Starting with Go 1.21, the go version in go.mod is a hard requirement.
 				// Ignore this check for Go 1.20 and earlier.
 				if file.Pkg.IsAtLeastGoVersion(lint.Go121) && version.IsValid(ver) {
 					fileVersion := file.Pkg.GoVersion().String()
