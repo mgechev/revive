@@ -150,8 +150,9 @@ func (*ReturnsInterfaceTypeRule) getIgnoredTypes() map[string]struct{} {
 	return ignoredInterfaceNames
 }
 
-// getNameForType helper function to get name from type and bool which
-// decide if type should be processed/checked in ignoredTypesName map.
+// getNameForType helper function to get name from type
+// if empty string that means we dont know what type it is,
+// and it should be processed by rule and return proper warning.
 func (*ReturnsInterfaceTypeRule) getNameForType(t types.Type) string {
 	switch t := t.(type) {
 	case *types.Named:
