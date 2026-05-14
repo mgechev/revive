@@ -7,7 +7,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-func TestReturnInterfaceTypesRule_Configure(t *testing.T) {
+func TestReturnsInterfaceTypeRule_Configure(t *testing.T) {
 	tests := []struct {
 		name                        string
 		arguments                   lint.Arguments
@@ -27,7 +27,7 @@ func TestReturnInterfaceTypesRule_Configure(t *testing.T) {
 					"abc",
 				},
 			},
-			wantErr: errors.New(`invalid argument '[abc]' for 'return-interface-types' rule. Expecting a k,v map, got []interface {}`),
+			wantErr: errors.New(`invalid argument '[abc]' for 'returns-interface-type' rule. Expecting a k,v map, got []interface {}`),
 		},
 		{
 			name: "invalid stopOnFirst value",
@@ -36,30 +36,30 @@ func TestReturnInterfaceTypesRule_Configure(t *testing.T) {
 					"stopOnFirst": "abc",
 				},
 			},
-			wantErr: errors.New(`invalid argument 'stopOnFirst' for 'return-interface-types' rule, expecting bool value. Got 'abc' (string)`),
+			wantErr: errors.New(`invalid argument 'stopOnFirst' for 'returns-interface-type' rule, expecting bool value. Got 'abc' (string)`),
 		},
 		{
 			name: "invalid user defined ignored names",
 			arguments: lint.Arguments{
 				map[string]any{
-					"userDefinedIgnoredNames": []int{
+					"ignoredNames": []int{
 						1,
 					},
 				},
 			},
-			wantErr: errors.New(`invalid format 'userDefinedIgnoredNames' for 'return-interface-types' rule []string expected. Got '[1]' ([]int)`),
+			wantErr: errors.New(`invalid format 'ignoredNames' for 'returns-interface-type' rule []string expected. Got '[1]' ([]int)`),
 		},
 		{
 			name: "invalid user defined ignored names int values",
 			arguments: lint.Arguments{
 				map[string]any{
 					"stopOnFirst": false,
-					"userDefinedIgnoredNames": []any{
+					"ignoredNames": []any{
 						1,
 					},
 				},
 			},
-			wantErr: errors.New(`invalid value in 'userDefinedIgnoredNames' for 'return-interface-types' rule string expected Got '1' (int)`),
+			wantErr: errors.New(`invalid value in 'ignoredNames' for 'returns-interface-type' rule string expected Got '1' (int)`),
 		},
 
 		{
@@ -67,7 +67,7 @@ func TestReturnInterfaceTypesRule_Configure(t *testing.T) {
 			arguments: lint.Arguments{
 				map[string]any{
 					"stopOnFirst": false,
-					"userDefinedIgnoredNames": []any{
+					"ignoredNames": []any{
 						"fixtures.DummyConfig",
 					},
 				},
@@ -78,7 +78,7 @@ func TestReturnInterfaceTypesRule_Configure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var rule ReturnInterfaceTypesRule
+			var rule ReturnsInterfaceTypeRule
 
 			err := rule.Configure(tt.arguments)
 			if tt.wantErr != nil {
@@ -101,14 +101,14 @@ func TestReturnInterfaceTypesRule_Configure(t *testing.T) {
 	}
 }
 
-func TestReturnInterfaceTypesRule_Configure_LoadTypes(t *testing.T) {
+func TestReturnsInterfaceTypeRule_Configure_LoadTypes(t *testing.T) {
 	t.Run("loads types", func(t *testing.T) {
-		var rule ReturnInterfaceTypesRule
+		var rule ReturnsInterfaceTypeRule
 
 		err := rule.Configure(lint.Arguments{
 			map[string]any{
 				"stopOnFirst": false,
-				"userDefinedIgnoredNames": []any{
+				"ignoredNames": []any{
 					"fixtures.DummyResults",
 				},
 			},
@@ -119,7 +119,8 @@ func TestReturnInterfaceTypesRule_Configure_LoadTypes(t *testing.T) {
 
 		types := []string{"fixtures.DummyResults"}
 		for _, typeValue := range types {
-			_, ok := rule.userDefinedIgnoredNames[typeValue]
+			all := rule.getIgnoredTypes()
+			_, ok := all[typeValue]
 			if !ok {
 				t.Errorf("not loaded expected type %q", typeValue)
 			}

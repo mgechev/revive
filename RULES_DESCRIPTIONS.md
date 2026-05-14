@@ -79,7 +79,7 @@ List of all available rules.
 - [redundant-build-tag](#redundant-build-tag)
 - [redundant-import-alias](#redundant-import-alias)
 - [redundant-test-main-exit](#redundant-test-main-exit)
-- [return-interface-types](#return-interface-types)
+- [returns-interface-type](#returns-interface-type)
 - [string-format](#string-format)
 - [string-of-int](#string-of-int)
 - [struct-tag](#struct-tag)
@@ -1435,26 +1435,26 @@ _Configuration_: N/A
 
 _Note_: This rule is irrelevant for Go 1.14-.
 
-## return-interface-types
+## returns-interface-type
 
 _Description_: This rule spots functions and methods that return interface types.
 The interface names `error`, `any`, and `interface{}` are ignored by default. In a large
-codebase, you can use `user-defined-ignored-names` (`[]string`) to add more common or
+codebase, you can use `ignored-names` (`[]string`) to add more common or
 special-case interface names to the ignore list.
 
-_Configuration_: This rule has two optional arguments: `stop-on-first` and `user-defined-ignored-names`
+_Configuration_: This rule has two optional arguments: `stop-on-first` and `ignored-names`
 
 - `stop-on-first`: (bool) default `false`, set it to `true` to stop processing on the first encountered interface type
 (in cases where functions or methods have more than one return value)
-- `user-defined-ignored-names`: (`[]string`) default `[]`, a set of user-defined ignored interface names
+- `ignored-names`: (`[]string`) default `[]`, a set of user-defined ignored interface names
 
-### Examples (return-interface-types)
+### Examples (returns-interface-type)
 
 ```toml
-[rule.return-interface-types]
+[rule.returns-interface-type]
 arguments = [
   { stop-on-first = true,
-    user-defined-ignored-names = [
+    ignored-names = [
     "dot.Dummy",
     "dot.Reader",
   ] },

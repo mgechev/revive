@@ -1,14 +1,18 @@
 package fixtures
 
+func fooAny() any {
+	return nil
+}
+
 func foo() error {
 	return nil
 }
 
-func bar() DummyReader { // MATCH /bar returns interface type: fixtures.DummyReader/
+func barEmptyInterface() interface{} {
 	return nil
 }
 
-func barEmptyInterface() interface{} {
+func bar() DummyReader { // MATCH /bar returns interface type: fixtures.DummyReader/
 	return nil
 }
 

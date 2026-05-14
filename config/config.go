@@ -120,7 +120,7 @@ var allRules = append([]lint.Rule{
 	&rule.UseSlicesSort{},
 	&rule.PackageNamingRule{},
 	&rule.MultilineIfInitRule{},
-	&rule.ReturnInterfaceTypesRule{},
+	&rule.ReturnsInterfaceTypeRule{},
 }, defaultRules...)
 
 // allFormatters is a list of all available formatters to output the linting results.
