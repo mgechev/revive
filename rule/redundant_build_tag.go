@@ -30,7 +30,7 @@ func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 							Category:   lint.FailureCategoryStyle,
 							Confidence: 1,
 							Node:       comment,
-							Failure:    fmt.Sprintf(`The build tag "%s" is redundant for Go %s and can be removed`, comment.Text, fileVersion),
+							Failure:    fmt.Sprintf(`The build tag %q is redundant for Go %s and can be removed`, comment.Text, fileVersion),
 						}}
 					}
 				}

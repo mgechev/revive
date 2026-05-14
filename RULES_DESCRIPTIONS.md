@@ -1418,7 +1418,7 @@ Also, the rule spots redundant build tags `//go:build go1.X` when the package ve
 
 ### Examples (redundant-build-tag)
 
-1. Redundant `// +build` comment:
+Redundant `// +build` comment:
 
 Before (violation):
 
@@ -1437,7 +1437,7 @@ After (fixed):
 package example
 ```
 
-2. Redundant build tag when the package version is Go 1.21 or later:
+Redundant build tag when the package version is Go 1.21 or later:
 
 Before (violation):
 
