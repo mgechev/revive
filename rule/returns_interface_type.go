@@ -106,6 +106,7 @@ func (r *ReturnsInterfaceTypeRule) Configure(arguments lint.Arguments) error {
 				return fmt.Errorf("invalid argument '%v' for '%s' rule, expecting bool value. got '%v' (%T)", k, r.Name(), v, v)
 			}
 			r.stopOnFirst = stop
+			continue
 		}
 		if !isRuleOption(k, "ignoredNames") {
 			continue
