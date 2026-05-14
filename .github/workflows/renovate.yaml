@@ -3,6 +3,7 @@ name: Renovate
 on:
   pull_request:
     paths:
+      - '.github/workflows/renovate.yaml'
       - 'renovate.json'
   push:
     branches:
@@ -27,7 +28,7 @@ jobs:
           node-version: '24'
 
       - name: Install Renovate
-        run: npm install -g renovate@46.1.14
+        run: npm install -g renovate@43.150.0
 
       - name: Validate renovate.json
         run: renovate-config-validator
