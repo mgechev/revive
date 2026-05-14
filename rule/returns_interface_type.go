@@ -89,7 +89,7 @@ func (*ReturnsInterfaceTypeRule) Name() string {
 // Configuration implements the [lint.ConfigurableRule] interface.
 func (r *ReturnsInterfaceTypeRule) Configure(arguments lint.Arguments) error {
 	r.stopOnFirst = false
-	r.ignoredNames = make(map[string]struct{})
+	r.ignoredNames = map[string]struct{}{}
 	if len(arguments) == 0 {
 		return nil
 	}
