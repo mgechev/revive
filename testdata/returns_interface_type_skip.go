@@ -1,6 +1,6 @@
 package fixtures
 
-func barSkip() (DummyWriter, error) { // MATCH /barSkip returns interface type: fixtures.DummyWriter/
+func barSkip() (DummyWriter, error) { // MATCH /barSkip returns interface type fixtures.DummyWriter/
 	return nil, nil
 }
 

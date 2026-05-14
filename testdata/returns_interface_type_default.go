@@ -12,11 +12,11 @@ func barEmptyInterface() interface{} {
 	return nil
 }
 
-func bar() DummyReader { // MATCH /bar returns interface type: fixtures.DummyReader/
+func bar() DummyReader { // MATCH /bar returns interface type fixtures.DummyReader/
 	return nil
 }
 
-func fix() Reader { // MATCH /fix returns interface type: fixtures.Reader/
+func fix() Reader { // MATCH /fix returns interface type fixtures.Reader/
 	return nil
 }
 
@@ -30,7 +30,7 @@ func (S) Do() {}
 
 type A struct{}
 
-func (a A) B() DummyReader { // MATCH /fixtures.A.B returns interface type: fixtures.DummyReader/
+func (a A) B() DummyReader { // MATCH /fixtures.A.B returns interface type fixtures.DummyReader/
 	return nil
 }
 
