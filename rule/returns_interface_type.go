@@ -69,7 +69,7 @@ func (r *ReturnsInterfaceTypeRule) Apply(file *lint.File, _ lint.Arguments) []li
 			failures = append(failures, lint.Failure{
 				Node:       fn,
 				Confidence: 1.0,
-				Failure:    returnName + " returns interface type: " + typeStr,
+				Failure:    returnName + " returns interface type " + typeStr,
 			})
 			if r.stopOnFirst {
 				break
