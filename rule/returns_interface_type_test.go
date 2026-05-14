@@ -9,11 +9,11 @@ import (
 
 func TestReturnsInterfaceTypeRule_Configure(t *testing.T) {
 	tests := []struct {
-		name                        string
-		arguments                   lint.Arguments
-		wantErr                     error
-		wantStopOnFirst             bool
-		wantUserDefinedIgnoredNames map[string]struct{}
+		name             string
+		arguments        lint.Arguments
+		wantErr          error
+		wantStopOnFirst  bool
+		wantIgnoredNames map[string]struct{}
 	}{
 		{
 			name:      "no arguments",
@@ -36,7 +36,7 @@ func TestReturnsInterfaceTypeRule_Configure(t *testing.T) {
 					"stopOnFirst": "abc",
 				},
 			},
-			wantErr: errors.New(`invalid argument 'stopOnFirst' for 'returns-interface-type' rule, expecting bool value. Got 'abc' (string)`),
+			wantErr: errors.New(`invalid argument 'stopOnFirst' for 'returns-interface-type' rule, expecting bool value. got 'abc' (string)`),
 		},
 		{
 			name: "invalid user defined ignored names",
@@ -47,7 +47,7 @@ func TestReturnsInterfaceTypeRule_Configure(t *testing.T) {
 					},
 				},
 			},
-			wantErr: errors.New(`invalid format 'ignoredNames' for 'returns-interface-type' rule []string expected. Got '[1]' ([]int)`),
+			wantErr: errors.New(`invalid format for entry 'ignoredNames' of 'returns-interface-type' rule configuration: []string expected. got '[1]' ([]int)`),
 		},
 		{
 			name: "invalid user defined ignored names int values",
@@ -59,7 +59,7 @@ func TestReturnsInterfaceTypeRule_Configure(t *testing.T) {
 					},
 				},
 			},
-			wantErr: errors.New(`invalid value in 'ignoredNames' for 'returns-interface-type' rule string expected Got '1' (int)`),
+			wantErr: errors.New(`invalid format for value in 'ignoredNames' of 'returns-interface-type' rule configuration: string expected. got '1' (int)`),
 		},
 
 		{

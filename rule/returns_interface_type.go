@@ -103,7 +103,7 @@ func (r *ReturnsInterfaceTypeRule) Configure(arguments lint.Arguments) error {
 		if isRuleOption(k, "stopOnFirst") {
 			stop, ok := v.(bool)
 			if !ok {
-				return fmt.Errorf("invalid argument '%v' for '%s' rule, expecting bool value. Got '%v' (%T)", k, r.Name(), v, v)
+				return fmt.Errorf("invalid argument '%v' for '%s' rule, expecting bool value. got '%v' (%T)", k, r.Name(), v, v)
 			}
 			r.stopOnFirst = stop
 		}
@@ -112,12 +112,12 @@ func (r *ReturnsInterfaceTypeRule) Configure(arguments lint.Arguments) error {
 		}
 		names, ok := v.([]any)
 		if !ok {
-			return fmt.Errorf("invalid format '%v' for '%s' rule []string expected. Got '%v' (%T)", k, r.Name(), v, v)
+			return fmt.Errorf("invalid format for entry '%v' of '%s' rule configuration: []string expected. got '%v' (%T)", k, r.Name(), v, v)
 		}
 		for _, p := range names {
 			name, ok := p.(string)
 			if !ok {
-				return fmt.Errorf("invalid value in '%v' for '%s' rule string expected Got '%v' (%T)", k, r.Name(), p, p)
+				return fmt.Errorf("invalid format for value in '%v' of '%s' rule configuration: string expected. got '%v' (%T)", k, r.Name(), p, p)
 			}
 			ignoredInterfaceNames[name] = struct{}{}
 		}
