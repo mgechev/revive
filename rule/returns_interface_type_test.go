@@ -2,10 +2,22 @@ package rule
 
 import (
 	"errors"
+	"reflect"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
 )
+
+// cfgInit helper for create test config with default + case update.
+func cfgInit(add []string) map[string]struct{} {
+	var r ReturnsInterfaceTypeRule
+	base := r.DefaultIgnoredTypes()
+	for _, v := range add {
+		base[v] = struct{}{}
+	}
+
+	return base
+}
 
 func TestReturnsInterfaceTypeRule_Configure(t *testing.T) {
 	tests := []struct {
@@ -15,10 +27,60 @@ func TestReturnsInterfaceTypeRule_Configure(t *testing.T) {
 		wantIgnoredNames map[string]struct{}
 	}{
 		{
-			name:      "no arguments",
-			arguments: lint.Arguments{},
-			wantErr:   nil,
+			name:             "no arguments",
+			arguments:        lint.Arguments{},
+			wantErr:          nil,
+			wantIgnoredNames: cfgInit([]string{}),
 		},
+		{
+			name: "user defined ignoredNames check list",
+			arguments: lint.Arguments{
+				map[string]any{
+					"ignoredNames": []any{
+						"A",
+					},
+				},
+			},
+			wantErr:          nil,
+			wantIgnoredNames: cfgInit([]string{"A"}),
+		},
+		{
+			name: "user defined ignoredNames ok",
+			arguments: lint.Arguments{
+				map[string]any{
+					"ignoredNames": []any{
+						"B",
+					},
+				},
+			},
+			wantErr:          nil,
+			wantIgnoredNames: cfgInit([]string{"B"}),
+		},
+		{
+			name: "user defined ignorednames",
+			arguments: lint.Arguments{
+				map[string]any{
+					"ignorednames": []any{
+						"fixtures.DummyConfig",
+					},
+				},
+			},
+			wantErr:          nil,
+			wantIgnoredNames: cfgInit([]string{"fixtures.DummyConfig"}),
+		},
+		{
+			name: "user defined ignored-names",
+			arguments: lint.Arguments{
+				map[string]any{
+					"ignored-names": []any{
+						"fixtures.DummyConfig",
+					},
+				},
+			},
+			wantErr:          nil,
+			wantIgnoredNames: cfgInit([]string{"fixtures.DummyConfig"}),
+		},
+
 		{
 			name: "invalid arguments format",
 			arguments: lint.Arguments{
@@ -50,17 +112,16 @@ func TestReturnsInterfaceTypeRule_Configure(t *testing.T) {
 			},
 			wantErr: errors.New(`invalid format for value in 'ignoredNames' of 'returns-interface-type' rule configuration: string expected. got '1' (int)`),
 		},
-
 		{
-			name: "user defined ignored names",
+			name: "user defined invalid ignored-names key",
 			arguments: lint.Arguments{
 				map[string]any{
-					"ignoredNames": []any{
+					"ignored": []any{
 						"fixtures.DummyConfig",
 					},
 				},
 			},
-			wantErr: nil,
+			wantErr: errors.New(`invalid argument 'ignored' of 'returns-interface-type' rule configuration: ignored-names expected. got 'ignored'`),
 		},
 	}
 
@@ -82,32 +143,9 @@ func TestReturnsInterfaceTypeRule_Configure(t *testing.T) {
 			if err != nil {
 				t.Errorf("unexpected error: got = %v, want = nil", err)
 			}
+			if !reflect.DeepEqual(rule.getIgnoredTypes(), tt.wantIgnoredNames) {
+				t.Errorf("unexpected ignoredNames: got = %v, want %v", rule.getIgnoredTypes(), tt.wantIgnoredNames)
+			}
 		})
 	}
-}
-
-func TestReturnsInterfaceTypeRule_Configure_LoadTypes(t *testing.T) {
-	t.Run("loads types", func(t *testing.T) {
-		var rule ReturnsInterfaceTypeRule
-
-		err := rule.Configure(lint.Arguments{
-			map[string]any{
-				"ignoredNames": []any{
-					"fixtures.DummyResults",
-				},
-			},
-		})
-		if err != nil {
-			t.Fatalf("unexpected error: got = %v, want = nil", err)
-		}
-
-		types := []string{"fixtures.DummyResults"}
-		for _, typeValue := range types {
-			all := rule.getIgnoredTypes()
-			_, ok := all[typeValue]
-			if !ok {
-				t.Errorf("not loaded expected type %q", typeValue)
-			}
-		}
-	})
 }

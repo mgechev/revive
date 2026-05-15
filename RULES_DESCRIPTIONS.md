@@ -1438,19 +1438,82 @@ _Note_: This rule is irrelevant for Go 1.14-.
 ## returns-interface-type
 
 _Description_: This rule spots functions and methods that return interface types.
-The interface names `error`, `any`, and `interface{}` are ignored by default. In a large
-codebase, you can use `ignored-names` (`[]string`) to add more common or
+By default rule ignores list of interfaces:
+
+- `any`
+- `context.Context`
+- `error`
+- `interface{}`
+- `io.ReadCloser`
+- `io.Reader`
+- `io.Writer`
+- `net.Conn`
+- `net.Listener`
+
+In a large codebase, you can use `ignored-names` (`[]string`) to add more common or
 special-case interface names to the ignore list.
 
-_Configuration_: This rule have one optional argument: `ignored-names`
+_Configuration_: Supports a single `map[string]any` argument with an `ignored-names` option to specify list of ignored interface types.
 
-- `ignored-names`: (`[]string`) default `[]`, a set of user-defined ignored interface names
+- `ignored-names`: (`[]string`) default `[]`, a set of ignored interface names
 
 ### Examples (returns-interface-type)
 
+With default config (without arguments)
+
 ```toml
 [rule.returns-interface-type]
-arguments = [{ ignored-names = ["dot.Dummy", "dot.Reader"] }]
+```
+
+For code:
+
+```go
+package main
+
+func foo() any {
+	return nil
+}
+
+func bar() error {
+	return nil
+}
+
+func empty() interface{} {
+	return nil
+}
+
+func zed() DummyReader {
+	return nil
+}
+
+func chad() Reader {
+	return nil
+}
+
+type Reader interface {
+	Read([]byte) (int, error)
+}
+type DummyReader interface{}
+```
+
+rule results should looks like this:
+
+```bash
+=$ revive --config ~/revive.toml ./...
+main.go:15:1: zed returns interface type main.DummyReader
+main.go:19:1: chad returns interface type main.Reader
+```
+
+to exclude our type from results, we need add type (`main.DummyReader` - interface name with package ) to `ignored-names` list:
+
+```toml
+[rule.returns-interface-type]
+arguments = [{ ignored-names = ["main.DummyReader"] }]
+```
+
+```bash
+=$ revive --config ~/revive.toml ./...
+main.go:19:1: chad returns interface type main.Reader
 ```
 
 ## string-format

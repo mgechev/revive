@@ -4,19 +4,28 @@ import (
 	"fmt"
 	"go/ast"
 	"go/types"
+	"maps"
 
 	"github.com/mgechev/revive/lint"
 )
 
-var ignoredInterfaceNames = map[string]struct{}{
-	"error":       {},
-	"any":         {},
-	"interface{}": {},
+var defaultIgnoredInterfaceNames = map[string]struct{}{
+	"any":             {},
+	"context.Context": {},
+	"error":           {},
+	"interface{}":     {},
+	"io.ReadCloser":   {},
+	"io.Reader":       {},
+	"io.Writer":       {},
+	"net.Conn":        {},
+	"net.Listener":    {},
 }
+
+var allIgnored = map[string]struct{}{}
 
 // ReturnsInterfaceTypeRule spots functions/methods returning an interface type.
 type ReturnsInterfaceTypeRule struct {
-	ignoredNames map[string]struct{} // set of user defined ignored interface names
+	ignoredNames []string // set of user defined ignored interface names
 }
 
 // Apply applies the rule to given file.
@@ -84,7 +93,8 @@ func (*ReturnsInterfaceTypeRule) Name() string {
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
 func (r *ReturnsInterfaceTypeRule) Configure(arguments lint.Arguments) error {
-	r.ignoredNames = map[string]struct{}{}
+	r.ignoredNames = []string{}
+	allIgnored = maps.Clone(defaultIgnoredInterfaceNames)
 	if len(arguments) == 0 {
 		return nil
 	}
@@ -96,7 +106,7 @@ func (r *ReturnsInterfaceTypeRule) Configure(arguments lint.Arguments) error {
 
 	for k, v := range args {
 		if !isRuleOption(k, "ignoredNames") {
-			continue
+			return fmt.Errorf("invalid argument '%v' of '%s' rule configuration: ignored-names expected. got '%v'", k, r.Name(), k)
 		}
 		names, ok := v.([]any)
 		if !ok {
@@ -107,7 +117,7 @@ func (r *ReturnsInterfaceTypeRule) Configure(arguments lint.Arguments) error {
 			if !ok {
 				return fmt.Errorf("invalid format for value in '%v' of '%s' rule configuration: string expected. got '%v' (%T)", k, r.Name(), p, p)
 			}
-			ignoredInterfaceNames[name] = struct{}{}
+			allIgnored[name] = struct{}{}
 		}
 	}
 	return nil
@@ -129,13 +139,18 @@ func (*ReturnsInterfaceTypeRule) returnFuncName(functionName string, signature *
 // on values from ignoredInterfaceNames(default values)+ignoredNames(provided by user from config).
 func (r *ReturnsInterfaceTypeRule) isIgnored(t types.Type) bool {
 	name := r.getNameForType(t)
-	_, ignored := ignoredInterfaceNames[name]
+	_, ignored := allIgnored[name]
 	return name != "" && ignored
 }
 
 // getIgnoredTypes helper function to get all ignored types.
 func (*ReturnsInterfaceTypeRule) getIgnoredTypes() map[string]struct{} {
-	return ignoredInterfaceNames
+	return allIgnored
+}
+
+// DefaultIgnoredTypes helper function to get by default ignored types.
+func (*ReturnsInterfaceTypeRule) DefaultIgnoredTypes() map[string]struct{} {
+	return defaultIgnoredInterfaceNames
 }
 
 // getNameForType helper function to get name from type
