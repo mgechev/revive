@@ -16,7 +16,6 @@ var ignoredInterfaceNames = map[string]struct{}{
 
 // ReturnsInterfaceTypeRule spots functions/methods returning an interface type.
 type ReturnsInterfaceTypeRule struct {
-	stopOnFirst  bool                // stop on first found interface type in function/method
 	ignoredNames map[string]struct{} // set of user defined ignored interface names
 }
 
@@ -71,9 +70,6 @@ func (r *ReturnsInterfaceTypeRule) Apply(file *lint.File, _ lint.Arguments) []li
 				Confidence: 1.0,
 				Failure:    returnName + " returns interface type " + typeStr,
 			})
-			if r.stopOnFirst {
-				break
-			}
 		}
 	}
 	return failures
@@ -88,7 +84,6 @@ func (*ReturnsInterfaceTypeRule) Name() string {
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
 func (r *ReturnsInterfaceTypeRule) Configure(arguments lint.Arguments) error {
-	r.stopOnFirst = false
 	r.ignoredNames = map[string]struct{}{}
 	if len(arguments) == 0 {
 		return nil
@@ -100,14 +95,6 @@ func (r *ReturnsInterfaceTypeRule) Configure(arguments lint.Arguments) error {
 	}
 
 	for k, v := range args {
-		if isRuleOption(k, "stopOnFirst") {
-			stop, ok := v.(bool)
-			if !ok {
-				return fmt.Errorf("invalid argument '%v' for '%s' rule, expecting bool value. got '%v' (%T)", k, r.Name(), v, v)
-			}
-			r.stopOnFirst = stop
-			continue
-		}
 		if !isRuleOption(k, "ignoredNames") {
 			continue
 		}

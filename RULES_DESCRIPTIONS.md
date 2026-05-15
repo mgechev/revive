@@ -1442,23 +1442,15 @@ The interface names `error`, `any`, and `interface{}` are ignored by default. In
 codebase, you can use `ignored-names` (`[]string`) to add more common or
 special-case interface names to the ignore list.
 
-_Configuration_: This rule has two optional arguments: `stop-on-first` and `ignored-names`
+_Configuration_: This rule have one optional argument: `ignored-names`
 
-- `stop-on-first`: (bool) default `false`, set it to `true` to stop processing on the first encountered interface type
-(in cases where functions or methods have more than one return value)
 - `ignored-names`: (`[]string`) default `[]`, a set of user-defined ignored interface names
 
 ### Examples (returns-interface-type)
 
 ```toml
 [rule.returns-interface-type]
-arguments = [
-  { stop-on-first = true,
-    ignored-names = [
-    "dot.Dummy",
-    "dot.Reader",
-  ] },
-]
+arguments = [{ ignored-names = ["dot.Dummy", "dot.Reader"] }]
 ```
 
 ## string-format

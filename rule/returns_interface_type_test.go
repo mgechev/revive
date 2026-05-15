@@ -12,7 +12,6 @@ func TestReturnsInterfaceTypeRule_Configure(t *testing.T) {
 		name             string
 		arguments        lint.Arguments
 		wantErr          error
-		wantStopOnFirst  bool
 		wantIgnoredNames map[string]struct{}
 	}{
 		{
@@ -30,15 +29,6 @@ func TestReturnsInterfaceTypeRule_Configure(t *testing.T) {
 			wantErr: errors.New(`invalid argument '[abc]' for 'returns-interface-type' rule. Expecting a k,v map, got []interface {}`),
 		},
 		{
-			name: "invalid stopOnFirst value",
-			arguments: lint.Arguments{
-				map[string]any{
-					"stopOnFirst": "abc",
-				},
-			},
-			wantErr: errors.New(`invalid argument 'stopOnFirst' for 'returns-interface-type' rule, expecting bool value. got 'abc' (string)`),
-		},
-		{
 			name: "invalid user defined ignored names",
 			arguments: lint.Arguments{
 				map[string]any{
@@ -53,7 +43,6 @@ func TestReturnsInterfaceTypeRule_Configure(t *testing.T) {
 			name: "invalid user defined ignored names int values",
 			arguments: lint.Arguments{
 				map[string]any{
-					"stopOnFirst": false,
 					"ignoredNames": []any{
 						1,
 					},
@@ -66,7 +55,6 @@ func TestReturnsInterfaceTypeRule_Configure(t *testing.T) {
 			name: "user defined ignored names",
 			arguments: lint.Arguments{
 				map[string]any{
-					"stopOnFirst": false,
 					"ignoredNames": []any{
 						"fixtures.DummyConfig",
 					},
@@ -94,9 +82,6 @@ func TestReturnsInterfaceTypeRule_Configure(t *testing.T) {
 			if err != nil {
 				t.Errorf("unexpected error: got = %v, want = nil", err)
 			}
-			if rule.stopOnFirst != tt.wantStopOnFirst {
-				t.Errorf("unexpected stopOnFirst: got = %v, want %v", rule.stopOnFirst, tt.wantStopOnFirst)
-			}
 		})
 	}
 }
@@ -107,7 +92,6 @@ func TestReturnsInterfaceTypeRule_Configure_LoadTypes(t *testing.T) {
 
 		err := rule.Configure(lint.Arguments{
 			map[string]any{
-				"stopOnFirst": false,
 				"ignoredNames": []any{
 					"fixtures.DummyResults",
 				},
