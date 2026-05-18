@@ -1438,24 +1438,15 @@ _Note_: This rule is irrelevant for Go 1.14-.
 ## returns-interface-type
 
 _Description_: This rule spots functions and methods that return interface types.
-By default rule ignores list of interfaces:
 
-- `any`
-- `context.Context`
-- `error`
-- `interface{}`
-- `io.ReadCloser`
-- `io.Reader`
-- `io.Writer`
-- `net.Conn`
-- `net.Listener`
+In a large codebase, you can use `searching-names` (`[]string`) to add more common or
+special-case interface names to the search list.
 
-In a large codebase, you can use `ignored-names` (`[]string`) to add more common or
-special-case interface names to the ignore list.
+_Configuration_: Supports a single `map[string]any` argument with an opitons: `report-all` to switch on/off finding all interface types,
+and `searching-names` option to specify list of filtered interface types, to reduce results for matched elements
 
-_Configuration_: Supports a single `map[string]any` argument with an `ignored-names` option to specify list of ignored interface types.
-
-- `ignored-names`: (`[]string`) default `[]`, a set of ignored interface names
+- `report-all`: (`bool`) default `false` finding all interace types
+- `searching-names`: (`[]string`) default `[]`, a set of filtered interface names
 
 ### Examples (returns-interface-type)
 
@@ -1470,50 +1461,49 @@ For code:
 ```go
 package main
 
-func foo() any {
+func fooAny() any {
 	return nil
 }
 
-func bar() error {
+func foo() error {
 	return nil
 }
 
-func empty() interface{} {
+func barEmptyInterface() interface{} {
 	return nil
 }
-
-func zed() DummyReader {
-	return nil
-}
-
-func chad() Reader {
-	return nil
-}
-
-type Reader interface {
-	Read([]byte) (int, error)
-}
-type DummyReader interface{}
 ```
 
-rule results should looks like this:
+rule results should looks like this (because by default we dont show results):
 
 ```bash
 =$ revive --config ~/revive.toml ./...
-main.go:15:1: zed returns interface type main.DummyReader
-main.go:19:1: chad returns interface type main.Reader
 ```
 
-to exclude our type from results, we need add type (`main.DummyReader` - interface name with package ) to `ignored-names` list:
+to show results , we need set `report-all = true`:
 
 ```toml
 [rule.returns-interface-type]
-arguments = [{ ignored-names = ["main.DummyReader"] }]
+arguments = [{ report-all = true }]
 ```
 
 ```bash
-=$ revive --config ~/revive.toml ./...
-main.go:19:1: chad returns interface type main.Reader
+=$ revive --config ~/revive-orig.toml ./...
+main.go:3:1: fooAny returns interface type any
+main.go:7:1: foo returns interface type error
+main.go:11:1: barEmptyInterface returns interface type interface{}
+```
+
+to filter results only for error we need to update config to:
+
+```toml
+[rule.returns-interface-type]
+arguments = [{ report-all = true, searching-names = ["error"] }]
+```
+
+```bash
+=$ revive --config ~/revive-orig.toml ./...
+main.go:3:1: fooAny returns interface type any
 ```
 
 ## string-format

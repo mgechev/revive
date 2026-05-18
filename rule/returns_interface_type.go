@@ -9,28 +9,23 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-var defaultIgnoredInterfaceNames = map[string]struct{}{
-	"any":             {},
-	"context.Context": {},
-	"error":           {},
-	"interface{}":     {},
-	"io.ReadCloser":   {},
-	"io.Reader":       {},
-	"io.Writer":       {},
-	"net.Conn":        {},
-	"net.Listener":    {},
-}
+var defaultFilteredInterfaceNames = map[string]struct{}{}
 
-var allIgnored = map[string]struct{}{}
+var allFounded = map[string]struct{}{}
 
 // ReturnsInterfaceTypeRule spots functions/methods returning an interface type.
 type ReturnsInterfaceTypeRule struct {
-	ignoredNames []string // set of user defined ignored interface names
+	reportAll      bool     // enable/disable reporting of interface types
+	searchingNames []string // set of user defined interface names used to filter results
 }
 
 // Apply applies the rule to given file.
 func (r *ReturnsInterfaceTypeRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
+
+	if !r.reportAll {
+		return failures
+	}
 
 	if err := file.Pkg.TypeCheck(); err != nil {
 		return []lint.Failure{
@@ -69,8 +64,8 @@ func (r *ReturnsInterfaceTypeRule) Apply(file *lint.File, _ lint.Arguments) []li
 
 			typeStr := typ.String()
 
-			if r.isIgnored(typ) {
-				continue // configured to ignore this interface
+			if !r.isFiltered(typ) {
+				continue // configured to find this interface
 			}
 
 			returnName := r.returnFuncName(fn.Name.Name, signature)
@@ -93,8 +88,9 @@ func (*ReturnsInterfaceTypeRule) Name() string {
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
 func (r *ReturnsInterfaceTypeRule) Configure(arguments lint.Arguments) error {
-	r.ignoredNames = []string{}
-	allIgnored = maps.Clone(defaultIgnoredInterfaceNames)
+	r.reportAll = false
+	r.searchingNames = []string{}
+	allFounded = maps.Clone(defaultFilteredInterfaceNames)
 	if len(arguments) == 0 {
 		return nil
 	}
@@ -105,8 +101,17 @@ func (r *ReturnsInterfaceTypeRule) Configure(arguments lint.Arguments) error {
 	}
 
 	for k, v := range args {
-		if !isRuleOption(k, "ignoredNames") {
-			return fmt.Errorf("invalid argument '%v' of '%s' rule configuration: ignored-names expected. got '%v'", k, r.Name(), k)
+		if isRuleOption(k, "reportAll") {
+			reportAll, ok := v.(bool)
+			if !ok {
+				return fmt.Errorf(`invalid argument '%v' fo '%s' rule; need bool but got %T`, k, r.Name(), k)
+			}
+			r.reportAll = reportAll
+			continue
+		}
+
+		if !isRuleOption(k, "searchingNames") {
+			return fmt.Errorf("invalid argument '%v' of '%s' rule configuration: searching-names expected. got '%v'", k, r.Name(), k)
 		}
 		names, ok := v.([]any)
 		if !ok {
@@ -117,7 +122,7 @@ func (r *ReturnsInterfaceTypeRule) Configure(arguments lint.Arguments) error {
 			if !ok {
 				return fmt.Errorf("invalid format for value in '%v' of '%s' rule configuration: string expected. got '%v' (%T)", k, r.Name(), p, p)
 			}
-			allIgnored[name] = struct{}{}
+			allFounded[name] = struct{}{}
 		}
 	}
 	return nil
@@ -135,22 +140,25 @@ func (*ReturnsInterfaceTypeRule) returnFuncName(functionName string, signature *
 	return returnName
 }
 
-// isIgnored helper function to check if type is ignored, decission is based
-// on values from ignoredInterfaceNames(default values)+ignoredNames(provided by user from config).
-func (r *ReturnsInterfaceTypeRule) isIgnored(t types.Type) bool {
+// isFiltered helper function to check if type is filtered, decission is based
+// on values from defaultFilteredNames(default values)+searchinNames(provided by user from config).
+func (r *ReturnsInterfaceTypeRule) isFiltered(t types.Type) bool {
+	if len(allFounded) == 0 {
+		return true
+	}
 	name := r.getNameForType(t)
-	_, ignored := allIgnored[name]
-	return name != "" && ignored
+	_, filtered := allFounded[name]
+	return name != "" && filtered
 }
 
-// getIgnoredTypes helper function to get all ignored types.
-func (*ReturnsInterfaceTypeRule) getIgnoredTypes() map[string]struct{} {
-	return allIgnored
+// getFilteredTypes helper function to get all filtered types.
+func (*ReturnsInterfaceTypeRule) getFilteredTypes() map[string]struct{} {
+	return allFounded
 }
 
-// DefaultIgnoredTypes helper function to get by default ignored types.
-func (*ReturnsInterfaceTypeRule) DefaultIgnoredTypes() map[string]struct{} {
-	return defaultIgnoredInterfaceNames
+// DefaultFilteredTypes helper function to get by default filtered types.
+func (*ReturnsInterfaceTypeRule) DefaultFilteredTypes() map[string]struct{} {
+	return defaultFilteredInterfaceNames
 }
 
 // getNameForType helper function to get name from type

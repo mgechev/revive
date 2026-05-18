@@ -11,7 +11,7 @@ import (
 // cfgInit helper for create test config with default + case update.
 func cfgInit(add []string) map[string]struct{} {
 	var r ReturnsInterfaceTypeRule
-	base := r.DefaultIgnoredTypes()
+	base := r.DefaultFilteredTypes()
 	for _, v := range add {
 		base[v] = struct{}{}
 	}
@@ -21,64 +21,64 @@ func cfgInit(add []string) map[string]struct{} {
 
 func TestReturnsInterfaceTypeRule_Configure(t *testing.T) {
 	tests := []struct {
-		name             string
-		arguments        lint.Arguments
-		wantErr          error
-		wantIgnoredNames map[string]struct{}
+		name               string
+		arguments          lint.Arguments
+		wantErr            error
+		wantSearchingNames map[string]struct{}
 	}{
 		{
-			name:             "no arguments",
-			arguments:        lint.Arguments{},
-			wantErr:          nil,
-			wantIgnoredNames: cfgInit([]string{}),
+			name:               "no arguments",
+			arguments:          lint.Arguments{},
+			wantErr:            nil,
+			wantSearchingNames: cfgInit([]string{}),
 		},
 		{
-			name: "user defined ignoredNames check list",
+			name: "user defined searchingNames check list",
 			arguments: lint.Arguments{
 				map[string]any{
-					"ignoredNames": []any{
+					"searchingNames": []any{
 						"A",
 					},
 				},
 			},
-			wantErr:          nil,
-			wantIgnoredNames: cfgInit([]string{"A"}),
+			wantErr:            nil,
+			wantSearchingNames: cfgInit([]string{"A"}),
 		},
 		{
-			name: "user defined ignoredNames ok",
+			name: "user defined searchingNames ok",
 			arguments: lint.Arguments{
 				map[string]any{
-					"ignoredNames": []any{
+					"searchingNames": []any{
 						"B",
 					},
 				},
 			},
-			wantErr:          nil,
-			wantIgnoredNames: cfgInit([]string{"B"}),
+			wantErr:            nil,
+			wantSearchingNames: cfgInit([]string{"B"}),
 		},
 		{
-			name: "user defined ignorednames",
+			name: "user defined searchingnames",
 			arguments: lint.Arguments{
 				map[string]any{
-					"ignorednames": []any{
+					"searchingnames": []any{
 						"fixtures.DummyConfig",
 					},
 				},
 			},
-			wantErr:          nil,
-			wantIgnoredNames: cfgInit([]string{"fixtures.DummyConfig"}),
+			wantErr:            nil,
+			wantSearchingNames: cfgInit([]string{"fixtures.DummyConfig"}),
 		},
 		{
-			name: "user defined ignored-names",
+			name: "user defined searching-names",
 			arguments: lint.Arguments{
 				map[string]any{
-					"ignored-names": []any{
+					"searching-names": []any{
 						"fixtures.DummyConfig",
 					},
 				},
 			},
-			wantErr:          nil,
-			wantIgnoredNames: cfgInit([]string{"fixtures.DummyConfig"}),
+			wantErr:            nil,
+			wantSearchingNames: cfgInit([]string{"fixtures.DummyConfig"}),
 		},
 
 		{
@@ -91,37 +91,37 @@ func TestReturnsInterfaceTypeRule_Configure(t *testing.T) {
 			wantErr: errors.New(`invalid argument '[abc]' for 'returns-interface-type' rule. Expecting a k,v map, got []interface {}`),
 		},
 		{
-			name: "invalid user defined ignored names",
+			name: "invalid user defined searching names",
 			arguments: lint.Arguments{
 				map[string]any{
-					"ignoredNames": []int{
+					"searchingNames": []int{
 						1,
 					},
 				},
 			},
-			wantErr: errors.New(`invalid format for entry 'ignoredNames' of 'returns-interface-type' rule configuration: []string expected. got '[1]' ([]int)`),
+			wantErr: errors.New(`invalid format for entry 'searchingNames' of 'returns-interface-type' rule configuration: []string expected. got '[1]' ([]int)`),
 		},
 		{
-			name: "invalid user defined ignored names int values",
+			name: "invalid user defined searching names int values",
 			arguments: lint.Arguments{
 				map[string]any{
-					"ignoredNames": []any{
+					"searchingNames": []any{
 						1,
 					},
 				},
 			},
-			wantErr: errors.New(`invalid format for value in 'ignoredNames' of 'returns-interface-type' rule configuration: string expected. got '1' (int)`),
+			wantErr: errors.New(`invalid format for value in 'searchingNames' of 'returns-interface-type' rule configuration: string expected. got '1' (int)`),
 		},
 		{
-			name: "user defined invalid ignored-names key",
+			name: "user defined invalid searching-names key",
 			arguments: lint.Arguments{
 				map[string]any{
-					"ignored": []any{
+					"searching": []any{
 						"fixtures.DummyConfig",
 					},
 				},
 			},
-			wantErr: errors.New(`invalid argument 'ignored' of 'returns-interface-type' rule configuration: ignored-names expected. got 'ignored'`),
+			wantErr: errors.New(`invalid argument 'searching' of 'returns-interface-type' rule configuration: searching-names expected. got 'searching'`),
 		},
 	}
 
@@ -143,8 +143,8 @@ func TestReturnsInterfaceTypeRule_Configure(t *testing.T) {
 			if err != nil {
 				t.Errorf("unexpected error: got = %v, want = nil", err)
 			}
-			if !reflect.DeepEqual(rule.getIgnoredTypes(), tt.wantIgnoredNames) {
-				t.Errorf("unexpected ignoredNames: got = %v, want %v", rule.getIgnoredTypes(), tt.wantIgnoredNames)
+			if !reflect.DeepEqual(rule.getFilteredTypes(), tt.wantSearchingNames) {
+				t.Errorf("unexpected searchingNames: got = %v, want %v", rule.getFilteredTypes(), tt.wantSearchingNames)
 			}
 		})
 	}
