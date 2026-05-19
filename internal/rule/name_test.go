@@ -40,6 +40,10 @@ func TestName(t *testing.T) {
 			want: "ID",
 		},
 		{
+			name: "ID",
+			want: "ID",
+		},
+		{
 			name: "foo_id",
 			want: "fooID",
 		},
@@ -134,6 +138,26 @@ func TestName(t *testing.T) {
 			want:                     "getJson",
 		},
 		{
+			name:                     "getJSON",
+			skipInitialismNameChecks: true,
+			want:                     "getJSON",
+		},
+		{
+			name:                     "httpMethod",
+			skipInitialismNameChecks: true,
+			want:                     "httpMethod",
+		},
+		{
+			name:                     "HttpMethod",
+			skipInitialismNameChecks: true,
+			want:                     "HttpMethod",
+		},
+		{
+			name:                     "HTTPMethod",
+			skipInitialismNameChecks: true,
+			want:                     "HTTPMethod",
+		},
+		{
 			name:                     "userId",
 			skipInitialismNameChecks: true,
 			want:                     "userId",
@@ -213,6 +237,11 @@ func TestName(t *testing.T) {
 		},
 		{
 			name:               "Id",
+			want:               "Id",
+			initialismsAsWords: true,
+		},
+		{
+			name:               "ID",
 			want:               "Id",
 			initialismsAsWords: true,
 		},
@@ -333,10 +362,34 @@ func TestName(t *testing.T) {
 		},
 		// Test skipInitialismChecks functionality
 		{
+			name:                     "getJSON",
+			skipInitialismNameChecks: true,
+			initialismsAsWords:       true,
+			want:                     "getJson",
+		},
+		{
 			name:                     "getJson",
 			skipInitialismNameChecks: true,
 			initialismsAsWords:       true,
 			want:                     "getJson",
+		},
+		{
+			name:                     "httpMethod",
+			skipInitialismNameChecks: true,
+			initialismsAsWords:       true,
+			want:                     "httpMethod",
+		},
+		{
+			name:                     "HttpMethod",
+			skipInitialismNameChecks: true,
+			initialismsAsWords:       true,
+			want:                     "HttpMethod",
+		},
+		{
+			name:                     "HTTPMethod",
+			skipInitialismNameChecks: true,
+			initialismsAsWords:       true,
+			want:                     "HttpMethod",
 		},
 		{
 			name:                     "userId",
@@ -358,10 +411,22 @@ func TestName(t *testing.T) {
 			want:               "fooId",
 		},
 		{
+			name:               "fooID",
+			allowlist:          []string{"ID"},
+			initialismsAsWords: true,
+			want:               "fooID",
+		},
+		{
 			name:               "fooApi",
 			allowlist:          []string{"API"},
 			initialismsAsWords: true,
 			want:               "fooApi",
+		},
+		{
+			name:               "fooAPI",
+			allowlist:          []string{"API"},
+			initialismsAsWords: true,
+			want:               "fooAPI",
 		},
 		{
 			name:               "fooHttp",

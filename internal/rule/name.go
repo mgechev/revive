@@ -52,7 +52,7 @@ var commonInitialisms = map[string]bool{
 }
 
 // Name returns a different name of struct, var, const, or function if it should be different.
-func Name(name string, allowlist, blocklist []string, skipInitialismNameChecks bool, initialismsAsWords bool) (should string) {
+func Name(name string, allowlist, blocklist []string, skipInitialismNameChecks, initialismsAsWords bool) (should string) {
 	// Fast path for simple cases: "_" and all lowercase.
 	if name == "_" {
 		return name
@@ -137,7 +137,7 @@ func Name(name string, allowlist, blocklist []string, skipInitialismNameChecks b
 		} else if w > 0 && strings.ToLower(word) == word {
 			// already all lowercase, and not the first word, so uppercase the first character.
 			runes[w] = unicode.ToUpper(runes[w])
-		} else if initialismsAsWords && strings.ToUpper(word) == word {
+		} else if initialismsAsWords && u == word && !ignoreInitWarnings[u] {
 			// If the word is all uppercase, but not in the known initialisms,
 			// it's either an incorrect all-caps word or an unknown initialism.
 			// Uppercase the first character and lowercase the rest.
