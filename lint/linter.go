@@ -40,9 +40,11 @@ func New(reader ReadFile, maxOpenFiles int) Linter {
 	}
 }
 
-// SetLogger sets the logger for the linter.
+// SetLogger sets the logger for the linter if the provided logger is not nil.
 func (l *Linter) SetLogger(logger *slog.Logger) {
-	l.logger = logger
+	if logger != nil {
+		l.logger = logger
+	}
 }
 
 func (l *Linter) readFile(path string) (result []byte, err error) {

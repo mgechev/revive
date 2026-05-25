@@ -52,12 +52,10 @@ func TestFile_lint_internalFailureDoesNotAbortOtherRules(t *testing.T) {
 
 	var logBuf bytes.Buffer
 	f := &File{
-		Name: "test.go",
-		Pkg:  &Package{fset: token.NewFileSet()},
-		AST:  &ast.File{},
-		logger: slog.New(slog.NewTextHandler(&logBuf, &slog.HandlerOptions{
-			Level: slog.LevelWarn,
-		})),
+		Name:   "test.go",
+		Pkg:    &Package{fset: token.NewFileSet()},
+		AST:    &ast.File{},
+		logger: slog.New(slog.NewTextHandler(&logBuf, &slog.HandlerOptions{Level: slog.LevelWarn})),
 	}
 
 	failures := make(chan Failure, 4)
@@ -79,8 +77,16 @@ func TestFile_lint_internalFailureDoesNotAbortOtherRules(t *testing.T) {
 	}
 
 	logged := logBuf.String()
-	if want := `level=WARN msg="rule skipped due to internal failure" rule=typecheck-internal-failure-rule file=test.go failure="simulated type-check failure"`; !strings.Contains(logged, want) {
-		t.Errorf("expected warning log containing %q, got %q", want, logged)
+	for _, want := range []string{
+		"level=WARN",
+		`msg="rule skipped due to internal failure"`,
+		"rule=typecheck-internal-failure-rule",
+		"file=test.go",
+		`failure="simulated type-check failure"`,
+	} {
+		if !strings.Contains(logged, want) {
+			t.Errorf("expected log output to contain %q, got %q", want, logged)
+		}
 	}
 }
 
