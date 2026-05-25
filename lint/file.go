@@ -7,6 +7,7 @@ import (
 	"go/printer"
 	"go/token"
 	"go/types"
+	"log/slog"
 	"math"
 	"regexp"
 	"strings"
@@ -18,6 +19,7 @@ type File struct {
 	Pkg     *Package
 	content []byte
 	AST     *ast.File
+	logger  *slog.Logger
 }
 
 // IsTest returns if the file contains tests.
@@ -56,6 +58,7 @@ func NewFile(name string, content []byte, pkg *Package) (*File, error) {
 		content: content,
 		Pkg:     pkg,
 		AST:     f,
+		logger:  slog.Default(),
 	}, nil
 }
 
@@ -128,6 +131,11 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 		filtered := currentFailures[:0]
 		for _, failure := range currentFailures {
 			if failure.IsInternal() {
+				f.logger.Warn("rule skipped due to internal failure",
+					"rule", currentRule.Name(),
+					"file", f.Name,
+					"failure", failure.Failure,
+				)
 				continue
 			}
 

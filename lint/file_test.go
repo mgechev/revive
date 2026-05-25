@@ -1,39 +1,38 @@
 package lint
 
 import (
+	"bytes"
 	"go/ast"
 	"go/token"
+	"log/slog"
+	"slices"
+	"strings"
 	"testing"
 )
 
-// fakeRule implements Rule and returns a fixed list of failures on every Apply.
 type fakeRule struct {
 	name     string
 	failures []Failure
 }
 
+var _ Rule = (*fakeRule)(nil)
+
 func (r *fakeRule) Name() string { return r.name }
+
 func (r *fakeRule) Apply(*File, Arguments) []Failure {
-	out := make([]Failure, len(r.failures))
-	copy(out, r.failures)
-	return out
+	return slices.Clone(r.failures)
 }
 
-// TestFile_lint_internalFailureDoesNotAbortOtherRules ensures that an
-// internal failure from one rule does not abort File.lint and thus does
-// not suppress reports from other rules running on the same file.
 func TestFile_lint_internalFailureDoesNotAbortOtherRules(t *testing.T) {
-	const otherRuleName = "other-rule"
-
 	rules := []Rule{
 		&fakeRule{
-			name: "internal-failure-rule",
+			name: "typecheck-internal-failure-rule",
 			failures: []Failure{
 				NewInternalFailure("simulated type-check failure"),
 			},
 		},
 		&fakeRule{
-			name: otherRuleName,
+			name: "normal-rule",
 			failures: []Failure{
 				{
 					Confidence: 1,
@@ -46,33 +45,42 @@ func TestFile_lint_internalFailureDoesNotAbortOtherRules(t *testing.T) {
 	cfg := Config{
 		Confidence: 0.8,
 		Rules: RulesConfig{
-			"internal-failure-rule": {},
-			otherRuleName:           {},
+			"typecheck-internal-failure-rule": {},
+			"normal-rule":                     {},
 		},
 	}
 
+	var logBuf bytes.Buffer
 	f := &File{
 		Name: "test.go",
 		Pkg:  &Package{fset: token.NewFileSet()},
 		AST:  &ast.File{},
+		logger: slog.New(slog.NewTextHandler(&logBuf, &slog.HandlerOptions{
+			Level: slog.LevelWarn,
+		})),
 	}
 
 	failures := make(chan Failure, 4)
 	if err := f.lint(rules, cfg, failures); err != nil {
-		t.Fatalf("File.lint returned error: %v", err)
+		t.Fatal("unexpected error from linting:", err)
 	}
 	close(failures)
 
 	var got []Failure
-	for fl := range failures {
-		got = append(got, fl)
+	for failure := range failures {
+		got = append(got, failure)
 	}
 
 	if len(got) != 1 {
 		t.Fatalf("expected exactly 1 failure to be reported, got %d: %+v", len(got), got)
 	}
-	if got[0].RuleName != otherRuleName {
-		t.Fatalf("expected failure from %q, got %q", otherRuleName, got[0].RuleName)
+	if got[0].RuleName != "normal-rule" {
+		t.Errorf("expected failure from %q, got %q", "normal-rule", got[0].RuleName)
+	}
+
+	logged := logBuf.String()
+	if want := `level=WARN msg="rule skipped due to internal failure" rule=typecheck-internal-failure-rule file=test.go failure="simulated type-check failure"`; !strings.Contains(logged, want) {
+		t.Errorf("expected warning log containing %q, got %q", want, logged)
 	}
 }
 
@@ -226,6 +234,7 @@ func TestFile_disabledIntervals(t *testing.T) {
 				AST: &ast.File{
 					Comments: tt.comments,
 				},
+				logger: slog.New(slog.DiscardHandler),
 			}
 			got := f.disabledIntervals(nil, false, make(chan Failure, 10))
 			if len(got) != len(tt.expected) {

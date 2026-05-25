@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"go/token"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -23,6 +24,7 @@ type ReadFile func(path string) (result []byte, err error)
 type Linter struct {
 	reader         ReadFile
 	fileReadTokens chan struct{}
+	logger         *slog.Logger
 }
 
 // New creates a new Linter.
@@ -34,7 +36,13 @@ func New(reader ReadFile, maxOpenFiles int) Linter {
 	return Linter{
 		reader:         reader,
 		fileReadTokens: fileReadTokens,
+		logger:         slog.Default(),
 	}
+}
+
+// SetLogger sets the logger for the linter.
+func (l *Linter) SetLogger(logger *slog.Logger) {
+	l.logger = logger
 }
 
 func (l *Linter) readFile(path string) (result []byte, err error) {
@@ -146,6 +154,7 @@ func (l *Linter) lintPackage(filenames []string, gover *goversion.Version, ruleS
 			addInvalidFileFailure(filename, err.Error(), failures)
 			continue
 		}
+		file.logger = l.logger
 		pkg.files[filename] = file
 	}
 
