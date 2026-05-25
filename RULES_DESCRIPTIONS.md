@@ -65,6 +65,7 @@ List of all available rules.
 - [max-public-structs](#max-public-structs)
 - [modifies-parameter](#modifies-parameter)
 - [modifies-value-receiver](#modifies-value-receiver)
+- [multiline-if-init](#multiline-if-init)
 - [nested-structs](#nested-structs)
 - [optimize-operands-order](#optimize-operands-order)
 - [package-comments](#package-comments)
@@ -259,6 +260,12 @@ _Configuration_: ([]string) list of exceptions. For example, to accept comments 
 ```
 
 You need to add both `"mypragma:"` and `"+optional"` in the configuration
+
+The following comment prefixes are allowed by default:
+
+- `//#nosec` — [gosec](https://github.com/securego/gosec) security scanner directive
+- Go directive comments matching `//[a-z0-9]+:[a-z0-9]` (e.g. `//nolint:linter`, `//go:generate`, `//revive:disable:rule`),
+as well as comments starting with "//line ", "//extern ", and "//export "
 
 Configuration example:
 
@@ -1152,6 +1159,47 @@ _Configuration_: N/A
 _Description_: A method that modifies its receiver value can have undesired behavior.
 The modification can be also the root of a bug because the actual value receiver could be a copy of that used at the calling site.
 This rule warns when a method modifies its receiver.
+
+_Configuration_: N/A
+
+## multiline-if-init
+
+_Description_: Flags `if` statements whose init clause spans multiple lines.
+The if-init idiom exists for tight one-liners.
+When the init wraps across lines, the reader has to visually parse a struct literal or
+call chain to find where the initialization ends and the condition begins.
+Extract the initialization to a separate statement instead.
+
+### Examples (multiline-if-init)
+
+Before (violation):
+
+```go
+if r, err := rec(
+	ctx,
+	mgr.GetClient(),
+	mgr.GetFieldIndexer(),
+	mgr.GetEventRecorderFor(fmt.Sprintf("%s-%s-controller", name, options.ManagerName)),
+	opts...,
+); err != nil {
+	return err
+}
+```
+
+After (fixed):
+
+```go
+r, err := rec(
+	ctx,
+	mgr.GetClient(),
+	mgr.GetFieldIndexer(),
+	mgr.GetEventRecorderFor(fmt.Sprintf("%s-%s-controller", name, options.ManagerName)),
+	opts...,
+)
+if err != nil {
+	return err
+}
+```
 
 _Configuration_: N/A
 

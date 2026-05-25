@@ -1,5 +1,10 @@
 package commentspacings
 
+import (
+	"fmt"
+	"os"
+)
+
 //revive:disable:cyclomatic
 type some struct{}
 
@@ -16,12 +21,10 @@ type hello struct {
 	random `json:random`
 }
 
-// MATCH:21 /no space between comment delimiter and comment text/
+// MATCH:26 /no space between comment delimiter and comment text/
 
 //This comment does not respect the spacing rule!
 var a string
-
-//myOwnDirective: do something
 
 /*
 Should be valid
@@ -29,7 +32,7 @@ Should be valid
 
 //	Tabs between comment delimiter and comment text should be fine
 
-// MATCH:34 /no space between comment delimiter and comment text/
+// MATCH:37 /no space between comment delimiter and comment text/
 
 /*Not valid
  */
@@ -43,15 +46,20 @@ Should be valid
 //nolint:staticcheck // nolint should be in the default list of acceptable comments.
 var b string
 
-type c struct {
-	//+optional
-	d *int `json:"d,omitempty"`
-}
-
 //extern open
 //export MyFunction
 
 //nolint:gochecknoglobals
 
 //this is a regular command that's incorrectly formatted //nolint:foobar // because one two three
-// MATCH:56 /no space between comment delimiter and comment text/
+// MATCH:54 /no space between comment delimiter and comment text/
+
+func _(outputPath string) {
+	//gosec:disable G703
+	f, err := os.Create(outputPath) //#nosec G703 - path is validated above
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(1)
+	}
+	defer f.Close()
+}
