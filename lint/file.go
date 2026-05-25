@@ -58,7 +58,7 @@ func NewFile(name string, content []byte, pkg *Package) (*File, error) {
 		content: content,
 		Pkg:     pkg,
 		AST:     f,
-		logger:  slog.Default(),
+		logger:  slog.New(slog.DiscardHandler),
 	}, nil
 }
 

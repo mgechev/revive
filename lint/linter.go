@@ -36,7 +36,7 @@ func New(reader ReadFile, maxOpenFiles int) Linter {
 	return Linter{
 		reader:         reader,
 		fileReadTokens: fileReadTokens,
-		logger:         slog.Default(),
+		logger:         slog.New(slog.DiscardHandler),
 	}
 }
 
