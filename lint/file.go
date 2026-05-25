@@ -126,10 +126,10 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 			continue
 		}
 		currentFailures := currentRule.Apply(f, ruleConfig.Arguments)
-		// Skip internal failures: they signal a rule could not run on this
-		// file, but other rules can still produce useful reports.
 		filtered := currentFailures[:0]
 		for _, failure := range currentFailures {
+			// Log and skip internal failures: they signal a rule could not run on this file,
+			// but other rules can still produce useful reports.
 			if failure.IsInternal() {
 				f.logger.Warn("rule skipped due to internal failure",
 					"rule", currentRule.Name(),
