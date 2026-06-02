@@ -310,6 +310,19 @@ in the configuration. You can set the severity (defaults to _warning_) of the vi
 severity = "error"
 ```
 
+Similarly, you can enforce specifying rule names in disable directives by adding
+
+```toml
+[directive.specify-disable-rules]
+```
+
+This forbids "naked" `//revive:disable` and `//revive:disable-line` directives and requires specifying at least one rule name, e.g. `//revive:disable:cyclomatic`. You can set the severity (defaults to _warning_) of the violation of this directive
+
+```toml
+[directive.specify-disable-rules]
+severity = "error"
+```
+
 ### Configuration
 
 `revive` can be configured with a TOML file. Here's a sample configuration with an explanation of the individual properties:
