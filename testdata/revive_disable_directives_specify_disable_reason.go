@@ -2,23 +2,23 @@ package fixtures
 
 // Disable reason is specified
 
-//revive:disable // it's ok to have exported function without comment
+//revive:disable it's ok to have exported function without comment
 func Exported1() {
 }
 
 //revive:enable
 
-//revive:disable:exported // it's ok to have exported function without comment
+//revive:disable:exported it's ok to have exported function without comment
 func Exported2() {
 }
 
 //revive:enable
 
-//revive:disable-next-line // it's ok to have exported function without comment
+//revive:disable-next-line it's ok to have exported function without comment
 func Exported3() {
 }
 
-//revive:disable-next-line:exported // it's ok to have exported function without comment
+//revive:disable-next-line:exported it's ok to have exported function without comment
 func Exported4() {
 }
 
