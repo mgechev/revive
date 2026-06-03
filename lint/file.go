@@ -112,13 +112,15 @@ func (f *File) isMain() bool {
 	return f.AST.Name.Name == "main"
 }
 
-const directiveSpecifyDisableReason = "specify-disable-reason"
-const directiveSpecifyDisableRules = "specify-disable-rules"
+const (
+	directiveSpecifyDisableReason = "specify-disable-reason"
+	directiveSpecifyDisableRule   = "specify-disable-rule"
+)
 
 func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 	rulesConfig := config.Rules
 	_, mustSpecifyDisableReason := config.Directives[directiveSpecifyDisableReason]
-	_, mustSpecifyDisableRules := config.Directives[directiveSpecifyDisableRules]
+	_, mustSpecifyDisableRules := config.Directives[directiveSpecifyDisableRule]
 	disabledIntervals := f.disabledIntervals(rules, mustSpecifyDisableReason, mustSpecifyDisableRules, failures)
 	for _, currentRule := range rules {
 		ruleConfig := rulesConfig[currentRule.Name()]
@@ -261,7 +263,7 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason, mustSpe
 			if mustCheckDisablingRules && len(ruleNames) == 0 {
 				failures <- Failure{
 					Confidence: 1,
-					RuleName:   directiveSpecifyDisableRules,
+					RuleName:   directiveSpecifyDisableRule,
 					Failure:    "rule name for lint disabling not found",
 					Position:   ToFailurePosition(c.Pos(), c.End(), f),
 					Node:       c,

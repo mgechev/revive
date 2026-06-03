@@ -313,13 +313,14 @@ severity = "error"
 Similarly, you can enforce specifying rule names in disable directives by adding
 
 ```toml
-[directive.specify-disable-rules]
+[directive.specify-disable-rule]
 ```
 
-This forbids "naked" `//revive:disable` and `//revive:disable-line` directives and requires specifying at least one rule name, e.g. `//revive:disable:cyclomatic`. You can set the severity (defaults to _warning_) of the violation of this directive
+This forbids "naked" `//revive:disable` and `//revive:disable-line` directives and requires specifying at least one rule name, e.g. `//revive:disable:cyclomatic`.
+You can set the severity (defaults to _warning_) of the violation of this directive
 
 ```toml
-[directive.specify-disable-rules]
+[directive.specify-disable-rule]
 severity = "error"
 ```
 

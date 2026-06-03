@@ -8,7 +8,7 @@ import (
 	"github.com/mgechev/revive/rule"
 )
 
-func TestSpecifyDisableRules(t *testing.T) {
+func TestSpecifyDisableRule(t *testing.T) {
 	l := lint.New(os.ReadFile, 0)
 
 	filePath := "../testdata/specify_disable_rules.go"
@@ -18,7 +18,7 @@ func TestSpecifyDisableRules(t *testing.T) {
 			"exported": {},
 		},
 		Directives: lint.DirectivesConfig{
-			"specify-disable-rules": {},
+			"specify-disable-rule": {},
 		},
 	}
 
@@ -39,8 +39,8 @@ func TestSpecifyDisableRules(t *testing.T) {
 	}
 
 	for _, f := range failures {
-		if f.RuleName != "specify-disable-rules" {
-			t.Errorf("Expected rule name 'specify-disable-rules', got '%s'", f.RuleName)
+		if f.RuleName != "specify-disable-rule" {
+			t.Errorf("Expected rule name 'specify-disable-rule', got '%s'", f.RuleName)
 		}
 		if f.Failure != "rule name for lint disabling not found" {
 			t.Errorf("Expected failure message 'rule name for lint disabling not found', got '%s'", f.Failure)
@@ -72,8 +72,8 @@ func TestSpecifyDisableRulesDisabled(t *testing.T) {
 
 	// No failures from the directive check - naked disables are allowed
 	for _, f := range failures {
-		if f.RuleName == "specify-disable-rules" {
-			t.Error("specify-disable-rules failure should not appear when directive is not configured")
+		if f.RuleName == "specify-disable-rule" {
+			t.Error("specify-disable-rule failure should not appear when directive is not configured")
 		}
 	}
 }
