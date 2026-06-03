@@ -22,7 +22,7 @@ func TestReviveDisableDirectives_NextLine(t *testing.T) {
 func TestReviveDisableDirectives_SpecifyDisableReason(t *testing.T) {
 	testRuleWithLintConfig(t, "revive_disable_directives_specify_disable_reason", &rule.ExportedRule{}, lint.Config{
 		Directives: lint.DirectivesConfig{
-			"specify-disable-reason": lint.DirectiveConfig{},
+			"specify-disable-reason": {},
 		},
 	})
 }

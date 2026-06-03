@@ -34,6 +34,7 @@ func configureRule(tb testing.TB, rule lint.Rule, arguments lint.Arguments) {
 }
 
 func testRule(tb testing.TB, filename string, rule lint.Rule, config ...*lint.RuleConfig) {
+	tb.Helper()
 	var ruleConfig lint.RuleConfig
 	if len(config) > 0 {
 		ruleConfig = *config[0]
