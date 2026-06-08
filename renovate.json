@@ -14,7 +14,7 @@
     },
     {
       "matchManagers": ["gomod"],
-      "matchFileNames": ["go.mod"],
+      "matchFileNames": ["go.mod", "tools/go.mod"],
       "matchDepTypes": ["indirect"],
       "enabled": false
     },
