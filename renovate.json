@@ -7,10 +7,16 @@
     {
       "matchManagers": ["gomod"],
       "matchFileNames": ["go.mod"],
-      "matchDepTypes": ["indirect"],
+      "matchDepTypes": ["direct"],
       "groupName": "gomod",
-      "extends": ["schedule:weekly"],
+      "extends": ["schedule:monthly"],
       "enabled": true
+    },
+    {
+      "matchManagers": ["gomod"],
+      "matchFileNames": ["go.mod"],
+      "matchDepTypes": ["indirect"],
+      "enabled": false
     },
     {
       "matchManagers": ["gomod"],
@@ -23,7 +29,7 @@
     {
       "matchManagers": ["github-actions"],
       "groupName": "github actions",
-      "extends": ["schedule:weekly"],
+      "extends": ["schedule:monthly"],
       "enabled": true
     }
   ],
