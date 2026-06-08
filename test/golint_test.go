@@ -65,7 +65,7 @@ func TestAll(t *testing.T) {
 
 			ins := parseInstructions(t, filePath, src)
 
-			assertFailures(t, filePath, rules, map[string]lint.RuleConfig{}, ins)
+			assertFailures(t, filePath, rules, lint.Config{}, ins)
 		})
 	}
 }
