@@ -316,7 +316,7 @@ Similarly, you can enforce specifying rule names in disable directives by adding
 [directive.specify-disable-rule]
 ```
 
-This forbids "naked" `//revive:disable` and `//revive:disable-line` directives and requires specifying at least one rule name, e.g. `//revive:disable:cyclomatic`.
+This forbids "naked" `//revive:disable`, `//revive:disable-line`, and `//revive:disable-next-line` directives and requires specifying at least one rule name, e.g. `//revive:disable:cyclomatic` or `//revive:disable-next-line:cyclomatic`.
 You can set the severity (defaults to _warning_) of the violation of this directive
 
 ```toml
