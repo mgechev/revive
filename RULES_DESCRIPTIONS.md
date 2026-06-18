@@ -1424,7 +1424,9 @@ _Note_: This rule is irrelevant for Go 1.16-.
 
 _Description_: This rule warns on [canonical import path comments](https://go.dev/doc/go1.4#canonicalimports)
 (e.g. `package pdf // import "rsc.io/pdf"`).
-In module mode the Go toolchain ignores these comments entirely — the `module` directive in `go.mod` is the single source of truth. So they are redundant and can be removed.
+In module mode the Go toolchain [ignores these comments entirely](https://pkg.go.dev/cmd/go@go1.11.0#hdr-Import_path_checking)
+the `module` directive in `go.mod` is the single source of truth.
+So they are redundant and can be removed.
 
 _Note_: This rule only reports for Go 1.11+.
 
