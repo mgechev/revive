@@ -8,7 +8,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// matches a canonical import comment body, e.g.: import "rsc.io/pdf" or import `rsc.io/pdf`
+// canonicalImportCommentRegexp matches a canonical import comment body, e.g.: import "rsc.io/pdf" or import `rsc.io/pdf`.
 var canonicalImportCommentRegexp = regexp.MustCompile("^import\\s+(?:\"[^\"]+\"|`[^`]+`)$")
 
 // RedundantCanonicalImport warns on canonical import path comments that are redundant in module mode (Go 1.11+).
