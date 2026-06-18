@@ -1438,7 +1438,7 @@ Before (violation):
 package pdf // import "rsc.io/pdf"
 ```
 
-After (fixed)
+After (fixed):
 
 ```go
 package pdf

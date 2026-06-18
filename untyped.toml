@@ -65,6 +65,7 @@
 [rule.receiver-naming]
 [rule.redefines-builtin-id]
 [rule.redundant-build-tag]
+[rule.redundant-canonical-import]
 [rule.redundant-import-alias]
 [rule.redundant-test-main-exit]
 [rule.string-format]
