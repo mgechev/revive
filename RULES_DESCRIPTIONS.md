@@ -77,6 +77,7 @@ List of all available rules.
 - [receiver-naming](#receiver-naming)
 - [redefines-builtin-id](#redefines-builtin-id)
 - [redundant-build-tag](#redundant-build-tag)
+- [redundant-canonical-import](#redundant-canonical-import)
 - [redundant-import-alias](#redundant-import-alias)
 - [redundant-test-main-exit](#redundant-test-main-exit)
 - [string-format](#string-format)
@@ -1418,6 +1419,30 @@ when `//go:build` is present.
 _Configuration_: N/A
 
 _Note_: This rule is irrelevant for Go 1.16-.
+
+## redundant-canonical-import
+
+_Description_: This rule warns on [canonical import path comments](https://go.dev/doc/go1.4#canonicalimports)
+(e.g. `package pdf // import "rsc.io/pdf"`).
+In module mode the Go toolchain ignores these comments entirely — the `module` directive in `go.mod` is the single source of truth. So they are redundant and can be removed.
+
+_Note_: This rule only reports for Go 1.11+.
+
+### Examples (redundant-canonical-import)
+
+Before (violation):
+
+```go
+package pdf // import "rsc.io/pdf"
+```
+
+After (fixed)
+
+```go
+package pdf
+```
+
+_Configuration_: N/A
 
 ## redundant-import-alias
 
