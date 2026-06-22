@@ -2,6 +2,7 @@ package rule
 
 import (
 	"fmt"
+	"go/ast"
 	"regexp"
 	"strings"
 
@@ -25,8 +26,8 @@ func (*RedundantCanonicalImport) Apply(file *lint.File, _ lint.Arguments) []lint
 
 	for _, cg := range file.AST.Comments {
 		for _, c := range cg.List {
-			if c.Pos() < file.AST.Name.End() {
-				continue // before the package name
+			if isBeforePackageName(c, file) {
+				continue
 			}
 			if file.ToPosition(c.Pos()).Line > packageLine {
 				return nil // past the package clause line; comments are ordered by position
@@ -48,6 +49,11 @@ func (*RedundantCanonicalImport) Apply(file *lint.File, _ lint.Arguments) []lint
 	}
 
 	return nil
+}
+
+// isBeforePackageName reports whether the comment appears before the package name.
+func isBeforePackageName(c *ast.Comment, file *lint.File) bool {
+	return c.Pos() < file.AST.Name.End()
 }
 
 // commentBody strips the comment markers from c.Text, handling both line and block comments.

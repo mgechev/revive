@@ -8,5 +8,8 @@ import (
 
 func TestRedundantCanonicalImport(t *testing.T) {
 	testRule(t, "go1.11/redundant_canonical_import", &rule.RedundantCanonicalImport{})
+	testRule(t, "go1.11/redundant_canonical_import_backtick", &rule.RedundantCanonicalImport{})
+	testRule(t, "go1.11/redundant_canonical_import_block", &rule.RedundantCanonicalImport{})
+	testRule(t, "go1.11/redundant_canonical_import_negative", &rule.RedundantCanonicalImport{})
 	testRule(t, "redundant_canonical_import", &rule.RedundantCanonicalImport{})
 }
