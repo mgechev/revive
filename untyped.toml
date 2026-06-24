@@ -54,6 +54,7 @@
 [rule.line-length-limit]
 [rule.max-control-nesting]
 [rule.max-public-structs]
+[rule.marshal-receiver]
 [rule.modifies-parameter]
 [rule.nested-structs]
 [rule.optimize-operands-order]
