@@ -11,8 +11,12 @@ import (
 // RedundantBuildTagRule lints the presence of redundant build tags.
 type RedundantBuildTagRule struct{}
 
-// Apply triggers if an old build tag `// +build` is found after a new one `//go:build`.
-// `//go:build` comments are automatically added by gofmt when Go 1.17+ is used.
+// Apply triggers on two kinds of redundant build tags:
+//   - an old `// +build` tag found after a new `//go:build` tag, since `//go:build`
+//     comments are automatically added by gofmt when Go 1.17+ is used;
+//   - a `//go:build go1.X` version constraint that is already guaranteed by the
+//     go version in go.mod (Go 1.21+, where the go directive is a hard requirement).
+//
 // See https://pkg.go.dev/cmd/go#hdr-Build_constraints
 func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	for _, group := range file.AST.Comments {
@@ -24,13 +28,14 @@ func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 				// Starting with Go 1.21, the go version in go.mod is a hard requirement.
 				// Ignore this check for Go 1.20 and earlier.
 				if file.Pkg.IsAtLeastGoVersion(lint.Go121) && version.IsValid(ver) {
-					fileVersion := file.Pkg.GoVersion().String()
+					segments := file.Pkg.GoVersion().Segments()
+					fileVersion := fmt.Sprintf("%d.%d", segments[0], segments[1])
 					if version.Compare("go"+fileVersion, ver) >= 0 {
 						return []lint.Failure{{
 							Category:   lint.FailureCategoryStyle,
 							Confidence: 1,
 							Node:       comment,
-							Failure:    fmt.Sprintf(`The build tag %q is redundant for Go %s and can be removed`, comment.Text, fileVersion),
+							Failure:    fmt.Sprintf("The build tag %q is redundant for Go %s and can be removed", comment.Text, fileVersion),
 						}}
 					}
 				}
@@ -38,12 +43,13 @@ func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 				continue
 			}
 
-			if hasGoBuild && strings.HasPrefix(comment.Text, "// +build ") {
+			const oldGoBuildPrefix = "// +build"
+			if hasGoBuild && strings.HasPrefix(comment.Text, oldGoBuildPrefix) {
 				return []lint.Failure{{
 					Category:   lint.FailureCategoryStyle,
 					Confidence: 1,
 					Node:       comment,
-					Failure:    `The build tag "// +build" is redundant since Go 1.17 and can be removed`,
+					Failure:    fmt.Sprintf("The build tag %q is redundant since Go 1.17 and can be removed", oldGoBuildPrefix),
 				}}
 			}
 		}
