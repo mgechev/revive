@@ -114,12 +114,16 @@ func (f *File) isMain() bool {
 	return f.AST.Name.Name == "main"
 }
 
-const directiveSpecifyDisableReason = "specify-disable-reason"
+const (
+	directiveSpecifyDisableReason = "specify-disable-reason"
+	directiveSpecifyDisableRule   = "specify-disable-rule"
+)
 
 func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 	rulesConfig := config.Rules
 	_, mustSpecifyDisableReason := config.Directives[directiveSpecifyDisableReason]
-	disabledIntervals := f.disabledIntervals(rules, mustSpecifyDisableReason, failures)
+	_, mustSpecifyDisableRules := config.Directives[directiveSpecifyDisableRule]
+	disabledIntervals := f.disabledIntervals(rules, mustSpecifyDisableReason, mustSpecifyDisableRules, failures)
 	for _, currentRule := range rules {
 		ruleConfig := rulesConfig[currentRule.Name()]
 		if ruleConfig.MustExclude(f.Name) {
@@ -173,7 +177,7 @@ const (
 
 var directiveRegexp = regexp.MustCompile(`^//[\s]*revive:(enable|disable)(?:-(line|next-line))?(?::([^\s]+))?[\s]*(?: (.+))?$`)
 
-func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, failures chan Failure) disabledIntervalsMap {
+func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason, mustSpecifyDisableRules bool, failures chan Failure) disabledIntervalsMap {
 	enabledDisabledRulesMap := map[string][]enableDisableConfig{}
 
 	getEnabledDisabledIntervals := func() disabledIntervalsMap {
@@ -259,6 +263,18 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, fa
 					Confidence: 1,
 					RuleName:   directiveSpecifyDisableReason,
 					Failure:    "reason of lint disabling not found",
+					Position:   ToFailurePosition(c.Pos(), c.End(), f),
+					Node:       c,
+				}
+				continue // skip this linter disabling directive
+			}
+
+			mustCheckDisablingRules := mustSpecifyDisableRules && match[directivePos] == "disable"
+			if mustCheckDisablingRules && len(ruleNames) == 0 {
+				failures <- Failure{
+					Confidence: 1,
+					RuleName:   directiveSpecifyDisableRule,
+					Failure:    "rule name for lint disabling not found",
 					Position:   ToFailurePosition(c.Pos(), c.End(), f),
 					Node:       c,
 				}

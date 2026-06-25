@@ -242,7 +242,7 @@ func TestFile_disabledIntervals(t *testing.T) {
 				},
 				logger: slog.New(slog.DiscardHandler),
 			}
-			got := f.disabledIntervals(nil, false, make(chan Failure, 10))
+			got := f.disabledIntervals(nil, false, false, make(chan Failure, 10))
 			if len(got) != len(tt.expected) {
 				t.Errorf("disabledIntervals() = got %v, want %v", got, tt.expected)
 			}

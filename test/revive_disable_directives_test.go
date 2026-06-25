@@ -26,3 +26,20 @@ func TestReviveDisableDirectives_SpecifyDisableReason(t *testing.T) {
 		},
 	})
 }
+
+func TestReviveDisableDirectives_SpecifyDisableRule(t *testing.T) {
+	testRuleWithLintConfig(t, "revive_disable_directives_specify_disable_rule", &rule.ExportedRule{}, lint.Config{
+		Directives: lint.DirectivesConfig{
+			"specify-disable-rule": {},
+		},
+	})
+}
+
+func TestReviveDisableDirectives_SpecifyDisableReasonSpecifyDisableRule(t *testing.T) {
+	testRuleWithLintConfig(t, "revive_disable_directives_specify_disable_reason_specify_disable_rule", &rule.ExportedRule{}, lint.Config{
+		Directives: lint.DirectivesConfig{
+			"specify-disable-reason": {},
+			"specify-disable-rule":   {},
+		},
+	})
+}
