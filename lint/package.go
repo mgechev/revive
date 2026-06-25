@@ -227,6 +227,14 @@ func (p *Package) IsAtLeastGoVersion(v *goversion.Version) bool {
 	return p.goVersion.GreaterThanOrEqual(v)
 }
 
+// GoVersion returns the Go version for this package.
+func (p *Package) GoVersion() *goversion.Version {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+
+	return p.goVersion
+}
+
 func getSortableMethodFlagForFunction(fn *ast.FuncDecl) sortableMethodsFlags {
 	switch {
 	case astutils.FuncSignatureIs(fn, "Len", []string{}, []string{"int"}):
