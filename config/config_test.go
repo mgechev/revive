@@ -495,7 +495,7 @@ func TestGetConfig_EnableAllRulesCasing(t *testing.T) {
 				t.Fatalf("Unexpected error %v", err)
 			}
 			if !cfg.EnableAllRules {
-				t.Errorf("EnableAllRules: expected true, got false")
+				t.Error("EnableAllRules: expected true, got false")
 			}
 		})
 	}
