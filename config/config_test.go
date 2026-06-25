@@ -425,6 +425,10 @@ func TestGetConfig(t *testing.T) {
 				confPath:  "enable-all-and-default.toml",
 				wantError: "config options enable-all-rules and enable-default-rules cannot be combined",
 			},
+			"same option with different casing": {
+				confPath:  "duplicate-option.toml",
+				wantError: "refer to the same option",
+			},
 		} {
 			t.Run(name, func(t *testing.T) {
 				_, err := config.GetConfig(filepath.Join("testdata", tc.confPath))

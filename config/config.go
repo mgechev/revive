@@ -205,11 +205,17 @@ func parseConfig(data []byte, config *lint.Config) error {
 	}
 
 	fields := configFieldsByNormalizedName(config)
+	seen := make(map[string]string, len(primitives))
 	for key, primitive := range primitives {
-		field, ok := fields[internalconfig.NormalizeOption(key)]
+		normalized := internalconfig.NormalizeOption(key)
+		field, ok := fields[normalized]
 		if !ok {
 			continue // ignore unknown options, as toml.Unmarshal does
 		}
+		if other, dup := seen[normalized]; dup {
+			return fmt.Errorf("cannot parse the config file: options %q and %q refer to the same option", other, key)
+		}
+		seen[normalized] = key
 		if err := md.PrimitiveDecode(primitive, field.Addr().Interface()); err != nil {
 			return fmt.Errorf("cannot parse the config file: %w", err)
 		}
