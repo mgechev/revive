@@ -160,7 +160,7 @@ func initConfig() {
 		excludeUsage      = "list of globs which specify files to be excluded (i.e. -exclude foo/...)"
 		formatterUsage    = "formatter to be used for the output (i.e. -formatter stylish)"
 		versionUsage      = "get revive version"
-		exitStatusUsage   = "set exit status to 1 if any issues are found, overwrites errorCode and warningCode in config"
+		exitStatusUsage   = "set exit status to 1 if any issues are found, overwrites error-code and warning-code in config"
 		maxOpenFilesUsage = "maximum number of open files at the same time"
 	)
 

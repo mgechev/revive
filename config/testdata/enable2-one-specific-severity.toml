@@ -1,8 +1,8 @@
-ignoreGeneratedHeader = false
+ignore-generated-header = false
 severity = "warning"
 confidence = 0.8
-errorCode = 0
-warningCode = 0
+error-code = 0
+warning-code = 0
 
 [rule.deep-exit]
 
