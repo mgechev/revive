@@ -61,6 +61,7 @@ List of all available rules.
 - [indent-error-flow](#indent-error-flow)
 - [inefficient-map-lookup](#inefficient-map-lookup)
 - [line-length-limit](#line-length-limit)
+- [marshal-receiver](#marshal-receiver)
 - [max-control-nesting](#max-control-nesting)
 - [max-public-structs](#max-public-structs)
 - [modifies-parameter](#modifies-parameter)
@@ -77,6 +78,7 @@ List of all available rules.
 - [receiver-naming](#receiver-naming)
 - [redefines-builtin-id](#redefines-builtin-id)
 - [redundant-build-tag](#redundant-build-tag)
+- [redundant-canonical-import](#redundant-canonical-import)
 - [redundant-import-alias](#redundant-import-alias)
 - [redundant-test-main-exit](#redundant-test-main-exit)
 - [string-format](#string-format)
@@ -1114,6 +1116,80 @@ Configuration example:
 arguments = [80]
 ```
 
+## marshal-receiver
+
+_Description_: Checks receiver type consistency for common marshal/unmarshal methods.
+The rule inspects only methods whose names exactly match: `MarshalJSON`, `MarshalText`, `MarshalYAML`, `UnmarshalJSON`, `UnmarshalText`, and `UnmarshalYAML`.
+For these methods, it enforces receiver kind only:
+
+- `Marshal*` methods should use a value receiver, and are reported when declared with a pointer receiver.
+- `Unmarshal*` methods should use a pointer receiver, and are reported when declared with a value receiver.
+
+This is a name-based, syntactic check.
+It does not validate method signatures (parameters or return values) and does not verify whether a method satisfies a specific marshaling interface.
+
+### Examples (marshal-receiver)
+
+Before (violation):
+
+```go
+import "encoding/json"
+
+type Person struct {
+	Name string
+	Age  int
+}
+
+func (p *Person) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]any{
+		"name": p.Name,
+		"age":  p.Age,
+	})
+}
+
+func (p Person) UnmarshalJSON(data []byte) error {
+	var raw map[string]any
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	p.Name = raw["name"].(string)
+	p.Age = int(raw["age"].(float64))
+	return nil
+}
+```
+
+After (fixed):
+
+```go
+import "encoding/json"
+
+type Person struct {
+	Name string
+	Age  int
+}
+
+// Value receiver — safe, works whether you have Person or *Person.
+func (p Person) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]any{
+		"name": p.Name,
+		"age":  p.Age,
+	})
+}
+
+// Pointer receiver — required, must mutate p.
+func (p *Person) UnmarshalJSON(data []byte) error {
+	var raw map[string]any
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	p.Name = raw["name"].(string)
+	p.Age = int(raw["age"].(float64))
+	return nil
+}
+```
+
+_Configuration_: N/A
+
 ## max-control-nesting
 
 _Description_: Warns if nesting level of control structures (`if-then-else`, `for`, `switch`) exceeds a given maximum.
@@ -1411,13 +1487,77 @@ _Configuration_: N/A
 
 ## redundant-build-tag
 
-_Description_: This rule warns about redundant [build tag comments](https://pkg.go.dev/cmd/go@go1.17.0#hdr-Build_constraints) `// +build`
-when `//go:build` is present.
+_Description_: This rule warns about redundant [build tag comments](https://pkg.go.dev/cmd/go@go1.17.0#hdr-Build_constraints).
+It detects unnecessary `// +build` comments when `//go:build` is present.
 `gofmt` in Go 1.17+ automatically adds the `//go:build` constraint, making the `// +build` comment unnecessary.
+Also, the rule spots redundant build tags `//go:build go1.X` when the package's Go language version is greater than or equal to `go1.X`.
+
+### Examples (redundant-build-tag)
+
+Redundant `// +build` comment:
+
+Before (violation):
+
+```go
+//go:build go1.17
+// +build go1.17
+
+package example
+```
+
+After (fixed):
+
+```go
+//go:build go1.17
+
+package example
+```
+
+Redundant build tag when the module Go version is Go 1.21 or later:
+
+Before (violation):
+
+```go
+//go:build go1.20
+
+package example
+```
+
+After (fixed):
+
+```go
+package example
+```
 
 _Configuration_: N/A
 
 _Note_: This rule is irrelevant for Go 1.16-.
+
+## redundant-canonical-import
+
+_Description_: This rule warns on [canonical import path comments](https://go.dev/doc/go1.4#canonicalimports)
+(e.g. `package pdf // import "rsc.io/pdf"`).
+In module mode the Go toolchain [ignores these comments entirely](https://pkg.go.dev/cmd/go@go1.11.0#hdr-Import_path_checking)
+the `module` directive in `go.mod` is the single source of truth.
+So they are redundant and can be removed.
+
+_Note_: This rule only reports for Go 1.11+.
+
+### Examples (redundant-canonical-import)
+
+Before (violation):
+
+```go
+package pdf // import "rsc.io/pdf"
+```
+
+After (fixed):
+
+```go
+package pdf
+```
+
+_Configuration_: N/A
 
 ## redundant-import-alias
 

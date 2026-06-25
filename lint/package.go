@@ -34,6 +34,8 @@ var (
 	trueValue  = 1
 	falseValue = 2
 
+	// Go111 is a constant representing the Go version 1.11.
+	Go111 = goversion.Must(goversion.NewVersion("1.11"))
 	// Go115 is a constant representing the Go version 1.15.
 	Go115 = goversion.Must(goversion.NewVersion("1.15"))
 	// Go118 is a constant representing the Go version 1.18.
@@ -225,6 +227,14 @@ func (p *Package) IsAtLeastGoVersion(v *goversion.Version) bool {
 	defer p.mu.RUnlock()
 
 	return p.goVersion.GreaterThanOrEqual(v)
+}
+
+// GoVersion returns the Go version for this package.
+func (p *Package) GoVersion() *goversion.Version {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+
+	return p.goVersion
 }
 
 func getSortableMethodFlagForFunction(fn *ast.FuncDecl) sortableMethodsFlags {

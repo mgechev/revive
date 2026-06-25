@@ -91,6 +91,7 @@ var allRules = append([]lint.Rule{
 	&rule.CommentSpacingsRule{},
 	&rule.IfReturnRule{},
 	&rule.RedundantImportAlias{},
+	&rule.RedundantCanonicalImport{},
 	&rule.ImportAliasNamingRule{},
 	&rule.EnforceMapStyleRule{},
 	&rule.EnforceRepeatedArgTypeStyleRule{},
@@ -120,6 +121,7 @@ var allRules = append([]lint.Rule{
 	&rule.UseSlicesSort{},
 	&rule.PackageNamingRule{},
 	&rule.MultilineIfInitRule{},
+	&rule.MarshalReceiverRule{},
 }, defaultRules...)
 
 // allFormatters is a list of all available formatters to output the linting results.

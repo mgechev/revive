@@ -105,6 +105,7 @@ func (r *Revive) Lint(patterns ...*LintPattern) (<-chan lint.Failure, error) {
 
 		return contents, nil
 	}, r.maxOpenFiles)
+	revive.SetLogger(r.logger)
 
 	failures, err := revive.Lint(packages, r.lintingRules, *r.config)
 	if err != nil {
