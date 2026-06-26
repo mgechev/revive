@@ -1,11 +1,11 @@
-ignoreGeneratedHeader = true
+ignore-generated-header = true
 severity = "error"
 confidence = 0.5
-errorCode = 2
-warningCode = 1
+error-code = 2
+warning-code = 1
 
-enableAllRules = false
-enableDefaultRules = true
+enable-all-rules = false
+enable-default-rules = true
 
 [rule.argument-limit]
     severity="warning"

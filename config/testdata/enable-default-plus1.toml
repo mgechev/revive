@@ -1,6 +1,6 @@
 # Enable default rules with a non-default rule
 
-enableDefaultRules = true
+enable-default-rules = true
 
 # Add a non-default rule
 [rule.cyclomatic]

@@ -1,8 +1,8 @@
 # Enable all rules without 1 default and 1 non-default
 
-enableAllRules = true
+enable-all-rules = true
 
 [rule.exported]
-Disabled = true
+disabled = true
 [rule.cyclomatic]
-Disabled = true
+disabled = true

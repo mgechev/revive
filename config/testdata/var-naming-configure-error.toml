@@ -1,4 +1,4 @@
-enableAllRules = false
+enable-all-rules = false
 
 [rule.var-naming]
   arguments = ["ID", "VM"]

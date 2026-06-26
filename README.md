@@ -243,7 +243,7 @@ If no exclusion patterns are specified, `vendor/...` will be excluded by default
   - `stylish` - formats the failures in a table. Keep in mind that it doesn't stream the output so it might be perceived as slower compared to others.
   - `checkstyle` - outputs the failures in XML format compatible with that of Java's [Checkstyle](https://checkstyle.org/).
 - `-max_open_files` -  maximum number of open files at the same time. Defaults to unlimited.
-- `-set_exit_status` - set exit status to 1 if any issues are found, overwrites `errorCode` and `warningCode` in config.
+- `-set_exit_status` - set exit status to 1 if any issues are found, overwrites `error-code` and `warning-code` in config.
 - `-version` - get revive version.
 
 ### Sample Invocations
@@ -331,7 +331,7 @@ severity = "error"
 
 ```toml
 # When set to false, ignores files with "GENERATED" header, similar to golint
-ignoreGeneratedHeader = true
+ignore-generated-header = true
 
 # Sets the default severity to "warning"
 severity = "warning"
@@ -341,10 +341,10 @@ severity = "warning"
 confidence = 0.8
 
 # Sets the error code for failures with the "error" severity
-errorCode = 0
+error-code = 0
 
 # Sets the error code for failures with severity "warning"
-warningCode = 0
+warning-code = 0
 
 # Configuration of the `cyclomatic` rule. Here we specify that
 # the rule should fail if it detects code with higher complexity than 10.
@@ -362,7 +362,7 @@ For example, the previous configuration file makes `revive` to enable only _cycl
 To enable default rules you need to use:
 
 ```toml
-enableDefaultRules = true
+enable-default-rules = true
 ```
 
 This will enable all rules available in `golint` and use their default configuration (i.e. the way they are hardcoded in `golint`).
@@ -371,19 +371,19 @@ The default configuration of `revive` can be found at `defaults.toml`.
 To enable all available rules you need to add:
 
 ```toml
-enableAllRules = true
+enable-all-rules = true
 ```
 
 This will enable all available rules no matter what rules are named in the configuration file.
 
-Options `enableAllRules` and `enableDefaultRules` cannot be combined.
+Options `enable-all-rules` and `enable-default-rules` cannot be combined.
 
 To disable a rule, you simply mark it as disabled in the configuration.
 For example:
 
 ```toml
 [rule.line-length-limit]
-Disabled = true
+disabled = true
 ```
 
 When enabling all rules you still need/can provide specific configurations for rules.
@@ -393,37 +393,37 @@ and some rules are configured with particular arguments:
 ```toml
 severity = "warning"
 confidence = 0.8
-errorCode = 0
-warningCode = 0
+error-code = 0
+warning-code = 0
 
 # Enable all available rules
-enableAllRules = true
+enable-all-rules = true
 
 # Disabled rules
 [rule.blank-imports]
-Disabled = true
+disabled = true
 [rule.file-header]
-Disabled = true
+disabled = true
 [rule.max-public-structs]
-Disabled = true
+disabled = true
 [rule.line-length-limit]
-Disabled = true
+disabled = true
 [rule.function-length]
-Disabled = true
+disabled = true
 [rule.banned-characters]
-Disabled = true
+disabled = true
 
 # Rule tuning
 [rule.argument-limit]
-Arguments = [5]
+arguments = [5]
 [rule.cyclomatic]
-Arguments = [10]
+arguments = [10]
 [rule.cognitive-complexity]
-Arguments = [7]
+arguments = [7]
 [rule.function-result-limit]
-Arguments = [3]
+arguments = [3]
 [rule.error-strings]
-Arguments = ["mypackage.Error"]
+arguments = ["mypackage.Error"]
 ```
 
 ### Custom Configuration
@@ -439,11 +439,11 @@ This will use `config.toml`, the `friendly` formatter, and will run linting over
 The following snippet contains the recommended `revive` configuration that you can use in your project:
 
 ```toml
-ignoreGeneratedHeader = false
+ignore-generated-header = false
 severity = "warning"
 confidence = 0.8
-errorCode = 0
-warningCode = 0
+error-code = 0
+warning-code = 0
 
 [rule.blank-imports]
 [rule.context-as-argument]
@@ -477,16 +477,16 @@ You also can setup custom excludes for each rule.
 It's an alternative for the global `-exclude` program arg.
 
 ```toml
-ignoreGeneratedHeader = false
+ignore-generated-header = false
 severity = "warning"
 confidence = 0.8
-errorCode = 0
-warningCode = 0
+error-code = 0
+warning-code = 0
 
 [rule.blank-imports]
-Exclude = ["**/*.pb.go"]
+exclude = ["**/*.pb.go"]
 [rule.context-as-argument]
-Exclude = ["src/somepkg/*.go", "TEST"]
+exclude = ["src/somepkg/*.go", "TEST"]
 ```
 
 You can use the following exclude patterns

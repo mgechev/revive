@@ -132,28 +132,28 @@ func TestGetConfig(t *testing.T) {
 				},
 			},
 			"config from file default confidence issue #585": {
-				confPath: "issue-585-defaultConfidence.toml",
+				confPath: "issue-585-default-confidence.toml",
 				wantConfig: lint.Config{
 					Confidence: 0.8,
 					Severity:   lint.SeverityWarning,
 				},
 			},
-			"config from file goVersion": {
-				confPath: "goVersion.toml",
+			"config from file go-version": {
+				confPath: "go-version.toml",
 				wantConfig: lint.Config{
 					Confidence: 0.8,
 					GoVersion:  goversion.Must(goversion.NewSemver("1.20.0")),
 				},
 			},
-			"config from file ignoreGeneratedHeader": {
-				confPath: "ignoreGeneratedHeader.toml",
+			"config from file ignore-generated-header": {
+				confPath: "ignore-generated-header.toml",
 				wantConfig: lint.Config{
 					Confidence:            0.8,
 					IgnoreGeneratedHeader: true,
 				},
 			},
-			"config from file enableDefault": {
-				confPath: "enableDefault.toml",
+			"config from file enable-default-rules": {
+				confPath: "enable-default.toml",
 				wantConfig: lint.Config{
 					Confidence:            0.8,
 					IgnoreGeneratedHeader: false,
@@ -418,12 +418,16 @@ func TestGetConfig(t *testing.T) {
 				wantError: "cannot parse the config file",
 			},
 			"invalid exclude pattern": {
-				confPath:  "invalidExcludePattern.toml",
+				confPath:  "invalid-exclude-pattern.toml",
 				wantError: "error in config of rule [var-naming]",
 			},
-			"enableAllRules and enableDefaultRules both set": {
-				confPath:  "enableAllAndDefault.toml",
-				wantError: "config options enableAllRules and enableDefaultRules cannot be combined",
+			"enable-all-rules and enable-default-rules both set": {
+				confPath:  "enable-all-and-default.toml",
+				wantError: "config options enable-all-rules and enable-default-rules cannot be combined",
+			},
+			"same option with different casing": {
+				confPath:  "duplicate-option.toml",
+				wantError: "refer to the same option",
 			},
 		} {
 			t.Run(name, func(t *testing.T) {
@@ -435,6 +439,93 @@ func TestGetConfig(t *testing.T) {
 			})
 		}
 	})
+}
+
+func TestGetConfig_OptionCasing(t *testing.T) {
+	want := lint.Config{
+		IgnoreGeneratedHeader: true,
+		Confidence:            0.5,
+		Severity:              lint.SeverityError,
+		EnableDefaultRules:    true,
+		ErrorCode:             2,
+		WarningCode:           1,
+		GoVersion:             goversion.Must(goversion.NewSemver("1.20")),
+	}
+
+	for _, confPath := range []string{
+		"options-camelCase.toml",
+		"options-kebab-case.toml",
+		"options-lowercase.toml",
+	} {
+		t.Run(confPath, func(t *testing.T) {
+			cfg, err := config.GetConfig(filepath.Join("testdata", confPath))
+			if err != nil {
+				t.Fatalf("Unexpected error %v", err)
+			}
+			if cfg.IgnoreGeneratedHeader != want.IgnoreGeneratedHeader {
+				t.Errorf("IgnoreGeneratedHeader: expected %v, got %v", want.IgnoreGeneratedHeader, cfg.IgnoreGeneratedHeader)
+			}
+			if cfg.Confidence != want.Confidence {
+				t.Errorf("Confidence: expected %v, got %v", want.Confidence, cfg.Confidence)
+			}
+			if cfg.Severity != want.Severity {
+				t.Errorf("Severity: expected %v, got %v", want.Severity, cfg.Severity)
+			}
+			if cfg.EnableDefaultRules != want.EnableDefaultRules {
+				t.Errorf("EnableDefaultRules: expected %v, got %v", want.EnableDefaultRules, cfg.EnableDefaultRules)
+			}
+			if cfg.ErrorCode != want.ErrorCode {
+				t.Errorf("ErrorCode: expected %v, got %v", want.ErrorCode, cfg.ErrorCode)
+			}
+			if cfg.WarningCode != want.WarningCode {
+				t.Errorf("WarningCode: expected %v, got %v", want.WarningCode, cfg.WarningCode)
+			}
+			if !want.GoVersion.Equal(cfg.GoVersion) {
+				t.Errorf("GoVersion: expected %v, got %v", want.GoVersion, cfg.GoVersion)
+			}
+		})
+	}
+}
+
+func TestGetConfig_EnableAllRulesCasing(t *testing.T) {
+	for _, confPath := range []string{
+		"enable-all-camel-case.toml",
+		"enable-all-kebab-case.toml",
+		"enable-all-lowercase.toml",
+	} {
+		t.Run(confPath, func(t *testing.T) {
+			cfg, err := config.GetConfig(filepath.Join("testdata", confPath))
+			if err != nil {
+				t.Fatalf("Unexpected error %v", err)
+			}
+			if !cfg.EnableAllRules {
+				t.Error("EnableAllRules: expected true, got false")
+			}
+		})
+	}
+}
+
+func TestGetConfig_RuleOptionCasing(t *testing.T) {
+	cfg, err := config.GetConfig(filepath.Join("testdata", "rule-option-casing.toml"))
+	if err != nil {
+		t.Fatalf("Unexpected error %v", err)
+	}
+
+	for _, ruleName := range []string{"blank-imports", "dot-imports"} {
+		if !cfg.Rules[ruleName].Disabled {
+			t.Errorf("Rule %q: expected disabled=true, got false", ruleName)
+		}
+	}
+	for _, ruleName := range []string{"argument-limit", "cyclomatic"} {
+		if len(cfg.Rules[ruleName].Arguments) != 1 {
+			t.Errorf("Rule %q: expected 1 argument, got %v", ruleName, cfg.Rules[ruleName].Arguments)
+		}
+	}
+	for _, ruleName := range []string{"var-naming", "error-strings"} {
+		if len(cfg.Rules[ruleName].Exclude) != 1 {
+			t.Errorf("Rule %q: expected 1 exclude, got %v", ruleName, cfg.Rules[ruleName].Exclude)
+		}
+	}
 }
 
 func TestGetLintingRules(t *testing.T) {
@@ -453,7 +544,7 @@ func TestGetLintingRules(t *testing.T) {
 		wantErr           string
 	}{
 		"no rules": {
-			confPath:       "noRules.toml",
+			confPath:       "no-rules.toml",
 			wantRulesCount: 0,
 			wantDisabledRules: []string{
 				"var-declaration",  // default rule
@@ -461,8 +552,8 @@ func TestGetLintingRules(t *testing.T) {
 				"deep-exit",        // non-default rule
 			},
 		},
-		"enableAllRules without disabled rules": {
-			confPath:       "enableAll.toml",
+		"enable-all-rules without disabled rules": {
+			confPath:       "enable-all.toml",
 			wantRulesCount: allRulesCount,
 			wantEnabledRules: []string{
 				"var-declaration",  // default rule
@@ -470,8 +561,8 @@ func TestGetLintingRules(t *testing.T) {
 				"deep-exit",        // non-default rule
 			},
 		},
-		"enableAllRules with 2 disabled rules": {
-			confPath:       "enableAllBut2.toml",
+		"enable-all-rules with 2 disabled rules": {
+			confPath:       "enable-all-but2.toml",
 			wantRulesCount: allRulesCount - 2,
 			wantEnabledRules: []string{
 				"var-declaration",  // default rule
@@ -483,8 +574,8 @@ func TestGetLintingRules(t *testing.T) {
 				"cyclomatic", // non-default rule
 			},
 		},
-		"enableDefaultRules without disabled rules": {
-			confPath:       "enableDefault.toml",
+		"enable-default-rules without disabled rules": {
+			confPath:       "enable-default.toml",
 			wantRulesCount: defaultRulesCount,
 			wantEnabledRules: []string{
 				"var-declaration",  // default rule
@@ -494,8 +585,8 @@ func TestGetLintingRules(t *testing.T) {
 				"deep-exit", // non-default rule
 			},
 		},
-		"enableDefaultRules with 2 disabled rules": {
-			confPath:       "enableDefaultBut2.toml",
+		"enable-default-rules with 2 disabled rules": {
+			confPath:       "enable-default-but2.toml",
 			wantRulesCount: defaultRulesCount - 2,
 			wantEnabledRules: []string{
 				"var-declaration",  // default rule
@@ -506,8 +597,8 @@ func TestGetLintingRules(t *testing.T) {
 				"indent-error-flow", // default rule
 			},
 		},
-		"enableDefaultRules plus 1 non-default rule": {
-			confPath:       "enableDefaultPlus1.toml",
+		"enable-default-rules plus 1 non-default rule": {
+			confPath:       "enable-default-plus1.toml",
 			wantRulesCount: defaultRulesCount + 1,
 			wantEnabledRules: []string{
 				"var-declaration",  // default rule
@@ -518,8 +609,8 @@ func TestGetLintingRules(t *testing.T) {
 				"deep-exit", // non-default rule
 			},
 		},
-		"enableDefaultRules plus rule already in defaults": {
-			confPath:       "enableDefaultPlusDefaultRule.toml",
+		"enable-default-rules plus rule already in defaults": {
+			confPath:       "enable-default-plus-default-rule.toml",
 			wantRulesCount: defaultRulesCount,
 			wantEnabledRules: []string{
 				"var-declaration",  // default rule
@@ -530,8 +621,8 @@ func TestGetLintingRules(t *testing.T) {
 				"deep-exit", // non-default rule
 			},
 		},
-		"enableAllRules plus rule already in all": {
-			confPath:       "enableAllWithRule.toml",
+		"enable-all-rules plus rule already in all": {
+			confPath:       "enable-all-with-rule.toml",
 			wantRulesCount: allRulesCount,
 			wantEnabledRules: []string{
 				"var-declaration",  // default rule
@@ -564,7 +655,7 @@ func TestGetLintingRules(t *testing.T) {
 			},
 		},
 		"var-naming configure error": {
-			confPath: "varNamingConfigureError.toml",
+			confPath: "var-naming-configure-error.toml",
 			wantErr:  `cannot configure rule: "var-naming": invalid argument to the var-naming rule. Expecting a allowlist of type slice with initialisms, got string`,
 		},
 	}
@@ -618,13 +709,13 @@ func TestGetGlobalSeverity(t *testing.T) {
 		wantParticularSeverity string
 	}{
 		"enable 2 rules with one specific severity": {
-			confPath:               "testdata/enable2OneSpecificSeverity.toml",
+			confPath:               "testdata/enable2-one-specific-severity.toml",
 			wantGlobalSeverity:     "warning",
 			particularRule:         &rule.CyclomaticRule{},
 			wantParticularSeverity: "error",
 		},
-		"enableAllRules with one specific severity": {
-			confPath:               "testdata/enableAllOneSpecificSeverity.toml",
+		"enable-all-rules with one specific severity": {
+			confPath:               "testdata/enable-all-one-specific-severity.toml",
 			wantGlobalSeverity:     "error",
 			particularRule:         &rule.DeepExitRule{},
 			wantParticularSeverity: "warning",

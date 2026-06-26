@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/mgechev/revive/internal/config"
 	"github.com/mgechev/revive/lint"
 )
 
@@ -22,14 +23,7 @@ func srcLine(src []byte, p token.Position) string {
 
 // isRuleOption returns true if arg and name are the same after normalization.
 func isRuleOption(arg, name string) bool {
-	return normalizeRuleOption(arg) == normalizeRuleOption(name)
-}
-
-// normalizeRuleOption returns an option name from the argument. It is lowercased and without hyphens.
-//
-// Example: normalizeRuleOption("allowTypesBefore"), normalizeRuleOption("allow-types-before") -> "allowtypesbefore".
-func normalizeRuleOption(arg string) string {
-	return strings.ToLower(strings.ReplaceAll(arg, "-", ""))
+	return config.NormalizeOption(arg) == config.NormalizeOption(name)
 }
 
 var normalizePathReplacer = strings.NewReplacer("-", "", "_", "", ".", "")
