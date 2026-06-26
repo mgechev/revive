@@ -35,7 +35,7 @@ func (f *Friendly) Format(failures <-chan lint.Failure, config lint.Config) (str
 	warningEmoji := color.YellowString("⚠")
 	errorEmoji := color.RedString("✘")
 	for failure := range failures {
-		sev := severity(config, failure)
+		sev := failure.SeverityFor(&config)
 		firstCol := warningEmoji
 		if sev == lint.SeverityError {
 			firstCol = errorEmoji
