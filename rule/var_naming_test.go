@@ -15,6 +15,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 		wantAllowList                []string
 		wantBlockList                []string
 		wantSkipInitialismNameChecks bool
+		wantInitialismsAsWords       bool
 		wantAllowUpperCaseConst      bool
 	}{
 		{
@@ -24,6 +25,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			wantAllowList:                nil,
 			wantBlockList:                nil,
 			wantSkipInitialismNameChecks: false,
+			wantInitialismsAsWords:       false,
 			wantAllowUpperCaseConst:      false,
 		},
 		{
@@ -33,6 +35,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{"VM"},
 				[]any{map[string]any{
 					"skipInitialismNameChecks": true,
+					"initialismsAsWords":       true,
 					"upperCaseConst":           true,
 				}},
 			},
@@ -40,6 +43,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			wantAllowList:                []string{"ID"},
 			wantBlockList:                []string{"VM"},
 			wantSkipInitialismNameChecks: true,
+			wantInitialismsAsWords:       true,
 			wantAllowUpperCaseConst:      true,
 		},
 		{
@@ -49,6 +53,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{"VM"},
 				[]any{map[string]any{
 					"skipinitialismnamechecks": true,
+					"initialismsaswords":       true,
 					"uppercaseconst":           true,
 				}},
 			},
@@ -56,6 +61,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			wantAllowList:                []string{"ID"},
 			wantBlockList:                []string{"VM"},
 			wantSkipInitialismNameChecks: true,
+			wantInitialismsAsWords:       true,
 			wantAllowUpperCaseConst:      true,
 		},
 		{
@@ -65,6 +71,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 				[]any{"VM"},
 				[]any{map[string]any{
 					"skip-initialism-name-checks": true,
+					"initialisms-as-words":        true,
 					"upper-case-const":            true,
 				}},
 			},
@@ -72,6 +79,7 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			wantAllowList:                []string{"ID"},
 			wantBlockList:                []string{"VM"},
 			wantSkipInitialismNameChecks: true,
+			wantInitialismsAsWords:       true,
 			wantAllowUpperCaseConst:      true,
 		},
 		{
@@ -130,6 +138,9 @@ func TestVarNamingRule_Configure(t *testing.T) {
 			}
 			if rule.skipInitialismNameChecks != tt.wantSkipInitialismNameChecks {
 				t.Errorf("unexpected skipInitialismNameChecks: got = %v, want %v", rule.skipInitialismNameChecks, tt.wantSkipInitialismNameChecks)
+			}
+			if rule.initialismsAsWords != tt.wantInitialismsAsWords {
+				t.Errorf("unexpected initialismsAsWords: got = %v, want %v", rule.initialismsAsWords, tt.wantInitialismsAsWords)
 			}
 		})
 	}

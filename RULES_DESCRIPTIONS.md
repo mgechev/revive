@@ -2136,17 +2136,16 @@ _Configuration_: N/A
 
 **_Ported from golint_**
 
-_Description_: This rule warns when [initialism](https://go.dev/wiki/CodeReviewComments#initialisms), [variable](https://go.dev/wiki/CodeReviewComments#variable-names)
+_Description_: This rule warns when
+[initialism](https://go.dev/wiki/CodeReviewComments#initialisms)
+or [variable](https://go.dev/wiki/CodeReviewComments#variable-names)
 naming conventions are not followed.
 It ignores functions starting with `Example`, `Test`, `Benchmark`, and `Fuzz` in test files, preserving `golint` original behavior.
 
 _Configuration_: This rule accepts two slices of strings and one optional slice containing a single map with named parameters.
 (This is because TOML does not support "slice of any," and we maintain backward compatibility with the previous configuration version).
-The first slice is an allowlist, and the second one is a blocklist of initialisms.
-You can add a boolean parameter `skip-initialism-name-checks` to control how names
-of functions, variables, consts, and structs handle known initialisms (e.g., JSON, HTTP, etc.) when written in `camelCase`.
-When `skip-initialism-name-checks` is set to true, the rule allows names like `readJson`, `HttpMethod` etc.
-In the map, you can add a boolean `upper-case-const` parameter to allow `UPPER_CASE` for `const`.
+The first slice is an allowlist of initialisms, the second one is a blocklist of initialisms,
+and the third, optional one holds a map with named parameters for configuring the rule.
 
 By default, the rule behaves exactly as the alternative in `golint` for non-package identifiers;
 `golint`-equivalent package-name warnings now require enabling the [`package-naming`](#package-naming) rule.
@@ -2154,6 +2153,41 @@ The legacy package-related options `skip-package-name-checks`, `extra-bad-packag
 and are now treated as no-ops by `var-naming` (they are ignored, apart from an optional warning when logging is enabled).
 Package-name checks should be configured via the [`package-naming`](#package-naming) rule instead,
 and these options should be removed from `var-naming` configurations to avoid confusion.
+
+_Configuration_ (0): (`[]string`) an allowlist of initialisms.
+It loosens capitalization rules,
+allowing all-uppercase, all-lowercase, and initial-uppercase forms
+for the listed initialisms (e.g., `ID`, `id` and `Id`).
+
+_Configuration_ (1): (`[]string`) a blocklist of initialisms.
+It prevents listed initialisms from appearing in mixed case;
+they must be all uppercase or all lowercase (e.g., `ID` or `id` but not `Id`).
+The blocklist lets you extend the built-in list of initialisms
+with additional initialisms.
+To ignore the built-in list and only use the blocklist,
+add the `initialismsAsWords` option.
+
+_Configuration_ (2): (`[]map[string]any`) a slice containing one map
+of named parameters,
+recognized in camelCaseStyle, kebab-case-style, or alllowercasestyle.
+
+`initialismsAsWords`: A boolean parameter to treat initialisms as normal words
+for uppercase and lowercase rules.
+When `initialismsAsWords` is set to true, the rule forbids names like
+`readJSON`, `HTTPMethod`, `ID`, etc. and requires names like
+`readJson`, `HttpMethod`, `httpMethod`, `Id`, `id`, etc.
+The built-in list of initialisms is ignored.
+The allowlist and blocklist continue to function as described above.
+
+`skipInitialismNameChecks`: A boolean parameter to control how names
+of functions, variables, consts, and structs handle known initialisms
+(e.g., JSON, HTTP, etc.) when written in `camelCase`.
+When `skipInitialismNameChecks` is set to true,
+the rule allows names like
+`readJson`, `readJSON`, `httpMethod`, `HttpMethod`, `HTTPMethod`, etc.
+It disables the allowlist, the blocklist, and all built-in initialisms.
+
+`upperCaseConst`: A boolean parameter to allow `UPPER_CASE` for `const`.
 
 Configuration examples:
 
