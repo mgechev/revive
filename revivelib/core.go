@@ -149,11 +149,7 @@ func (r *Revive) Format(
 			exitCode = conf.WarningCode
 		}
 
-		if c, ok := conf.Rules[failure.RuleName]; ok && c.Severity == lint.SeverityError {
-			exitCode = conf.ErrorCode
-		}
-
-		if c, ok := conf.Directives[failure.RuleName]; ok && c.Severity == lint.SeverityError {
+		if failure.SeverityFor(conf) == lint.SeverityError {
 			exitCode = conf.ErrorCode
 		}
 

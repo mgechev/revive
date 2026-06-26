@@ -29,7 +29,7 @@ func (*JSON) Format(failures <-chan lint.Failure, config lint.Config) (string, e
 	var slice []jsonObject
 	for failure := range failures {
 		obj := jsonObject{}
-		obj.Severity = severity(config, failure)
+		obj.Severity = failure.SeverityFor(&config)
 		obj.Failure = failure
 		slice = append(slice, obj)
 	}
