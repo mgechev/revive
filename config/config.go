@@ -288,9 +288,9 @@ func validateConfig(config *lint.Config) error {
 	return nil
 }
 
-// NormalizeConfig fills in default rule entries (according to the EnableAllRules / EnableDefaultRules options)
+// Normalize fills in default rule entries (according to the EnableAllRules / EnableDefaultRules options)
 // and propagates the configured severity to rules and directives that don't define their own.
-func NormalizeConfig(config *lint.Config) {
+func Normalize(config *lint.Config) {
 	if len(config.Rules) == 0 {
 		config.Rules = map[string]lint.RuleConfig{}
 	}
@@ -353,7 +353,7 @@ func GetConfig(configPath string) (*lint.Config, error) {
 		return nil, err
 	}
 
-	NormalizeConfig(config)
+	Normalize(config)
 	return config, nil
 }
 

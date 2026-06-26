@@ -877,11 +877,11 @@ func TestDefault(t *testing.T) {
 	}
 }
 
-func TestNormalizeConfig(t *testing.T) {
+func TestNormalize(t *testing.T) {
 	t.Run("enable-default-rules adds default rule entries", func(t *testing.T) {
 		cfg := &lint.Config{EnableDefaultRules: true}
 
-		config.NormalizeConfig(cfg)
+		config.Normalize(cfg)
 
 		if got := config.EnabledRuleNames(cfg); !slices.Equal(got, config.DefaultRuleNames()) {
 			t.Errorf("expected default rules %v, got %v", config.DefaultRuleNames(), got)
@@ -900,7 +900,7 @@ func TestNormalizeConfig(t *testing.T) {
 			},
 		}
 
-		config.NormalizeConfig(cfg)
+		config.Normalize(cfg)
 
 		if got := cfg.Rules["exported"].Severity; got != lint.SeverityError {
 			t.Errorf("exported severity: expected %q, got %q", lint.SeverityError, got)
@@ -916,7 +916,7 @@ func TestNormalizeConfig(t *testing.T) {
 	t.Run("nil rules map is initialized", func(t *testing.T) {
 		cfg := &lint.Config{}
 
-		config.NormalizeConfig(cfg)
+		config.Normalize(cfg)
 
 		if cfg.Rules == nil {
 			t.Error("Rules map should be initialized")
