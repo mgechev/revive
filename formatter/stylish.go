@@ -42,7 +42,7 @@ func (*Stylish) Format(failures <-chan lint.Failure, config lint.Config) (string
 
 	for f := range failures {
 		total++
-		currentType := severity(config, f)
+		currentType := f.SeverityFor(&config)
 		if currentType == lint.SeverityError {
 			totalErrors++
 		}

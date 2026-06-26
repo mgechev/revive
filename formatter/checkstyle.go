@@ -40,7 +40,7 @@ func (*Checkstyle) Format(failures <-chan lint.Failure, config lint.Config) (str
 			Col:        failure.Position.Start.Column,
 			What:       what,
 			Confidence: failure.Confidence,
-			Severity:   severity(config, failure),
+			Severity:   failure.SeverityFor(&config),
 			RuleName:   failure.RuleName,
 		}
 		fn := failure.Filename()
