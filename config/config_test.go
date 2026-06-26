@@ -849,6 +849,12 @@ func TestEnabledRuleNames(t *testing.T) {
 			t.Errorf("EnabledRuleNames: expected none, got %v", got)
 		}
 	})
+
+	t.Run("nil config has no enabled rules", func(t *testing.T) {
+		if got := config.EnabledRuleNames(nil); len(got) != 0 {
+			t.Errorf("EnabledRuleNames: expected none, got %v", got)
+		}
+	})
 }
 
 func TestDefaultConfidence(t *testing.T) {

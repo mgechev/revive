@@ -140,6 +140,9 @@ func DefaultRuleNames() []string {
 
 // EnabledRuleNames returns the sorted names of the rules that are enabled in the given configuration.
 func EnabledRuleNames(config *lint.Config) []string {
+	if config == nil {
+		return nil
+	}
 	var names []string
 	for name, ruleConfig := range config.Rules {
 		if !ruleConfig.Disabled {
