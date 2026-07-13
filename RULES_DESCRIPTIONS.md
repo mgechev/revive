@@ -178,6 +178,28 @@ arguments = ["Ω", "Σ", "σ"]
 
 _Description_: Warns on bare (a.k.a. naked) returns.
 
+### Examples (bare-return)
+
+Before (violation):
+
+```go
+func split(sum int) (x, y int) {
+	x = sum * 4 / 9
+	y = sum - x
+	return
+}
+```
+
+After (fixed):
+
+```go
+func split(sum int) (x, y int) {
+	x = sum * 4 / 9
+	y = sum - x
+	return x, y
+}
+```
+
 _Configuration_: N/A
 
 ## blank-imports
@@ -468,6 +490,30 @@ if !cond {
 // do something
 ```
 
+### Examples (early-return)
+
+Before (violation):
+
+```go
+if hasAccess {
+	grantResource()
+	logAccess()
+} else {
+	return errNoAccess
+}
+```
+
+After (fixed):
+
+```go
+if !hasAccess {
+	return errNoAccess
+}
+
+grantResource()
+logAccess()
+```
+
 _Configuration_: ([]string) rule flags. Available flags are:
 
 - `preserve-scope`: do not suggest refactorings that would increase variable scope
@@ -712,6 +758,25 @@ Notice that a configuration including both options will effectively deactivate t
 **_Ported from golint_**
 
 _Description_: By convention, for the sake of readability, variables of type `error` must be named with the prefix `err`.
+Unexported error variables should start with `err`, exported ones with `Err`.
+
+### Examples (error-naming)
+
+Before (violation):
+
+```go
+var invalidInput = errors.New("invalid input")
+
+var TimeoutError = errors.New("connection timed out")
+```
+
+After (fixed):
+
+```go
+var errInvalidInput = errors.New("invalid input")
+
+var ErrTimeout = errors.New("connection timed out")
+```
 
 _Configuration_: N/A
 
@@ -720,6 +785,24 @@ _Configuration_: N/A
 **_Ported from golint_**
 
 _Description_: By convention, for the sake of readability, the errors should be last in the list of returned values by a function.
+
+### Examples (error-return)
+
+Before (violation):
+
+```go
+func readConfig(path string) (error, *Config) {
+	// ...
+}
+```
+
+After (fixed):
+
+```go
+func readConfig(path string) (*Config, error) {
+	// ...
+}
+```
 
 _Configuration_: N/A
 
@@ -970,6 +1053,27 @@ _Configuration_: N/A
 
 _Description_: Checking if an error is _nil_ to just after return the error or nil is redundant.
 
+### Examples (if-return)
+
+Before (violation):
+
+```go
+func do() error {
+	if err := validate(); err != nil {
+		return err
+	}
+	return nil
+}
+```
+
+After (fixed):
+
+```go
+func do() error {
+	return validate()
+}
+```
+
 _Configuration_: N/A
 
 ## import-alias-naming
@@ -1035,6 +1139,22 @@ arguments = ["crypto/md5", "crypto/sha1", "crypto/**/pkix"]
 _Description_: By convention, for better readability, incrementing an integer variable by 1 is recommended to be done using the `++` operator.
 This rule spots expressions like `i += 1` and `i -= 1` and proposes to change them into `i++` and `i--`.
 
+### Examples (increment-decrement)
+
+Before (violation):
+
+```go
+i += 1
+count -= 1
+```
+
+After (fixed):
+
+```go
+i++
+count--
+```
+
 _Configuration_: N/A
 
 ## indent-error-flow
@@ -1045,6 +1165,28 @@ _Description_: To improve the readability of code, it is recommended to reduce t
 This rule highlights redundant _else-blocks_ that can be eliminated from the code.
 
 More [information here](https://go.dev/wiki/CodeReviewComments#indent-error-flow).
+
+### Examples (indent-error-flow)
+
+Before (violation):
+
+```go
+if err != nil {
+	return err
+} else {
+	log.Println("no error")
+}
+```
+
+After (fixed):
+
+```go
+if err != nil {
+	return err
+}
+
+log.Println("no error")
+```
 
 _Configuration_: ([]string) rule flags. Available flags are:
 
@@ -1456,6 +1598,24 @@ _Note_: This rule is irrelevant for Go 1.22+.
 
 _Description_: This rule suggests a shorter way of writing ranges that do not use the second value.
 
+### Examples (range)
+
+Before (violation):
+
+```go
+for i, _ := range items {
+	process(i)
+}
+```
+
+After (fixed):
+
+```go
+for i := range items {
+	process(i)
+}
+```
+
 _Configuration_: N/A
 
 ## receiver-naming
@@ -1465,6 +1625,33 @@ _Configuration_: N/A
 _Description_: By convention, receiver names in a method should reflect their identity.
 For example, if the receiver is of type `Parts`, `p` is an adequate name for it.
 Contrary to other languages, it is not idiomatic to name receivers as `this` or `self`.
+All methods of a type should also use the same receiver name.
+
+### Examples (receiver-naming)
+
+Before (violation):
+
+```go
+func (p *Parts) Add(part Part) {
+	// ...
+}
+
+func (parts *Parts) Clear() {
+	// ...
+}
+```
+
+After (fixed):
+
+```go
+func (p *Parts) Add(part Part) {
+	// ...
+}
+
+func (p *Parts) Clear() {
+	// ...
+}
+```
 
 _Configuration_: (optional) list of key-value-pair-map (`[]map[string]any`).
 
@@ -1685,7 +1872,34 @@ arguments = ["!validate", "bson,outline,gnu"]
 ## superfluous-else
 
 _Description_: To improve the readability of code, it is recommended to reduce the indentation as much as possible.
-This rule highlights redundant _else-blocks_ that can be eliminated from the code.
+This rule highlights redundant _else-blocks_ that can be eliminated when the preceding `if`-block ends with a
+`break`, `continue` or `goto` statement (the `return` case is handled by [indent-error-flow](#indent-error-flow)).
+
+### Examples (superfluous-else)
+
+Before (violation):
+
+```go
+for _, v := range values {
+	if v < 0 {
+		continue
+	} else {
+		sum += v
+	}
+}
+```
+
+After (fixed):
+
+```go
+for _, v := range values {
+	if v < 0 {
+		continue
+	}
+
+	sum += v
+}
+```
 
 _Configuration_: ([]string) rule flags. Available flags are:
 
@@ -1900,11 +2114,52 @@ _Configuration_: N/A
 
 _Description_: This rule suggests to remove redundant statements like a `break` at the end of a case block, for improving the code's readability.
 
+### Examples (unnecessary-stmt)
+
+Before (violation):
+
+```go
+switch status {
+case "active":
+	handle()
+	break
+}
+```
+
+After (fixed):
+
+```go
+switch status {
+case "active":
+	handle()
+}
+```
+
 _Configuration_: N/A
 
 ## unreachable-code
 
 _Description_: This rule spots and proposes to remove [unreachable code](https://en.wikipedia.org/wiki/Unreachable_code).
+
+### Examples (unreachable-code)
+
+Before (violation):
+
+```go
+func compute() int {
+	return doWork()
+	log.Println("done")
+}
+```
+
+After (fixed):
+
+```go
+func compute() int {
+	log.Println("starting")
+	return doWork()
+}
+```
 
 _Configuration_: N/A
 
@@ -1963,6 +2218,24 @@ arguments = [{ allow-regex = "^_" }]
 
 _Description_: This rule proposes to replace instances of `interface{}` with its alias [`any`](https://pkg.go.dev/builtin@go1.18.0#any).
 
+### Examples (use-any)
+
+Before (violation):
+
+```go
+func PrintValue(v interface{}) {
+	fmt.Println(v)
+}
+```
+
+After (fixed):
+
+```go
+func PrintValue(v any) {
+	fmt.Println(v)
+}
+```
+
 _Configuration_: N/A
 
 _Note_: This rule is irrelevant for Go 1.17-.
@@ -1970,6 +2243,21 @@ _Note_: This rule is irrelevant for Go 1.17-.
 ## use-errors-new
 
 _Description_: This rule identifies calls to `fmt.Errorf` that can be safely replaced by, the more efficient, `errors.New`.
+This applies when the format string has no formatting verbs (no additional arguments are passed).
+
+### Examples (use-errors-new)
+
+Before (violation):
+
+```go
+return fmt.Errorf("connection refused")
+```
+
+After (fixed):
+
+```go
+return errors.New("connection refused")
+```
 
 _Configuration_: N/A
 
@@ -2081,6 +2369,31 @@ Therefore, inserting a `break` at the end of a case clause has no effect.
 Because `break` statements are rarely used in case clauses, when switch or select statements are inside a for-loop,
 the programmer might wrongly assume that a `break` in a case clause will take the control out of the loop.
 The rule emits a specific warning for such cases.
+
+### Examples (useless-break)
+
+Before (violation):
+
+```go
+for {
+	switch state {
+	case done:
+		cleanup()
+		break
+	}
+}
+```
+
+After (fixed):
+
+```go
+for {
+	switch state {
+	case done:
+		cleanup()
+	}
+}
+```
 
 _Configuration_: N/A
 
