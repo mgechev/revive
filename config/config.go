@@ -94,7 +94,6 @@ var allRules = append([]lint.Rule{
 	&rule.CommentSpacingsRule{},
 	&rule.IfReturnRule{},
 	&rule.RedundantImportAlias{},
-	&rule.RedundantCanonicalImport{},
 	&rule.ImportAliasNamingRule{},
 	&rule.EnforceMapStyleRule{},
 	&rule.EnforceRepeatedArgTypeStyleRule{},
