@@ -1880,8 +1880,8 @@ arguments = ["!validate", "bson,outline,gnu"]
 ## superfluous-else
 
 _Description_: To improve the readability of code, it is recommended to reduce the indentation as much as possible.
-This rule highlights redundant _else-blocks_ that can be eliminated when the preceding `if`-block ends with a
-`break`, `continue` or `goto` statement (the `return` case is handled by [indent-error-flow](#indent-error-flow)).
+This rule highlights redundant _else-blocks_ that can be eliminated when the preceding `if`-block deviates control flow,
+for example ending with a `break`, `continue`, `goto`, `panic` or `os.Exit` call (the `return` case is handled by [indent-error-flow](#indent-error-flow)).
 
 ### Examples (superfluous-else)
 
@@ -2274,7 +2274,7 @@ return fmt.Errorf("connection refused")
 After (fixed):
 
 ```go
-import "fmt"
+import "errors"
 
 return errors.New("connection refused")
 ```
