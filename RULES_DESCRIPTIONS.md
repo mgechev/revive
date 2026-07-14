@@ -1175,6 +1175,8 @@ More [information here](https://go.dev/wiki/CodeReviewComments#indent-error-flow
 Before (violation):
 
 ```go
+import "log"
+
 if err != nil {
 	return err
 } else {
@@ -1185,6 +1187,8 @@ if err != nil {
 After (fixed):
 
 ```go
+import "log"
+
 if err != nil {
 	return err
 }
@@ -1236,14 +1240,14 @@ aValue := false
 
 // Inefficient map lookup
 for k := range aMap {
-  if k == aValue {
-    // do something
-  }
+	if k == aValue {
+		// do something
+	}
 }
 
 // Simpler and more efficient version
 if _, ok := aMap[aValue]; ok {
-  // do something
+	// do something
 }
 ```
 
@@ -2162,6 +2166,7 @@ After (fixed):
 
 ```go
 import "log"
+
 func compute() int {
 	log.Println("starting")
 	return doWork()
