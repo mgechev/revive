@@ -765,6 +765,8 @@ Unexported error variables should start with `err`, exported ones with `Err`.
 Before (violation):
 
 ```go
+import "errors"
+
 var invalidInput = errors.New("invalid input")
 
 var TimeoutError = errors.New("connection timed out")
@@ -773,6 +775,8 @@ var TimeoutError = errors.New("connection timed out")
 After (fixed):
 
 ```go
+import "errors"
+
 var errInvalidInput = errors.New("invalid input")
 
 var ErrTimeout = errors.New("connection timed out")
@@ -2146,6 +2150,8 @@ _Description_: This rule spots and proposes to remove [unreachable code](https:/
 Before (violation):
 
 ```go
+import "log"
+
 func compute() int {
 	return doWork()
 	log.Println("done")
@@ -2155,6 +2161,7 @@ func compute() int {
 After (fixed):
 
 ```go
+import "log"
 func compute() int {
 	log.Println("starting")
 	return doWork()
@@ -2223,6 +2230,8 @@ _Description_: This rule proposes to replace instances of `interface{}` with its
 Before (violation):
 
 ```go
+import "fmt"
+
 func PrintValue(v interface{}) {
 	fmt.Println(v)
 }
@@ -2231,6 +2240,8 @@ func PrintValue(v interface{}) {
 After (fixed):
 
 ```go
+import "fmt"
+
 func PrintValue(v any) {
 	fmt.Println(v)
 }
@@ -2250,12 +2261,16 @@ This applies when the format string has no formatting verbs (no additional argum
 Before (violation):
 
 ```go
+import "fmt"
+
 return fmt.Errorf("connection refused")
 ```
 
 After (fixed):
 
 ```go
+import "fmt"
+
 return errors.New("connection refused")
 ```
 
