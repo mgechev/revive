@@ -57,7 +57,7 @@ func (*PrimitiveInNameRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 				}
 			}
 		case *ast.GenDecl:
-			if v.Tok != token.VAR {
+			if v.Tok != token.VAR && v.Tok != token.CONST {
 				return true
 			}
 			for _, spec := range v.Specs {
@@ -76,6 +76,8 @@ func (*PrimitiveInNameRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 	return failures
 }
 
+// isPrimitiveResolvePrimitiveString will resolve the type to a string.
+// Note currently this will not work for []string, only concrete types.
 func isPrimitiveResolvePrimitiveString(typ types.Type) (string, bool) {
 	basic, ok := typ.(*types.Basic)
 	if !ok {
@@ -84,19 +86,20 @@ func isPrimitiveResolvePrimitiveString(typ types.Type) (string, bool) {
 
 	switch basic.Kind() {
 	case types.Int, types.Int8, types.Int16, types.Int64,
-		types.Uint, types.Uint16, types.Uint32, types.Uint64, types.Uintptr:
+		types.Uint, types.Uint16, types.Uint32, types.Uint64, types.Uintptr,
+		types.UntypedInt:
 		return "Int", true
-	case types.Int32:
+	case types.Int32, types.UntypedRune:
 		return "Rune", true
 	case types.Uint8:
 		return "Byte", true
-	case types.String:
+	case types.String, types.UntypedString:
 		return "String", true
-	case types.Bool:
+	case types.Bool, types.UntypedBool:
 		return "Bool", true
 	case types.Float32:
 		return "Float32", true
-	case types.Float64:
+	case types.Float64, types.UntypedFloat:
 		return "Float64", true
 	}
 
