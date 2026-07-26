@@ -9,7 +9,8 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// UseFmtPrintRule lints calls to print and println.
+// UseFmtPrintRule proposes to replace calls to built-in `print` and `println`
+// with their equivalents from [fmt] package.
 type UseFmtPrintRule struct{}
 
 // Apply applies the rule to given file.
@@ -85,7 +86,7 @@ func (lintUseFmtPrint) callArgsAsStr(args []ast.Expr) string {
 	return strings.Join(strs, ", ")
 }
 
-func (UseFmtPrintRule) analyzeRedefinitions(decls []ast.Decl) (redefinesPrint, redefinesPrintln bool) {
+func (*UseFmtPrintRule) analyzeRedefinitions(decls []ast.Decl) (redefinesPrint, redefinesPrintln bool) {
 	for _, decl := range decls {
 		fnDecl, ok := decl.(*ast.FuncDecl)
 		if !ok {

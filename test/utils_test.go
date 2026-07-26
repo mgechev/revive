@@ -1,4 +1,4 @@
-package test
+package test_test
 
 import (
 	"encoding/json"
@@ -19,8 +19,8 @@ import (
 
 // configureRule configures the given rule with the given configuration
 // if the rule implements the ConfigurableRule interface.
-func configureRule(t *testing.T, rule lint.Rule, arguments lint.Arguments) {
-	t.Helper()
+func configureRule(tb testing.TB, rule lint.Rule, arguments lint.Arguments) {
+	tb.Helper()
 
 	cr, ok := rule.(lint.ConfigurableRule)
 	if !ok {
@@ -29,69 +29,76 @@ func configureRule(t *testing.T, rule lint.Rule, arguments lint.Arguments) {
 
 	err := cr.Configure(arguments)
 	if err != nil {
-		t.Fatalf("Cannot configure rule %s: %v", rule.Name(), err)
+		tb.Fatalf("Cannot configure rule %s: %v", rule.Name(), err)
 	}
 }
 
-func testRule(t *testing.T, filename string, rule lint.Rule, config ...*lint.RuleConfig) {
-	t.Helper()
+func testRule(tb testing.TB, filename string, rule lint.Rule, config ...*lint.RuleConfig) {
+	tb.Helper()
+	var ruleConfig lint.RuleConfig
+	if len(config) > 0 {
+		ruleConfig = *config[0]
+	}
+
+	lintConfig := lint.Config{
+		Rules: map[string]lint.RuleConfig{
+			rule.Name(): ruleConfig,
+		},
+	}
+
+	testRuleWithLintConfig(tb, filename, rule, lintConfig)
+}
+
+func testRuleWithLintConfig(tb testing.TB, filename string, rule lint.Rule, config lint.Config) {
+	tb.Helper()
 
 	baseDir := filepath.Join("..", "testdata", filepath.Dir(filename))
 	filename = filepath.Base(filename) + ".go"
 	fullFilePath := filepath.Join(baseDir, filename)
-	src, err := os.ReadFile(fullFilePath)
+	src, err := os.ReadFile(fullFilePath) //nolint:gosec // ignore G304: potential file inclusion via variable
 	if err != nil {
-		t.Fatalf("Bad filename path in test for %s: %v", rule.Name(), err)
+		tb.Fatalf("Bad filename path in test for %s: %v", rule.Name(), err)
 	}
 
-	var ruleConfig lint.RuleConfig
-	c := map[string]lint.RuleConfig{}
-	if len(config) > 0 {
-		ruleConfig = *config[0]
-		c[rule.Name()] = ruleConfig
-	}
-	configureRule(t, rule, ruleConfig.Arguments)
+	configureRule(tb, rule, config.Rules[rule.Name()].Arguments)
 
-	ins := parseInstructions(t, fullFilePath, src)
+	ins := parseInstructions(tb, fullFilePath, src)
 	if ins == nil {
-		assertSuccess(t, fullFilePath, []lint.Rule{rule}, c)
+		assertSuccess(tb, fullFilePath, []lint.Rule{rule}, config)
 		return
 	}
-	assertFailures(t, fullFilePath, []lint.Rule{rule}, c, ins)
+	assertFailures(tb, fullFilePath, []lint.Rule{rule}, config, ins)
 }
 
-func assertSuccess(t *testing.T, filePath string, rules []lint.Rule, config map[string]lint.RuleConfig) error {
-	t.Helper()
+func assertSuccess(tb testing.TB, filePath string, rules []lint.Rule, config lint.Config) {
+	tb.Helper()
 
 	l := lint.New(os.ReadFile, 0)
 
-	ps, err := l.Lint([][]string{{filePath}}, rules, lint.Config{
-		Rules: config,
-	})
+	ps, err := l.Lint([][]string{{filePath}}, rules, config)
 	if err != nil {
-		return err
+		tb.Errorf("Linting %s: %v", filePath, err)
+		return
 	}
 
-	failures := ""
+	var failures []string
 	for p := range ps {
-		failures += p.Failure
+		failures = append(failures, p.Failure)
 	}
-	if failures != "" {
-		t.Errorf("Expected the rule to pass but got the following failures: %s", failures)
+	if len(failures) > 0 {
+		tb.Errorf("Expected the rule to pass but got the following failures: %s", strings.Join(failures, ", "))
 	}
-	return nil
 }
 
-func assertFailures(t *testing.T, filePath string, rules []lint.Rule, config map[string]lint.RuleConfig, ins []instruction) error {
-	t.Helper()
+func assertFailures(tb testing.TB, filePath string, rules []lint.Rule, config lint.Config, ins []instruction) {
+	tb.Helper()
 
 	l := lint.New(os.ReadFile, 0)
 
-	ps, err := l.Lint([][]string{{filePath}}, rules, lint.Config{
-		Rules: config,
-	})
+	ps, err := l.Lint([][]string{{filePath}}, rules, config)
 	if err != nil {
-		return err
+		tb.Errorf("Linting %s: %v", filePath, err)
+		return
 	}
 
 	failures := []lint.Failure{}
@@ -182,7 +189,7 @@ func assertFailures(t *testing.T, filePath string, rules []lint.Rule, config map
 		currentFileLine := fmt.Sprintf("%s:%d", p.File, p.Line)
 		if currentFileLine != lastFileLine {
 			if errorMessage != "" {
-				t.Error(errorMessage)
+				tb.Error(errorMessage)
 			}
 			errorMessage = fmt.Sprintf("problem at %s: ", currentFileLine)
 			lastFileLine = currentFileLine
@@ -192,10 +199,8 @@ func assertFailures(t *testing.T, filePath string, rules []lint.Rule, config map
 	}
 
 	if errorMessage != "" {
-		t.Error(errorMessage)
+		tb.Error(errorMessage)
 	}
-
-	return nil
 }
 
 type instruction struct {
@@ -216,19 +221,19 @@ type JSONInstruction struct {
 
 // parseInstructions parses instructions from the comments in a Go source file.
 // It returns nil if none were parsed.
-func parseInstructions(t *testing.T, filename string, src []byte) []instruction {
-	t.Helper()
+func parseInstructions(tb testing.TB, filename string, src []byte) []instruction {
+	tb.Helper()
 
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, filename, src, parser.ParseComments)
 	if err != nil {
-		t.Fatalf("Test file %v does not parse: %v", filename, err)
+		tb.Fatalf("Test file %v does not parse: %v", filename, err)
 	}
 	var ins []instruction
 	for _, cg := range f.Comments {
 		ln := fset.Position(cg.Pos()).Line
 		raw := cg.Text()
-		for _, line := range strings.Split(raw, "\n") {
+		for line := range strings.SplitSeq(raw, "\n") {
 			if line == "" || strings.HasPrefix(line, "#") || strings.HasPrefix(line, "ignore") {
 				continue
 			}
@@ -241,13 +246,13 @@ func parseInstructions(t *testing.T, filename string, src []byte) []instruction 
 			case "json":
 				jsonInst, err := extractInstructionFromJSON(strings.TrimPrefix(line, "json:"), ln)
 				if err != nil {
-					t.Fatalf("At %v:%d: %v", filename, ln, err)
+					tb.Fatalf("At %v:%d: %v", filename, ln, err)
 				}
 				ins = append(ins, jsonInst)
 			case "classic":
 				match, err := extractPattern(line)
 				if err != nil {
-					t.Fatalf("At %v:%d: %v", filename, ln, err)
+					tb.Fatalf("At %v:%d: %v", filename, ln, err)
 				}
 				matchLine := ln
 				if i := strings.Index(line, "MATCH:"); i >= 0 {
@@ -256,7 +261,7 @@ func parseInstructions(t *testing.T, filename string, src []byte) []instruction 
 					lns = lns[:strings.Index(lns, " ")] //nolint:gocritic // offBy1: false positive
 					matchLine, err = strconv.Atoi(lns)
 					if err != nil {
-						t.Fatalf("Bad match line number %q at %v:%d: %v", lns, filename, ln, err)
+						tb.Fatalf("Bad match line number %q at %v:%d: %v", lns, filename, ln, err)
 					}
 				}
 				var repl string
@@ -425,7 +430,7 @@ func mkdirTempDotGit(t *testing.T, root string) {
 	}
 
 	gitDir := filepath.Join(dir, ".git")
-	if err := os.MkdirAll(gitDir, 0o755); err != nil {
+	if err := os.MkdirAll(gitDir, 0o750); err != nil {
 		t.Fatalf("Failed to create .git directory: %v", err)
 	}
 

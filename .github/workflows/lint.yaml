@@ -1,101 +1,65 @@
-name: Lint
+name: Lint Go
 on:
   workflow_dispatch:
   pull_request:
     types: [opened, synchronize, reopened]
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'tools/**'
+      - '.golangci.yml'
+      - 'revive.toml'
+      - '.github/workflows/lint.yaml'
   push:
     branches:
       - master
 
+permissions:
+  contents: read
+
 jobs:
   go-mod:
-    name: Check go.mod
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
         with:
           go-version: stable
-      - name: Check go.mod
+      - name: Check tools/go.mod
+        working-directory: tools
         run: |
-          go mod tidy
-          git diff --exit-code go.mod
-          git diff --exit-code go.sum
+          go mod tidy -diff
 
   lint-go:
     name: Lint Go
     runs-on: ubuntu-latest
     steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v4
-
-    - name: Setup Go and register problem matcher
-      uses: actions/setup-go@v5
-      with:
-        go-version: stable
-
-    - name: Install revive
-      run: go install
-
-    - name: Run revive
-      run: revive --config revive.toml ./...
-
-    - name: Run golangci-lint
-      uses: golangci/golangci-lint-action@v8
-      with:
-        version: v2.2.1
-
-  lint-md:
-    name: Lint Markdown
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
+      - name: Setup Go and register problem matcher
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
         with:
           go-version: stable
 
-      - name: Setup mdsf
-        uses: hougesen/mdsf@v0.9.5
+      - name: Install revive
+        run: go install
 
-      - name: Setup goimports
-        # https://pkg.go.dev/golang.org/x/tools/cmd/goimports
-        run: go install golang.org/x/tools/cmd/goimports@v0.33.0
+      - name: Run revive
+        run: revive --config revive.toml ./...
 
-      - name: Setup shfmt
-        # https://github.com/mvdan/sh#shfmt
-        run: go install mvdan.cc/sh/v3/cmd/shfmt@v3.11.0
-
-      - name: Setup taplo
-        # https://taplo.tamasfe.dev/cli/installation/binary.html
-        run: curl -fsSL https://github.com/tamasfe/taplo/releases/download/0.10.0/taplo-linux-x86_64.gz | gzip -d - | install -m 755 /dev/stdin /usr/local/bin/taplo
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install markdown-toc
-        run: npm install -g markdown-toc
-
-      - name: Verify files format using markdownlint-cli2
-        uses: DavidAnson/markdownlint-cli2-action@v20
-        with:
-          config: .markdownlint-cli2.yaml
-
-      - name: Verify TOC in markdown files
+      - id: golangci-lint-version
+        working-directory: tools
         run: |
-          markdown-toc --maxdepth 4 --no-first1 --bullets "-" -i README.md && git diff --exit-code README.md
-          markdown-toc --maxdepth 2 --no-first1 --bullets "-" -i RULES_DESCRIPTIONS.md && git diff --exit-code RULES_DESCRIPTIONS.md
+          echo "GOLANGCI_LINT_VERSION=$(go list -m -f '{{.Version}}' github.com/golangci/golangci-lint/v2)" >> $GITHUB_OUTPUT
 
-      - name: Verify code snippets using mdsf
-        id: verify_snippets
-        run: mdsf verify --on-missing-language-definition ignore --on-missing-tool-binary fail-fast .
-
-      - name: Show diff when mdsf failed
-        if: failure() && steps.verify_snippets.outcome == 'failure'
-        run: |
-          mdsf format --debug --on-missing-language-definition ignore --on-missing-tool-binary fail-fast .
-          git diff --exit-code
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@1e7e51e771db61008b38414a730f564565cf7c20 # v9.2.0
+        with:
+          version: ${{ steps.golangci-lint-version.outputs.GOLANGCI_LINT_VERSION }}
+          args: --verbose

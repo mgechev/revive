@@ -9,13 +9,13 @@ import (
 func TestRetrieveModFile(t *testing.T) {
 	t.Run("go.mod file exists", func(t *testing.T) {
 		nestedDir := filepath.Join(t.TempDir(), "nested", "dir", "structure")
-		err := os.MkdirAll(nestedDir, 0o755)
+		err := os.MkdirAll(nestedDir, 0o750)
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		modFilePath := filepath.Join(nestedDir, "go.mod")
-		err = os.WriteFile(modFilePath, []byte("module example.com/test"), 0o644)
+		err = os.WriteFile(modFilePath, []byte("module example.com/test"), 0o600)
 		if err != nil {
 			t.Fatal(err)
 		}

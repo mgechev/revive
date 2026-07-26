@@ -1,4 +1,4 @@
-package test
+package test_test
 
 import (
 	"testing"
@@ -6,6 +6,6 @@ import (
 	"github.com/mgechev/revive/rule"
 )
 
-func TestUselessFallTrhough(t *testing.T) {
+func TestUselessFallthrough(t *testing.T) {
 	testRule(t, "useless_fallthrough", &rule.UselessFallthroughRule{})
 }

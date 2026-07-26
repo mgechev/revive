@@ -40,7 +40,6 @@ If you disable them in the config file, revive will run over 6x faster than goli
   - [Docker](#docker)
   - [Manual Binary Download](#manual-binary-download)
 - [Usage](#usage)
-  - [Bazel](#bazel)
   - [Text Editors](#text-editors)
   - [GitHub Actions](#github-actions)
   - [Continuous Integration](#continuous-integration)
@@ -50,13 +49,11 @@ If you disable them in the config file, revive will run over 6x faster than goli
   - [Sample Invocations](#sample-invocations)
   - [Comment Directives](#comment-directives)
   - [Configuration](#configuration)
-  - [Default Configuration](#default-configuration)
   - [Custom Configuration](#custom-configuration)
   - [Recommended Configuration](#recommended-configuration)
   - [Rule-level file excludes](#rule-level-file-excludes)
 - [Available Rules](#available-rules)
 - [Configurable rules](#configurable-rules)
-  - [`var-naming`](#var-naming)
 - [Available Formatters](#available-formatters)
   - [Friendly](#friendly)
   - [Stylish](#stylish)
@@ -79,6 +76,7 @@ If you disable them in the config file, revive will run over 6x faster than goli
 - [Contributors](#contributors)
   - [Maintainers](#maintainers)
   - [All](#all)
+- [Star History](#star-history)
 - [License](#license)
 
 <!-- tocstop -->
@@ -122,7 +120,7 @@ go install github.com/mgechev/revive@HEAD
 You can run `revive` using Docker to avoid installing it directly on your system:
 
 ```bash
-docker run -v "$(pwd)":/var/YOUR_REPOSITORY ghcr.io/mgechev/revive:v1.10.0 -config /var/YOUR_REPOSITORY/revive.toml -formatter stylish ./var/YOUR_REPOSITORY/...
+docker run -v "$(pwd)":/var/YOUR_REPOSITORY ghcr.io/mgechev/revive:v1.15.0 -config /var/YOUR_REPOSITORY/revive.toml -formatter stylish ./var/YOUR_REPOSITORY/...
 ```
 
 _Note_: Replace `YOUR_REPOSITORY` with the path to your repository.
@@ -131,7 +129,7 @@ A volume must be mounted to share the current repository with the container.
 For more details, refer to the [bind mounts Docker documentation](https://docs.docker.com/storage/bind-mounts/).
 
 - `-v`: Mounts the current directory (`$(pwd)`) to `/var/YOUR_REPOSITORY` inside the container.
-- `ghcr.io/mgechev/revive:v1.10.0`: Specifies the Docker image and its version.
+- `ghcr.io/mgechev/revive:v1.15.0`: Specifies the Docker image and its version.
 - `revive`: The command to run inside the container.
 - Flags like `-config` and `-formatter` are the same as when using the binary directly.
 
@@ -156,10 +154,6 @@ the only difference you'd notice is faster execution.
 If not provided, `revive` will try to use a global config file (assumed to be located at `$HOME/revive.toml`).
 Otherwise, if no configuration TOML file is found then `revive` uses a built-in set of default linting rules.
 
-### Bazel
-
-If you want to use revive with Bazel, look at the [rules](https://github.com/atlassian/bazel-tools/tree/master/gorevive) that Atlassian maintains.
-
 ### Text Editors
 
 - Support for VSCode via [vscode-go](https://code.visualstudio.com/docs/languages/go#_build-and-diagnose) by changing the `go.lintTool` setting to `revive`:
@@ -177,16 +171,6 @@ If you want to use revive with Bazel, look at the [rules](https://github.com/atl
   let g:ale_linters = {
   \   'go': ['revive'],
   \}
-  ```
-
-- Support for Neovim via [null-ls.nvim](https://github.com/jose-elias-alvarez/null-ls.nvim).
-
-  ```lua
-  require("null-ls").setup({
-      sources = {
-          require("null-ls").builtins.diagnostics.revive
-      },
-  })
   ```
 
 ### GitHub Actions
@@ -259,7 +243,7 @@ If no exclusion patterns are specified, `vendor/...` will be excluded by default
   - `stylish` - formats the failures in a table. Keep in mind that it doesn't stream the output so it might be perceived as slower compared to others.
   - `checkstyle` - outputs the failures in XML format compatible with that of Java's [Checkstyle](https://checkstyle.org/).
 - `-max_open_files` -  maximum number of open files at the same time. Defaults to unlimited.
-- `-set_exit_status` - set exit status to 1 if any issues are found, overwrites `errorCode` and `warningCode` in config.
+- `-set_exit_status` - set exit status to 1 if any issues are found, overwrites `error-code` and `warning-code` in config.
 - `-version` - get revive version.
 
 ### Sample Invocations
@@ -326,13 +310,28 @@ in the configuration. You can set the severity (defaults to _warning_) of the vi
 severity = "error"
 ```
 
+Similarly, you can enforce specifying rule names in disable directives by adding
+
+```toml
+[directive.specify-disable-rule]
+```
+
+This forbids "naked" `//revive:disable`, `//revive:disable-line`, and `//revive:disable-next-line` directives
+and requires specifying at least one rule name, e.g. `//revive:disable:cyclomatic` or `//revive:disable-next-line:cyclomatic`.
+You can set the severity (defaults to _warning_) of the violation of this directive
+
+```toml
+[directive.specify-disable-rule]
+severity = "error"
+```
+
 ### Configuration
 
 `revive` can be configured with a TOML file. Here's a sample configuration with an explanation of the individual properties:
 
 ```toml
 # When set to false, ignores files with "GENERATED" header, similar to golint
-ignoreGeneratedHeader = true
+ignore-generated-header = true
 
 # Sets the default severity to "warning"
 severity = "warning"
@@ -342,10 +341,10 @@ severity = "warning"
 confidence = 0.8
 
 # Sets the error code for failures with the "error" severity
-errorCode = 0
+error-code = 0
 
 # Sets the error code for failures with severity "warning"
-warningCode = 0
+warning-code = 0
 
 # Configuration of the `cyclomatic` rule. Here we specify that
 # the rule should fail if it detects code with higher complexity than 10.
@@ -360,20 +359,31 @@ severity = "error"
 By default `revive` will enable only the linting rules that are named in the configuration file.
 For example, the previous configuration file makes `revive` to enable only _cyclomatic_ and _package-comments_ linting rules.
 
+To enable default rules you need to use:
+
+```toml
+enable-default-rules = true
+```
+
+This will enable all rules available in `golint` and use their default configuration (i.e. the way they are hardcoded in `golint`).
+The default configuration of `revive` can be found at `defaults.toml`.
+
 To enable all available rules you need to add:
 
 ```toml
-enableAllRules = true
+enable-all-rules = true
 ```
 
 This will enable all available rules no matter what rules are named in the configuration file.
+
+Options `enable-all-rules` and `enable-default-rules` cannot be combined.
 
 To disable a rule, you simply mark it as disabled in the configuration.
 For example:
 
 ```toml
 [rule.line-length-limit]
-Disabled = true
+disabled = true
 ```
 
 When enabling all rules you still need/can provide specific configurations for rules.
@@ -383,49 +393,38 @@ and some rules are configured with particular arguments:
 ```toml
 severity = "warning"
 confidence = 0.8
-errorCode = 0
-warningCode = 0
+error-code = 0
+warning-code = 0
 
 # Enable all available rules
-enableAllRules = true
+enable-all-rules = true
 
 # Disabled rules
 [rule.blank-imports]
-Disabled = true
+disabled = true
 [rule.file-header]
-Disabled = true
+disabled = true
 [rule.max-public-structs]
-Disabled = true
+disabled = true
 [rule.line-length-limit]
-Disabled = true
+disabled = true
 [rule.function-length]
-Disabled = true
+disabled = true
 [rule.banned-characters]
-Disabled = true
+disabled = true
 
 # Rule tuning
 [rule.argument-limit]
-Arguments = [5]
+arguments = [5]
 [rule.cyclomatic]
-Arguments = [10]
+arguments = [10]
 [rule.cognitive-complexity]
-Arguments = [7]
+arguments = [7]
 [rule.function-result-limit]
-Arguments = [3]
+arguments = [3]
 [rule.error-strings]
-Arguments = ["mypackage.Error"]
+arguments = ["mypackage.Error"]
 ```
-
-### Default Configuration
-
-The default configuration of `revive` can be found at `defaults.toml`.
-This will enable all rules available in `golint` and use their default configuration (i.e. the way they are hardcoded in `golint`).
-
-```shell
-revive -config defaults.toml github.com/mgechev/revive
-```
-
-This will use the configuration file `defaults.toml`, the `default` formatter, and will run linting over the `github.com/mgechev/revive` package.
 
 ### Custom Configuration
 
@@ -440,11 +439,11 @@ This will use `config.toml`, the `friendly` formatter, and will run linting over
 The following snippet contains the recommended `revive` configuration that you can use in your project:
 
 ```toml
-ignoreGeneratedHeader = false
+ignore-generated-header = false
 severity = "warning"
 confidence = 0.8
-errorCode = 0
-warningCode = 0
+error-code = 0
+warning-code = 0
 
 [rule.blank-imports]
 [rule.context-as-argument]
@@ -478,16 +477,16 @@ You also can setup custom excludes for each rule.
 It's an alternative for the global `-exclude` program arg.
 
 ```toml
-ignoreGeneratedHeader = false
+ignore-generated-header = false
 severity = "warning"
 confidence = 0.8
-errorCode = 0
-warningCode = 0
+error-code = 0
+warning-code = 0
 
 [rule.blank-imports]
-Exclude = ["**/*.pb.go"]
+exclude = ["**/*.pb.go"]
 [rule.context-as-argument]
-Exclude = ["src/somepkg/*.go", "TEST"]
+exclude = ["src/somepkg/*.go", "TEST"]
 ```
 
 You can use the following exclude patterns
@@ -504,7 +503,7 @@ You can use the following exclude patterns
 
 ## Available Rules
 
-List of all available rules. The rules ported from `golint` are left unchanged and indicated in the `golint` column.
+List of all [available rules](./RULES_DESCRIPTIONS.md).
 
 | Name                  | Config | Description                                                      | `golint` | Typed |
 | --------------------- | :----: | :--------------------------------------------------------------- | :------: | :---: |
@@ -523,7 +522,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`confusing-results`](./RULES_DESCRIPTIONS.md#confusing-results)   |  n/a   | Suggests to name potentially confusing function results          |    no    |  no   |
 | [`constant-logical-expr`](./RULES_DESCRIPTIONS.md#constant-logical-expr)   |  n/a   | Warns on constant logical expressions                        |    no    |  no   |
 | [`context-as-argument`](./RULES_DESCRIPTIONS.md#context-as-argument) |  n/a   | `context.Context` should be the first argument of a function.    |   yes    |  no   |
-| [`context-keys-type`](./RULES_DESCRIPTIONS.md#context-key-types)   |  n/a   | Disallows the usage of basic types in `context.WithValue`.       |   yes    |  yes  |
+| [`context-keys-type`](./RULES_DESCRIPTIONS.md#context-keys-type)   |  n/a   | Disallows the usage of basic types in `context.WithValue`.       |   yes    |  yes  |
 | [`cyclomatic`](./RULES_DESCRIPTIONS.md#cyclomatic)          |  int (defaults to 10)   | Sets restriction for maximum Cyclomatic complexity.              |    no    |  no   |
 | [`datarace`](./RULES_DESCRIPTIONS.md#datarace)          |  n/a   |  Spots potential dataraces |    no    |  no   |
 | [`deep-exit`](./RULES_DESCRIPTIONS.md#deep-exit)           |  n/a   | Looks for program exits in funcs other than `main()` or `init()` |    no    |  no   |
@@ -531,8 +530,9 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`dot-imports`](./RULES_DESCRIPTIONS.md#dot-imports)         |  n/a   | Forbids `.` imports.                                             |   yes    |  no   |
 | [`duplicated-imports`](./RULES_DESCRIPTIONS.md#duplicated-imports) | n/a  | Looks for packages that are imported two or more times   |    no    |  no   |
 | [`early-return`](./RULES_DESCRIPTIONS.md#early-return)          | []string   | Spots if-then-else statements where the predicate may be inverted to reduce nesting |    no    |  no   |
-| [`empty-block`](./RULES_DESCRIPTIONS.md#empty-block)         |  n/a   | Warns on empty code blocks                                       |    no    |  yes   |
+| [`empty-block`](./RULES_DESCRIPTIONS.md#empty-block)         |  n/a   | Warns on empty code blocks                                       |    no    |  no   |
 | [`empty-lines`](./RULES_DESCRIPTIONS.md#empty-lines)   | n/a | Warns when there are heading or trailing newlines in a block              |    no    |  no   |
+| [`epoch-naming`](./RULES_DESCRIPTIONS.md#epoch-naming)      |  n/a   | Enforces naming conventions for epoch time variables       |    no    |  yes   |
 | [`enforce-map-style`](./RULES_DESCRIPTIONS.md#enforce-map-style) |  string (defaults to "any")  |  Enforces consistent usage of `make(map[type]type)` or `map[type]type{}` for map initialization. Does not affect `make(map[type]type, size)` constructions. |    no    |  no   |
 | [`enforce-repeated-arg-type-style`](./RULES_DESCRIPTIONS.md#enforce-repeated-arg-type-style) |  string (defaults to "any")  |  Enforces consistent style for repeated argument and/or return value types. |    no    |  no   |
 | [`enforce-slice-style`](./RULES_DESCRIPTIONS.md#enforce-slice-style) |  string (defaults to "any")  |  Enforces consistent usage of `make([]type, 0)` or `[]type{}` for slice initialization. Does not affect `make(map[type]type, non_zero_len, or_non_zero_cap)` constructions. |    no    |  no   |
@@ -563,6 +563,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`indent-error-flow`](./RULES_DESCRIPTIONS.md#indent-error-flow)   |  []string   | Prevents redundant else statements.                              |   yes    |  no   |
 | [`inefficient-map-lookup`](./RULES_DESCRIPTIONS.md#inefficient-map-lookup)   |  n/a  | Spots iterative searches for a key in a map           |   no    |  yes   |
 | [`line-length-limit`](./RULES_DESCRIPTIONS.md#line-length-limit)   | int (defaults to 80) | Specifies the maximum number of characters in a line             |    no    |  no   |
+| [`marshal-receiver`](./RULES_DESCRIPTIONS.md#marshal-receiver) |  n/a   | Checks receiver type consistency for common marshal/unmarshal methods. |    no    |  no   |
 | [`max-control-nesting`](./RULES_DESCRIPTIONS.md#max-control-nesting) |  int (defaults to 5)  | Sets restriction for maximum nesting of control structures. |    no    |  no   |
 | [`max-public-structs`](./RULES_DESCRIPTIONS.md#max-public-structs)  |  int (defaults to 5)  | The maximum number of public structs in a file.                  |    no    |  no   |
 | [`modifies-parameter`](./RULES_DESCRIPTIONS.md#modifies-parameter)  |  n/a   | Warns on assignments to function parameters                      |    no    |  no   |
@@ -570,6 +571,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`nested-structs`](./RULES_DESCRIPTIONS.md#nested-structs)          |  n/a   |  Warns on structs within structs |    no    |  no   |
 | [`optimize-operands-order`](./RULES_DESCRIPTIONS.md#optimize-operands-order)          |  n/a   |  Checks inefficient conditional expressions |    no    |  no   |
 | [`package-comments`](./RULES_DESCRIPTIONS.md#package-comments)    |  n/a   | Package commenting conventions.                                  |   yes    |  no   |
+| [`package-naming`](./RULES_DESCRIPTIONS.md#package-naming)    |  map   | Checks that package names follow Go conventions and best practices |   no    |  no   |
 | [`package-directory-mismatch`](./RULES_DESCRIPTIONS.md#package-directory-mismatch)    | string | Checks that package name matches containing directory name     |   no    |  no   |
 | [`range-val-address`](./RULES_DESCRIPTIONS.md#range-val-address)|  n/a   | Warns if address of range value is used dangerously |    no    |  yes   |
 | [`range-val-in-closure`](./RULES_DESCRIPTIONS.md#range-val-in-closure)|  n/a   | Warns if range value is used in a closure dispatched as goroutine|    no    |  no   |
@@ -583,10 +585,10 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`string-of-int`](./RULES_DESCRIPTIONS.md#string-of-int)          |  n/a   | Warns on suspicious casts from int to string            |    no    |  yes   |
 | [`struct-tag`](./RULES_DESCRIPTIONS.md#struct-tag)          |  []string   | Checks common struct tags like `json`, `xml`, `yaml`               |    no    |  no   |
 | [`superfluous-else`](./RULES_DESCRIPTIONS.md#superfluous-else)    |  []string   | Prevents redundant else statements (extends [`indent-error-flow`](./RULES_DESCRIPTIONS.md#indent-error-flow)) |    no    |  no   |
-| [`time-date`](./RULES_DESCRIPTIONS.md#time-date)         |  n/a   | Reports bad usage of `time.Date`.                 |   no    |  yes  |
+| [`time-date`](./RULES_DESCRIPTIONS.md#time-date)         |  n/a   | Reports bad usage of `time.Date`.                 |   no    |  no   |
 | [`time-equal`](./RULES_DESCRIPTIONS.md#time-equal)         |  n/a   | Suggests to use `time.Time.Equal` instead of `==` and `!=` for equality check time.                 |   no    |  yes  |
 | [`time-naming`](./RULES_DESCRIPTIONS.md#time-naming)         |  n/a   | Conventions around the naming of time variables.                 |   yes    |  yes  |
-| [`unchecked-type-assertions`](./RULES_DESCRIPTIONS.md#unchecked-type-assertions)         |  n/a   | Disallows type assertions without checking the result.                 |   no    |  yes  |
+| [`unchecked-type-assertion`](./RULES_DESCRIPTIONS.md#unchecked-type-assertion)         |  n/a   | Disallows type assertions without checking the result.                 |   no    |  no   |
 | [`unconditional-recursion`](./RULES_DESCRIPTIONS.md#unconditional-recursion)          |  n/a   | Warns on function calls that will lead to (direct) infinite recursion |    no    |  no   |
 | [`unexported-naming`](./RULES_DESCRIPTIONS.md#unexported-naming)          |  n/a   |  Warns on wrongly named un-exported symbols       |    no    |  no   |
 | [`unexported-return`](./RULES_DESCRIPTIONS.md#unexported-return)   |  n/a   | Warns when a public return is from unexported type.              |   yes    |  yes  |
@@ -601,6 +603,7 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`use-any`](./RULES_DESCRIPTIONS.md#use-any)          |  n/a   |  Proposes to replace `interface{}` with its alias `any` |    no    |  no   |
 | [`use-errors-new`](./RULES_DESCRIPTIONS.md#use-errors-new) | n/a   | Spots calls to `fmt.Errorf` that can be replaced by `errors.New` |   no    |  no   |
 | [`use-fmt-print`](./RULES_DESCRIPTIONS.md#use-fmt-print) | n/a   | Proposes to replace calls to built-in `print` and `println` with their equivalents from `fmt`. |   no    |  no   |
+| [`use-slices-sort`](./RULES_DESCRIPTIONS.md#use-slices-sort) | n/a   | Proposes to replace calls to `sort.Ints`, `sort.Strings` and the like with their equivalents from `slices` package. |   no    |  no   |
 | [`use-waitgroup-go`](./RULES_DESCRIPTIONS.md#use-waitgroup-go)          |  n/a   |  Proposes to replace `wg.Add ... go {... wg.Done ...}` idiom with `wg.Go` |    no    |  no   |
 | [`useless-break`](./RULES_DESCRIPTIONS.md#useless-break)          |  n/a   |  Warns on useless `break` statements in case clauses |    no    |  no   |
 | [`useless-fallthrough`](./RULES_DESCRIPTIONS.md#useless-fallthrough)  |  n/a   |  Warns on useless `fallthrough` statements in case clauses |    no    |  no   |
@@ -608,21 +611,15 @@ List of all available rules. The rules ported from `golint` are left unchanged a
 | [`var-naming`](./RULES_DESCRIPTIONS.md#var-naming)          |  allowlist & blocklist of initialisms   | Naming rules.                                                    |   yes    |  no   |
 | [`waitgroup-by-value`](./RULES_DESCRIPTIONS.md#waitgroup-by-value)  |  n/a   | Warns on functions taking sync.WaitGroup as a by-value parameter |    no    |  no   |
 
+ The rules ported from `golint` are left unchanged and indicated in the "golint" column.
+
+ The rules in the "Typed" column use the type system, which depends on the `GOROOT` and `GOPATH` environment variables.
+ Therefore, if `revive` binary is built with `-trimpath` or run on GitHub Actions, these rules may not work as expected.
+ See [#1277](https://github.com/mgechev/revive/issues/1277) for details.
+
 ## Configurable rules
 
-Here you can find how you can configure some existing rules:
-
-### `var-naming`
-
-This rule accepts two slices of strings, an allowlist and a blocklist of initialisms. By default, the rule behaves exactly as the alternative
-in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
-
-```toml
-[rule.var-naming]
-arguments = [["ID"], ["VM"]]
-```
-
-This way, revive will not warn for an identifier called `customId` but will warn that `customVm` should be called `customVM`.
+A lot of rules can be configured. See [RULES_DESCRIPTIONS.md](./RULES_DESCRIPTIONS.md) for the list of all configurable rules and their options.
 
 ## Available Formatters
 
@@ -681,7 +678,7 @@ The tool can be extended with custom rules or formatters. This section contains 
 To extend the linter with a custom rule you can push it to this repository or use `revive` as a library (see below)
 
 To add a custom formatter you'll have to push it to this repository or fork it.
-This is due to the limited `-buildmode=plugin` support which [works only on Linux (with known issues)](https://golang.org/pkg/plugin/).
+This is due to the limited `-buildmode=plugin` support which [works only on Linux (with known issues)](https://pkg.go.dev/plugin).
 
 ### Writing a Custom Rule
 
@@ -886,9 +883,9 @@ _Open a PR to add your project_.
 
 ### Maintainers
 
-[<img alt="mgechev" src="https://avatars.githubusercontent.com/u/455023?v=4&s=100" width="100">](https://github.com/mgechev) |[<img alt="chavacava" src="https://avatars.githubusercontent.com/u/25788468?v=4&s=100" width="100">](https://github.com/chavacava) |[<img alt="denisvmedia" src="https://avatars.githubusercontent.com/u/5462781?v=4&s=100" width="100">](https://github.com/denisvmedia) |[<img alt="alexandear" src="https://avatars.githubusercontent.com/u/3228886?v=4&s=100" width="100">](https://github.com/alexandear) |
-:---: |:---: |:---: |:---: |
-[mgechev](https://github.com/mgechev) |[chavacava](https://github.com/chavacava) |[denisvmedia](https://github.com/denisvmedia) |[alexandear](https://github.com/alexandear) |
+| [<img alt="mgechev" src="https://avatars.githubusercontent.com/u/455023?v=4&s=100" width="100">](https://github.com/mgechev) | [<img alt="chavacava" src="https://avatars.githubusercontent.com/u/25788468?v=4&s=100" width="100">](https://github.com/chavacava) | [<img alt="denisvmedia" src="https://avatars.githubusercontent.com/u/5462781?v=4&s=100" width="100">](https://github.com/denisvmedia) | [<img alt="alexandear" src="https://avatars.githubusercontent.com/u/3228886?v=4&s=100" width="100">](https://github.com/alexandear) |
+|---|---|---|---|
+| [mgechev](https://github.com/mgechev) | [chavacava](https://github.com/chavacava) | [denisvmedia](https://github.com/denisvmedia) | [alexandear](https://github.com/alexandear) |
 
 ### All
 
@@ -896,6 +893,16 @@ This project exists thanks to all the people who contribute.
 
 <a href="https://github.com/mgechev/revive/graphs/contributors">
   <img alt="All Contributors" src="https://contrib.rocks/image?repo=mgechev/revive&max=500" />
+</a>
+
+## Star History
+
+<a href="https://www.star-history.com/#mgechev/revive&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=mgechev/revive&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=mgechev/revive&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=mgechev/revive&type=date&legend=top-left" />
+ </picture>
 </a>
 
 ## License

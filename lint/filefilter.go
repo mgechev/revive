@@ -41,6 +41,7 @@ func ParseFileFilter(rawFilter string) (*FileFilter, error) {
 	return result, nil
 }
 
+// String returns the original raw filter definition as it appears in the configuration.
 func (ff *FileFilter) String() string { return ff.raw }
 
 // MatchFileName checks if the file name matches the filter.

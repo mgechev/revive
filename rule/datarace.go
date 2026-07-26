@@ -11,7 +11,8 @@ import (
 //nolint:staticcheck // TODO: ast.Object is deprecated
 type nodeUID *ast.Object // type of the unique id for AST nodes
 
-// DataRaceRule lints assignments to value method-receivers.
+// DataRaceRule spots potential dataraces caused by goroutines capturing (by-reference)
+// particular identifiers of the function from which goroutines are created.
 type DataRaceRule struct{}
 
 // Apply applies the rule to given file.
@@ -65,7 +66,6 @@ func (*DataRaceRule) extractReturnIDs(fields []*ast.Field) map[nodeUID]struct{} 
 }
 
 type lintFunctionForDataRaces struct {
-	_         struct{}
 	onFailure func(failure lint.Failure)
 	returnIDs map[nodeUID]struct{}
 	rangeIDs  map[nodeUID]struct{}

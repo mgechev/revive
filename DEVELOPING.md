@@ -21,23 +21,34 @@ make build
 
 The command will produce the `revive` binary in the root of the project.
 
-## Debug
+## Logging
 
-To enable debug logging, set the `DEBUG` environment variable:
+By default, any logging output is disabled when `REVIVE_LOG_LEVEL` is unset or empty.
+You can enable and customize the log level using the `REVIVE_LOG_LEVEL` environment variable.
+Supported values are:
+
+- `debug`: log all messages including debug-level information
+- `info`: log informational messages and above
+- `warn`: log warnings and errors; also used as a fallback when `REVIVE_LOG_LEVEL` is set to an invalid value
+- `error`: log errors only
+
+Logs are output to stderr:
 
 ```sh
-DEBUG=1 go run main.go
+REVIVE_LOG_LEVEL=debug go run main.go
 ```
-
-This will output debug information to `stderr` and to the log file `revive.log` created in the current working directory.
 
 ## Coding standards
 
-Follow [the instructions](.github/instructions/) which contain Go coding standards and conventions used by both humans and GitHub Copilot.
+Follow [the instructions](./.github/instructions/go.instructions.md) which contain Go coding standards and conventions used by both humans and
+GitHub Copilot.
 
 ## Development of rules
 
 If you want to develop a new rule, follow as an example the already existing rules in the [rule package](https://github.com/mgechev/revive/tree/master/rule).
+
+When adding a new rule that does not require type information (for example, a rule that does not call `file.Pkg.TypeCheck()` and works purely on syntax/AST),
+add its name to `untyped.toml` and keep that file in sync with any such rules.
 
 Each rule needs to implement the `lint.Rule` interface:
 

@@ -1,0 +1,4 @@
+ignore-generated-header = false
+severity = "warning"
+error-code = 0
+warning-code = 0

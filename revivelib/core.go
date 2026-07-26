@@ -2,6 +2,7 @@
 package revivelib
 
 import (
+	"flag"
 	"fmt"
 	"log/slog"
 	"maps"
@@ -25,7 +26,7 @@ type Revive struct {
 	maxOpenFiles int
 }
 
-// New creates a new instance of Revive lint runner.
+// New creates a new instance of [Revive] lint runner.
 func New(
 	conf *lint.Config,
 	setExitStatus bool,
@@ -97,13 +98,14 @@ func (r *Revive) Lint(patterns ...*LintPattern) (<-chan lint.Failure, error) {
 	}
 
 	revive := lint.New(func(file string) ([]byte, error) {
-		contents, err := os.ReadFile(file)
+		contents, err := os.ReadFile(file) //nolint:gosec // ignore G304: potential file inclusion via variable
 		if err != nil {
 			return nil, fmt.Errorf("reading file %v: %w", file, err)
 		}
 
 		return contents, nil
 	}, r.maxOpenFiles)
+	revive.SetLogger(r.logger)
 
 	failures, err := revive.Lint(packages, r.lintingRules, *r.config)
 	if err != nil {
@@ -113,7 +115,7 @@ func (r *Revive) Lint(patterns ...*LintPattern) (<-chan lint.Failure, error) {
 	return failures, nil
 }
 
-// Format gets the output for a given failures channel from Lint.
+// Format gets the output for a given failures channel from [Revive.Lint].
 func (r *Revive) Format(
 	formatterName string,
 	failuresChan <-chan lint.Failure,
@@ -196,8 +198,12 @@ func normalizeSplit(strs []string) []string {
 }
 
 // ArrayFlags type for string list.
+// Implements [flag.Value] interface, to be used in command line arguments.
 type ArrayFlags []string
 
+var _ flag.Value = (*ArrayFlags)(nil)
+
+// String returns the space-separated representation of the ArrayFlags.
 func (i *ArrayFlags) String() string {
 	return strings.Join([]string(*i), " ")
 }

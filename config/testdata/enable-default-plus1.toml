@@ -1,0 +1,6 @@
+# Enable default rules with a non-default rule
+
+enable-default-rules = true
+
+# Add a non-default rule
+[rule.cyclomatic]

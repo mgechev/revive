@@ -1,4 +1,4 @@
-package test
+package test_test
 
 import (
 	"testing"
@@ -13,7 +13,7 @@ func TestStructTag(t *testing.T) {
 
 func TestStructTagWithUserOptions(t *testing.T) {
 	testRule(t, "struct_tag_user_options", &rule.StructTagRule{}, &lint.RuleConfig{
-		Arguments: []any{
+		Arguments: lint.Arguments{
 			"json,inline,outline",
 			"bson,gnu",
 			"url,myURLOption",
@@ -30,7 +30,7 @@ func TestStructTagWithUserOptions(t *testing.T) {
 
 func TestStructTagWithOmittedTags(t *testing.T) {
 	testRule(t, "struct_tag_user_options_omit", &rule.StructTagRule{}, &lint.RuleConfig{
-		Arguments: []any{
+		Arguments: lint.Arguments{
 			"!validate",
 			"!toml",
 			"json,inline,outline",

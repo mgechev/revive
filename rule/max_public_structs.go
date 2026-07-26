@@ -25,11 +25,6 @@ func (r *MaxPublicStructsRule) Configure(arguments lint.Arguments) error {
 		return nil
 	}
 
-	err := checkNumberOfArguments(1, arguments, r.Name())
-	if err != nil {
-		return err
-	}
-
 	maxStructs, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok {
 		return errors.New(`invalid value passed as argument number to the "max-public-structs" rule`)

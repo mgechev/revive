@@ -2,12 +2,12 @@ package lint
 
 import (
 	"bytes"
-	"errors"
 	"go/ast"
 	"go/parser"
 	"go/printer"
 	"go/token"
 	"go/types"
+	"log/slog"
 	"math"
 	"regexp"
 	"strings"
@@ -19,6 +19,7 @@ type File struct {
 	Pkg     *Package
 	content []byte
 	AST     *ast.File
+	logger  *slog.Logger
 }
 
 // IsTest returns if the file contains tests.
@@ -57,6 +58,7 @@ func NewFile(name string, content []byte, pkg *Package) (*File, error) {
 		content: content,
 		Pkg:     pkg,
 		AST:     f,
+		logger:  slog.New(slog.DiscardHandler),
 	}, nil
 }
 
@@ -112,21 +114,33 @@ func (f *File) isMain() bool {
 	return f.AST.Name.Name == "main"
 }
 
-const directiveSpecifyDisableReason = "specify-disable-reason"
+const (
+	directiveSpecifyDisableReason = "specify-disable-reason"
+	directiveSpecifyDisableRule   = "specify-disable-rule"
+)
 
 func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 	rulesConfig := config.Rules
 	_, mustSpecifyDisableReason := config.Directives[directiveSpecifyDisableReason]
-	disabledIntervals := f.disabledIntervals(rules, mustSpecifyDisableReason, failures)
+	_, mustSpecifyDisableRules := config.Directives[directiveSpecifyDisableRule]
+	disabledIntervals := f.disabledIntervals(rules, mustSpecifyDisableReason, mustSpecifyDisableRules, failures)
 	for _, currentRule := range rules {
 		ruleConfig := rulesConfig[currentRule.Name()]
 		if ruleConfig.MustExclude(f.Name) {
 			continue
 		}
 		currentFailures := currentRule.Apply(f, ruleConfig.Arguments)
-		for idx, failure := range currentFailures {
+		filtered := currentFailures[:0]
+		for _, failure := range currentFailures {
+			// Log and skip internal failures: they signal a rule could not run on this file,
+			// but other rules can still produce useful reports.
 			if failure.IsInternal() {
-				return errors.New(failure.Failure)
+				f.logger.Warn("rule skipped due to internal failure",
+					"rule", currentRule.Name(),
+					"file", f.Name,
+					"failure", failure.Failure,
+				)
+				continue
 			}
 
 			if failure.RuleName == "" {
@@ -135,9 +149,9 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 			if failure.Node != nil {
 				failure.Position = ToFailurePosition(failure.Node.Pos(), failure.Node.End(), f)
 			}
-			currentFailures[idx] = failure
+			filtered = append(filtered, failure)
 		}
-		currentFailures = f.filterFailures(currentFailures, disabledIntervals)
+		currentFailures = f.filterFailures(filtered, disabledIntervals)
 		for _, failure := range currentFailures {
 			if failure.Confidence >= config.Confidence {
 				failures <- failure
@@ -163,7 +177,7 @@ const (
 
 var directiveRegexp = regexp.MustCompile(`^//[\s]*revive:(enable|disable)(?:-(line|next-line))?(?::([^\s]+))?[\s]*(?: (.+))?$`)
 
-func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, failures chan Failure) disabledIntervalsMap {
+func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason, mustSpecifyDisableRules bool, failures chan Failure) disabledIntervalsMap {
 	enabledDisabledRulesMap := map[string][]enableDisableConfig{}
 
 	getEnabledDisabledIntervals := func() disabledIntervalsMap {
@@ -235,9 +249,8 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, fa
 				continue
 			}
 			ruleNames := []string{}
-			tempNames := strings.Split(match[rulesPos], ",")
 
-			for _, name := range tempNames {
+			for name := range strings.SplitSeq(match[rulesPos], ",") {
 				name = strings.Trim(name, "\n")
 				if name != "" {
 					ruleNames = append(ruleNames, name)
@@ -250,6 +263,18 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, fa
 					Confidence: 1,
 					RuleName:   directiveSpecifyDisableReason,
 					Failure:    "reason of lint disabling not found",
+					Position:   ToFailurePosition(c.Pos(), c.End(), f),
+					Node:       c,
+				}
+				continue // skip this linter disabling directive
+			}
+
+			mustCheckDisablingRules := mustSpecifyDisableRules && match[directivePos] == "disable"
+			if mustCheckDisablingRules && len(ruleNames) == 0 {
+				failures <- Failure{
+					Confidence: 1,
+					RuleName:   directiveSpecifyDisableRule,
+					Failure:    "rule name for lint disabling not found",
 					Position:   ToFailurePosition(c.Pos(), c.End(), f),
 					Node:       c,
 				}
@@ -274,7 +299,7 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason bool, fa
 	return getEnabledDisabledIntervals()
 }
 
-func (File) filterFailures(failures []Failure, disabledIntervals disabledIntervalsMap) []Failure {
+func (*File) filterFailures(failures []Failure, disabledIntervals disabledIntervalsMap) []Failure {
 	result := []Failure{}
 	for _, failure := range failures {
 		fStart := failure.Position.Start.Line

@@ -11,7 +11,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// DeepExitRule lints program exit at functions other than main or init.
+// DeepExitRule lints program exit in functions other than main or init.
 type DeepExitRule struct{}
 
 // Apply applies the rule to given file.
@@ -65,7 +65,7 @@ func (w *lintDeepExit) Visit(node ast.Node) ast.Visitor {
 
 	pkg := id.Name
 	fn := fc.Sel.Name
-	if isCallToExitFunction(pkg, fn, ce.Args) {
+	if astutils.IsCallToExitFunction(pkg, fn, ce.Args) {
 		msg := fmt.Sprintf("calls to %s.%s only in main() or init() functions", pkg, fn)
 
 		if pkg == "flag" && fn == "NewFlagSet" &&

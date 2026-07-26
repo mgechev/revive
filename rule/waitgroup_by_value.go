@@ -7,7 +7,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// WaitGroupByValueRule lints sync.WaitGroup passed by copy in functions.
+// WaitGroupByValueRule lints [sync.WaitGroup] passed by copy in functions.
 type WaitGroupByValueRule struct{}
 
 // Apply applies the rule to given file.

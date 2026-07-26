@@ -7,7 +7,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// BoolLiteralRule warns when logic expressions contains Boolean literals.
+// BoolLiteralRule warns when logic expressions contain boolean literals.
 type BoolLiteralRule struct{}
 
 // Apply applies the rule to given file.
@@ -61,7 +61,7 @@ func (w *lintBoolLiteral) Visit(node ast.Node) ast.Visitor {
 	return w
 }
 
-func (w lintBoolLiteral) addFailure(node ast.Node, msg string, cat lint.FailureCategory) {
+func (w *lintBoolLiteral) addFailure(node ast.Node, msg string, cat lint.FailureCategory) {
 	w.onFailure(lint.Failure{
 		Confidence: 1,
 		Node:       node,

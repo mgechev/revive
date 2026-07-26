@@ -3,10 +3,35 @@
   "extends": [
     "config:recommended"
   ],
+  "minimumReleaseAge": "7 days",
+  "internalChecksFilter": "strict",
   "packageRules": [
     {
       "matchManagers": ["gomod"],
+      "matchFileNames": ["go.mod"],
+      "matchDepTypes": ["direct"],
+      "groupName": "gomod",
+      "extends": ["schedule:monthly"],
+      "enabled": true
+    },
+    {
+      "matchManagers": ["gomod"],
+      "matchFileNames": ["go.mod", "tools/go.mod"],
       "matchDepTypes": ["indirect"],
+      "enabled": false
+    },
+    {
+      "matchManagers": ["gomod"],
+      "matchFileNames": ["tools/go.mod"],
+      "matchDepTypes": ["direct"],
+      "groupName": "tools gomod",
+      "extends": ["schedule:monthly"],
+      "enabled": true
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions",
+      "extends": ["schedule:monthly"],
       "enabled": true
     }
   ],

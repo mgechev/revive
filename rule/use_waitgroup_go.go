@@ -7,7 +7,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// UseWaitGroupGoRule spots Go idioms that might be rewritten using WaitGroup.Go.
+// UseWaitGroupGoRule spots Go idioms that might be rewritten using [sync.WaitGroup.Go].
 type UseWaitGroupGoRule struct{}
 
 // Apply applies the rule to given file.
@@ -98,28 +98,54 @@ func (w *lintUseWaitGroupGo) analyzeBlock(b *ast.BlockStmt) {
 		// we will iterate from the (i+1)-th statement up to the last statement of block.List
 		for i++; i < len(stmts); i++ {
 			stmt := stmts[i]
-			// looking for a go statement
-			goStmt, ok := stmt.(*ast.GoStmt)
-			if !ok {
-				continue // not a go statement
-			}
-
-			// here we found a the go statement
-			// now let's check is the go statement is applied to a function literal that contains a wg.Done
-			if !w.hasCallToWgDone(goStmt) {
+			// looking for a go statement (directly or inside a for/range loop)
+			goStmt := w.findGoStmtWithWgDone(stmt)
+			if goStmt == nil {
 				continue
 			}
 
 			w.onFailure(lint.Failure{
 				Confidence: 1,
 				Node:       call,
-				Category:   lint.FailureCategoryCodeStyle,
+				Category:   lint.FailureCategoryStyle,
 				Failure:    "replace wg.Add()...go {...wg.Done()...} with wg.Go(...)",
 			})
 
 			break
 		}
 	}
+}
+
+// findGoStmtWithWgDone returns the first go statement with wg.Done found in stmt,
+// searching directly and one level deep inside for/range loop bodies.
+// Returns nil if no such go statement is found.
+func (w *lintUseWaitGroupGo) findGoStmtWithWgDone(stmt ast.Stmt) *ast.GoStmt {
+	switch s := stmt.(type) {
+	case *ast.GoStmt:
+		if w.hasCallToWgDone(s) {
+			return s
+		}
+	case *ast.ForStmt:
+		return w.seekGoStmtWithWgDoneInBlock(s.Body)
+	case *ast.RangeStmt:
+		return w.seekGoStmtWithWgDoneInBlock(s.Body)
+	}
+	return nil
+}
+
+// seekGoStmtWithWgDoneInBlock returns the first go statement with wg.Done
+// found as a direct child of block, or nil if none is found.
+func (w *lintUseWaitGroupGo) seekGoStmtWithWgDoneInBlock(block *ast.BlockStmt) *ast.GoStmt {
+	if block == nil {
+		return nil
+	}
+	for _, s := range block.List {
+		goStmt, ok := s.(*ast.GoStmt)
+		if ok && w.hasCallToWgDone(goStmt) {
+			return goStmt
+		}
+	}
+	return nil
 }
 
 // hasCallToWgDone returns true if the given go statement
@@ -150,7 +176,7 @@ func (*lintUseWaitGroupGo) isCallToWgAdd(stmt ast.Stmt) bool {
 	return ok && astutils.IsPkgDotName(call.Fun, "wg", "Add")
 }
 
-// function used when calling astutils.SeekNode that search for calls to wg.Done.
+// wgDonePicker is used when calling astutils.SeekNode that search for calls to wg.Done.
 func wgDonePicker(n ast.Node) bool {
 	call, ok := n.(*ast.CallExpr)
 	result := ok && astutils.IsPkgDotName(call.Fun, "wg", "Done")

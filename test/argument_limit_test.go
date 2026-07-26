@@ -1,4 +1,4 @@
-package test
+package test_test
 
 import (
 	"testing"
@@ -13,13 +13,12 @@ func TestArgumentsLimitDefault(t *testing.T) {
 
 func TestArgumentsLimit(t *testing.T) {
 	testRule(t, "argument_limit", &rule.ArgumentsLimitRule{}, &lint.RuleConfig{
-		Arguments: []any{int64(3)},
+		Arguments: lint.Arguments{int64(3)},
 	})
 }
 
 func BenchmarkArgumentsLimit(b *testing.B) {
-	var t *testing.T
-	for i := 0; i <= b.N; i++ {
-		testRule(t, "argument_limit_default", &rule.ArgumentsLimitRule{}, &lint.RuleConfig{})
+	for b.Loop() {
+		testRule(b, "argument_limit_default", &rule.ArgumentsLimitRule{}, &lint.RuleConfig{})
 	}
 }

@@ -1,4 +1,4 @@
-package test
+package test_test
 
 import (
 	"testing"
@@ -13,6 +13,6 @@ func TestLineLengthLimitDefault(t *testing.T) {
 
 func TestLineLengthLimit(t *testing.T) {
 	testRule(t, "line_length_limit", &rule.LineLengthLimitRule{}, &lint.RuleConfig{
-		Arguments: []any{int64(100)},
+		Arguments: lint.Arguments{int64(100)},
 	})
 }

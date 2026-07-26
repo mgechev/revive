@@ -99,7 +99,7 @@ func (w *lintInefficientMapLookup) analyzeBlock(b *ast.BlockStmt) {
 		w.onFailure(lint.Failure{
 			Confidence: 1,
 			Node:       rangeOverMap,
-			Category:   lint.FailureCategoryCodeStyle,
+			Category:   lint.FailureCategoryStyle,
 			Failure:    "inefficient lookup of map key",
 		})
 	}
@@ -153,6 +153,11 @@ func (w *lintInefficientMapLookup) isRangeOverMapKey(stmt ast.Stmt) bool {
 	rangeStmt, ok := stmt.(*ast.RangeStmt)
 	if !ok {
 		return false // not a range
+	}
+
+	// Check if we range on the key
+	if rangeStmt.Key == nil {
+		return false // no key in range
 	}
 
 	// Check if we range only on key

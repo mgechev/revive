@@ -24,6 +24,9 @@ config:
   # MD055/table-pipe-style : Table pipe style : https://github.com/DavidAnson/markdownlint/blob/HEAD/doc/md055.md
   MD055: false
 
+  # MD060/table-column-style : Table column style : https://github.com/DavidAnson/markdownlint/blob/HEAD/doc/md060.md
+  MD060: false
+
 # Define glob expressions to use
 globs:
   - "*.md"

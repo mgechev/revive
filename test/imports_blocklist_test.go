@@ -1,4 +1,4 @@
-package test
+package test_test
 
 import (
 	"testing"
@@ -8,27 +8,21 @@ import (
 )
 
 func TestImportsBlocklistOriginal(t *testing.T) {
-	args := []any{"crypto/md5", "crypto/sha1"}
-
 	testRule(t, "imports_blocklist_original", &rule.ImportsBlocklistRule{}, &lint.RuleConfig{
-		Arguments: args,
+		Arguments: lint.Arguments{"crypto/md5", "crypto/sha1"},
 	})
 }
 
 func TestImportsBlocklist(t *testing.T) {
-	args := []any{"github.com/full/match", "wildcard/**/between", "wildcard/backward/**", "**/wildcard/forward", "full"}
-
 	testRule(t, "imports_blocklist", &rule.ImportsBlocklistRule{}, &lint.RuleConfig{
-		Arguments: args,
+		Arguments: lint.Arguments{"github.com/full/match", "wildcard/**/between", "wildcard/backward/**", "**/wildcard/forward", "full"},
 	})
 }
 
 func BenchmarkImportsBlocklist(b *testing.B) {
-	args := []any{"github.com/full/match", "wildcard/**/between", "wildcard/backward/**", "**/wildcard/forward", "full"}
-	var t *testing.T
-	for i := 0; i <= b.N; i++ {
-		testRule(t, "imports_blocklist", &rule.ImportsBlocklistRule{}, &lint.RuleConfig{
-			Arguments: args,
+	for b.Loop() {
+		testRule(b, "imports_blocklist", &rule.ImportsBlocklistRule{}, &lint.RuleConfig{
+			Arguments: lint.Arguments{"github.com/full/match", "wildcard/**/between", "wildcard/backward/**", "**/wildcard/forward", "full"},
 		})
 	}
 }

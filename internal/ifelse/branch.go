@@ -9,11 +9,12 @@ import (
 // Branch contains information about a branch within an if-else chain.
 type Branch struct {
 	BranchKind
-	Call  // The function called at the end for kind Panic or Exit.
+	Call // The function called at the end for kind Panic or Exit.
+
 	block []ast.Stmt
 }
 
-// BlockBranch gets the Branch of an ast.BlockStmt.
+// BlockBranch gets the Branch of an [ast.BlockStmt].
 func BlockBranch(block *ast.BlockStmt) Branch {
 	blockLen := len(block.List)
 	if blockLen == 0 {
@@ -25,7 +26,7 @@ func BlockBranch(block *ast.BlockStmt) Branch {
 	return branch
 }
 
-// StmtBranch gets the Branch of an ast.Stmt.
+// StmtBranch gets the Branch of an [ast.Stmt].
 func StmtBranch(stmt ast.Stmt) Branch {
 	switch stmt := stmt.(type) {
 	case *ast.ReturnStmt:

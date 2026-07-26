@@ -1,0 +1,3 @@
+# Enable only default rules
+
+enable-default-rules = true

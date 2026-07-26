@@ -13,6 +13,8 @@ type SuperfluousElseRule struct {
 	preserveScope bool
 }
 
+var _ lint.ConfigurableRule = (*SuperfluousElseRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

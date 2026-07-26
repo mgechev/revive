@@ -95,7 +95,7 @@ func (v *cognitiveComplexityVisitor) subTreeComplexity(n ast.Node) int {
 	return v.complexity
 }
 
-// Visit implements the ast.Visitor interface.
+// Visit implements the [ast.Visitor] interface.
 func (v *cognitiveComplexityVisitor) Visit(n ast.Node) ast.Visitor {
 	switch n := n.(type) {
 	case *ast.IfStmt:

@@ -4,8 +4,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/fatih/color"
-
 	"github.com/mgechev/revive/config"
 	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/revivelib"
@@ -38,6 +36,7 @@ func TestReviveLint(t *testing.T) {
 }
 
 func TestReviveFormat(t *testing.T) {
+	t.Setenv("NO_COLOR", "true")
 	// ARRANGE
 	revive := getMockRevive(t)
 
@@ -47,7 +46,6 @@ func TestReviveFormat(t *testing.T) {
 	}
 
 	// ACT
-	color.NoColor = true
 	failures, exitCode, err := revive.Format("stylish", failuresChan)
 	// ASSERT
 	if err != nil {

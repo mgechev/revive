@@ -23,7 +23,7 @@ var DeviatingFuncs = map[Call]BranchKind{
 	{"log", "Panicln"}: Panic,
 }
 
-// ExprCall gets the Call of an ExprStmt, if any.
+// ExprCall gets the [Call] of an [ast.ExprStmt], if any.
 func ExprCall(expr *ast.ExprStmt) (Call, bool) {
 	call, ok := expr.X.(*ast.CallExpr)
 	if !ok {

@@ -60,4 +60,11 @@ func inefficientMapLookup() {
 		}
 		fmt.Println(key)
 	}
+
+	// Test case for issue #1601
+	var count int
+	for range aMap {
+		count++
+	}
+	_ = count
 }

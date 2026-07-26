@@ -51,3 +51,19 @@ func useWaitGroupGo() {
 	}()
 	wg.Wait()
 }
+
+// from https://github.com/kubernetes-sigs/kueue/blob/4f2d0d2ef10c634daa4766be5f308fe2cda7503a/cmd/importer/util/util.go#L260
+func concurrentJobs(jobs uint) {
+	wg := sync.WaitGroup{}
+
+	wg.Add(int(jobs)) // MATCH /replace wg.Add()...go {...wg.Done()...} with wg.Go(...)/
+
+	for range int(jobs) {
+		go func() {
+			defer wg.Done()
+			doSomething()
+		}()
+	}
+
+	wg.Wait()
+}

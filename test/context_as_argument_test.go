@@ -1,4 +1,4 @@
-package test
+package test_test
 
 import (
 	"testing"
@@ -13,14 +13,14 @@ func TestContextAsArgumentDefault(t *testing.T) {
 
 func TestContextAsArgument(t *testing.T) {
 	testRule(t, "context_as_argument", &rule.ContextAsArgumentRule{}, &lint.RuleConfig{
-		Arguments: []any{
+		Arguments: lint.Arguments{
 			map[string]any{
 				"allowTypesBefore": "AllowedBeforeType,AllowedBeforeStruct,*AllowedBeforePtrStruct,*testing.T",
 			},
 		},
 	})
 	testRule(t, "context_as_argument", &rule.ContextAsArgumentRule{}, &lint.RuleConfig{
-		Arguments: []any{
+		Arguments: lint.Arguments{
 			map[string]any{
 				"allow-types-before": "AllowedBeforeType,AllowedBeforeStruct,*AllowedBeforePtrStruct,*testing.T",
 			},

@@ -1,7 +1,7 @@
 // Test for name linting.
 
 // Package pkg ...
-package pkg // package names checks are tested elesewhere
+package pkg // package names checks are tested elsewhere
 
 import (
 	"io"

@@ -2,7 +2,7 @@ package fixtures
 
 func enforceSwitchStyle3() {
 
-	switch expression { // skipt tagged switch
+	switch expression { // skip tagged switch
 	case value:
 	default:
 	}

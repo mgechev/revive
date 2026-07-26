@@ -1,0 +1,21 @@
+ignore-generated-header = true
+severity = "error"
+confidence = 0.5
+error-code = 2
+warning-code = 1
+
+enable-all-rules = false
+enable-default-rules = true
+
+[rule.argument-limit]
+    severity="warning"
+    exclude=["excluded/file.go"]
+    arguments=[4]
+
+[rule.blank-imports]
+    disabled=true
+
+[rule.exported]
+    severity="error"
+    exclude=["excluded/file-exported.go"]
+    arguments=["check-private-receivers", "disable-stuttering-check"]

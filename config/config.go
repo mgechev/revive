@@ -1,14 +1,17 @@
-// Package config implements revive's configuration data structures and related methods
+// Package config implements revive's configuration data structures and related methods.
 package config
 
 import (
 	"errors"
 	"fmt"
 	"os"
+	"reflect"
+	"strings"
 
 	"github.com/BurntSushi/toml"
 
 	"github.com/mgechev/revive/formatter"
+	internalconfig "github.com/mgechev/revive/internal/config"
 	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/rule"
 )
@@ -116,6 +119,11 @@ var allRules = append([]lint.Rule{
 	&rule.InefficientMapLookupRule{},
 	&rule.ForbiddenCallInWgGoRule{},
 	&rule.UnnecessaryIfRule{},
+	&rule.EpochNamingRule{},
+	&rule.UseSlicesSort{},
+	&rule.PackageNamingRule{},
+	&rule.MultilineIfInitRule{},
+	&rule.MarshalReceiverRule{},
 	&rule.PrimitiveInNameRule{},
 }, defaultRules...)
 
@@ -187,15 +195,32 @@ func actualRuleName(name string) string {
 	}
 }
 
-func parseConfig(path string, config *lint.Config) error {
-	file, err := os.ReadFile(path)
-	if err != nil {
-		return errors.New("cannot read the config file")
-	}
-	err = toml.Unmarshal(file, config)
+func parseConfig(data []byte, config *lint.Config) error {
+	// Decode the top-level keys as primitives first so each option can be matched to its config field
+	// regardless of the spelling used in the file (camelCase, kebab-case or lowercase).
+	primitives := map[string]toml.Primitive{}
+	md, err := toml.Decode(string(data), &primitives)
 	if err != nil {
 		return fmt.Errorf("cannot parse the config file: %w", err)
 	}
+
+	fields := configFieldsByNormalizedName(config)
+	seen := make(map[string]string, len(primitives))
+	for key, primitive := range primitives {
+		normalized := internalconfig.NormalizeOption(key)
+		field, ok := fields[normalized]
+		if !ok {
+			continue // ignore unknown options, as toml.Unmarshal does
+		}
+		if other, dup := seen[normalized]; dup {
+			return fmt.Errorf("cannot parse the config file: options %q and %q refer to the same option", other, key)
+		}
+		seen[normalized] = key
+		if err := md.PrimitiveDecode(primitive, field.Addr().Interface()); err != nil {
+			return fmt.Errorf("cannot parse the config file: %w", err)
+		}
+	}
+
 	for k, r := range config.Rules {
 		err := r.Initialize()
 		if err != nil {
@@ -207,21 +232,48 @@ func parseConfig(path string, config *lint.Config) error {
 	return nil
 }
 
+// configFieldsByNormalizedName maps the normalized name of each config option to the corresponding struct field,
+// so an option can be looked up regardless of the casing or hyphenation used in the config file.
+func configFieldsByNormalizedName(config *lint.Config) map[string]reflect.Value {
+	v := reflect.ValueOf(config).Elem()
+	t := v.Type()
+	fields := make(map[string]reflect.Value, t.NumField())
+	for i := range t.NumField() {
+		tag := t.Field(i).Tag.Get("toml")
+		if tag == "" {
+			continue
+		}
+		name, _, _ := strings.Cut(tag, ",")
+		fields[internalconfig.NormalizeOption(name)] = v.Field(i)
+	}
+	return fields
+}
+
+func validateConfig(config *lint.Config) error {
+	if config.EnableAllRules && config.EnableDefaultRules {
+		return errors.New("config options enable-all-rules and enable-default-rules cannot be combined")
+	}
+	return nil
+}
+
 func normalizeConfig(config *lint.Config) {
 	if len(config.Rules) == 0 {
 		config.Rules = map[string]lint.RuleConfig{}
 	}
-	if config.EnableAllRules {
-		// Add to the configuration all rules not yet present in it
-		for _, r := range allRules {
+
+	addRules := func(config *lint.Config, rules []lint.Rule) {
+		for _, r := range rules {
 			ruleName := r.Name()
-			_, alreadyInConf := config.Rules[ruleName]
-			if alreadyInConf {
-				continue
+			if _, ok := config.Rules[ruleName]; !ok {
+				config.Rules[ruleName] = lint.RuleConfig{}
 			}
-			// Add the rule with an empty conf for
-			config.Rules[ruleName] = lint.RuleConfig{}
 		}
+	}
+
+	if config.EnableAllRules {
+		addRules(config, allRules)
+	} else if config.EnableDefaultRules {
+		addRules(config, defaultRules)
 	}
 
 	severity := config.Severity
@@ -249,13 +301,21 @@ func GetConfig(configPath string) (*lint.Config, error) {
 	switch {
 	case configPath != "":
 		config.Confidence = defaultConfidence
-		err := parseConfig(configPath, config)
+		data, err := os.ReadFile(configPath) //nolint:gosec // ignore G304: potential file inclusion via variable
+		if err != nil {
+			return nil, errors.New("cannot read the config file")
+		}
+		err = parseConfig(data, config)
 		if err != nil {
 			return nil, err
 		}
 
 	default: // no configuration provided
 		config = defaultConfig()
+	}
+
+	if err := validateConfig(config); err != nil {
+		return nil, err
 	}
 
 	normalizeConfig(config)

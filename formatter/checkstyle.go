@@ -8,7 +8,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// Checkstyle is an implementation of the Formatter interface
+// Checkstyle is an implementation of the [lint.Formatter] interface
 // which formats the errors to Checkstyle-like format.
 type Checkstyle struct {
 	Metadata lint.FormatterMetadata

@@ -77,7 +77,7 @@ func (*PackageDirectoryMismatchRule) buildIgnoreRegex(ignoredDirs []string) (*re
 }
 
 // skipDirs contains directory names that should be unconditionally ignored when checking.
-// These entries handle edge cases where filepath.Base might return these values.
+// These entries handle edge cases where [filepath.Base] might return these values.
 var skipDirs = map[string]struct{}{
 	".": {}, // Current directory
 	"/": {}, // Root directory
@@ -85,7 +85,7 @@ var skipDirs = map[string]struct{}{
 }
 
 // semanticallyEqual checks if package and directory names are semantically equal to each other.
-func (PackageDirectoryMismatchRule) semanticallyEqual(packageName, dirName string) bool {
+func (*PackageDirectoryMismatchRule) semanticallyEqual(packageName, dirName string) bool {
 	normDir := normalizePath(dirName)
 	normPkg := normalizePath(packageName)
 	return normDir == normPkg || normDir == "go"+normPkg

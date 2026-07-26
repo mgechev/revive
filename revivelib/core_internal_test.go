@@ -36,8 +36,7 @@ func TestReviveCreateInstance(t *testing.T) {
 	}
 }
 
-type mockRule struct {
-}
+type mockRule struct{}
 
 func (*mockRule) Name() string {
 	return "mock-rule"

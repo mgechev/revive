@@ -1,4 +1,4 @@
-package test
+package test_test
 
 import (
 	"testing"
@@ -8,4 +8,6 @@ import (
 
 func TestImportShadowing(t *testing.T) {
 	testRule(t, "import_shadowing", &rule.ImportShadowingRule{})
+	testRule(t, "import_shadowing_issue_1435", &rule.ImportShadowingRule{})
+	testRule(t, "import_shadowing_issue_1435_v1", &rule.ImportShadowingRule{})
 }

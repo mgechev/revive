@@ -1,43 +1,13 @@
 package rule
 
 import (
-	"fmt"
-	"go/ast"
 	"go/token"
 	"regexp"
 	"strings"
 
-	"github.com/mgechev/revive/internal/astutils"
+	"github.com/mgechev/revive/internal/config"
 	"github.com/mgechev/revive/lint"
 )
-
-// exitChecker is a function type that checks whether a function call is an exit function.
-type exitFuncChecker func(args []ast.Expr) bool
-
-var alwaysTrue exitFuncChecker = func([]ast.Expr) bool { return true }
-
-// exitFunctions is a map of std packages and functions that are considered as exit functions.
-var exitFunctions = map[string]map[string]exitFuncChecker{
-	"os":      {"Exit": alwaysTrue},
-	"syscall": {"Exit": alwaysTrue},
-	"log": {
-		"Fatal":   alwaysTrue,
-		"Fatalf":  alwaysTrue,
-		"Fatalln": alwaysTrue,
-		"Panic":   alwaysTrue,
-		"Panicf":  alwaysTrue,
-		"Panicln": alwaysTrue,
-	},
-	"flag": {
-		"Parse": func([]ast.Expr) bool { return true },
-		"NewFlagSet": func(args []ast.Expr) bool {
-			if len(args) != 2 {
-				return false
-			}
-			return astutils.IsPkgDotName(args[1], "flag", "ExitOnError")
-		},
-	},
-}
 
 func srcLine(src []byte, p token.Position) string {
 	// Run to end of line in both directions if not at line start/end.
@@ -51,24 +21,9 @@ func srcLine(src []byte, p token.Position) string {
 	return string(src[lo:hi])
 }
 
-// checkNumberOfArguments fails if the given number of arguments is not, at least, the expected one.
-func checkNumberOfArguments(expected int, args lint.Arguments, ruleName string) error {
-	if len(args) < expected {
-		return fmt.Errorf("not enough arguments for %s rule, expected %d, got %d. Please check the rule's documentation", ruleName, expected, len(args))
-	}
-	return nil
-}
-
 // isRuleOption returns true if arg and name are the same after normalization.
 func isRuleOption(arg, name string) bool {
-	return normalizeRuleOption(arg) == normalizeRuleOption(name)
-}
-
-// normalizeRuleOption returns an option name from the argument. It is lowercased and without hyphens.
-//
-// Example: normalizeRuleOption("allowTypesBefore"), normalizeRuleOption("allow-types-before") -> "allowtypesbefore".
-func normalizeRuleOption(arg string) string {
-	return strings.ToLower(strings.ReplaceAll(arg, "-", ""))
+	return config.NormalizeOption(arg) == config.NormalizeOption(name)
 }
 
 var normalizePathReplacer = strings.NewReplacer("-", "", "_", "", ".", "")
@@ -99,21 +54,6 @@ var directiveCommentRE = regexp.MustCompile("^//(line |extern |export |[a-z0-9]+
 
 func isDirectiveComment(line string) bool {
 	return directiveCommentRE.MatchString(line)
-}
-
-// isCallToExitFunction checks if the function call is a call to an exit function.
-func isCallToExitFunction(pkgName, functionName string, callArgs []ast.Expr) bool {
-	m, ok := exitFunctions[pkgName]
-	if !ok {
-		return false
-	}
-
-	check, ok := m[functionName]
-	if !ok {
-		return false
-	}
-
-	return check(callArgs)
 }
 
 // newInternalFailureError returns a slice of Failure with a single internal failure in it.

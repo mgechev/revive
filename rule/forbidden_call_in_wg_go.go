@@ -9,7 +9,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ForbiddenCallInWgGoRule spots calls to panic or wg.Done when using WaitGroup.Go.
+// ForbiddenCallInWgGoRule spots calls to panic or wg.Done when using [sync.WaitGroup.Go].
 type ForbiddenCallInWgGoRule struct{}
 
 // Apply applies the rule to given file.

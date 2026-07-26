@@ -81,7 +81,7 @@ func (w *lintUselessFallthrough) Visit(node ast.Node) ast.Visitor {
 		w.onFailure(lint.Failure{
 			Confidence: confidence,
 			Node:       branchStmt,
-			Category:   lint.FailureCategoryCodeStyle,
+			Category:   lint.FailureCategoryStyle,
 			Failure:    `this "fallthrough" can be removed by consolidating this case clause with the next one`,
 		})
 

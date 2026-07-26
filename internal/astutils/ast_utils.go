@@ -1,14 +1,15 @@
-// Package astutils provides utility functions for working with AST nodes
+// Package astutils provides utility functions for working with AST nodes.
 package astutils
 
 import (
 	"bytes"
-	"crypto/md5"
+	"crypto/md5" //nolint:gosec // G501: Blocklisted import crypto/md5: weak cryptographic primitive
 	"encoding/hex"
 	"fmt"
 	"go/ast"
 	"go/printer"
 	"go/token"
+	"go/types"
 	"regexp"
 	"slices"
 )
@@ -16,8 +17,13 @@ import (
 // FuncSignatureIs returns true if the given func decl satisfies a signature characterized
 // by the given name, parameters types and return types; false otherwise.
 //
-// Example: to check if a function declaration has the signature Foo(int, string) (bool,error)
-// call to FuncSignatureIs(funcDecl,"Foo",[]string{"int","string"},[]string{"bool","error"}).
+// Example: To check if a function declaration has the signature
+//
+//	Foo(int, string) (bool, error)
+//
+// call to
+//
+//	FuncSignatureIs(funcDecl, "Foo", []string{"int", "string"}, []string{"bool", "error"})
 func FuncSignatureIs(funcDecl *ast.FuncDecl, wantName string, wantParametersTypes, wantResultsTypes []string) bool {
 	if wantName != funcDecl.Name.String() {
 		return false // func name doesn't match expected one
@@ -118,6 +124,22 @@ func IsPkgDotName(expr ast.Expr, pkg, name string) bool {
 	return ok && IsIdent(sel.X, pkg) && IsIdent(sel.Sel, name)
 }
 
+// IsPointerToPkgDotType returns true if typ is a pointer to the named type pkgPath.typeName.
+func IsPointerToPkgDotType(typ types.Type, pkgPath, typeName string) bool {
+	ptrType, ok := typ.(*types.Pointer)
+	if !ok {
+		return false
+	}
+
+	namedType, ok := ptrType.Elem().(*types.Named)
+	if !ok {
+		return false
+	}
+
+	obj := namedType.Obj()
+	return obj != nil && obj.Pkg() != nil && obj.Pkg().Path() == pkgPath && obj.Name() == typeName
+}
+
 // PickNodes yields a list of nodes by picking them from a sub-ast with root node n.
 // Nodes are selected by applying the selector function.
 func PickNodes(n ast.Node, selector func(n ast.Node) bool) []ast.Node {
@@ -201,14 +223,14 @@ var gofmtConfig = &printer.Config{Tabwidth: 8}
 func GoFmt(x any) string {
 	buf := bytes.Buffer{}
 	fs := token.NewFileSet()
-	gofmtConfig.Fprint(&buf, fs, x)
+	_ = gofmtConfig.Fprint(&buf, fs, x)
 	return buf.String()
 }
 
 // NodeHash yields the MD5 hash of the given AST node.
 func NodeHash(node ast.Node) string {
 	hasher := func(in string) string {
-		binHash := md5.Sum([]byte(in))
+		binHash := md5.Sum([]byte(in)) //nolint:gosec // G401: Weak cryptographic primitive
 		return hex.EncodeToString(binHash[:])
 	}
 	str := GoFmt(node)
