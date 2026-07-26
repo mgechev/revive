@@ -67,6 +67,7 @@ List of all available rules.
 - [optimize-operands-order](#optimize-operands-order)
 - [package-comments](#package-comments)
 - [package-directory-mismatch](#package-directory-mismatch)
+- [primitive-in-name](#primitive-in-name)
 - [range-val-address](#range-val-address)
 - [range-val-in-closure](#range-val-in-closure)
 - [range](#range)
@@ -1145,6 +1146,12 @@ Include all directories (`testdata` also)
 [rule.package-directory-mismatch]
 arguments = [{ ignoreDirectories = [] }]
 ```
+
+## primitive-in-name
+
+_Description_: Warns when a variable's name contains a predeclared primitive type name (`Int`, `Bool`, `String`, `Float32`, `Float64`, `Rune`, `Byte`) as a distinct camelCase word, e.g. `sumInt := a + b`. Such names are redundant in a statically typed language, since the type is already known.
+
+_Configuration_: N/A
 
 ## range-val-address
 
