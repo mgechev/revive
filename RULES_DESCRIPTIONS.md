@@ -1581,7 +1581,9 @@ arguments = [{ ignore-directories = [] }]
 
 ## primitive-in-name
 
-_Description_: Warns when a variable's name contains a predeclared primitive type name (`Int`, `Bool`, `String`, `Float32`, `Float64`, `Rune`, `Byte`) as a distinct camelCase word, e.g. `sumInt := a + b`. Such names are redundant in a statically typed language, since the type is already known.
+_Description_: Warns when a variable's name contains a predeclared primitive type name, or a common shorthand for one (`Int`/`Num`, `Bool`/`Flag`,
+`String`/`Str`, `Float32`/`Float`, `Float64`/`Float`, `Rune`/`Char`, `Byte`), as a distinct camelCase word, e.g. `sumInt := a + b`. Such names are
+redundant in a statically typed language, since the type is already known.
 
 _Configuration_: N/A
 

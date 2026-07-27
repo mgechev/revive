@@ -44,4 +44,22 @@ func PrimitiveInNameExample() {
 
 	var c complex128 = 1 + 2i // regression: complex is not in the primitive word list, and must not panic
 	_ = c
+
+	var nameStr string // MATCH /avoid primitive type in name/
+	_ = nameStr
+
+	var retryNum int // MATCH /avoid primitive type in name/
+	_ = retryNum
+
+	var firstChar rune // MATCH /avoid primitive type in name/
+	_ = firstChar
+
+	var verboseFlag bool // MATCH /avoid primitive type in name/
+	_ = verboseFlag
+
+	var avgFloat float32 // MATCH /avoid primitive type in name/
+	_ = avgFloat
+
+	var totalFloat float64 // MATCH /avoid primitive type in name/
+	_ = totalFloat
 }

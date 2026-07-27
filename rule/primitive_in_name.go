@@ -17,7 +17,7 @@ type PrimitiveInNameRule struct {
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
-func (r *PrimitiveInNameRule) Configure(_ lint.Arguments) error {
+func (*PrimitiveInNameRule) Configure(_ lint.Arguments) error {
 	return nil
 }
 
@@ -28,12 +28,8 @@ func (*PrimitiveInNameRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 	file.Pkg.TypeCheck()
 
 	check := func(id *ast.Ident) {
-		if id.Name == "_" {
-			return
-		}
-
-		word, ok := isPrimitiveResolvePrimitiveString(file.Pkg.TypeOf(id))
-		if !ok || !hasWord(id.Name, word) {
+		words, ok := isPrimitiveResolvePrimitiveString(file.Pkg.TypeOf(id))
+		if !ok || !hasWord(id.Name, words) {
 			return
 		}
 
@@ -78,38 +74,41 @@ func (*PrimitiveInNameRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fail
 
 // isPrimitiveResolvePrimitiveString will resolve the type to a string.
 // Note currently this will not work for []string, only concrete types.
-func isPrimitiveResolvePrimitiveString(typ types.Type) (string, bool) {
+func isPrimitiveResolvePrimitiveString(typ types.Type) ([]string, bool) {
 	basic, ok := typ.(*types.Basic)
 	if !ok {
-		return "", false
+		return nil, false
 	}
 
 	switch basic.Kind() {
 	case types.Int, types.Int8, types.Int16, types.Int64,
 		types.Uint, types.Uint16, types.Uint32, types.Uint64, types.Uintptr,
 		types.UntypedInt:
-		return "Int", true
+		return []string{"Int", "Num"}, true
 	case types.Int32, types.UntypedRune:
-		return "Rune", true
+		return []string{"Rune", "Char"}, true
 	case types.Uint8:
-		return "Byte", true
+		return []string{"Byte"}, true
 	case types.String, types.UntypedString:
-		return "String", true
+		return []string{"String", "Str"}, true
 	case types.Bool, types.UntypedBool:
-		return "Bool", true
+		return []string{"Bool", "Flag"}, true
 	case types.Float32:
-		return "Float32", true
+		return []string{"Float32", "Float"}, true
 	case types.Float64, types.UntypedFloat:
-		return "Float64", true
+		return []string{"Float64", "Float"}, true
 	}
 
-	return "", false
+	return nil, false
 }
 
-func hasWord(name, word string) bool {
-	for _, segment := range splitWords(name) {
-		if strings.EqualFold(segment, word) {
-			return true
+func hasWord(name string, words []string) bool {
+	segments := splitWords(name)
+	for _, word := range words {
+		for _, segment := range segments {
+			if strings.EqualFold(segment, word) {
+				return true
+			}
 		}
 	}
 	return false
