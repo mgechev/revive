@@ -58,6 +58,9 @@ linters:
         path: rule/modifies_value_receiver.go
       - linters:
           - gosec
+        path: rule/primitive_in_name.go
+      - linters:
+          - gosec
         path: rule/range_val_address.go
       - linters:
           - gosec

@@ -11,8 +11,7 @@ import (
 )
 
 // PrimitiveInNameRule lints the name of a variable.
-type PrimitiveInNameRule struct {
-}
+type PrimitiveInNameRule struct{}
 
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
@@ -120,13 +119,6 @@ func splitWords(name string) []string {
 
 	runes := []rune(name)
 	for i, r := range runes {
-		if r == '_' {
-			if len(current) > 0 {
-				words = append(words, string(current))
-				current = nil
-			}
-			continue
-		}
 		if i > 0 && unicode.IsUpper(r) && !unicode.IsUpper(runes[i-1]) {
 			words = append(words, string(current))
 			current = nil

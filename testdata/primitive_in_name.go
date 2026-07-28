@@ -18,7 +18,7 @@ func PrimitiveInNameExample() {
 	sprintfCount := 5 // "Int" is not a segment of "Sprintf"
 	_ = sprintfCount
 
-	sum_int := a + b // MATCH /avoid primitive type in name/
+	sum_int := a + b // underscore-separated names aren't split into words; var-naming already flags snake_case separately
 	_ = sum_int
 
 	var isValidBool bool = true // MATCH /avoid primitive type in name/
