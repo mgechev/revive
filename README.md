@@ -225,6 +225,11 @@ Please notice that if no particular configuration is provided, `revive` will beh
 (the [Available Rules table](#available-rules) details what are the `golint` rules).
 When a configuration is provided, only rules in the configuration are enabled.
 
+#### MegaLinter
+
+[MegaLinter](https://megalinter.io/), an open-source linters aggregator for CI, runs `revive` on Go projects out of the box.
+See its [revive documentation page](https://megalinter.io/latest/descriptors/go_revive/) for configuration details.
+
 ### Command Line Flags
 
 `revive` accepts the following command line parameters:
