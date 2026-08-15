@@ -32,18 +32,15 @@ type issue struct {
 func (*Checkstyle) Format(failures <-chan lint.Failure, config lint.Config) (string, error) {
 	issues := map[string][]issue{}
 	for failure := range failures {
-		buf := new(bytes.Buffer)
-		xml.Escape(buf, []byte(failure.Failure))
-		what := buf.String()
 		iss := issue{
 			Line:       failure.Position.Start.Line,
 			Col:        failure.Position.Start.Column,
-			What:       what,
+			What:       xmlEscape(failure.Failure),
 			Confidence: failure.Confidence,
 			Severity:   severity(config, failure),
-			RuleName:   failure.RuleName,
+			RuleName:   xmlEscape(failure.RuleName),
 		}
-		fn := failure.Filename()
+		fn := xmlEscape(failure.Filename())
 		if issues[fn] == nil {
 			issues[fn] = []issue{}
 		}
@@ -63,6 +60,14 @@ func (*Checkstyle) Format(failures <-chan lint.Failure, config lint.Config) (str
 	}
 
 	return buf.String(), nil
+}
+
+// xmlEscape escapes s so that it can be safely interpolated
+// into the XML attributes of the checkstyle template.
+func xmlEscape(s string) string {
+	buf := new(bytes.Buffer)
+	xml.Escape(buf, []byte(s))
+	return buf.String()
 }
 
 const checkstyleTemplate = `<?xml version='1.0' encoding='UTF-8'?>
