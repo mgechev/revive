@@ -45,6 +45,7 @@ If you disable them in the config file, revive will run over 6x faster than goli
   - [Continuous Integration](#continuous-integration)
   - [Linter aggregators](#linter-aggregators)
     - [golangci-lint](#golangci-lint)
+    - [MegaLinter](#megalinter)
   - [Command Line Flags](#command-line-flags)
   - [Sample Invocations](#sample-invocations)
   - [Comment Directives](#comment-directives)
@@ -76,7 +77,6 @@ If you disable them in the config file, revive will run over 6x faster than goli
 - [Contributors](#contributors)
   - [Maintainers](#maintainers)
   - [All](#all)
-- [Star History](#star-history)
 - [License](#license)
 
 <!-- tocstop -->
@@ -898,16 +898,6 @@ This project exists thanks to all the people who contribute.
 
 <a href="https://github.com/mgechev/revive/graphs/contributors">
   <img alt="All Contributors" src="https://contrib.rocks/image?repo=mgechev/revive&max=500" />
-</a>
-
-## Star History
-
-<a href="https://www.star-history.com/#mgechev/revive&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=mgechev/revive&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=mgechev/revive&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=mgechev/revive&type=date&legend=top-left" />
- </picture>
 </a>
 
 ## License
