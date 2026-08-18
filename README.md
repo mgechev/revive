@@ -567,7 +567,7 @@ List of all [available rules](./RULES_DESCRIPTIONS.md).
 | [`increment-decrement`](./RULES_DESCRIPTIONS.md#increment-decrement) |  n/a   | Use `i++` and `i--` instead of `i += 1` and `i -= 1`.            |   yes    |  no   |
 | [`indent-error-flow`](./RULES_DESCRIPTIONS.md#indent-error-flow)   |  []string   | Prevents redundant else statements.                              |   yes    |  no   |
 | [`inefficient-map-lookup`](./RULES_DESCRIPTIONS.md#inefficient-map-lookup)   |  n/a  | Spots iterative searches for a key in a map           |   no    |  yes   |
-| [`line-length-limit`](./RULES_DESCRIPTIONS.md#line-length-limit)   | int (defaults to 80) | Specifies the maximum number of characters in a line             |    no    |  no   |
+| [`line-length-limit`](./RULES_DESCRIPTIONS.md#line-length-limit)   | int or map | Specifies the maximum number of characters in a line, with optional per-line exclusions |    no    |  no   |
 | [`marshal-receiver`](./RULES_DESCRIPTIONS.md#marshal-receiver) |  n/a   | Checks receiver type consistency for common marshal/unmarshal methods. |    no    |  no   |
 | [`max-control-nesting`](./RULES_DESCRIPTIONS.md#max-control-nesting) |  int (defaults to 5)  | Sets restriction for maximum nesting of control structures. |    no    |  no   |
 | [`max-public-structs`](./RULES_DESCRIPTIONS.md#max-public-structs)  |  int (defaults to 5)  | The maximum number of public structs in a file.                  |    no    |  no   |
