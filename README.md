@@ -574,6 +574,7 @@ List of all [available rules](./RULES_DESCRIPTIONS.md).
 | [`modifies-parameter`](./RULES_DESCRIPTIONS.md#modifies-parameter)  |  n/a   | Warns on assignments to function parameters                      |    no    |  no   |
 | [`modifies-value-receiver`](./RULES_DESCRIPTIONS.md#modifies-value-receiver) |  n/a   | Warns on assignments to value-passed method receivers        |    no    |  yes  |
 | [`nested-structs`](./RULES_DESCRIPTIONS.md#nested-structs)          |  n/a   |  Warns on structs within structs |    no    |  no   |
+| [`no-increment-decrement`](./RULES_DESCRIPTIONS.md#no-increment-decrement) |  n/a   | Use `i += 1` and `i -= 1` instead of `i++` and `i--`.            |    no    |  no   |
 | [`optimize-operands-order`](./RULES_DESCRIPTIONS.md#optimize-operands-order)          |  n/a   |  Checks inefficient conditional expressions |    no    |  no   |
 | [`package-comments`](./RULES_DESCRIPTIONS.md#package-comments)    |  n/a   | Package commenting conventions.                                  |   yes    |  no   |
 | [`package-naming`](./RULES_DESCRIPTIONS.md#package-naming)    |  map   | Checks that package names follow Go conventions and best practices |   no    |  no   |
