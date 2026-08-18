@@ -124,6 +124,7 @@ var allRules = append([]lint.Rule{
 	&rule.PackageNamingRule{},
 	&rule.MultilineIfInitRule{},
 	&rule.MarshalReceiverRule{},
+	&rule.NoIncrementDecrementRule{},
 }, defaultRules...)
 
 // allFormatters is a list of all available formatters to output the linting results.
