@@ -57,6 +57,7 @@
 [rule.marshal-receiver]
 [rule.modifies-parameter]
 [rule.nested-structs]
+[rule.no-increment-decrement]
 [rule.optimize-operands-order]
 [rule.package-comments]
 [rule.package-directory-mismatch]

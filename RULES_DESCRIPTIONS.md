@@ -68,6 +68,7 @@ List of all available rules.
 - [modifies-value-receiver](#modifies-value-receiver)
 - [multiline-if-init](#multiline-if-init)
 - [nested-structs](#nested-structs)
+- [no-increment-decrement](#no-increment-decrement)
 - [optimize-operands-order](#optimize-operands-order)
 - [package-comments](#package-comments)
 - [package-naming](#package-naming)
@@ -1431,6 +1432,40 @@ _Configuration_: N/A
 ## nested-structs
 
 _Description_: Packages declaring structs that contain other inline struct definitions can be hard to understand/read for other developers.
+
+_Configuration_: N/A
+
+## no-increment-decrement
+
+_Description_: This rule is the opposite of [increment-decrement](#increment-decrement).
+Some coding styles prefer the explicit `i += 1` and `i -= 1` forms over the `i++` and `i--` operators,
+which are absent from many other languages and, in practice, are seldom used outside of loop counters.
+This rule spots `i++` and `i--` statements and proposes to change them into `i += 1` and `i -= 1`.
+Increment and decrement statements used as the post statement of a `for` loop are ignored, as that is
+the idiomatic place for a loop counter.
+
+### Examples (no-increment-decrement)
+
+Before (violation):
+
+```go
+i++
+count--
+```
+
+After (fixed):
+
+```go
+i += 1
+count -= 1
+```
+
+Loop counters are not flagged:
+
+```go
+for i := 0; i < n; i++ {
+}
+```
 
 _Configuration_: N/A
 
