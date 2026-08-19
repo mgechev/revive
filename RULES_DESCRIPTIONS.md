@@ -1387,6 +1387,30 @@ arguments = [80]
 arguments = [{ max = 80, excludes = ['^\s*//go:generate ', 'https?://'] }]
 ```
 
+### Examples (line-length-limit)
+
+Given the configuration:
+
+```toml
+[rule.line-length-limit]
+arguments = [{ max = 80, excludes = ['^\s*//go:generate ', 'https?://'] }]
+```
+
+for the file:
+
+```go
+package example
+
+//go:generate stringer -type=Color -output=color_string.go -linecomment -trimprefix=Color
+
+// Reference: https://example.com/some/really/long/documentation/url/kept/for/context/here
+
+const greeting = "a long enough line of code to comfortably exceed the eighty character limit"
+```
+
+only the last line is reported.
+The `//go:generate` directive and the line containing a URL match the `excludes` patterns and are skipped, even though both exceed 80 characters.
+
 ## marshal-receiver
 
 _Go version_: 1.0.

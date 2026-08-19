@@ -24,19 +24,16 @@ const defaultLineLengthLimit = 80
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
-//
-// It accepts either a single integer (the maximum line length) for backward
-// compatibility, or a map of options with the keys "max" (the maximum line
-// length) and "excludes" (a list of regular expressions; lines matching any of
-// them are not checked).
 func (r *LineLengthLimitRule) Configure(arguments lint.Arguments) error {
 	r.max = defaultLineLengthLimit
+	r.excludes = nil
 	if len(arguments) < 1 {
 		return nil
 	}
 
 	switch arg := arguments[0].(type) {
 	case int64:
+		// backward compatibility: if the first argument is an integer, it is treated as the maximum line length.
 		return r.setMax(arg)
 	case map[string]any:
 		return r.configureFromMap(arg)
