@@ -32,13 +32,10 @@ type issue struct {
 func (*Checkstyle) Format(failures <-chan lint.Failure, config lint.Config) (string, error) {
 	issues := map[string][]issue{}
 	for failure := range failures {
-		buf := new(bytes.Buffer)
-		xml.Escape(buf, []byte(failure.Failure))
-		what := buf.String()
 		iss := issue{
 			Line:       failure.Position.Start.Line,
 			Col:        failure.Position.Start.Column,
-			What:       what,
+			What:       failure.Failure,
 			Confidence: failure.Confidence,
 			Severity:   severity(config, failure),
 			RuleName:   failure.RuleName,
@@ -50,7 +47,7 @@ func (*Checkstyle) Format(failures <-chan lint.Failure, config lint.Config) (str
 		issues[fn] = append(issues[fn], iss)
 	}
 
-	t, err := plain.New("revive").Parse(checkstyleTemplate)
+	t, err := plain.New("revive").Funcs(plain.FuncMap{"escape": xmlEscape}).Parse(checkstyleTemplate)
 	if err != nil {
 		return "", err
 	}
@@ -65,12 +62,22 @@ func (*Checkstyle) Format(failures <-chan lint.Failure, config lint.Config) (str
 	return buf.String(), nil
 }
 
+// xmlEscape escapes s so that it can be safely interpolated
+// into the XML attributes of the checkstyle template.
+// It is registered as the "escape" function of the template.
+func xmlEscape(s string) string {
+	buf := new(bytes.Buffer)
+	xml.Escape(buf, []byte(s))
+	return buf.String()
+}
+
 const checkstyleTemplate = `<?xml version='1.0' encoding='UTF-8'?>
 <checkstyle version="5.0">
 {{- range $k, $v := . }}
-    <file name="{{ $k }}">
+    <file name="{{ escape $k }}">
       {{- range $i, $issue := $v }}
-      <error line="{{ $issue.Line }}" column="{{ $issue.Col }}" message="{{ $issue.What }} (confidence {{ $issue.Confidence}})" severity="{{ $issue.Severity }}" source="revive/{{ $issue.RuleName }}"/>
+      <error line="{{ $issue.Line }}" column="{{ $issue.Col }}" message="{{ escape $issue.What }} (confidence {{ $issue.Confidence}})" {{ "" -}}
+        severity="{{ $issue.Severity }}" source="revive/{{ escape $issue.RuleName }}"/>
       {{- end }}
     </file>
 {{- end }}
