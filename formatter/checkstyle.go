@@ -76,7 +76,8 @@ const checkstyleTemplate = `<?xml version='1.0' encoding='UTF-8'?>
 {{- range $k, $v := . }}
     <file name="{{ escape $k }}">
       {{- range $i, $issue := $v }}
-      <error line="{{ $issue.Line }}" column="{{ $issue.Col }}" message="{{ escape $issue.What }} (confidence {{ $issue.Confidence}})" severity="{{ $issue.Severity }}" source="revive/{{ escape $issue.RuleName }}"/>
+      <error line="{{ $issue.Line }}" column="{{ $issue.Col }}" message="{{ escape $issue.What }} (confidence {{ $issue.Confidence}})" {{ "" -}}
+        severity="{{ $issue.Severity }}" source="revive/{{ escape $issue.RuleName }}"/>
       {{- end }}
     </file>
 {{- end }}
