@@ -11,7 +11,7 @@ builds:
       - CGO_ENABLED=0
     ldflags:
       - -s -w
-      - -X github.com/mgechev/revive/cli.version={{.Version}}
+      - -X github.com/mgechev/revive/cli.version={{.Tag}}
       - -X github.com/mgechev/revive/cli.commit={{.Commit}}
       - -X github.com/mgechev/revive/cli.date={{.Date}}
       - -X github.com/mgechev/revive/cli.builtBy=GoReleaser
