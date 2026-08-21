@@ -370,7 +370,7 @@ func (gds exportedGoDocStatus) confidence() float64 {
 }
 
 func (gds exportedGoDocStatus) correctionHint(firstCommentLine string) string {
-	firstWord := strings.Split(firstCommentLine, " ")[0]
+	firstWord, _, _ := strings.Cut(firstCommentLine, " ")
 	switch gds {
 	case exportedGoDocStatusCaseMismatch:
 		return ` by using its correct casing, not "` + firstWord + ` ..."`

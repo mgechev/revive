@@ -47,7 +47,7 @@ func (w lintUseFmtPrint) Visit(node ast.Node) ast.Visitor {
 		return w // nothing to do, the node is not a call
 	}
 
-	id, ok := (ce.Fun).(*ast.Ident)
+	id, ok := ce.Fun.(*ast.Ident)
 	if !ok {
 		return nil
 	}

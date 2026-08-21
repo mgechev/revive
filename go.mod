@@ -1,6 +1,6 @@
 module github.com/mgechev/revive
 
-go 1.25.0
+go 1.26.0
 
 require (
 	codeberg.org/chavacava/garif v0.2.1

@@ -569,7 +569,7 @@ func checkProtobufOptions(checkCtx *checkContext, options []string) (message str
 	seenOptions := map[string]bool{}
 	hasName := false
 	for _, opt := range options {
-		opt := strings.Split(opt, "=")[0]
+		opt, _, _ := strings.Cut(opt, "=")
 
 		if number, err := strconv.Atoi(opt); err == nil {
 			_, alreadySeen := checkCtx.usedTagNbr[number]
