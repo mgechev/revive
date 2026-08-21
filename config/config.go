@@ -142,9 +142,16 @@ func EnabledRules(config *lint.Config) []lint.Rule {
 	if config == nil {
 		return nil
 	}
-	var rules []lint.Rule
+	rulesByName := make(map[string]lint.Rule, len(allRules))
 	for _, r := range allRules {
-		if c, ok := config.Rules[r.Name()]; ok && !c.Disabled {
+		rulesByName[r.Name()] = r
+	}
+	var rules []lint.Rule
+	for name, c := range config.Rules {
+		if c.Disabled {
+			continue
+		}
+		if r, ok := rulesByName[actualRuleName(name)]; ok {
 			rules = append(rules, r)
 		}
 	}

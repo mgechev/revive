@@ -847,6 +847,20 @@ func TestEnabledRules(t *testing.T) {
 		}
 	})
 
+	t.Run("resolves deprecated rule-name aliases", func(t *testing.T) {
+		cfg := &lint.Config{
+			Rules: lint.RulesConfig{
+				"imports-blacklist": {}, // deprecated alias for imports-blocklist
+			},
+		}
+
+		got := ruleNames(config.EnabledRules(cfg))
+		want := []string{"imports-blocklist"}
+		if !slices.Equal(got, want) {
+			t.Errorf("EnabledRules: expected %v, got %v", want, got)
+		}
+	})
+
 	t.Run("empty config has no enabled rules", func(t *testing.T) {
 		if got := config.EnabledRules(&lint.Config{}); len(got) != 0 {
 			t.Errorf("EnabledRules: expected none, got %v", got)
