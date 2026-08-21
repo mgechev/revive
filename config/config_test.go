@@ -777,3 +777,182 @@ func TestGetFormatter(t *testing.T) {
 		}
 	})
 }
+
+func ruleNames(rules []lint.Rule) []string {
+	names := make([]string, len(rules))
+	for i, r := range rules {
+		names[i] = r.Name()
+	}
+	slices.Sort(names)
+	return names
+}
+
+func TestAllRules(t *testing.T) {
+	names := ruleNames(config.AllRules())
+
+	if len(names) == 0 {
+		t.Fatal("AllRules returned no rules")
+	}
+	if compacted := slices.Compact(slices.Clone(names)); len(compacted) != len(names) {
+		t.Errorf("AllRules should not contain duplicates, got %v", names)
+	}
+	for _, want := range []string{"argument-limit", "cyclomatic", "exported", "var-naming"} {
+		if !slices.Contains(names, want) {
+			t.Errorf("AllRules should contain %q", want)
+		}
+	}
+	// Every default rule is also part of all rules.
+	for _, name := range ruleNames(config.DefaultRules()) {
+		if !slices.Contains(names, name) {
+			t.Errorf("AllRules is missing default rule %q", name)
+		}
+	}
+}
+
+func TestDefaultRules(t *testing.T) {
+	names := ruleNames(config.DefaultRules())
+
+	if len(names) == 0 {
+		t.Fatal("DefaultRules returned no rules")
+	}
+	if compacted := slices.Compact(slices.Clone(names)); len(compacted) != len(names) {
+		t.Errorf("DefaultRules should not contain duplicates, got %v", names)
+	}
+	for _, want := range []string{"blank-imports", "exported", "var-naming"} {
+		if !slices.Contains(names, want) {
+			t.Errorf("DefaultRules should contain %q", want)
+		}
+	}
+	// Default rules are a strict subset of all rules.
+	if len(names) >= len(config.AllRules()) {
+		t.Errorf("DefaultRules (%d) should be fewer than AllRules (%d)", len(names), len(config.AllRules()))
+	}
+}
+
+func TestEnabledRules(t *testing.T) {
+	t.Run("returns only enabled rules", func(t *testing.T) {
+		cfg := &lint.Config{
+			Rules: lint.RulesConfig{
+				"var-naming":     {},
+				"exported":       {Disabled: true},
+				"argument-limit": {},
+				"cyclomatic":     {Disabled: true},
+			},
+		}
+
+		got := ruleNames(config.EnabledRules(cfg))
+		want := []string{"argument-limit", "var-naming"}
+		if !slices.Equal(got, want) {
+			t.Errorf("EnabledRules: expected %v, got %v", want, got)
+		}
+	})
+
+	t.Run("resolves deprecated rule-name aliases", func(t *testing.T) {
+		cfg := &lint.Config{
+			Rules: lint.RulesConfig{
+				"imports-blacklist": {}, // deprecated alias for imports-blocklist
+			},
+		}
+
+		got := ruleNames(config.EnabledRules(cfg))
+		want := []string{"imports-blocklist"}
+		if !slices.Equal(got, want) {
+			t.Errorf("EnabledRules: expected %v, got %v", want, got)
+		}
+	})
+
+	t.Run("empty config has no enabled rules", func(t *testing.T) {
+		if got := config.EnabledRules(&lint.Config{}); len(got) != 0 {
+			t.Errorf("EnabledRules: expected none, got %v", got)
+		}
+	})
+
+	t.Run("nil config has no enabled rules", func(t *testing.T) {
+		if got := config.EnabledRules(nil); len(got) != 0 {
+			t.Errorf("EnabledRules: expected none, got %v", got)
+		}
+	})
+}
+
+func TestDefaultConfidence(t *testing.T) {
+	if config.DefaultConfidence != 0.8 {
+		t.Errorf("DefaultConfidence: expected 0.8, got %v", config.DefaultConfidence)
+	}
+}
+
+func TestDefault(t *testing.T) {
+	cfg := config.Default()
+
+	if cfg.Confidence != config.DefaultConfidence {
+		t.Errorf("Confidence: expected %v, got %v", config.DefaultConfidence, cfg.Confidence)
+	}
+	if cfg.Severity != lint.SeverityWarning {
+		t.Errorf("Severity: expected %v, got %v", lint.SeverityWarning, cfg.Severity)
+	}
+
+	var names []string
+	for name := range cfg.Rules {
+		names = append(names, name)
+	}
+	slices.Sort(names)
+	if want := ruleNames(config.DefaultRules()); !slices.Equal(names, want) {
+		t.Errorf("Default config rules: expected %v, got %v", want, names)
+	}
+}
+
+func TestNormalize(t *testing.T) {
+	t.Run("enable-default-rules adds default rule entries", func(t *testing.T) {
+		cfg := &lint.Config{EnableDefaultRules: true}
+
+		config.Normalize(cfg)
+
+		if got, want := ruleNames(config.EnabledRules(cfg)), ruleNames(config.DefaultRules()); !slices.Equal(got, want) {
+			t.Errorf("expected default rules %v, got %v", want, got)
+		}
+	})
+
+	t.Run("enable-all-rules adds all rule entries", func(t *testing.T) {
+		cfg := &lint.Config{EnableAllRules: true}
+
+		config.Normalize(cfg)
+
+		if got, want := ruleNames(config.EnabledRules(cfg)), ruleNames(config.AllRules()); !slices.Equal(got, want) {
+			t.Errorf("expected all rules %v, got %v", want, got)
+		}
+	})
+
+	t.Run("severity is propagated to rules and directives without their own", func(t *testing.T) {
+		cfg := &lint.Config{
+			Severity: lint.SeverityError,
+			Rules: lint.RulesConfig{
+				"exported":   {},
+				"var-naming": {Severity: lint.SeverityWarning},
+			},
+			Directives: lint.DirectivesConfig{
+				"specify-disable-reason": {},
+			},
+		}
+
+		config.Normalize(cfg)
+
+		if got := cfg.Rules["exported"].Severity; got != lint.SeverityError {
+			t.Errorf("exported severity: expected %q, got %q", lint.SeverityError, got)
+		}
+		if got := cfg.Rules["var-naming"].Severity; got != lint.SeverityWarning {
+			t.Errorf("var-naming severity should be preserved: expected %q, got %q", lint.SeverityWarning, got)
+		}
+		if got := cfg.Directives["specify-disable-reason"].Severity; got != lint.SeverityError {
+			t.Errorf("directive severity: expected %q, got %q", lint.SeverityError, got)
+		}
+	})
+
+	t.Run("nil rules map is initialized", func(t *testing.T) {
+		cfg := &lint.Config{}
+
+		config.Normalize(cfg)
+
+		if cfg.Rules == nil {
+			t.Error("Rules map should be initialized")
+		}
+	})
+}

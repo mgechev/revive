@@ -24,7 +24,7 @@ func (*NDJSON) Format(failures <-chan lint.Failure, config lint.Config) (string,
 	enc := json.NewEncoder(&buf)
 	for failure := range failures {
 		obj := jsonObject{}
-		obj.Severity = severity(config, failure)
+		obj.Severity = failure.SeverityFor(&config)
 		obj.Failure = failure
 		err := enc.Encode(obj)
 		if err != nil {

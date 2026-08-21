@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"slices"
 	"strings"
 
 	"github.com/BurntSushi/toml"
@@ -125,6 +126,37 @@ var allRules = append([]lint.Rule{
 	&rule.MultilineIfInitRule{},
 	&rule.MarshalReceiverRule{},
 }, defaultRules...)
+
+// AllRules returns a copy of the list of all rules registered in revive.
+func AllRules() []lint.Rule {
+	return slices.Clone(allRules)
+}
+
+// DefaultRules returns a copy of the list of rules that are enabled by default.
+func DefaultRules() []lint.Rule {
+	return slices.Clone(defaultRules)
+}
+
+// EnabledRules returns the rules that are enabled in the given configuration.
+func EnabledRules(config *lint.Config) []lint.Rule {
+	if config == nil {
+		return nil
+	}
+	rulesByName := make(map[string]lint.Rule, len(allRules))
+	for _, r := range allRules {
+		rulesByName[r.Name()] = r
+	}
+	var rules []lint.Rule
+	for name, c := range config.Rules {
+		if c.Disabled {
+			continue
+		}
+		if r, ok := rulesByName[actualRuleName(name)]; ok {
+			rules = append(rules, r)
+		}
+	}
+	return rules
+}
 
 // allFormatters is a list of all available formatters to output the linting results.
 // Keep the list sorted and in sync with available formatters in README.md.
@@ -255,7 +287,9 @@ func validateConfig(config *lint.Config) error {
 	return nil
 }
 
-func normalizeConfig(config *lint.Config) {
+// Normalize fills in default rule entries (according to the EnableAllRules / EnableDefaultRules options)
+// and propagates the configured severity to rules and directives that don't define their own.
+func Normalize(config *lint.Config) {
 	if len(config.Rules) == 0 {
 		config.Rules = map[string]lint.RuleConfig{}
 	}
@@ -292,14 +326,15 @@ func normalizeConfig(config *lint.Config) {
 	}
 }
 
-const defaultConfidence = 0.8
+// DefaultConfidence is the default confidence level for revive's linter.
+const DefaultConfidence = 0.8
 
 // GetConfig yields the configuration.
 func GetConfig(configPath string) (*lint.Config, error) {
 	config := &lint.Config{}
 	switch {
 	case configPath != "":
-		config.Confidence = defaultConfidence
+		config.Confidence = DefaultConfidence
 		data, err := os.ReadFile(configPath) //nolint:gosec // ignore G304: potential file inclusion via variable
 		if err != nil {
 			return nil, errors.New("cannot read the config file")
@@ -310,14 +345,14 @@ func GetConfig(configPath string) (*lint.Config, error) {
 		}
 
 	default: // no configuration provided
-		config = defaultConfig()
+		config = Default()
 	}
 
 	if err := validateConfig(config); err != nil {
 		return nil, err
 	}
 
-	normalizeConfig(config)
+	Normalize(config)
 	return config, nil
 }
 
@@ -334,9 +369,10 @@ func GetFormatter(formatterName string) (lint.Formatter, error) {
 	return f, nil
 }
 
-func defaultConfig() *lint.Config {
+// Default returns the default linter configuration, used when no configuration is provided.
+func Default() *lint.Config {
 	defaultConfig := lint.Config{
-		Confidence: defaultConfidence,
+		Confidence: DefaultConfidence,
 		Severity:   lint.SeverityWarning,
 		Rules:      map[string]lint.RuleConfig{},
 	}

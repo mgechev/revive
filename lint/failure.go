@@ -98,6 +98,21 @@ func (f *Failure) IsInternal() bool {
 	return f.Category == failureCategoryInternal
 }
 
+// SeverityFor returns the effective severity of the failure under the given configuration.
+// A failure is an error if its rule or directive is configured with [SeverityError]; otherwise it is a warning.
+func (f *Failure) SeverityFor(config *Config) Severity {
+	if config == nil {
+		return SeverityWarning
+	}
+	if c, ok := config.Rules[f.RuleName]; ok && c.Severity == SeverityError {
+		return SeverityError
+	}
+	if c, ok := config.Directives[f.RuleName]; ok && c.Severity == SeverityError {
+		return SeverityError
+	}
+	return SeverityWarning
+}
+
 // NewInternalFailure yields an internal failure with the given message as failure message.
 func NewInternalFailure(message string) Failure {
 	return Failure{
