@@ -127,38 +127,28 @@ var allRules = append([]lint.Rule{
 	&rule.MarshalReceiverRule{},
 }, defaultRules...)
 
-// AllRuleNames returns the sorted names of all rules registered in revive.
-func AllRuleNames() []string {
-	return ruleNames(allRules)
+// AllRules returns a copy of the list of all rules registered in revive.
+func AllRules() []lint.Rule {
+	return slices.Clone(allRules)
 }
 
-// DefaultRuleNames returns the sorted names of the rules that are enabled by default.
-func DefaultRuleNames() []string {
-	return ruleNames(defaultRules)
+// DefaultRules returns a copy of the list of rules that are enabled by default.
+func DefaultRules() []lint.Rule {
+	return slices.Clone(defaultRules)
 }
 
-// EnabledRuleNames returns the sorted names of the rules that are enabled in the given configuration.
-func EnabledRuleNames(config *lint.Config) []string {
+// EnabledRules returns the rules that are enabled in the given configuration.
+func EnabledRules(config *lint.Config) []lint.Rule {
 	if config == nil {
 		return nil
 	}
-	var names []string
-	for name, ruleConfig := range config.Rules {
-		if !ruleConfig.Disabled {
-			names = append(names, name)
+	var rules []lint.Rule
+	for _, r := range allRules {
+		if c, ok := config.Rules[r.Name()]; ok && !c.Disabled {
+			rules = append(rules, r)
 		}
 	}
-	slices.Sort(names)
-	return names
-}
-
-func ruleNames(rules []lint.Rule) []string {
-	names := make([]string, len(rules))
-	for i, r := range rules {
-		names[i] = r.Name()
-	}
-	slices.Sort(names)
-	return names
+	return rules
 }
 
 // allFormatters is a list of all available formatters to output the linting results.

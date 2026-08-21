@@ -778,56 +778,59 @@ func TestGetFormatter(t *testing.T) {
 	})
 }
 
-func TestAllRuleNames(t *testing.T) {
-	names := config.AllRuleNames()
+func ruleNames(rules []lint.Rule) []string {
+	names := make([]string, len(rules))
+	for i, r := range rules {
+		names[i] = r.Name()
+	}
+	slices.Sort(names)
+	return names
+}
+
+func TestAllRules(t *testing.T) {
+	names := ruleNames(config.AllRules())
 
 	if len(names) == 0 {
-		t.Fatal("AllRuleNames returned no rules")
-	}
-	if !slices.IsSorted(names) {
-		t.Errorf("AllRuleNames should be sorted, got %v", names)
+		t.Fatal("AllRules returned no rules")
 	}
 	if compacted := slices.Compact(slices.Clone(names)); len(compacted) != len(names) {
-		t.Errorf("AllRuleNames should not contain duplicates, got %v", names)
+		t.Errorf("AllRules should not contain duplicates, got %v", names)
 	}
 	for _, want := range []string{"argument-limit", "cyclomatic", "exported", "var-naming"} {
 		if !slices.Contains(names, want) {
-			t.Errorf("AllRuleNames should contain %q", want)
+			t.Errorf("AllRules should contain %q", want)
 		}
 	}
 	// Every default rule is also part of all rules.
-	for _, name := range config.DefaultRuleNames() {
+	for _, name := range ruleNames(config.DefaultRules()) {
 		if !slices.Contains(names, name) {
-			t.Errorf("AllRuleNames is missing default rule %q", name)
+			t.Errorf("AllRules is missing default rule %q", name)
 		}
 	}
 }
 
-func TestDefaultRuleNames(t *testing.T) {
-	names := config.DefaultRuleNames()
+func TestDefaultRules(t *testing.T) {
+	names := ruleNames(config.DefaultRules())
 
 	if len(names) == 0 {
-		t.Fatal("DefaultRuleNames returned no rules")
-	}
-	if !slices.IsSorted(names) {
-		t.Errorf("DefaultRuleNames should be sorted, got %v", names)
+		t.Fatal("DefaultRules returned no rules")
 	}
 	if compacted := slices.Compact(slices.Clone(names)); len(compacted) != len(names) {
-		t.Errorf("DefaultRuleNames should not contain duplicates, got %v", names)
+		t.Errorf("DefaultRules should not contain duplicates, got %v", names)
 	}
 	for _, want := range []string{"blank-imports", "exported", "var-naming"} {
 		if !slices.Contains(names, want) {
-			t.Errorf("DefaultRuleNames should contain %q", want)
+			t.Errorf("DefaultRules should contain %q", want)
 		}
 	}
 	// Default rules are a strict subset of all rules.
-	if len(names) >= len(config.AllRuleNames()) {
-		t.Errorf("DefaultRuleNames (%d) should be fewer than AllRuleNames (%d)", len(names), len(config.AllRuleNames()))
+	if len(names) >= len(config.AllRules()) {
+		t.Errorf("DefaultRules (%d) should be fewer than AllRules (%d)", len(names), len(config.AllRules()))
 	}
 }
 
-func TestEnabledRuleNames(t *testing.T) {
-	t.Run("returns only enabled rules, sorted", func(t *testing.T) {
+func TestEnabledRules(t *testing.T) {
+	t.Run("returns only enabled rules", func(t *testing.T) {
 		cfg := &lint.Config{
 			Rules: lint.RulesConfig{
 				"var-naming":     {},
@@ -837,22 +840,22 @@ func TestEnabledRuleNames(t *testing.T) {
 			},
 		}
 
-		got := config.EnabledRuleNames(cfg)
+		got := ruleNames(config.EnabledRules(cfg))
 		want := []string{"argument-limit", "var-naming"}
 		if !slices.Equal(got, want) {
-			t.Errorf("EnabledRuleNames: expected %v, got %v", want, got)
+			t.Errorf("EnabledRules: expected %v, got %v", want, got)
 		}
 	})
 
 	t.Run("empty config has no enabled rules", func(t *testing.T) {
-		if got := config.EnabledRuleNames(&lint.Config{}); len(got) != 0 {
-			t.Errorf("EnabledRuleNames: expected none, got %v", got)
+		if got := config.EnabledRules(&lint.Config{}); len(got) != 0 {
+			t.Errorf("EnabledRules: expected none, got %v", got)
 		}
 	})
 
 	t.Run("nil config has no enabled rules", func(t *testing.T) {
-		if got := config.EnabledRuleNames(nil); len(got) != 0 {
-			t.Errorf("EnabledRuleNames: expected none, got %v", got)
+		if got := config.EnabledRules(nil); len(got) != 0 {
+			t.Errorf("EnabledRules: expected none, got %v", got)
 		}
 	})
 }
@@ -873,13 +876,13 @@ func TestDefault(t *testing.T) {
 		t.Errorf("Severity: expected %v, got %v", lint.SeverityWarning, cfg.Severity)
 	}
 
-	var ruleNames []string
+	var names []string
 	for name := range cfg.Rules {
-		ruleNames = append(ruleNames, name)
+		names = append(names, name)
 	}
-	slices.Sort(ruleNames)
-	if want := config.DefaultRuleNames(); !slices.Equal(ruleNames, want) {
-		t.Errorf("Default config rules: expected %v, got %v", want, ruleNames)
+	slices.Sort(names)
+	if want := ruleNames(config.DefaultRules()); !slices.Equal(names, want) {
+		t.Errorf("Default config rules: expected %v, got %v", want, names)
 	}
 }
 
@@ -889,8 +892,8 @@ func TestNormalize(t *testing.T) {
 
 		config.Normalize(cfg)
 
-		if got := config.EnabledRuleNames(cfg); !slices.Equal(got, config.DefaultRuleNames()) {
-			t.Errorf("expected default rules %v, got %v", config.DefaultRuleNames(), got)
+		if got, want := ruleNames(config.EnabledRules(cfg)), ruleNames(config.DefaultRules()); !slices.Equal(got, want) {
+			t.Errorf("expected default rules %v, got %v", want, got)
 		}
 	})
 
@@ -899,8 +902,8 @@ func TestNormalize(t *testing.T) {
 
 		config.Normalize(cfg)
 
-		if got := config.EnabledRuleNames(cfg); !slices.Equal(got, config.AllRuleNames()) {
-			t.Errorf("expected all rules %v, got %v", config.AllRuleNames(), got)
+		if got, want := ruleNames(config.EnabledRules(cfg)), ruleNames(config.AllRules()); !slices.Equal(got, want) {
+			t.Errorf("expected all rules %v, got %v", want, got)
 		}
 	})
 
