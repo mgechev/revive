@@ -1,0 +1,2 @@
+# Fixtures in this directory must keep Windows line endings.
+*.go text eol=crlf

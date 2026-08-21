@@ -1,9 +1,13 @@
 package formatter_test
 
 import (
+	"encoding/xml"
+	"errors"
 	"go/token"
+	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/mgechev/revive/formatter"
@@ -16,6 +20,7 @@ func TestFormatter(t *testing.T) {
 		formatter lint.Formatter
 		failures  []lint.Failure
 		want      string
+		wantXML   bool
 	}{
 		"checkstyle": {
 			formatter: &formatter.Checkstyle{},
@@ -82,6 +87,36 @@ func TestFormatter(t *testing.T) {
       <error line="2" column="5" message="error var Exp should have name of the form ErrFoo (confidence 0)" severity="warning" source="revive/error-naming"/>
     </file>
 </checkstyle>`,
+			wantXML: true,
+		},
+		"checkstyle with XML special characters": {
+			formatter: &formatter.Checkstyle{},
+			failures: []lint.Failure{
+				{
+					Failure:  `error var Exp should have name of the form ErrFoo & not "Exp"`,
+					RuleName: "error-naming",
+					Category: lint.FailureCategoryNaming,
+					Position: lint.FailurePosition{
+						Start: token.Position{
+							Filename: `./q"dir/a&b.go`,
+							Line:     2,
+							Column:   5,
+						},
+						End: token.Position{
+							Filename: `./q"dir/a&b.go`,
+							Line:     2,
+							Column:   10,
+						},
+					},
+				},
+			},
+			want: `<?xml version='1.0' encoding='UTF-8'?>
+<checkstyle version="5.0">
+    <file name="./q&#34;dir/a&amp;b.go">
+      <error line="2" column="5" message="error var Exp should have name of the form ErrFoo &amp; not &#34;Exp&#34; (confidence 0)" severity="warning" source="revive/error-naming"/>
+    </file>
+</checkstyle>`,
+			wantXML: true,
 		},
 		"default": {
 			formatter: &formatter.Default{},
@@ -877,6 +912,18 @@ file.go
 			}
 			if td.want != output {
 				t.Errorf("got:\n%s\nwant:\n%s\n", output, td.want)
+			}
+			if td.wantXML {
+				decoder := xml.NewDecoder(strings.NewReader(output))
+				for {
+					_, err := decoder.Token()
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					if err != nil {
+						t.Fatalf("output is not well-formed XML: %v\ngot:\n%s", err, output)
+					}
+				}
 			}
 		})
 	}
