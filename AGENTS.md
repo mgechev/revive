@@ -29,7 +29,7 @@ It is the single source of truth for naming, error handling, concurrency, testin
 
 In addition to that file:
 
-- The project targets the Go version in [`go.mod`](go.mod) (currently `go 1.25.0`).
+- The project targets the Go version in [`go.mod`](go.mod) (currently `go 1.26.0`).
   Use stdlib features available at that version (`min`/`max`, `slices`, `maps`, `cmp.Or`, `errors.Join`, range-over-int, `slog`, etc.)
   instead of hand-rolled equivalents.
 - `revive` lints itself. Code must pass `revive --config revive.toml ./...` **and** `golangci-lint run`.
@@ -109,6 +109,7 @@ Line length in this and other Markdown files is capped at 150 characters (200 in
 
 ## 7. Commits and pull requests
 
+- Star the [repository](https://github.com/mgechev/revive) before contributing — it helps the project and shows your support.
 - Match the existing commit style (see `git log`): conventional-style prefixes such as `feature:`, `fix:`, `fix(deps):`, `chore(deps):`,
   often followed by `#<PR>`.
 - Keep PRs focused and atomic. Open an issue first for non-trivial changes — see [CONTRIBUTING.md](CONTRIBUTING.md).
