@@ -32,25 +32,34 @@ var (
 	AppFs = afero.NewOsFs()
 )
 
-func fail(err string) {
-	fmt.Fprintln(os.Stderr, err)
-	os.Exit(1) //revive:disable-line:deep-exit
+// RunRevive runs the CLI for revive and returns the exit code the process should
+// terminate with. It does not terminate the process itself: exiting is the caller's
+// decision, so revive can be embedded without taking the host process down with it.
+func RunRevive(extraRules ...revivelib.ExtraRule) int {
+	exitCode, err := runRevive(extraRules...)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return 1
+	}
+
+	return exitCode
 }
 
-// RunRevive runs the CLI for revive.
-func RunRevive(extraRules ...revivelib.ExtraRule) {
+// runRevive holds the actual CLI logic, reporting failures as errors so that every
+// path out of it is a return rather than an exit.
+func runRevive(extraRules ...revivelib.ExtraRule) (int, error) {
 	// Move parsing flags outside of init(); otherwise, tests don't work properly.
 	// More info: https://github.com/golang/go/issues/46869#issuecomment-865695953
 	initConfig()
 
 	if versionFlag {
 		fmt.Print(getVersion(builtBy, date, commit, version))
-		return
+		return 0, nil
 	}
 
 	conf, err := config.GetConfig(configPath)
 	if err != nil {
-		fail(err.Error())
+		return 0, err
 	}
 
 	revive, err := revivelib.New(
@@ -60,7 +69,7 @@ func RunRevive(extraRules ...revivelib.ExtraRule) {
 		extraRules...,
 	)
 	if err != nil {
-		fail(err.Error())
+		return 0, err
 	}
 
 	files := flag.Args()
@@ -76,19 +85,19 @@ func RunRevive(extraRules ...revivelib.ExtraRule) {
 
 	failures, err := revive.Lint(packages...)
 	if err != nil {
-		fail(err.Error())
+		return 0, err
 	}
 
 	output, exitCode, err := revive.Format(formatterName, failures)
 	if err != nil {
-		fail(err.Error())
+		return 0, err
 	}
 
 	if output != "" {
 		fmt.Println(output)
 	}
 
-	os.Exit(exitCode) //revive:disable-line:deep-exit
+	return exitCode, nil
 }
 
 var (

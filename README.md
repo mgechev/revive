@@ -704,13 +704,15 @@ The full rule set of `revive` is also actionable by your application.
 package main
 
 import (
+	"os"
+
 	"github.com/mgechev/revive/cli"
 	"github.com/mgechev/revive/lint"
 	"github.com/mgechev/revive/revivelib"
 )
 
 func main() {
-	cli.RunRevive(revivelib.NewExtraRule(&myRule{}, lint.RuleConfig{}))
+	os.Exit(cli.RunRevive(revivelib.NewExtraRule(&myRule{}, lint.RuleConfig{})))
 }
 
 type myRule struct{}

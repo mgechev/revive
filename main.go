@@ -1,8 +1,12 @@
 // Package main is the build entry point of revive.
 package main
 
-import "github.com/mgechev/revive/cli"
+import (
+	"os"
+
+	"github.com/mgechev/revive/cli"
+)
 
 func main() {
-	cli.RunRevive()
+	os.Exit(cli.RunRevive())
 }
