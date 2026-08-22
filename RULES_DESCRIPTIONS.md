@@ -1139,6 +1139,23 @@ _Description_: A `switch` with identical branches makes maintenance harder
 and might be a source of bugs. Duplicated branches should be consolidated
 in one case clause.
 
+_Configuration_: ([]string) Specifies exceptions to the rule. The available option is:
+
+- "allow-identical-default": do not report a `default` case clause that is identical to another
+  case clause.
+
+Configuration example:
+
+When switching over values from an external package, spelling out a fallback that repeats a
+listed case can be deliberate: it documents which values are explicitly handled and that
+everything else lands on the same code. To keep the rule for identical `case` clauses while
+allowing that:
+
+```toml
+[rule.identical-switch-branches]
+arguments = ["allow-identical-default"]
+```
+
 ## identical-switch-conditions
 
 _Go version_: 1.0.
