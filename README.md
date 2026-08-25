@@ -546,6 +546,7 @@ List of all [available rules](./RULES_DESCRIPTIONS.md).
 | [`error-return`](./RULES_DESCRIPTIONS.md#error-return)        |  n/a   | The error return parameter should be last.                       | 1.0 |   yes    |  no   |
 | [`error-strings`](./RULES_DESCRIPTIONS.md#error-strings)       |  []string   | Conventions around error strings.                                | 1.0 |   yes    |  no   |
 | [`errorf`](./RULES_DESCRIPTIONS.md#errorf)              |  n/a   | Should replace `errors.New(fmt.Sprintf())` with `fmt.Errorf()`   | 1.0 |   yes    |  yes  |
+| [`exit-after-defer`](./RULES_DESCRIPTIONS.md#exit-after-defer) |  n/a   | Spots `os.Exit`, `syscall.Exit` or `log.Fatal` calls reachable after a `defer` | 1.0 |    no    |  no   |
 | [`exported`](./RULES_DESCRIPTIONS.md#exported)            |  []string   | Naming and commenting conventions on exported symbols.           | 1.0 |   yes    |  no   |
 | [`file-header`](./RULES_DESCRIPTIONS.md#file-header)         | string (defaults to none)| Header which each file should have.                              | 1.0 |    no    |  no   |
 | [`file-length-limit`](./RULES_DESCRIPTIONS.md#file-length-limit) | map (optional)| Enforces a maximum number of lines per file | 1.0 |    no    |  no   |
