@@ -15,14 +15,17 @@ func runReviveWith(t *testing.T, args ...string) int {
 
 	oldArgs, oldCommandLine, oldUsage := os.Args, flag.CommandLine, flag.Usage
 	t.Cleanup(func() {
+		//nolint:reassign // restoring the globals this helper swapped; RunRevive reads them directly
 		os.Args, flag.CommandLine, flag.Usage = oldArgs, oldCommandLine, oldUsage
 		versionFlag, configPath, formatterName = false, "", ""
 		setExitStatus, maxOpenFiles, excludePatterns = false, 0, nil
 	})
 
+	//nolint:reassign // a fresh FlagSet per call; initConfig panics re-registering on the global one
 	flag.CommandLine = flag.NewFlagSet("revive", flag.ContinueOnError)
 	flag.CommandLine.SetOutput(io.Discard)
 	excludePatterns = nil
+	//nolint:reassign // RunRevive parses os.Args itself, so the case under test has to be put there
 	os.Args = append([]string{"revive"}, args...)
 
 	return RunRevive()
