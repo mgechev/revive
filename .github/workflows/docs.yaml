@@ -1,0 +1,87 @@
+name: Website
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'docs/**'
+      - 'scripts/website/**'
+      - 'README.md'
+      - 'RULES_DESCRIPTIONS.md'
+      - 'assets/**'
+      # The generator cross-checks documented rules against config.AllRules(),
+      # so rule (de)registrations must run it in the PR that causes the drift.
+      - 'config/**'
+      - '.github/workflows/docs.yaml'
+  push:
+    branches:
+      - master
+    paths:
+      - 'docs/**'
+      - 'scripts/website/**'
+      - 'README.md'
+      - 'RULES_DESCRIPTIONS.md'
+      - 'assets/**'
+      - 'config/**'
+      - '.github/workflows/docs.yaml'
+
+permissions:
+  contents: read
+
+# Never run two Pages deployments at once: they can collide or complete out of
+# order, leaving an older commit's content live.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build website
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Setup Go
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version: stable
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@75d2e84710de30f6ff7268e08f310b60ef14033f # v3.0.0
+        with:
+          hugo-version: '0.155.3'
+          extended: true
+
+      - name: Generate website content
+        run: go run ./scripts/website
+
+      - name: Build website
+        run: hugo --source docs --gc --minify
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: docs/public
+
+  # Deploy stays skipped until a maintainer enables GitHub Pages (source:
+  # GitHub Actions) on this repo, sets the WEBSITE_DEPLOY repository variable to
+  # 'true', and moves the revive.run custom domain over from mgechev/revive.run —
+  # see docs/README.md. Without the variable gate the job would fail red on
+  # every docs-adjacent push to master.
+  deploy:
+    name: Deploy website
+    if: github.event_name != 'pull_request' && vars.WEBSITE_DEPLOY == 'true'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
