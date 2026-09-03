@@ -558,7 +558,7 @@ List of all [available rules](./RULES_DESCRIPTIONS.md).
 | [`identical-branches`](./RULES_DESCRIPTIONS.md#identical-branches)          |  n/a   | Spots if-then-else statements with identical `then` and `else` branches       | 1.0 |    no    |  no   |
 | [`identical-ifelseif-branches`](./RULES_DESCRIPTIONS.md#identical-ifelseif-branches)          |  n/a   | Spots `if ... else if` chains with identical branches.       | 1.0 |    no    |  no   |
 | [`identical-ifelseif-conditions`](./RULES_DESCRIPTIONS.md#identical-ifelseif-conditions)          |  n/a   | Spots identical conditions in  `if ... else if` chains.       | 1.0 |    no    |  no   |
-| [`identical-switch-branches`](./RULES_DESCRIPTIONS.md#identical-switch-branches)          |  n/a   | Spots `switch` with identical branches.       | 1.0 |    no    |  no   |
+| [`identical-switch-branches`](./RULES_DESCRIPTIONS.md#identical-switch-branches)          |  map   | Spots `switch` with identical branches.       | 1.0 |    no    |  no   |
 | [`identical-switch-conditions`](./RULES_DESCRIPTIONS.md#identical-switch-conditions)          |  n/a   | Spots identical conditions in case clauses of `switch` statements.       | 1.0 |    no    |  no   |
 | [`if-return`](./RULES_DESCRIPTIONS.md#if-return)           |  n/a   | Redundant if when returning an error.                            | 1.0 |   no    |  no   |
 | [`import-alias-naming`](./RULES_DESCRIPTIONS.md#import-alias-naming)         | string or map[string]string (defaults to allow regex pattern `^[a-z][a-z0-9]{0,}$`) | Conventions around the naming of import aliases.                              | 1.0 |    no    |  no   |

@@ -1135,25 +1135,36 @@ _Configuration_: N/A
 
 _Go version_: 1.0.
 
-_Description_: A `switch` with identical branches makes maintenance harder
-and might be a source of bugs. Duplicated branches should be consolidated
-in one case clause.
+_Description_: A `switch` with identical branches makes maintenance harder and might be a source of bugs.
+Duplicated branches should be consolidated in one case clause.
 
-_Configuration_: ([]string) Specifies exceptions to the rule. The available option is:
+_Configuration_: (optional) single map of options (`map[string]any`), provided as the single configuration argument in the rule's arguments array.
 
-- "allow-identical-default": do not report a `default` case clause that is identical to another
-  case clause.
+- `allow-identical-default`: (bool) If `true`, do not report a `default` case clause that is identical to another case clause. Default: `false`.
 
-Configuration example:
+### Examples (identical-switch-branches)
 
-When switching over values from an external package, spelling out a fallback that repeats a
-listed case can be deliberate: it documents which values are explicitly handled and that
-everything else lands on the same code. To keep the rule for identical `case` clauses while
-allowing that:
+When switching over values from an external package, spelling out a fallback that repeats a listed case can be deliberate:
+it documents which values are explicitly handled and that everything else lands on the same code.
+
+```go
+switch http.SameSite(s) {
+case http.SameSiteNoneMode:
+	return SameSiteNoneMode
+case http.SameSiteLaxMode:
+	return SameSiteLaxMode
+case http.SameSiteStrictMode:
+	return SameSiteStrictMode
+default:
+	return SameSiteLaxMode
+}
+```
+
+To keep the rule for identical `case` clauses while allowing that:
 
 ```toml
 [rule.identical-switch-branches]
-arguments = ["allow-identical-default"]
+arguments = [{ allow-identical-default = true }]
 ```
 
 ## identical-switch-conditions

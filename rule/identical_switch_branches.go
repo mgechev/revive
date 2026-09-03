@@ -18,17 +18,25 @@ type IdenticalSwitchBranchesRule struct {
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
 func (r *IdenticalSwitchBranchesRule) Configure(arguments lint.Arguments) error {
-	for _, arg := range arguments {
-		argStr, ok := arg.(string)
-		if !ok {
-			return fmt.Errorf("invalid argument for rule %s; expected string but got %T", r.Name(), arg)
-		}
+	if len(arguments) < 1 {
+		return nil // use defaults
+	}
 
+	argKV, ok := arguments[0].(map[string]any)
+	if !ok {
+		return fmt.Errorf("invalid argument to the %s rule. Expecting a k,v map, got %T", r.Name(), arguments[0])
+	}
+
+	for k, v := range argKV {
 		switch {
-		case isRuleOption(argStr, "allowIdenticalDefault"):
-			r.allowIdenticalDefault = true
+		case isRuleOption(k, "allowIdenticalDefault"):
+			allow, ok := v.(bool)
+			if !ok {
+				return fmt.Errorf("invalid configuration value for %q in %s rule; need bool but got %T", k, r.Name(), v)
+			}
+			r.allowIdenticalDefault = allow
 		default:
-			return fmt.Errorf(`invalid argument %q for rule %s; expected "allow-identical-default"`, argStr, r.Name())
+			return fmt.Errorf(`invalid argument %q for rule %s; expected "allow-identical-default"`, k, r.Name())
 		}
 	}
 
