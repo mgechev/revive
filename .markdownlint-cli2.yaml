@@ -29,7 +29,7 @@ config:
 
 # Define glob expressions to use
 globs:
-  - "*.md"
+  - "**/*.md"
 
 # Disable banner message on stdout
 noBanner: true
