@@ -28,10 +28,11 @@ on:
 permissions:
   contents: read
 
-# Never run two Pages deployments at once: they can collide or complete out of
-# order, leaving an older commit's content live.
+# Never run two Pages deployments for the same ref at once: they can collide or
+# complete out of order, leaving an older commit's content live. Keying by ref
+# keeps unrelated pull request builds from queueing behind each other.
 concurrency:
-  group: pages
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -49,7 +50,7 @@ jobs:
           go-version: stable
 
       - name: Setup Hugo
-        uses: peaceiris/actions-hugo@75d2e84710de30f6ff7268e08f310b60ef14033f # v3.0.0
+        uses: peaceiris/actions-hugo@2752ce1d29631191ea3f27c23495fa06139a5b78 # v3.2.1
         with:
           hugo-version: '0.155.3'
           extended: true
@@ -84,4 +85,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
