@@ -69,6 +69,8 @@ The canonical example is [`rule/argument_limit.go`](rule/argument_limit.go). For
 
     If the rule takes arguments, also implement `lint.ConfigurableRule.Configure(lint.Arguments) error`.
     Validate arguments there and return errors rather than panicking.
+    Any newly added option must be passed as a `map[string]any` (a single map argument with named keys),
+    not as a positional/scalar argument — this keeps rule configuration extensible and self-documenting.
 2. **Naming** — `Name()` returns `kebab-case` (e.g. `argument-limit`).
    The Go type is `ArgumentsLimitRule`. Source file is `argument_limit.go`. Keep these three in lockstep.
 3. **Concurrency** — `Apply` may be called concurrently for different files.
