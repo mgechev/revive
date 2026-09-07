@@ -23,6 +23,7 @@ type VarNamingRule struct {
 	blockList []string
 
 	allowUpperCaseConst      bool // if true - allows to use UPPER_SOME_NAMES for constants
+	initialismsAsWords       bool // if true - enforce initial capitals like Http
 	skipInitialismNameChecks bool // if true - disable enforcing capitals for common initialisms
 }
 
@@ -64,6 +65,8 @@ func (r *VarNamingRule) Configure(arguments lint.Arguments) error {
 			switch {
 			case isRuleOption(k, "skipInitialismNameChecks"):
 				r.skipInitialismNameChecks = fmt.Sprint(v) == "true"
+			case isRuleOption(k, "initialismsAsWords"):
+				r.initialismsAsWords = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "upperCaseConst"):
 				r.allowUpperCaseConst = fmt.Sprint(v) == "true"
 			case isRuleOption(k, "skipPackageNameChecks"):
@@ -104,6 +107,7 @@ func (r *VarNamingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 		allowList:            r.allowList,
 		blockList:            r.blockList,
 		skipInitialismChecks: r.skipInitialismNameChecks,
+		initialismsAsWords:   r.initialismsAsWords,
 		upperCaseConst:       r.allowUpperCaseConst,
 	}
 
@@ -124,6 +128,7 @@ type lintNames struct {
 	allowList            []string
 	blockList            []string
 	skipInitialismChecks bool
+	initialismsAsWords   bool
 	upperCaseConst       bool
 }
 
@@ -163,7 +168,7 @@ func (w *lintNames) check(id *ast.Ident, thing string) {
 		return
 	}
 
-	should := rule.Name(id.Name, w.allowList, w.blockList, w.skipInitialismChecks)
+	should := rule.Name(id.Name, w.allowList, w.blockList, w.skipInitialismChecks, w.initialismsAsWords)
 	if id.Name == should {
 		return
 	}
