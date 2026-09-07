@@ -1,0 +1,92 @@
+# Hugo configuration for the revive website (https://revive.run/).
+# POC for https://github.com/mgechev/revive/issues/1647 — see docs/README.md.
+
+baseURL: https://revive.run/
+title: revive
+languageCode: en-us
+
+# Theme: Hextra, imported as a Hugo Module (see go.mod / go.sum).
+module:
+  imports:
+    - path: github.com/imfing/hextra
+
+markup:
+  goldmark:
+    parser:
+      # GitHub-style heading ids (e.g. #examples-add-constant) — the legacy
+      # fragment shim and inbound deep links rely on them.
+      autoHeadingID: true
+      autoHeadingIDType: github
+    renderer:
+      # Required: the homepage, the README-derived docs page, and the legacy
+      # /r#<rule> fragment shim contain raw HTML.
+      unsafe: true
+  highlight:
+    # Hextra styles code via CSS classes (light/dark aware), so class-based
+    # highlighting must be enabled instead of inline styles.
+    noClasses: false
+    codeFences: true
+    guessSyntax: false
+    lineNos: false
+
+enableInlineShortcodes: true
+
+menu:
+  main:
+    - name: Docs
+      url: /docs/
+      weight: 1
+    - name: Rules
+      url: /r/
+      weight: 2
+    - name: Search
+      weight: 3
+      params:
+        type: search
+    - name: GitHub
+      url: https://github.com/mgechev/revive
+      weight: 4
+      params:
+        icon: github
+    # Light/dark/system toggle, rendered in the navbar (label + icon).
+    - name: Theme
+      weight: 5
+      params:
+        type: theme-toggle
+        label: true
+
+params:
+  description: >-
+    ~6x faster, stricter, configurable, extensible, and beautiful drop-in
+    replacement for golint.
+
+  navbar:
+    displayTitle: true
+    displayLogo: true
+    logo:
+      path: images/logo.png
+      link: /
+      width: 28
+
+  theme:
+    # Light/dark follows the visitor's OS preference. The toggle lives in the
+    # navbar (menu entry with type: theme-toggle); displayToggle stays off so
+    # the footer/sidebar don't render a second one.
+    default: system
+    displayToggle: false
+
+  # Client-side full-text search (FlexSearch) — pure configuration in Hextra,
+  # the index is generated at build time.
+  search:
+    enable: true
+    type: flexsearch
+    flexsearch:
+      index: content
+      tokenize: forward
+
+  footer:
+    displayCopyright: false
+    displayPoweredBy: false
+
+  editURL:
+    enable: false

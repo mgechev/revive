@@ -1,0 +1,10 @@
+# Hugo build output
+/public/
+/resources/
+/.hugo_build.lock
+
+# Generated content — produced from README.md, RULES_DESCRIPTIONS.md, and
+# assets/ by `go run ./scripts/website` (run from the repository root).
+/content/r/
+/content/docs/
+/static/images/
