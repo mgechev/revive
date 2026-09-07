@@ -52,3 +52,14 @@ func foo2() (new int) { // MATCH /redefinition of the built-in function new/
 
 func foo3[new any]() { // MATCH /redefinition of the built-in function new/
 }
+
+type comparable int // MATCH /redefinition of the built-in type comparable/
+
+func comparable() {} // MATCH /redefinition of the built-in type comparable/
+
+var comparable int // MATCH /redefinition of the built-in type comparable/
+
+const comparable = 1 // MATCH /redefinition of the built-in type comparable/
+
+func foo4[comparable any]() { // MATCH /redefinition of the built-in type comparable/
+}
