@@ -39,6 +39,7 @@ List of all available rules.
 - [error-return](#error-return)
 - [error-strings](#error-strings)
 - [errorf](#errorf)
+- [exit-after-defer](#exit-after-defer)
 - [exported](#exported)
 - [file-header](#file-header)
 - [file-length-limit](#file-length-limit)
@@ -907,6 +908,31 @@ _Description_: It is possible to get a simpler program by replacing `errors.New(
 This rule spots that kind of simplification opportunities.
 
 _Configuration_: N/A
+
+## exit-after-defer
+
+_Go version_: 1.0.
+
+_Description_: Calls to `os.Exit`, `syscall.Exit` or the `log.Fatal` family stop the program immediately without running deferred functions.
+When such a call is reachable after a `defer` statement, the deferred call will never run, which is usually a mistake.
+
+`panic` and the `log.Panic` family are not reported because deferred functions still run while a panic unwinds the stack.
+
+_Configuration_: N/A
+
+### Examples (exit-after-defer)
+
+```go
+import "log"
+
+func run() {
+	defer cleanup()
+
+	if err := work(); err != nil {
+		log.Fatal(err) // cleanup is never called
+	}
+}
+```
 
 ## exported
 
