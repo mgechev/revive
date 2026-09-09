@@ -5,23 +5,23 @@ import "fmt"
 func somefn() {
 	m0 := make([]string, 10)
 	m1 := make([]string, 0, 10)
-	m2 := make([]string, 0)    // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
-	m3 := make([]string, 0, 0) // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
-	m4 := []string{}           // MATCH /use nil slice declaration (e.g. var args []type) instead of []type{}/
+	m2 := make([]string, 0)    // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
+	m3 := make([]string, 0, 0) // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
+	m4 := []string{}           // MATCH /use nil slice (e.g. []type(nil)) instead of []type{}/
 	m5 := []string{"v1", "v2"}
 	m6 := [8]string{}
 	m7 := [...]string{}
 	var m8 []string
-	var m9 []string = make([]string, 0) // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
-	var m10 = make([]string, 0)         // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
+	var m9 []string = make([]string, 0) // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
+	var m10 = make([]string, 0)         // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
 	m11 := []string(nil)
-	var m12 []string = []string{} // MATCH /use nil slice declaration (e.g. var args []type) instead of []type{}/
-	var m13 = []string{}          // MATCH /use nil slice declaration (e.g. var args []type) instead of []type{}/
+	var m12 []string = []string{} // MATCH /use nil slice (e.g. []type(nil)) instead of []type{}/
+	var m13 = []string{}          // MATCH /use nil slice (e.g. []type(nil)) instead of []type{}/
 	var m14 = []string(nil)
 	var m15 []string = nil
 	var m16 []string
-	m16 = make([]string, 0) // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
-	m16 = []string{}        // MATCH /use nil slice declaration (e.g. var args []type) instead of []type{}/
+	m16 = make([]string, 0) // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
+	m16 = []string{}        // MATCH /use nil slice (e.g. []type(nil)) instead of []type{}/
 
 	_ = m0
 	_ = m1
@@ -47,21 +47,21 @@ type Slice []string
 func somefn2() {
 	m0 := make(Slice, 10)
 	m1 := make(Slice, 0, 10)
-	m2 := make(Slice, 0)    // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
-	m3 := make(Slice, 0, 0) // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
-	m4 := Slice{}           // MATCH /use nil slice declaration (e.g. var args []type) instead of []type{}/
+	m2 := make(Slice, 0)    // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
+	m3 := make(Slice, 0, 0) // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
+	m4 := Slice{}           // MATCH /use nil slice (e.g. []type(nil)) instead of []type{}/
 	m5 := Slice{"v1", "v2"}
 	var m6 Slice
-	var m7 Slice = make(Slice, 0) // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
-	var m8 = make(Slice, 0)       // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
+	var m7 Slice = make(Slice, 0) // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
+	var m8 = make(Slice, 0)       // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
 	m9 := Slice(nil)
-	var m10 Slice = Slice{} // MATCH /use nil slice declaration (e.g. var args []type) instead of []type{}/
-	var m11 = Slice{}       // MATCH /use nil slice declaration (e.g. var args []type) instead of []type{}/
+	var m10 Slice = Slice{} // MATCH /use nil slice (e.g. []type(nil)) instead of []type{}/
+	var m11 = Slice{}       // MATCH /use nil slice (e.g. []type(nil)) instead of []type{}/
 	var m12 = Slice(nil)
 	var m13 Slice = nil
 	var m14 Slice
-	m14 = make(Slice, 0) // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
-	m14 = Slice{}        // MATCH /use nil slice declaration (e.g. var args []type) instead of []type{}/
+	m14 = make(Slice, 0) // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
+	m14 = Slice{}        // MATCH /use nil slice (e.g. []type(nil)) instead of []type{}/
 
 	_ = m0
 	_ = m1
@@ -85,21 +85,21 @@ type SliceSlice Slice
 func somefn3() {
 	m0 := make(SliceSlice, 10)
 	m1 := make(SliceSlice, 0, 10)
-	m2 := make(SliceSlice, 0)    // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
-	m3 := make(SliceSlice, 0, 0) // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
-	m4 := SliceSlice{}           // MATCH /use nil slice declaration (e.g. var args []type) instead of []type{}/
+	m2 := make(SliceSlice, 0)    // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
+	m3 := make(SliceSlice, 0, 0) // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
+	m4 := SliceSlice{}           // MATCH /use nil slice (e.g. []type(nil)) instead of []type{}/
 	m5 := SliceSlice{"v1", "v2"}
 	var m6 SliceSlice
-	var m7 SliceSlice = make(SliceSlice, 0) // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
-	var m8 = make(SliceSlice, 0)            // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
+	var m7 SliceSlice = make(SliceSlice, 0) // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
+	var m8 = make(SliceSlice, 0)            // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
 	m9 := SliceSlice(nil)
-	var m10 SliceSlice = SliceSlice{} // MATCH /use nil slice declaration (e.g. var args []type) instead of []type{}/
-	var m11 = SliceSlice{}            // MATCH /use nil slice declaration (e.g. var args []type) instead of []type{}/
+	var m10 SliceSlice = SliceSlice{} // MATCH /use nil slice (e.g. []type(nil)) instead of []type{}/
+	var m11 = SliceSlice{}            // MATCH /use nil slice (e.g. []type(nil)) instead of []type{}/
 	var m12 = SliceSlice(nil)
 	var m13 SliceSlice = nil
 	var m14 SliceSlice
-	m14 = make(SliceSlice, 0) // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
-	m14 = SliceSlice{}        // MATCH /use nil slice declaration (e.g. var args []type) instead of []type{}/
+	m14 = make(SliceSlice, 0) // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
+	m14 = SliceSlice{}        // MATCH /use nil slice (e.g. []type(nil)) instead of []type{}/
 
 	_ = m0
 	_ = m1
@@ -119,12 +119,12 @@ func somefn3() {
 }
 
 func somefn4() {
-	m1 := [][]string{} // MATCH /use nil slice declaration (e.g. var args []type) instead of []type{}/
+	m1 := [][]string{} // MATCH /use nil slice (e.g. []type(nil)) instead of []type{}/
 	m1["el0"] = make([]string, 10)
 	m1["el1"] = make([]string, 0, 10)
-	m1["el2"] = make([]string, 0)    // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
-	m1["el3"] = make([]string, 0, 0) // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
-	m1["el4"] = []string{}           // MATCH /use nil slice declaration (e.g. var args []type) instead of []type{}/
+	m1["el2"] = make([]string, 0)    // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
+	m1["el3"] = make([]string, 0, 0) // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
+	m1["el4"] = []string{}           // MATCH /use nil slice (e.g. []type(nil)) instead of []type{}/
 	m1["el5"] = []string{"v1", "v2"}
 	m1["el6"] = nil
 
@@ -132,8 +132,8 @@ func somefn4() {
 }
 
 func somefn5() {
-	afunc([]string{})        // MATCH /use nil slice declaration (e.g. var args []type) instead of []type{}/
-	afunc(make([]string, 0)) // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
+	afunc([]string{})        // MATCH /use nil slice (e.g. []type(nil)) instead of []type{}/
+	afunc(make([]string, 0)) // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
 	afunc([]string(nil))
 }
 
@@ -141,8 +141,8 @@ func somefn6() {
 	type s struct {
 		a []string
 	}
-	s1 = s{a: []string{}}        // MATCH /use nil slice declaration (e.g. var args []type) instead of []type{}/
-	s2 = s{a: make([]string, 0)} // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
+	s1 = s{a: []string{}}        // MATCH /use nil slice (e.g. []type(nil)) instead of []type{}/
+	s2 = s{a: make([]string, 0)} // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
 	s3 = s{}
 	s4 = s{a: nil}
 }
@@ -151,10 +151,22 @@ func somefn7() {
 	if m := []string(nil); len(m) == 0 {
 		fmt.Println("Hello, 世界")
 	}
-	if m := make([]string, 0); len(m) == 0 { // MATCH /use nil slice declaration (e.g. var args []type) instead of make([]type, 0)/
+	if m := make([]string, 0); len(m) == 0 { // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
 		fmt.Println("Hello, 世界")
 	}
-	if m := []string{}; len(m) == 0 { // MATCH /use nil slice declaration (e.g. var args []type) instead of []type{}/
+	if m := []string{}; len(m) == 0 { // MATCH /use nil slice (e.g. []type(nil)) instead of []type{}/
 		fmt.Println("Hello, 世界")
 	}
+}
+
+func somefn8() []string {
+	return []string{} // MATCH /use nil slice (e.g. []type(nil)) instead of []type{}/
+}
+
+func somefn9() []string {
+	return make([]string, 0) // MATCH /use nil slice (e.g. []type(nil)) instead of make([]type, 0)/
+}
+
+func somefn10() []string {
+	return []string(nil)
 }

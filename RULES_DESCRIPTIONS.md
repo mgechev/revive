@@ -758,7 +758,7 @@ arguments = [{ func-arg-style = "full", func-ret-val-style = "short" }]
 
 _Go version_: 1.0.
 
-_Description_: This rule enforces consistent usage of `make([]type, 0)`, `[]type{}`, or `var []type` for slice initialization.
+_Description_: This rule enforces consistent usage of `make([]type, 0)`, `[]type{}`, or nil slices for slice initialization.
 It does not affect `make([]type, non_zero_len, or_non_zero_cap)` constructions as well as `[]type{v1}`.
 Nil slices are always permitted.
 
@@ -767,7 +767,7 @@ _Configuration_: (string) Specifies the enforced style for slice initialization.
 - "any": No enforcement (default).
 - "make": Enforces the usage of `make([]type, 0)`.
 - "literal": Enforces the usage of `[]type{}`.
-- "nil": Enforces the usage of `var []type`.
+- "nil": Enforces nil slices, for example `var s []type` in declarations or `[]type(nil)` in expressions.
 
 Configuration example:
 

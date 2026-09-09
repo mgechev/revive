@@ -99,7 +99,7 @@ func (r *EnforceSliceStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint.
 
 			var failureMessage string
 			if r.enforceSliceStyle == enforceSliceStyleTypeNil {
-				failureMessage = "use nil slice declaration (e.g. var args []type) instead of []type{}"
+				failureMessage = "use nil slice (e.g. []type(nil)) instead of []type{}"
 			} else {
 				failureMessage = "use make([]type) instead of []type{} (or declare nil slice)"
 			}
@@ -158,7 +158,7 @@ func (r *EnforceSliceStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint.
 
 			var failureMessage string
 			if r.enforceSliceStyle == enforceSliceStyleTypeNil {
-				failureMessage = "use nil slice declaration (e.g. var args []type) instead of make([]type, 0)"
+				failureMessage = "use nil slice (e.g. []type(nil)) instead of make([]type, 0)"
 			} else {
 				failureMessage = "use []type{} instead of make([]type, 0) (or declare nil slice)"
 			}
