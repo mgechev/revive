@@ -59,6 +59,15 @@ func ExportedIntReturner() int { // MATCH /exported func ExportedIntReturner ret
 	return int{}
 }
 
+type unexportedInterface interface {
+	UnexportedInterface()
+}
+
+// UnexportedInterfacePointer returns an unexported interface pointer type from this package.
+func UnexportedInterfacePointer() *unexportedInterface { // MATCH /exported func UnexportedInterfacePointer returns unexported type *foo.unexportedInterface, which can be annoying to use/
+	return nil
+}
+
 type config struct {
 	N int
 }
