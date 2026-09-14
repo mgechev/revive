@@ -77,8 +77,20 @@ func (r *EnforceSliceStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint.
 
 	var failures []lint.Failure
 
+	var stack []ast.Node
 	astFile := file.AST
 	ast.Inspect(astFile, func(n ast.Node) bool {
+		if n == nil {
+			stack = stack[:len(stack)-1]
+			return true
+		}
+
+		var parent ast.Node
+		if len(stack) > 0 {
+			parent = stack[len(stack)-1]
+		}
+		stack = append(stack, n)
+
 		switch v := n.(type) {
 		case *ast.CompositeLit:
 			switch r.enforceSliceStyle {
@@ -99,7 +111,7 @@ func (r *EnforceSliceStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint.
 
 			var failureMessage string
 			if r.enforceSliceStyle == enforceSliceStyleTypeNil {
-				failureMessage = "use nil slice declaration (e.g. var args []type) instead of []type{}"
+				failureMessage = nilSliceFailureMessage(parent, "[]type{}")
 			} else {
 				failureMessage = "use make([]type) instead of []type{} (or declare nil slice)"
 			}
@@ -158,7 +170,7 @@ func (r *EnforceSliceStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint.
 
 			var failureMessage string
 			if r.enforceSliceStyle == enforceSliceStyleTypeNil {
-				failureMessage = "use nil slice declaration (e.g. var args []type) instead of make([]type, 0)"
+				failureMessage = nilSliceFailureMessage(parent, "make([]type, 0)")
 			} else {
 				failureMessage = "use []type{} instead of make([]type, 0) (or declare nil slice)"
 			}
@@ -178,6 +190,13 @@ func (r *EnforceSliceStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint.
 // Name returns the rule name.
 func (*EnforceSliceStyleRule) Name() string {
 	return "enforce-slice-style"
+}
+
+func nilSliceFailureMessage(parent ast.Node, instead string) string {
+	if _, ok := parent.(*ast.ValueSpec); ok {
+		return "use nil slice declaration (e.g. var args []type) instead of " + instead
+	}
+	return "use nil slice (e.g. []type(nil)) instead of " + instead
 }
 
 func (r *EnforceSliceStyleRule) isSliceType(v ast.Expr) bool {
