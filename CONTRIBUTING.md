@@ -30,6 +30,8 @@ We greatly appreciate any attention to tests. These help us validate that new wo
 In particular, this community seeks the following types of contributions:
 
 * Improvement of the documentation. For example, tutorial on development of a custom rule, or a formatter.
+  Note that the [website](https://revive.run/) is generated from the docs in this repository,
+  see the [Website](DEVELOPING.md#website) section of the developer guide.
 * Development of new rules for providing an even stricter preset of validations.
 * Development of new formatters for more readable output of the linting process.
 
