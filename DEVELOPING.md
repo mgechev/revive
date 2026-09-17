@@ -154,3 +154,18 @@ mdsf format .
 
 _Note: Use `golang` for Go code snippets that are intentionally non-compilable.
 However, it is recommended to avoid this and use `go` whenever possible._
+
+## Website
+
+The documentation website <https://revive.run/> lives in a separate repository: [mgechev/revive.run](https://github.com/mgechev/revive.run).
+
+Most of its content is generated from this repository, so there is no need to edit the website when changing docs here:
+
+- `/docs` is generated from `README.md`
+- `/r` is generated from `RULES_DESCRIPTIONS.md`
+- `/images` is generated from `assets/`
+
+The website is rebuilt from the latest revive release twice a month by a scheduled workflow,
+so documentation changes appear on the website after the next release.
+
+Keep the headings in `RULES_DESCRIPTIONS.md` stable: the `/r/#<rule>` links printed by revive rely on them.
