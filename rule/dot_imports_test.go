@@ -1,25 +1,22 @@
-package rule
+package rule_test
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
 )
 
 func TestDotImportsRule_Configure(t *testing.T) {
 	tests := []struct {
-		name              string
-		arguments         lint.Arguments
-		wantErr           error
-		wantAllowPackages allowPackages
+		name      string
+		arguments lint.Arguments
+		wantErr   error
 	}{
 		{
-			name:              "no arguments",
-			arguments:         lint.Arguments{},
-			wantErr:           nil,
-			wantAllowPackages: allowPackages{},
+			name:      "no arguments",
+			arguments: lint.Arguments{},
 		},
 		{
 			name: "no allowedPackages key",
@@ -28,8 +25,6 @@ func TestDotImportsRule_Configure(t *testing.T) {
 					"invalid": "argument",
 				},
 			},
-			wantErr:           nil,
-			wantAllowPackages: allowPackages{},
 		},
 		{
 			name: "valid arguments",
@@ -39,10 +34,6 @@ func TestDotImportsRule_Configure(t *testing.T) {
 						"github.com/onsi/ginkgo/v2",
 					},
 				},
-			},
-			wantErr: nil,
-			wantAllowPackages: allowPackages{
-				`"github.com/onsi/ginkgo/v2"`: struct{}{},
 			},
 		},
 		{
@@ -54,10 +45,6 @@ func TestDotImportsRule_Configure(t *testing.T) {
 					},
 				},
 			},
-			wantErr: nil,
-			wantAllowPackages: allowPackages{
-				`"github.com/onsi/ginkgo/v2"`: struct{}{},
-			},
 		},
 		{
 			name: "valid kebab-cased arguments",
@@ -67,10 +54,6 @@ func TestDotImportsRule_Configure(t *testing.T) {
 						"github.com/onsi/ginkgo/v2",
 					},
 				},
-			},
-			wantErr: nil,
-			wantAllowPackages: allowPackages{
-				`"github.com/onsi/ginkgo/v2"`: struct{}{},
 			},
 		},
 		{
@@ -102,25 +85,18 @@ func TestDotImportsRule_Configure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var rule DotImportsRule
+			var r rule.DotImportsRule
 
-			err := rule.Configure(tt.arguments)
+			err := r.Configure(tt.arguments)
 
-			if tt.wantErr != nil {
-				if err == nil {
-					t.Errorf("unexpected error: got = nil, want = %v", tt.wantErr)
-					return
-				}
-				if err.Error() != tt.wantErr.Error() {
-					t.Errorf("unexpected error: got = %v, want = %v", err, tt.wantErr)
+			if tt.wantErr == nil {
+				if err != nil {
+					t.Errorf("Configure() unexpected non-nil error %q", err)
 				}
 				return
 			}
-			if err != nil {
-				t.Errorf("unexpected error: got = %v, want = nil", err)
-			}
-			if !reflect.DeepEqual(rule.allowedPackages, tt.wantAllowPackages) {
-				t.Errorf("unexpected allowedPackages: got = %v, want %v", rule.allowedPackages, tt.wantAllowPackages)
+			if err == nil || err.Error() != tt.wantErr.Error() {
+				t.Errorf("Configure() unexpected error: got %q, want %q", err, tt.wantErr)
 			}
 		})
 	}

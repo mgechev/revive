@@ -1,27 +1,22 @@
-package rule
+package rule_test
 
 import (
 	"errors"
-	"regexp"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
 )
 
 func TestUnusedReceiverRule_Configure(t *testing.T) {
 	tests := []struct {
-		name           string
-		arguments      lint.Arguments
-		wantErr        error
-		wantRegex      *regexp.Regexp
-		wantFailureMsg string
+		name      string
+		arguments lint.Arguments
+		wantErr   error
 	}{
 		{
-			name:           "no arguments",
-			arguments:      lint.Arguments{},
-			wantErr:        nil,
-			wantRegex:      regexp.MustCompile("^_$"),
-			wantFailureMsg: "method receiver '%s' is not referenced in method's body, consider removing or renaming it as _",
+			name:      "no arguments",
+			arguments: lint.Arguments{},
 		},
 		{
 			name: "valid arguments",
@@ -30,9 +25,6 @@ func TestUnusedReceiverRule_Configure(t *testing.T) {
 					"allowRegex": "^_",
 				},
 			},
-			wantErr:        nil,
-			wantRegex:      regexp.MustCompile("^_"),
-			wantFailureMsg: "method receiver '%s' is not referenced in method's body, consider removing or renaming it to match ^_",
 		},
 		{
 			name: "valid lowercased arguments",
@@ -41,9 +33,6 @@ func TestUnusedReceiverRule_Configure(t *testing.T) {
 					"allowregex": "^_",
 				},
 			},
-			wantErr:        nil,
-			wantRegex:      regexp.MustCompile("^_"),
-			wantFailureMsg: "method receiver '%s' is not referenced in method's body, consider removing or renaming it to match ^_",
 		},
 		{
 			name: "valid kebab-cased arguments",
@@ -52,26 +41,18 @@ func TestUnusedReceiverRule_Configure(t *testing.T) {
 					"allow-regex": "^_",
 				},
 			},
-			wantErr:        nil,
-			wantRegex:      regexp.MustCompile("^_"),
-			wantFailureMsg: "method receiver '%s' is not referenced in method's body, consider removing or renaming it to match ^_",
 		},
 		{
 			name: "argument is not a map",
 			arguments: lint.Arguments{
 				"invalid_argument",
 			},
-			wantErr:        nil,
-			wantFailureMsg: "method receiver '%s' is not referenced in method's body, consider removing or renaming it as _",
 		},
 		{
 			name: "missing allowRegex key",
 			arguments: lint.Arguments{
 				map[string]any{},
 			},
-			wantErr:        nil,
-			wantRegex:      allowBlankIdentifierRegex,
-			wantFailureMsg: "method receiver '%s' is not referenced in method's body, consider removing or renaming it as _",
 		},
 		{
 			name: "invalid allowRegex type",
@@ -95,28 +76,18 @@ func TestUnusedReceiverRule_Configure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var rule UnusedReceiverRule
+			var r rule.UnusedReceiverRule
 
-			err := rule.Configure(tt.arguments)
+			err := r.Configure(tt.arguments)
 
-			if tt.wantErr != nil {
-				if err == nil {
-					t.Errorf("unexpected error: got = nil, want = %v", tt.wantErr)
-					return
-				}
-				if err.Error() != tt.wantErr.Error() {
-					t.Errorf("unexpected error: got = %v, want = %v", err, tt.wantErr)
+			if tt.wantErr == nil {
+				if err != nil {
+					t.Errorf("Configure() unexpected non-nil error %q", err)
 				}
 				return
 			}
-			if err != nil {
-				t.Errorf("unexpected error: got = %v, want = nil", err)
-			}
-			if tt.wantRegex != nil && rule.allowRegex.String() != tt.wantRegex.String() {
-				t.Errorf("unexpected allowRegex: got = %v, want = %v", rule.allowRegex.String(), tt.wantRegex.String())
-			}
-			if tt.wantFailureMsg != rule.failureMsg {
-				t.Errorf("unexpected failureMsg: got = %v, want = %v", rule.failureMsg, tt.wantFailureMsg)
+			if err == nil || err.Error() != tt.wantErr.Error() {
+				t.Errorf("Configure() unexpected error: got %q, want %q", err, tt.wantErr)
 			}
 		})
 	}

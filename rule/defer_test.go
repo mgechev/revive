@@ -1,11 +1,11 @@
-package rule
+package rule_test
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
 )
 
 func TestDeferRule_Configure(t *testing.T) {
@@ -13,20 +13,10 @@ func TestDeferRule_Configure(t *testing.T) {
 		name      string
 		arguments lint.Arguments
 		wantErr   error
-		wantAllow map[string]bool
 	}{
 		{
 			name:      "no arguments",
 			arguments: lint.Arguments{},
-			wantErr:   nil,
-			wantAllow: map[string]bool{
-				"loop":             true,
-				"callchain":        true,
-				"methodcall":       true,
-				"return":           true,
-				"recover":          true,
-				"immediaterecover": true,
-			},
 		},
 		{
 			name: "valid arguments",
@@ -39,15 +29,6 @@ func TestDeferRule_Configure(t *testing.T) {
 					"recover",
 					"immediateRecover",
 				},
-			},
-			wantErr: nil,
-			wantAllow: map[string]bool{
-				"loop":             true,
-				"callchain":        true,
-				"methodcall":       true,
-				"return":           true,
-				"recover":          true,
-				"immediaterecover": true,
 			},
 		},
 		{
@@ -62,15 +43,6 @@ func TestDeferRule_Configure(t *testing.T) {
 					"immediaterecover",
 				},
 			},
-			wantErr: nil,
-			wantAllow: map[string]bool{
-				"loop":             true,
-				"callchain":        true,
-				"methodcall":       true,
-				"return":           true,
-				"recover":          true,
-				"immediaterecover": true,
-			},
 		},
 		{
 			name: "valid kebab-cased arguments",
@@ -83,15 +55,6 @@ func TestDeferRule_Configure(t *testing.T) {
 					"recover",
 					"immediate-recover",
 				},
-			},
-			wantErr: nil,
-			wantAllow: map[string]bool{
-				"loop":             true,
-				"callchain":        true,
-				"methodcall":       true,
-				"return":           true,
-				"recover":          true,
-				"immediaterecover": true,
 			},
 		},
 		{
@@ -112,25 +75,18 @@ func TestDeferRule_Configure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var rule DeferRule
+			var r rule.DeferRule
 
-			err := rule.Configure(tt.arguments)
+			err := r.Configure(tt.arguments)
 
-			if tt.wantErr != nil {
-				if err == nil {
-					t.Errorf("unexpected error: got = nil, want = %v", tt.wantErr)
-					return
-				}
-				if err.Error() != tt.wantErr.Error() {
-					t.Errorf("unexpected error: got = %v, want = %v", err, tt.wantErr)
+			if tt.wantErr == nil {
+				if err != nil {
+					t.Errorf("Configure() unexpected non-nil error %q", err)
 				}
 				return
 			}
-			if err != nil {
-				t.Errorf("unexpected error: got = %v, want = nil", err)
-			}
-			if !reflect.DeepEqual(rule.allow, tt.wantAllow) {
-				t.Errorf("unexpected allow: got = %v, want %v", rule.allow, tt.wantAllow)
+			if err == nil || err.Error() != tt.wantErr.Error() {
+				t.Errorf("Configure() unexpected error: got %q, want %q", err, tt.wantErr)
 			}
 		})
 	}

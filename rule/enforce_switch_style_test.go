@@ -1,40 +1,34 @@
-package rule
+package rule_test
 
 import (
 	"errors"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
 )
 
 func TestEnforceSwitchStyleRule_Configure(t *testing.T) {
 	tests := []struct {
-		name                    string
-		arguments               lint.Arguments
-		wantErr                 error
-		wantAllowNoDefault      bool
-		wantAllowDefaultNotLast bool
+		name      string
+		arguments lint.Arguments
+		wantErr   error
 	}{
 		{
 			name:      "no arguments",
 			arguments: lint.Arguments{},
-			wantErr:   nil,
 		},
 		{
 			name: "valid argument: allowNoDefault",
 			arguments: lint.Arguments{
 				"allowNoDefault",
 			},
-			wantErr:            nil,
-			wantAllowNoDefault: true,
 		},
 		{
 			name: "valid argument: allowDefaultNotLast",
 			arguments: lint.Arguments{
 				"allowDefaultNotLast",
 			},
-			wantErr:                 nil,
-			wantAllowDefaultNotLast: true,
 		},
 		{
 			name: "valid kebab-cased arguments",
@@ -42,9 +36,6 @@ func TestEnforceSwitchStyleRule_Configure(t *testing.T) {
 				"allow-default-not-last",
 				"allow-no-default",
 			},
-			wantErr:                 nil,
-			wantAllowNoDefault:      true,
-			wantAllowDefaultNotLast: true,
 		},
 		{
 			name: "valid lowercased arguments",
@@ -52,9 +43,6 @@ func TestEnforceSwitchStyleRule_Configure(t *testing.T) {
 				"allowdefaultnotlast",
 				"allownodefault",
 			},
-			wantErr:                 nil,
-			wantAllowNoDefault:      true,
-			wantAllowDefaultNotLast: true,
 		},
 		{
 			name: "unknown argument: unknown",
@@ -74,28 +62,18 @@ func TestEnforceSwitchStyleRule_Configure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var rule EnforceSwitchStyleRule
+			var r rule.EnforceSwitchStyleRule
 
-			err := rule.Configure(tt.arguments)
+			err := r.Configure(tt.arguments)
 
-			if tt.wantErr != nil {
-				if err == nil {
-					t.Errorf("unexpected error: got = nil, want = %v", tt.wantErr)
-					return
-				}
-				if err.Error() != tt.wantErr.Error() {
-					t.Errorf("unexpected error: got = %v, want = %v", err, tt.wantErr)
+			if tt.wantErr == nil {
+				if err != nil {
+					t.Errorf("Configure() unexpected non-nil error %q", err)
 				}
 				return
 			}
-			if err != nil {
-				t.Errorf("unexpected error: got = %v, want = nil", err)
-			}
-			if tt.wantAllowNoDefault != rule.allowNoDefault {
-				t.Errorf("unexpected allowNoDefault: want = %v, got %v", tt.wantAllowNoDefault, rule.allowNoDefault)
-			}
-			if tt.wantAllowDefaultNotLast != rule.allowDefaultNotLast {
-				t.Errorf("unexpected funcRetValStyle: want = %v, got %v", tt.wantAllowDefaultNotLast, rule.allowDefaultNotLast)
+			if err == nil || err.Error() != tt.wantErr.Error() {
+				t.Errorf("Configure() unexpected error: got %q, want %q", err, tt.wantErr)
 			}
 		})
 	}

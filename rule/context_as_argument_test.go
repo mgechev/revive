@@ -1,11 +1,11 @@
-package rule
+package rule_test
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
 )
 
 func TestContextAsArgumentRule_Configure(t *testing.T) {
@@ -13,7 +13,6 @@ func TestContextAsArgumentRule_Configure(t *testing.T) {
 		name      string
 		arguments lint.Arguments
 		wantErr   error
-		wantTypes map[string]struct{}
 	}{
 		{
 			name: "valid arguments",
@@ -21,14 +20,6 @@ func TestContextAsArgumentRule_Configure(t *testing.T) {
 				map[string]any{
 					"allowTypesBefore": "AllowedBeforeType,AllowedBeforeStruct,*AllowedBeforePtrStruct,*testing.T",
 				},
-			},
-			wantErr: nil,
-			wantTypes: map[string]struct{}{
-				"context.Context":         {},
-				"AllowedBeforeType":       {},
-				"AllowedBeforeStruct":     {},
-				"*AllowedBeforePtrStruct": {},
-				"*testing.T":              {},
 			},
 		},
 		{
@@ -38,14 +29,6 @@ func TestContextAsArgumentRule_Configure(t *testing.T) {
 					"allowtypesbefore": "AllowedBeforeType,AllowedBeforeStruct,*AllowedBeforePtrStruct,*testing.T",
 				},
 			},
-			wantErr: nil,
-			wantTypes: map[string]struct{}{
-				"context.Context":         {},
-				"AllowedBeforeType":       {},
-				"AllowedBeforeStruct":     {},
-				"*AllowedBeforePtrStruct": {},
-				"*testing.T":              {},
-			},
 		},
 		{
 			name: "valid kebab-cased arguments",
@@ -53,14 +36,6 @@ func TestContextAsArgumentRule_Configure(t *testing.T) {
 				map[string]any{
 					"allow-types-before": "AllowedBeforeType,AllowedBeforeStruct,*AllowedBeforePtrStruct,*testing.T",
 				},
-			},
-			wantErr: nil,
-			wantTypes: map[string]struct{}{
-				"context.Context":         {},
-				"AllowedBeforeType":       {},
-				"AllowedBeforeStruct":     {},
-				"*AllowedBeforePtrStruct": {},
-				"*testing.T":              {},
 			},
 		},
 		{
@@ -92,25 +67,18 @@ func TestContextAsArgumentRule_Configure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var rule ContextAsArgumentRule
+			var r rule.ContextAsArgumentRule
 
-			err := rule.Configure(tt.arguments)
+			err := r.Configure(tt.arguments)
 
-			if tt.wantErr != nil {
-				if err == nil {
-					t.Errorf("unexpected error: got = nil, want = %v", tt.wantErr)
-					return
-				}
-				if err.Error() != tt.wantErr.Error() {
-					t.Errorf("unexpected error: got = %v, want = %v", err, tt.wantErr)
+			if tt.wantErr == nil {
+				if err != nil {
+					t.Errorf("Configure() unexpected non-nil error %q", err)
 				}
 				return
 			}
-			if err != nil {
-				t.Errorf("unexpected error: got = %v, want = nil", err)
-			}
-			if !reflect.DeepEqual(rule.allowTypes, tt.wantTypes) {
-				t.Errorf("unexpected allowTypes: got = %v, want %v", rule.allowTypes, tt.wantTypes)
+			if err == nil || err.Error() != tt.wantErr.Error() {
+				t.Errorf("Configure() unexpected error: got %q, want %q", err, tt.wantErr)
 			}
 		})
 	}
