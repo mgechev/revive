@@ -13,12 +13,12 @@ import (
 type ImportShadowingRule struct{}
 
 // Apply applies the rule to given file.
-func (*ImportShadowingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+func (r *ImportShadowingRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	var failures []lint.Failure
 
 	importNames := map[string]struct{}{}
 	for _, imp := range file.AST.Imports {
-		importNames[getName(imp)] = struct{}{}
+		importNames[r.getName(imp)] = struct{}{}
 	}
 
 	fileAst := file.AST
@@ -42,20 +42,23 @@ func (*ImportShadowingRule) Name() string {
 	return "import-shadowing"
 }
 
-func getName(imp *ast.ImportSpec) string {
+func (r *ImportShadowingRule) getName(imp *ast.ImportSpec) string {
 	const pathSep = "/"
 	const strDelim = `"`
 	if imp.Name != nil {
 		return imp.Name.Name
 	}
 
-	path := imp.Path.Value
-	i := strings.LastIndex(path, pathSep)
-	if i == -1 {
-		return strings.Trim(path, strDelim)
+	path := strings.Trim(imp.Path.Value, strDelim)
+	parts := strings.Split(path, pathSep)
+
+	lastSegment := parts[len(parts)-1]
+	if r.isVersion(lastSegment) && len(parts) >= 2 {
+		// Use the previous segment when current is a version (v1, v2, etc.).
+		return parts[len(parts)-2]
 	}
 
-	return strings.Trim(path[i+1:], strDelim)
+	return lastSegment
 }
 
 type importShadowing struct {
@@ -112,4 +115,18 @@ func (w importShadowing) Visit(n ast.Node) ast.Visitor {
 	}
 
 	return w
+}
+
+func (*ImportShadowingRule) isVersion(name string) bool {
+	if len(name) < 2 || (name[0] != 'v' && name[0] != 'V') {
+		return false
+	}
+
+	for i := 1; i < len(name); i++ {
+		if name[i] < '0' || name[i] > '9' {
+			return false
+		}
+	}
+
+	return true
 }

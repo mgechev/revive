@@ -17,7 +17,6 @@ func TestAddConstantRule_Configure(t *testing.T) {
 		wantStrLitLimit int
 	}{
 		{
-
 			name:      "no arguments",
 			arguments: lint.Arguments{},
 			wantErr:   nil,

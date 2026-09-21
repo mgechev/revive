@@ -9,7 +9,7 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// ContextKeysType disallows the usage of basic types in `context.WithValue`.
+// ContextKeysType disallows the usage of basic types in [context.WithValue].
 type ContextKeysType struct{}
 
 // Apply applies the rule to given file.

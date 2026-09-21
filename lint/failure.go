@@ -11,6 +11,8 @@ const (
 	// FailureCategoryBadPractice indicates bad practice issues.
 	FailureCategoryBadPractice FailureCategory = "bad practice"
 	// FailureCategoryCodeStyle indicates code style issues.
+	//
+	// Deprecated: use FailureCategoryStyle instead.
 	FailureCategoryCodeStyle FailureCategory = "code-style"
 	// FailureCategoryComments indicates comment issues.
 	FailureCategoryComments FailureCategory = "comments"
@@ -64,25 +66,24 @@ type Severity string
 
 // FailurePosition returns the failure position.
 type FailurePosition struct {
-	Start token.Position
-	End   token.Position
+	Start token.Position `json:"Start"`
+	End   token.Position `json:"End"`
 }
 
 // Failure defines a struct for a linting failure.
 type Failure struct {
-	Failure    string
-	RuleName   string
-	Category   FailureCategory
-	Position   FailurePosition
-	Node       ast.Node `json:"-"`
-	Confidence float64
-	// For future use
-	ReplacementLine string
+	Failure         string          `json:"Failure"`
+	RuleName        string          `json:"RuleName"`
+	Category        FailureCategory `json:"Category"`
+	Position        FailurePosition `json:"Position"`
+	Node            ast.Node        `json:"-"`
+	Confidence      float64         `json:"Confidence"`
+	ReplacementLine string          `json:"ReplacementLine"`
 }
 
 // GetFilename returns the filename.
 //
-// Deprecated: Use [Filename].
+// Deprecated: Use [Failure.Filename] instead.
 func (f *Failure) GetFilename() string {
 	return f.Filename()
 }
@@ -95,6 +96,21 @@ func (f *Failure) Filename() string {
 // IsInternal returns true if this failure is internal, false otherwise.
 func (f *Failure) IsInternal() bool {
 	return f.Category == failureCategoryInternal
+}
+
+// SeverityFor returns the effective severity of the failure under the given configuration.
+// A failure is an error if its rule or directive is configured with [SeverityError]; otherwise it is a warning.
+func (f *Failure) SeverityFor(config *Config) Severity {
+	if config == nil {
+		return SeverityWarning
+	}
+	if c, ok := config.Rules[f.RuleName]; ok && c.Severity == SeverityError {
+		return SeverityError
+	}
+	if c, ok := config.Directives[f.RuleName]; ok && c.Severity == SeverityError {
+		return SeverityError
+	}
+	return SeverityWarning
 }
 
 // NewInternalFailure yields an internal failure with the given message as failure message.

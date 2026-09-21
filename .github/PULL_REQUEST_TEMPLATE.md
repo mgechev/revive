@@ -1,12 +1,13 @@
-<!-- ### IMPORTANT ### -->
-<!-- Please do not create a Pull Request without creating an issue first.** -->
-<!-- If you're fixing a typo or improving the documentation, you may not have to open an issue. -->
+<!--
+Please do not create a pull request without creating an issue first.
 
-<!-- ### CHECKLIST ### -->
-<!-- Please, describe in details what's your motivation for this PR -->
-<!-- Did you add tests? -->
-<!-- Does your code follow the coding style of the rest of the repository? -->
-<!-- Does the GitHub Action build passes? -->
+If you're fixing a typo or improving the documentation, you may not have to open an issue.
+-->
 
-<!-- ### FOOTER (OPTIONAL) ### -->
-<!-- If you're closing an issue, add "Closes #XXXX" in your comment. This way, the PR will be linked to the issue automatically. -->
+<!--
+Please keep the description brief.
+-->
+
+<!--
+If you're closing an issue, add "Closes #XXXX" in the description.
+-->

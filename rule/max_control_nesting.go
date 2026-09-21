@@ -112,11 +112,6 @@ func (r *MaxControlNestingRule) Configure(arguments lint.Arguments) error {
 		return nil
 	}
 
-	check := checkNumberOfArguments(1, arguments, r.Name())
-	if check != nil {
-		return check
-	}
-
 	maxNesting, ok := arguments[0].(int64) // Alt. non panicking version
 	if !ok {
 		return errors.New(`invalid value passed as argument number to the "max-control-nesting" rule`)

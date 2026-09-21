@@ -14,7 +14,7 @@ import (
 	"github.com/mgechev/revive/logging"
 )
 
-// TimeDateRule lints the way time.Date is used.
+// TimeDateRule lints the way [time.Date] is used.
 type TimeDateRule struct{}
 
 // Apply applies the rule to given file.
@@ -41,7 +41,7 @@ type lintTimeDate struct {
 	onFailure func(lint.Failure)
 }
 
-// timeDateArgument is a type for the arguments of time.Date function.
+// timeDateArgument is a type for the arguments of [time.Date] function.
 type timeDateArgument string
 
 const (
@@ -56,7 +56,7 @@ const (
 )
 
 var (
-	// timeDateArgumentNames are the names of the arguments of time.Date.
+	// timeDateArgumentNames are the names of the arguments of [time.Date].
 	timeDateArgumentNames = []timeDateArgument{
 		timeDateArgYear,
 		timeDateArgMonth,
@@ -68,7 +68,7 @@ var (
 		timeDateArgTimezone,
 	}
 
-	// timeDateArity is the number of arguments of time.Date.
+	// timeDateArity is the number of arguments of [time.Date].
 	timeDateArity = len(timeDateArgumentNames)
 )
 
@@ -86,7 +86,7 @@ type timeDateMonthYear struct {
 	year, month int64
 }
 
-func (w lintTimeDate) Visit(n ast.Node) ast.Visitor {
+func (w *lintTimeDate) Visit(n ast.Node) ast.Visitor {
 	ce, ok := n.(*ast.CallExpr)
 	if !ok || len(ce.Args) != timeDateArity {
 		return w
@@ -361,7 +361,7 @@ func (w *lintTimeDate) checkArgSign(arg ast.Node, fieldName timeDateArgument) (*
 
 // isLeapYear checks if the year is a leap year.
 // This is used to check if the date is valid according to Go implementation.
-func (lintTimeDate) isLeapYear(year int64) bool {
+func (*lintTimeDate) isLeapYear(year int64) bool {
 	// We cannot use the classic formula of
 	// year%4 == 0 && (year%100 != 0 || year%400 == 0)
 	// because we want to ensure what time.Date will compute
@@ -369,7 +369,7 @@ func (lintTimeDate) isLeapYear(year int64) bool {
 	return time.Date(int(year), 2, 29, 0, 0, 0, 0, time.UTC).Format("01-02") == "02-29"
 }
 
-func (w lintTimeDate) daysInMonth(year int64, month time.Month) int64 {
+func (w *lintTimeDate) daysInMonth(year int64, month time.Month) int64 {
 	switch month {
 	case time.April, time.June, time.September, time.November:
 		return 30

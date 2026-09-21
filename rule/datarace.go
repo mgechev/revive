@@ -8,7 +8,11 @@ import (
 	"github.com/mgechev/revive/lint"
 )
 
-// DataRaceRule lints assignments to value method-receivers.
+//nolint:staticcheck // TODO: ast.Object is deprecated
+type nodeUID *ast.Object // type of the unique id for AST nodes
+
+// DataRaceRule spots potential dataraces caused by goroutines capturing (by-reference)
+// particular identifiers of the function from which goroutines are created.
 type DataRaceRule struct{}
 
 // Apply applies the rule to given file.
@@ -23,8 +27,7 @@ func (r *DataRaceRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 
 		funcResults := funcDecl.Type.Results
 
-		//nolint:staticcheck // TODO: ast.Object is deprecated
-		returnIDs := map[*ast.Object]struct{}{}
+		returnIDs := map[nodeUID]struct{}{}
 		if funcResults != nil {
 			returnIDs = r.extractReturnIDs(funcResults.List)
 		}
@@ -36,7 +39,7 @@ func (r *DataRaceRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 		fl := &lintFunctionForDataRaces{
 			onFailure: onFailure,
 			returnIDs: returnIDs,
-			rangeIDs:  map[*ast.Object]struct{}{}, //nolint:staticcheck // TODO: ast.Object is deprecated
+			rangeIDs:  map[nodeUID]struct{}{},
 			go122for:  isGo122,
 		}
 
@@ -51,9 +54,8 @@ func (*DataRaceRule) Name() string {
 	return "datarace"
 }
 
-//nolint:staticcheck // TODO: ast.Object is deprecated
-func (*DataRaceRule) extractReturnIDs(fields []*ast.Field) map[*ast.Object]struct{} {
-	r := map[*ast.Object]struct{}{}
+func (*DataRaceRule) extractReturnIDs(fields []*ast.Field) map[nodeUID]struct{} {
+	r := map[nodeUID]struct{}{}
 	for _, f := range fields {
 		for _, id := range f.Names {
 			r[id.Obj] = struct{}{}
@@ -64,10 +66,9 @@ func (*DataRaceRule) extractReturnIDs(fields []*ast.Field) map[*ast.Object]struc
 }
 
 type lintFunctionForDataRaces struct {
-	_         struct{}
 	onFailure func(failure lint.Failure)
-	returnIDs map[*ast.Object]struct{} //nolint:staticcheck // TODO: ast.Object is deprecated
-	rangeIDs  map[*ast.Object]struct{} //nolint:staticcheck // TODO: ast.Object is deprecated
+	returnIDs map[nodeUID]struct{}
+	rangeIDs  map[nodeUID]struct{}
 
 	go122for bool
 }

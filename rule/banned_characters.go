@@ -20,10 +20,6 @@ const bannedCharsRuleName = "banned-characters"
 // Configuration implements the [lint.ConfigurableRule] interface.
 func (r *BannedCharsRule) Configure(arguments lint.Arguments) error {
 	if len(arguments) > 0 {
-		err := checkNumberOfArguments(1, arguments, bannedCharsRuleName)
-		if err != nil {
-			return err
-		}
 		list, err := r.getBannedCharsList(arguments)
 		if err != nil {
 			return err

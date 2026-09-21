@@ -1,4 +1,4 @@
-package test
+package test_test
 
 import (
 	"testing"
@@ -13,19 +13,25 @@ func TestStringFormat(t *testing.T) {
 			[]any{
 				"stringFormatMethod1", // The first argument is checked by default
 				"/^[A-Z]/",
-				"must start with a capital letter"},
+				"must start with a capital letter",
+			},
 
 			[]any{
 				"stringFormatMethod2[2].d",
-				"/[^\\.]$/"}, // Must not end with a period
+				"/[^\\.]$/",
+			}, // Must not end with a period
 			[]any{
 				"s.Method3[2]",
 				"!/^[Tt][Hh]/",
-				"must not start with 'th'"},
+				"must not start with 'th'",
+			},
 			[]any{
 				"s.Method4", // same as before, but called from a struct
 				"!/^[Ot][Tt]/",
-				"must not start with 'ot'"}}})
+				"must not start with 'ot'",
+			},
+		},
+	})
 }
 
 func TestStringFormatDuplicatedStrings(t *testing.T) {

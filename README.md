@@ -32,57 +32,54 @@ If you disable them in the config file, revive will run over 6x faster than goli
   <img src="./assets/demo.svg" alt="" width="700">
 </p>
 
-<!-- TOC -->
+<!-- toc -->
 
-- [revive](#revive)
-  - [Installation](#installation)
-    - [Homebrew](#homebrew)
-    - [Install from Sources](#install-from-sources)
-    - [Docker](#docker)
-    - [Manual Binary Download](#manual-binary-download)
-  - [Usage](#usage)
-    - [Bazel](#bazel)
-    - [Text Editors](#text-editors)
-    - [GitHub Actions](#github-actions)
-    - [Continuous Integration](#continuous-integration)
-    - [Linter aggregators](#linter-aggregators)
-      - [golangci-lint](#golangci-lint)
-    - [Command Line Flags](#command-line-flags)
-    - [Sample Invocations](#sample-invocations)
-    - [Comment Directives](#comment-directives)
-    - [Configuration](#configuration)
-    - [Default Configuration](#default-configuration)
-    - [Custom Configuration](#custom-configuration)
-    - [Recommended Configuration](#recommended-configuration)
-    - [Rule-level file excludes](#rule-level-file-excludes)
-  - [Available Rules](#available-rules)
-  - [Configurable rules](#configurable-rules)
-    - [`var-naming`](#var-naming)
-  - [Available Formatters](#available-formatters)
-    - [Friendly](#friendly)
-    - [Stylish](#stylish)
-    - [Default](#default)
-    - [Plain](#plain)
-    - [Unix](#unix)
-    - [JSON](#json)
-    - [NDJSON](#ndjson)
-    - [Checkstyle](#checkstyle)
-    - [SARIF](#sarif)
-  - [Extensibility](#extensibility)
-    - [Writing a Custom Rule](#writing-a-custom-rule)
-      - [Using `revive` as a library](#using-revive-as-a-library)
-    - [Custom Formatter](#custom-formatter)
-  - [Speed Comparison](#speed-comparison)
-    - [golint](#golint)
-    - [revive's speed](#revives-speed)
-  - [Overriding colorization detection](#overriding-colorization-detection)
-  - [Who uses Revive](#who-uses-revive)
-  - [Contributors](#contributors)
-    - [Maintainers](#maintainers)
-    - [All](#all)
-  - [License](#license)
+- [Installation](#installation)
+  - [Homebrew](#homebrew)
+  - [Install from Sources](#install-from-sources)
+  - [Docker](#docker)
+  - [Manual Binary Download](#manual-binary-download)
+- [Usage](#usage)
+  - [Text Editors](#text-editors)
+  - [GitHub Actions](#github-actions)
+  - [Continuous Integration](#continuous-integration)
+  - [Linter aggregators](#linter-aggregators)
+    - [golangci-lint](#golangci-lint)
+    - [MegaLinter](#megalinter)
+  - [Command Line Flags](#command-line-flags)
+  - [Sample Invocations](#sample-invocations)
+  - [Comment Directives](#comment-directives)
+  - [Configuration](#configuration)
+  - [Custom Configuration](#custom-configuration)
+  - [Recommended Configuration](#recommended-configuration)
+  - [Rule-level file excludes](#rule-level-file-excludes)
+- [Available Rules](#available-rules)
+- [Configurable rules](#configurable-rules)
+- [Available Formatters](#available-formatters)
+  - [Friendly](#friendly)
+  - [Stylish](#stylish)
+  - [Default](#default)
+  - [Plain](#plain)
+  - [Unix](#unix)
+  - [JSON](#json)
+  - [NDJSON](#ndjson)
+  - [Checkstyle](#checkstyle)
+  - [SARIF](#sarif)
+- [Extensibility](#extensibility)
+  - [Writing a Custom Rule](#writing-a-custom-rule)
+    - [Using `revive` as a library](#using-revive-as-a-library)
+  - [Custom Formatter](#custom-formatter)
+- [Speed Comparison](#speed-comparison)
+  - [golint](#golint)
+  - [revive's speed](#revives-speed)
+- [Overriding colorization detection](#overriding-colorization-detection)
+- [Who uses Revive](#who-uses-revive)
+- [Contributors](#contributors)
+  - [Maintainers](#maintainers)
+  - [All](#all)
+- [License](#license)
 
-<!-- /TOC -->
+<!-- tocstop -->
 
 ## Installation
 
@@ -123,7 +120,7 @@ go install github.com/mgechev/revive@HEAD
 You can run `revive` using Docker to avoid installing it directly on your system:
 
 ```bash
-docker run -v "$(pwd)":/var/YOUR_REPOSITORY ghcr.io/mgechev/revive:v1.10.0 -config /var/YOUR_REPOSITORY/revive.toml -formatter stylish ./var/YOUR_REPOSITORY/...
+docker run -v "$(pwd)":/var/YOUR_REPOSITORY ghcr.io/mgechev/revive:v1.16.0 -config /var/YOUR_REPOSITORY/revive.toml -formatter stylish ./var/YOUR_REPOSITORY/...
 ```
 
 _Note_: Replace `YOUR_REPOSITORY` with the path to your repository.
@@ -132,7 +129,7 @@ A volume must be mounted to share the current repository with the container.
 For more details, refer to the [bind mounts Docker documentation](https://docs.docker.com/storage/bind-mounts/).
 
 - `-v`: Mounts the current directory (`$(pwd)`) to `/var/YOUR_REPOSITORY` inside the container.
-- `ghcr.io/mgechev/revive:v1.10.0`: Specifies the Docker image and its version.
+- `ghcr.io/mgechev/revive:v1.16.0`: Specifies the Docker image and its version.
 - `revive`: The command to run inside the container.
 - Flags like `-config` and `-formatter` are the same as when using the binary directly.
 
@@ -157,10 +154,6 @@ the only difference you'd notice is faster execution.
 If not provided, `revive` will try to use a global config file (assumed to be located at `$HOME/revive.toml`).
 Otherwise, if no configuration TOML file is found then `revive` uses a built-in set of default linting rules.
 
-### Bazel
-
-If you want to use revive with Bazel, look at the [rules](https://github.com/atlassian/bazel-tools/tree/master/gorevive) that Atlassian maintains.
-
 ### Text Editors
 
 - Support for VSCode via [vscode-go](https://code.visualstudio.com/docs/languages/go#_build-and-diagnose) by changing the `go.lintTool` setting to `revive`:
@@ -178,16 +171,6 @@ If you want to use revive with Bazel, look at the [rules](https://github.com/atl
   let g:ale_linters = {
   \   'go': ['revive'],
   \}
-  ```
-
-- Support for Neovim via [null-ls.nvim](https://github.com/jose-elias-alvarez/null-ls.nvim).
-
-  ```lua
-  require("null-ls").setup({
-      sources = {
-          require("null-ls").builtins.diagnostics.revive
-      },
-  })
   ```
 
 ### GitHub Actions
@@ -242,6 +225,11 @@ Please notice that if no particular configuration is provided, `revive` will beh
 (the [Available Rules table](#available-rules) details what are the `golint` rules).
 When a configuration is provided, only rules in the configuration are enabled.
 
+#### MegaLinter
+
+[MegaLinter](https://megalinter.io/), an open-source linters aggregator for CI, runs `revive` on Go projects out of the box.
+See its [revive documentation page](https://megalinter.io/latest/descriptors/go_revive/) for configuration details.
+
 ### Command Line Flags
 
 `revive` accepts the following command line parameters:
@@ -260,7 +248,7 @@ If no exclusion patterns are specified, `vendor/...` will be excluded by default
   - `stylish` - formats the failures in a table. Keep in mind that it doesn't stream the output so it might be perceived as slower compared to others.
   - `checkstyle` - outputs the failures in XML format compatible with that of Java's [Checkstyle](https://checkstyle.org/).
 - `-max_open_files` -  maximum number of open files at the same time. Defaults to unlimited.
-- `-set_exit_status` - set exit status to 1 if any issues are found, overwrites `errorCode` and `warningCode` in config.
+- `-set_exit_status` - set exit status to 1 if any issues are found, overwrites `error-code` and `warning-code` in config.
 - `-version` - get revive version.
 
 ### Sample Invocations
@@ -327,13 +315,28 @@ in the configuration. You can set the severity (defaults to _warning_) of the vi
 severity = "error"
 ```
 
+Similarly, you can enforce specifying rule names in disable directives by adding
+
+```toml
+[directive.specify-disable-rule]
+```
+
+This forbids "naked" `//revive:disable`, `//revive:disable-line`, and `//revive:disable-next-line` directives
+and requires specifying at least one rule name, e.g. `//revive:disable:cyclomatic` or `//revive:disable-next-line:cyclomatic`.
+You can set the severity (defaults to _warning_) of the violation of this directive
+
+```toml
+[directive.specify-disable-rule]
+severity = "error"
+```
+
 ### Configuration
 
 `revive` can be configured with a TOML file. Here's a sample configuration with an explanation of the individual properties:
 
 ```toml
 # When set to false, ignores files with "GENERATED" header, similar to golint
-ignoreGeneratedHeader = true
+ignore-generated-header = true
 
 # Sets the default severity to "warning"
 severity = "warning"
@@ -343,10 +346,10 @@ severity = "warning"
 confidence = 0.8
 
 # Sets the error code for failures with the "error" severity
-errorCode = 0
+error-code = 0
 
 # Sets the error code for failures with severity "warning"
-warningCode = 0
+warning-code = 0
 
 # Configuration of the `cyclomatic` rule. Here we specify that
 # the rule should fail if it detects code with higher complexity than 10.
@@ -361,20 +364,31 @@ severity = "error"
 By default `revive` will enable only the linting rules that are named in the configuration file.
 For example, the previous configuration file makes `revive` to enable only _cyclomatic_ and _package-comments_ linting rules.
 
+To enable default rules you need to use:
+
+```toml
+enable-default-rules = true
+```
+
+This will enable all rules available in `golint` and use their default configuration (i.e. the way they are hardcoded in `golint`).
+The default configuration of `revive` can be found at `defaults.toml`.
+
 To enable all available rules you need to add:
 
 ```toml
-enableAllRules = true
+enable-all-rules = true
 ```
 
 This will enable all available rules no matter what rules are named in the configuration file.
+
+Options `enable-all-rules` and `enable-default-rules` cannot be combined.
 
 To disable a rule, you simply mark it as disabled in the configuration.
 For example:
 
 ```toml
 [rule.line-length-limit]
-Disabled = true
+disabled = true
 ```
 
 When enabling all rules you still need/can provide specific configurations for rules.
@@ -384,49 +398,38 @@ and some rules are configured with particular arguments:
 ```toml
 severity = "warning"
 confidence = 0.8
-errorCode = 0
-warningCode = 0
+error-code = 0
+warning-code = 0
 
 # Enable all available rules
-enableAllRules = true
+enable-all-rules = true
 
 # Disabled rules
 [rule.blank-imports]
-Disabled = true
+disabled = true
 [rule.file-header]
-Disabled = true
+disabled = true
 [rule.max-public-structs]
-Disabled = true
+disabled = true
 [rule.line-length-limit]
-Disabled = true
+disabled = true
 [rule.function-length]
-Disabled = true
+disabled = true
 [rule.banned-characters]
-Disabled = true
+disabled = true
 
 # Rule tuning
 [rule.argument-limit]
-Arguments = [5]
+arguments = [5]
 [rule.cyclomatic]
-Arguments = [10]
+arguments = [10]
 [rule.cognitive-complexity]
-Arguments = [7]
+arguments = [7]
 [rule.function-result-limit]
-Arguments = [3]
+arguments = [3]
 [rule.error-strings]
-Arguments = ["mypackage.Error"]
+arguments = ["mypackage.Error"]
 ```
-
-### Default Configuration
-
-The default configuration of `revive` can be found at `defaults.toml`.
-This will enable all rules available in `golint` and use their default configuration (i.e. the way they are hardcoded in `golint`).
-
-```shell
-revive -config defaults.toml github.com/mgechev/revive
-```
-
-This will use the configuration file `defaults.toml`, the `default` formatter, and will run linting over the `github.com/mgechev/revive` package.
 
 ### Custom Configuration
 
@@ -441,11 +444,11 @@ This will use `config.toml`, the `friendly` formatter, and will run linting over
 The following snippet contains the recommended `revive` configuration that you can use in your project:
 
 ```toml
-ignoreGeneratedHeader = false
+ignore-generated-header = false
 severity = "warning"
 confidence = 0.8
-errorCode = 0
-warningCode = 0
+error-code = 0
+warning-code = 0
 
 [rule.blank-imports]
 [rule.context-as-argument]
@@ -479,16 +482,16 @@ You also can setup custom excludes for each rule.
 It's an alternative for the global `-exclude` program arg.
 
 ```toml
-ignoreGeneratedHeader = false
+ignore-generated-header = false
 severity = "warning"
 confidence = 0.8
-errorCode = 0
-warningCode = 0
+error-code = 0
+warning-code = 0
 
 [rule.blank-imports]
-Exclude = ["**/*.pb.go"]
+exclude = ["**/*.pb.go"]
 [rule.context-as-argument]
-Exclude = ["src/somepkg/*.go", "TEST"]
+exclude = ["src/somepkg/*.go", "TEST"]
 ```
 
 You can use the following exclude patterns
@@ -505,115 +508,124 @@ You can use the following exclude patterns
 
 ## Available Rules
 
-List of all available rules. The rules ported from `golint` are left unchanged and indicated in the `golint` column.
+List of all [available rules](./RULES_DESCRIPTIONS.md).
 
-| Name                  | Config | Description                                                      | `golint` | Typed |
-| --------------------- | :----: | :--------------------------------------------------------------- | :------: | :---: |
-| [`add-constant`](./RULES_DESCRIPTIONS.md#add-constant)        |  map   | Suggests using constant for magic numbers and string literals    |    no    |  no   |
-| [`argument-limit`](./RULES_DESCRIPTIONS.md#argument-limit)      |  int (defaults to 8)  | Specifies the maximum number of arguments a function can receive |    no    |  no   |
-| [`atomic`](./RULES_DESCRIPTIONS.md#atomic)              |  n/a   | Check for common mistaken usages of the `sync/atomic` package    |    no    |  no   |
-| [`banned-characters`](./RULES_DESCRIPTIONS.md#banned-characters)          |  []string (defaults to []string{})   |  Checks banned characters in identifiers |    no    |  no   |
-| [`bare-return`](./RULES_DESCRIPTIONS.md#bare-return) | n/a  | Warns on bare returns   |    no    |  no   |
-| [`blank-imports`](./RULES_DESCRIPTIONS.md#blank-imports)       |  n/a   | Disallows blank imports                                          |   yes    |  no   |
-| [`bool-literal-in-expr`](./RULES_DESCRIPTIONS.md#bool-literal-in-expr)|  n/a   | Suggests removing Boolean literals from logic expressions        |    no    |  no   |
-| [`call-to-gc`](./RULES_DESCRIPTIONS.md#call-to-gc)   | n/a    | Warns on explicit call to the garbage collector    |    no    |  no   |
-| [`cognitive-complexity`](./RULES_DESCRIPTIONS.md#cognitive-complexity)          |  int (defaults to 7) | Sets restriction for maximum Cognitive complexity.              |    no    |  no   |
-| [`comment-spacings`](./RULES_DESCRIPTIONS.md#comment-spacings)          |  []string   |  Warns on malformed comments |    no    |  no   |
-| [`comments-density`](./RULES_DESCRIPTIONS.md#comments-density) |  int (defaults to 0)  | Enforces a minimum comment / code relation |    no    |  no   |
-| [`confusing-naming`](./RULES_DESCRIPTIONS.md#confusing-naming)    |  n/a   | Warns on methods with names that differ only by capitalization   |    no    |  no   |
-| [`confusing-results`](./RULES_DESCRIPTIONS.md#confusing-results)   |  n/a   | Suggests to name potentially confusing function results          |    no    |  no   |
-| [`constant-logical-expr`](./RULES_DESCRIPTIONS.md#constant-logical-expr)   |  n/a   | Warns on constant logical expressions                        |    no    |  no   |
-| [`context-as-argument`](./RULES_DESCRIPTIONS.md#context-as-argument) |  n/a   | `context.Context` should be the first argument of a function.    |   yes    |  no   |
-| [`context-keys-type`](./RULES_DESCRIPTIONS.md#context-key-types)   |  n/a   | Disallows the usage of basic types in `context.WithValue`.       |   yes    |  yes  |
-| [`cyclomatic`](./RULES_DESCRIPTIONS.md#cyclomatic)          |  int (defaults to 10)   | Sets restriction for maximum Cyclomatic complexity.              |    no    |  no   |
-| [`datarace`](./RULES_DESCRIPTIONS.md#datarace)          |  n/a   |  Spots potential dataraces |    no    |  no   |
-| [`deep-exit`](./RULES_DESCRIPTIONS.md#deep-exit)           |  n/a   | Looks for program exits in funcs other than `main()` or `init()` |    no    |  no   |
-| [`defer`](./RULES_DESCRIPTIONS.md#defer)          |  map   |  Warns on some [defer gotchas](https://blog.learngoprogramming.com/5-gotchas-of-defer-in-go-golang-part-iii-36a1ab3d6ef1)       |    no    |  no   |
-| [`dot-imports`](./RULES_DESCRIPTIONS.md#dot-imports)         |  n/a   | Forbids `.` imports.                                             |   yes    |  no   |
-| [`duplicated-imports`](./RULES_DESCRIPTIONS.md#duplicated-imports) | n/a  | Looks for packages that are imported two or more times   |    no    |  no   |
-| [`early-return`](./RULES_DESCRIPTIONS.md#early-return)          | []string   | Spots if-then-else statements where the predicate may be inverted to reduce nesting |    no    |  no   |
-| [`empty-block`](./RULES_DESCRIPTIONS.md#empty-block)         |  n/a   | Warns on empty code blocks                                       |    no    |  yes   |
-| [`empty-lines`](./RULES_DESCRIPTIONS.md#empty-lines)   | n/a | Warns when there are heading or trailing newlines in a block              |    no    |  no   |
-| [`enforce-map-style`](./RULES_DESCRIPTIONS.md#enforce-map-style) |  string (defaults to "any")  |  Enforces consistent usage of `make(map[type]type)` or `map[type]type{}` for map initialization. Does not affect `make(map[type]type, size)` constructions. |    no    |  no   |
-| [`enforce-repeated-arg-type-style`](./RULES_DESCRIPTIONS.md#enforce-repeated-arg-type-style) |  string (defaults to "any")  |  Enforces consistent style for repeated argument and/or return value types. |    no    |  no   |
-| [`enforce-slice-style`](./RULES_DESCRIPTIONS.md#enforce-slice-style) |  string (defaults to "any")  |  Enforces consistent usage of `make([]type, 0)` or `[]type{}` for slice initialization. Does not affect `make(map[type]type, non_zero_len, or_non_zero_cap)` constructions. |    no    |  no   |
-| [`enforce-switch-style`](./RULES_DESCRIPTIONS.md#enforce-switch-style) |  []string (defaults to enforce occurrence and position) |  Enforces consistent usage of `default` on `switch` statements. |    no    |  no   |
-| [`error-naming`](./RULES_DESCRIPTIONS.md#error-naming)        |  n/a   | Naming of error variables.                                       |   yes    |  no   |
-| [`error-return`](./RULES_DESCRIPTIONS.md#error-return)        |  n/a   | The error return parameter should be last.                       |   yes    |  no   |
-| [`error-strings`](./RULES_DESCRIPTIONS.md#error-strings)       |  []string   | Conventions around error strings.                                |   yes    |  no   |
-| [`errorf`](./RULES_DESCRIPTIONS.md#errorf)              |  n/a   | Should replace `errors.New(fmt.Sprintf())` with `fmt.Errorf()`   |   yes    |  yes  |
-| [`exported`](./RULES_DESCRIPTIONS.md#exported)            |  []string   | Naming and commenting conventions on exported symbols.           |   yes    |  no   |
-| [`file-header`](./RULES_DESCRIPTIONS.md#file-header)         | string (defaults to none)| Header which each file should have.                              |    no    |  no   |
-| [`file-length-limit`](./RULES_DESCRIPTIONS.md#file-length-limit) | map (optional)| Enforces a maximum number of lines per file |    no    |  no   |
-| [`filename-format`](./RULES_DESCRIPTIONS.md#filename-format) | regular expression (optional) | Enforces the formatting of filenames |   no    |  no   |
-| [`flag-parameter`](./RULES_DESCRIPTIONS.md#flag-parameter)      |  n/a   | Warns on boolean parameters that create a control coupling       |    no    |  no   |
-| [`function-length`](./RULES_DESCRIPTIONS.md#function-length)          |  int, int (defaults to 50 statements, 75 lines)   |  Warns on functions exceeding the statements or lines max |    no    |  no   |
-| [`function-result-limit`](./RULES_DESCRIPTIONS.md#function-result-limit) |  int (defaults to 3)| Specifies the maximum number of results a function can return    |    no    |  no   |
-| [`get-return`](./RULES_DESCRIPTIONS.md#get-return)          |  n/a   | Warns on getters that do not yield any result                    |    no    |  no   |
-| [`identical-branches`](./RULES_DESCRIPTIONS.md#identical-branches)          |  n/a   | Spots if-then-else statements with identical `then` and `else` branches       |    no    |  no   |
-| [`identical-switch-conditions`](./RULES_DESCRIPTIONS.md#identical-switch-conditions)          |  n/a   | Spots identical conditions in case clauses of `switch` statements.       |    no    |  no   |
-| [`if-return`](./RULES_DESCRIPTIONS.md#if-return)           |  n/a   | Redundant if when returning an error.                            |   no    |  no   |
-| [`import-alias-naming`](./RULES_DESCRIPTIONS.md#import-alias-naming)         | string or map[string]string (defaults to allow regex pattern `^[a-z][a-z0-9]{0,}$`) | Conventions around the naming of import aliases.                              |    no    |  no   |
-| [`import-shadowing`](./RULES_DESCRIPTIONS.md#import-shadowing)   | n/a    | Spots identifiers that shadow an import    |    no    |  no   |
-| [`imports-blocklist`](./RULES_DESCRIPTIONS.md#imports-blocklist)   | []string | Disallows importing the specified packages                     |    no    |  no   |
-| [`increment-decrement`](./RULES_DESCRIPTIONS.md#increment-decrement) |  n/a   | Use `i++` and `i--` instead of `i += 1` and `i -= 1`.            |   yes    |  no   |
-| [`indent-error-flow`](./RULES_DESCRIPTIONS.md#indent-error-flow)   |  []string   | Prevents redundant else statements.                              |   yes    |  no   |
-| [`line-length-limit`](./RULES_DESCRIPTIONS.md#line-length-limit)   | int (defaults to 80) | Specifies the maximum number of characters in a line             |    no    |  no   |
-| [`max-control-nesting`](./RULES_DESCRIPTIONS.md#max-control-nesting) |  int (defaults to 5)  | Sets restriction for maximum nesting of control structures. |    no    |  no   |
-| [`max-public-structs`](./RULES_DESCRIPTIONS.md#max-public-structs)  |  int (defaults to 5)  | The maximum number of public structs in a file.                  |    no    |  no   |
-| [`modifies-parameter`](./RULES_DESCRIPTIONS.md#modifies-parameter)  |  n/a   | Warns on assignments to function parameters                      |    no    |  no   |
-| [`modifies-value-receiver`](./RULES_DESCRIPTIONS.md#modifies-value-receiver) |  n/a   | Warns on assignments to value-passed method receivers        |    no    |  yes  |
-| [`nested-structs`](./RULES_DESCRIPTIONS.md#nested-structs)          |  n/a   |  Warns on structs within structs |    no    |  no   |
-| [`optimize-operands-order`](./RULES_DESCRIPTIONS.md#optimize-operands-order)          |  n/a   |  Checks inefficient conditional expressions |    no    |  no   |
-| [`package-comments`](./RULES_DESCRIPTIONS.md#package-comments)    |  n/a   | Package commenting conventions.                                  |   yes    |  no   |
-| [`range-val-address`](./RULES_DESCRIPTIONS.md#range-val-address)|  n/a   | Warns if address of range value is used dangerously |    no    |  yes   |
-| [`range-val-in-closure`](./RULES_DESCRIPTIONS.md#range-val-in-closure)|  n/a   | Warns if range value is used in a closure dispatched as goroutine|    no    |  no   |
-| [`range`](./RULES_DESCRIPTIONS.md#range)               |  n/a   | Prevents redundant variables when iterating over a collection.   |   yes    |  no   |
-| [`receiver-naming`](./RULES_DESCRIPTIONS.md#receiver-naming)     |  map (optional)   | Conventions around the naming of receivers.                      |   yes    |  no   |
-| [`redefines-builtin-id`](./RULES_DESCRIPTIONS.md#redefines-builtin-id)|  n/a   | Warns on redefinitions of builtin identifiers                    |    no    |  no   |
-| [`redundant-build-tag`](./RULES_DESCRIPTIONS.md#redundant-build-tag) | n/a   | Warns about redundant `// +build` comment lines |   no    |  no   |
-| [`redundant-import-alias`](./RULES_DESCRIPTIONS.md#redundant-import-alias)          |  n/a   |  Warns on import aliases matching the imported package name |    no    |  no   |
-| [`redundant-test-main-exit`](./RULES_DESCRIPTIONS.md#redundant-test-main-exit) |  n/a   | Suggests removing `Exit` call in `TestMain` function for test files |    no    |  no   |
-| [`string-format`](./RULES_DESCRIPTIONS.md#string-format)          |  map   | Warns on specific string literals that fail one or more user-configured regular expressions            |    no    |  no   |
-| [`string-of-int`](./RULES_DESCRIPTIONS.md#string-of-int)          |  n/a   | Warns on suspicious casts from int to string            |    no    |  yes   |
-| [`struct-tag`](./RULES_DESCRIPTIONS.md#struct-tag)          |  []string   | Checks common struct tags like `json`, `xml`, `yaml`               |    no    |  no   |
-| [`superfluous-else`](./RULES_DESCRIPTIONS.md#superfluous-else)    |  []string   | Prevents redundant else statements (extends [`indent-error-flow`](./RULES_DESCRIPTIONS.md#indent-error-flow)) |    no    |  no   |
-| [`time-date`](./RULES_DESCRIPTIONS.md#time-date)         |  n/a   | Reports bad usage of `time.Date`.                 |   no    |  yes  |
-| [`time-equal`](./RULES_DESCRIPTIONS.md#time-equal)         |  n/a   | Suggests to use `time.Time.Equal` instead of `==` and `!=` for equality check time.                 |   no    |  yes  |
-| [`time-naming`](./RULES_DESCRIPTIONS.md#time-naming)         |  n/a   | Conventions around the naming of time variables.                 |   yes    |  yes  |
-| [`unchecked-type-assertions`](./RULES_DESCRIPTIONS.md#unchecked-type-assertions)         |  n/a   | Disallows type assertions without checking the result.                 |   no    |  yes  |
-| [`unconditional-recursion`](./RULES_DESCRIPTIONS.md#unconditional-recursion)          |  n/a   | Warns on function calls that will lead to (direct) infinite recursion |    no    |  no   |
-| [`unexported-naming`](./RULES_DESCRIPTIONS.md#unexported-naming)          |  n/a   |  Warns on wrongly named un-exported symbols       |    no    |  no   |
-| [`unexported-return`](./RULES_DESCRIPTIONS.md#unexported-return)   |  n/a   | Warns when a public return is from unexported type.              |   yes    |  yes  |
-| [`unhandled-error`](./RULES_DESCRIPTIONS.md#unhandled-error)   | []string   | Warns on unhandled errors returned by function calls    |    no    |  yes   |
-| [`unnecessary-format`](./RULES_DESCRIPTIONS.md#unnecessary-format)    |  n/a   | Identifies calls to formatting functions where the format string does not contain any formatting verbs          |    no    |  no   |
-| [`unnecessary-stmt`](./RULES_DESCRIPTIONS.md#unnecessary-stmt)    |  n/a   | Suggests removing or simplifying unnecessary statements          |    no    |  no   |
-| [`unreachable-code`](./RULES_DESCRIPTIONS.md#unreachable-code)    |  n/a   | Warns on unreachable code                                        |    no    |  no   |
-| [`unused-parameter`](./RULES_DESCRIPTIONS.md#unused-parameter)    |  n/a   | Suggests to rename or remove unused function parameters          |    no    |  no   |
-| [`unused-receiver`](./RULES_DESCRIPTIONS.md#unused-receiver)   | n/a    | Suggests to rename or remove unused method receivers    |    no    |  no   |
-| [`use-any`](./RULES_DESCRIPTIONS.md#use-any)          |  n/a   |  Proposes to replace `interface{}` with its alias `any` |    no    |  no   |
-| [`use-errors-new`](./RULES_DESCRIPTIONS.md#use-errors-new) | n/a   | Spots calls to `fmt.Errorf` that can be replaced by `errors.New` |   no    |  no   |
-| [`use-fmt-print`](./RULES_DESCRIPTIONS.md#use-fmt-print) | n/a   | Proposes to replace calls to built-in `print` and `println` with their equivalents from `fmt`. |   no    |  no   |
-| [`useless-break`](./RULES_DESCRIPTIONS.md#useless-break)          |  n/a   |  Warns on useless `break` statements in case clauses |    no    |  no   |
-| [`var-declaration`](./RULES_DESCRIPTIONS.md#var-declaration)     |  n/a   | Reduces redundancies around variable declaration.                |   yes    |  yes  |
-| [`var-naming`](./RULES_DESCRIPTIONS.md#var-naming)          |  allowlist & blocklist of initialisms   | Naming rules.                                                    |   yes    |  no   |
-| [`waitgroup-by-value`](./RULES_DESCRIPTIONS.md#waitgroup-by-value)  |  n/a   | Warns on functions taking sync.WaitGroup as a by-value parameter |    no    |  no   |
+| Name                  | Config | Description                                                      | Go version | `golint` | Typed |
+| --------------------- | :----: | :--------------------------------------------------------------- | :--------: | :------: | :---: |
+| [`add-constant`](./RULES_DESCRIPTIONS.md#add-constant)        |  map   | Suggests using constant for magic numbers and string literals    | 1.0 |    no    |  no   |
+| [`argument-limit`](./RULES_DESCRIPTIONS.md#argument-limit)      |  int (defaults to 8)  | Specifies the maximum number of arguments a function can receive | 1.0 |    no    |  no   |
+| [`atomic`](./RULES_DESCRIPTIONS.md#atomic)              |  n/a   | Check for common mistaken usages of the `sync/atomic` package    | 1.0 |    no    |  no   |
+| [`banned-characters`](./RULES_DESCRIPTIONS.md#banned-characters)          |  []string (defaults to []string{})   |  Checks banned characters in identifiers | 1.0 |    no    |  no   |
+| [`bare-return`](./RULES_DESCRIPTIONS.md#bare-return) | n/a  | Warns on bare returns   | 1.0 |    no    |  no   |
+| [`blank-imports`](./RULES_DESCRIPTIONS.md#blank-imports)       |  n/a   | Disallows blank imports                                          | 1.0 |   yes    |  no   |
+| [`bool-literal-in-expr`](./RULES_DESCRIPTIONS.md#bool-literal-in-expr)|  n/a   | Suggests removing Boolean literals from logic expressions        | 1.0 |    no    |  no   |
+| [`call-to-gc`](./RULES_DESCRIPTIONS.md#call-to-gc)   | n/a    | Warns on explicit call to the garbage collector    | 1.0 |    no    |  no   |
+| [`cognitive-complexity`](./RULES_DESCRIPTIONS.md#cognitive-complexity)          |  int (defaults to 7) | Sets restriction for maximum Cognitive complexity.              | 1.0 |    no    |  no   |
+| [`comment-spacings`](./RULES_DESCRIPTIONS.md#comment-spacings)          |  []string   |  Warns on malformed comments | 1.0 |    no    |  no   |
+| [`comments-density`](./RULES_DESCRIPTIONS.md#comments-density) |  int (defaults to 0)  | Enforces a minimum comment / code relation | 1.0 |    no    |  no   |
+| [`confusing-naming`](./RULES_DESCRIPTIONS.md#confusing-naming)    |  n/a   | Warns on methods with names that differ only by capitalization   | 1.0 |    no    |  no   |
+| [`confusing-results`](./RULES_DESCRIPTIONS.md#confusing-results)   |  n/a   | Suggests to name potentially confusing function results          | 1.0 |    no    |  no   |
+| [`constant-logical-expr`](./RULES_DESCRIPTIONS.md#constant-logical-expr)   |  n/a   | Warns on constant logical expressions                        | 1.0 |    no    |  no   |
+| [`context-as-argument`](./RULES_DESCRIPTIONS.md#context-as-argument) |  n/a   | `context.Context` should be the first argument of a function.    | 1.0 |   yes    |  no   |
+| [`context-keys-type`](./RULES_DESCRIPTIONS.md#context-keys-type)   |  n/a   | Disallows the usage of basic types in `context.WithValue`.       | 1.0 |   yes    |  yes  |
+| [`cyclomatic`](./RULES_DESCRIPTIONS.md#cyclomatic)          |  int (defaults to 10)   | Sets restriction for maximum Cyclomatic complexity.              | 1.0 |    no    |  no   |
+| [`datarace`](./RULES_DESCRIPTIONS.md#datarace)          |  n/a   |  Spots potential dataraces | 1.0 |    no    |  no   |
+| [`deep-exit`](./RULES_DESCRIPTIONS.md#deep-exit)           |  n/a   | Looks for program exits in funcs other than `main()` or `init()` | 1.0 |    no    |  no   |
+| [`defer`](./RULES_DESCRIPTIONS.md#defer)          |  map   |  Warns on some [defer gotchas](https://blog.learngoprogramming.com/5-gotchas-of-defer-in-go-golang-part-iii-36a1ab3d6ef1)       | 1.0 |    no    |  no   |
+| [`dot-imports`](./RULES_DESCRIPTIONS.md#dot-imports)         |  n/a   | Forbids `.` imports.                                             | 1.0 |   yes    |  no   |
+| [`duplicated-imports`](./RULES_DESCRIPTIONS.md#duplicated-imports) | n/a  | Looks for packages that are imported two or more times   | 1.0 |    no    |  no   |
+| [`early-return`](./RULES_DESCRIPTIONS.md#early-return)          | []string   | Spots if-then-else statements where the predicate may be inverted to reduce nesting | 1.0 |    no    |  no   |
+| [`empty-block`](./RULES_DESCRIPTIONS.md#empty-block)         |  n/a   | Warns on empty code blocks                                       | 1.0 |    no    |  no   |
+| [`empty-lines`](./RULES_DESCRIPTIONS.md#empty-lines)   | n/a | Warns when there are heading or trailing newlines in a block              | 1.0 |    no    |  no   |
+| [`epoch-naming`](./RULES_DESCRIPTIONS.md#epoch-naming)      |  n/a   | Enforces naming conventions for epoch time variables       | 1.0 |    no    |  yes   |
+| [`enforce-map-style`](./RULES_DESCRIPTIONS.md#enforce-map-style) |  string (defaults to "any")  |  Enforces consistent usage of `make(map[type]type)` or `map[type]type{}` for map initialization. Does not affect `make(map[type]type, size)` constructions. | 1.0 |    no    |  no   |
+| [`enforce-repeated-arg-type-style`](./RULES_DESCRIPTIONS.md#enforce-repeated-arg-type-style) |  string (defaults to "any")  |  Enforces consistent style for repeated argument and/or return value types. | 1.0 |    no    |  no   |
+| [`enforce-slice-style`](./RULES_DESCRIPTIONS.md#enforce-slice-style) |  string (defaults to "any")  |  Enforces consistent usage of `make([]type, 0)` or `[]type{}` for slice initialization. Does not affect `make(map[type]type, non_zero_len, or_non_zero_cap)` constructions. | 1.0 |    no    |  no   |
+| [`enforce-switch-style`](./RULES_DESCRIPTIONS.md#enforce-switch-style) |  []string (defaults to enforce occurrence and position) |  Enforces consistent usage of `default` on `switch` statements. | 1.0 |    no    |  no   |
+| [`error-naming`](./RULES_DESCRIPTIONS.md#error-naming)        |  n/a   | Naming of error variables.                                       | 1.0 |   yes    |  no   |
+| [`error-return`](./RULES_DESCRIPTIONS.md#error-return)        |  n/a   | The error return parameter should be last.                       | 1.0 |   yes    |  no   |
+| [`error-strings`](./RULES_DESCRIPTIONS.md#error-strings)       |  []string   | Conventions around error strings.                                | 1.0 |   yes    |  no   |
+| [`errorf`](./RULES_DESCRIPTIONS.md#errorf)              |  n/a   | Should replace `errors.New(fmt.Sprintf())` with `fmt.Errorf()`   | 1.0 |   yes    |  yes  |
+| [`exported`](./RULES_DESCRIPTIONS.md#exported)            |  []string   | Naming and commenting conventions on exported symbols.           | 1.0 |   yes    |  no   |
+| [`file-header`](./RULES_DESCRIPTIONS.md#file-header)         | string (defaults to none)| Header which each file should have.                              | 1.0 |    no    |  no   |
+| [`file-length-limit`](./RULES_DESCRIPTIONS.md#file-length-limit) | map (optional)| Enforces a maximum number of lines per file | 1.0 |    no    |  no   |
+| [`filename-format`](./RULES_DESCRIPTIONS.md#filename-format) | regular expression (optional) | Enforces the formatting of filenames | 1.0 |   no    |  no   |
+| [`flag-parameter`](./RULES_DESCRIPTIONS.md#flag-parameter)      |  n/a   | Warns on boolean parameters that create a control coupling       | 1.0 |    no    |  no   |
+| [`forbidden-call-in-wg-go`](./RULES_DESCRIPTIONS.md#forbidden-call-in-wg-go)  |  n/a   | Warns on forbidden calls inside calls to wg.Go | >= 1.25 |    no    |  no   |
+| [`function-length`](./RULES_DESCRIPTIONS.md#function-length)          |  int, int (defaults to 50 statements, 75 lines)   |  Warns on functions exceeding the statements or lines max | 1.0 |    no    |  no   |
+| [`function-result-limit`](./RULES_DESCRIPTIONS.md#function-result-limit) |  int (defaults to 3)| Specifies the maximum number of results a function can return    | 1.0 |    no    |  no   |
+| [`get-return`](./RULES_DESCRIPTIONS.md#get-return)          |  n/a   | Warns on getters that do not yield any result                    | 1.0 |    no    |  no   |
+| [`identical-branches`](./RULES_DESCRIPTIONS.md#identical-branches)          |  n/a   | Spots if-then-else statements with identical `then` and `else` branches       | 1.0 |    no    |  no   |
+| [`identical-ifelseif-branches`](./RULES_DESCRIPTIONS.md#identical-ifelseif-branches)          |  n/a   | Spots `if ... else if` chains with identical branches.       | 1.0 |    no    |  no   |
+| [`identical-ifelseif-conditions`](./RULES_DESCRIPTIONS.md#identical-ifelseif-conditions)          |  n/a   | Spots identical conditions in  `if ... else if` chains.       | 1.0 |    no    |  no   |
+| [`identical-switch-branches`](./RULES_DESCRIPTIONS.md#identical-switch-branches)          |  map   | Spots `switch` with identical branches.       | 1.0 |    no    |  no   |
+| [`identical-switch-conditions`](./RULES_DESCRIPTIONS.md#identical-switch-conditions)          |  n/a   | Spots identical conditions in case clauses of `switch` statements.       | 1.0 |    no    |  no   |
+| [`if-return`](./RULES_DESCRIPTIONS.md#if-return)           |  n/a   | Redundant if when returning an error.                            | 1.0 |   no    |  no   |
+| [`import-alias-naming`](./RULES_DESCRIPTIONS.md#import-alias-naming)         | string or map[string]string (defaults to allow regex pattern `^[a-z][a-z0-9]{0,}$`) | Conventions around the naming of import aliases.                              | 1.0 |    no    |  no   |
+| [`import-shadowing`](./RULES_DESCRIPTIONS.md#import-shadowing)   | n/a    | Spots identifiers that shadow an import    | 1.0 |    no    |  no   |
+| [`imports-blocklist`](./RULES_DESCRIPTIONS.md#imports-blocklist)   | []string | Disallows importing the specified packages                     | 1.0 |    no    |  no   |
+| [`increment-decrement`](./RULES_DESCRIPTIONS.md#increment-decrement) |  n/a   | Use `i++` and `i--` instead of `i += 1` and `i -= 1`.            | 1.0 |   yes    |  no   |
+| [`indent-error-flow`](./RULES_DESCRIPTIONS.md#indent-error-flow)   |  []string   | Prevents redundant else statements.                              | 1.0 |   yes    |  no   |
+| [`inefficient-map-lookup`](./RULES_DESCRIPTIONS.md#inefficient-map-lookup)   |  n/a  | Spots iterative searches for a key in a map           | 1.0 |   no    |  yes   |
+| [`line-length-limit`](./RULES_DESCRIPTIONS.md#line-length-limit)   | int or map | Specifies the maximum number of characters in a line, with optional per-line exclusions | 1.0 |    no    |  no   |
+| [`marshal-receiver`](./RULES_DESCRIPTIONS.md#marshal-receiver) |  n/a   | Checks receiver type consistency for common marshal/unmarshal methods. | 1.0 |    no    |  no   |
+| [`max-control-nesting`](./RULES_DESCRIPTIONS.md#max-control-nesting) |  int (defaults to 5)  | Sets restriction for maximum nesting of control structures. | 1.0 |    no    |  no   |
+| [`max-public-structs`](./RULES_DESCRIPTIONS.md#max-public-structs)  |  int (defaults to 5)  | The maximum number of public structs in a file.                  | 1.0 |    no    |  no   |
+| [`modifies-parameter`](./RULES_DESCRIPTIONS.md#modifies-parameter)  |  n/a   | Warns on assignments to function parameters                      | 1.0 |    no    |  no   |
+| [`modifies-value-receiver`](./RULES_DESCRIPTIONS.md#modifies-value-receiver) |  n/a   | Warns on assignments to value-passed method receivers        | 1.0 |    no    |  yes  |
+| [`multiline-if-init`](./RULES_DESCRIPTIONS.md#multiline-if-init)    |  n/a   | Flags `if` statements whose init clause spans multiple lines    | 1.0 |    no    |  no   |
+| [`nested-structs`](./RULES_DESCRIPTIONS.md#nested-structs)          |  n/a   |  Warns on structs within structs | 1.0 |    no    |  no   |
+| [`optimize-operands-order`](./RULES_DESCRIPTIONS.md#optimize-operands-order)          |  n/a   |  Checks inefficient conditional expressions | 1.0 |    no    |  no   |
+| [`package-comments`](./RULES_DESCRIPTIONS.md#package-comments)    |  n/a   | Package commenting conventions.                                  | 1.0 |   yes    |  no   |
+| [`package-naming`](./RULES_DESCRIPTIONS.md#package-naming)    |  map   | Checks that package names follow Go conventions and best practices | 1.0 |   no    |  no   |
+| [`package-directory-mismatch`](./RULES_DESCRIPTIONS.md#package-directory-mismatch)    | string | Checks that package name matches containing directory name     | 1.0 |   no    |  no   |
+| [`range-val-address`](./RULES_DESCRIPTIONS.md#range-val-address)|  n/a   | Warns if address of range value is used dangerously | < 1.22 |    no    |  yes   |
+| [`range-val-in-closure`](./RULES_DESCRIPTIONS.md#range-val-in-closure)|  n/a   | Warns if range value is used in a closure dispatched as goroutine| < 1.22 |    no    |  no   |
+| [`range`](./RULES_DESCRIPTIONS.md#range)               |  n/a   | Prevents redundant variables when iterating over a collection.   | 1.0 |   yes    |  no   |
+| [`receiver-naming`](./RULES_DESCRIPTIONS.md#receiver-naming)     |  map (optional)   | Conventions around the naming of receivers.                      | 1.0 |   yes    |  no   |
+| [`redefines-builtin-id`](./RULES_DESCRIPTIONS.md#redefines-builtin-id)|  n/a   | Warns on redefinitions of builtin identifiers                    | 1.0 |    no    |  no   |
+| [`redundant-build-tag`](./RULES_DESCRIPTIONS.md#redundant-build-tag) | n/a   | Warns about redundant `// +build` comment lines | >= 1.17 |   no    |  no   |
+| [`redundant-import-alias`](./RULES_DESCRIPTIONS.md#redundant-import-alias)          |  n/a   |  Warns on import aliases matching the imported package name | 1.0 |    no    |  no   |
+| [`redundant-test-main-exit`](./RULES_DESCRIPTIONS.md#redundant-test-main-exit) |  n/a   | Suggests removing `Exit` call in `TestMain` function for test files | >= 1.15 |    no    |  no   |
+| [`string-format`](./RULES_DESCRIPTIONS.md#string-format)          |  map   | Warns on specific string literals that fail one or more user-configured regular expressions            | 1.0 |    no    |  no   |
+| [`string-of-int`](./RULES_DESCRIPTIONS.md#string-of-int)          |  n/a   | Warns on suspicious casts from int to string            | 1.0 |    no    |  yes   |
+| [`struct-tag`](./RULES_DESCRIPTIONS.md#struct-tag)          |  []string   | Checks common struct tags like `json`, `xml`, `yaml`               | 1.0 |    no    |  no   |
+| [`superfluous-else`](./RULES_DESCRIPTIONS.md#superfluous-else)    |  []string   | Prevents redundant else statements (extends [`indent-error-flow`](./RULES_DESCRIPTIONS.md#indent-error-flow)) | 1.0 |    no    |  no   |
+| [`time-date`](./RULES_DESCRIPTIONS.md#time-date)         |  n/a   | Reports bad usage of `time.Date`.                 | 1.0 |   no    |  no   |
+| [`time-equal`](./RULES_DESCRIPTIONS.md#time-equal)         |  n/a   | Suggests to use `time.Time.Equal` instead of `==` and `!=` for equality check time.                 | 1.0 |   no    |  yes  |
+| [`time-naming`](./RULES_DESCRIPTIONS.md#time-naming)         |  n/a   | Conventions around the naming of time variables.                 | 1.0 |   yes    |  yes  |
+| [`unchecked-type-assertion`](./RULES_DESCRIPTIONS.md#unchecked-type-assertion)         |  n/a   | Disallows type assertions without checking the result.                 | 1.0 |   no    |  no   |
+| [`unconditional-recursion`](./RULES_DESCRIPTIONS.md#unconditional-recursion)          |  n/a   | Warns on function calls that will lead to (direct) infinite recursion | 1.0 |    no    |  no   |
+| [`unexported-naming`](./RULES_DESCRIPTIONS.md#unexported-naming)          |  n/a   |  Warns on wrongly named un-exported symbols       | 1.0 |    no    |  no   |
+| [`unexported-return`](./RULES_DESCRIPTIONS.md#unexported-return)   |  n/a   | Warns when a public return is from unexported type.              | 1.0 |   yes    |  yes  |
+| [`unhandled-error`](./RULES_DESCRIPTIONS.md#unhandled-error)   | []string   | Warns on unhandled errors returned by function calls    | 1.0 |    no    |  yes   |
+| [`unnecessary-if`](./RULES_DESCRIPTIONS.md#unnecessary-if)    |  n/a   | Identifies `if-else` statements that can be replaced by simpler statements  | 1.0 |    no    |  no   |
+| [`unnecessary-format`](./RULES_DESCRIPTIONS.md#unnecessary-format)    |  n/a   | Identifies calls to formatting functions where the format string does not contain any formatting verbs          | 1.0 |    no    |  no   |
+| [`unnecessary-stmt`](./RULES_DESCRIPTIONS.md#unnecessary-stmt)    |  n/a   | Suggests removing or simplifying unnecessary statements          | 1.0 |    no    |  no   |
+| [`unreachable-code`](./RULES_DESCRIPTIONS.md#unreachable-code)    |  n/a   | Warns on unreachable code                                        | 1.0 |    no    |  no   |
+| [`unsecure-url-scheme`](./RULES_DESCRIPTIONS.md#unsecure-url-scheme)          |  n/a   |  Checks for usage of potentially unsecure URL schemes. | 1.0 |    no    |  no   |
+| [`unused-parameter`](./RULES_DESCRIPTIONS.md#unused-parameter)    |  n/a   | Suggests to rename or remove unused function parameters          | 1.0 |    no    |  no   |
+| [`unused-receiver`](./RULES_DESCRIPTIONS.md#unused-receiver)   | n/a    | Suggests to rename or remove unused method receivers    | 1.0 |    no    |  no   |
+| [`use-any`](./RULES_DESCRIPTIONS.md#use-any)          |  n/a   |  Proposes to replace `interface{}` with its alias `any` | >= 1.18 |    no    |  no   |
+| [`use-errors-new`](./RULES_DESCRIPTIONS.md#use-errors-new) | n/a   | Spots calls to `fmt.Errorf` that can be replaced by `errors.New` | < 1.26 |   no    |  no   |
+| [`use-fmt-print`](./RULES_DESCRIPTIONS.md#use-fmt-print) | n/a   | Proposes to replace calls to built-in `print` and `println` with their equivalents from `fmt`. | 1.0 |   no    |  no   |
+| [`use-slices-sort`](./RULES_DESCRIPTIONS.md#use-slices-sort) | n/a   | Proposes to replace calls to `sort.Ints`, `sort.Strings` and the like with their equivalents from `slices` package. | >= 1.21 |   no    |  no   |
+| [`use-waitgroup-go`](./RULES_DESCRIPTIONS.md#use-waitgroup-go)          |  n/a   |  Proposes to replace `wg.Add ... go {... wg.Done ...}` idiom with `wg.Go` | >= 1.25 |    no    |  no   |
+| [`useless-break`](./RULES_DESCRIPTIONS.md#useless-break)          |  n/a   |  Warns on useless `break` statements in case clauses | 1.0 |    no    |  no   |
+| [`useless-fallthrough`](./RULES_DESCRIPTIONS.md#useless-fallthrough)  |  n/a   |  Warns on useless `fallthrough` statements in case clauses | 1.0 |    no    |  no   |
+| [`var-declaration`](./RULES_DESCRIPTIONS.md#var-declaration)     |  n/a   | Reduces redundancies around variable declaration.                | 1.0 |   yes    |  yes  |
+| [`var-naming`](./RULES_DESCRIPTIONS.md#var-naming)          |  allowlist & blocklist of initialisms   | Naming rules.                                                    | 1.0 |   yes    |  no   |
+| [`waitgroup-by-value`](./RULES_DESCRIPTIONS.md#waitgroup-by-value)  |  n/a   | Warns on functions taking sync.WaitGroup as a by-value parameter | 1.0 |    no    |  no   |
+
+ The rules ported from `golint` are left unchanged and indicated in the "golint" column.
+
+ The rules in the "Typed" column use the type system, which depends on the `GOROOT` and `GOPATH` environment variables.
+ Therefore, if `revive` binary is built with `-trimpath` or run on GitHub Actions, these rules may not work as expected.
+ See [#1277](https://github.com/mgechev/revive/issues/1277) for details.
 
 ## Configurable rules
 
-Here you can find how you can configure some existing rules:
-
-### `var-naming`
-
-This rule accepts two slices of strings, an allowlist and a blocklist of initialisms. By default, the rule behaves exactly as the alternative
-in `golint` but optionally, you can relax it (see [golint/lint/issues/89](https://github.com/golang/lint/issues/89))
-
-```toml
-[rule.var-naming]
-arguments = [["ID"], ["VM"]]
-```
-
-This way, revive will not warn for an identifier called `customId` but will warn that `customVm` should be called `customVM`.
+A lot of rules can be configured. See [RULES_DESCRIPTIONS.md](./RULES_DESCRIPTIONS.md) for the list of all configurable rules and their options.
 
 ## Available Formatters
 
@@ -672,7 +684,7 @@ The tool can be extended with custom rules or formatters. This section contains 
 To extend the linter with a custom rule you can push it to this repository or use `revive` as a library (see below)
 
 To add a custom formatter you'll have to push it to this repository or fork it.
-This is due to the limited `-buildmode=plugin` support which [works only on Linux (with known issues)](https://golang.org/pkg/plugin/).
+This is due to the limited `-buildmode=plugin` support which [works only on Linux (with known issues)](https://pkg.go.dev/plugin).
 
 ### Writing a Custom Rule
 
@@ -877,9 +889,9 @@ _Open a PR to add your project_.
 
 ### Maintainers
 
-[<img alt="mgechev" src="https://avatars.githubusercontent.com/u/455023?v=4&s=100" width="100">](https://github.com/mgechev) |[<img alt="chavacava" src="https://avatars.githubusercontent.com/u/25788468?v=4&s=100" width="100">](https://github.com/chavacava) |[<img alt="denisvmedia" src="https://avatars.githubusercontent.com/u/5462781?v=4&s=100" width="100">](https://github.com/denisvmedia) |[<img alt="alexandear" src="https://avatars.githubusercontent.com/u/3228886?v=4&s=100" width="100">](https://github.com/alexandear) |
-:---: |:---: |:---: |:---: |
-[mgechev](https://github.com/mgechev) |[chavacava](https://github.com/chavacava) |[denisvmedia](https://github.com/denisvmedia) |[alexandear](https://github.com/alexandear) |
+| [<img alt="mgechev" src="https://avatars.githubusercontent.com/u/455023?v=4&s=100" width="100">](https://github.com/mgechev) | [<img alt="chavacava" src="https://avatars.githubusercontent.com/u/25788468?v=4&s=100" width="100">](https://github.com/chavacava) | [<img alt="denisvmedia" src="https://avatars.githubusercontent.com/u/5462781?v=4&s=100" width="100">](https://github.com/denisvmedia) | [<img alt="alexandear" src="https://avatars.githubusercontent.com/u/3228886?v=4&s=100" width="100">](https://github.com/alexandear) |
+|---|---|---|---|
+| [mgechev](https://github.com/mgechev) | [chavacava](https://github.com/chavacava) | [denisvmedia](https://github.com/denisvmedia) | [alexandear](https://github.com/alexandear) |
 
 ### All
 

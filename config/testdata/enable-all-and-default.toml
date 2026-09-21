@@ -1,0 +1,4 @@
+# Invalid configuration file for testing error handling of config loading.
+
+enable-all-rules = true
+enable-default-rules = true

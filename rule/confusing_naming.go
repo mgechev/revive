@@ -70,7 +70,8 @@ func (*ConfusingNamingRule) Name() string {
 	return "confusing-naming"
 }
 
-// checkMethodName checks if a given method/function name is similar (just case differences) to other method/function of the same struct/file.
+// checkMethodName checks if a given method/function name is similar (just case differences) to other method/function
+// of the same struct/file.
 func checkMethodName(holder string, id *ast.Ident, w *lintConfusingNames) {
 	if id.Name == "init" && holder == defaultStructName {
 		// ignore init functions
@@ -167,6 +168,11 @@ func checkStructFields(fields *ast.FieldList, structName string, w *lintConfusin
 	bl := make(map[string]bool, len(fields.List))
 	for _, f := range fields.List {
 		for _, id := range f.Names {
+			// Skip blank identifiers
+			if id.Name == "_" {
+				continue
+			}
+
 			normName := strings.ToUpper(id.Name)
 			if bl[normName] {
 				w.onFailure(lint.Failure{

@@ -118,16 +118,16 @@ func (l *lintPackageComments) Visit(_ ast.Node) ast.Visitor {
 		lastCG = cg
 	}
 	if lastCG != nil && strings.HasPrefix(lastCG.Text(), prefix) {
-		endPos := l.file.ToPosition(lastCG.End())
+		endLine := commentGroupEndLine(l.file, lastCG)
 		pkgPos := l.file.ToPosition(l.fileAst.Package)
-		if endPos.Line+1 < pkgPos.Line {
+		if endLine+1 < pkgPos.Line {
 			// There isn't a great place to anchor this error;
 			// the start of the blank lines between the doc and the package statement
 			// is at least pointing at the location of the problem.
 			pos := token.Position{
-				Filename: endPos.Filename,
+				Filename: pkgPos.Filename,
 				// Offset not set; it is non-trivial, and doesn't appear to be needed.
-				Line:   endPos.Line + 1,
+				Line:   endLine + 1,
 				Column: 1,
 			}
 			l.onFailure(lint.Failure{
@@ -161,6 +161,16 @@ func (l *lintPackageComments) Visit(_ ast.Node) ast.Visitor {
 		})
 	}
 	return nil
+}
+
+// commentGroupEndLine returns the line of the last character of the given comment group.
+//
+// It does not rely on [ast.CommentGroup.End] because that position is derived from the
+// comment text, from which the scanner strips carriage returns. On CRLF sources End()
+// therefore points before the actual end of a block comment (see https://go.dev/issue/41197).
+func commentGroupEndLine(file *lint.File, cg *ast.CommentGroup) int {
+	lastComment := cg.List[len(cg.List)-1]
+	return file.ToPosition(lastComment.Slash).Line + strings.Count(lastComment.Text, "\n")
 }
 
 func isEmptyDoc(commentGroup *ast.CommentGroup) bool {

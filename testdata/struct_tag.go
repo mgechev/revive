@@ -88,6 +88,12 @@ type TestDuplicatedProtobufTags struct {
 	C int `protobuf:"varint,name=c"` // MATCH /duplicated tag name "c" in protobuf tag/
 }
 
+type SpannerDuplicatedTags struct {
+	A int `spanner:"field_a"`
+	B int `spanner:"field_a"` // MATCH /duplicated tag name "field_a" in spanner tag/
+	C int `spanner:"field_c"`
+}
+
 // test case from
 // sigs.k8s.io/kustomize/api/types/helmchartargs.go
 
@@ -150,16 +156,19 @@ type MapStruct struct {
 }
 
 type ValidateUser struct {
-	Username    string `validate:"required,min=3,max=32"`
-	Email       string `validate:"required,email"`
-	Password    string `validate:"required,min=8,max=32"`
-	Biography   string `validate:"min=0,max=1000"`
-	DisplayName string `validate:"displayName,min=3,max=32"` // MATCH /unknown option "displayName" in validate tag/
-	Complex     string `validate:"gt=0,dive,keys,eq=1|eq=2,endkeys,required"`
-	BadComplex  string `validate:"gt=0,keys,eq=1|eq=2,endkeys,required"`              // MATCH /option "keys" must follow a "dive" option in validate tag/
-	BadComplex2 string `validate:"gt=0,dive,eq=1|eq=2,endkeys,required"`              // MATCH /option "endkeys" without a previous "keys" option in validate tag/
-	BadComplex3 string `validate:"gt=0,dive,keys,eq=1|eq=2,endkeys,endkeys,required"` // MATCH /option "endkeys" without a previous "keys" option in validate tag/
-	Issue1367   string `validate:"required_without=ExternalValue,excluded_with=ExternalValue"`
+	Id          string  `validate:"omitempty,min=3,max=32"`
+	Username    string  `validate:"required,min=3,max=32"`
+	Email       string  `validate:"required,email"`
+	Password    string  `validate:"required,min=8,max=32"`
+	Biography   string  `validate:"min=0,max=1000"`
+	DisplayName string  `validate:"displayName,min=3,max=32"` // MATCH /unknown option "displayName" in validate tag/
+	Complex     string  `validate:"gt=0,dive,keys,eq=1|eq=2,endkeys,required"`
+	BadComplex  string  `validate:"gt=0,keys,eq=1|eq=2,endkeys,required"`              // MATCH /option "keys" must follow a "dive" option in validate tag/
+	BadComplex2 string  `validate:"gt=0,dive,eq=1|eq=2,endkeys,required"`              // MATCH /option "endkeys" without a previous "keys" option in validate tag/
+	BadComplex3 string  `validate:"gt=0,dive,keys,eq=1|eq=2,endkeys,endkeys,required"` // MATCH /option "endkeys" without a previous "keys" option in validate tag/
+	Issue1367   string  `validate:"required_without=ExternalValue,excluded_with=ExternalValue"`
+	Handle      *string `validate:"omitnil,omitempty"`
+	Score       int     `validate:"omitzero"`
 }
 
 type TomlUser struct {
@@ -181,4 +190,51 @@ type PropertiesTags struct {
 	Field string            `properties:"date,layout=2006-01-02"` // MATCH /layout option is only applicable to fields of type time.Time in properties tag/
 	Field []string          `properties:",default=a;b;c"`
 	Field map[string]string `properties:"myName,omitempty"` // MATCH /unknown or malformed option "omitempty" in properties tag/
+}
+
+type SpannerUser struct {
+	ID        int       `spanner:"user_id"`
+	Name      string    `spanner:"full_name"`
+	Email     string    `spanner:"-"` // Valid: ignore field
+	CreatedAt time.Time `spanner:"created_at"`
+	UpdatedAt time.Time `spanner:"updated_at,unknown"` // MATCH /unknown option "unknown" in spanner tag/
+}
+
+type Codec struct {
+	_something struct{} `codec:",omitempty,int"` // MATCH /tag on not-exported field _something/
+	_struct    struct{} `codec:",omitempty,int"` // do not match, _struct has special meaning for codec tag
+	Field1     string   `codec:"-"`
+	Field2     int      `codec:"myName"`
+	Field3     int32    `codec:",omitempty"` // MATCH /redundant option "omitempty", already set for all fields in codec tag/
+	Field4     bool     `codec:"f4,int"`     // MATCH /redundant option "int", already set for all fields in codec tag/
+	field5     bool     // unexported, so skipped
+	Anon
+}
+
+type TestDuplicatedCodecTags struct {
+	_struct struct{} `json:",omitempty"` // MATCH /tag on not-exported field _struct/
+	A       int      `codec:"field_a"`
+	B       int      `codec:"field_a"` // MATCH /duplicated tag name "field_a" in codec tag/
+	C       int      `codec:"field_c"`
+}
+
+type Cbor struct {
+	RepeatedStr string `cbor:"errors"`
+	Repeated    string `cbor:"1,keyasint"`
+	Useless     string `cbor:"-,omitempty"`              // MATCH /useless option omitempty for ignored field in cbor tag/
+	Inputs      string `cbor:",keyasint"`                // MATCH /tag name for option "keyasint" should be an integer in cbor tag/
+	Outputs     string `cbor:"inputs,keyasint"`          // MATCH /tag name for option "keyasint" should be an integer in cbor tag/
+	Errors      string `cbor:"errors,optempty,keyasint"` // MATCH /unknown option "optempty" in cbor tag/
+	Inputs2     string `cbor:"-10,omitempty"`            // MATCH /integer tag names are only allowed in presence of "keyasint" option in cbor tag/
+	Outputs2    string `cbor:"-12,toarray"`              // MATCH /tag name for option "toarray" should be empty in cbor tag/
+	RepeatedInt string `cbor:"1,keyasint"`               // MATCH /duplicated integer key 1 in cbor tag/
+	RepeatedStr string `cbor:"errors,omitempty"`         // MATCH /duplicated tag name errors in cbor tag/
+	Useless     string `cbor:",toarray,omitempty"`       // MATCH /options "omitempty" and "omitzero" are ignored in presence of "toarray" option in cbor tag/
+	Useless2    string `cbor:",omitzero,toarray"`        // MATCH /options "omitempty" and "omitzero" are ignored in presence of "toarray" option in cbor tag/
+	// OK
+	InputsOk   string `cbor:"8,keyasint"`
+	OutputsOk  string `cbor:"-100,keyasint"`
+	ErrorsOk   string `cbor:"-1,keyasint"`
+	InputsOk2  string `cbor:"inputs,omitempty"`
+	OutputsOk2 string `cbor:",toarray"`
 }

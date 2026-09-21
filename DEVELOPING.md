@@ -21,23 +21,34 @@ make build
 
 The command will produce the `revive` binary in the root of the project.
 
-## Debug
+## Logging
 
-To enable debug logging, set the `DEBUG` environment variable:
+By default, any logging output is disabled when `REVIVE_LOG_LEVEL` is unset or empty.
+You can enable and customize the log level using the `REVIVE_LOG_LEVEL` environment variable.
+Supported values are:
+
+- `debug`: log all messages including debug-level information
+- `info`: log informational messages and above
+- `warn`: log warnings and errors; also used as a fallback when `REVIVE_LOG_LEVEL` is set to an invalid value
+- `error`: log errors only
+
+Logs are output to stderr:
 
 ```sh
-DEBUG=1 go run main.go
+REVIVE_LOG_LEVEL=debug go run main.go
 ```
-
-This will output debug information to `stderr` and to the log file `revive.log` created in the current working directory.
 
 ## Coding standards
 
-Follow [the instructions](.github/instructions/) which contain Go coding standards and conventions used by both humans and GitHub Copilot.
+Follow [the instructions](./.github/instructions/go.instructions.md) which contain Go coding standards and conventions used by both humans and
+GitHub Copilot.
 
 ## Development of rules
 
 If you want to develop a new rule, follow as an example the already existing rules in the [rule package](https://github.com/mgechev/revive/tree/master/rule).
+
+When adding a new rule that does not require type information (for example, a rule that does not call `file.Pkg.TypeCheck()` and works purely on syntax/AST),
+add its name to `untyped.toml` and keep that file in sync with any such rules.
 
 Each rule needs to implement the `lint.Rule` interface:
 
@@ -93,15 +104,20 @@ type Formatter interface {
 
 ### Lint Markdown files
 
-We use [markdownlint](https://github.com/DavidAnson/markdownlint) and [mdsf](https://github.com/hougesen/mdsf) to check Markdown files.
-`markdownlint` verifies document formatting, such as line length and empty lines, while `mdsf` is responsible for formatting code snippets.
+We use [markdownlint](https://github.com/DavidAnson/markdownlint),
+[markdown-toc](https://github.com/jonschlinkert/markdown-toc),
+and [mdsf](https://github.com/hougesen/mdsf) to check Markdown files.
+`markdownlint` verifies document formatting, such as line length and empty lines.
+`markdown-toc` checks the entries in the table of contents.
+`mdsf` is responsible for formatting code snippets.
 
 1. Install [markdownlint-cli2](https://github.com/DavidAnson/markdownlint-cli2#install).
-2. Install [mdsf](https://mdsf.mhouge.dk/#installation) and formatters:
+2. Install [markdown-toc](https://github.com/jonschlinkert/markdown-toc#quick-start).
+3. Install [mdsf](https://mdsf.mhouge.dk/#installation) and formatters:
     - [goimports](https://pkg.go.dev/golang.org/x/tools/cmd/goimports) for `go`: `go install golang.org/x/tools/cmd/goimports@latest`
     - [shfmt](https://github.com/mvdan/sh#shfmt) for `sh, shell, bash`: `go install mvdan.cc/sh/v3/cmd/shfmt@latest`
     - [taplo](https://taplo.tamasfe.dev/cli/installation/binary.html) for `toml`
-3. Run the following command to check formatting:
+4. Run the following command to check formatting:
 
 ```shellsession
 $ markdownlint-cli2 .
@@ -118,7 +134,15 @@ Summary: 0 error(s)
 
 _The `markdownlint-cli2` tool automatically uses the config file [.markdownlint-cli2.yaml](./.markdownlint-cli2.yaml)._
 \
-4. Run the following commands to verify and format code snippets:
+4. Run the following command to check TOC:
+
+```sh
+markdown-toc --maxdepth 4 --no-first1 --bullets "-" -i README.md && git diff --exit-code README.md
+markdown-toc --maxdepth 2 --no-first1 --bullets "-" -i RULES_DESCRIPTIONS.md && git diff --exit-code RULES_DESCRIPTIONS.md
+```
+
+\
+5. Run the following commands to verify and format code snippets:
 
 ```sh
 mdsf verify .
@@ -127,3 +151,21 @@ mdsf verify .
 ```sh
 mdsf format .
 ```
+
+_Note: Use `golang` for Go code snippets that are intentionally non-compilable.
+However, it is recommended to avoid this and use `go` whenever possible._
+
+## Website
+
+The documentation website <https://revive.run/> lives in a separate repository: [mgechev/revive.run](https://github.com/mgechev/revive.run).
+
+Most of its content is generated from this repository, so there is no need to edit the website when changing docs here:
+
+- `/docs` is generated from `README.md`
+- `/r` is generated from `RULES_DESCRIPTIONS.md`
+- `/images` is generated from `assets/`
+
+The website is rebuilt from the latest revive release twice a month by a scheduled workflow,
+so documentation changes appear on the website after the next release.
+
+Keep the headings in `RULES_DESCRIPTIONS.md` stable: the `/r/#<rule>` links printed by revive rely on them.

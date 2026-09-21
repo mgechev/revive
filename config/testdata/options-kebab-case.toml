@@ -1,0 +1,7 @@
+ignore-generated-header = true
+confidence = 0.5
+severity = "error"
+enable-default-rules = true
+error-code = 2
+warning-code = 1
+go-version = "1.20"

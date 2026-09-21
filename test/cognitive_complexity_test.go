@@ -1,4 +1,4 @@
-package test
+package test_test
 
 import (
 	"testing"
@@ -13,6 +13,6 @@ func TestCognitiveComplexityDefault(t *testing.T) {
 
 func TestCognitiveComplexity(t *testing.T) {
 	testRule(t, "cognitive_complexity", &rule.CognitiveComplexityRule{}, &lint.RuleConfig{
-		Arguments: []any{int64(0)},
+		Arguments: lint.Arguments{int64(0)},
 	})
 }

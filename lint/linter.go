@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"go/token"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -23,6 +24,7 @@ type ReadFile func(path string) (result []byte, err error)
 type Linter struct {
 	reader         ReadFile
 	fileReadTokens chan struct{}
+	logger         *slog.Logger
 }
 
 // New creates a new Linter.
@@ -34,10 +36,18 @@ func New(reader ReadFile, maxOpenFiles int) Linter {
 	return Linter{
 		reader:         reader,
 		fileReadTokens: fileReadTokens,
+		logger:         slog.New(slog.DiscardHandler),
 	}
 }
 
-func (l Linter) readFile(path string) (result []byte, err error) {
+// SetLogger sets the logger for the linter if the provided logger is not nil.
+func (l *Linter) SetLogger(logger *slog.Logger) {
+	if logger != nil {
+		l.logger = logger
+	}
+}
+
+func (l *Linter) readFile(path string) (result []byte, err error) {
 	if l.fileReadTokens != nil {
 		// "take" a token by writing to the channel.
 		// It will block if no more space in the channel's buffer
@@ -146,6 +156,7 @@ func (l *Linter) lintPackage(filenames []string, gover *goversion.Version, ruleS
 			addInvalidFileFailure(filename, err.Error(), failures)
 			continue
 		}
+		file.logger = l.logger
 		pkg.files[filename] = file
 	}
 
@@ -162,7 +173,7 @@ func detectGoMod(dir string) (rootDir string, ver *goversion.Version, err error)
 		return "", nil, fmt.Errorf("%q doesn't seem to be part of a Go module", dir)
 	}
 
-	mod, err := os.ReadFile(modFileName)
+	mod, err := os.ReadFile(modFileName) //nolint:gosec // ignore G304: potential file inclusion via variable
 	if err != nil {
 		return "", nil, fmt.Errorf("failed to read %q, got %w", modFileName, err)
 	}
@@ -202,7 +213,7 @@ func retrieveModFile(dir string) (string, error) {
 }
 
 // isGenerated reports whether the source file is generated code
-// according the rules from https://golang.org/s/generatedcode.
+// according to the rules from https://go.dev/s/generatedcode.
 // This is inherited from the original go lint.
 func isGenerated(src []byte) bool {
 	sc := bufio.NewScanner(bytes.NewReader(src))

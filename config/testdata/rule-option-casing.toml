@@ -1,0 +1,19 @@
+# Each rule option must be accepted in both lowercase and capitalized form.
+
+# `disabled` / `Disabled`
+[rule.blank-imports]
+disabled = true
+[rule.dot-imports]
+Disabled = true
+
+# `arguments` / `Arguments`
+[rule.argument-limit]
+arguments = [5]
+[rule.cyclomatic]
+Arguments = [10]
+
+# `exclude` / `Exclude`
+[rule.var-naming]
+exclude = ["**/*.pb.go"]
+[rule.error-strings]
+Exclude = ["src/somepkg/*.go"]

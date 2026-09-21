@@ -145,12 +145,11 @@ func buildDefaultConfigPath() string {
 }
 
 func initConfig() {
-	// Force colorizing for no TTY environments
 	if os.Getenv("REVIVE_FORCE_COLOR") == "1" {
-		color.NoColor = false
+		color.NoColor = false //nolint:reassign // We want to reassign the default value of NoColor to force colorizing for non-TTY environments.
 	}
 
-	flag.Usage = func() {
+	flag.Usage = func() { //nolint:reassign // We want to reassign the default usage function to print our banner.
 		fmt.Println(banner())
 		originalUsage()
 	}
@@ -161,7 +160,7 @@ func initConfig() {
 		excludeUsage      = "list of globs which specify files to be excluded (i.e. -exclude foo/...)"
 		formatterUsage    = "formatter to be used for the output (i.e. -formatter stylish)"
 		versionUsage      = "get revive version"
-		exitStatusUsage   = "set exit status to 1 if any issues are found, overwrites errorCode and warningCode in config"
+		exitStatusUsage   = "set exit status to 1 if any issues are found, overwrites error-code and warning-code in config"
 		maxOpenFilesUsage = "maximum number of open files at the same time"
 	)
 
@@ -173,7 +172,7 @@ func initConfig() {
 	flag.BoolVar(&versionFlag, "version", false, versionUsage)
 	flag.BoolVar(&setExitStatus, "set_exit_status", false, exitStatusUsage)
 	flag.IntVar(&maxOpenFiles, "max_open_files", 0, maxOpenFilesUsage)
-	flag.Parse()
+	flag.Parse() //revive:disable-line:deep-exit
 }
 
 // getVersion returns build info (version, commit, date, and builtBy).

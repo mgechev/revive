@@ -11,9 +11,11 @@ func (p *LintPattern) IsExclude() bool {
 	return p.isExclude
 }
 
-// GetPattern returns the actual pattern
+// GetPattern returns the actual pattern.
 //
-// Deprecated: Use [Pattern].
+// Deprecated: Use [LintPattern.Pattern].
+//
+//go:fix inline
 func (p *LintPattern) GetPattern() string {
 	return p.Pattern()
 }

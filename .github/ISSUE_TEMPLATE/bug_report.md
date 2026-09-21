@@ -4,11 +4,15 @@ about: Create a report to help us improve
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+# Bug report
 
-**To Reproduce**
-Steps to reproduce the behavior:
+## Describe the bug
+
+<!-- A clear and concise description of what the bug is. -->
+
+## Steps to reproduce
+
+<!--
 1. I updated revive `go install github.com/mgechev/revive@latest`
 2. I run it with the following flags & configuration file:
 
@@ -20,17 +24,16 @@ revive ...
 
 ```toml
 # config file
-```
+``` -->
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## Expected behavior
 
-**Logs**
-If applicable, add screenshots to help explain your problem.
+<!-- A clear and concise description of what you expected to happen. -->
 
-**Desktop (please complete the following information):**
- - OS: [e.g. Ubuntu 18.04]
- - Version of Go
+## Logs
 
-**Additional context**
-Add any other context about the problem here.
+<!-- If applicable, add screenshots to help explain your problem. -->
+
+## Additional context
+
+<!-- Add any other context about the problem here: OS, Go version etc. -->

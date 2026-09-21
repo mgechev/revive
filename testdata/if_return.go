@@ -1,7 +1,7 @@
 // Test of redundant if err != nil
 
-// Package pkg ...
-package pkg
+// Package fixtures ...
+package fixtures
 
 func f() error {
 	if err := f(); err != nil {
