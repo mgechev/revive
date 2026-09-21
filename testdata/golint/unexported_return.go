@@ -60,12 +60,25 @@ func ExportedIntReturner() int { // MATCH /exported func ExportedIntReturner ret
 }
 
 type unexportedInterface interface {
-	UnexportedInterface()
+	ForInterface() error
 }
 
-// UnexportedInterfacePointer returns an unexported interface pointer type from this package.
-func UnexportedInterfacePointer() *unexportedInterface { // MATCH /exported func UnexportedInterfacePointer returns unexported type *foo.unexportedInterface, which can be annoying to use/
+// ExportedInterfaceReturner returns an unexported interface type, which is annoying.
+func ExportedInterfaceReturner() unexportedInterface { // MATCH /exported func ExportedInterfaceReturner returns unexported type foo.unexportedInterface, which can be annoying to use/
+	return hidden{}
+}
+
+// ExportedInterfaceSliceReturner returns a slice of an unexported interface type, which is annoying.
+func ExportedInterfaceSliceReturner() []unexportedInterface { // MATCH /exported func ExportedInterfaceSliceReturner returns unexported type []foo.unexportedInterface, which can be annoying to use/
 	return nil
+}
+
+// ExportedInterface is an exported alias of an unexported interface type.
+type ExportedInterface = unexportedInterface
+
+// ExportedInterfaceAliasReturner returns an unexported interface type through an exported alias, which is fine.
+func ExportedInterfaceAliasReturner() ExportedInterface { // ok
+	return hidden{}
 }
 
 type config struct {

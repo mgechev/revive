@@ -1233,6 +1233,8 @@ _Configuration_: N/A
 ## unexported-return
 
 _Description_: This rule warns when an exported function or method returns a value of an un-exported type.
+Unexported interface types are reported too.
+To expose an unexported type, declare an exported alias for it (e.g. `type Option = option`) and return the alias.
 
 _Configuration_: N/A
 
