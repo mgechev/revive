@@ -264,6 +264,7 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason, mustSpe
 			mustCheckDisablingReason := mustSpecifyDisableReason && match[directivePos] == "disable"
 			if mustCheckDisablingReason && strings.Trim(match[reasonPos], " ") == "" {
 				failures <- Failure{
+					Category:   FailureCategoryComments,
 					Confidence: 1,
 					RuleName:   directiveSpecifyDisableReason,
 					Failure:    "reason of lint disabling not found",
@@ -276,6 +277,7 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason, mustSpe
 			mustCheckDisablingRules := mustSpecifyDisableRules && match[directivePos] == "disable"
 			if mustCheckDisablingRules && len(ruleNames) == 0 {
 				failures <- Failure{
+					Category:   FailureCategoryComments,
 					Confidence: 1,
 					RuleName:   directiveSpecifyDisableRule,
 					Failure:    "rule name for lint disabling not found",

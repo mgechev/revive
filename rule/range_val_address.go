@@ -159,6 +159,7 @@ func (bw rangeBodyVisitor) isAccessingRangeValueAddress(exp ast.Expr) bool {
 
 func (bw rangeBodyVisitor) newFailure(node ast.Node) lint.Failure {
 	return lint.Failure{
+		Category:   lint.FailureCategoryLogic,
 		Node:       node,
 		Confidence: 1,
 		Failure:    fmt.Sprintf("suspicious assignment of '%s'. range-loop variables always have the same address", bw.valueID.Name),

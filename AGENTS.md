@@ -67,7 +67,9 @@ The canonical example is [`rule/argument_limit.go`](rule/argument_limit.go). For
     Apply(*lint.File, lint.Arguments) []lint.Failure
     ```
 
-    If the rule takes arguments, also implement `lint.ConfigurableRule.Configure(lint.Arguments) error`.
+    If the rule takes arguments, also implement `lint.ConfigurableRule.Configure(lint.Arguments) error`
+    and add the compile-time assertion `var _ lint.ConfigurableRule = (*<RuleType>)(nil)` next to the type declaration,
+    so a signature typo fails the build instead of silently leaving the rule unconfigured.
     Validate arguments there and return errors rather than panicking.
     Any newly added option must be passed as a `map[string]any` (a single map argument with named keys),
     not as a positional/scalar argument — this keeps rule configuration extensible and self-documenting.
@@ -85,6 +87,9 @@ The canonical example is [`rule/argument_limit.go`](rule/argument_limit.go). For
 7. **Defaults** — hard-code defaults as constants in the rule file and apply them in `Configure` when arguments are missing
    (see `defaultArgumentsLimit` in `rule/argument_limit.go`). Bundle-level defaults live in `defaults.toml` / `revive.toml`.
 8. **Register** — append the rule to `allRules` in [`config/config.go`](config/config.go) so the CLI can discover it.
+9. **Failures** — every `lint.Failure` a rule reports must set `Category` to one of the `lint.FailureCategory*` constants
+   (see [`lint/failure.go`](lint/failure.go)); pick the one used by rules with a similar intent. The test harness fails on
+   a failure with an empty category. Set `Confidence` as well (`1` unless the rule is heuristic).
 
 ## 5. Adding a formatter
 

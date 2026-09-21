@@ -14,6 +14,8 @@ type IdenticalSwitchBranchesRule struct {
 	allowIdenticalDefault bool // allow the default clause to be identical to a case clause
 }
 
+var _ lint.ConfigurableRule = (*IdenticalSwitchBranchesRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

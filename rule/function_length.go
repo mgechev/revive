@@ -14,6 +14,8 @@ type FunctionLength struct {
 	maxLines int
 }
 
+var _ lint.ConfigurableRule = (*FunctionLength)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
@@ -46,6 +48,7 @@ func (r *FunctionLength) Apply(file *lint.File, _ lint.Arguments) []lint.Failure
 			stmtCount := r.countStmts(body.List)
 			if stmtCount > r.maxStmt {
 				failures = append(failures, lint.Failure{
+					Category:   lint.FailureCategoryMaintenance,
 					Confidence: 1,
 					Failure:    fmt.Sprintf("maximum number of statements per function exceeded; max %d but got %d", r.maxStmt, stmtCount),
 					Node:       funcDecl,
@@ -57,6 +60,7 @@ func (r *FunctionLength) Apply(file *lint.File, _ lint.Arguments) []lint.Failure
 			lineCount := r.countLines(body, file)
 			if lineCount > r.maxLines {
 				failures = append(failures, lint.Failure{
+					Category:   lint.FailureCategoryMaintenance,
 					Confidence: 1,
 					Failure:    fmt.Sprintf("maximum number of lines per function exceeded; max %d but got %d", r.maxLines, lineCount),
 					Node:       funcDecl,

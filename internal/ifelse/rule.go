@@ -129,6 +129,7 @@ func (v *visitor) checkRule(ifStmt *ast.IfStmt, chain Chain) {
 		msg += " (move short variable declaration to its own line if necessary)"
 	}
 	v.failures = append(v.failures, lint.Failure{
+		Category:   lint.FailureCategoryStyle,
 		Confidence: 1,
 		Node:       v.target.node(ifStmt),
 		Failure:    msg,

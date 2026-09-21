@@ -84,6 +84,7 @@ func (w atomic) Visit(node ast.Node) ast.Visitor {
 
 			if broken {
 				w.onFailure(lint.Failure{
+					Category:   lint.FailureCategoryLogic,
 					Confidence: 1,
 					Failure:    "direct assignment to atomic value",
 					Node:       n,

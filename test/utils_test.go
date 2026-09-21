@@ -103,6 +103,9 @@ func assertFailures(tb testing.TB, filePath string, rules []lint.Rule, config li
 
 	failures := []lint.Failure{}
 	for f := range ps {
+		if f.Category == "" {
+			tb.Errorf("failure %q at %s:%d has no category", f.Failure, filePath, f.Position.Start.Line)
+		}
 		failures = append(failures, f)
 	}
 

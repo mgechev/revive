@@ -200,6 +200,8 @@ func (w *lintAddConstantRule) isStructTag(n *ast.BasicLit) bool {
 	return ok
 }
 
+var _ lint.ConfigurableRule = (*AddConstantRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

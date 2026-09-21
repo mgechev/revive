@@ -69,6 +69,8 @@ type ExportedRule struct {
 	disabledChecks  disabledChecks
 }
 
+var _ lint.ConfigurableRule = (*ExportedRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configure makes the rule implement the [lint.ConfigurableRule] interface.

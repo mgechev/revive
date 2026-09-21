@@ -26,6 +26,8 @@ type VarNamingRule struct {
 	skipInitialismNameChecks bool // if true - disable enforcing capitals for common initialisms
 }
 
+var _ lint.ConfigurableRule = (*VarNamingRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

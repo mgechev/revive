@@ -46,6 +46,7 @@ func (w lintWaitGroupByValueRule) Visit(node ast.Node) ast.Visitor {
 		}
 
 		w.onFailure(lint.Failure{
+			Category:   lint.FailureCategoryLogic,
 			Confidence: 1,
 			Node:       field,
 			Failure:    "sync.WaitGroup passed by value, the function will get a copy of the original one",

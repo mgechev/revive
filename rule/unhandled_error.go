@@ -17,6 +17,8 @@ type UnhandledErrorRule struct {
 	ignoreList []*regexp.Regexp
 }
 
+var _ lint.ConfigurableRule = (*UnhandledErrorRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

@@ -67,7 +67,16 @@ type ConfigurableRule interface {
 }
 ```
 
+Add a compile-time assertion next to the rule type so that the interface is guaranteed to be implemented:
+
+```go
+var _ lint.ConfigurableRule = (*ArgumentsLimitRule)(nil)
+```
+
 The `Arguments` type is an alias of the type `[]any`. The arguments of the rule are passed from the configuration file.
+
+Every `lint.Failure` reported by a rule must set `Category` to one of the `lint.FailureCategory*` constants defined in
+[`lint/failure.go`](/lint/failure.go). Failures without a category are rejected by the test harness.
 
 ### Example
 

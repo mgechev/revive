@@ -55,6 +55,8 @@ func (*ContextAsArgumentRule) Name() string {
 	return "context-as-argument"
 }
 
+var _ lint.ConfigurableRule = (*ContextAsArgumentRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

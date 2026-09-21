@@ -46,6 +46,8 @@ type EnforceSliceStyleRule struct {
 	enforceSliceStyle enforceSliceStyleType
 }
 
+var _ lint.ConfigurableRule = (*EnforceSliceStyleRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
