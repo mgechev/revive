@@ -58,7 +58,8 @@ Logging during local runs: set `REVIVE_LOG_LEVEL` (`debug|info|warn|error`) — 
 
 ## 4. Adding or modifying a rule
 
-The canonical example is [`rule/argument_limit.go`](rule/argument_limit.go). For each new rule:
+The canonical example is [`rule/argument_limit.go`](rule/argument_limit.go).
+The review checklist lives in [`.github/instructions/rule.instructions.md`](.github/instructions/rule.instructions.md). For each new rule:
 
 1. **Implementation** — `rule/<rule_name>.go`. Implement `lint.Rule`:
 
@@ -136,6 +137,7 @@ Line length in this and other Markdown files is capped at 150 characters (200 in
 | Need                                 | File / dir                                               |
 | ------------------------------------ | -------------------------------------------------------- |
 | Go style and idioms                  | `.github/instructions/go.instructions.md`                |
+| Rule checklist (PR review)           | `.github/instructions/rule.instructions.md`              |
 | Build / test / lint commands         | `Makefile`, `DEVELOPING.md`                              |
 | How to write a rule (worked example) | `rule/argument_limit.go` + `test/argument_limit_test.go` |
 | Rule interfaces, `File`, `Failure`   | `lint/`                                                  |
