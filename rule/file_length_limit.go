@@ -70,6 +70,8 @@ func (r *FileLengthLimitRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 	}
 }
 
+var _ lint.ConfigurableRule = (*FileLengthLimitRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

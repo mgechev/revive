@@ -82,6 +82,7 @@ func (w lintUnsecureURLSchemeRule) Visit(node ast.Node) ast.Visitor {
 	}
 
 	w.onFailure(lint.Failure{
+		Category:   lint.FailureCategoryBadPractice,
 		Confidence: 1,
 		Failure:    fmt.Sprintf("prefer secure protocol %s over %s in %s", scheme+"s", scheme, n.Value),
 		Node:       n,

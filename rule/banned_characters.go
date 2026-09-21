@@ -15,6 +15,8 @@ type BannedCharsRule struct {
 
 const bannedCharsRuleName = "banned-characters"
 
+var _ lint.ConfigurableRule = (*BannedCharsRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
@@ -80,6 +82,7 @@ func (w lintBannedCharsRule) Visit(node ast.Node) ast.Visitor {
 		ok := strings.Contains(n.Name, c)
 		if ok {
 			w.onFailure(lint.Failure{
+				Category:   lint.FailureCategoryContent,
 				Confidence: 1,
 				Failure:    fmt.Sprintf("banned character found: %s", c),
 				RuleName:   bannedCharsRuleName,

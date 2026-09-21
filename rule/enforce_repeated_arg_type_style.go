@@ -45,6 +45,8 @@ type EnforceRepeatedArgTypeStyleRule struct {
 	funcRetValStyle enforceRepeatedArgTypeStyleType
 }
 
+var _ lint.ConfigurableRule = (*EnforceRepeatedArgTypeStyleRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

@@ -14,6 +14,8 @@ type EnforceSwitchStyleRule struct {
 	allowDefaultNotLast bool // allow default, if present, not being the last case
 }
 
+var _ lint.ConfigurableRule = (*EnforceSwitchStyleRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

@@ -53,6 +53,7 @@ func (w *lintRanges) Visit(node ast.Node) ast.Visitor {
 	newRS.Value = nil
 
 	w.onFailure(lint.Failure{
+		Category:        lint.FailureCategoryStyle,
 		Failure:         fmt.Sprintf("should omit 2nd value from range; this loop is equivalent to `for %s %s range ...`", w.file.Render(rs.Key), rs.Tok),
 		Confidence:      1,
 		Node:            rs.Value,

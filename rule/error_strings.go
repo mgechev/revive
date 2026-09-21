@@ -17,6 +17,8 @@ type ErrorStringsRule struct {
 	errorFunctions map[string]map[string]struct{}
 }
 
+var _ lint.ConfigurableRule = (*ErrorStringsRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

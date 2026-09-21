@@ -21,6 +21,8 @@ type LineLengthLimitRule struct {
 
 const defaultLineLengthLimit = 80
 
+var _ lint.ConfigurableRule = (*LineLengthLimitRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

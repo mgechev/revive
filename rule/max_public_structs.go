@@ -16,6 +16,8 @@ type MaxPublicStructsRule struct {
 
 const defaultMaxPublicStructs = 5
 
+var _ lint.ConfigurableRule = (*MaxPublicStructsRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
