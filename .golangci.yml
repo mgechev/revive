@@ -39,15 +39,6 @@ linters:
           - godoclint
           - godot
       - linters:
-          - testpackage
-        text: 'package should be `rule_test` instead of `rule`'
-      - linters:
-          - testpackage
-        text: 'package should be `lint_test` instead of `lint`'
-      - linters:
-          - testpackage
-        text: 'package should be `cli_test` instead of `cli`'
-      - linters:
           - gosec
         path: rule/context_keys_type.go
       - linters:

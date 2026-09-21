@@ -49,3 +49,8 @@ func flagNewFlagSetExitOnErrorOutsideMain() {
 func flagNewFlagSetContinueOnErrorOK() {
 	flag.NewFlagSet("cmd", flag.ContinueOnError)
 }
+
+// Not a testable example because this is not a test file
+func Example() {
+	os.Exit(1) // MATCH /calls to os.Exit only in main() or init() functions/
+}
