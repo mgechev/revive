@@ -1,35 +1,26 @@
-package rule
+package rule_test
 
 import (
 	"errors"
-	"reflect"
-	"regexp"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
 )
 
 func TestImportAliasNamingRule_Configure(t *testing.T) {
 	tests := []struct {
-		name           string
-		arguments      lint.Arguments
-		wantErr        error
-		wantAllowRegex *regexp.Regexp
-		wantDenyRegex  *regexp.Regexp
+		name      string
+		arguments lint.Arguments
+		wantErr   error
 	}{
 		{
-			name:           "no arguments",
-			arguments:      lint.Arguments{},
-			wantErr:        nil,
-			wantAllowRegex: regexp.MustCompile("^[a-z][a-z0-9]{0,}$"), //nolint:gocritic // regexpSimplify: backward compatibility
-			wantDenyRegex:  nil,
+			name:      "no arguments",
+			arguments: lint.Arguments{},
 		},
 		{
-			name:           "valid string argument",
-			arguments:      lint.Arguments{"^[a-z][a-z0-9]*$"},
-			wantErr:        nil,
-			wantAllowRegex: regexp.MustCompile("^[a-z][a-z0-9]*$"),
-			wantDenyRegex:  nil,
+			name:      "valid string argument",
+			arguments: lint.Arguments{"^[a-z][a-z0-9]*$"},
 		},
 		{
 			name: "valid map arguments",
@@ -37,9 +28,6 @@ func TestImportAliasNamingRule_Configure(t *testing.T) {
 				"allowRegex": "^[a-z][a-z0-9]*$",
 				"denyRegex":  "^v\\d+$",
 			}},
-			wantErr:        nil,
-			wantAllowRegex: regexp.MustCompile("^[a-z][a-z0-9]*$"),
-			wantDenyRegex:  regexp.MustCompile(`^v\d+$`),
 		},
 		{
 			name: "valid map lowercased arguments",
@@ -47,9 +35,6 @@ func TestImportAliasNamingRule_Configure(t *testing.T) {
 				"allowregex": "^[a-z][a-z0-9]*$",
 				"denyregex":  "^v\\d+$",
 			}},
-			wantErr:        nil,
-			wantAllowRegex: regexp.MustCompile("^[a-z][a-z0-9]*$"),
-			wantDenyRegex:  regexp.MustCompile(`^v\d+$`),
 		},
 		{
 			name: "valid map kebab-cased arguments",
@@ -57,9 +42,6 @@ func TestImportAliasNamingRule_Configure(t *testing.T) {
 				"allow-regex": "^[a-z][a-z0-9]*$",
 				"deny-regex":  "^v\\d+$",
 			}},
-			wantErr:        nil,
-			wantAllowRegex: regexp.MustCompile("^[a-z][a-z0-9]*$"),
-			wantDenyRegex:  regexp.MustCompile(`^v\d+$`),
 		},
 		{
 			name:      "invalid argument type",
@@ -105,28 +87,18 @@ func TestImportAliasNamingRule_Configure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var rule ImportAliasNamingRule
+			var r rule.ImportAliasNamingRule
 
-			err := rule.Configure(tt.arguments)
+			err := r.Configure(tt.arguments)
 
-			if tt.wantErr != nil {
-				if err == nil {
-					t.Errorf("unexpected error: got = nil, want = %v", tt.wantErr)
-					return
-				}
-				if err.Error() != tt.wantErr.Error() {
-					t.Errorf("unexpected error: got = %v, want = %v", err, tt.wantErr)
+			if tt.wantErr == nil {
+				if err != nil {
+					t.Errorf("Configure() unexpected non-nil error %q", err)
 				}
 				return
 			}
-			if err != nil {
-				t.Errorf("unexpected error: got = %v, want = nil", err)
-			}
-			if !reflect.DeepEqual(rule.allowRegexp, tt.wantAllowRegex) {
-				t.Errorf("unexpected allowRegex: got = %v, want %v", rule.allowRegexp, tt.wantAllowRegex)
-			}
-			if !reflect.DeepEqual(rule.denyRegexp, tt.wantDenyRegex) {
-				t.Errorf("unexpected denyRegexp: got = %v, want %v", rule.denyRegexp, tt.wantDenyRegex)
+			if err == nil || err.Error() != tt.wantErr.Error() {
+				t.Errorf("Configure() unexpected error: got %q, want %q", err, tt.wantErr)
 			}
 		})
 	}

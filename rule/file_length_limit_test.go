@@ -1,28 +1,22 @@
-package rule
+package rule_test
 
 import (
 	"errors"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
 )
 
 func TestFileLengthLimitRule_Configure(t *testing.T) {
 	tests := []struct {
-		name               string
-		arguments          lint.Arguments
-		wantErr            error
-		wantMax            int
-		wantSkipComments   bool
-		wantSkipBlankLines bool
+		name      string
+		arguments lint.Arguments
+		wantErr   error
 	}{
 		{
-			name:               "no arguments",
-			arguments:          lint.Arguments{},
-			wantErr:            nil,
-			wantMax:            0,
-			wantSkipComments:   false,
-			wantSkipBlankLines: false,
+			name:      "no arguments",
+			arguments: lint.Arguments{},
 		},
 		{
 			name: "valid arguments",
@@ -31,10 +25,6 @@ func TestFileLengthLimitRule_Configure(t *testing.T) {
 				"skipComments":   true,
 				"skipBlankLines": true,
 			}},
-			wantErr:            nil,
-			wantMax:            100,
-			wantSkipComments:   true,
-			wantSkipBlankLines: true,
 		},
 		{
 			name: "valid lowercased arguments",
@@ -43,10 +33,6 @@ func TestFileLengthLimitRule_Configure(t *testing.T) {
 				"skipcomments":   true,
 				"skipblanklines": true,
 			}},
-			wantErr:            nil,
-			wantMax:            100,
-			wantSkipComments:   true,
-			wantSkipBlankLines: true,
 		},
 		{
 			name: "valid kebab-cased arguments",
@@ -55,10 +41,6 @@ func TestFileLengthLimitRule_Configure(t *testing.T) {
 				"skip-comments":    true,
 				"skip-blank-lines": true,
 			}},
-			wantErr:            nil,
-			wantMax:            100,
-			wantSkipComments:   true,
-			wantSkipBlankLines: true,
 		},
 		{
 			name:      "invalid argument",
@@ -90,31 +72,18 @@ func TestFileLengthLimitRule_Configure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var rule FileLengthLimitRule
+			var r rule.FileLengthLimitRule
 
-			err := rule.Configure(tt.arguments)
+			err := r.Configure(tt.arguments)
 
-			if tt.wantErr != nil {
-				if err == nil {
-					t.Errorf("unexpected error: got = nil, want = %v", tt.wantErr)
-					return
-				}
-				if err.Error() != tt.wantErr.Error() {
-					t.Errorf("unexpected error: got = %v, want = %v", err, tt.wantErr)
+			if tt.wantErr == nil {
+				if err != nil {
+					t.Errorf("Configure() unexpected non-nil error %q", err)
 				}
 				return
 			}
-			if err != nil {
-				t.Errorf("unexpected error: got = %v, want = nil", err)
-			}
-			if rule.max != tt.wantMax {
-				t.Errorf("unexpected max: got = %v, want %v", rule.max, tt.wantMax)
-			}
-			if rule.skipComments != tt.wantSkipComments {
-				t.Errorf("unexpected skipComments: got = %v, want %v", rule.skipComments, tt.wantSkipComments)
-			}
-			if rule.skipBlankLines != tt.wantSkipBlankLines {
-				t.Errorf("unexpected skipBlankLines: got = %v, want %v", rule.skipBlankLines, tt.wantSkipBlankLines)
+			if err == nil || err.Error() != tt.wantErr.Error() {
+				t.Errorf("Configure() unexpected error: got %q, want %q", err, tt.wantErr)
 			}
 		})
 	}

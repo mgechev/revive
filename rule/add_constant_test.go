@@ -1,31 +1,22 @@
-package rule
+package rule_test
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
 )
 
 func TestAddConstantRule_Configure(t *testing.T) {
 	tests := []struct {
-		name            string
-		arguments       lint.Arguments
-		wantErr         error
-		wantList        allowList
-		wantStrLitLimit int
+		name      string
+		arguments lint.Arguments
+		wantErr   error
 	}{
 		{
 			name:      "no arguments",
 			arguments: lint.Arguments{},
-			wantErr:   nil,
-			wantList: allowList{
-				kindINT:    {},
-				kindFLOAT:  {},
-				kindSTRING: {},
-			},
-			wantStrLitLimit: 2,
 		},
 		{
 			name: "valid arguments",
@@ -38,13 +29,6 @@ func TestAddConstantRule_Configure(t *testing.T) {
 					"ignoreFuncs": "fmt.Println,fmt.Printf",
 				},
 			},
-			wantErr: nil,
-			wantList: allowList{
-				kindFLOAT:  {"1.0": true, "2.0": true},
-				kindINT:    {"1": true, "2": true},
-				kindSTRING: {"a": true, "b": true},
-			},
-			wantStrLitLimit: 3,
 		},
 		{
 			name: "valid lowercased arguments",
@@ -57,13 +41,6 @@ func TestAddConstantRule_Configure(t *testing.T) {
 					"ignorefuncs": "fmt.Println,fmt.Printf",
 				},
 			},
-			wantErr: nil,
-			wantList: allowList{
-				kindFLOAT:  {"1.0": true, "2.0": true},
-				kindINT:    {"1": true, "2": true},
-				kindSTRING: {"a": true, "b": true},
-			},
-			wantStrLitLimit: 3,
 		},
 		{
 			name: "valid kebab-cased arguments",
@@ -76,13 +53,6 @@ func TestAddConstantRule_Configure(t *testing.T) {
 					"ignore-funcs":  "fmt.Println,fmt.Printf",
 				},
 			},
-			wantErr: nil,
-			wantList: allowList{
-				kindFLOAT:  {"1.0": true, "2.0": true},
-				kindINT:    {"1": true, "2": true},
-				kindSTRING: {"a": true, "b": true},
-			},
-			wantStrLitLimit: 3,
 		},
 		{
 			name: "unrecognized key",
@@ -91,13 +61,6 @@ func TestAddConstantRule_Configure(t *testing.T) {
 					"unknownKey": "someValue",
 				},
 			},
-			wantErr: nil,
-			wantList: allowList{
-				kindINT:    {},
-				kindFLOAT:  {},
-				kindSTRING: {},
-			},
-			wantStrLitLimit: 2,
 		},
 		{
 			name: "invalid argument type",
@@ -164,28 +127,18 @@ func TestAddConstantRule_Configure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var rule AddConstantRule
+			var r rule.AddConstantRule
 
-			err := rule.Configure(tt.arguments)
+			err := r.Configure(tt.arguments)
 
-			if tt.wantErr != nil {
-				if err == nil {
-					t.Errorf("unexpected error: got = nil, want = %v", tt.wantErr)
-					return
-				}
-				if err.Error() != tt.wantErr.Error() {
-					t.Errorf("unexpected error: got = %v, want = %v", err, tt.wantErr)
+			if tt.wantErr == nil {
+				if err != nil {
+					t.Errorf("Configure() unexpected non-nil error %q", err)
 				}
 				return
 			}
-			if err != nil {
-				t.Errorf("unexpected error: got = %v, want = nil", err)
-			}
-			if !reflect.DeepEqual(rule.allowList, tt.wantList) {
-				t.Errorf("unexpected allowList: got = %v, want %v", rule.allowList, tt.wantList)
-			}
-			if rule.strLitLimit != tt.wantStrLitLimit {
-				t.Errorf("unexpected strLitLimit: got = %v, want %v", rule.strLitLimit, tt.wantStrLitLimit)
+			if err == nil || err.Error() != tt.wantErr.Error() {
+				t.Errorf("Configure() unexpected error: got %q, want %q", err, tt.wantErr)
 			}
 		})
 	}

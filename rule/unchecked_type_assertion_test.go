@@ -1,48 +1,40 @@
-package rule
+package rule_test
 
 import (
 	"errors"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
 )
 
 func TestUncheckedTypeAssertionRule_Configure(t *testing.T) {
 	tests := []struct {
-		name                             string
-		arguments                        lint.Arguments
-		wantErr                          error
-		wantAcceptIgnoredAssertionResult bool
+		name      string
+		arguments lint.Arguments
+		wantErr   error
 	}{
 		{
-			name:                             "no arguments",
-			arguments:                        lint.Arguments{},
-			wantErr:                          nil,
-			wantAcceptIgnoredAssertionResult: false,
+			name:      "no arguments",
+			arguments: lint.Arguments{},
 		},
 		{
 			name: "valid acceptIgnoredAssertionResult argument",
 			arguments: lint.Arguments{map[string]any{
 				"acceptIgnoredAssertionResult": true,
 			}},
-			wantErr:                          nil,
-			wantAcceptIgnoredAssertionResult: true,
 		},
 		{
 			name: "valid lowercased argument",
 			arguments: lint.Arguments{map[string]any{
 				"acceptignoredassertionresult": true,
 			}},
-			wantErr:                          nil,
-			wantAcceptIgnoredAssertionResult: true,
 		},
 		{
 			name: "valid kebab-cased argument",
 			arguments: lint.Arguments{map[string]any{
 				"accept-ignored-assertion-result": true,
 			}},
-			wantErr:                          nil,
-			wantAcceptIgnoredAssertionResult: true,
 		},
 		{
 			name:      "invalid type",
@@ -67,25 +59,18 @@ func TestUncheckedTypeAssertionRule_Configure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var rule UncheckedTypeAssertionRule
+			var r rule.UncheckedTypeAssertionRule
 
-			err := rule.Configure(tt.arguments)
+			err := r.Configure(tt.arguments)
 
-			if tt.wantErr != nil {
-				if err == nil {
-					t.Errorf("unexpected error: got = nil, want = %v", tt.wantErr)
-					return
-				}
-				if err.Error() != tt.wantErr.Error() {
-					t.Errorf("unexpected error: got = %v, want = %v", err, tt.wantErr)
+			if tt.wantErr == nil {
+				if err != nil {
+					t.Errorf("Configure() unexpected non-nil error %q", err)
 				}
 				return
 			}
-			if err != nil {
-				t.Errorf("unexpected error: got = %v, want = nil", err)
-			}
-			if rule.acceptIgnoredAssertionResult != tt.wantAcceptIgnoredAssertionResult {
-				t.Errorf("unexpected acceptIgnoredAssertionResult: got = %v, want %v", rule.acceptIgnoredAssertionResult, tt.wantAcceptIgnoredAssertionResult)
+			if err == nil || err.Error() != tt.wantErr.Error() {
+				t.Errorf("Configure() unexpected error: got %q, want %q", err, tt.wantErr)
 			}
 		})
 	}

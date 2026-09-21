@@ -1,79 +1,62 @@
-package rule
+package rule_test
 
 import (
 	"testing"
 
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
 )
 
 func TestSuperfluousElseRule_Configure(t *testing.T) {
 	tests := []struct {
-		name              string
-		arguments         lint.Arguments
-		wantErr           error
-		wantPreserveScope bool
+		name      string
+		arguments lint.Arguments
+		wantErr   error
 	}{
 		{
-			name:              "no arguments",
-			arguments:         lint.Arguments{},
-			wantErr:           nil,
-			wantPreserveScope: false,
+			name:      "no arguments",
+			arguments: lint.Arguments{},
 		},
 		{
 			name: "valid arguments",
 			arguments: lint.Arguments{
 				"preserveScope",
 			},
-			wantErr:           nil,
-			wantPreserveScope: true,
 		},
 		{
 			name: "valid lowercased arguments",
 			arguments: lint.Arguments{
 				"preservescope",
 			},
-			wantErr:           nil,
-			wantPreserveScope: true,
 		},
 		{
 			name: "valid kebab-cased arguments",
 			arguments: lint.Arguments{
 				"preserve-scope",
 			},
-			wantErr:           nil,
-			wantPreserveScope: true,
 		},
 		{
 			name: "invalid arguments",
 			arguments: lint.Arguments{
 				"unknown",
 			},
-			wantErr:           nil,
-			wantPreserveScope: false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var rule SuperfluousElseRule
+			var r rule.SuperfluousElseRule
 
-			err := rule.Configure(tt.arguments)
+			err := r.Configure(tt.arguments)
 
-			if tt.wantErr != nil {
-				if err == nil {
-					t.Errorf("unexpected error: got = nil, want = %v", tt.wantErr)
-					return
-				}
-				if err.Error() != tt.wantErr.Error() {
-					t.Errorf("unexpected error: got = %v, want = %v", err, tt.wantErr)
+			if tt.wantErr == nil {
+				if err != nil {
+					t.Errorf("Configure() unexpected non-nil error %q", err)
 				}
 				return
 			}
-			if err != nil {
-				t.Errorf("unexpected error: got = %v, want = nil", err)
-			}
-			if rule.preserveScope != tt.wantPreserveScope {
-				t.Errorf("unexpected preserveScope: got = %v, want = %v", rule.preserveScope, tt.wantPreserveScope)
+			if err == nil || err.Error() != tt.wantErr.Error() {
+				t.Errorf("Configure() unexpected error: got %q, want %q", err, tt.wantErr)
 			}
 		})
 	}

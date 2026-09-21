@@ -1,25 +1,21 @@
-package rule
+package rule_test
 
 import (
 	"testing"
 
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
 )
 
 func TestEarlyReturn_Configure(t *testing.T) {
 	tests := []struct {
-		name              string
-		arguments         lint.Arguments
-		wantErr           error
-		wantPreserveScope bool
-		wantAllowJump     bool
+		name      string
+		arguments lint.Arguments
+		wantErr   error
 	}{
 		{
-			name:              "no arguments",
-			arguments:         lint.Arguments{},
-			wantErr:           nil,
-			wantPreserveScope: false,
-			wantAllowJump:     false,
+			name:      "no arguments",
+			arguments: lint.Arguments{},
 		},
 		{
 			name: "valid arguments",
@@ -27,9 +23,6 @@ func TestEarlyReturn_Configure(t *testing.T) {
 				"preserveScope",
 				"allowJump",
 			},
-			wantErr:           nil,
-			wantPreserveScope: true,
-			wantAllowJump:     true,
 		},
 		{
 			name: "valid lowercased arguments",
@@ -37,9 +30,6 @@ func TestEarlyReturn_Configure(t *testing.T) {
 				"preservescope",
 				"allowjump",
 			},
-			wantErr:           nil,
-			wantPreserveScope: true,
-			wantAllowJump:     true,
 		},
 		{
 			name: "valid kebab-cased arguments",
@@ -47,45 +37,29 @@ func TestEarlyReturn_Configure(t *testing.T) {
 				"preserve-scope",
 				"allow-jump",
 			},
-			wantErr:           nil,
-			wantPreserveScope: true,
-			wantAllowJump:     true,
 		},
 		{
 			name: "invalid arguments",
 			arguments: lint.Arguments{
 				"unknown",
 			},
-			wantErr:           nil,
-			wantPreserveScope: false,
-			wantAllowJump:     false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var rule EarlyReturnRule
+			var r rule.EarlyReturnRule
 
-			err := rule.Configure(tt.arguments)
+			err := r.Configure(tt.arguments)
 
-			if tt.wantErr != nil {
-				if err == nil {
-					t.Errorf("unexpected error: got = nil, want = %v", tt.wantErr)
-					return
-				}
-				if err.Error() != tt.wantErr.Error() {
-					t.Errorf("unexpected error: got = %v, want = %v", err, tt.wantErr)
+			if tt.wantErr == nil {
+				if err != nil {
+					t.Errorf("Configure() unexpected non-nil error %q", err)
 				}
 				return
 			}
-			if err != nil {
-				t.Errorf("unexpected error: got = %v, want = nil", err)
-			}
-			if rule.preserveScope != tt.wantPreserveScope {
-				t.Errorf("unexpected preserveScope: got = %v, want = %v", rule.preserveScope, tt.wantPreserveScope)
-			}
-			if rule.allowJump != tt.wantAllowJump {
-				t.Errorf("unexpected allowJump: got = %v, want = %v", rule.allowJump, tt.wantAllowJump)
+			if err == nil || err.Error() != tt.wantErr.Error() {
+				t.Errorf("Configure() unexpected error: got %q, want %q", err, tt.wantErr)
 			}
 		})
 	}

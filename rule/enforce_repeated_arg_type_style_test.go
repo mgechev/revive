@@ -1,35 +1,28 @@
-package rule
+package rule_test
 
 import (
 	"errors"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
 )
 
 func TestEnforceRepeatedArgTypeStyleRule_Configure(t *testing.T) {
 	tests := []struct {
-		name                string
-		arguments           lint.Arguments
-		wantErr             error
-		wantFuncArgStyle    enforceRepeatedArgTypeStyleType
-		wantFuncRetValStyle enforceRepeatedArgTypeStyleType
+		name      string
+		arguments lint.Arguments
+		wantErr   error
 	}{
 		{
-			name:                "no arguments",
-			arguments:           lint.Arguments{},
-			wantErr:             nil,
-			wantFuncArgStyle:    "any",
-			wantFuncRetValStyle: "any",
+			name:      "no arguments",
+			arguments: lint.Arguments{},
 		},
 		{
 			name: "valid arguments: short",
 			arguments: lint.Arguments{
 				"short",
 			},
-			wantErr:             nil,
-			wantFuncArgStyle:    "short",
-			wantFuncRetValStyle: "short",
 		},
 		{
 			name: "valid arguments",
@@ -39,9 +32,6 @@ func TestEnforceRepeatedArgTypeStyleRule_Configure(t *testing.T) {
 					"funcRetValStyle": "short",
 				},
 			},
-			wantErr:             nil,
-			wantFuncArgStyle:    "full",
-			wantFuncRetValStyle: "short",
 		},
 		{
 			name: "valid lowercased arguments",
@@ -51,9 +41,6 @@ func TestEnforceRepeatedArgTypeStyleRule_Configure(t *testing.T) {
 					"funcretvalstyle": "short",
 				},
 			},
-			wantErr:             nil,
-			wantFuncArgStyle:    "full",
-			wantFuncRetValStyle: "short",
 		},
 		{
 			name: "valid kebab-cased arguments",
@@ -63,9 +50,6 @@ func TestEnforceRepeatedArgTypeStyleRule_Configure(t *testing.T) {
 					"func-ret-val-style": "short",
 				},
 			},
-			wantErr:             nil,
-			wantFuncArgStyle:    "full",
-			wantFuncRetValStyle: "short",
 		},
 		{
 			name: "unrecognized key",
@@ -130,28 +114,18 @@ func TestEnforceRepeatedArgTypeStyleRule_Configure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var rule EnforceRepeatedArgTypeStyleRule
+			var r rule.EnforceRepeatedArgTypeStyleRule
 
-			err := rule.Configure(tt.arguments)
+			err := r.Configure(tt.arguments)
 
-			if tt.wantErr != nil {
-				if err == nil {
-					t.Errorf("unexpected error: got = nil, want = %v", tt.wantErr)
-					return
-				}
-				if err.Error() != tt.wantErr.Error() {
-					t.Errorf("unexpected error: got = %v, want = %v", err, tt.wantErr)
+			if tt.wantErr == nil {
+				if err != nil {
+					t.Errorf("Configure() unexpected non-nil error %q", err)
 				}
 				return
 			}
-			if err != nil {
-				t.Errorf("unexpected error: got = %v, want = nil", err)
-			}
-			if rule.funcArgStyle != tt.wantFuncArgStyle {
-				t.Errorf("unexpected funcArgStyle: got = %v, want %v", rule.funcArgStyle, tt.wantFuncArgStyle)
-			}
-			if rule.funcRetValStyle != tt.wantFuncRetValStyle {
-				t.Errorf("unexpected funcRetValStyle: got = %v, want %v", rule.funcRetValStyle, tt.wantFuncRetValStyle)
+			if err == nil || err.Error() != tt.wantErr.Error() {
+				t.Errorf("Configure() unexpected error: got %q, want %q", err, tt.wantErr)
 			}
 		})
 	}

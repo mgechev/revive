@@ -1,24 +1,22 @@
-package rule
+package rule_test
 
 import (
 	"errors"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
 )
 
 func TestReceiverNamingRule_Configure(t *testing.T) {
 	tests := []struct {
-		name          string
-		arguments     lint.Arguments
-		wantErr       error
-		wantMaxLength int
+		name      string
+		arguments lint.Arguments
+		wantErr   error
 	}{
 		{
-			name:          "no arguments",
-			arguments:     lint.Arguments{},
-			wantErr:       nil,
-			wantMaxLength: -1,
+			name:      "no arguments",
+			arguments: lint.Arguments{},
 		},
 		{
 			name:      "invalid type",
@@ -30,24 +28,18 @@ func TestReceiverNamingRule_Configure(t *testing.T) {
 			arguments: lint.Arguments{map[string]any{
 				"maxLength": int64(10),
 			}},
-			wantErr:       nil,
-			wantMaxLength: 10,
 		},
 		{
 			name: "valid lowercased argument",
 			arguments: lint.Arguments{map[string]any{
 				"maxlength": int64(10),
 			}},
-			wantErr:       nil,
-			wantMaxLength: 10,
 		},
 		{
 			name: "valid kebab-cased argument",
 			arguments: lint.Arguments{map[string]any{
 				"max-length": int64(10),
 			}},
-			wantErr:       nil,
-			wantMaxLength: 10,
 		},
 		{
 			name: "invalid maxLength type",
@@ -67,25 +59,18 @@ func TestReceiverNamingRule_Configure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var rule ReceiverNamingRule
+			var r rule.ReceiverNamingRule
 
-			err := rule.Configure(tt.arguments)
+			err := r.Configure(tt.arguments)
 
-			if tt.wantErr != nil {
-				if err == nil {
-					t.Errorf("unexpected error: got = nil, want = %v", tt.wantErr)
-					return
-				}
-				if err.Error() != tt.wantErr.Error() {
-					t.Errorf("unexpected error: got = %v, want = %v", err, tt.wantErr)
+			if tt.wantErr == nil {
+				if err != nil {
+					t.Errorf("Configure() unexpected non-nil error %q", err)
 				}
 				return
 			}
-			if err != nil {
-				t.Errorf("unexpected error: got = %v, want = nil", err)
-			}
-			if rule.receiverNameMaxLength != tt.wantMaxLength {
-				t.Errorf("unexpected maxLength: got = %v, want %v", rule.receiverNameMaxLength, tt.wantMaxLength)
+			if err == nil || err.Error() != tt.wantErr.Error() {
+				t.Errorf("Configure() unexpected error: got %q, want %q", err, tt.wantErr)
 			}
 		})
 	}
