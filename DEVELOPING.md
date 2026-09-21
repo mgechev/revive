@@ -45,8 +45,9 @@ GitHub Copilot.
 
 ## Development of rules
 
-If you want to develop a new rule, follow as an example the already existing rules in the [rule package](https://github.com/mgechev/revive/tree/master/rule)
-and check your change against [the rule checklist](./.github/instructions/rule.instructions.md), which GitHub Copilot also uses when reviewing pull requests.
+If you want to develop a new rule, follow as an example the already existing rules in the
+[rule package](https://github.com/mgechev/revive/tree/master/rule) and check your change against
+[the rule checklist](./.github/instructions/rule.instructions.md), which GitHub Copilot also uses when reviewing pull requests.
 
 When adding a new rule that does not require type information (for example, a rule that does not call `file.Pkg.TypeCheck()` and works purely on syntax/AST),
 add its name to `untyped.toml` and keep that file in sync with any such rules.
