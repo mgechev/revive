@@ -114,6 +114,11 @@ func TestLint_disableDirectives(t *testing.T) {
 			wantLines: []int{1},
 		},
 		{
+			name:      "disable rule twice",
+			src:       "package foo\n//revive:disable:rule1\n\n//revive:disable:rule1\n\n// 6\n",
+			wantLines: []int{1},
+		},
+		{
 			name:      "enable rule",
 			src:       "package foo\n//revive:enable:rule1\n\n// 4\n\n// 6\n",
 			wantLines: []int{1, 2, 3, 4, 5, 6},
@@ -131,7 +136,7 @@ func TestLint_disableDirectives(t *testing.T) {
 		{
 			name:      "enable-line rule",
 			src:       "package foo\n//revive:enable-line:rule1\n\n// 4\n\n// 6\n",
-			wantLines: []int{1},
+			wantLines: []int{1, 2, 3, 4, 5, 6},
 		},
 		{
 			name:      "disable-next-line rule",
@@ -141,7 +146,7 @@ func TestLint_disableDirectives(t *testing.T) {
 		{
 			name:      "enable-next-line rule",
 			src:       "package foo\n//revive:enable-next-line:rule1\n\n// 4\n\n// 6\n",
-			wantLines: []int{1, 2},
+			wantLines: []int{1, 2, 3, 4, 5, 6},
 		},
 		{
 			name:      "directives for another rule are ignored",
