@@ -132,6 +132,24 @@ func TestFile_disabledIntervals(t *testing.T) {
 			},
 		},
 		{
+			name:     "disable rule twice",
+			comments: buildCommentGroups("//revive:disable:rule1", "//revive:disable:rule1"),
+			expected: disabledIntervalsMap{
+				"rule1": {
+					{
+						RuleName: "rule1",
+						From: token.Position{
+							Filename: "test.go",
+						},
+						To: token.Position{
+							Filename: "test.go",
+							Line:     2147483647,
+						},
+					},
+				},
+			},
+		},
+		{
 			name:     "enable rule",
 			comments: buildCommentGroups("//revive:enable:rule1"),
 			expected: disabledIntervalsMap{
@@ -176,18 +194,7 @@ func TestFile_disabledIntervals(t *testing.T) {
 			name:     "enable-line rule",
 			comments: buildCommentGroups("//revive:enable-line:rule1"),
 			expected: disabledIntervalsMap{
-				"rule1": {
-					{
-						RuleName: "rule1",
-						From: token.Position{
-							Filename: "test.go",
-						},
-						To: token.Position{
-							Filename: "test.go",
-							Line:     2147483647,
-						},
-					},
-				},
+				"rule1": {},
 			},
 		},
 		{
@@ -213,19 +220,7 @@ func TestFile_disabledIntervals(t *testing.T) {
 			name:     "enable-next-line rule",
 			comments: buildCommentGroups("//revive:enable-next-line:rule1"),
 			expected: disabledIntervalsMap{
-				"rule1": {
-					{
-						RuleName: "rule1",
-						From: token.Position{
-							Filename: "test.go",
-							Line:     1,
-						},
-						To: token.Position{
-							Filename: "test.go",
-							Line:     2147483647,
-						},
-					},
-				},
+				"rule1": {},
 			},
 		},
 	}
