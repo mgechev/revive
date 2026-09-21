@@ -2,6 +2,7 @@ package lint_test
 
 import (
 	"bytes"
+	"go/token"
 	"log/slog"
 	"slices"
 	"strings"
@@ -23,14 +24,14 @@ func (r *fakeRule) Apply(*lint.File, lint.Arguments) []lint.Failure {
 	return slices.Clone(r.failures)
 }
 
-// lintSource lints src as a single file named test.go and returns the reported failures.
-func lintSource(t *testing.T, src string, rules []lint.Rule, config lint.Config, logger *slog.Logger) []lint.Failure {
+// lintFile lints src as a single file named filename and returns the reported failures.
+func lintFile(t *testing.T, filename, src string, rules []lint.Rule, config lint.Config, logger *slog.Logger) []lint.Failure {
 	t.Helper()
 
 	l := lint.New(func(string) ([]byte, error) { return []byte(src), nil }, 0)
 	l.SetLogger(logger)
 
-	failures, err := l.Lint([][]string{{"test.go"}}, rules, config)
+	failures, err := l.Lint([][]string{{filename}}, rules, config)
 	if err != nil {
 		t.Fatal("unexpected error from linting:", err)
 	}
@@ -72,7 +73,7 @@ func TestLint_internalFailureDoesNotAbortOtherRules(t *testing.T) {
 	var logBuf bytes.Buffer
 	logger := slog.New(slog.NewTextHandler(&logBuf, &slog.HandlerOptions{Level: slog.LevelWarn}))
 
-	got := lintSource(t, "package foo\n", rules, cfg, logger)
+	got := lintFile(t, "test.go", "package foo\n", rules, cfg, logger)
 
 	if len(got) != 1 {
 		t.Fatalf("expected exactly 1 failure to be reported, got %d: %+v", len(got), got)
@@ -93,6 +94,10 @@ func TestLint_internalFailureDoesNotAbortOtherRules(t *testing.T) {
 			t.Errorf("expected log output to contain %q, got %q", want, logged)
 		}
 	}
+}
+
+func positionAtLine(line int) token.Position {
+	return token.Position{Filename: "test.go", Line: line}
 }
 
 func TestLint_disableDirectives(t *testing.T) {
@@ -168,7 +173,7 @@ func TestLint_disableDirectives(t *testing.T) {
 				})
 			}
 
-			got := lintSource(t, tt.src, []lint.Rule{r}, lint.Config{}, nil)
+			got := lintFile(t, "test.go", tt.src, []lint.Rule{r}, lint.Config{}, nil)
 
 			gotLines := make([]int, 0, len(got))
 			for _, failure := range got {
