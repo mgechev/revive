@@ -1,56 +1,46 @@
-package rule
+package rule_test
 
 import (
 	"errors"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
 )
 
 func TestIdenticalSwitchBranchesRule_Configure(t *testing.T) {
 	tests := []struct {
-		name                      string
-		arguments                 lint.Arguments
-		wantErr                   error
-		wantAllowIdenticalDefault bool
+		name      string
+		arguments lint.Arguments
+		wantErr   error
 	}{
 		{
-			name:                      "no arguments",
-			arguments:                 lint.Arguments{},
-			wantErr:                   nil,
-			wantAllowIdenticalDefault: false,
+			name:      "no arguments",
+			arguments: lint.Arguments{},
 		},
 		{
 			name: "allow-identical-default enabled",
 			arguments: lint.Arguments{map[string]any{
 				"allow-identical-default": true,
 			}},
-			wantErr:                   nil,
-			wantAllowIdenticalDefault: true,
 		},
 		{
 			name: "allow-identical-default disabled",
 			arguments: lint.Arguments{map[string]any{
 				"allow-identical-default": false,
 			}},
-			wantErr:                   nil,
-			wantAllowIdenticalDefault: false,
 		},
 		{
 			name: "camelCased argument",
 			arguments: lint.Arguments{map[string]any{
 				"allowIdenticalDefault": true,
 			}},
-			wantErr:                   nil,
-			wantAllowIdenticalDefault: true,
 		},
 		{
 			name: "lowercased argument",
 			arguments: lint.Arguments{map[string]any{
 				"allowidenticaldefault": true,
 			}},
-			wantErr:                   nil,
-			wantAllowIdenticalDefault: true,
 		},
 		{
 			name:      "invalid argument type",
@@ -75,25 +65,18 @@ func TestIdenticalSwitchBranchesRule_Configure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var rule IdenticalSwitchBranchesRule
+			var r rule.IdenticalSwitchBranchesRule
 
-			err := rule.Configure(tt.arguments)
+			err := r.Configure(tt.arguments)
 
-			if tt.wantErr != nil {
-				if err == nil {
-					t.Errorf("unexpected error: got = nil, want = %v", tt.wantErr)
-					return
-				}
-				if err.Error() != tt.wantErr.Error() {
-					t.Errorf("unexpected error: got = %v, want = %v", err, tt.wantErr)
+			if tt.wantErr == nil {
+				if err != nil {
+					t.Errorf("Configure() unexpected non-nil error %q", err)
 				}
 				return
 			}
-			if err != nil {
-				t.Errorf("unexpected error: got = %v, want = nil", err)
-			}
-			if rule.allowIdenticalDefault != tt.wantAllowIdenticalDefault {
-				t.Errorf("unexpected allowIdenticalDefault: got = %v, want %v", rule.allowIdenticalDefault, tt.wantAllowIdenticalDefault)
+			if err == nil || err.Error() != tt.wantErr.Error() {
+				t.Errorf("Configure() unexpected error: got %q, want %q", err, tt.wantErr)
 			}
 		})
 	}

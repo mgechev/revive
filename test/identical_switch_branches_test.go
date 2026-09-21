@@ -9,7 +9,9 @@ import (
 
 func TestIdenticalSwitchBranches(t *testing.T) {
 	testRule(t, "identical_switch_branches", &rule.IdenticalSwitchBranchesRule{})
-	testRule(t, "identical_switch_branches_allow_identical_default", &rule.IdenticalSwitchBranchesRule{}, &lint.RuleConfig{
-		Arguments: lint.Arguments{map[string]any{"allow-identical-default": true}},
-	})
+	for _, key := range []string{"allow-identical-default", "allowIdenticalDefault", "allowidenticaldefault"} {
+		testRule(t, "identical_switch_branches_allow_identical_default", &rule.IdenticalSwitchBranchesRule{}, &lint.RuleConfig{
+			Arguments: lint.Arguments{map[string]any{key: true}},
+		})
+	}
 }
