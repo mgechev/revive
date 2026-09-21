@@ -69,7 +69,7 @@ type ConfigurableRule interface {
 
 Add a compile-time assertion next to the rule type so that the interface is guaranteed to be implemented:
 
-```go
+```golang
 var _ lint.ConfigurableRule = (*ArgumentsLimitRule)(nil)
 ```
 
