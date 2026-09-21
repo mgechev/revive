@@ -97,6 +97,8 @@ func (checkCtx *checkContext) addCommonOption(opt string) {
 	checkCtx.commonOptions[opt] = true
 }
 
+var _ lint.ConfigurableRule = (*StructTagRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
@@ -796,6 +798,7 @@ func (w lintStructTagRule) addFailureWithTagKey(n ast.Node, msg, tagKey string) 
 
 func (w lintStructTagRule) addFailuref(n ast.Node, msg string, args ...any) {
 	w.onFailure(lint.Failure{
+		Category:   lint.FailureCategoryBadPractice,
 		Node:       n,
 		Failure:    fmt.Sprintf(msg, args...),
 		Confidence: 1,

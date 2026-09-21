@@ -17,6 +17,8 @@ type CognitiveComplexityRule struct {
 
 const defaultMaxCognitiveComplexity = 7
 
+var _ lint.ConfigurableRule = (*CognitiveComplexityRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

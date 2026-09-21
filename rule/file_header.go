@@ -18,6 +18,8 @@ var (
 	singleRegexp = regexp.MustCompile("^//")
 )
 
+var _ lint.ConfigurableRule = (*FileHeaderRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
@@ -42,6 +44,7 @@ func (r *FileHeaderRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure
 
 	failure := []lint.Failure{
 		{
+			Category:   lint.FailureCategoryComments,
 			Node:       file.AST,
 			Confidence: 1,
 			Failure:    "the file doesn't have an appropriate header",

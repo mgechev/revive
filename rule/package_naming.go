@@ -101,6 +101,8 @@ type PackageNamingRule struct {
 	alreadyCheckedNames *syncset.Set
 }
 
+var _ lint.ConfigurableRule = (*PackageNamingRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

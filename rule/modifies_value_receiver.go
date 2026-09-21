@@ -42,6 +42,7 @@ func (r *ModifiesValRecRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 
 		for _, assignment := range assignmentsToReceiver {
 			failures = append(failures, lint.Failure{
+				Category:   lint.FailureCategoryLogic,
 				Node:       assignment,
 				Confidence: 1,
 				Failure:    "suspicious assignment to a by-value method receiver",
