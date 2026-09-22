@@ -174,3 +174,20 @@ func leaked() bool {
 func adjust(code *int) {
 	*code = 1
 }
+
+func TestMain(m *testing.M) {
+	var code int
+	if setupErr() != nil {
+		os.Exit(code) // must not match because m.Run has not been called yet
+	}
+	code = m.Run()
+	os.Exit(code) // MATCH /redundant call to os.Exit in TestMain function, the test runner will handle it automatically as of Go 1.15/
+}
+
+func TestMain(m *testing.M) {
+	var code int
+	if testing.Short() {
+		code = m.Run()
+	}
+	os.Exit(code) // must not match because m.Run is called conditionally
+}
