@@ -188,8 +188,8 @@ matching the [Go release policy](https://go.dev/doc/devel/release#policy).
 
 ### How to release
 
-1. Check `git log <last-tag>..master`: any `feat:` commit or new rule means a minor, otherwise a patch.
-2. Tag and push: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+1. Check `git log <last-tag>..master`: any `feat`/`feature` commit (including scoped forms) or new rule means a minor, otherwise a patch.
+2. From an up-to-date `master`, tag and push: `git switch master && git pull --ff-only origin master && git tag vX.Y.Z && git push origin vX.Y.Z`.
 3. Edit the auto-generated release notes into sections: New rules / Rule changes / Fixes / Go version.
    Call out the Go version bump and any behavior changes that will produce new findings on existing code.
 
