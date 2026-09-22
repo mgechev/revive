@@ -17,6 +17,8 @@ import (
 
 // New returns an analyzer applying the rules enabled by conf and the given extra rules.
 func New(conf *lint.Config, extraRules ...revivelib.ExtraRule) (*analysis.Analyzer, error) {
+	config.Normalize(conf)
+
 	extraRuleInstances := make([]lint.Rule, len(extraRules))
 	for i, extraRule := range extraRules {
 		extraRuleInstances[i] = extraRule.Rule
@@ -84,6 +86,9 @@ func goVersion(pass *analysis.Pass, conf lint.Config) *goversion.Version {
 		return conf.GoVersion
 	}
 
+	if pass.Module == nil {
+		return nil
+	}
 	version := strings.TrimPrefix(pass.Module.GoVersion, "go")
 	if version == "" {
 		return nil
