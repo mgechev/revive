@@ -49,7 +49,7 @@ func (w lintUseSlicesConcat) Visit(n ast.Node) ast.Visitor {
 		w.checkConsecutiveAppends(n.Body)
 	case *ast.CallExpr:
 		appended := appendedSlices(n)
-		if len(appended) > 1 {
+		if len(appended) > 1 && allSideEffectFree(appended[1:]) {
 			w.addFailure(n, "replace nested appends by a call to slices.Concat")
 			// only walk the appended slices, to not report the nested appends again
 			for _, slice := range appended {
@@ -130,7 +130,48 @@ func appendsToTarget(stmt ast.Stmt, target string) bool {
 
 	// target = append(target, f(target)...) can not be replaced by a call to slices.Concat
 	// because the target is not defined yet in the replacement
-	return !usesIdent(call.Args[1], target)
+	return !usesIdent(call.Args[1], target) && isSideEffectFree(call.Args[1])
+}
+
+// allSideEffectFree returns true if none of the given expressions can have side effects, false otherwise.
+func allSideEffectFree(exprs []ast.Expr) bool {
+	for _, expr := range exprs {
+		if !isSideEffectFree(expr) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// isSideEffectFree returns true if evaluating the given expression can not modify the program state, false otherwise.
+// Appends are merged into a single call to [slices.Concat] that copies the slices only once all of them are evaluated,
+// thus an appended slice that can mutate the previously appended ones must not be reported.
+func isSideEffectFree(expr ast.Expr) bool {
+	switch expr := expr.(type) {
+	case *ast.Ident, *ast.BasicLit:
+		return true
+	case *ast.ParenExpr:
+		return isSideEffectFree(expr.X)
+	case *ast.StarExpr:
+		return isSideEffectFree(expr.X)
+	case *ast.SelectorExpr:
+		return isSideEffectFree(expr.X)
+	case *ast.IndexExpr:
+		return isSideEffectFree(expr.X) && isSideEffectFree(expr.Index)
+	case *ast.SliceExpr:
+		return isSideEffectFree(expr.X) &&
+			(expr.Low == nil || isSideEffectFree(expr.Low)) &&
+			(expr.High == nil || isSideEffectFree(expr.High)) &&
+			(expr.Max == nil || isSideEffectFree(expr.Max))
+	case *ast.CallExpr:
+		// only a conversion to a slice type, e.g. []byte("a string"), is not a call to a function
+		_, isSliceConversion := expr.Fun.(*ast.ArrayType)
+
+		return isSliceConversion && len(expr.Args) == 1 && isSideEffectFree(expr.Args[0])
+	default:
+		return false
+	}
 }
 
 // usesIdent returns true if the identifier name occurs in the given expression, false otherwise.
@@ -166,8 +207,9 @@ func appendedSlices(expr ast.Expr) []ast.Expr {
 }
 
 // isVariadicAppend returns true if the call is of the form append(s1, s2...), false otherwise.
-// Appends of a string to a byte slice, e.g. append(b, "str"...), are excluded because [slices.Concat]
-// does not accept a string.
+// Appends of a string literal to a byte slice, e.g. append(b, "str"...), are excluded because [slices.Concat]
+// does not accept a string. Strings given by a variable or by a call are not excluded: telling them from a
+// slice requires type information.
 func isVariadicAppend(call *ast.CallExpr) bool {
 	if !astutils.IsIdent(call.Fun, "append") || !call.Ellipsis.IsValid() || len(call.Args) != 2 {
 		return false

@@ -1,8 +1,9 @@
 package fixtures
 
-func useSlicesConcat(s1, s2, s3 []int) {
-	_ = append(append([]int{}, s1...), s2...)                // MATCH /replace nested appends by a call to slices.Concat/
-	_ = append(append(append([]int{}, s1...), s2...), s3...) // MATCH /replace nested appends by a call to slices.Concat/
+func useSlicesConcat(s1, s2, s3 []int, magic []byte) {
+	_ = append(append([]int{}, s1...), s2...)                      // MATCH /replace nested appends by a call to slices.Concat/
+	_ = append(append(append([]int{}, s1...), s2...), s3...)       // MATCH /replace nested appends by a call to slices.Concat/
+	_ = append(append([]byte{}, magic...), []byte("a payload")...) // MATCH /replace nested appends by a call to slices.Concat/
 
 	all := append([]int{}, s1...) // MATCH /replace consecutive appends by a call to slices.Concat/
 	all = append(all, s2...)
@@ -25,6 +26,14 @@ func useSlicesConcat(s1, s2, s3 []int) {
 }
 
 func useSlicesConcatOK(s1, s2 []int, b []byte) {
+	// mutate can modify s1 after the first append has copied it,
+	// while slices.Concat copies the slices only once all of them are evaluated
+	_ = append(append([]int{}, s1...), mutate(s1)...)
+
+	mutated := append([]int{}, s1...)
+	mutated = append(mutated, mutate(s1)...)
+	_ = mutated
+
 	_ = append([]int{}, s1...)            // a single append is a clone, not a concatenation
 	_ = append(s1, s2...)                 // the appends are not based on an empty slice
 	_ = append([]int{0}, s1...)           // the appends are not based on an empty slice
@@ -45,4 +54,10 @@ func useSlicesConcatOK(s1, s2 []int, b []byte) {
 	self := append([]int{}, s1...)
 	self = append(self, self...) // the appended slice is the target itself
 	_ = self
+}
+
+func mutate(s []int) []int {
+	s[0] = 0
+
+	return s
 }
