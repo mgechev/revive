@@ -609,6 +609,7 @@ List of all [available rules](./RULES_DESCRIPTIONS.md).
 | [`use-any`](./RULES_DESCRIPTIONS.md#use-any)          |  n/a   |  Proposes to replace `interface{}` with its alias `any` | >= 1.18 |    no    |  no   |
 | [`use-errors-new`](./RULES_DESCRIPTIONS.md#use-errors-new) | n/a   | Spots calls to `fmt.Errorf` that can be replaced by `errors.New` | < 1.26 |   no    |  no   |
 | [`use-fmt-print`](./RULES_DESCRIPTIONS.md#use-fmt-print) | n/a   | Proposes to replace calls to built-in `print` and `println` with their equivalents from `fmt`. | 1.0 |   no    |  no   |
+| [`use-slices-concat`](./RULES_DESCRIPTIONS.md#use-slices-concat) | n/a   | Proposes to replace appends to an empty slice with a call to `slices.Concat`. | >= 1.22 |   no    |  no   |
 | [`use-slices-sort`](./RULES_DESCRIPTIONS.md#use-slices-sort) | n/a   | Proposes to replace calls to `sort.Ints`, `sort.Strings` and the like with their equivalents from `slices` package. | >= 1.21 |   no    |  no   |
 | [`use-waitgroup-go`](./RULES_DESCRIPTIONS.md#use-waitgroup-go)          |  n/a   |  Proposes to replace `wg.Add ... go {... wg.Done ...}` idiom with `wg.Go` | >= 1.25 |    no    |  no   |
 | [`useless-break`](./RULES_DESCRIPTIONS.md#useless-break)          |  n/a   |  Warns on useless `break` statements in case clauses | 1.0 |    no    |  no   |

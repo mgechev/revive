@@ -122,6 +122,7 @@ var allRules = append([]lint.Rule{
 	&rule.UnnecessaryIfRule{},
 	&rule.EpochNamingRule{},
 	&rule.UseSlicesSort{},
+	&rule.UseSlicesConcatRule{},
 	&rule.PackageNamingRule{},
 	&rule.MultilineIfInitRule{},
 	&rule.MarshalReceiverRule{},
