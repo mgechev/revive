@@ -1982,8 +1982,10 @@ _Configuration_: N/A
 
 _Go version_: >= 1.15.
 
-_Description_: This rule warns about redundant `Exit` calls in the `TestMain` function,
+_Description_: This rule warns about redundant `os.Exit` and `syscall.Exit` calls in the `TestMain` function,
 as the Go test runner automatically handles program termination starting from Go 1.15.
+Only calls that exit with the result of `m.Run` are reported (e.g. `os.Exit(m.Run())` or `code := m.Run(); os.Exit(code)`),
+since exiting with another status is the only way to fail the test binary when setup or teardown fails.
 
 _Configuration_: N/A
 
