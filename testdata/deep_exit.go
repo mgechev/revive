@@ -39,7 +39,7 @@ func TestMain(m *testing.M) {
 }
 
 func flagParseOutsideMain() {
-	flag.Parse() // MATCH /calls to flag.Parse only in main() or init() functions/
+	flag.Parse() // MATCH /calls to flag.Parse only in main() or init() functions; move the call or refactor to use flag.NewFlagSet with flag.ContinueOnError/
 }
 
 func flagNewFlagSetExitOnErrorOutsideMain() {
