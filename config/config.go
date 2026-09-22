@@ -183,7 +183,7 @@ func getFormatters() map[string]lint.Formatter {
 // GetLintingRules yields the linting rules that must be applied by the linter.
 func GetLintingRules(config *lint.Config, extraRules []lint.Rule) ([]lint.Rule, error) {
 	rulesMap := map[string]lint.Rule{}
-	for _, r := range AllRules() {
+	for _, r := range allRules {
 		rulesMap[r.Name()] = r
 	}
 	for _, r := range extraRules {
