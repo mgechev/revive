@@ -166,6 +166,33 @@ mdsf format .
 _Note: Use `golang` for Go code snippets that are intentionally non-compilable.
 However, it is recommended to avoid this and use `go` whenever possible._
 
+## Releasing
+
+Releases are cut from `master` by pushing a tag; there are no release branches and no backports.
+Pushing a tag triggers [`release.yml`](.github/workflows/release.yml), which runs GoReleaser and publishes the `ghcr.io/mgechev/revive` image.
+
+### When to release
+
+- **Minor (`v1.N.0`)**: every 3 months, and never later than 6 months after the previous minor,
+  so the supported Go version is bumped at least once per Go release cycle.
+  Ship whatever is on `master`.
+  When possible, tag 1–2 weeks before the next expected [golangci-lint](https://github.com/golangci/golangci-lint/releases) minor,
+  so its dependency bump lands before their release.
+- **Patch (`v1.N.M`)**: within 2 weeks of merging a fix for a regression, a panic, a false positive/negative in a rule enabled by default
+  (in revive or golangci-lint), or a Go version compatibility issue.
+  If `feat:` commits or new rules have already been merged since the last tag, bump the minor instead.
+- **Major (`v2.0.0`)**: not time-driven; when the items tracked in [#1391](https://github.com/mgechev/revive/issues/1391) are ready.
+
+Go version: raise `go` in `go.mod` to the previous Go release in the first minor after a new Go version is released,
+matching the [Go release policy](https://go.dev/doc/devel/release#policy).
+
+### How to release
+
+1. Check `git log <last-tag>..master`: any `feat`/`feature` commit (including scoped forms) or new rule means a minor, otherwise a patch.
+2. From an up-to-date `master`, tag and push: `git switch master && git pull --ff-only origin master && git tag vX.Y.Z && git push origin vX.Y.Z`.
+3. Edit the auto-generated release notes into sections: New rules / Rule changes / Fixes / Go version.
+   Call out the Go version bump and any behavior changes that will produce new findings on existing code.
+
 ## Website
 
 The documentation website <https://revive.run/> lives in a separate repository: [mgechev/revive.run](https://github.com/mgechev/revive.run).
