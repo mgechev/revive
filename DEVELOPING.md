@@ -189,8 +189,13 @@ matching the [Go release policy](https://go.dev/doc/devel/release#policy).
 ### How to release
 
 1. Check `git log <last-tag>..master`: any `feat`/`feature` commit (including scoped forms) or new rule means a minor, otherwise a patch.
-2. From an up-to-date `master`, tag and push: `git switch master && git pull --ff-only origin master && git tag vX.Y.Z && git push origin vX.Y.Z`.
-3. Edit the auto-generated release notes into sections: New rules / Rule changes / Fixes / Go version.
+2. From an up-to-date `master`, tag and push with `<remote>` set to the remote pointing at `mgechev/revive`
+   (`origin` in a direct clone, `upstream` when working from a fork — check with `git remote -v`):
+   `git switch master && git pull --ff-only <remote> master && git tag vX.Y.Z && git push <remote> vX.Y.Z`.
+3. Edit the auto-generated release notes into the sections used by previous releases, dropping any that have no entries:
+   `## What's Changed`, with `### Features`, `### Bug Fixes`, `### Documentation`, `### Dependency Updates` and `### Chores & Internal`,
+   followed by `## New Contributors` and the `**Full Changelog**` link.
+   Every merged PR since the last tag belongs in exactly one section.
    Call out the Go version bump and any behavior changes that will produce new findings on existing code.
 
 ## Website
