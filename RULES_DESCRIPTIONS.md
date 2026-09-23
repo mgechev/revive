@@ -102,6 +102,7 @@ List of all available rules.
 - [use-any](#use-any)
 - [use-errors-new](#use-errors-new)
 - [use-fmt-print](#use-fmt-print)
+- [use-slices-concat](#use-slices-concat)
 - [use-slices-sort](#use-slices-sort)
 - [use-waitgroup-go](#use-waitgroup-go)
 - [useless-break](#useless-break)
@@ -2560,6 +2561,40 @@ _Description_: This rule proposes to replace calls to built-in `print` and `prin
 [language bootstrapping and are not guaranteed to stay in the language](https://go.dev/ref/spec#Bootstrapping).
 
 _Configuration_: N/A
+
+## use-slices-concat
+
+_Go version_: >= 1.22.
+
+_Description_: Since Go 1.22 the `slices` package provides the `slices.Concat` function that concatenates slices into a new one.
+The rule proposes to replace appends to an empty slice, which do the same in a more convoluted way, with a call to `slices.Concat`.
+
+### Examples (use-slices-concat)
+
+Before (violation):
+
+```go
+content := append(append([]byte{}, magic...), payload...)
+
+allRanges := append([]ignoredRange{}, inlineRanges...)
+allRanges = append(allRanges, expandedRanges...)
+```
+
+After (fixed):
+
+```go
+content := slices.Concat(magic, payload)
+
+allRanges := slices.Concat(inlineRanges, expandedRanges)
+```
+
+_Configuration_: N/A
+
+_Note_: The rule does not use type information, thus it can report appends that `slices.Concat` can not replace,
+for example the append of a `string` to a `[]byte`.
+Mind also that `slices.Concat` returns `nil` where the appends return an empty slice when all the concatenated slices are empty.
+
+_Note_: This rule is irrelevant for Go 1.21-.
 
 ## use-slices-sort
 

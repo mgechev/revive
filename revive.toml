@@ -119,6 +119,7 @@ warning-code = 1
 [rule.use-any]
 [rule.use-errors-new]
 [rule.use-fmt-print]
+[rule.use-slices-concat]
 [rule.use-slices-sort]
 [rule.use-waitgroup-go]
 [rule.useless-break]
