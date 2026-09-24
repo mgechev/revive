@@ -123,6 +123,8 @@ and `lowercase` (e.g., `maxlitcount`, `allowstrs`, `skipcomments`) formats are s
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 _Description_: Suggests using constant for [magic numbers](https://en.wikipedia.org/wiki/Magic_number_(programming)#Unnamed_numerical_constants)
 and string literals.
 
@@ -147,6 +149,8 @@ arguments = [
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 _Description_: Warns when a function receives more parameters than the maximum set by the rule's configuration.
 Enforcing a maximum number of parameters helps to keep the code readable and maintainable.
 
@@ -163,6 +167,8 @@ arguments = [4]
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 _Description_: Check for commonly mistaken usages of the `sync/atomic` package.
 
 _Configuration_: N/A
@@ -170,6 +176,8 @@ _Configuration_: N/A
 ## banned-characters
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.1.3](https://github.com/revive-lint/revive/releases/tag/v1.1.3).
 
 _Description_: Checks given banned characters in identifiers (func, var, const). Comments are not checked.
 
@@ -185,6 +193,8 @@ arguments = ["Ω", "Σ", "σ"]
 ## bare-return
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 _Description_: Warns on bare (a.k.a. naked) returns.
 
@@ -216,6 +226,8 @@ _Configuration_: N/A
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 **_Ported from golint_**
 
 _Description_: Blank import should be only in a main or test package, or have a comment justifying it.
@@ -225,6 +237,8 @@ _Configuration_: N/A
 ## bool-literal-in-expr
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 _Description_: Using Boolean literals (`true`, `false`) in logic expressions may make the code less readable.
 This rule suggests removing Boolean literals from logic expressions.
@@ -261,6 +275,8 @@ _Configuration_: N/A
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 _Description_: Explicitly invoking the garbage collector is, except for specific uses in benchmarking, very dubious.
 
 The garbage collector can be configured through environment variables as [described here](https://pkg.go.dev/runtime).
@@ -270,6 +286,8 @@ _Configuration_: N/A
 ## cognitive-complexity
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 _Description_: [Cognitive complexity](https://www.sonarsource.com/docs/CognitiveComplexity.pdf) is a measure of how hard code is to understand.
 While cyclomatic complexity is good to measure "testability" of the code,
@@ -288,6 +306,8 @@ arguments = [7]
 ## comment-spacings
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.2.5](https://github.com/revive-lint/revive/releases/tag/v1.2.5).
 
 _Description_: Warns on malformed comments.
 Spots comments of the form:
@@ -322,6 +342,8 @@ arguments = ["mypragma:", "+optional"]
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.3.8](https://github.com/revive-lint/revive/tree/v1.3.8).
+
 _Description_: Spots files not respecting a minimum value for the [_comments lines density_](https://docs.sonarsource.com/sonarqube/latest/user-guide/metric-definitions/)
 metric = _comment lines / (lines of code + comment lines) * 100_
 
@@ -338,6 +360,8 @@ arguments = [15]
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 _Description_: Methods or fields of `struct` that have names different only by capitalization could be confusing.
 
 _Configuration_: N/A
@@ -345,6 +369,8 @@ _Configuration_: N/A
 ## confusing-results
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 _Description_: Function or methods that return multiple, no named, values of the same type could induce error.
 
@@ -370,6 +396,8 @@ _Configuration_: N/A
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 _Description_: The rule spots logical expressions that evaluate always to the same value.
 
 _Configuration_: N/A
@@ -377,6 +405,8 @@ _Configuration_: N/A
 ## context-as-argument
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 **_Ported from golint_**
 
@@ -400,6 +430,8 @@ arguments = [
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 **_Ported from golint_**
 
 **_Typed_**
@@ -411,6 +443,8 @@ _Configuration_: N/A
 ## cyclomatic
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 _Description_: [Cyclomatic complexity](https://en.wikipedia.org/wiki/Cyclomatic_complexity) is a measure of code complexity.
 Enforcing a maximum complexity per function helps to keep code readable and maintainable.
@@ -428,6 +462,8 @@ arguments = [3]
 
 _Go version_: 1.0; behavior changes in 1.22.
 
+_Revive version_: [v1.2.2](https://github.com/revive-lint/revive/releases/tag/v1.2.2).
+
 _Description_: This rule spots potential dataraces caused by goroutines capturing (by-reference) particular identifiers of the function from
 which goroutines are created.
 The rule is able to spot two of such cases: go-routines capturing named return values, and capturing `for-range` values.
@@ -438,6 +474,8 @@ _Configuration_: N/A
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 _Description_: Packages exposing functions that can stop program execution by exiting are hard to reuse.
 This rule looks for program exits in functions other than `main()` or `init()`.
 
@@ -446,6 +484,8 @@ _Configuration_: N/A
 ## defer
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.3](https://github.com/revive-lint/revive/releases/tag/v1.0.3).
 
 _Description_: This rule warns on some common mistakes when using `defer` statement. It currently alerts on the following situations:
 
@@ -478,6 +518,8 @@ arguments = [["call-chain", "loop"]]
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 **_Ported from golint_**
 
 _Description_: Importing with `.` makes the programs much harder to understand because it is unclear whether names belong to the current package or
@@ -505,6 +547,8 @@ arguments = [
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 _Description_: It is possible to unintentionally import the same package twice. This rule looks for packages that are imported two or more times.
 
 _Configuration_: N/A
@@ -512,6 +556,8 @@ _Configuration_: N/A
 ## early-return
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.3](https://github.com/revive-lint/revive/releases/tag/v1.0.3).
 
 _Description_: In Go it is idiomatic to minimize nesting statements, a typical example is to avoid if-then-else constructions.
 This rule spots constructions like
@@ -576,6 +622,8 @@ arguments = ["preserve-scope", "allow-jump"]
 ## empty-block
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 _Description_: Empty blocks make code less readable and could be a symptom of a bug or unfinished refactoring.
 
@@ -648,6 +696,8 @@ For more details, see:
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 _Description_: Sometimes `gofmt` is not enough to enforce a common formatting of a code-base;
 this rule warns when there are heading or trailing newlines in code blocks.
 
@@ -656,6 +706,8 @@ _Configuration_: N/A
 ## epoch-naming
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.14.0](https://github.com/revive-lint/revive/releases/tag/v1.14.0).
 
 **_Typed_**
 
@@ -701,6 +753,8 @@ _Configuration_: N/A
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.3.4](https://github.com/revive-lint/revive/releases/tag/v1.3.4).
+
 _Description_: This rule enforces consistent usage of `make(map[type]type)` or `map[type]type{}` for map initialization.
 It does not affect `make(map[type]type, size)` constructions as well as `map[type]type{k1: v1}`.
 
@@ -720,6 +774,8 @@ arguments = ["make"]
 ## enforce-repeated-arg-type-style
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.3.5](https://github.com/revive-lint/revive/releases/tag/v1.3.5).
 
 _Description_: This rule is designed to maintain consistency in the declaration of repeated argument and return value types in Go functions.
 It supports three styles: 'any', 'short', and 'full'.
@@ -758,6 +814,8 @@ arguments = [{ func-arg-style = "full", func-ret-val-style = "short" }]
 ## enforce-slice-style
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.3.5](https://github.com/revive-lint/revive/releases/tag/v1.3.5).
 
 _Description_: This rule enforces consistent usage of `make([]type, 0)`, `[]type{}`, `var args []type`, or nil slices for slice initialization.
 It does not affect `make([]type, non_zero_len, or_non_zero_cap)` constructions as well as `[]type{v1}`.
@@ -816,6 +874,8 @@ func f() []string {
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.11.0](https://github.com/revive-lint/revive/releases/tag/v1.11.0).
+
 _Description_: This rule enforces consistent usage of `default` on `switch` statements.
 It can check for `default` case clause occurrence and/or position in the list of case clauses.
 
@@ -852,6 +912,8 @@ Notice that a configuration including both options will effectively deactivate t
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 **_Ported from golint_**
 
 _Description_: By convention, for the sake of readability, variables of type `error` must be named with the prefix `err`.
@@ -885,6 +947,8 @@ _Configuration_: N/A
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 **_Ported from golint_**
 
 _Description_: By convention, for the sake of readability, the errors should be last in the list of returned values by a function.
@@ -913,6 +977,8 @@ _Configuration_: N/A
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 **_Ported from golint_**
 
 _Description_: By convention, for better readability, error messages should not be capitalized or end with punctuation or a newline.
@@ -935,6 +1001,8 @@ arguments = ["xerrors.Errorf"]
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 **_Ported from golint_**
 
 **_Typed_**
@@ -947,6 +1015,8 @@ _Configuration_: N/A
 ## exported
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 **_Ported from golint_**
 
@@ -985,6 +1055,8 @@ arguments = [
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 _Description_: This rule helps to enforce a common header for all source files in a project by spotting those files that do not have the specified header.
 
 _Configuration_: (string) the header to look for in source files.
@@ -999,6 +1071,8 @@ arguments = ["This is the text that must appear at the top of source files."]
 ## file-length-limit
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.5.0](https://github.com/revive-lint/revive/releases/tag/v1.5.0).
 
 _Description_: This rule enforces a maximum number of lines per file, in order to aid in maintainability and reduce complexity.
 
@@ -1019,6 +1093,8 @@ arguments = [{ max = 100, skip-comments = true, skip-blank-lines = true }]
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.5.0](https://github.com/revive-lint/revive/releases/tag/v1.5.0).
+
 _Description_: Enforces conventions on source file names. By default, the rule enforces filenames of the form `^[_A-Za-z0-9][_A-Za-z0-9-]*\.go$`.
 Optionally, the rule can be configured to enforce other forms.
 
@@ -1035,6 +1111,8 @@ arguments = ["^[_a-z][_a-z0-9]*\\.go$"]
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 _Description_: If a function controls the flow of another by passing it information on what to do, both functions are said to be [control-coupled](https://en.wikipedia.org/wiki/Coupling_(computer_programming)#Procedural_programming).
 Coupling among functions must be minimized for better maintainability of the code.
 This rule warns on boolean parameters that create a control coupling.
@@ -1044,6 +1122,8 @@ _Configuration_: N/A
 ## forbidden-call-in-wg-go
 
 _Go version_: >= 1.25.
+
+_Revive version_: [v1.13.0](https://github.com/revive-lint/revive/releases/tag/v1.13.0).
 
 _Description_: Since Go 1.25, it is possible to create goroutines with the method `WaitGroup.Go`.
 The `Go` method calls a function in a new goroutine and adds (`Add`) that task to the WaitGroup.
@@ -1102,6 +1182,8 @@ _Configuration_: N/A
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.5](https://github.com/revive-lint/revive/releases/tag/v1.0.5).
+
 _Description_: Functions too long (with many statements and/or lines) can be hard to understand.
 
 _Configuration_: (int, int) the maximum allowed statements and lines.
@@ -1120,6 +1202,8 @@ Will check for functions exceeding 10 statements and will not check the number o
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 _Description_: Specifies the maximum number of results a function can return.
 Functions returning too many results can be hard to understand/use.
 
@@ -1136,6 +1220,8 @@ arguments = [3]
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 _Description_: Warns on getters that do not yield any result.
 Typically, functions with names prefixed with _Get_ are supposed to return a value.
 
@@ -1145,6 +1231,8 @@ _Configuration_: N/A
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.3](https://github.com/revive-lint/revive/releases/tag/v1.0.3).
+
 _Description_: An `if-then-else` conditional with identical implementations in both branches is an error.
 
 _Configuration_: N/A
@@ -1152,6 +1240,8 @@ _Configuration_: N/A
 ## identical-ifelseif-branches
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.12.0](https://github.com/revive-lint/revive/releases/tag/v1.12.0).
 
 _Description_: An `if ... else if` chain with identical branches makes maintenance harder
 and might be a source of bugs. Duplicated branches should be consolidated in one.
@@ -1162,6 +1252,8 @@ _Configuration_: N/A
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.12.0](https://github.com/revive-lint/revive/releases/tag/v1.12.0).
+
 _Description_: An `if ... else if` chain with identical conditions can lead to
 unreachable code and is a potential source of bugs while making the code harder to read and maintain.
 
@@ -1170,6 +1262,8 @@ _Configuration_: N/A
 ## identical-switch-branches
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.12.0](https://github.com/revive-lint/revive/releases/tag/v1.12.0).
 
 _Description_: A `switch` with identical branches makes maintenance harder and might be a source of bugs.
 Duplicated branches should be consolidated in one case clause.
@@ -1207,6 +1301,8 @@ arguments = [{ allow-identical-default = true }]
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.12.0](https://github.com/revive-lint/revive/releases/tag/v1.12.0).
+
 _Description_: A `switch` statement with cases with the same condition can lead to
 unreachable code and is a potential source of bugs while making the code harder to read and maintain.
 
@@ -1215,6 +1311,8 @@ _Configuration_: N/A
 ## if-return
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 _Description_: Checking if an error is _nil_ to just after return the error or nil is redundant.
 
@@ -1244,6 +1342,8 @@ _Configuration_: N/A
 ## import-alias-naming
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.3.4](https://github.com/revive-lint/revive/releases/tag/v1.3.4).
 
 _Description_: Aligns with Go's naming conventions, as outlined in the official
 [blog post](https://go.dev/blog/package-names). It enforces clear and lowercase import alias names, echoing
@@ -1279,6 +1379,8 @@ arguments = [{ allow-regex = "^[a-z][a-z0-9]{0,}$", deny-regex = '^v\d+$' }]
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 _Description_: In Go it is possible to declare identifiers (packages, structs,
 interfaces, parameters, receivers, variables, constants...) that conflict with the
 name of an imported package. This rule spots identifiers that shadow an import.
@@ -1291,6 +1393,8 @@ _Configuration_: N/A
 ## imports-blocklist
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 _Description_: Warns when importing block-listed packages.
 
@@ -1306,6 +1410,8 @@ arguments = ["crypto/md5", "crypto/sha1", "crypto/**/pkix"]
 ## increment-decrement
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 **_Ported from golint_**
 
@@ -1333,6 +1439,8 @@ _Configuration_: N/A
 ## indent-error-flow
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 **_Ported from golint_**
 
@@ -1382,6 +1490,8 @@ arguments = ["preserve-scope"]
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.13.0](https://github.com/revive-lint/revive/releases/tag/v1.13.0).
+
 **_Typed_**
 
 _Description_: This rule identifies code that iteratively searches for a key in a map.
@@ -1429,6 +1539,8 @@ _Configuration_: N/A
 ## line-length-limit
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 _Description_: Warns in the presence of code lines longer than a configured maximum.
 
@@ -1478,6 +1590,8 @@ The `//go:generate` directive and the line containing a URL match the `excludes`
 ## marshal-receiver
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.16.0](https://github.com/revive-lint/revive/releases/tag/v1.16.0).
 
 _Description_: Checks receiver type consistency for common marshal/unmarshal methods.
 The rule inspects only methods whose names exactly match: `MarshalJSON`, `MarshalText`, `MarshalYAML`, `UnmarshalJSON`, `UnmarshalText`, and `UnmarshalYAML`.
@@ -1555,6 +1669,8 @@ _Configuration_: N/A
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.3.7](https://github.com/revive-lint/revive/releases/tag/v1.3.7).
+
 _Description_: Warns if nesting level of control structures (`if-then-else`, `for`, `switch`) exceeds a given maximum.
 
 _Configuration_: (int) maximum accepted nesting level of control structures. Default: `5`.
@@ -1569,6 +1685,8 @@ arguments = [3]
 ## max-public-structs
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 _Description_: Packages declaring too many public structs can be hard to understand/use,
 and could be a symptom of bad design.
@@ -1588,6 +1706,8 @@ arguments = [3]
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 _Description_: A function that modifies its parameters can be hard to understand.
 It can also be misleading if the arguments are passed by value by the caller.
 This rule warns when a function modifies one or more of its parameters or when
@@ -1598,6 +1718,8 @@ _Configuration_: N/A
 ## modifies-value-receiver
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 **_Typed_**
 
@@ -1610,6 +1732,8 @@ _Configuration_: N/A
 ## multiline-if-init
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.16.0](https://github.com/revive-lint/revive/releases/tag/v1.16.0).
 
 _Description_: Flags `if` statements whose init clause spans multiple lines.
 The if-init idiom exists for tight one-liners.
@@ -1654,6 +1778,8 @@ _Configuration_: N/A
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.8](https://github.com/revive-lint/revive/releases/tag/v1.0.8).
+
 _Description_: Packages declaring structs that contain other inline struct definitions can be hard to understand/read for other developers.
 
 _Configuration_: N/A
@@ -1661,6 +1787,8 @@ _Configuration_: N/A
 ## optimize-operands-order
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.1.3](https://github.com/revive-lint/revive/releases/tag/v1.1.3).
 
 _Description_: Conditional expressions can be written to take advantage of short circuit evaluation and speed up its average evaluation time
 by forcing the evaluation of less time-consuming terms before more costly ones.
@@ -1686,6 +1814,8 @@ if !config.IgnoreGeneratedHeader && isGenerated(content) {
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 **_Ported from golint_**
 
 _Description_: Packages should have comments. This rule warns on undocumented packages and when packages comments are detached to the `package` keyword.
@@ -1697,6 +1827,8 @@ _Configuration_: N/A
 ## package-naming
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.15.0](https://github.com/revive-lint/revive/releases/tag/v1.15.0).
 
 _Description_: This rule checks that package names follow [Go conventions](https://go.dev/blog/package-names) and best practices.
 It helps prevent using bad package names and enforces consistent naming patterns.
@@ -1770,6 +1902,8 @@ arguments = [{ check-collision-with-all-std = true }]
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.12.0](https://github.com/revive-lint/revive/releases/tag/v1.12.0).
+
 _Description_: It is considered a good practice to name a package after the directory containing it.
 This rule warns when the package name declared in the file does not match the name of the directory containing the file.
 
@@ -1814,6 +1948,8 @@ arguments = [{ ignore-directories = [] }]
 
 _Go version_: < 1.22.
 
+_Revive version_: [v1.0.2](https://github.com/revive-lint/revive/releases/tag/v1.0.2).
+
 **_Typed_**
 
 _Description_: Range variables in a loop are reused at each iteration.
@@ -1827,6 +1963,8 @@ _Note_: This rule is irrelevant for Go 1.22+.
 
 _Go version_: < 1.22.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 _Description_: Range variables in a loop are reused at each iteration; therefore a goroutine created in a loop will point to the range variable
 with from the upper scope. This way, the goroutine could use the variable with an undesired value.
 This rule warns when a range value (or index) is used inside a closure.
@@ -1838,6 +1976,8 @@ _Note_: This rule is irrelevant for Go 1.22+.
 ## range
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 **_Ported from golint_**
 
@@ -1866,6 +2006,8 @@ _Configuration_: N/A
 ## receiver-naming
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 **_Ported from golint_**
 
@@ -1915,6 +2057,8 @@ arguments = [{ max-length = 2 }]
 
 _Go version_: 1.0; behavior changes in 1.21.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 _Description_: Constant names like `false`, `true`, `nil`, function names like `append`, `make`,
 and basic type names like `bool`, and `byte` are not reserved words of the language; therefore the can be redefined.
 Even if possible, redefining these built in names can lead to bugs very difficult to detect.
@@ -1924,6 +2068,8 @@ _Configuration_: N/A
 ## redundant-build-tag
 
 _Go version_: >= 1.17; behavior changes in 1.21.
+
+_Revive version_: [v1.6.0](https://github.com/revive-lint/revive/releases/tag/v1.6.0).
 
 _Description_: This rule warns about redundant [build tag comments](https://pkg.go.dev/cmd/go@go1.17.0#hdr-Build_constraints).
 It detects unnecessary `// +build` comments when `//go:build` is present.
@@ -1975,6 +2121,8 @@ _Note_: This rule is irrelevant for Go 1.16-.
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.3.3](https://github.com/revive-lint/revive/releases/tag/v1.3.3).
+
 _Description_: This rule warns on redundant import aliases. This happens when the alias used on the import statement matches the imported package name.
 
 _Configuration_: N/A
@@ -1982,6 +2130,8 @@ _Configuration_: N/A
 ## redundant-test-main-exit
 
 _Go version_: >= 1.15.
+
+_Revive version_: [v1.6.1](https://github.com/revive-lint/revive/releases/tag/v1.6.1).
 
 _Description_: This rule warns about redundant `os.Exit` and `syscall.Exit` calls in the `TestMain` function,
 as the Go test runner automatically handles program termination starting from Go 1.15.
@@ -1995,6 +2145,8 @@ _Note_: This rule is irrelevant for Go 1.14-.
 ## string-format
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.7](https://github.com/revive-lint/revive/releases/tag/v1.0.7).
 
 _Description_: This rule allows you to configure a list of regular expressions that string literals in certain function calls are checked against.
 This is geared towards user facing applications where string literals are often used for messages that will be presented to users,
@@ -2051,6 +2203,8 @@ arguments = [
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.2](https://github.com/revive-lint/revive/releases/tag/v1.0.2).
+
 **_Typed_**
 
 _Description_: Explicit type conversion `string(i)` where `i` has an integer type other than `rune` might behave not as expected by the developer
@@ -2061,6 +2215,8 @@ _Configuration_: N/A
 ## struct-tag
 
 _Go version_: 1.0; behavior changes in 1.24.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 _Description_: The rule spots errors in struct tags.
 This is useful because struct tags are not checked at compile time.
@@ -2110,6 +2266,8 @@ arguments = ["!validate", "bson,outline,gnu"]
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 _Description_: To improve the readability of code, it is recommended to reduce the indentation as much as possible.
 This rule highlights redundant _else-blocks_ that can be eliminated when the preceding `if`-block deviates control flow,
 for example ending with a `break`, `continue`, `goto`, `panic` or `os.Exit` call (the `return` case is handled by [indent-error-flow](#indent-error-flow)).
@@ -2154,6 +2312,8 @@ arguments = ["preserve-scope"]
 ## time-date
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.10.0](https://github.com/revive-lint/revive/releases/tag/v1.10.0).
 
 _Description_: Reports bad usage of `time.Date`.
 
@@ -2230,6 +2390,8 @@ var _ = time.Date(2023, 01, 02, 03, 04, 00, 0, time.UTC)
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.1.3](https://github.com/revive-lint/revive/releases/tag/v1.1.3).
+
 **_Typed_**
 
 _Description_: This rule warns when using `==` and `!=` for equality checks on `time.Time` and suggests using the `time.Time.Equal` method.
@@ -2240,6 +2402,8 @@ _Configuration_: N/A
 ## time-naming
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 **_Ported from golint_**
 
@@ -2253,6 +2417,8 @@ _Configuration_: N/A
 ## unchecked-type-assertion
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.3.4](https://github.com/revive-lint/revive/releases/tag/v1.3.4).
 
 _Description_: This rule checks whether a type assertion result is checked (the `ok` value), preventing unexpected `panic`s.
 
@@ -2277,6 +2443,8 @@ arguments = [{ accept-ignored-assertion-result = true }]
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.3](https://github.com/revive-lint/revive/releases/tag/v1.0.3).
+
 _Description_: Unconditional recursive calls will produce infinite recursion, thus program stack overflow.
 This rule detects and warns about unconditional (direct) recursive calls.
 
@@ -2286,6 +2454,8 @@ _Configuration_: N/A
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.3](https://github.com/revive-lint/revive/releases/tag/v1.0.3).
+
 _Description_: this rule warns on wrongly named un-exported symbols, i.e. un-exported symbols whose name start with a capital letter.
 
 _Configuration_: N/A
@@ -2293,6 +2463,8 @@ _Configuration_: N/A
 ## unexported-return
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 **_Ported from golint_**
 
@@ -2307,6 +2479,8 @@ _Configuration_: N/A
 ## unhandled-error
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 **_Typed_**
 
@@ -2330,6 +2504,8 @@ arguments = [
 ## unnecessary-if
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.13.0](https://github.com/revive-lint/revive/releases/tag/v1.13.0).
 
 _Description_: Detects unnecessary `if-else` statements that return or assign a boolean value
 based on a condition and suggests a simplified, direct return or assignment.
@@ -2366,6 +2542,8 @@ _Configuration_: N/A
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.10.0](https://github.com/revive-lint/revive/releases/tag/v1.10.0).
+
 _Description_: This rule identifies calls to formatting functions where the format string does not contain any formatting verbs
 and recommends switching to the non-formatting, more efficient alternative.
 
@@ -2374,6 +2552,8 @@ _Configuration_: N/A
 ## unnecessary-stmt
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 _Description_: This rule suggests to remove redundant statements like a `break` at the end of a case block, for improving the code's readability.
 
@@ -2403,6 +2583,8 @@ _Configuration_: N/A
 ## unreachable-code
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 _Description_: This rule spots and proposes to remove [unreachable code](https://en.wikipedia.org/wiki/Unreachable_code).
 
@@ -2436,6 +2618,8 @@ _Configuration_: N/A
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.12.0](https://github.com/revive-lint/revive/releases/tag/v1.12.0).
+
 _Description_: Checks for usage of potentially unsecure URL schemes (`http`, `ws`) in string literals.
 Using unencrypted URL schemes can expose sensitive data during transmission and
 make applications vulnerable to man-in-the-middle attacks.
@@ -2448,6 +2632,8 @@ The rule will not warn on local URLs (`localhost`, `127.0.0.1`).
 ## unused-parameter
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 _Description_: This rule warns on unused parameters. Functions or methods with unused parameters can be a symptom of an unfinished refactoring or a bug.
 
@@ -2471,6 +2657,8 @@ arguments = [{ allow-regex = "^_" }]
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 _Description_: This rule warns on unused method receivers. Methods with unused receivers can be a symptom of an unfinished refactoring or a bug.
 
 _Configuration_:
@@ -2492,6 +2680,8 @@ arguments = [{ allow-regex = "^_" }]
 ## use-any
 
 _Go version_: >= 1.18.
+
+_Revive version_: [v1.2.0](https://github.com/revive-lint/revive/releases/tag/v1.2.0).
 
 _Description_: This rule proposes to replace instances of `interface{}` with its alias [`any`](https://pkg.go.dev/builtin@go1.18.0#any).
 
@@ -2525,6 +2715,8 @@ _Note_: This rule is irrelevant for Go 1.17-.
 
 _Go version_: < 1.26.
 
+_Revive version_: [v1.6.0](https://github.com/revive-lint/revive/releases/tag/v1.6.0).
+
 _Description_: This rule identifies calls to `fmt.Errorf` that can be safely replaced by, the more efficient, `errors.New`.
 This applies when the format string has no formatting verbs (no additional arguments are passed).
 
@@ -2555,6 +2747,8 @@ For unformatted strings, `fmt.Errorf("x")` generally [matches](https://go.dev/do
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.10.0](https://github.com/revive-lint/revive/releases/tag/v1.10.0).
+
 _Description_: This rule proposes to replace calls to built-in `print` and `println` with their equivalents from `fmt` standard package.
 
 `print` and `println` built-in functions are not recommended for use-cases other than
@@ -2565,6 +2759,8 @@ _Configuration_: N/A
 ## use-slices-concat
 
 _Go version_: >= 1.22.
+
+_Revive version_: [v1.17.0](https://github.com/revive-lint/revive/releases/tag/v1.17.0).
 
 _Description_: Since Go 1.22 the `slices` package provides the `slices.Concat` function that concatenates slices into a new one.
 The rule proposes to replace appends to an empty slice, which do the same in a more convoluted way, with a call to `slices.Concat`.
@@ -2600,6 +2796,8 @@ _Note_: This rule is irrelevant for Go 1.21-.
 
 _Go version_: >= 1.21.
 
+_Revive version_: [v1.14.0](https://github.com/revive-lint/revive/releases/tag/v1.14.0).
+
 _Description_: Since Go 1.21 the `slices` package proposes methods that are faster and easier to use
 than their equivalents in `sort` package.
 The rule proposes to replace these legacy idioms with calls to the new methods.
@@ -2633,6 +2831,8 @@ _Note_: This rule is irrelevant for Go 1.20-.
 ## use-waitgroup-go
 
 _Go version_: >= 1.25.
+
+_Revive version_: [v1.12.0](https://github.com/revive-lint/revive/releases/tag/v1.12.0).
 
 _Description_: Since Go 1.25 the `sync` package proposes the [`WaitGroup.Go`](https://pkg.go.dev/sync#WaitGroup.Go) method.
 This method is a shorter and safer replacement for the idiom `wg.Add ... go { ... wg.Done ... }`.
@@ -2691,6 +2891,8 @@ _Note_: This rule is irrelevant for Go 1.24-.
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.1.0](https://github.com/revive-lint/revive/releases/tag/v1.1.0).
+
 _Description_: This rule warns on useless `break` statements in case clauses of switch and select statements. Go,
 unlike other programming languages like C, only executes statements of the selected case while ignoring the subsequent case clauses.
 Therefore, inserting a `break` at the end of a case clause has no effect.
@@ -2729,6 +2931,8 @@ _Configuration_: N/A
 ## useless-fallthrough
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.12.0](https://github.com/revive-lint/revive/releases/tag/v1.12.0).
 
 _Description_: This rule warns on useless `fallthrough` statements in case clauses of switch statements.
 A `fallthrough` is considered _useless_ if it's the single statement of a case clause block.
@@ -2770,6 +2974,8 @@ _Configuration_: N/A
 
 _Go version_: 1.0.
 
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
+
 **_Ported from golint_**
 
 **_Typed_**
@@ -2781,6 +2987,8 @@ _Configuration_: N/A
 ## var-naming
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 **_Ported from golint_**
 
@@ -2818,6 +3026,8 @@ arguments = [["ID"], ["VM"], [{ upper-case-const = true }]]
 ## waitgroup-by-value
 
 _Go version_: 1.0.
+
+_Revive version_: [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0).
 
 _Description_: Function parameters that are passed by value, are in fact a copy of the original argument.
 Passing a copy of a `sync.WaitGroup` is usually not what the developer wants to do.
