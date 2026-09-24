@@ -169,7 +169,7 @@ However, it is recommended to avoid this and use `go` whenever possible._
 ## Releasing
 
 Releases are cut from `master` by pushing a tag; there are no release branches and no backports.
-Pushing a tag triggers [`release.yml`](.github/workflows/release.yml), which runs GoReleaser and publishes the `ghcr.io/mgechev/revive` image.
+Pushing a tag triggers [`release.yml`](.github/workflows/release.yml), which runs GoReleaser and publishes the `ghcr.io/revive-lint/revive` image.
 
 ### When to release
 

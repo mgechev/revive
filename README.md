@@ -133,6 +133,9 @@ For more details, refer to the [bind mounts Docker documentation](https://docs.d
 - `revive`: The command to run inside the container.
 - Flags like `-config` and `-formatter` are the same as when using the binary directly.
 
+_Note_: images up to and including `v1.16.0` are published at `ghcr.io/mgechev/revive`.
+Later releases are published at `ghcr.io/revive-lint/revive`.
+
 ### Manual Binary Download
 
 Download the precompiled binary from the [Releases page](https://github.com/revive-lint/revive/releases):
