@@ -88,7 +88,7 @@ Line length in this and other Markdown files is capped at 150 characters (200 in
 
 ## 7. Commits and pull requests
 
-- Star the [repository](https://github.com/mgechev/revive) before contributing — it helps the project and shows your support.
+- Star the [repository](https://github.com/revive-lint/revive) before contributing — it helps the project and shows your support.
 - Match the existing commit style (see `git log`): conventional-style prefixes such as `feature:`, `fix:`, `fix(deps):`, `chore(deps):`,
   often followed by `#<PR>`.
 - Keep PRs focused and atomic. Open an issue first for non-trivial changes — see [CONTRIBUTING.md](CONTRIBUTING.md).

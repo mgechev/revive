@@ -1,8 +1,8 @@
 # revive
 
-[![Build Status](https://github.com/mgechev/revive/actions/workflows/test.yaml/badge.svg)](https://github.com/mgechev/revive/actions/workflows/test.yaml)
+[![Build Status](https://github.com/revive-lint/revive/actions/workflows/test.yaml/badge.svg)](https://github.com/revive-lint/revive/actions/workflows/test.yaml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/mgechev/revive.svg)](https://pkg.go.dev/github.com/mgechev/revive)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/mgechev/revive)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/revive-lint/revive)
 
 Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in replacement of golint.
 **`Revive` provides a framework for development of custom rules,
@@ -133,9 +133,12 @@ For more details, refer to the [bind mounts Docker documentation](https://docs.d
 - `revive`: The command to run inside the container.
 - Flags like `-config` and `-formatter` are the same as when using the binary directly.
 
+_Note_: images up to and including `v1.16.0` are published at `ghcr.io/mgechev/revive`.
+Later releases are published at `ghcr.io/revive-lint/revive`.
+
 ### Manual Binary Download
 
-Download the precompiled binary from the [Releases page](https://github.com/mgechev/revive/releases):
+Download the precompiled binary from the [Releases page](https://github.com/revive-lint/revive/releases):
 
 1. Select the appropriate binary for your OS and architecture.
 2. Extract the binary and move it to a directory in your `PATH` (e.g., `/usr/local/bin`).
@@ -622,7 +625,7 @@ List of all [available rules](./RULES_DESCRIPTIONS.md).
 
  The rules in the "Typed" column use the type system, which depends on the `GOROOT` and `GOPATH` environment variables.
  Therefore, if `revive` binary is built with `-trimpath` or run on GitHub Actions, these rules may not work as expected.
- See [#1277](https://github.com/mgechev/revive/issues/1277) for details.
+ See [#1277](https://github.com/revive-lint/revive/issues/1277) for details.
 
 ## Configurable rules
 
@@ -898,8 +901,8 @@ _Open a PR to add your project_.
 
 This project exists thanks to all the people who contribute.
 
-<a href="https://github.com/mgechev/revive/graphs/contributors">
-  <img alt="All Contributors" src="https://contrib.rocks/image?repo=mgechev/revive&max=500" />
+<a href="https://github.com/revive-lint/revive/graphs/contributors">
+  <img alt="All Contributors" src="https://contrib.rocks/image?repo=revive-lint/revive&max=500" />
 </a>
 
 ## License
