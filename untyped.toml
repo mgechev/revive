@@ -31,6 +31,7 @@
 [rule.error-naming]
 [rule.error-return]
 [rule.error-strings]
+[rule.exit-after-defer]
 [rule.exported]
 [rule.file-header]
 [rule.file-length-limit]
