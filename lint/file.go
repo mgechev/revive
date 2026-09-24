@@ -53,13 +53,19 @@ func NewFile(name string, content []byte, pkg *Package) (*File, error) {
 	if err != nil {
 		return nil, err
 	}
+	return NewFileFromAST(name, content, f, pkg), nil
+}
+
+// NewFileFromAST creates a file from an already parsed AST.
+// The AST must include comments and must have been parsed with the file set of pkg.
+func NewFileFromAST(name string, content []byte, astFile *ast.File, pkg *Package) *File {
 	return &File{
 		Name:    name,
 		content: content,
 		Pkg:     pkg,
-		AST:     f,
+		AST:     astFile,
 		logger:  slog.New(slog.DiscardHandler),
-	}, nil
+	}
 }
 
 // ToPosition returns line and column for given position.
