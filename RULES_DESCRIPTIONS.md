@@ -641,8 +641,8 @@ analysis that this rule performs.
 
 For more details, see:
 
-- <https://github.com/mgechev/revive/issues/1622>
-- <https://github.com/mgechev/revive/issues/386>
+- <https://github.com/revive-lint/revive/issues/1622>
+- <https://github.com/revive-lint/revive/issues/386>
 
 ## empty-lines
 

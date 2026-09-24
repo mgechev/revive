@@ -448,7 +448,7 @@ const structTagCodecSpecialField = "_struct"
 
 func checkCodecTag(checkCtx *checkContext, tag *structtag.Tag, field *ast.Field) (message string, succeeded bool) {
 	fieldNames := field.Names
-	mustAddToCommonOptions := len(fieldNames) == 1 && fieldNames[0].Name == structTagCodecSpecialField // see https://github.com/mgechev/revive/issues/1477#issuecomment-3191493076
+	mustAddToCommonOptions := len(fieldNames) == 1 && fieldNames[0].Name == structTagCodecSpecialField // see https://github.com/revive-lint/revive/issues/1477#issuecomment-3191493076
 	for _, opt := range tag.Options {
 		if mustAddToCommonOptions {
 			checkCtx.addCommonOption(opt)

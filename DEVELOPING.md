@@ -7,7 +7,7 @@ This document explains how to build, test, and develop features for revive.
 Clone the project:
 
 ```bash
-git clone git@github.com:mgechev/revive.git
+git clone git@github.com:revive-lint/revive.git
 cd revive
 ```
 
@@ -46,7 +46,7 @@ GitHub Copilot.
 ## Development of rules
 
 If you want to develop a new rule, follow as an example the already existing rules in the
-[rule package](https://github.com/mgechev/revive/tree/master/rule) and check your change against
+[rule package](https://github.com/revive-lint/revive/tree/master/rule) and check your change against
 [the rule checklist](./.github/instructions/rule.instructions.md), which GitHub Copilot also uses when reviewing pull requests.
 
 When adding a new rule that does not require type information (for example, a rule that does not call `file.Pkg.TypeCheck()`
@@ -100,7 +100,7 @@ A sample rule implementation can be [found here](/rule/argument_limit.go).
 
 ## Development of formatters
 
-If you want to develop a new formatter, follow as an example the already existing formatters in the [formatter package](https://github.com/mgechev/revive/tree/master/formatter).
+If you want to develop a new formatter, follow as an example the already existing formatters in the [formatter package](https://github.com/revive-lint/revive/tree/master/formatter).
 
 All formatters should implement the following interface:
 
@@ -181,7 +181,7 @@ Pushing a tag triggers [`release.yml`](.github/workflows/release.yml), which run
 - **Patch (`v1.N.M`)**: within 2 weeks of merging a fix for a regression, a panic, a false positive/negative in a rule enabled by default
   (in revive or golangci-lint), or a Go version compatibility issue.
   If `feat:` commits or new rules have already been merged since the last tag, bump the minor instead.
-- **Major (`v2.0.0`)**: not time-driven; when the items tracked in [#1391](https://github.com/mgechev/revive/issues/1391) are ready.
+- **Major (`v2.0.0`)**: not time-driven; when the items tracked in [#1391](https://github.com/revive-lint/revive/issues/1391) are ready.
 
 Go version: raise `go` in `go.mod` to the previous Go release in the first minor after a new Go version is released,
 matching the [Go release policy](https://go.dev/doc/devel/release#policy).
@@ -189,7 +189,7 @@ matching the [Go release policy](https://go.dev/doc/devel/release#policy).
 ### How to release
 
 1. Check `git log <last-tag>..master`: any `feat`/`feature` commit (including scoped forms) or new rule means a minor, otherwise a patch.
-2. From an up-to-date `master`, tag and push with `<remote>` set to the remote pointing at `mgechev/revive`
+2. From an up-to-date `master`, tag and push with `<remote>` set to the remote pointing at `revive-lint/revive`
    (`origin` in a direct clone, `upstream` when working from a fork — check with `git remote -v`):
    `git switch master && git pull --ff-only <remote> master && git tag vX.Y.Z && git push <remote> vX.Y.Z`.
 3. Edit the auto-generated release notes into the sections used by previous releases, dropping any that have no entries:
@@ -200,7 +200,7 @@ matching the [Go release policy](https://go.dev/doc/devel/release#policy).
 
 ## Website
 
-The documentation website <https://revive.run/> lives in a separate repository: [mgechev/revive.run](https://github.com/mgechev/revive.run).
+The documentation website <https://revive.run/> lives in a separate repository: [revive-lint/revive.run](https://github.com/revive-lint/revive.run).
 
 Most of its content is generated from this repository, so there is no need to edit the website when changing docs here:
 
