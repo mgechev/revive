@@ -286,3 +286,16 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 		})
 	}
 }
+
+func TestPackageNamingRule_ConfigureAllStdTwice(t *testing.T) {
+	arguments := lint.Arguments{
+		map[string]any{"check-collision-with-all-std": true},
+	}
+
+	var r rule.PackageNamingRule
+	for range 2 {
+		if err := r.Configure(arguments); err != nil {
+			t.Fatalf("Configure() unexpected non-nil error %q", err)
+		}
+	}
+}
