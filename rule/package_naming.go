@@ -78,8 +78,8 @@ var stdPackagesCache struct {
 // stdPackageNames returns name -> path of standard library packages excluding internal and vendor ones,
 // e.g. `http` -> `net/http`, `rand` -> `math/rand`.
 // Listing the standard library spawns a `go list` subprocess, so a successful result is loaded once per
-// process and shared by all rule instances. The returned map must not be modified. Failures are not
-// cached, so a later call retries the listing.
+// process and shared by all rule instances. The returned map must not be modified. Failures, including
+// a partial listing, are not cached, so a later call retries the listing.
 func stdPackageNames() (map[string]string, error) {
 	stdPackagesCache.Lock()
 	defer stdPackagesCache.Unlock()
@@ -99,6 +99,9 @@ func stdPackageNames() (map[string]string, error) {
 
 	names := map[string]string{}
 	for _, pkg := range pkgs {
+		if len(pkg.Errors) > 0 {
+			return nil, fmt.Errorf("load std packages: %s: %w", pkg.PkgPath, pkg.Errors[0])
+		}
 		if isNonPublicPackage(pkg.PkgPath) {
 			continue
 		}
