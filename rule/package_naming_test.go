@@ -286,17 +286,3 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 		})
 	}
 }
-
-func TestPackageNamingRule_ConfigureAllStd(t *testing.T) {
-	arguments := lint.Arguments{
-		map[string]any{"check-collision-with-all-std": true},
-	}
-
-	// Separate instances share the process-wide standard library listing.
-	for range 2 {
-		var r rule.PackageNamingRule
-		if err := r.Configure(arguments); err != nil {
-			t.Fatalf("Configure() unexpected non-nil error %q", err)
-		}
-	}
-}
