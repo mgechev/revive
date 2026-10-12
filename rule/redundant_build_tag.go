@@ -197,8 +197,7 @@ func simplifyConstraint(expr constraint.Expr, tags map[string]bool) (simplified 
 // e.g. "example_linux.go" fixes "linux" and "unix" to true and every other GOOS to false.
 // It returns nil when the file name constrains nothing. Tags that remain undecided are absent from the result.
 //
-// The file name rules mirror goodOSArchFile:
-// https://go.googlesource.com/go/+/refs/tags/go1.26.0/src/go/build/build.go#1995
+// Mirrors goodOSArchFile: https://go.googlesource.com/go/+/refs/tags/go1.26.0/src/go/build/build.go#1995
 func buildTagsFromFileName(fileName string) map[string]bool {
 	name, _, _ := strings.Cut(fileName, ".")
 
@@ -251,7 +250,6 @@ func buildTagsFromFileName(fileName string) map[string]bool {
 }
 
 // impliedOS maps a GOOS value to the other GOOS build tags it also satisfies.
-//
 // Mirrors https://go.googlesource.com/go/+/refs/tags/go1.26.0/src/go/build/build.go#1959
 var impliedOS = map[string][]string{
 	"android": {"linux"},
