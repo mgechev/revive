@@ -35,6 +35,9 @@ func TestRedundantBuildTagRuleFileName(t *testing.T) {
 		"redundant_build_tag_contradict_windows",
 		"redundant_build_tag_no_failure_linux",
 		"redundant_build_tag_no_failure_amd64",
+		"redundant_build_tag_old_linux",
+		"redundant_build_tag_implied_illumos",
+		"redundant_build_tag_no_failure_solaris",
 	} {
 		t.Run(fixture, func(t *testing.T) {
 			testRule(t, fixture, &rule.RedundantBuildTagRule{}, &lint.RuleConfig{})

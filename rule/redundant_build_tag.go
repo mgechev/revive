@@ -2,6 +2,7 @@ package rule
 
 import (
 	"fmt"
+	"go/ast"
 	"go/build/constraint"
 	"go/version"
 	"path/filepath"
@@ -32,50 +33,71 @@ func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 			break // build constraints must appear before the package clause
 		}
 
-		hasGoBuild := false
+		// The old `// +build` tag is reported first: when a file carries both tags it is the
+		// only actionable finding, since dropping a `//go:build` line that `// +build` still
+		// backs up just makes gofmt add it again.
+		if comment, ok := oldBuildTag(group); ok {
+			return []lint.Failure{{
+				Category:   lint.FailureCategoryStyle,
+				Confidence: 1,
+				Node:       comment,
+				Failure:    fmt.Sprintf("The build tag %q is redundant since Go 1.17 and can be removed", oldGoBuildPrefix),
+			}}
+		}
+
 		for _, comment := range group.List {
-			if ver, ok := strings.CutPrefix(comment.Text, "//go:build "); ok {
-				hasGoBuild = true
-
-				// goVersion is the module's language version, e.g. "go1.21".
-				goVersion := version.Lang("go" + file.Pkg.GoVersion().String())
-				// Starting with Go 1.21 the go version in go.mod is a hard requirement,
-				// so a `//go:build go1.X` constraint it already satisfies is redundant.
-				// Skip this check for Go 1.20 and earlier.
-				if file.Pkg.IsAtLeastGoVersion(lint.Go121) && version.IsValid(ver) && version.Compare(goVersion, ver) >= 0 {
-					return []lint.Failure{{
-						Category:   lint.FailureCategoryStyle,
-						Confidence: 1,
-						Node:       comment,
-						Failure:    fmt.Sprintf("The build tag %q is redundant for Go %s and can be removed", comment.Text, strings.TrimPrefix(goVersion, "go")),
-					}}
-				}
-
-				if msg, ok := redundantFileNameConstraint(comment.Text, fileName, fileNameTags); ok {
-					return []lint.Failure{{
-						Category:   lint.FailureCategoryStyle,
-						Confidence: 1,
-						Node:       comment,
-						Failure:    msg,
-					}}
-				}
-
+			ver, ok := strings.CutPrefix(comment.Text, goBuildPrefix)
+			if !ok {
 				continue
 			}
 
-			const oldGoBuildPrefix = "// +build"
-			if hasGoBuild && strings.HasPrefix(comment.Text, oldGoBuildPrefix) {
+			// goVersion is the module's language version, e.g. "go1.21".
+			goVersion := version.Lang("go" + file.Pkg.GoVersion().String())
+			// Starting with Go 1.21 the go version in go.mod is a hard requirement,
+			// so a `//go:build go1.X` constraint it already satisfies is redundant.
+			// Skip this check for Go 1.20 and earlier.
+			if file.Pkg.IsAtLeastGoVersion(lint.Go121) && version.IsValid(ver) && version.Compare(goVersion, ver) >= 0 {
 				return []lint.Failure{{
 					Category:   lint.FailureCategoryStyle,
 					Confidence: 1,
 					Node:       comment,
-					Failure:    fmt.Sprintf("The build tag %q is redundant since Go 1.17 and can be removed", oldGoBuildPrefix),
+					Failure:    fmt.Sprintf("The build tag %q is redundant for Go %s and can be removed", comment.Text, strings.TrimPrefix(goVersion, "go")),
+				}}
+			}
+
+			if msg, ok := redundantFileNameConstraint(comment.Text, fileName, fileNameTags); ok {
+				return []lint.Failure{{
+					Category:   lint.FailureCategoryStyle,
+					Confidence: 1,
+					Node:       comment,
+					Failure:    msg,
 				}}
 			}
 		}
 	}
 
 	return []lint.Failure{}
+}
+
+const (
+	goBuildPrefix    = "//go:build "
+	oldGoBuildPrefix = "// +build"
+)
+
+// oldBuildTag returns the `// +build` comment of the group when it follows a `//go:build` one,
+// which makes it redundant since Go 1.17.
+func oldBuildTag(group *ast.CommentGroup) (*ast.Comment, bool) {
+	hasGoBuild := false
+	for _, comment := range group.List {
+		switch {
+		case strings.HasPrefix(comment.Text, goBuildPrefix):
+			hasGoBuild = true
+		case hasGoBuild && strings.HasPrefix(comment.Text, oldGoBuildPrefix):
+			return comment, true
+		}
+	}
+
+	return nil, false
 }
 
 // Name returns the rule name.
@@ -224,6 +246,7 @@ func buildTagsFromFileName(fileName string) map[string]bool {
 // impliedGOOS maps a GOOS value to the other GOOS build tags it also satisfies.
 var impliedGOOS = map[string][]string{
 	"android": {"linux"},
+	"illumos": {"solaris"},
 	"ios":     {"darwin"},
 }
 
