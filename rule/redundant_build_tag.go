@@ -16,12 +16,12 @@ import (
 type RedundantBuildTagRule struct{}
 
 // Apply triggers on three kinds of redundant build tags:
-//   - an old `// +build` tag found after a new `//go:build` tag, since `//go:build`
-//     comments are automatically added by gofmt when Go 1.17+ is used;
-//   - a `//go:build go1.X` version constraint that is already guaranteed by the
-//     go version in go.mod (Go 1.21+, where the go directive is a hard requirement);
-//   - a `//go:build` constraint that is already implied by the GOOS/GOARCH suffix of
-//     the file name, e.g. `//go:build windows` in a file named `example_windows.go`.
+//   - a `// +build` tag found after a `//go:build` tag, since `//go:build` comments are automatically added by gofmt
+//     when Go 1.17+ is used;
+//   - a `//go:build go1.X` version constraint that is already guaranteed by the go version in go.mod
+//     (Go 1.21+, where the go directive is a hard requirement);
+//   - a `//go:build` constraint that is already implied by the GOOS/GOARCH suffix of the file name,
+//     e.g. `//go:build windows` in a file named `example_windows.go`.
 //
 // See https://pkg.go.dev/cmd/go#hdr-Build_constraints
 func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
@@ -33,30 +33,28 @@ func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 			break // build constraints must appear before the package clause
 		}
 
-		// The old `// +build` tag is reported first: when a file carries both tags it is the
-		// only actionable finding, since dropping a `//go:build` line that `// +build` still
-		// backs up just makes gofmt add it again.
-		if comment, ok := oldBuildTag(group); ok {
+		// The `// +build` tag is reported first: when a file carries both tags it is the only actionable finding,
+		// since dropping a `//go:build` line that `// +build` still backs up just makes gofmt add it again.
+		if comment, ok := redundantPlusBuildTag(group); ok {
 			return []lint.Failure{{
 				Category:   lint.FailureCategoryStyle,
 				Confidence: 1,
 				Node:       comment,
-				Failure:    fmt.Sprintf("The build tag %q is redundant since Go 1.17 and can be removed", oldGoBuildPrefix),
+				Failure:    fmt.Sprintf("The build tag %q is redundant since Go 1.17 and can be removed", plusBuildPrefix),
 			}}
 		}
 
 		for _, comment := range group.List {
-			ver, ok := strings.CutPrefix(comment.Text, goBuildPrefix)
+			expr, ok := goBuildExpr(comment.Text)
 			if !ok {
 				continue
 			}
 
 			// goVersion is the module's language version, e.g. "go1.21".
 			goVersion := version.Lang("go" + file.Pkg.GoVersion().String())
-			// Starting with Go 1.21 the go version in go.mod is a hard requirement,
-			// so a `//go:build go1.X` constraint it already satisfies is redundant.
-			// Skip this check for Go 1.20 and earlier.
-			if file.Pkg.IsAtLeastGoVersion(lint.Go121) && version.IsValid(ver) && version.Compare(goVersion, ver) >= 0 {
+			// Starting with Go 1.21 the go version in go.mod is a hard requirement, so a `//go:build go1.X` constraint
+			// it already satisfies is redundant. Skip this check for Go 1.20 and earlier.
+			if file.Pkg.IsAtLeastGoVersion(lint.Go121) && version.IsValid(expr) && version.Compare(goVersion, expr) >= 0 {
 				return []lint.Failure{{
 					Category:   lint.FailureCategoryStyle,
 					Confidence: 1,
@@ -80,19 +78,30 @@ func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 }
 
 const (
-	goBuildPrefix    = "//go:build "
-	oldGoBuildPrefix = "// +build"
+	goBuildPrefix   = "//go:build"
+	plusBuildPrefix = "// +build"
 )
 
-// oldBuildTag returns the `// +build` comment of the group when it follows a `//go:build` one,
+// goBuildExpr returns the build expression of a `//go:build` comment line, e.g. "windows && amd64" for
+// `//go:build windows && amd64`.
+// The directive may be separated from the expression by any whitespace, so the prefix cannot be cut directly.
+func goBuildExpr(line string) (string, bool) {
+	if !constraint.IsGoBuild(line) {
+		return "", false
+	}
+
+	return strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(line), goBuildPrefix)), true
+}
+
+// redundantPlusBuildTag returns the `// +build` comment of the group when it follows a `//go:build` one,
 // which makes it redundant since Go 1.17.
-func oldBuildTag(group *ast.CommentGroup) (*ast.Comment, bool) {
+func redundantPlusBuildTag(group *ast.CommentGroup) (*ast.Comment, bool) {
 	hasGoBuild := false
 	for _, comment := range group.List {
 		switch {
-		case strings.HasPrefix(comment.Text, goBuildPrefix):
+		case constraint.IsGoBuild(comment.Text):
 			hasGoBuild = true
-		case hasGoBuild && strings.HasPrefix(comment.Text, oldGoBuildPrefix):
+		case hasGoBuild && constraint.IsPlusBuild(comment.Text):
 			return comment, true
 		}
 	}
@@ -105,9 +114,8 @@ func (*RedundantBuildTagRule) Name() string {
 	return "redundant-build-tag"
 }
 
-// redundantFileNameConstraint reports whether the `//go:build` line is wholly or
-// partly implied by the GOOS/GOARCH suffix of the file name, together with the
-// message describing the finding.
+// redundantFileNameConstraint reports whether the `//go:build` line is wholly or partly implied by the GOOS/GOARCH
+// suffix of the file name, together with the message describing the finding.
 func redundantFileNameConstraint(line, fileName string, fileNameTags map[string]bool) (string, bool) {
 	if len(fileNameTags) == 0 {
 		return "", false
@@ -124,16 +132,15 @@ func redundantFileNameConstraint(line, fileName string, fileNameTags map[string]
 	case simplified == nil && !value:
 		return fmt.Sprintf("The build tag %q contradicts the file name %q, so the file is never built", line, fileName), true
 	case simplified != expr:
-		return fmt.Sprintf("The build tag %q is partly implied by the file name %q and can be reduced to %q", line, fileName, "//go:build "+simplified.String()), true
+		return fmt.Sprintf("The build tag %q is partly implied by the file name %q and can be reduced to %q", line, fileName, goBuildPrefix+" "+simplified.String()), true
 	}
 
 	return "", false
 }
 
-// simplifyConstraint partially evaluates expr using the tags whose truth value is
-// fixed by the file name. It returns a nil expression when expr is fully determined,
-// in which case value is its result; otherwise it returns the simplified expression,
-// which is expr itself when no simplification is possible.
+// simplifyConstraint partially evaluates expr using the tags whose truth value is fixed by the file name.
+// It returns a nil expression when expr is fully determined, in which case value is its result;
+// otherwise it returns the simplified expression, which is expr itself when no simplification is possible.
 func simplifyConstraint(expr constraint.Expr, tags map[string]bool) (simplified constraint.Expr, value bool) {
 	switch e := expr.(type) {
 	case *constraint.TagExpr:
@@ -186,12 +193,12 @@ func simplifyConstraint(expr constraint.Expr, tags map[string]bool) (simplified 
 	return expr, false
 }
 
-// buildTagsFromFileName returns the build tags whose truth value is fixed by the
-// GOOS/GOARCH suffix of fileName, e.g. "example_linux.go" fixes "linux" and "unix"
-// to true and every other GOOS to false. It returns nil when the file name
-// constrains nothing. Tags that remain undecided are absent from the result.
+// buildTagsFromFileName returns the build tags whose truth value is fixed by the GOOS/GOARCH suffix of fileName,
+// e.g. "example_linux.go" fixes "linux" and "unix" to true and every other GOOS to false.
+// It returns nil when the file name constrains nothing. Tags that remain undecided are absent from the result.
 //
-// The file name rules mirror goodOSArchFile in go/build.
+// The file name rules mirror goodOSArchFile:
+// https://go.googlesource.com/go/+/refs/tags/go1.26.0/src/go/build/build.go#1995
 func buildTagsFromFileName(fileName string) map[string]bool {
 	name, _, _ := strings.Cut(fileName, ".")
 
@@ -209,11 +216,11 @@ func buildTagsFromFileName(fileName string) map[string]bool {
 	var goos, goarch string
 	last := parts[len(parts)-1]
 	switch n := len(parts); {
-	case n >= 2 && knownGOOS[parts[n-2]] && knownGOARCH[last]:
+	case n >= 2 && knownOS[parts[n-2]] && knownArch[last]:
 		goos, goarch = parts[n-2], last
-	case knownGOOS[last]:
+	case knownOS[last]:
 		goos = last
-	case knownGOARCH[last]:
+	case knownArch[last]:
 		goarch = last
 	default:
 		return nil
@@ -221,13 +228,13 @@ func buildTagsFromFileName(fileName string) map[string]bool {
 
 	tags := map[string]bool{}
 	if goos != "" {
-		for os := range knownGOOS {
+		for os := range knownOS {
 			switch {
-			case os == goos || slices.Contains(impliedGOOS[goos], os):
+			case os == goos || slices.Contains(impliedOS[goos], os):
 				tags[os] = true
-			case slices.Contains(impliedGOOS[os], goos):
-				// goos is a superset of os, e.g. a file named "*_linux.go" is also
-				// built for GOOS=android, so the "android" tag stays undecided.
+			case slices.Contains(impliedOS[os], goos):
+				// goos is a superset of os, e.g. a file named "*_linux.go" is also built for GOOS=android, so the
+				// "android" tag stays undecided.
 			default:
 				tags[os] = false
 			}
@@ -235,7 +242,7 @@ func buildTagsFromFileName(fileName string) map[string]bool {
 		tags["unix"] = unixGOOS[goos]
 	}
 	if goarch != "" {
-		for arch := range knownGOARCH {
+		for arch := range knownArch {
 			tags[arch] = arch == goarch
 		}
 	}
@@ -243,35 +250,68 @@ func buildTagsFromFileName(fileName string) map[string]bool {
 	return tags
 }
 
-// impliedGOOS maps a GOOS value to the other GOOS build tags it also satisfies.
-var impliedGOOS = map[string][]string{
+// impliedOS maps a GOOS value to the other GOOS build tags it also satisfies.
+//
+// Mirrors https://go.googlesource.com/go/+/refs/tags/go1.26.0/src/go/build/build.go#1959
+var impliedOS = map[string][]string{
 	"android": {"linux"},
 	"illumos": {"solaris"},
 	"ios":     {"darwin"},
 }
 
-// knownGOOS, knownGOARCH and unixGOOS mirror the tables of the standard library's
-// internal/syslist package. Values are only ever added to them, never removed,
-// because the go tool keeps matching them in file names.
 var (
-	knownGOOS = map[string]bool{
+	// knownOS is the list of past, present, and future known GOOS values.
+	// Mirrors https://go.googlesource.com/go/+/refs/tags/go1.26.0/src/internal/syslist/syslist.go#17
+	knownOS = map[string]bool{
 		"aix": true, "android": true, "darwin": true, "dragonfly": true, "freebsd": true,
 		"hurd": true, "illumos": true, "ios": true, "js": true, "linux": true, "nacl": true,
 		"netbsd": true, "openbsd": true, "plan9": true, "solaris": true, "wasip1": true,
 		"windows": true, "zos": true,
 	}
 
-	knownGOARCH = map[string]bool{
-		"386": true, "amd64": true, "amd64p32": true, "arm": true, "armbe": true,
-		"arm64": true, "arm64be": true, "loong64": true, "mips": true, "mipsle": true,
-		"mips64": true, "mips64le": true, "mips64p32": true, "mips64p32le": true,
-		"ppc": true, "ppc64": true, "ppc64le": true, "riscv": true, "riscv64": true,
-		"s390": true, "s390x": true, "sparc": true, "sparc64": true, "wasm": true,
+	// knownArch is the list of past, present, and future known GOARCH values.
+	// Mirrors https://go.googlesource.com/go/+/refs/tags/go1.26.0/src/internal/syslist/syslist.go#58
+	knownArch = map[string]bool{
+		"386":         true,
+		"amd64":       true,
+		"amd64p32":    true,
+		"arm":         true,
+		"armbe":       true,
+		"arm64":       true,
+		"arm64be":     true,
+		"loong64":     true,
+		"mips":        true,
+		"mipsle":      true,
+		"mips64":      true,
+		"mips64le":    true,
+		"mips64p32":   true,
+		"mips64p32le": true,
+		"ppc":         true,
+		"ppc64":       true,
+		"ppc64le":     true,
+		"riscv":       true,
+		"riscv64":     true,
+		"s390":        true,
+		"s390x":       true,
+		"sparc":       true,
+		"sparc64":     true,
+		"wasm":        true,
 	}
 
+	// unixGOOS is the set of GOOS values matched by the "unix" build tag.
+	// Mirrors https://go.googlesource.com/go/+/refs/tags/go1.26.0/src/internal/syslist/syslist.go#41
 	unixGOOS = map[string]bool{
-		"aix": true, "android": true, "darwin": true, "dragonfly": true, "freebsd": true,
-		"hurd": true, "illumos": true, "ios": true, "linux": true, "netbsd": true,
-		"openbsd": true, "solaris": true,
+		"aix":       true,
+		"android":   true,
+		"darwin":    true,
+		"dragonfly": true,
+		"freebsd":   true,
+		"hurd":      true,
+		"illumos":   true,
+		"ios":       true,
+		"linux":     true,
+		"netbsd":    true,
+		"openbsd":   true,
+		"solaris":   true,
 	}
 )

@@ -20,14 +20,21 @@ func TestRedundantBuildTagRuleGo116(t *testing.T) {
 }
 
 func TestRedundantBuildTagRuleGo121(t *testing.T) {
-	testRule(t, "go1.21/redundant_build_tag", &rule.RedundantBuildTagRule{}, &lint.RuleConfig{})
-	testRule(t, "go1.21/redundant_build_tag_go120", &rule.RedundantBuildTagRule{}, &lint.RuleConfig{})
-	testRule(t, "go1.21/redundant_build_tag_go122", &rule.RedundantBuildTagRule{}, &lint.RuleConfig{})
+	for _, fixture := range []string{
+		"go1.21/redundant_build_tag",
+		"go1.21/redundant_build_tag_go120",
+		"go1.21/redundant_build_tag_go122",
+	} {
+		t.Run(fixture, func(t *testing.T) {
+			testRule(t, fixture, &rule.RedundantBuildTagRule{}, &lint.RuleConfig{})
+		})
+	}
 }
 
 func TestRedundantBuildTagRuleFileName(t *testing.T) {
 	for _, fixture := range []string{
 		"redundant_build_tag_windows",
+		"redundant_build_tag_tab_windows",
 		"redundant_build_tag_unix_linux",
 		"redundant_build_tag_linux_amd64",
 		"redundant_build_tag_or_linux",
