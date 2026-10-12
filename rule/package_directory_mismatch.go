@@ -53,6 +53,11 @@ func (r *PackageDirectoryMismatchRule) Configure(arguments lint.Arguments) error
 			ignoredDirs[i] = str
 		}
 
+		if len(ignoredDirs) == 0 {
+			r.ignoredDirs = nil
+			return nil
+		}
+
 		var err error
 		r.ignoredDirs, err = r.buildIgnoreRegex(ignoredDirs)
 		return err
@@ -62,10 +67,6 @@ func (r *PackageDirectoryMismatchRule) Configure(arguments lint.Arguments) error
 }
 
 func (*PackageDirectoryMismatchRule) buildIgnoreRegex(ignoredDirs []string) (*regexp.Regexp, error) {
-	if len(ignoredDirs) == 0 {
-		return nil, nil
-	}
-
 	patterns := make([]string, len(ignoredDirs))
 	for i, dir := range ignoredDirs {
 		patterns[i] = regexp.QuoteMeta(dir)

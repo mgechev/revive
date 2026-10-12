@@ -57,7 +57,7 @@ Each rule needs to implement the `lint.Rule` interface:
 ```go
 type Rule interface {
 	Name() string
-	Apply(*File, Arguments) []Failure
+	Apply(file *File, arguments Arguments) []Failure
 }
 ```
 
@@ -65,7 +65,7 @@ All rules with a configuration must implement `lint.ConfigurableRule` interface:
 
 ```go
 type ConfigurableRule interface {
-	Configure(Arguments) error
+	Configure(arguments Arguments) error
 }
 ```
 

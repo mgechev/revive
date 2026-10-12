@@ -58,7 +58,7 @@ var commonMethods = map[string]bool{
 	"Error":     true,
 	"Read":      true,
 	"ServeHTTP": true,
-	"String":    true,
+	"String":    true, //nolint:usestdlibvars // "String" can be replaced by constant.String.String()
 	"Write":     true,
 	"Unwrap":    true,
 }
