@@ -34,7 +34,7 @@ func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 			Category:   lint.FailureCategoryStyle,
 			Confidence: 1,
 			Node:       comment,
-			Failure:    fmt.Sprintf("The build tag %q is redundant since Go 1.17 and can be removed", plusBuildPrefix),
+			Failure:    `The build tag "// +build" is redundant since Go 1.17 and can be removed`,
 		}}
 	}
 
@@ -88,11 +88,6 @@ func (*RedundantBuildTagRule) Name() string {
 	return "redundant-build-tag"
 }
 
-const (
-	goBuildPrefix   = "//go:build"
-	plusBuildPrefix = "// +build"
-)
-
 // buildConstraintComments returns the comments that may hold build constraints, i.e. those preceding
 // the package clause.
 func buildConstraintComments(file *lint.File) []*ast.Comment {
@@ -116,7 +111,7 @@ func redundantPlusBuildTag(comments []*ast.Comment) (*ast.Comment, bool) {
 		switch {
 		case constraint.IsGoBuild(comment.Text):
 			hasGoBuild = true
-		case hasGoBuild && strings.HasPrefix(comment.Text, plusBuildPrefix):
+		case hasGoBuild && strings.HasPrefix(comment.Text, "// +build"):
 			return comment, true
 		}
 	}
@@ -152,7 +147,7 @@ func redundantFileNameConstraint(expr constraint.Expr, line, fileName string, fi
 		return fmt.Sprintf("The build tag %q contradicts the go directive in go.mod, so the file is never built", line), true
 	}
 
-	return fmt.Sprintf("The build tag %q is partly implied by the file name %q and can be reduced to %q", line, fileName, goBuildPrefix+" "+reduced.String()), true
+	return fmt.Sprintf("The build tag %q is partly implied by the file name %q and can be reduced to %q", line, fileName, "//go:build "+reduced.String()), true
 }
 
 // simplifyConstraint partially evaluates expr, treating every tag that satisfied accepts as true.
