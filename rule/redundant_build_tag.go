@@ -263,10 +263,24 @@ var (
 	// knownOS is the list of past, present, and future known GOOS values.
 	// Mirrors https://go.googlesource.com/go/+/refs/tags/go1.26.0/src/internal/syslist/syslist.go#17
 	knownOS = map[string]bool{
-		"aix": true, "android": true, "darwin": true, "dragonfly": true, "freebsd": true,
-		"hurd": true, "illumos": true, "ios": true, "js": true, "linux": true, "nacl": true,
-		"netbsd": true, "openbsd": true, "plan9": true, "solaris": true, "wasip1": true,
-		"windows": true, "zos": true,
+		"aix":       true,
+		"android":   true,
+		"darwin":    true,
+		"dragonfly": true,
+		"freebsd":   true,
+		"hurd":      true,
+		"illumos":   true,
+		"ios":       true,
+		"js":        true,
+		"linux":     true,
+		"nacl":      true,
+		"netbsd":    true,
+		"openbsd":   true,
+		"plan9":     true,
+		"solaris":   true,
+		"wasip1":    true,
+		"windows":   true,
+		"zos":       true,
 	}
 
 	// knownArch is the list of past, present, and future known GOARCH values.
