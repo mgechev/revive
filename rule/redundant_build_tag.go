@@ -40,12 +40,15 @@ func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 
 	fileName := filepath.Base(file.Name)
 	fileNameTags := buildTagsFromFileName(fileName)
-	// goVersion is the module's language version, e.g. "go1.21".
-	goVersion := version.Lang("go" + file.Pkg.GoVersion().String())
-	// Starting with Go 1.21 the go version in go.mod is a hard requirement, so a `//go:build go1.X` constraint
-	// it already satisfies is redundant. Skip this check for Go 1.20 and earlier.
+	// goVersion is the module's language version, e.g. "go1.21". Starting with Go 1.21 the go version in go.mod
+	// is a hard requirement, so a `//go:build go1.X` constraint it already satisfies is redundant; before that it
+	// guarantees nothing, which an empty goVersion expresses since it compares as lower than any version.
+	goVersion := ""
+	if file.Pkg.IsAtLeastGoVersion(lint.Go121) {
+		goVersion = version.Lang("go" + file.Pkg.GoVersion().String())
+	}
 	goVersionSatisfied := func(tag string) bool {
-		return file.Pkg.IsAtLeastGoVersion(lint.Go121) && version.IsValid(tag) && version.Compare(goVersion, tag) >= 0
+		return version.IsValid(tag) && version.Compare(goVersion, tag) >= 0
 	}
 
 	for _, comment := range comments {
