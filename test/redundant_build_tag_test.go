@@ -42,7 +42,7 @@ func TestRedundantBuildTagRuleFileName(t *testing.T) {
 		"redundant_build_tag_or_linux",
 		"redundant_build_tag_partly_darwin",
 		"redundant_build_tag_negated_windows",
-		"redundant_build_tag_old_linux",
+		"redundant_build_tag_plus_linux",
 		"redundant_build_tag_no_failure_linux",
 		"redundant_build_tag_no_failure_amd64",
 		"redundant_build_tag_no_failure_implied_illumos",
