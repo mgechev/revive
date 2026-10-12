@@ -3,7 +3,6 @@ package rule
 import (
 	"fmt"
 	"go/ast"
-	"reflect"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -41,7 +40,7 @@ func (r *FunctionLength) Apply(file *lint.File, _ lint.Arguments) []lint.Failure
 		body := funcDecl.Body
 		emptyBody := body == nil || len(body.List) == 0
 		if emptyBody {
-			return nil
+			continue
 		}
 
 		if r.maxStmt > 0 {
@@ -105,7 +104,7 @@ func (*FunctionLength) parseArguments(arguments lint.Arguments) (maxStmt, maxLin
 		return 0, 0, fmt.Errorf(`invalid configuration value for max lines in "function-length" rule; need int64 but got %T`, arguments[1])
 	}
 	if maxLines < 0 {
-		return 0, 0, fmt.Errorf(`the configuration value for max statements in "function-length" rule cannot be negative, got %d`, maxLines)
+		return 0, 0, fmt.Errorf(`the configuration value for max lines in "function-length" rule cannot be negative, got %d`, maxLines)
 	}
 
 	return maxStmt, maxLines, nil
@@ -156,7 +155,22 @@ func (r *FunctionLength) countFuncLitStmts(stmt ast.Expr) int {
 	return 0
 }
 
-func (r *FunctionLength) countBodyListStmts(t any) int {
-	i := reflect.ValueOf(t).Elem().FieldByName(`Body`).Elem().FieldByName(`List`).Interface()
-	return r.countStmts(i.([]ast.Stmt))
+// countBodyListStmts counts the statements in the body of the given statement.
+func (r *FunctionLength) countBodyListStmts(stmt ast.Stmt) int {
+	switch stmt := stmt.(type) {
+	case *ast.IfStmt:
+		return r.countStmts(stmt.Body.List)
+	case *ast.ForStmt:
+		return r.countStmts(stmt.Body.List)
+	case *ast.RangeStmt:
+		return r.countStmts(stmt.Body.List)
+	case *ast.SwitchStmt:
+		return r.countStmts(stmt.Body.List)
+	case *ast.TypeSwitchStmt:
+		return r.countStmts(stmt.Body.List)
+	case *ast.SelectStmt:
+		return r.countStmts(stmt.Body.List)
+	default:
+		return 0
+	}
 }

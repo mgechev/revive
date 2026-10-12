@@ -20,6 +20,9 @@ var _ lint.ConfigurableRule = (*EnforceSwitchStyleRule)(nil)
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
 func (r *EnforceSwitchStyleRule) Configure(arguments lint.Arguments) error {
+	r.allowNoDefault = false
+	r.allowDefaultNotLast = false
+
 	if len(arguments) < 1 {
 		return nil
 	}
@@ -115,7 +118,10 @@ func (*EnforceSwitchStyleRule) seekDefaultCase(body *ast.BlockStmt) (defaultClau
 
 func (*EnforceSwitchStyleRule) allBranchesEndWithJumpStmt(body *ast.BlockStmt) bool {
 	for _, stmt := range body.List {
-		caseClause := stmt.(*ast.CaseClause) // safe to assume stmt is a case clause
+		caseClause, ok := stmt.(*ast.CaseClause)
+		if !ok {
+			continue
+		}
 
 		caseBody := caseClause.Body
 		if caseBody == nil {

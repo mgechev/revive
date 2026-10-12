@@ -78,7 +78,7 @@ func (w lintUseFmtPrint) Visit(node ast.Node) ast.Visitor {
 }
 
 func (lintUseFmtPrint) callArgsAsStr(args []ast.Expr) string {
-	strs := []string{}
+	strs := make([]string, 0, len(args))
 	for _, expr := range args {
 		strs = append(strs, astutils.GoFmt(expr))
 	}

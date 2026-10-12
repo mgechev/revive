@@ -366,7 +366,7 @@ func (*lintTimeDate) isLeapYear(year int64) bool {
 	// year%4 == 0 && (year%100 != 0 || year%400 == 0)
 	// because we want to ensure what time.Date will compute
 
-	return time.Date(int(year), 2, 29, 0, 0, 0, 0, time.UTC).Format("01-02") == "02-29"
+	return time.Date(int(year), time.February, 29, 0, 0, 0, 0, time.UTC).Format("01-02") == "02-29"
 }
 
 func (w *lintTimeDate) daysInMonth(year int64, month time.Month) int64 {
