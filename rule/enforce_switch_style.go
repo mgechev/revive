@@ -118,7 +118,10 @@ func (*EnforceSwitchStyleRule) seekDefaultCase(body *ast.BlockStmt) (defaultClau
 
 func (*EnforceSwitchStyleRule) allBranchesEndWithJumpStmt(body *ast.BlockStmt) bool {
 	for _, stmt := range body.List {
-		caseClause := stmt.(*ast.CaseClause) // safe to assume stmt is a case clause
+		caseClause, ok := stmt.(*ast.CaseClause)
+		if !ok {
+			continue
+		}
 
 		caseBody := caseClause.Body
 		if caseBody == nil {

@@ -3,7 +3,6 @@ package rule
 import (
 	"fmt"
 	"go/ast"
-	"reflect"
 
 	"github.com/mgechev/revive/lint"
 )
@@ -156,7 +155,22 @@ func (r *FunctionLength) countFuncLitStmts(stmt ast.Expr) int {
 	return 0
 }
 
-func (r *FunctionLength) countBodyListStmts(t any) int {
-	i := reflect.ValueOf(t).Elem().FieldByName(`Body`).Elem().FieldByName(`List`).Interface()
-	return r.countStmts(i.([]ast.Stmt))
+// countBodyListStmts counts the statements in the body of the given statement.
+func (r *FunctionLength) countBodyListStmts(stmt ast.Stmt) int {
+	switch stmt := stmt.(type) {
+	case *ast.IfStmt:
+		return r.countStmts(stmt.Body.List)
+	case *ast.ForStmt:
+		return r.countStmts(stmt.Body.List)
+	case *ast.RangeStmt:
+		return r.countStmts(stmt.Body.List)
+	case *ast.SwitchStmt:
+		return r.countStmts(stmt.Body.List)
+	case *ast.TypeSwitchStmt:
+		return r.countStmts(stmt.Body.List)
+	case *ast.SelectStmt:
+		return r.countStmts(stmt.Body.List)
+	default:
+		return 0
+	}
 }
