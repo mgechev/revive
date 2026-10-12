@@ -104,7 +104,7 @@ func (*FunctionLength) parseArguments(arguments lint.Arguments) (maxStmt, maxLin
 		return 0, 0, fmt.Errorf(`invalid configuration value for max lines in "function-length" rule; need int64 but got %T`, arguments[1])
 	}
 	if maxLines < 0 {
-		return 0, 0, fmt.Errorf(`the configuration value for max statements in "function-length" rule cannot be negative, got %d`, maxLines)
+		return 0, 0, fmt.Errorf(`the configuration value for max lines in "function-length" rule cannot be negative, got %d`, maxLines)
 	}
 
 	return maxStmt, maxLines, nil
