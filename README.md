@@ -723,7 +723,7 @@ func (f myRule) Name() string {
 	return "myRule"
 }
 
-func (f myRule) Apply(*lint.File, lint.Arguments) []lint.Failure {
+func (f myRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	// ...
 }
 ```

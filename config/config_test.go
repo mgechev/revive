@@ -1,6 +1,7 @@
 package config_test
 
 import (
+	"maps"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -890,11 +891,7 @@ func TestDefault(t *testing.T) {
 		t.Errorf("Severity: expected %v, got %v", lint.SeverityWarning, cfg.Severity)
 	}
 
-	var names []string
-	for name := range cfg.Rules {
-		names = append(names, name)
-	}
-	slices.Sort(names)
+	names := slices.Sorted(maps.Keys(cfg.Rules))
 	if want := ruleNames(config.DefaultRules()); !slices.Equal(names, want) {
 		t.Errorf("Default config rules: expected %v, got %v", want, names)
 	}

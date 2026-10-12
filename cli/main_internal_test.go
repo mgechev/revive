@@ -10,9 +10,9 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	os.Unsetenv("HOME")
-	os.Unsetenv("USERPROFILE")
-	os.Unsetenv("XDG_CONFIG_HOME")
+	_ = os.Unsetenv("HOME")
+	_ = os.Unsetenv("USERPROFILE")
+	_ = os.Unsetenv("XDG_CONFIG_HOME")
 	AppFs = afero.NewMemMapFs()
 	m.Run()
 }

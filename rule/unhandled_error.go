@@ -57,7 +57,7 @@ func (r *UnhandledErrorRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 		},
 	}
 
-	file.Pkg.TypeCheck()
+	file.Pkg.TypeCheck() //nolint:errcheck,gosec // G104: Errors unhandled
 	ast.Walk(walker, file.AST)
 
 	return failures
