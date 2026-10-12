@@ -88,8 +88,6 @@ func (*RedundantBuildTagRule) Name() string {
 	return "redundant-build-tag"
 }
 
-// buildConstraintComments returns the comments that may hold build constraints, i.e. those preceding
-// the package clause.
 func buildConstraintComments(file *lint.File) []*ast.Comment {
 	var comments []*ast.Comment
 	for _, group := range file.AST.Comments {
