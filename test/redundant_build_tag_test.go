@@ -34,6 +34,7 @@ func TestRedundantBuildTagRuleGo121(t *testing.T) {
 func TestRedundantBuildTagRuleFileName(t *testing.T) {
 	for _, fixture := range []string{
 		"redundant_build_tag_windows",
+		"redundant_build_tag_windows_test",
 		"redundant_build_tag_tab_windows",
 		"redundant_build_tag_linux_amd64",
 		"redundant_build_tag_or_linux",
