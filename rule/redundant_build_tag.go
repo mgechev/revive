@@ -25,57 +25,55 @@ type RedundantBuildTagRule struct{}
 //
 // See https://pkg.go.dev/cmd/go#hdr-Build_constraints
 func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+	comments := buildConstraintComments(file)
+
+	// The `// +build` tag is reported first: when a file carries both tags it is the only actionable finding,
+	// since dropping a `//go:build` line that `// +build` still backs up just makes gofmt add it again.
+	if comment, ok := redundantPlusBuildTag(comments); ok {
+		return []lint.Failure{{
+			Category:   lint.FailureCategoryStyle,
+			Confidence: 1,
+			Node:       comment,
+			Failure:    fmt.Sprintf("The build tag %q is redundant since Go 1.17 and can be removed", plusBuildPrefix),
+		}}
+	}
+
 	fileName := filepath.Base(file.Name)
 	fileNameTags := buildTagsFromFileName(fileName)
 	// goVersion is the module's language version, e.g. "go1.21".
 	goVersion := version.Lang("go" + file.Pkg.GoVersion().String())
 	// Starting with Go 1.21 the go version in go.mod is a hard requirement, so a `//go:build go1.X` constraint
 	// it already satisfies is redundant. Skip this check for Go 1.20 and earlier.
-	checkGoVersion := file.Pkg.IsAtLeastGoVersion(lint.Go121)
+	goVersionSatisfied := func(tag string) bool {
+		return file.Pkg.IsAtLeastGoVersion(lint.Go121) && version.IsValid(tag) && version.Compare(goVersion, tag) >= 0
+	}
 
-	for _, group := range file.AST.Comments {
-		if group.End() > file.AST.Package {
-			break // build constraints must appear before the package clause
+	for _, comment := range comments {
+		if !constraint.IsGoBuild(comment.Text) {
+			continue
 		}
 
-		// The `// +build` tag is reported first: when a file carries both tags it is the only actionable finding,
-		// since dropping a `//go:build` line that `// +build` still backs up just makes gofmt add it again.
-		if comment, ok := redundantPlusBuildTag(group); ok {
+		expr, err := constraint.Parse(comment.Text)
+		if err != nil {
+			continue // not a well-formed build constraint, nothing to say about it
+		}
+
+		if tag, ok := expr.(*constraint.TagExpr); ok && goVersionSatisfied(tag.Tag) {
 			return []lint.Failure{{
 				Category:   lint.FailureCategoryStyle,
 				Confidence: 1,
 				Node:       comment,
-				Failure:    fmt.Sprintf("The build tag %q is redundant since Go 1.17 and can be removed", plusBuildPrefix),
+				Failure:    fmt.Sprintf("The build tag %q is redundant for Go %s and can be removed", comment.Text, strings.TrimPrefix(goVersion, "go")),
 			}}
 		}
 
-		for _, comment := range group.List {
-			if !constraint.IsGoBuild(comment.Text) {
-				continue
-			}
-
-			expr, err := constraint.Parse(comment.Text)
-			if err != nil {
-				continue // not a well-formed build constraint, nothing to say about it
-			}
-
-			if checkGoVersion && satisfiedGoVersionTag(expr, goVersion) {
-				return []lint.Failure{{
-					Category:   lint.FailureCategoryStyle,
-					Confidence: 1,
-					Node:       comment,
-					Failure:    fmt.Sprintf("The build tag %q is redundant for Go %s and can be removed", comment.Text, strings.TrimPrefix(goVersion, "go")),
-				}}
-			}
-
-			if msg, ok := redundantFileNameConstraint(expr, comment.Text, fileName, fileNameTags); ok {
-				return []lint.Failure{{
-					Category:   lint.FailureCategoryStyle,
-					Confidence: 1,
-					Node:       comment,
-					Failure:    msg,
-				}}
-			}
+		if msg, ok := redundantFileNameConstraint(expr, comment.Text, fileName, fileNameTags, goVersionSatisfied); ok {
+			return []lint.Failure{{
+				Category:   lint.FailureCategoryStyle,
+				Confidence: 1,
+				Node:       comment,
+				Failure:    msg,
+			}}
 		}
 	}
 
@@ -92,22 +90,30 @@ const (
 	plusBuildPrefix = "// +build"
 )
 
-// satisfiedGoVersionTag reports whether expr is a lone `go1.X` version tag that goVersion already satisfies.
-func satisfiedGoVersionTag(expr constraint.Expr, goVersion string) bool {
-	tag, ok := expr.(*constraint.TagExpr)
+// buildConstraintComments returns the comments that may hold build constraints, i.e. those preceding
+// the package clause.
+func buildConstraintComments(file *lint.File) []*ast.Comment {
+	var comments []*ast.Comment
+	for _, group := range file.AST.Comments {
+		if group.End() > file.AST.Package {
+			break
+		}
 
-	return ok && version.IsValid(tag.Tag) && version.Compare(goVersion, tag.Tag) >= 0
+		comments = append(comments, group.List...)
+	}
+
+	return comments
 }
 
-// redundantPlusBuildTag returns the `// +build` comment of the group when it follows a `//go:build` one,
-// which makes it redundant since Go 1.17.
-func redundantPlusBuildTag(group *ast.CommentGroup) (*ast.Comment, bool) {
+// redundantPlusBuildTag returns the `// +build` comment of a file when it follows a `//go:build` one,
+// which makes it redundant since Go 1.17. The two tags need not share a comment group.
+func redundantPlusBuildTag(comments []*ast.Comment) (*ast.Comment, bool) {
 	hasGoBuild := false
-	for _, comment := range group.List {
+	for _, comment := range comments {
 		switch {
 		case constraint.IsGoBuild(comment.Text):
 			hasGoBuild = true
-		case hasGoBuild && constraint.IsPlusBuild(comment.Text):
+		case hasGoBuild && strings.HasPrefix(comment.Text, plusBuildPrefix):
 			return comment, true
 		}
 	}
@@ -117,35 +123,46 @@ func redundantPlusBuildTag(group *ast.CommentGroup) (*ast.Comment, bool) {
 
 // redundantFileNameConstraint reports whether the `//go:build` line is wholly or partly implied by the GOOS/GOARCH
 // suffix of the file name, together with the message describing the finding.
-func redundantFileNameConstraint(expr constraint.Expr, line, fileName string, fileNameTags []string) (string, bool) {
+func redundantFileNameConstraint(expr constraint.Expr, line, fileName string, fileNameTags []string, goVersionSatisfied func(tag string) bool) (string, bool) {
 	if len(fileNameTags) == 0 {
 		return "", false
 	}
 
-	switch simplified, value := simplifyConstraint(expr, fileNameTags); {
+	simplified, value := simplifyConstraint(expr, func(tag string) bool { return slices.Contains(fileNameTags, tag) })
+	switch {
 	case simplified == nil && value:
 		return fmt.Sprintf("The build tag %q is implied by the file name %q and can be removed", line, fileName), true
-	case simplified == nil && !value:
+	case simplified == nil:
 		return fmt.Sprintf("The build tag %q contradicts the file name %q, so the file is never built", line, fileName), true
-	case simplified != expr:
-		return fmt.Sprintf("The build tag %q is partly implied by the file name %q and can be reduced to %q", line, fileName, goBuildPrefix+" "+simplified.String()), true
+	case simplified == expr:
+		return "", false // the file name implies nothing about this constraint
 	}
 
-	return "", false
+	// `go1.X` tags that the go directive in go.mod already guarantees are dropped from what is left, since
+	// suggesting a replacement that the version check in Apply reports in turn would take two rounds to fix.
+	reduced, reducedValue := simplifyConstraint(simplified, goVersionSatisfied)
+	switch {
+	case reduced == nil && reducedValue:
+		return fmt.Sprintf("The build tag %q is implied by the file name %q and the go directive in go.mod, so it can be removed", line, fileName), true
+	case reduced == nil:
+		return fmt.Sprintf("The build tag %q contradicts the go directive in go.mod, so the file is never built", line), true
+	}
+
+	return fmt.Sprintf("The build tag %q is partly implied by the file name %q and can be reduced to %q", line, fileName, goBuildPrefix+" "+reduced.String()), true
 }
 
-// simplifyConstraint partially evaluates expr using the tags that the file name guarantees to be satisfied.
+// simplifyConstraint partially evaluates expr, treating every tag that satisfied accepts as true.
 // It returns a nil expression when expr is fully determined, in which case value is its result;
 // otherwise it returns the simplified expression, which is expr itself when no simplification is possible.
-func simplifyConstraint(expr constraint.Expr, tags []string) (simplified constraint.Expr, value bool) {
+func simplifyConstraint(expr constraint.Expr, satisfied func(tag string) bool) (simplified constraint.Expr, value bool) {
 	switch e := expr.(type) {
 	case *constraint.TagExpr:
-		if slices.Contains(tags, e.Tag) {
+		if satisfied(e.Tag) {
 			return nil, true
 		}
 
 	case *constraint.NotExpr:
-		x, xValue := simplifyConstraint(e.X, tags)
+		x, xValue := simplifyConstraint(e.X, satisfied)
 		switch {
 		case x == nil:
 			return nil, !xValue
@@ -154,8 +171,8 @@ func simplifyConstraint(expr constraint.Expr, tags []string) (simplified constra
 		}
 
 	case *constraint.AndExpr:
-		x, xValue := simplifyConstraint(e.X, tags)
-		y, yValue := simplifyConstraint(e.Y, tags)
+		x, xValue := simplifyConstraint(e.X, satisfied)
+		y, yValue := simplifyConstraint(e.Y, satisfied)
 		switch {
 		case x == nil && !xValue, y == nil && !yValue:
 			return nil, false
@@ -170,8 +187,8 @@ func simplifyConstraint(expr constraint.Expr, tags []string) (simplified constra
 		}
 
 	case *constraint.OrExpr:
-		x, xValue := simplifyConstraint(e.X, tags)
-		y, yValue := simplifyConstraint(e.Y, tags)
+		x, xValue := simplifyConstraint(e.X, satisfied)
+		y, yValue := simplifyConstraint(e.Y, satisfied)
 		switch {
 		case x == nil && xValue, y == nil && yValue:
 			return nil, true

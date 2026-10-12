@@ -80,6 +80,10 @@ The `Arguments` type is an alias of the type `[]any`. The arguments of the rule 
 Every `lint.Failure` reported by a rule must set `Category` to one of the `lint.FailureCategory*` constants defined in
 [`lint/failure.go`](/lint/failure.go). Failures without a category are rejected by the test harness.
 
+Keep the failure messages of existing rules stable: do not reword one unless the change is necessary, for example because
+the message became wrong after a behavior change. Users grep for these strings, match them in `// MATCH` test fixtures,
+and baseline them in CI, so a cosmetic rewording breaks setups without making anything better.
+
 ### Example
 
 Let's suppose we have developed a rule called `BanStructNameRule` which disallow us to name a structure with a given identifier.
