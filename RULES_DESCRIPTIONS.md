@@ -2075,6 +2075,8 @@ _Description_: This rule warns about redundant [build tag comments](https://pkg.
 It detects unnecessary `// +build` comments when `//go:build` is present.
 `gofmt` in Go 1.17+ automatically adds the `//go:build` constraint, making the `// +build` comment unnecessary.
 Also, the rule spots redundant build tags `//go:build go1.X` when the package's Go language version is greater than or equal to `go1.X`.
+Finally, it spots `//go:build` constraints that are already implied by the `GOOS`/`GOARCH` suffix of the file name,
+e.g. `//go:build windows` in a file named `example_windows.go`.
 
 ### Examples (redundant-build-tag)
 
@@ -2112,6 +2114,25 @@ After (fixed):
 ```go
 package example
 ```
+
+Redundant build tag implied by the file name, in `example_windows.go`:
+
+Before (violation):
+
+```go
+//go:build windows
+
+package example
+```
+
+After (fixed):
+
+```go
+package example
+```
+
+A build tag only partly implied by the file name is reported as well, and so is one that contradicts it
+(e.g. `//go:build linux` in `example_windows.go`), since such a file is never built.
 
 _Configuration_: N/A
 

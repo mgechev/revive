@@ -2,7 +2,10 @@ package rule
 
 import (
 	"fmt"
+	"go/build/constraint"
 	"go/version"
+	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/mgechev/revive/lint"
@@ -11,15 +14,24 @@ import (
 // RedundantBuildTagRule lints the presence of redundant build tags.
 type RedundantBuildTagRule struct{}
 
-// Apply triggers on two kinds of redundant build tags:
+// Apply triggers on three kinds of redundant build tags:
 //   - an old `// +build` tag found after a new `//go:build` tag, since `//go:build`
 //     comments are automatically added by gofmt when Go 1.17+ is used;
 //   - a `//go:build go1.X` version constraint that is already guaranteed by the
-//     go version in go.mod (Go 1.21+, where the go directive is a hard requirement).
+//     go version in go.mod (Go 1.21+, where the go directive is a hard requirement);
+//   - a `//go:build` constraint that is already implied by the GOOS/GOARCH suffix of
+//     the file name, e.g. `//go:build windows` in a file named `example_windows.go`.
 //
 // See https://pkg.go.dev/cmd/go#hdr-Build_constraints
 func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
+	fileName := filepath.Base(file.Name)
+	fileNameTags := buildTagsFromFileName(fileName)
+
 	for _, group := range file.AST.Comments {
+		if group.End() > file.AST.Package {
+			break // build constraints must appear before the package clause
+		}
+
 		hasGoBuild := false
 		for _, comment := range group.List {
 			if ver, ok := strings.CutPrefix(comment.Text, "//go:build "); ok {
@@ -36,6 +48,15 @@ func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 						Confidence: 1,
 						Node:       comment,
 						Failure:    fmt.Sprintf("The build tag %q is redundant for Go %s and can be removed", comment.Text, strings.TrimPrefix(goVersion, "go")),
+					}}
+				}
+
+				if msg, ok := redundantFileNameConstraint(comment.Text, fileName, fileNameTags); ok {
+					return []lint.Failure{{
+						Category:   lint.FailureCategoryStyle,
+						Confidence: 1,
+						Node:       comment,
+						Failure:    msg,
 					}}
 				}
 
@@ -61,3 +82,173 @@ func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 func (*RedundantBuildTagRule) Name() string {
 	return "redundant-build-tag"
 }
+
+// redundantFileNameConstraint reports whether the `//go:build` line is wholly or
+// partly implied by the GOOS/GOARCH suffix of the file name, together with the
+// message describing the finding.
+func redundantFileNameConstraint(line, fileName string, fileNameTags map[string]bool) (string, bool) {
+	if len(fileNameTags) == 0 {
+		return "", false
+	}
+
+	expr, err := constraint.Parse(line)
+	if err != nil {
+		return "", false // not a well-formed build constraint, nothing to say about it
+	}
+
+	switch simplified, value := simplifyConstraint(expr, fileNameTags); {
+	case simplified == nil && value:
+		return fmt.Sprintf("The build tag %q is implied by the file name %q and can be removed", line, fileName), true
+	case simplified == nil && !value:
+		return fmt.Sprintf("The build tag %q contradicts the file name %q, so the file is never built", line, fileName), true
+	case simplified != expr:
+		return fmt.Sprintf("The build tag %q is partly implied by the file name %q and can be reduced to %q", line, fileName, "//go:build "+simplified.String()), true
+	}
+
+	return "", false
+}
+
+// simplifyConstraint partially evaluates expr using the tags whose truth value is
+// fixed by the file name. It returns a nil expression when expr is fully determined,
+// in which case value is its result; otherwise it returns the simplified expression,
+// which is expr itself when no simplification is possible.
+func simplifyConstraint(expr constraint.Expr, tags map[string]bool) (simplified constraint.Expr, value bool) {
+	switch e := expr.(type) {
+	case *constraint.TagExpr:
+		if value, ok := tags[e.Tag]; ok {
+			return nil, value
+		}
+
+	case *constraint.NotExpr:
+		x, xValue := simplifyConstraint(e.X, tags)
+		switch {
+		case x == nil:
+			return nil, !xValue
+		case x != e.X:
+			return &constraint.NotExpr{X: x}, false
+		}
+
+	case *constraint.AndExpr:
+		x, xValue := simplifyConstraint(e.X, tags)
+		y, yValue := simplifyConstraint(e.Y, tags)
+		switch {
+		case x == nil && !xValue, y == nil && !yValue:
+			return nil, false
+		case x == nil && y == nil:
+			return nil, true
+		case x == nil:
+			return y, false
+		case y == nil:
+			return x, false
+		case x != e.X || y != e.Y:
+			return &constraint.AndExpr{X: x, Y: y}, false
+		}
+
+	case *constraint.OrExpr:
+		x, xValue := simplifyConstraint(e.X, tags)
+		y, yValue := simplifyConstraint(e.Y, tags)
+		switch {
+		case x == nil && xValue, y == nil && yValue:
+			return nil, true
+		case x == nil && y == nil:
+			return nil, false
+		case x == nil:
+			return y, false
+		case y == nil:
+			return x, false
+		case x != e.X || y != e.Y:
+			return &constraint.OrExpr{X: x, Y: y}, false
+		}
+	}
+
+	return expr, false
+}
+
+// buildTagsFromFileName returns the build tags whose truth value is fixed by the
+// GOOS/GOARCH suffix of fileName, e.g. "example_linux.go" fixes "linux" and "unix"
+// to true and every other GOOS to false. It returns nil when the file name
+// constrains nothing. Tags that remain undecided are absent from the result.
+//
+// The file name rules mirror goodOSArchFile in go/build.
+func buildTagsFromFileName(fileName string) map[string]bool {
+	name, _, _ := strings.Cut(fileName, ".")
+
+	i := strings.Index(name, "_")
+	if i < 0 {
+		return nil // everything before the first "_" is the file's own name, so "linux.go" constrains nothing
+	}
+
+	// Keep the leading "_" so that parts[0] holds the file's own name and is never a GOOS/GOARCH.
+	parts := strings.Split(name[i:], "_")
+	if n := len(parts); parts[n-1] == "test" {
+		parts = parts[:n-1]
+	}
+
+	var goos, goarch string
+	last := parts[len(parts)-1]
+	switch n := len(parts); {
+	case n >= 2 && knownGOOS[parts[n-2]] && knownGOARCH[last]:
+		goos, goarch = parts[n-2], last
+	case knownGOOS[last]:
+		goos = last
+	case knownGOARCH[last]:
+		goarch = last
+	default:
+		return nil
+	}
+
+	tags := map[string]bool{}
+	if goos != "" {
+		for os := range knownGOOS {
+			switch {
+			case os == goos || slices.Contains(impliedGOOS[goos], os):
+				tags[os] = true
+			case slices.Contains(impliedGOOS[os], goos):
+				// goos is a superset of os, e.g. a file named "*_linux.go" is also
+				// built for GOOS=android, so the "android" tag stays undecided.
+			default:
+				tags[os] = false
+			}
+		}
+		tags["unix"] = unixGOOS[goos]
+	}
+	if goarch != "" {
+		for arch := range knownGOARCH {
+			tags[arch] = arch == goarch
+		}
+	}
+
+	return tags
+}
+
+// impliedGOOS maps a GOOS value to the other GOOS build tags it also satisfies.
+var impliedGOOS = map[string][]string{
+	"android": {"linux"},
+	"ios":     {"darwin"},
+}
+
+// knownGOOS, knownGOARCH and unixGOOS mirror the tables of the standard library's
+// internal/syslist package. Values are only ever added to them, never removed,
+// because the go tool keeps matching them in file names.
+var (
+	knownGOOS = map[string]bool{
+		"aix": true, "android": true, "darwin": true, "dragonfly": true, "freebsd": true,
+		"hurd": true, "illumos": true, "ios": true, "js": true, "linux": true, "nacl": true,
+		"netbsd": true, "openbsd": true, "plan9": true, "solaris": true, "wasip1": true,
+		"windows": true, "zos": true,
+	}
+
+	knownGOARCH = map[string]bool{
+		"386": true, "amd64": true, "amd64p32": true, "arm": true, "armbe": true,
+		"arm64": true, "arm64be": true, "loong64": true, "mips": true, "mipsle": true,
+		"mips64": true, "mips64le": true, "mips64p32": true, "mips64p32le": true,
+		"ppc": true, "ppc64": true, "ppc64le": true, "riscv": true, "riscv64": true,
+		"s390": true, "s390x": true, "sparc": true, "sparc64": true, "wasm": true,
+	}
+
+	unixGOOS = map[string]bool{
+		"aix": true, "android": true, "darwin": true, "dragonfly": true, "freebsd": true,
+		"hurd": true, "illumos": true, "ios": true, "linux": true, "netbsd": true,
+		"openbsd": true, "solaris": true,
+	}
+)
