@@ -116,7 +116,7 @@ func (*RedundantBuildTagRule) Name() string {
 
 // redundantFileNameConstraint reports whether the `//go:build` line is wholly or partly implied by the GOOS/GOARCH
 // suffix of the file name, together with the message describing the finding.
-func redundantFileNameConstraint(line, fileName string, fileNameTags map[string]bool) (string, bool) {
+func redundantFileNameConstraint(line, fileName string, fileNameTags []string) (string, bool) {
 	if len(fileNameTags) == 0 {
 		return "", false
 	}
@@ -138,14 +138,14 @@ func redundantFileNameConstraint(line, fileName string, fileNameTags map[string]
 	return "", false
 }
 
-// simplifyConstraint partially evaluates expr using the tags whose truth value is fixed by the file name.
+// simplifyConstraint partially evaluates expr using the tags that the file name guarantees to be satisfied.
 // It returns a nil expression when expr is fully determined, in which case value is its result;
 // otherwise it returns the simplified expression, which is expr itself when no simplification is possible.
-func simplifyConstraint(expr constraint.Expr, tags map[string]bool) (simplified constraint.Expr, value bool) {
+func simplifyConstraint(expr constraint.Expr, tags []string) (simplified constraint.Expr, value bool) {
 	switch e := expr.(type) {
 	case *constraint.TagExpr:
-		if value, ok := tags[e.Tag]; ok {
-			return nil, value
+		if slices.Contains(tags, e.Tag) {
+			return nil, true
 		}
 
 	case *constraint.NotExpr:
@@ -193,12 +193,16 @@ func simplifyConstraint(expr constraint.Expr, tags map[string]bool) (simplified 
 	return expr, false
 }
 
-// buildTagsFromFileName returns the build tags whose truth value is fixed by the GOOS/GOARCH suffix of fileName,
-// e.g. "example_linux.go" fixes "linux" and "unix" to true and every other GOOS to false.
-// It returns nil when the file name constrains nothing. Tags that remain undecided are absent from the result.
+// buildTagsFromFileName returns the build tags that the GOOS/GOARCH suffix of fileName guarantees to be satisfied,
+// e.g. "example_linux_amd64.go" guarantees "linux" and "amd64". It returns nil when the file name constrains nothing.
+//
+// Only the suffix tags themselves are guaranteed: goodOSArchFile matches them with the same matcher as any other
+// build tag, so e.g. `-tags=linux` builds "example_linux.go" for every GOOS. Nothing can therefore be concluded
+// about the "unix" tag, about a GOOS implying another one (`GOOS=android` satisfies "linux"), or about the
+// remaining GOOS/GOARCH tags being unsatisfied.
 //
 // Mirrors goodOSArchFile: https://go.googlesource.com/go/+/refs/tags/go1.26.0/src/go/build/build.go#1995
-func buildTagsFromFileName(fileName string) map[string]bool {
+func buildTagsFromFileName(fileName string) []string {
 	name, _, _ := strings.Cut(fileName, ".")
 
 	i := strings.Index(name, "_")
@@ -212,49 +216,15 @@ func buildTagsFromFileName(fileName string) map[string]bool {
 		parts = parts[:n-1]
 	}
 
-	var goos, goarch string
 	last := parts[len(parts)-1]
 	switch n := len(parts); {
 	case n >= 2 && knownOS[parts[n-2]] && knownArch[last]:
-		goos, goarch = parts[n-2], last
-	case knownOS[last]:
-		goos = last
-	case knownArch[last]:
-		goarch = last
-	default:
-		return nil
+		return []string{parts[n-2], last}
+	case knownOS[last], knownArch[last]:
+		return []string{last}
 	}
 
-	tags := map[string]bool{}
-	if goos != "" {
-		for os := range knownOS {
-			switch {
-			case os == goos || slices.Contains(impliedOS[goos], os):
-				tags[os] = true
-			case slices.Contains(impliedOS[os], goos):
-				// goos is a superset of os, e.g. a file named "*_linux.go" is also built for GOOS=android, so the
-				// "android" tag stays undecided.
-			default:
-				tags[os] = false
-			}
-		}
-		tags["unix"] = unixGOOS[goos]
-	}
-	if goarch != "" {
-		for arch := range knownArch {
-			tags[arch] = arch == goarch
-		}
-	}
-
-	return tags
-}
-
-// impliedOS maps a GOOS value to the other GOOS build tags it also satisfies.
-// Mirrors https://go.googlesource.com/go/+/refs/tags/go1.26.0/src/go/build/build.go#1959
-var impliedOS = map[string][]string{
-	"android": {"linux"},
-	"illumos": {"solaris"},
-	"ios":     {"darwin"},
+	return nil
 }
 
 var (
@@ -308,22 +278,5 @@ var (
 		"sparc":       true,
 		"sparc64":     true,
 		"wasm":        true,
-	}
-
-	// unixGOOS is the set of GOOS values matched by the "unix" build tag.
-	// Mirrors https://go.googlesource.com/go/+/refs/tags/go1.26.0/src/internal/syslist/syslist.go#41
-	unixGOOS = map[string]bool{
-		"aix":       true,
-		"android":   true,
-		"darwin":    true,
-		"dragonfly": true,
-		"freebsd":   true,
-		"hurd":      true,
-		"illumos":   true,
-		"ios":       true,
-		"linux":     true,
-		"netbsd":    true,
-		"openbsd":   true,
-		"solaris":   true,
 	}
 )

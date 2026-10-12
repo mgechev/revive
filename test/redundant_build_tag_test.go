@@ -35,16 +35,17 @@ func TestRedundantBuildTagRuleFileName(t *testing.T) {
 	for _, fixture := range []string{
 		"redundant_build_tag_windows",
 		"redundant_build_tag_tab_windows",
-		"redundant_build_tag_unix_linux",
 		"redundant_build_tag_linux_amd64",
 		"redundant_build_tag_or_linux",
 		"redundant_build_tag_partly_darwin",
+		"redundant_build_tag_negated_windows",
 		"redundant_build_tag_contradict_windows",
+		"redundant_build_tag_old_linux",
 		"redundant_build_tag_no_failure_linux",
 		"redundant_build_tag_no_failure_amd64",
-		"redundant_build_tag_old_linux",
-		"redundant_build_tag_implied_illumos",
-		"redundant_build_tag_no_failure_solaris",
+		"redundant_build_tag_no_failure_unix_linux",
+		"redundant_build_tag_no_failure_implied_illumos",
+		"redundant_build_tag_no_failure_other_goos_windows",
 	} {
 		t.Run(fixture, func(t *testing.T) {
 			testRule(t, fixture, &rule.RedundantBuildTagRule{}, &lint.RuleConfig{})

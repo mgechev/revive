@@ -2131,8 +2131,14 @@ After (fixed):
 package example
 ```
 
-A build tag only partly implied by the file name is reported as well, and so is one that contradicts it
-(e.g. `//go:build linux` in `example_windows.go`), since such a file is never built.
+A build tag only partly implied by the file name is reported as well (e.g. `//go:build windows && cgo` reduces
+to `//go:build cgo`), and so is one that contradicts it (e.g. `//go:build !windows` in `example_windows.go`),
+since such a file is never built.
+
+Only the `GOOS`/`GOARCH` tags of the file name suffix itself are taken as satisfied: Go matches them like any other
+build tag, so `-tags=windows` builds `example_windows.go` for every `GOOS`. Nothing is therefore concluded about
+the `unix` tag, about implied `GOOS` values (`GOOS=android` satisfies `linux`), or about the remaining
+`GOOS`/`GOARCH` tags being unsatisfied.
 
 _Configuration_: N/A
 
