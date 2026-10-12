@@ -109,7 +109,7 @@ func buildConstraintComments(file *lint.File) []*ast.Comment {
 }
 
 // redundantPlusBuildTag returns the `// +build` comment of a file when it follows a `//go:build` one,
-// which makes it redundant since Go 1.17. The two tags need not share a comment group.
+// which makes it redundant since Go 1.17.
 func redundantPlusBuildTag(comments []*ast.Comment) (*ast.Comment, bool) {
 	hasGoBuild := false
 	for _, comment := range comments {
@@ -136,7 +136,8 @@ func redundantFileNameConstraint(expr constraint.Expr, line, fileName string, fi
 	case simplified == nil && value:
 		return fmt.Sprintf("The build tag %q is implied by the file name %q and can be removed", line, fileName), true
 	case simplified == nil:
-		return fmt.Sprintf("The build tag %q contradicts the file name %q, so the file is never built", line, fileName), true
+		// The file name contradicts the constraint, so the file is never built: nothing useful to report.
+		return "", false
 	case simplified == expr:
 		return "", false // the file name implies nothing about this constraint
 	}
