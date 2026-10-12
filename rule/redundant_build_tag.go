@@ -27,6 +27,11 @@ type RedundantBuildTagRule struct{}
 func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	fileName := filepath.Base(file.Name)
 	fileNameTags := buildTagsFromFileName(fileName)
+	// goVersion is the module's language version, e.g. "go1.21".
+	goVersion := version.Lang("go" + file.Pkg.GoVersion().String())
+	// Starting with Go 1.21 the go version in go.mod is a hard requirement, so a `//go:build go1.X` constraint
+	// it already satisfies is redundant. Skip this check for Go 1.20 and earlier.
+	checkGoVersion := file.Pkg.IsAtLeastGoVersion(lint.Go121)
 
 	for _, group := range file.AST.Comments {
 		if group.End() > file.AST.Package {
@@ -45,16 +50,16 @@ func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 		}
 
 		for _, comment := range group.List {
-			expr, ok := goBuildExpr(comment.Text)
-			if !ok {
+			if !constraint.IsGoBuild(comment.Text) {
 				continue
 			}
 
-			// goVersion is the module's language version, e.g. "go1.21".
-			goVersion := version.Lang("go" + file.Pkg.GoVersion().String())
-			// Starting with Go 1.21 the go version in go.mod is a hard requirement, so a `//go:build go1.X` constraint
-			// it already satisfies is redundant. Skip this check for Go 1.20 and earlier.
-			if file.Pkg.IsAtLeastGoVersion(lint.Go121) && version.IsValid(expr) && version.Compare(goVersion, expr) >= 0 {
+			expr, err := constraint.Parse(comment.Text)
+			if err != nil {
+				continue // not a well-formed build constraint, nothing to say about it
+			}
+
+			if checkGoVersion && satisfiedGoVersionTag(expr, goVersion) {
 				return []lint.Failure{{
 					Category:   lint.FailureCategoryStyle,
 					Confidence: 1,
@@ -63,7 +68,7 @@ func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 				}}
 			}
 
-			if msg, ok := redundantFileNameConstraint(comment.Text, fileName, fileNameTags); ok {
+			if msg, ok := redundantFileNameConstraint(expr, comment.Text, fileName, fileNameTags); ok {
 				return []lint.Failure{{
 					Category:   lint.FailureCategoryStyle,
 					Confidence: 1,
@@ -77,20 +82,21 @@ func (*RedundantBuildTagRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 	return []lint.Failure{}
 }
 
+// Name returns the rule name.
+func (*RedundantBuildTagRule) Name() string {
+	return "redundant-build-tag"
+}
+
 const (
 	goBuildPrefix   = "//go:build"
 	plusBuildPrefix = "// +build"
 )
 
-// goBuildExpr returns the build expression of a `//go:build` comment line, e.g. "windows && amd64" for
-// `//go:build windows && amd64`.
-// The directive may be separated from the expression by any whitespace, so the prefix cannot be cut directly.
-func goBuildExpr(line string) (string, bool) {
-	if !constraint.IsGoBuild(line) {
-		return "", false
-	}
+// satisfiedGoVersionTag reports whether expr is a lone `go1.X` version tag that goVersion already satisfies.
+func satisfiedGoVersionTag(expr constraint.Expr, goVersion string) bool {
+	tag, ok := expr.(*constraint.TagExpr)
 
-	return strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(line), goBuildPrefix)), true
+	return ok && version.IsValid(tag.Tag) && version.Compare(goVersion, tag.Tag) >= 0
 }
 
 // redundantPlusBuildTag returns the `// +build` comment of the group when it follows a `//go:build` one,
@@ -109,21 +115,11 @@ func redundantPlusBuildTag(group *ast.CommentGroup) (*ast.Comment, bool) {
 	return nil, false
 }
 
-// Name returns the rule name.
-func (*RedundantBuildTagRule) Name() string {
-	return "redundant-build-tag"
-}
-
 // redundantFileNameConstraint reports whether the `//go:build` line is wholly or partly implied by the GOOS/GOARCH
 // suffix of the file name, together with the message describing the finding.
-func redundantFileNameConstraint(line, fileName string, fileNameTags []string) (string, bool) {
+func redundantFileNameConstraint(expr constraint.Expr, line, fileName string, fileNameTags []string) (string, bool) {
 	if len(fileNameTags) == 0 {
 		return "", false
-	}
-
-	expr, err := constraint.Parse(line)
-	if err != nil {
-		return "", false // not a well-formed build constraint, nothing to say about it
 	}
 
 	switch simplified, value := simplifyConstraint(expr, fileNameTags); {
@@ -210,7 +206,7 @@ func buildTagsFromFileName(fileName string) []string {
 		return nil // everything before the first "_" is the file's own name, so "linux.go" constrains nothing
 	}
 
-	// Keep the leading "_" so that parts[0] holds the file's own name and is never a GOOS/GOARCH.
+	// Keep the leading "_" so that parts[0] is the empty string and can never be a GOOS/GOARCH.
 	parts := strings.Split(name[i:], "_")
 	if n := len(parts); parts[n-1] == "test" {
 		parts = parts[:n-1]
