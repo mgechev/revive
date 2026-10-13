@@ -25,7 +25,6 @@ func TestRedundantBuildTagRuleGo121(t *testing.T) {
 		"go1.21/redundant_build_tag_go120",
 		"go1.21/redundant_build_tag_go122",
 		"go1.21/redundant_build_tag_version_linux",
-		"go1.21/redundant_build_tag_contradict_version_linux",
 	} {
 		t.Run(fixture, func(t *testing.T) {
 			testRule(t, fixture, &rule.RedundantBuildTagRule{}, &lint.RuleConfig{})

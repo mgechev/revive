@@ -125,24 +125,26 @@ func redundantFileNameConstraint(expr constraint.Expr, line, fileName string, fi
 	}
 
 	simplified, value := simplifyConstraint(expr, func(tag string) bool { return slices.Contains(fileNameTags, tag) })
-	switch {
-	case simplified == nil && value:
-		return fmt.Sprintf("The build tag %q is implied by the file name %q and can be removed", line, fileName), true
-	case simplified == nil:
-		// The file name contradicts the constraint, so the file is never built: nothing useful to report.
-		return "", false
-	case simplified == expr:
+	if simplified == expr {
 		return "", false // the file name implies nothing about this constraint
+	}
+	if simplified == nil {
+		if !value {
+			// The file name contradicts the constraint, so the file is never built.
+			return "", false
+		}
+		return fmt.Sprintf("The build tag %q is implied by the file name %q and can be removed", line, fileName), true
 	}
 
 	// `go1.X` tags that the go directive in go.mod already guarantees are dropped from what is left, since
 	// suggesting a replacement that the version check in Apply reports in turn would take two rounds to fix.
 	reduced, reducedValue := simplifyConstraint(simplified, goVersionSatisfied)
-	switch {
-	case reduced == nil && reducedValue:
+	if reduced == nil {
+		if !reducedValue {
+			// The go directive in go.mod contradicts what is left of the constraint, so the file is never built.
+			return "", false
+		}
 		return fmt.Sprintf("The build tag %q is implied by the file name %q and the go directive in go.mod, so it can be removed", line, fileName), true
-	case reduced == nil:
-		return fmt.Sprintf("The build tag %q contradicts the go directive in go.mod, so the file is never built", line), true
 	}
 
 	return fmt.Sprintf("The build tag %q is partly implied by the file name %q and can be reduced to %q", line, fileName, "//go:build "+reduced.String()), true
