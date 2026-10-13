@@ -2131,10 +2131,9 @@ After (fixed):
 package example
 ```
 
-A build tag only partly implied by the file name is reported as well (e.g. `//go:build windows && cgo` reduces to `//go:build cgo`),
-and so is one that contradicts it (e.g. `//go:build !windows` in `example_windows.go`), since such a file is never built.
+A build tag only partly implied by the file name is reported as well (e.g. `//go:build windows && cgo` reduces to `//go:build cgo`).
 
-Build tag contradicting the `go` directive in `go.mod`, in `example.go` of a module requiring Go 1.23 or later:
+Build tag contradicting the `go` directive in `go.mod`, in `example_go122.go` of a module requiring Go 1.23 or later:
 
 Before (violation):
 
@@ -2146,9 +2145,7 @@ package example
 
 After (fixed):
 
-```go
-package example
-```
+The file `example_go122.go` removed.
 
 Only the `GOOS`/`GOARCH` tags of the file name suffix itself are taken as satisfied: Go matches them like any other
 build tag, so `-tags=windows` builds `example_windows.go` for every `GOOS`. Nothing is therefore concluded about
