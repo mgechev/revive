@@ -11,7 +11,8 @@ It parses Go source via `go/ast` (+ `go/types` for typed rules), runs a configur
 
 Top-level packages:
 
-- `cli/` — command-line entry point (`main.go` defers to `cli.RunRevive`).
+- `cli/` — command-line entry point (`main.go` defers to `cli.RunRevive`),
+  plus the end-to-end CLI tests (`e2e_test.go`, `package cli_test`) and their fixtures in `cli/testdata/`.
 - `lint/` — core linter engine, rule interfaces (`Rule`, `ConfigurableRule`), `File`, `Failure`, `Severity`, and the in-memory `Config` types.
 - `rule/` — one file per rule (100+ rules). Untyped rules also listed in `untyped.toml`.
 - `formatter/` — output formatters (default, json, sarif, stylish, friendly, …).
@@ -53,6 +54,26 @@ Run a single rule's tests:
 ```sh
 go test -run TestUnusedParam ./test/...
 ```
+
+Run the end-to-end CLI tests:
+
+```sh
+go test -run TestRevive ./cli/
+```
+
+These run revive as a subprocess, so they cover what unit tests cannot: exit codes, flag parsing, and output on stdout/stderr.
+
+- The test binary re-executes *itself* as revive: with `REVIVE_E2E_RUN_REVIVE=1` set it calls `RunRevive()` instead of running tests.
+  There is no separate `go build` step, and the CLI code stays in coverage.
+- The file is `package cli_test` and owns the only `TestMain` in the directory. A test binary allows exactly one, so an internal
+  test file in `cli/` must not declare another.
+- Fixtures live in `cli/testdata/` (`clean.go` has no failures, `bad.go` has two) and the subprocess runs in that directory.
+  `HOME`, `USERPROFILE` and `XDG_CONFIG_HOME` point at temp dirs, so a local `revive.toml` cannot change the result, and a
+  case can write its own config there with the `homeConfig` and `xdgConfig` fields to cover default config discovery.
+- The `version` case only checks that `-version` prints a version line. The release-build format (`Version:`, `Commit:`,
+  `Built`) comes from build information that ldflags set. A test binary has none of it, and the subprocess does not fake it,
+  so nothing covers that format or `getVersion()`.
+- To cover another flag, exit code, or config error, add a case to the table in `TestRevive` instead of a new test function.
 
 Logging during local runs: set `REVIVE_LOG_LEVEL` (`debug|info|warn|error`) — logs go to stderr. See [DEVELOPING.md](DEVELOPING.md#logging).
 
