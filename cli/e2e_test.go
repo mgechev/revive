@@ -13,11 +13,8 @@ import (
 	"github.com/mgechev/revive/cli"
 )
 
-const runReviveEnv = "REVIVE_E2E_RUN_REVIVE"
-
-// TestMain makes the test binary behave like the revive binary when re-executed by runRevive.
 func TestMain(m *testing.M) {
-	if os.Getenv(runReviveEnv) == "1" {
+	if os.Getenv("REVIVE_E2E_RUN_REVIVE") == "1" {
 		cli.RunRevive()
 		return
 	}
@@ -25,19 +22,12 @@ func TestMain(m *testing.M) {
 	m.Run()
 }
 
-type result struct {
-	exitCode int
-	stdout   string
-	stderr   string
-}
-
-// runRevive runs revive in the testdata directory with args and an isolated environment.
-func runRevive(t *testing.T, homeConfig, xdgConfig string, args ...string) result {
+func runRevive(t *testing.T, homeConfig, xdgConfig string, args ...string) (exitCode int, stdout, stderr string) {
 	t.Helper()
 
 	self, err := os.Executable()
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("getting executable: %v", err)
 	}
 
 	cmd := exec.CommandContext(t.Context(), self, args...)
@@ -45,21 +35,19 @@ func runRevive(t *testing.T, homeConfig, xdgConfig string, args ...string) resul
 	home, xdg := t.TempDir(), t.TempDir()
 	writeConfig(t, home, homeConfig)
 	writeConfig(t, xdg, xdgConfig)
-	cmd.Env = []string{runReviveEnv + "=1", "HOME=" + home, "USERPROFILE=" + home, "XDG_CONFIG_HOME=" + xdg}
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
+	cmd.Env = []string{"REVIVE_E2E_RUN_REVIVE=1", "HOME=" + home, "USERPROFILE=" + home, "XDG_CONFIG_HOME=" + xdg}
+	var stdoutBuf, stderrBuf bytes.Buffer
+	cmd.Stdout = &stdoutBuf
+	cmd.Stderr = &stderrBuf
 
 	err = cmd.Run()
-	res := result{stdout: stdout.String(), stderr: stderr.String()}
 	if exitErr, ok := errors.AsType[*exec.ExitError](err); ok {
-		res.exitCode = exitErr.ExitCode()
-		return res
+		return exitErr.ExitCode(), stdoutBuf.String(), stderrBuf.String()
 	}
 	if err != nil {
 		t.Fatalf("running revive: %v", err)
 	}
-	return res
+	return 0, stdoutBuf.String(), stderrBuf.String()
 }
 
 func writeConfig(t *testing.T, dir, content string) {
@@ -74,18 +62,6 @@ func writeConfig(t *testing.T, dir, content string) {
 }
 
 func TestRevive(t *testing.T) {
-	// Both enable only the exported rule but set a different exit code,
-	// so a run without -config shows which of the two files revive picked up.
-	const (
-		xdgConfig = `error-code = 5
-		[rule.exported]
-severity = "error"
-`
-		homeConfig = `warning-code = 3
-[rule.exported]
-`
-	)
-
 	tests := []struct {
 		name         string
 		args         []string
@@ -125,23 +101,29 @@ severity = "error"
 			wantStdout: []string{"exported function Bad should have comment or be unexported"},
 		},
 		{
-			name:         "config from $XDG_CONFIG_HOME",
-			xdgConfig:    xdgConfig,
+			name: "config from $XDG_CONFIG_HOME",
+			xdgConfig: `error-code = 5
+		[rule.exported]
+severity = "error"`,
 			args:         []string{"bad.go"},
 			wantExitCode: 5,
 			wantStdout:   []string{"exported function Bad should have comment or be unexported"},
 		},
 		{
-			name:         "config from $HOME",
-			homeConfig:   homeConfig,
+			name: "config from $HOME",
+			homeConfig: `warning-code = 3
+[rule.exported]`,
 			args:         []string{"bad.go"},
 			wantExitCode: 3,
 			wantStdout:   []string{"exported function Bad should have comment or be unexported"},
 		},
 		{
-			name:         "config from $XDG_CONFIG_HOME wins over the one from $HOME",
-			homeConfig:   homeConfig,
-			xdgConfig:    xdgConfig,
+			name: "config from $XDG_CONFIG_HOME wins over the one from $HOME",
+			homeConfig: `warning-code = 3
+[rule.exported]`,
+			xdgConfig: `error-code = 5
+		[rule.exported]
+severity = "error"`,
 			args:         []string{"bad.go"},
 			wantExitCode: 5,
 			wantStdout:   []string{"exported function Bad should have comment or be unexported"},
@@ -208,7 +190,7 @@ severity = "error"
 		{
 			name:       "json formatter",
 			args:       []string{"-formatter", "json", "bad.go"},
-			wantStdout: []string{`"RuleName":"exported"`},
+			wantStdout: []string{`"RuleName":"exported","Category":"comments"`},
 		},
 		{
 			name:         "missing config file",
@@ -238,22 +220,22 @@ severity = "error"
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := runRevive(t, tt.homeConfig, tt.xdgConfig, tt.args...)
+			gotExitCode, gotStdout, gotStderr := runRevive(t, tt.homeConfig, tt.xdgConfig, tt.args...)
 
-			if got.exitCode != tt.wantExitCode {
-				t.Errorf("exit code = %d, want %d\nstdout: %s\nstderr: %s", got.exitCode, tt.wantExitCode, got.stdout, got.stderr)
+			if gotExitCode != tt.wantExitCode {
+				t.Errorf("exit code = %d, want %d\nstdout: %s\nstderr: %s", gotExitCode, tt.wantExitCode, gotStdout, gotStderr)
 			}
-			if len(tt.wantStdout) == 0 && got.stdout != "" {
-				t.Errorf("stdout = %q, want empty", got.stdout)
+			if len(tt.wantStdout) == 0 && gotStdout != "" {
+				t.Errorf("stdout = %q, want empty", gotStdout)
 			}
 			for _, w := range tt.wantStdout {
-				if !strings.Contains(got.stdout, w) {
-					t.Errorf("stdout = %q, want it to contain %q", got.stdout, w)
+				if !strings.Contains(gotStdout, w) {
+					t.Errorf("stdout = %q, want it to contain %q", gotStdout, w)
 				}
 			}
 			for _, w := range tt.wantStderr {
-				if !strings.Contains(got.stderr, w) {
-					t.Errorf("stderr = %q, want it to contain %q", got.stderr, w)
+				if !strings.Contains(gotStderr, w) {
+					t.Errorf("stderr = %q, want it to contain %q", gotStderr, w)
 				}
 			}
 		})

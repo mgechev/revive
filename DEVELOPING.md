@@ -35,27 +35,18 @@ The tests come in two kinds:
   They call the linter as a library and compare the reported failures with the `// MATCH` comments in the fixtures.
   Run a single rule with `go test -run TestUnusedParam ./test/...`.
 - **End-to-end tests** in [`cli/e2e_test.go`](./cli/e2e_test.go) (`package cli_test`), run with `go test -run TestRevive ./cli/`.
-  They execute revive as a separate process and assert on its exit code and on its output on stdout and stderr, which covers
-  the behavior a library call cannot: flag parsing, `-set_exit_status`, the `warning-code` and `error-code` config settings,
-  `-exclude`, and config file errors.
+  They execute revive as a separate process and assert on its exit code and on its output on stdout and stderr,
+  which covers the behavior a library call cannot:
+  flag parsing, `-set_exit_status`, the `warning-code` and `error-code` config settings, `-exclude`, and config file errors.
 
-The end-to-end tests do not build a binary. The test binary re-executes itself with `REVIVE_E2E_RUN_REVIVE=1` set, and its
-`TestMain` sees that variable and calls `RunRevive()` instead of running any test, so coverage still counts the CLI code.
-That is the only `TestMain` in the directory, and a test binary allows exactly one, so a test file in `package cli` must not
-declare another.
+The end-to-end tests do not build a binary. The test binary re-executes itself with `REVIVE_E2E_RUN_REVIVE=1` set,
+and its `TestMain` sees that variable and calls `RunRevive()` instead of running any test, so coverage still counts the CLI code.
 
 Fixtures for these tests are in [`cli/testdata/`](./cli/testdata): `clean.go` reports nothing, `bad.go` reports two failures,
 and each `.toml` file sets up one configuration under test. The subprocess runs in that directory with `HOME`, `USERPROFILE`,
 and `XDG_CONFIG_HOME` pointed at temporary directories, so a `revive.toml` in your home directory cannot affect the outcome.
 A case that needs one writes it there itself through the `homeConfig` and `xdgConfig` fields. That is how these tests cover
 the default config discovery: `$XDG_CONFIG_HOME/revive.toml` first, then `$HOME/revive.toml`, then the built-in defaults.
-
-The `version` case checks only that `-version` prints a version line. The release-build format, with its `Version:`,
-`Commit:` and `Built` lines, depends on build information that ldflags inject (`version`, `commit`, `date`, `builtBy`).
-A test binary has none of it, and faking it in the subprocess would test the fake rather than the binary users run, so
-nothing covers that format or `getVersion()` itself.
-
-When covering a new flag or exit code, add a case to the table in `TestRevive` rather than writing a new test function.
 
 ## Logging
 
