@@ -137,10 +137,14 @@ type lintLineLengthNum struct {
 }
 
 func (r lintLineLengthNum) check() {
-	f := bytes.NewReader(r.file.Content())
+	content := r.file.Content()
+	f := bytes.NewReader(content)
 	spaces := strings.Repeat(" ", 4) // tab width = 4
 	l := 1
 	s := bufio.NewScanner(f)
+	// The scanner's default 64 KiB token limit would silently stop at the
+	// first longer line; a file cannot contain a line longer than its content.
+	s.Buffer(make([]byte, 0, 64*1024), len(content)+1)
 	for s.Scan() {
 		t := s.Text()
 		if r.isExcluded(t) {
