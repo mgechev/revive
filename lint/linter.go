@@ -1,7 +1,6 @@
 package lint
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"go/token"
@@ -64,6 +63,7 @@ func (l *Linter) readFile(path string) (result []byte, err error) {
 var (
 	generatedPrefix  = []byte("// Code generated ")
 	generatedSuffix  = []byte(" DO NOT EDIT.")
+	packageKeyword   = []byte("package")
 	defaultGoVersion = goversion.Must(goversion.NewVersion("1.0"))
 )
 
@@ -214,11 +214,13 @@ func retrieveModFile(dir string) (string, error) {
 
 // isGenerated reports whether the source file is generated code
 // according to the rules from https://go.dev/s/generatedcode.
-// This is inherited from the original go lint.
+// The header must appear before the package clause, so scanning stops there.
 func isGenerated(src []byte) bool {
-	sc := bufio.NewScanner(bytes.NewReader(src))
-	for sc.Scan() {
-		b := sc.Bytes()
+	for line := range bytes.Lines(src) {
+		b := bytes.TrimSuffix(bytes.TrimSuffix(line, []byte{'\n'}), []byte{'\r'})
+		if bytes.HasPrefix(b, packageKeyword) {
+			return false
+		}
 		if bytes.HasPrefix(b, generatedPrefix) && bytes.HasSuffix(b, generatedSuffix) && len(b) >= len(generatedPrefix)+len(generatedSuffix) {
 			return true
 		}
