@@ -21,6 +21,33 @@ make build
 
 The command will produce the `revive` binary in the root of the project.
 
+## Test
+
+Run the whole suite with:
+
+```bash
+make test
+```
+
+The tests come in two kinds:
+
+- **Rule tests** in [`test/`](./test), one `_test.go` per rule, driven by the Go source fixtures in [`testdata/`](./testdata).
+  They call the linter as a library and compare the reported failures with the `// MATCH` comments in the fixtures.
+  Run a single rule with `go test -run TestUnusedParam ./test/...`.
+- **End-to-end tests** in [`cli/e2e_test.go`](./cli/e2e_test.go) (`package cli_test`), run with `go test -run TestRevive ./cli/`.
+  They execute revive as a separate process and assert on its exit code and on its output on stdout and stderr,
+  which covers the behavior a library call cannot:
+  flag parsing, `-set_exit_status`, the `warning-code` and `error-code` config settings, `-exclude`, and config file errors.
+
+The end-to-end tests do not build a binary. The test binary re-executes itself with `REVIVE_E2E_RUN_REVIVE=1` set,
+and its `TestMain` sees that variable and calls `RunRevive()` instead of running any test, so coverage still counts the CLI code.
+
+Fixtures for these tests are in [`cli/testdata/`](./cli/testdata): `clean.go` reports nothing, `bad.go` reports two failures,
+and each `.toml` file sets up one configuration under test. The subprocess runs in that directory with `HOME`, `USERPROFILE`,
+and `XDG_CONFIG_HOME` pointed at temporary directories, so a `revive.toml` in your home directory cannot affect the outcome.
+A case that needs one writes it there itself through the `homeConfig` and `xdgConfig` fields. That is how these tests cover
+the default config discovery: `$XDG_CONFIG_HOME/revive.toml` first, then `$HOME/revive.toml`, then the built-in defaults.
+
 ## Logging
 
 By default, any logging output is disabled when `REVIVE_LOG_LEVEL` is unset or empty.
