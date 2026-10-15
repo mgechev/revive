@@ -1,9 +1,8 @@
 package lint
 
 import (
+	"bytes"
 	"fmt"
-	"go/ast"
-	"go/parser"
 	"go/token"
 	"log/slog"
 	"os"
@@ -61,7 +60,12 @@ func (l *Linter) readFile(path string) (result []byte, err error) {
 	return l.reader(path)
 }
 
-var defaultGoVersion = goversion.Must(goversion.NewVersion("1.0"))
+var (
+	generatedPrefix  = []byte("// Code generated ")
+	generatedSuffix  = []byte(" DO NOT EDIT.")
+	packageKeyword   = []byte("package")
+	defaultGoVersion = goversion.Must(goversion.NewVersion("1.0"))
+)
 
 // Lint lints a set of files with the specified rule.
 func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-chan Failure, error) {
@@ -143,7 +147,7 @@ func (l *Linter) lintPackage(filenames []string, gover *goversion.Version, ruleS
 		if err != nil {
 			return err
 		}
-		if !config.IgnoreGeneratedHeader && isGenerated(filename, content) {
+		if !config.IgnoreGeneratedHeader && isGenerated(content) {
 			continue
 		}
 
@@ -210,10 +214,18 @@ func retrieveModFile(dir string) (string, error) {
 
 // isGenerated reports whether the source file is generated code
 // according to the rules from https://go.dev/s/generatedcode.
-// Only the part up to the package clause is parsed, as that is where the header must be.
-func isGenerated(filename string, src []byte) bool {
-	f, err := parser.ParseFile(token.NewFileSet(), filename, src, parser.PackageClauseOnly|parser.ParseComments)
-	return err == nil && ast.IsGenerated(f)
+// The header must appear before the package clause, so scanning stops there.
+func isGenerated(src []byte) bool {
+	for line := range bytes.Lines(src) {
+		b := bytes.TrimSuffix(bytes.TrimSuffix(line, []byte{'\n'}), []byte{'\r'})
+		if bytes.HasPrefix(b, packageKeyword) {
+			return false
+		}
+		if bytes.HasPrefix(b, generatedPrefix) && bytes.HasSuffix(b, generatedSuffix) && len(b) >= len(generatedPrefix)+len(generatedSuffix) {
+			return true
+		}
+	}
+	return false
 }
 
 // addInvalidFileFailure adds a failure for an invalid formatted file.
