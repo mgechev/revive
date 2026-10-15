@@ -32,8 +32,6 @@ type result struct {
 }
 
 // runRevive runs revive in the testdata directory with args and an isolated environment.
-// It writes homeConfig and xdgConfig, when not empty, as the revive.toml that revive picks up
-// from $HOME and from $XDG_CONFIG_HOME when no -config flag is given.
 func runRevive(t *testing.T, homeConfig, xdgConfig string, args ...string) result {
 	t.Helper()
 
@@ -44,8 +42,6 @@ func runRevive(t *testing.T, homeConfig, xdgConfig string, args ...string) resul
 
 	cmd := exec.CommandContext(t.Context(), self, args...)
 	cmd.Dir = "testdata"
-	// Point HOME and XDG_CONFIG_HOME at temp directories, so that the user's config cannot
-	// affect the result and a case can supply its own.
 	home, xdg := t.TempDir(), t.TempDir()
 	writeConfig(t, home, homeConfig)
 	writeConfig(t, xdg, xdgConfig)
@@ -78,11 +74,16 @@ func writeConfig(t *testing.T, dir, content string) {
 }
 
 func TestRevive(t *testing.T) {
-	// Both enable only the exported rule but set a different exit code, so a run without
-	// -config shows which of the two files revive picked up.
+	// Both enable only the exported rule but set a different exit code,
+	// so a run without -config shows which of the two files revive picked up.
 	const (
-		xdgConfig  = "error-code = 5\n[rule.exported]\nseverity = \"error\"\n"
-		homeConfig = "warning-code = 3\n[rule.exported]\n"
+		xdgConfig = `error-code = 5
+		[rule.exported]
+severity = "error"
+`
+		homeConfig = `warning-code = 3
+[rule.exported]
+`
 	)
 
 	tests := []struct {
