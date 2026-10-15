@@ -1,7 +1,6 @@
 package lint
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"go/token"
@@ -216,9 +215,8 @@ func retrieveModFile(dir string) (string, error) {
 // according to the rules from https://go.dev/s/generatedcode.
 // This is inherited from the original go lint.
 func isGenerated(src []byte) bool {
-	sc := bufio.NewScanner(bytes.NewReader(src))
-	for sc.Scan() {
-		b := sc.Bytes()
+	for line := range bytes.Lines(src) {
+		b := bytes.TrimSuffix(bytes.TrimSuffix(line, []byte{'\n'}), []byte{'\r'})
 		if bytes.HasPrefix(b, generatedPrefix) && bytes.HasSuffix(b, generatedSuffix) && len(b) >= len(generatedPrefix)+len(generatedSuffix) {
 			return true
 		}
