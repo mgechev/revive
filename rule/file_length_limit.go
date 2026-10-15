@@ -1,7 +1,6 @@
 package rule
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"go/ast"
@@ -36,16 +35,11 @@ func (r *FileLengthLimitRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 
 	all := 0
 	blank := 0
-	scanner := bufio.NewScanner(bytes.NewReader(file.Content()))
-	for scanner.Scan() {
+	for line := range bytes.Lines(file.Content()) {
 		all++
-		if len(bytes.TrimSpace(scanner.Bytes())) == 0 {
+		if len(bytes.TrimSpace(line)) == 0 {
 			blank++
 		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		return newInternalFailureError(err)
 	}
 
 	lines := all
