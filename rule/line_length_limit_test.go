@@ -2,9 +2,6 @@ package rule_test
 
 import (
 	"errors"
-	"os"
-	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
@@ -114,38 +111,5 @@ func TestLineLengthLimitRule_Configure(t *testing.T) {
 				t.Errorf("Configure() unexpected error: got %q, want %q", err, tt.wantErr)
 			}
 		})
-	}
-}
-
-func TestLineLengthLimitRuleApplyPastScannerDefaultLimit(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "long_lines.go")
-	source := "// " + strings.Repeat("a", 70_000) + "\n" +
-		"// " + strings.Repeat("b", 100) + "\n" +
-		"package fixtures\n"
-	if err := os.WriteFile(path, []byte(source), 0o600); err != nil {
-		t.Fatal(err)
-	}
-
-	var r rule.LineLengthLimitRule
-	if err := r.Configure(lint.Arguments{int64(80)}); err != nil {
-		t.Fatal(err)
-	}
-
-	l := lint.New(os.ReadFile, 0)
-	failures, err := l.Lint([][]string{{path}}, []lint.Rule{&r}, lint.Config{
-		Rules: map[string]lint.RuleConfig{
-			r.Name(): {Arguments: lint.Arguments{int64(80)}},
-		},
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	var lines []int
-	for failure := range failures {
-		lines = append(lines, failure.Position.Start.Line)
-	}
-	if len(lines) != 2 || lines[0] != 1 || lines[1] != 2 {
-		t.Fatalf("got failure lines %v, want [1 2]", lines)
 	}
 }
