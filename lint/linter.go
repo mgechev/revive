@@ -3,6 +3,7 @@ package lint
 import (
 	"fmt"
 	"go/ast"
+	"go/parser"
 	"go/token"
 	"log/slog"
 	"os"
@@ -142,12 +143,13 @@ func (l *Linter) lintPackage(filenames []string, gover *goversion.Version, ruleS
 		if err != nil {
 			return err
 		}
+		if !config.IgnoreGeneratedHeader && isGenerated(filename, content) {
+			continue
+		}
+
 		file, err := NewFile(filename, content, pkg)
 		if err != nil {
 			addInvalidFileFailure(filename, err.Error(), failures)
-			continue
-		}
-		if !config.IgnoreGeneratedHeader && ast.IsGenerated(file.AST) {
 			continue
 		}
 		file.logger = l.logger
@@ -204,6 +206,14 @@ func retrieveModFile(dir string) (string, error) {
 
 		return lookingForFilePath, nil
 	}
+}
+
+// isGenerated reports whether the source file is generated code
+// according to the rules from https://go.dev/s/generatedcode.
+// Only the part up to the package clause is parsed, as that is where the header must be.
+func isGenerated(filename string, src []byte) bool {
+	f, err := parser.ParseFile(token.NewFileSet(), filename, src, parser.PackageClauseOnly|parser.ParseComments)
+	return err == nil && ast.IsGenerated(f)
 }
 
 // addInvalidFileFailure adds a failure for an invalid formatted file.
