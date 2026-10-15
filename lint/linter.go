@@ -1,8 +1,8 @@
 package lint
 
 import (
-	"bytes"
 	"fmt"
+	"go/ast"
 	"go/token"
 	"log/slog"
 	"os"
@@ -60,11 +60,7 @@ func (l *Linter) readFile(path string) (result []byte, err error) {
 	return l.reader(path)
 }
 
-var (
-	generatedPrefix  = []byte("// Code generated ")
-	generatedSuffix  = []byte(" DO NOT EDIT.")
-	defaultGoVersion = goversion.Must(goversion.NewVersion("1.0"))
-)
+var defaultGoVersion = goversion.Must(goversion.NewVersion("1.0"))
 
 // Lint lints a set of files with the specified rule.
 func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-chan Failure, error) {
@@ -146,13 +142,12 @@ func (l *Linter) lintPackage(filenames []string, gover *goversion.Version, ruleS
 		if err != nil {
 			return err
 		}
-		if !config.IgnoreGeneratedHeader && isGenerated(content) {
-			continue
-		}
-
 		file, err := NewFile(filename, content, pkg)
 		if err != nil {
 			addInvalidFileFailure(filename, err.Error(), failures)
+			continue
+		}
+		if !config.IgnoreGeneratedHeader && ast.IsGenerated(file.AST) {
 			continue
 		}
 		file.logger = l.logger
@@ -209,19 +204,6 @@ func retrieveModFile(dir string) (string, error) {
 
 		return lookingForFilePath, nil
 	}
-}
-
-// isGenerated reports whether the source file is generated code
-// according to the rules from https://go.dev/s/generatedcode.
-// This is inherited from the original go lint.
-func isGenerated(src []byte) bool {
-	for line := range bytes.Lines(src) {
-		b := bytes.TrimSuffix(bytes.TrimSuffix(line, []byte{'\n'}), []byte{'\r'})
-		if bytes.HasPrefix(b, generatedPrefix) && bytes.HasSuffix(b, generatedSuffix) && len(b) >= len(generatedPrefix)+len(generatedSuffix) {
-			return true
-		}
-	}
-	return false
 }
 
 // addInvalidFileFailure adds a failure for an invalid formatted file.
