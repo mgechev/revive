@@ -47,3 +47,9 @@ func TestFileLengthLimitConfigureResetsPreviousOptions(t *testing.T) {
 		Arguments: lint.Arguments{map[string]any{"max": int64(9)}},
 	})
 }
+
+func TestFileLengthLimitLongLine(t *testing.T) {
+	testRule(t, "file_length_limit_long_line", &rule.FileLengthLimitRule{}, &lint.RuleConfig{
+		Arguments: lint.Arguments{map[string]any{"max": int64(4)}},
+	})
+}
