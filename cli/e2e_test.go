@@ -22,7 +22,13 @@ func TestMain(m *testing.M) {
 	m.Run()
 }
 
-func runRevive(t *testing.T, homeConfig, xdgConfig string, args ...string) (exitCode int, stdout, stderr string) {
+type reviveResult struct {
+	exitCode int
+	stdout   string
+	stderr   string
+}
+
+func runRevive(t *testing.T, homeConfig, xdgConfig string, args ...string) reviveResult {
 	t.Helper()
 
 	self, err := os.Executable()
@@ -42,12 +48,19 @@ func runRevive(t *testing.T, homeConfig, xdgConfig string, args ...string) (exit
 
 	err = cmd.Run()
 	if exitErr, ok := errors.AsType[*exec.ExitError](err); ok {
-		return exitErr.ExitCode(), stdoutBuf.String(), stderrBuf.String()
+		return reviveResult{
+			exitCode: exitErr.ExitCode(),
+			stdout:   stdoutBuf.String(),
+			stderr:   stderrBuf.String(),
+		}
 	}
 	if err != nil {
 		t.Fatalf("running revive: %v", err)
 	}
-	return 0, stdoutBuf.String(), stderrBuf.String()
+	return reviveResult{
+		stdout: stdoutBuf.String(),
+		stderr: stderrBuf.String(),
+	}
 }
 
 func writeConfig(t *testing.T, dir, content string) {
@@ -220,22 +233,22 @@ severity = "error"`,
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotExitCode, gotStdout, gotStderr := runRevive(t, tt.homeConfig, tt.xdgConfig, tt.args...)
+			got := runRevive(t, tt.homeConfig, tt.xdgConfig, tt.args...)
 
-			if gotExitCode != tt.wantExitCode {
-				t.Errorf("exit code = %d, want %d\nstdout: %s\nstderr: %s", gotExitCode, tt.wantExitCode, gotStdout, gotStderr)
+			if got.exitCode != tt.wantExitCode {
+				t.Errorf("exit code = %d, want %d\nstdout: %s\nstderr: %s", got.exitCode, tt.wantExitCode, got.stdout, got.stderr)
 			}
-			if len(tt.wantStdout) == 0 && gotStdout != "" {
-				t.Errorf("stdout = %q, want empty", gotStdout)
+			if len(tt.wantStdout) == 0 && got.stdout != "" {
+				t.Errorf("stdout = %q, want empty", got.stdout)
 			}
 			for _, w := range tt.wantStdout {
-				if !strings.Contains(gotStdout, w) {
-					t.Errorf("stdout = %q, want it to contain %q", gotStdout, w)
+				if !strings.Contains(got.stdout, w) {
+					t.Errorf("stdout = %q, want it to contain %q", got.stdout, w)
 				}
 			}
 			for _, w := range tt.wantStderr {
-				if !strings.Contains(gotStderr, w) {
-					t.Errorf("stderr = %q, want it to contain %q", gotStderr, w)
+				if !strings.Contains(got.stderr, w) {
+					t.Errorf("stderr = %q, want it to contain %q", got.stderr, w)
 				}
 			}
 		})

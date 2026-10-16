@@ -149,7 +149,7 @@ func isKeyLookup(keyName string, blockStmt *ast.BlockStmt) bool {
 
 // rangeOverMapKey returns the range statement and its key identifier when stmt
 // ranges over the keys of a map, and nil otherwise.
-func (w *lintInefficientMapLookup) rangeOverMapKey(stmt ast.Stmt) (rangeStmt *ast.RangeStmt, key *ast.Ident) {
+func (w *lintInefficientMapLookup) rangeOverMapKey(stmt ast.Stmt) (*ast.RangeStmt, *ast.Ident) {
 	rangeStmt, ok := stmt.(*ast.RangeStmt)
 	if !ok {
 		return nil, nil // not a range
@@ -157,7 +157,7 @@ func (w *lintInefficientMapLookup) rangeOverMapKey(stmt ast.Stmt) (rangeStmt *as
 
 	// Check if we range on the key, and that the key is a plain identifier:
 	// an assigning range like "for s.field = range aMap" has a non-identifier key.
-	key, ok = rangeStmt.Key.(*ast.Ident)
+	key, ok := rangeStmt.Key.(*ast.Ident)
 	if !ok {
 		return nil, nil
 	}

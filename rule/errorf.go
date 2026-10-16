@@ -86,7 +86,7 @@ func (w lintErrorf) Visit(n ast.Node) ast.Visitor {
 	return w
 }
 
-func srcLineWithMatch(file *lint.File, node ast.Node, pattern string) (m []string) {
+func srcLineWithMatch(file *lint.File, node ast.Node, pattern string) []string {
 	line := srcLine(file.Content(), file.ToPosition(node.Pos()))
 	line = strings.TrimSuffix(line, "\n")
 	rx := regexp.MustCompile(pattern)

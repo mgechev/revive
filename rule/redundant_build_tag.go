@@ -153,7 +153,7 @@ func redundantFileNameConstraint(expr constraint.Expr, line, fileName string, fi
 // simplifyConstraint partially evaluates expr, treating every tag that satisfied accepts as true.
 // It returns a nil expression when expr is fully determined, in which case value is its result;
 // otherwise it returns the simplified expression, which is expr itself when no simplification is possible.
-func simplifyConstraint(expr constraint.Expr, satisfied func(tag string) bool) (simplified constraint.Expr, value bool) {
+func simplifyConstraint(expr constraint.Expr, satisfied func(tag string) bool) (constraint.Expr, bool) {
 	switch e := expr.(type) {
 	case *constraint.TagExpr:
 		if satisfied(e.Tag) {

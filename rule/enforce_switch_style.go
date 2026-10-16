@@ -63,7 +63,7 @@ func (r *EnforceSwitchStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint
 			return true // not a switch statement
 		}
 
-		defaultClause, isLast := r.seekDefaultCase(body)
+		defaultClause, isLast := r.findDefaultCase(body)
 		hasDefault := defaultClause != nil
 
 		if !hasDefault && r.allowNoDefault {
@@ -103,8 +103,10 @@ func (r *EnforceSwitchStyleRule) Apply(file *lint.File, _ lint.Arguments) []lint
 	return failures
 }
 
-func (*EnforceSwitchStyleRule) seekDefaultCase(body *ast.BlockStmt) (defaultClause *ast.CaseClause, isLast bool) {
+// findDefaultCase returns the default case clause and a boolean indicating if it is the last case in the switch body.
+func (*EnforceSwitchStyleRule) findDefaultCase(body *ast.BlockStmt) (*ast.CaseClause, bool) {
 	var last *ast.CaseClause
+	var defaultClause *ast.CaseClause
 	for _, stmt := range body.List {
 		cc, _ := stmt.(*ast.CaseClause) // no need to check for ok
 		last = cc

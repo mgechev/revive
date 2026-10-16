@@ -46,7 +46,7 @@ func (l *Linter) SetLogger(logger *slog.Logger) {
 	}
 }
 
-func (l *Linter) readFile(path string) (result []byte, err error) {
+func (l *Linter) readFile(path string) ([]byte, error) {
 	if l.fileReadTokens != nil {
 		// "take" a token by writing to the channel.
 		// It will block if no more space in the channel's buffer
@@ -167,7 +167,10 @@ func (l *Linter) lintPackage(filenames []string, gover *goversion.Version, ruleS
 	return pkg.lint(ruleSet, config, failures)
 }
 
-func detectGoMod(dir string) (rootDir string, ver *goversion.Version, err error) {
+// detectGoMod looks for the go.mod file in dir and its parent directories.
+// It returns the directory containing the go.mod file and the Go version declared in it.
+// It returns an error if no go.mod file is found, or if it can't be read, parsed or has no Go version.
+func detectGoMod(dir string) (string, *goversion.Version, error) {
 	modFileName, err := retrieveModFile(dir)
 	if err != nil {
 		return "", nil, fmt.Errorf("%q doesn't seem to be part of a Go module", dir)
@@ -187,7 +190,7 @@ func detectGoMod(dir string) (rootDir string, ver *goversion.Version, err error)
 		return "", nil, fmt.Errorf("%q does not specify a Go version", modFileName)
 	}
 
-	ver, err = goversion.NewVersion(modAst.Go.Version)
+	ver, err := goversion.NewVersion(modAst.Go.Version)
 	return filepath.Dir(modFileName), ver, err
 }
 

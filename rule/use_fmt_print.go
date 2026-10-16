@@ -86,7 +86,7 @@ func (lintUseFmtPrint) callArgsAsStr(args []ast.Expr) string {
 	return strings.Join(strs, ", ")
 }
 
-func (*UseFmtPrintRule) analyzeRedefinitions(decls []ast.Decl) (redefinesPrint, redefinesPrintln bool) {
+func (*UseFmtPrintRule) analyzeRedefinitions(decls []ast.Decl) (redefinesPrint, redefinesPrintln bool) { //nolint:nonamedreturns // names are used for clarity
 	for _, decl := range decls {
 		fnDecl, ok := decl.(*ast.FuncDecl)
 		if !ok {

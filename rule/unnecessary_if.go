@@ -76,9 +76,9 @@ func (w *lintUnnecessaryIf) Visit(node ast.Node) ast.Visitor {
 	var thenBool bool
 	switch thenStmt := thenStmts[0].(type) {
 	case *ast.ReturnStmt:
-		replacement, thenBool = w.replacementForReturnStmt(thenStmt, elseStmts)
+		replacement, thenBool = w.boolReturnReplacement(thenStmt, elseStmts)
 	case *ast.AssignStmt:
-		replacement, thenBool = w.replacementForAssignmentStmt(thenStmt, elseStmts)
+		replacement, thenBool = w.boolAssignmentReplacement(thenStmt, elseStmts)
 	default:
 		return w // the then branch is neither a return nor an assignment
 	}
@@ -132,13 +132,13 @@ func (*lintUnnecessaryIf) condAsString(cond ast.Expr, mustNegate bool) string {
 	return result
 }
 
-// replacementForAssignmentStmt returns a replacement statement != ""
+// boolAssignmentReplacement returns a replacement statement != ""
 // iff both then and else statements are of the form <idX> = <bool literal>
 // with the same assignment token and complementary Boolean literals.
 // If the replacement != "" then the second return value is the Boolean value
 // of <bool literal> in the then-side assignment, false otherwise.
-func (w *lintUnnecessaryIf) replacementForAssignmentStmt(thenStmt *ast.AssignStmt, elseStmts []ast.Stmt) (replacement string, thenBool bool) {
-	thenValue, ok := w.isSingleBooleanLiteral(thenStmt.Rhs)
+func (w *lintUnnecessaryIf) boolAssignmentReplacement(thenStmt *ast.AssignStmt, elseStmts []ast.Stmt) (string, bool) {
+	thenValue, ok := w.singleBooleanLiteral(thenStmt.Rhs)
 	if !ok {
 		return "", false
 	}
@@ -157,7 +157,7 @@ func (w *lintUnnecessaryIf) replacementForAssignmentStmt(thenStmt *ast.AssignStm
 		return "", false
 	}
 
-	elseValue, ok := w.isSingleBooleanLiteral(elseStmt.Rhs)
+	elseValue, ok := w.singleBooleanLiteral(elseStmt.Rhs)
 	if !ok || thenValue == elseValue {
 		return "", false // not a Boolean assignment or both branches assign the same value
 	}
@@ -165,13 +165,13 @@ func (w *lintUnnecessaryIf) replacementForAssignmentStmt(thenStmt *ast.AssignStm
 	return fmt.Sprintf("%s %s", thenLHS, thenStmt.Tok.String()), thenValue
 }
 
-// replacementForReturnStmt returns a replacement statement != ""
+// boolReturnReplacement returns a replacement statement != ""
 // iff both then and else statements are of the form return <bool literal>
 // and the returned literals are complementary.
 // If the replacement != "" then the second return value is the Boolean value
 // of <bool literal> in the then-side return, false otherwise.
-func (w *lintUnnecessaryIf) replacementForReturnStmt(thenStmt *ast.ReturnStmt, elseStmts []ast.Stmt) (replacement string, thenBool bool) {
-	thenValue, ok := w.isSingleBooleanLiteral(thenStmt.Results)
+func (w *lintUnnecessaryIf) boolReturnReplacement(thenStmt *ast.ReturnStmt, elseStmts []ast.Stmt) (string, bool) {
+	thenValue, ok := w.singleBooleanLiteral(thenStmt.Results)
 	if !ok {
 		return "", false
 	}
@@ -181,7 +181,7 @@ func (w *lintUnnecessaryIf) replacementForReturnStmt(thenStmt *ast.ReturnStmt, e
 		return "", false
 	}
 
-	elseValue, ok := w.isSingleBooleanLiteral(elseStmt.Results)
+	elseValue, ok := w.singleBooleanLiteral(elseStmt.Results)
 	if !ok || thenValue == elseValue {
 		return "", false // not a Boolean return or both branches return the same value
 	}
@@ -189,10 +189,10 @@ func (w *lintUnnecessaryIf) replacementForReturnStmt(thenStmt *ast.ReturnStmt, e
 	return "return", thenValue
 }
 
-// isSingleBooleanLiteral returns the value of <bool literal> and true
+// singleBooleanLiteral returns the value of <bool literal> and true
 // if the given list of expressions has exactly one element and that element is a bool literal (true or false),
 // otherwise it returns false and false.
-func (*lintUnnecessaryIf) isSingleBooleanLiteral(exprs []ast.Expr) (value, ok bool) {
+func (*lintUnnecessaryIf) singleBooleanLiteral(exprs []ast.Expr) (value, ok bool) { //nolint:nonamedreturns // names are used for clarity
 	if len(exprs) != 1 {
 		return false, false
 	}

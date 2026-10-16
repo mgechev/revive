@@ -51,6 +51,7 @@ linters:
     - nilnil
     - noctx
     - nolintlint
+    - nonamedreturns
     - nosprintfhostport
     - prealloc
     - predeclared

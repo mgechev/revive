@@ -90,10 +90,9 @@ var basicTypeKinds = map[types.BasicKind]string{
 	types.UntypedString:  "string",
 }
 
-// IsUntypedConst reports whether expr is an untyped constant,
-// and indicates what its default type is.
+// IsUntypedConst reports whether expr is an untyped constant, and indicates what its default type is.
 // Scope may be nil.
-func (f *File) IsUntypedConst(expr ast.Expr) (defType string, ok bool) {
+func (f *File) IsUntypedConst(expr ast.Expr) (string, bool) {
 	// Re-evaluate expr outside its context to see if it's untyped.
 	// (An expr evaluated within, for example, an assignment context will get the type of the LHS.)
 	exprStr := f.Render(expr)
