@@ -15,7 +15,7 @@ type UseFmtPrintRule struct{}
 
 // Apply applies the rule to given file.
 func (r *UseFmtPrintRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
-	redefinesPrint, redefinesPrintln := r.analyzeRedefinitions(file.AST.Decls)
+	redef := r.analyzeRedefinitions(file.AST.Decls)
 	// Here we could check if both are redefined and if it's the case return nil
 	// but the check being false 99.9999999% of the cases we don't
 
@@ -24,7 +24,7 @@ func (r *UseFmtPrintRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failur
 		failures = append(failures, failure)
 	}
 
-	w := lintUseFmtPrint{onFailure, redefinesPrint, redefinesPrintln}
+	w := lintUseFmtPrint{onFailure, redef.print, redef.println}
 	ast.Walk(w, file.AST)
 
 	return failures
@@ -86,7 +86,8 @@ func (lintUseFmtPrint) callArgsAsStr(args []ast.Expr) string {
 	return strings.Join(strs, ", ")
 }
 
-func (*UseFmtPrintRule) analyzeRedefinitions(decls []ast.Decl) (redefinesPrint, redefinesPrintln bool) {
+func (*UseFmtPrintRule) analyzeRedefinitions(decls []ast.Decl) struct{ print, println bool } {
+	r := struct{ print, println bool }{}
 	for _, decl := range decls {
 		fnDecl, ok := decl.(*ast.FuncDecl)
 		if !ok {
@@ -99,10 +100,10 @@ func (*UseFmtPrintRule) analyzeRedefinitions(decls []ast.Decl) (redefinesPrint, 
 
 		switch fnDecl.Name.Name {
 		case "print":
-			redefinesPrint = true
+			r.print = true
 		case "println":
-			redefinesPrintln = true
+			r.println = true
 		}
 	}
-	return redefinesPrint, redefinesPrintln
+	return r
 }

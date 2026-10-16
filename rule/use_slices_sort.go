@@ -45,8 +45,8 @@ func (w lintSort) Visit(n ast.Node) ast.Visitor {
 		return w // not a function call
 	}
 
-	isCallToSort, sortMethod, sliceMethod := findCallToSortReplacement(funcCall.Fun)
-	if !isCallToSort {
+	replacement, found := sortReplacement(funcCall.Fun)
+	if !found {
 		return w
 	}
 
@@ -54,41 +54,42 @@ func (w lintSort) Visit(n ast.Node) ast.Visitor {
 		Category:   lint.FailureCategoryMaintenance,
 		Node:       n,
 		Confidence: 1,
-		Failure:    fmt.Sprintf("replace sort.%s by slices.%s", sortMethod, sliceMethod),
+		Failure:    fmt.Sprintf("replace sort.%s by slices.%s", replacement.sortMethod, replacement.slicesMethod),
 	})
 
 	return nil
 }
 
-// findCallToSortReplacement returns true if the given function call is a call to a sort method that
+// sortReplacement returns true if the given function call is a call to a sort method that
 // can be replaced with a call to a slices package method, false otherwise.
 // Alongside with the boolean, the function returns the sort method name and the name of its
 // replacement method from the slices package.
-func findCallToSortReplacement(expr ast.Expr) (isCallToSort bool, sortMethod, slicesMethod string) {
+func sortReplacement(expr ast.Expr) (struct{ sortMethod, slicesMethod string }, bool) {
+	var result struct{ sortMethod, slicesMethod string }
 	sel, ok := expr.(*ast.SelectorExpr)
 	if !ok {
-		return false, "", ""
+		return struct{ sortMethod, slicesMethod string }{}, false
 	}
 
 	if !astutils.IsIdent(sel.X, "sort") {
-		return false, "", ""
+		return struct{ sortMethod, slicesMethod string }{}, false
 	}
 
-	sortMethod = sel.Sel.Name
-	switch sortMethod {
+	result.sortMethod = sel.Sel.Name
+	switch result.sortMethod {
 	case "Float64s", "Ints", "Strings":
-		slicesMethod = "Sort"
+		result.slicesMethod = "Sort"
 	case "Slice", "Sort":
-		slicesMethod = "SortFunc"
+		result.slicesMethod = "SortFunc"
 	case "SliceStable", "Stable":
-		slicesMethod = "SortStableFunc"
+		result.slicesMethod = "SortStableFunc"
 	case "Float64sAreSorted", "IntsAreSorted", "StringsAreSorted":
-		slicesMethod = "IsSorted"
+		result.slicesMethod = "IsSorted"
 	case "IsSorted", "SliceIsSorted":
-		slicesMethod = "IsSortedFunc"
+		result.slicesMethod = "IsSortedFunc"
 	default:
-		return false, "", ""
+		return struct{ sortMethod, slicesMethod string }{}, false
 	}
 
-	return true, sortMethod, slicesMethod
+	return result, true
 }

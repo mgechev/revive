@@ -119,7 +119,7 @@ func (r *Revive) Lint(patterns ...*LintPattern) (<-chan lint.Failure, error) {
 func (r *Revive) Format(
 	formatterName string,
 	failuresChan <-chan lint.Failure,
-) (output string, exitCode int, err error) {
+) (output string, exitCode int, err error) { //nolint:nonamedreturns // named return values are used for clarity
 	conf := r.config
 	formatChan := make(chan lint.Failure)
 	exitChan := make(chan bool)
