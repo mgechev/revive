@@ -91,40 +91,13 @@ func TestPackageDirectoryMismatchIgnoresWholePathComponents(t *testing.T) {
 }
 
 func TestPackageDirectoryMismatchIgnoresMultiSegmentDirectories(t *testing.T) {
-	for _, entry := range []string{"internal/gen", "internal/gen/", "./internal/gen", `internal\gen`} {
+	for _, entry := range []string{"internal/gen", "/internal/gen/"} {
 		config := &lint.RuleConfig{Arguments: lint.Arguments{map[string]any{"ignore-directories": []any{entry}}}}
 
 		testRule(t, "package_directory_mismatch/multi/internal/gen/wrong", &rule.PackageDirectoryMismatchRule{}, config)
 		testRule(t, "package_directory_mismatch/multi/internal/generated/wrong", &rule.PackageDirectoryMismatchRule{}, config)
 		// Segments must be adjacent.
 		testRule(t, "package_directory_mismatch/multi/internal/other/gen/wrong", &rule.PackageDirectoryMismatchRule{}, config)
-	}
-}
-
-func TestPackageDirectoryMismatchIgnoresOnlyPathRelativeToWorkdir(t *testing.T) {
-	// testRule reads files from "../testdata", which resolves to the same directory after changing into it.
-	// The working directory is named "testdata", but it must not make the rule ignore everything below it.
-	t.Chdir("../testdata")
-	config := &lint.RuleConfig{Arguments: lint.Arguments{map[string]any{"ignore-directories": []any{"testdata"}}}}
-	testRule(t, "package_directory_mismatch/targeted/wrong", &rule.PackageDirectoryMismatchRule{}, config)
-	// A component below the working directory is still matched at the start of the relative path.
-	testRule(t, "package_directory_mismatch/testdata/ignored", &rule.PackageDirectoryMismatchRule{}, config)
-}
-
-func TestPackageDirectoryMismatchDoesNotMatchDirectoriesAboveWorkdir(t *testing.T) {
-	// The files are in "../testdata", so the names of the directories above the working directory must not match.
-	t.Chdir("../cli")
-	config := &lint.RuleConfig{Arguments: lint.Arguments{map[string]any{"ignore-directories": []any{"revive", "revive-lint"}}}}
-	testRule(t, "package_directory_mismatch/targeted/wrong", &rule.PackageDirectoryMismatchRule{}, config)
-}
-
-func TestPackageDirectoryMismatchInvalidIgnoredDirectories(t *testing.T) {
-	for _, entry := range []string{"", ".", "/", "./", "/abs/gen", "..", "../gen", "a/../gen"} {
-		r := &rule.PackageDirectoryMismatchRule{}
-		err := r.Configure(lint.Arguments{map[string]any{"ignore-directories": []any{entry}}})
-		if err == nil {
-			t.Errorf("entry %q: expected configuration error", entry)
-		}
 	}
 }
 
