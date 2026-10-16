@@ -1924,13 +1924,16 @@ _Configuration_: Named arguments for directory exclusions.
 
 Configuration examples:
 
-Default behavior excludes paths containing `testdata`
+Default behavior excludes the `testdata` directory and everything below it
 
 ```toml
 [rule.package-directory-mismatch]
 ```
 
-Ignore specific directories with `ignore-directories`
+Ignore specific directories with `ignore-directories`.
+Each entry must consist of whole directory names, such as `testinfo` or `internal/gen`, matched against the directory path relative to the working directory.
+Entry `target` ignores `target/` and `a/target/b/`, but not `targeted/` or `mytarget/`.
+Leading `./` and trailing `/` in entries are ignored, and `\` is treated as `/`.
 
 ```toml
 [rule.package-directory-mismatch]

@@ -76,10 +76,38 @@ func TestPackageDirectoryMismatchWithTestDirectories(t *testing.T) {
 
 	testRule(t, "package_directory_mismatch/testinfo/good", &rule.PackageDirectoryMismatchRule{}, config)
 	testRule(t, "package_directory_mismatch/testutils/good", &rule.PackageDirectoryMismatchRule{}, config)
+}
 
-	// Ignoring a directory must not suppress similarly named sibling directories.
-	prefixConfig := &lint.RuleConfig{Arguments: lint.Arguments{map[string]any{"ignore-directories": []any{"target"}}}}
-	testRule(t, "package_directory_mismatch/targeted/wrong", &rule.PackageDirectoryMismatchRule{}, prefixConfig)
+func TestPackageDirectoryMismatchIgnoresWholePathComponents(t *testing.T) {
+	config := &lint.RuleConfig{Arguments: lint.Arguments{map[string]any{"ignore-directories": []any{"target"}}}}
+
+	// Ignored directory itself and its subdirectory.
+	testRule(t, "package_directory_mismatch/target/wrong", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/target/nested/wrong", &rule.PackageDirectoryMismatchRule{}, config)
+	// Prefix, suffix and infix collisions are not ignored.
+	testRule(t, "package_directory_mismatch/targeted/wrong", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/mytarget/wrong", &rule.PackageDirectoryMismatchRule{}, config)
+	testRule(t, "package_directory_mismatch/retargeted/wrong", &rule.PackageDirectoryMismatchRule{}, config)
+}
+
+func TestPackageDirectoryMismatchIgnoresMultiSegmentDirectories(t *testing.T) {
+	for _, entry := range []string{"internal/gen", "internal/gen/", "./internal/gen", `internal\gen`} {
+		config := &lint.RuleConfig{Arguments: lint.Arguments{map[string]any{"ignore-directories": []any{entry}}}}
+
+		testRule(t, "package_directory_mismatch/multi/internal/gen/wrong", &rule.PackageDirectoryMismatchRule{}, config)
+		testRule(t, "package_directory_mismatch/multi/internal/generated/wrong", &rule.PackageDirectoryMismatchRule{}, config)
+		// Segments must be adjacent.
+		testRule(t, "package_directory_mismatch/multi/internal/other/gen/wrong", &rule.PackageDirectoryMismatchRule{}, config)
+	}
+}
+
+func TestPackageDirectoryMismatchIgnoresOnlyPathRelativeToWorkdir(t *testing.T) {
+	// The working directory is named "testdata", but it must not make the rule ignore everything below it.
+	t.Chdir("../testdata")
+	config := &lint.RuleConfig{Arguments: lint.Arguments{map[string]any{"ignore-directories": []any{"testdata"}}}}
+	testRule(t, "package_directory_mismatch/targeted/wrong", &rule.PackageDirectoryMismatchRule{}, config)
+	// A component below the working directory is still matched at the start of the relative path.
+	testRule(t, "package_directory_mismatch/testdata/ignored", &rule.PackageDirectoryMismatchRule{}, config)
 }
 
 func TestPackageDirectoryMismatchWithMultipleDirectories(t *testing.T) {

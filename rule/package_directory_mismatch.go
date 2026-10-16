@@ -3,6 +3,7 @@ package rule
 import (
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -66,11 +67,18 @@ func (r *PackageDirectoryMismatchRule) Configure(arguments lint.Arguments) error
 	return nil
 }
 
+// buildIgnoreRegex builds a regular expression matching the given directories as sequences of whole path components.
+// Entries are normalized: "testdata/", "./testdata" and "testdata" are equivalent, and `internal\gen` is "internal/gen".
 func (*PackageDirectoryMismatchRule) buildIgnoreRegex(ignoredDirs []string) (*regexp.Regexp, error) {
-	patterns := make([]string, len(ignoredDirs))
-	for i, dir := range ignoredDirs {
-		patterns[i] = regexp.QuoteMeta(dir)
+	patterns := make([]string, 0, len(ignoredDirs))
+	for _, orig := range ignoredDirs {
+		dir := strings.Trim(path.Clean(strings.ReplaceAll(orig, `\`, "/")), "/")
+		if dir == "." || dir == "" {
+			return nil, fmt.Errorf("invalid empty directory %q in ignored directories of rule package-directory-mismatch", orig)
+		}
+		patterns = append(patterns, regexp.QuoteMeta(dir))
 	}
+	// For ["internal/gen"] matches "internal/gen", "a/internal/gen/b" but not "internal/generated" or "myinternal/gen".
 	pattern := "(^|/)(" + strings.Join(patterns, "|") + ")(/|$)"
 
 	regex, err := regexp.Compile(pattern)
@@ -79,6 +87,20 @@ func (*PackageDirectoryMismatchRule) buildIgnoreRegex(ignoredDirs []string) (*re
 	}
 
 	return regex, nil
+}
+
+// relativeToWorkdir returns the slash-separated path relative to the working directory,
+// so directories above the working directory don't affect matching of ignored directories.
+func relativeToWorkdir(absPath string) string {
+	wd, err := os.Getwd()
+	if err != nil {
+		return filepath.ToSlash(absPath)
+	}
+	rel, err := filepath.Rel(wd, absPath)
+	if err != nil {
+		return filepath.ToSlash(absPath)
+	}
+	return filepath.ToSlash(rel)
 }
 
 // skipDirs contains directory names that should be unconditionally ignored when checking.
@@ -110,7 +132,7 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 	dirPath := filepath.Dir(absPath)
 	dirName := filepath.Base(dirPath)
 
-	if r.ignoredDirs != nil && r.ignoredDirs.MatchString(filepath.ToSlash(dirPath)) {
+	if r.ignoredDirs != nil && r.ignoredDirs.MatchString(relativeToWorkdir(dirPath)) {
 		return nil
 	}
 
