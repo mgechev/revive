@@ -1934,6 +1934,8 @@ Ignore specific directories with `ignore-directories`.
 Each entry must consist of whole directory names, such as `testinfo` or `internal/gen`, matched against the directory path relative to the working directory.
 Entry `target` ignores `target/` and `a/target/b/`, but not `targeted/` or `mytarget/`.
 Leading `./` and trailing `/` in entries are ignored, and `\` is treated as `/`.
+Absolute entries, empty entries and entries with `..` are rejected.
+Names of the directories above the working directory never match.
 
 ```toml
 [rule.package-directory-mismatch]

@@ -3,7 +3,6 @@ package rule
 import (
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -14,6 +13,7 @@ import (
 // PackageDirectoryMismatchRule detects when package name doesn't match directory name.
 type PackageDirectoryMismatchRule struct {
 	ignoredDirs *regexp.Regexp
+	workDir     string // working directory at configuration time, ignored directories are matched relative to it
 }
 
 const defaultIgnoredDirs = "testdata"
@@ -24,8 +24,13 @@ var _ lint.ConfigurableRule = (*PackageDirectoryMismatchRule)(nil)
 func (r *PackageDirectoryMismatchRule) Configure(arguments lint.Arguments) error {
 	r.ignoredDirs = nil
 
+	var err error
+	r.workDir, err = os.Getwd()
+	if err != nil {
+		return fmt.Errorf("get working directory for rule %s: %w", r.Name(), err)
+	}
+
 	if len(arguments) < 1 {
-		var err error
 		r.ignoredDirs, err = r.buildIgnoreRegex([]string{defaultIgnoredDirs})
 		return err
 	}
@@ -59,7 +64,6 @@ func (r *PackageDirectoryMismatchRule) Configure(arguments lint.Arguments) error
 			return nil
 		}
 
-		var err error
 		r.ignoredDirs, err = r.buildIgnoreRegex(ignoredDirs)
 		return err
 	}
@@ -68,15 +72,30 @@ func (r *PackageDirectoryMismatchRule) Configure(arguments lint.Arguments) error
 }
 
 // buildIgnoreRegex builds a regular expression matching the given directories as sequences of whole path components.
-// Entries are normalized: "testdata/", "./testdata" and "testdata" are equivalent, and `internal\gen` is "internal/gen".
-func (*PackageDirectoryMismatchRule) buildIgnoreRegex(ignoredDirs []string) (*regexp.Regexp, error) {
+// Entries are relative to the working directory and normalized: "testdata/", "./testdata" and "testdata" are equivalent,
+// and `internal\gen` is "internal/gen". Absolute entries and entries with ".." are rejected.
+func (r *PackageDirectoryMismatchRule) buildIgnoreRegex(ignoredDirs []string) (*regexp.Regexp, error) {
 	patterns := make([]string, 0, len(ignoredDirs))
 	for _, orig := range ignoredDirs {
-		dir := strings.Trim(path.Clean(strings.ReplaceAll(orig, `\`, "/")), "/")
-		if dir == "." || dir == "" {
-			return nil, fmt.Errorf("invalid empty directory %q in ignored directories of rule package-directory-mismatch", orig)
+		slashed := strings.ReplaceAll(orig, `\`, "/")
+		if strings.HasPrefix(slashed, "/") || filepath.IsAbs(orig) {
+			return nil, fmt.Errorf("invalid ignored directory %q of rule %s: absolute paths are not supported", orig, r.Name())
 		}
-		patterns = append(patterns, regexp.QuoteMeta(dir))
+
+		var components []string
+		for component := range strings.SplitSeq(slashed, "/") {
+			switch component {
+			case "", ".":
+			case "..":
+				return nil, fmt.Errorf("invalid ignored directory %q of rule %s: %q is not supported", orig, r.Name(), "..")
+			default:
+				components = append(components, regexp.QuoteMeta(component))
+			}
+		}
+		if len(components) == 0 {
+			return nil, fmt.Errorf("invalid empty ignored directory %q of rule %s", orig, r.Name())
+		}
+		patterns = append(patterns, strings.Join(components, "/"))
 	}
 	// For ["internal/gen"] matches "internal/gen", "a/internal/gen/b" but not "internal/generated" or "myinternal/gen".
 	pattern := "(^|/)(" + strings.Join(patterns, "|") + ")(/|$)"
@@ -89,18 +108,24 @@ func (*PackageDirectoryMismatchRule) buildIgnoreRegex(ignoredDirs []string) (*re
 	return regex, nil
 }
 
-// relativeToWorkdir returns the slash-separated path relative to the working directory,
-// so directories above the working directory don't affect matching of ignored directories.
-func relativeToWorkdir(absPath string) string {
-	wd, err := os.Getwd()
-	if err != nil {
-		return filepath.ToSlash(absPath)
+// isIgnoredDir reports whether the directory is, or is below, an ignored directory.
+// The path is matched relative to the working directory without leading "..",
+// so names of the directories above the working directory never match.
+func (r *PackageDirectoryMismatchRule) isIgnoredDir(absDirPath string) bool {
+	if r.ignoredDirs == nil {
+		return false
 	}
-	rel, err := filepath.Rel(wd, absPath)
+
+	rel, err := filepath.Rel(r.workDir, absDirPath)
 	if err != nil {
-		return filepath.ToSlash(absPath)
+		return false
 	}
-	return filepath.ToSlash(rel)
+	rel = filepath.ToSlash(rel)
+	for rel == ".." || strings.HasPrefix(rel, "../") {
+		rel = strings.TrimPrefix(strings.TrimPrefix(rel, ".."), "/")
+	}
+
+	return r.ignoredDirs.MatchString(rel)
 }
 
 // skipDirs contains directory names that should be unconditionally ignored when checking.
@@ -132,7 +157,7 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 	dirPath := filepath.Dir(absPath)
 	dirName := filepath.Base(dirPath)
 
-	if r.ignoredDirs != nil && r.ignoredDirs.MatchString(relativeToWorkdir(dirPath)) {
+	if r.isIgnoredDir(dirPath) {
 		return nil
 	}
 
