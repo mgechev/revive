@@ -1,7 +1,6 @@
 package lint
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"go/token"
@@ -47,7 +46,7 @@ func (l *Linter) SetLogger(logger *slog.Logger) {
 	}
 }
 
-func (l *Linter) readFile(path string) (result []byte, err error) {
+func (l *Linter) readFile(path string) ([]byte, error) {
 	if l.fileReadTokens != nil {
 		// "take" a token by writing to the channel.
 		// It will block if no more space in the channel's buffer
@@ -64,6 +63,7 @@ func (l *Linter) readFile(path string) (result []byte, err error) {
 var (
 	generatedPrefix  = []byte("// Code generated ")
 	generatedSuffix  = []byte(" DO NOT EDIT.")
+	packageKeyword   = []byte("package")
 	defaultGoVersion = goversion.Must(goversion.NewVersion("1.0"))
 )
 
@@ -167,7 +167,10 @@ func (l *Linter) lintPackage(filenames []string, gover *goversion.Version, ruleS
 	return pkg.lint(ruleSet, config, failures)
 }
 
-func detectGoMod(dir string) (rootDir string, ver *goversion.Version, err error) {
+// detectGoMod looks for the go.mod file in dir and its parent directories.
+// It returns the directory containing the go.mod file and the Go version declared in it.
+// It returns an error if no go.mod file is found, or if it can't be read, parsed or has no Go version.
+func detectGoMod(dir string) (string, *goversion.Version, error) {
 	modFileName, err := retrieveModFile(dir)
 	if err != nil {
 		return "", nil, fmt.Errorf("%q doesn't seem to be part of a Go module", dir)
@@ -187,7 +190,7 @@ func detectGoMod(dir string) (rootDir string, ver *goversion.Version, err error)
 		return "", nil, fmt.Errorf("%q does not specify a Go version", modFileName)
 	}
 
-	ver, err = goversion.NewVersion(modAst.Go.Version)
+	ver, err := goversion.NewVersion(modAst.Go.Version)
 	return filepath.Dir(modFileName), ver, err
 }
 
@@ -214,11 +217,13 @@ func retrieveModFile(dir string) (string, error) {
 
 // isGenerated reports whether the source file is generated code
 // according to the rules from https://go.dev/s/generatedcode.
-// This is inherited from the original go lint.
+// The header must appear before the package clause, so scanning stops there.
 func isGenerated(src []byte) bool {
-	sc := bufio.NewScanner(bytes.NewReader(src))
-	for sc.Scan() {
-		b := sc.Bytes()
+	for line := range bytes.Lines(src) {
+		b := bytes.TrimSuffix(bytes.TrimSuffix(line, []byte{'\n'}), []byte{'\r'})
+		if bytes.HasPrefix(b, packageKeyword) {
+			return false
+		}
 		if bytes.HasPrefix(b, generatedPrefix) && bytes.HasSuffix(b, generatedSuffix) && len(b) >= len(generatedPrefix)+len(generatedSuffix) {
 			return true
 		}
