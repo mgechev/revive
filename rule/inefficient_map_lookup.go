@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
-	"strings"
+	"go/types"
 
 	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/lint"
@@ -172,9 +172,33 @@ func (w *lintInefficientMapLookup) rangeOverMapKey(stmt ast.Stmt) (*ast.RangeStm
 
 	// Check if we range over a map
 	t := w.file.Pkg.TypeOf(rangeStmt.X)
-	if t == nil || !strings.HasPrefix(t.String(), "map[") {
+	if t == nil || !isMapType(t) {
 		return nil, nil
 	}
 
 	return rangeStmt, key
+}
+
+// isMapType reports whether t is a map type, including named and alias map types
+// and type parameters whose constraint only allows maps.
+func isMapType(t types.Type) bool {
+	switch u := t.Underlying().(type) {
+	case *types.Map:
+		return true
+	case *types.Interface:
+		// The underlying type of a type parameter is its constraint interface.
+		for embedded := range u.EmbeddedTypes() {
+			if isMapType(embedded) {
+				return true
+			}
+		}
+	case *types.Union:
+		for term := range u.Terms() {
+			if !isMapType(term.Type()) {
+				return false
+			}
+		}
+		return u.Len() > 0
+	}
+	return false
 }
