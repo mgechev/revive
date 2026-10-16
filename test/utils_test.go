@@ -236,7 +236,7 @@ func parseInstructions(tb testing.TB, filename string, src []byte) []instruction
 	for _, cg := range f.Comments {
 		ln := fset.Position(cg.Pos()).Line
 		raw := cg.Text()
-		for line := range strings.SplitSeq(raw, "\n") {
+		for line := range strings.Lines(raw) {
 			if line == "" || strings.HasPrefix(line, "#") || strings.HasPrefix(line, "ignore") {
 				continue
 			}
