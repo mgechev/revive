@@ -202,9 +202,5 @@ func (*lintUnnecessaryIf) singleBooleanLiteral(exprs []ast.Expr) (value, ok bool
 		return false, false
 	}
 
-	if ident.Name != "true" && ident.Name != "false" {
-		return false, false
-	}
-
-	return ident.Name == "true", true
+	return ident.Name == "true", ident.Name == "true" || ident.Name == "false"
 }
