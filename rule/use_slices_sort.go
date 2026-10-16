@@ -45,7 +45,7 @@ func (w lintSort) Visit(n ast.Node) ast.Visitor {
 		return w // not a function call
 	}
 
-	sortMethod, slicesMethod, found := sortReplacement(funcCall.Fun)
+	sortMethod, sliceMethod, found := sortReplacement(funcCall.Fun)
 	if !found {
 		return w
 	}
@@ -54,7 +54,7 @@ func (w lintSort) Visit(n ast.Node) ast.Visitor {
 		Category:   lint.FailureCategoryMaintenance,
 		Node:       n,
 		Confidence: 1,
-		Failure:    fmt.Sprintf("replace sort.%s by slices.%s", sortMethod, slicesMethod),
+		Failure:    fmt.Sprintf("replace sort.%s by slices.%s", sortMethod, sliceMethod),
 	})
 
 	return nil
@@ -63,7 +63,7 @@ func (w lintSort) Visit(n ast.Node) ast.Visitor {
 // sortReplacement returns the name of the given sort method and the name of its replacement method
 // from the slices package, and true if the given function call is a call to a sort method that can be replaced.
 // Otherwise it returns empty names and false.
-func sortReplacement(expr ast.Expr) (sortMethod, slicesMethod string, _ bool) { //nolint:nonamedreturns // names are used for clarity
+func sortReplacement(expr ast.Expr) (sortMethod, slicesMethod string, ok bool) { //nolint:nonamedreturns // names are used for clarity
 	sel, ok := expr.(*ast.SelectorExpr)
 	if !ok {
 		return "", "", false
