@@ -4,6 +4,8 @@ import "fmt"
 
 type namedIntMap map[int]string
 
+type aliasIntMap = map[int]string
+
 func inefficientMapLookup() {
 	type aS struct {
 		TagIDs map[int]string
@@ -19,6 +21,13 @@ func inefficientMapLookup() {
 
 	var namedMap namedIntMap
 	for key := range namedMap { // MATCH /inefficient lookup of map key/
+		if key == someStaticValue {
+			return
+		}
+	}
+
+	var aliasMap aliasIntMap
+	for key := range aliasMap { // MATCH /inefficient lookup of map key/
 		if key == someStaticValue {
 			return
 		}
@@ -95,6 +104,31 @@ func inefficientMapLookup() {
 	p := new(int)
 	for *p = range aMap {
 		if *p == 1 {
+			return
+		}
+	}
+}
+
+type intMapConstraint interface {
+	namedIntMap | map[int]string
+}
+
+func inefficientGenericMapLookup[M ~map[int]string, N intMapConstraint, S ~[]int](m M, n N, s S, x int) {
+	for key := range m { // MATCH /inefficient lookup of map key/
+		if key == x {
+			return
+		}
+	}
+
+	for key := range n { // MATCH /inefficient lookup of map key/
+		if key == x {
+			return
+		}
+	}
+
+	// do not match on type parameters constrained to non-map types
+	for i := range s {
+		if i == x {
 			return
 		}
 	}
