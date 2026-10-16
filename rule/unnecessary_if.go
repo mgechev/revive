@@ -138,8 +138,8 @@ func (*lintUnnecessaryIf) condAsString(cond ast.Expr, mustNegate bool) string {
 // If the replacement != "" then the second return value is the Boolean value
 // of <bool literal> in the then-side assignment, false otherwise.
 func (w *lintUnnecessaryIf) boolAssignmentReplacement(thenStmt *ast.AssignStmt, elseStmts []ast.Stmt) (string, bool) {
-	thenValue := w.singleBooleanLiteral(thenStmt.Rhs)
-	if thenValue == nil {
+	thenValue, ok := w.singleBooleanLiteral(thenStmt.Rhs)
+	if !ok {
 		return "", false
 	}
 
@@ -157,12 +157,12 @@ func (w *lintUnnecessaryIf) boolAssignmentReplacement(thenStmt *ast.AssignStmt, 
 		return "", false
 	}
 
-	elseValue := w.singleBooleanLiteral(elseStmt.Rhs)
-	if elseValue == nil || *thenValue == *elseValue {
+	elseValue, ok := w.singleBooleanLiteral(elseStmt.Rhs)
+	if !ok || thenValue == elseValue {
 		return "", false // not a Boolean assignment or both branches assign the same value
 	}
 
-	return fmt.Sprintf("%s %s", thenLHS, thenStmt.Tok.String()), *thenValue
+	return fmt.Sprintf("%s %s", thenLHS, thenStmt.Tok.String()), thenValue
 }
 
 // boolReturnReplacement returns a replacement statement != ""
@@ -171,8 +171,8 @@ func (w *lintUnnecessaryIf) boolAssignmentReplacement(thenStmt *ast.AssignStmt, 
 // If the replacement != "" then the second return value is the Boolean value
 // of <bool literal> in the then-side return, false otherwise.
 func (w *lintUnnecessaryIf) boolReturnReplacement(thenStmt *ast.ReturnStmt, elseStmts []ast.Stmt) (string, bool) {
-	thenValue := w.singleBooleanLiteral(thenStmt.Results)
-	if thenValue == nil {
+	thenValue, ok := w.singleBooleanLiteral(thenStmt.Results)
+	if !ok {
 		return "", false
 	}
 
@@ -181,30 +181,30 @@ func (w *lintUnnecessaryIf) boolReturnReplacement(thenStmt *ast.ReturnStmt, else
 		return "", false
 	}
 
-	elseValue := w.singleBooleanLiteral(elseStmt.Results)
-	if elseValue == nil || *thenValue == *elseValue {
+	elseValue, ok := w.singleBooleanLiteral(elseStmt.Results)
+	if !ok || thenValue == elseValue {
 		return "", false // not a Boolean return or both branches return the same value
 	}
 
-	return "return", *thenValue
+	return "return", thenValue
 }
 
-// singleBooleanLiteral returns the value of <bool literal>
+// singleBooleanLiteral returns the value of <bool literal> and true
 // if the given list of expressions has exactly one element and that element is a bool literal (true or false),
-// otherwise it returns nil.
-func (*lintUnnecessaryIf) singleBooleanLiteral(exprs []ast.Expr) *bool {
+// otherwise it returns false and false.
+func (*lintUnnecessaryIf) singleBooleanLiteral(exprs []ast.Expr) (value, ok bool) { //nolint:nonamedreturns // names are used for clarity
 	if len(exprs) != 1 {
-		return nil
+		return false, false
 	}
 
 	ident, ok := exprs[0].(*ast.Ident)
 	if !ok {
-		return nil
+		return false, false
 	}
 
 	if ident.Name != "true" && ident.Name != "false" {
-		return nil
+		return false, false
 	}
 
-	return new(ident.Name == "true")
+	return ident.Name == "true", true
 }

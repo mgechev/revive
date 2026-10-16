@@ -188,7 +188,7 @@ func (w *lintRedefinesBuiltinID) Visit(node ast.Node) ast.Visitor {
 						msg = fmt.Sprintf("assignment modifies built-in identifier %s", id.Name)
 					}
 				default:
-					msg = fmt.Sprintf("redefinition of the built-in %s %s", bt, id.Name)
+					msg = fmt.Sprintf("redefinition of the built-in %s %s", bt, id)
 				}
 
 				w.addFailure(n, msg)
@@ -209,14 +209,17 @@ func (w *lintRedefinesBuiltinID) addFailure(node ast.Node, msg string) {
 }
 
 func (w *lintRedefinesBuiltinID) builtInKind(id string) string {
-	switch {
-	case w.builtFunctions[id]:
+	if w.builtFunctions[id] {
 		return "function"
-	case w.builtInConstAndVars[id]:
-		return "constant or variable"
-	case w.builtInTypes[id]:
-		return "type"
-	default:
-		return ""
 	}
+
+	if w.builtInConstAndVars[id] {
+		return "constant or variable"
+	}
+
+	if w.builtInTypes[id] {
+		return "type"
+	}
+
+	return ""
 }

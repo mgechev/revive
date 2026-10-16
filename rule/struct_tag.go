@@ -71,9 +71,9 @@ type checkContext struct {
 	isAtLeastGo124 bool
 }
 
-// isTagNbrUsed reports whether number was already used by another field for the given tag key
-// and marks it as used otherwise. Each tag key has its own numbering namespace.
-func (checkCtx *checkContext) isTagNbrUsed(key tagKey, number int) bool {
+// markTagNbrUsed marks number as used for the given tag key and reports whether it was already used by another field.
+// Each tag key has its own numbering namespace.
+func (checkCtx *checkContext) markTagNbrUsed(key tagKey, number int) bool {
 	numbers := checkCtx.usedTagNbr[key]
 	if numbers == nil {
 		numbers = map[int]bool{}
@@ -347,7 +347,7 @@ func checkCompoundANS1Option(checkCtx *checkContext, opt string, fieldType ast.E
 		if err != nil {
 			return fmt.Sprintf("tag must be a number but is %q", value), false
 		}
-		if checkCtx.isTagNbrUsed(keyASN1, number) {
+		if checkCtx.markTagNbrUsed(keyASN1, number) {
 			return fmt.Sprintf(msgDuplicatedTagNumber, number), false
 		}
 	case "default":
@@ -420,7 +420,7 @@ func checkCborTag(checkCtx *checkContext, tag *structtag.Tag, _ *ast.Field) (str
 				return `tag name for option "keyasint" should be an integer`, false
 			}
 
-			if checkCtx.isTagNbrUsed(keyCbor, intKey) {
+			if checkCtx.markTagNbrUsed(keyCbor, intKey) {
 				return fmt.Sprintf("duplicated integer key %d", intKey), false
 			}
 
@@ -588,7 +588,7 @@ func checkProtobufOptions(checkCtx *checkContext, options []string) (string, boo
 		opt, _, _ := strings.Cut(opt, "=")
 
 		if number, err := strconv.Atoi(opt); err == nil {
-			if checkCtx.isTagNbrUsed(keyProtobuf, number) {
+			if checkCtx.markTagNbrUsed(keyProtobuf, number) {
 				return fmt.Sprintf(msgDuplicatedTagNumber, number), false
 			}
 			continue // option is an integer
