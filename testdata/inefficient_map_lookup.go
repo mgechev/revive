@@ -76,4 +76,26 @@ func inefficientMapLookup() {
 		count++
 	}
 	_ = count
+
+	// do not crash on assigning ranges whose key is not a plain identifier
+	var holder struct{ k int }
+	for holder.k = range aMap {
+		if holder.k == 1 {
+			return
+		}
+	}
+
+	keys := make([]int, 1)
+	for keys[0] = range aMap {
+		if keys[0] == 1 {
+			return
+		}
+	}
+
+	p := new(int)
+	for *p = range aMap {
+		if *p == 1 {
+			return
+		}
+	}
 }
