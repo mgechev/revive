@@ -69,9 +69,10 @@ func (r *PackageDirectoryMismatchRule) Configure(arguments lint.Arguments) error
 func (*PackageDirectoryMismatchRule) buildIgnoreRegex(ignoredDirs []string) (*regexp.Regexp, error) {
 	patterns := make([]string, len(ignoredDirs))
 	for i, dir := range ignoredDirs {
-		patterns[i] = regexp.QuoteMeta(dir)
+		patterns[i] = regexp.QuoteMeta(strings.Trim(filepath.ToSlash(dir), "/"))
 	}
-	pattern := strings.Join(patterns, "|")
+	// Matches whole path components, e.g. for "internal/gen" matches "/a/internal/gen/b" but not "/a/internal/generated".
+	pattern := "(^|/)(" + strings.Join(patterns, "|") + ")(/|$)"
 
 	regex, err := regexp.Compile(pattern)
 	if err != nil {
@@ -110,7 +111,7 @@ func (r *PackageDirectoryMismatchRule) Apply(file *lint.File, _ lint.Arguments) 
 	dirPath := filepath.Dir(absPath)
 	dirName := filepath.Base(dirPath)
 
-	if r.ignoredDirs != nil && r.ignoredDirs.MatchString(dirPath) {
+	if r.ignoredDirs != nil && r.ignoredDirs.MatchString(filepath.ToSlash(dirPath)) {
 		return nil
 	}
 

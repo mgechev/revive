@@ -1930,7 +1930,9 @@ Default behavior excludes paths containing `testdata`
 [rule.package-directory-mismatch]
 ```
 
-Ignore specific directories with `ignore-directories`
+Ignore specific directories with `ignore-directories`.
+Entries match whole directory names at any level, such as `testinfo` or `internal/gen`:
+entry `target` ignores `target/` and `a/target/b/`, but not `targeted/` or `mytarget/`.
 
 ```toml
 [rule.package-directory-mismatch]
