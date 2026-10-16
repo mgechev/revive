@@ -76,16 +76,18 @@ func sortReplacement(expr ast.Expr) (sortMethod, slicesMethod string, _ bool) { 
 	sortMethod = sel.Sel.Name
 	switch sortMethod {
 	case "Float64s", "Ints", "Strings":
-		return sortMethod, "Sort", true
+		slicesMethod = "Sort"
 	case "Slice", "Sort":
-		return sortMethod, "SortFunc", true
+		slicesMethod = "SortFunc"
 	case "SliceStable", "Stable":
-		return sortMethod, "SortStableFunc", true
+		slicesMethod = "SortStableFunc"
 	case "Float64sAreSorted", "IntsAreSorted", "StringsAreSorted":
-		return sortMethod, "IsSorted", true
+		slicesMethod = "IsSorted"
 	case "IsSorted", "SliceIsSorted":
-		return sortMethod, "IsSortedFunc", true
+		slicesMethod = "IsSortedFunc"
 	default:
 		return "", "", false
 	}
+
+	return sortMethod, slicesMethod, true
 }
