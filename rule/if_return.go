@@ -85,6 +85,7 @@ func (w *lintElseError) Visit(node ast.Node) ast.Visitor {
 			}
 
 			w.onFailure(lint.Failure{
+				Category:   lint.FailureCategoryStyle,
 				Confidence: .9,
 				Node:       v.List[i],
 				Failure:    "redundant if ...; err != nil check, just return error instead.",

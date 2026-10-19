@@ -73,6 +73,7 @@ func (w *lintUselessBreak) inspectCaseStatement(body []ast.Stmt) {
 	}
 
 	w.onFailure(lint.Failure{
+		Category:   lint.FailureCategoryStyle,
 		Confidence: 1,
 		Node:       s,
 		Failure:    msg,

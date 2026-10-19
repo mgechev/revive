@@ -37,6 +37,8 @@ func (*DotImportsRule) Name() string {
 	return "dot-imports"
 }
 
+var _ lint.ConfigurableRule = (*DotImportsRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

@@ -14,6 +14,9 @@ type ReceiverNamingRule struct {
 }
 
 const defaultReceiverNameMaxLength = -1 // thus will not check
+
+var _ lint.ConfigurableRule = (*ReceiverNamingRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

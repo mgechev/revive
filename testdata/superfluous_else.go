@@ -153,7 +153,7 @@ func Panic4() string {
 	return "ok"
 }
 
-// noreg_19 no-regression test for issue #19 (https://github.com/mgechev/revive/issues/19)
+// noreg_19 no-regression test for issue #19 (https://github.com/revive-lint/revive/issues/19)
 func noreg_19(f func() bool, x int) string {
 	if err == author.ErrCourseNotFound {
 		break

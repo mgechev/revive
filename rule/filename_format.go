@@ -24,6 +24,7 @@ func (r *FilenameFormatRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 
 	failureMsg := fmt.Sprintf("Filename %s is not of the format %s.%s", filename, r.format.String(), r.getMsgForNonASCIIChars(filename))
 	return []lint.Failure{{
+		Category:   lint.FailureCategoryNaming,
 		Confidence: 1,
 		Failure:    failureMsg,
 		RuleName:   r.Name(),
@@ -50,6 +51,8 @@ func (*FilenameFormatRule) Name() string {
 }
 
 var defaultFormat = regexp.MustCompile(`^[_A-Za-z0-9][_A-Za-z0-9-]*\.go$`)
+
+var _ lint.ConfigurableRule = (*FilenameFormatRule)(nil)
 
 // Configure validates the rule configuration, and configures the rule accordingly.
 //

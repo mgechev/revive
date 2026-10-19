@@ -22,7 +22,7 @@ func (*UnexportedReturnRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 
 	var failures []lint.Failure
 
-	file.Pkg.TypeCheck()
+	file.Pkg.TypeCheck() //nolint:errcheck,gosec // G104: Errors unhandled
 
 	for _, decl := range file.AST.Decls {
 		fn, ok := decl.(*ast.FuncDecl)
@@ -80,27 +80,9 @@ func (*UnexportedReturnRule) Name() string {
 func exportedType(typ types.Type) bool {
 	switch t := typ.(type) {
 	case *types.Alias:
-		obj := t.Obj()
-		switch {
-		// Builtin types have no package.
-		case obj.Pkg() == nil:
-		case obj.Exported():
-		default:
-			_, ok := t.Underlying().(*types.Interface)
-			return ok
-		}
-		return true
+		return exportedTypeName(t.Obj())
 	case *types.Named:
-		obj := t.Obj()
-		switch {
-		// Builtin types have no package.
-		case obj.Pkg() == nil:
-		case obj.Exported():
-		default:
-			_, ok := t.Underlying().(*types.Interface)
-			return ok
-		}
-		return true
+		return exportedTypeName(t.Obj())
 	case *types.Map:
 		return exportedType(t.Key()) && exportedType(t.Elem())
 	case interface {
@@ -108,6 +90,11 @@ func exportedType(typ types.Type) bool {
 	}: // array, slice, pointer, chan
 		return exportedType(t.Elem())
 	}
-	// Be conservative about other types, such as struct, interface, etc.
+	// Be conservative about other unnamed types, such as struct, interface, etc.
 	return true
+}
+
+func exportedTypeName(obj *types.TypeName) bool {
+	// Builtin types have no package.
+	return obj.Pkg() == nil || obj.Exported()
 }

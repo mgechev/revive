@@ -39,7 +39,7 @@ func TestMain(m *testing.M) {
 }
 
 func flagParseOutsideMain() {
-	flag.Parse() // MATCH /calls to flag.Parse only in main() or init() functions/
+	flag.Parse() // MATCH /calls to flag.Parse only in main() or init() functions; move the call or refactor to use flag.NewFlagSet with flag.ContinueOnError/
 }
 
 func flagNewFlagSetExitOnErrorOutsideMain() {
@@ -48,4 +48,9 @@ func flagNewFlagSetExitOnErrorOutsideMain() {
 
 func flagNewFlagSetContinueOnErrorOK() {
 	flag.NewFlagSet("cmd", flag.ContinueOnError)
+}
+
+// Not a testable example because this is not a test file
+func Example() {
+	os.Exit(1) // MATCH /calls to os.Exit only in main() or init() functions/
 }

@@ -19,7 +19,7 @@ func (*StringOfIntRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure 
 	}
 
 	astFile := file.AST
-	file.Pkg.TypeCheck()
+	file.Pkg.TypeCheck() //nolint:errcheck,gosec // G104: Errors unhandled
 
 	w := &lintStringInt{file, onFailure}
 	ast.Walk(w, astFile)
@@ -52,6 +52,7 @@ func (w *lintStringInt) Visit(node ast.Node) ast.Visitor {
 	}
 
 	w.onFailure(lint.Failure{
+		Category:   lint.FailureCategoryLogic,
 		Confidence: 1,
 		Node:       ce,
 		Failure:    "dubious conversion of an integer into a string, use strconv.Itoa",

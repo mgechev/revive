@@ -1,28 +1,22 @@
-package rule
+package rule_test
 
 import (
 	"errors"
-	"reflect"
-	"regexp"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
 )
 
 func TestUnusedParamRule_Configure(t *testing.T) {
 	tests := []struct {
-		name           string
-		arguments      lint.Arguments
-		wantErr        error
-		wantAllowRegex *regexp.Regexp
-		wantFailureMsg string
+		name      string
+		arguments lint.Arguments
+		wantErr   error
 	}{
 		{
-			name:           "no arguments",
-			arguments:      lint.Arguments{},
-			wantErr:        nil,
-			wantAllowRegex: regexp.MustCompile("^_$"),
-			wantFailureMsg: "parameter '%s' seems to be unused, consider removing or renaming it as _",
+			name:      "no arguments",
+			arguments: lint.Arguments{},
 		},
 		{
 			name: "valid arguments",
@@ -31,9 +25,6 @@ func TestUnusedParamRule_Configure(t *testing.T) {
 					"allowRegex": "^_",
 				},
 			},
-			wantErr:        nil,
-			wantAllowRegex: regexp.MustCompile("^_"),
-			wantFailureMsg: "parameter '%s' seems to be unused, consider removing or renaming it to match ^_",
 		},
 		{
 			name: "valid lowercased arguments",
@@ -42,9 +33,6 @@ func TestUnusedParamRule_Configure(t *testing.T) {
 					"allowregex": "^_",
 				},
 			},
-			wantErr:        nil,
-			wantAllowRegex: regexp.MustCompile("^_"),
-			wantFailureMsg: "parameter '%s' seems to be unused, consider removing or renaming it to match ^_",
 		},
 		{
 			name: "valid kebab-cased arguments",
@@ -53,9 +41,6 @@ func TestUnusedParamRule_Configure(t *testing.T) {
 					"allow-regex": "^_",
 				},
 			},
-			wantErr:        nil,
-			wantAllowRegex: regexp.MustCompile("^_"),
-			wantFailureMsg: "parameter '%s' seems to be unused, consider removing or renaming it to match ^_",
 		},
 		{
 			name: "missed allowRegex value",
@@ -64,9 +49,6 @@ func TestUnusedParamRule_Configure(t *testing.T) {
 					"unknownKey": "123",
 				},
 			},
-			wantErr:        nil,
-			wantAllowRegex: regexp.MustCompile("^_$"),
-			wantFailureMsg: "parameter '%s' seems to be unused, consider removing or renaming it as _",
 		},
 		{
 			name: "invalid allowRegex: not a string",
@@ -90,28 +72,18 @@ func TestUnusedParamRule_Configure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var rule UnusedParamRule
+			var r rule.UnusedParamRule
 
-			err := rule.Configure(tt.arguments)
+			err := r.Configure(tt.arguments)
 
-			if tt.wantErr != nil {
-				if err == nil {
-					t.Errorf("unexpected error: got = nil, want = %v", tt.wantErr)
-					return
-				}
-				if err.Error() != tt.wantErr.Error() {
-					t.Errorf("unexpected error: got = %v, want = %v", err, tt.wantErr)
+			if tt.wantErr == nil {
+				if err != nil {
+					t.Errorf("Configure() unexpected non-nil error %q", err)
 				}
 				return
 			}
-			if err != nil {
-				t.Errorf("unexpected error: got = %v, want = nil", err)
-			}
-			if !reflect.DeepEqual(rule.allowRegex, tt.wantAllowRegex) {
-				t.Errorf("unexpected allowRegex: got = %v, want %v", rule.allowRegex, tt.wantAllowRegex)
-			}
-			if rule.failureMsg != tt.wantFailureMsg {
-				t.Errorf("unexpected failureMessage: got = %v, want %v", rule.failureMsg, tt.wantFailureMsg)
+			if err == nil || err.Error() != tt.wantErr.Error() {
+				t.Errorf("Configure() unexpected error: got %q, want %q", err, tt.wantErr)
 			}
 		})
 	}

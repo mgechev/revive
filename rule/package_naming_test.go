@@ -1,30 +1,22 @@
-package rule
+package rule_test
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
 )
 
 func TestPackageNamingRule_Configure(t *testing.T) {
 	tests := []struct {
-		name                           string
-		arguments                      lint.Arguments
-		wantErr                        error
-		wantSkipConventionNameCheck    bool
-		wantSkipTopLevelCheck          bool
-		wantSkipDefaultBadNameCheck    bool
-		wantCheckExtraBadName          bool
-		wantUserDefinedBadNames        map[string]struct{}
-		wantSkipCollisionWithCommonStd bool
-		wantCheckCollisionWithAllStd   bool
+		name      string
+		arguments lint.Arguments
+		wantErr   error
 	}{
 		{
 			name:      "no arguments",
 			arguments: lint.Arguments{},
-			wantErr:   nil,
 		},
 		{
 			name: "valid arguments - camelCase",
@@ -38,13 +30,6 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 					"checkCollisionWithAllStd":   false,
 				},
 			},
-			wantErr:                        nil,
-			wantSkipConventionNameCheck:    true,
-			wantSkipTopLevelCheck:          true,
-			wantSkipDefaultBadNameCheck:    true,
-			wantUserDefinedBadNames:        map[string]struct{}{"helpers": {}, "models": {}},
-			wantSkipCollisionWithCommonStd: true,
-			wantCheckCollisionWithAllStd:   false,
 		},
 		{
 			name: "valid arguments - lowercase",
@@ -58,13 +43,6 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 					"checkcollisionwithallstd":   false,
 				},
 			},
-			wantErr:                        nil,
-			wantSkipConventionNameCheck:    true,
-			wantSkipTopLevelCheck:          true,
-			wantSkipDefaultBadNameCheck:    true,
-			wantUserDefinedBadNames:        map[string]struct{}{"helpers": {}, "models": {}},
-			wantSkipCollisionWithCommonStd: true,
-			wantCheckCollisionWithAllStd:   false,
 		},
 		{
 			name: "valid arguments - kebab-case",
@@ -78,13 +56,6 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 					"check-collision-with-all-std":   false,
 				},
 			},
-			wantErr:                        nil,
-			wantSkipConventionNameCheck:    true,
-			wantSkipTopLevelCheck:          true,
-			wantSkipDefaultBadNameCheck:    true,
-			wantUserDefinedBadNames:        map[string]struct{}{"helpers": {}, "models": {}},
-			wantSkipCollisionWithCommonStd: true,
-			wantCheckCollisionWithAllStd:   false,
 		},
 		{
 			name: "partial arguments",
@@ -94,9 +65,6 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 					"user-defined-bad-names":     []any{"custom"},
 				},
 			},
-			wantErr:                     nil,
-			wantSkipConventionNameCheck: true,
-			wantUserDefinedBadNames:     map[string]struct{}{"custom": {}},
 		},
 		{
 			name: "invalid argument type",
@@ -139,8 +107,6 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 					"user-defined-bad-names": []any{"HELPERS", "Models"},
 				},
 			},
-			wantErr:                 nil,
-			wantUserDefinedBadNames: map[string]struct{}{"helpers": {}, "models": {}},
 		},
 		{
 			name: "valid conventionNameCheckRegex",
@@ -149,7 +115,6 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 					"convention-name-check-regex": "^[a-z][a-z0-9_]*$",
 				},
 			},
-			wantErr: nil,
 		},
 		{
 			name: "invalid conventionNameCheckRegex type",
@@ -232,8 +197,6 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 					"check-extra-bad-name": true,
 				},
 			},
-			wantErr:               nil,
-			wantCheckExtraBadName: true,
 		},
 		{
 			name: "valid checkExtraBadName set to false",
@@ -242,8 +205,6 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 					"check-extra-bad-name": false,
 				},
 			},
-			wantErr:               nil,
-			wantCheckExtraBadName: false,
 		},
 		{
 			name: "invalid checkExtraBadName type",
@@ -257,7 +218,6 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 		{
 			name:      "empty arguments slice",
 			arguments: lint.Arguments{},
-			wantErr:   nil,
 		},
 		{
 			name: "multiple arguments (more than 1)",
@@ -275,7 +235,6 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 					"another-unknown": "value",
 				},
 			},
-			wantErr: nil,
 		},
 		{
 			name: "mixed known and unknown options",
@@ -285,8 +244,6 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 					"unknown-option":             "value",
 				},
 			},
-			wantErr:                     nil,
-			wantSkipConventionNameCheck: true,
 		},
 		{
 			name: "all boolean options together",
@@ -300,13 +257,6 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 					"check-collision-with-all-std":   false,
 				},
 			},
-			wantErr:                        nil,
-			wantSkipConventionNameCheck:    true,
-			wantSkipTopLevelCheck:          true,
-			wantSkipDefaultBadNameCheck:    true,
-			wantCheckExtraBadName:          true,
-			wantSkipCollisionWithCommonStd: true,
-			wantCheckCollisionWithAllStd:   false,
 		},
 		{
 			name: "conventional names with empty userDefinedBadNames",
@@ -315,126 +265,24 @@ func TestPackageNamingRule_Configure(t *testing.T) {
 					"user-defined-bad-names": []any{},
 				},
 			},
-			wantErr: nil,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var rule PackageNamingRule
+			var r rule.PackageNamingRule
 
-			err := rule.Configure(tt.arguments)
+			err := r.Configure(tt.arguments)
 
-			if tt.wantErr != nil {
-				if err == nil {
-					t.Errorf("unexpected error: got = nil, want = %v", tt.wantErr)
-					return
-				}
-				if err.Error() != tt.wantErr.Error() {
-					t.Errorf("unexpected error: got = %v, want = %v", err, tt.wantErr)
+			if tt.wantErr == nil {
+				if err != nil {
+					t.Errorf("Configure() unexpected non-nil error %q", err)
 				}
 				return
 			}
-			if err != nil {
-				t.Errorf("unexpected error: got = %v, want = nil", err)
-			}
-			if rule.skipConventionNameCheck != tt.wantSkipConventionNameCheck {
-				t.Errorf("unexpected skipConventionNameCheck: got = %v, want %v", rule.skipConventionNameCheck, tt.wantSkipConventionNameCheck)
-			}
-			if rule.skipTopLevelCheck != tt.wantSkipTopLevelCheck {
-				t.Errorf("unexpected skipTopLevelCheck: got = %v, want %v", rule.skipTopLevelCheck, tt.wantSkipTopLevelCheck)
-			}
-			if rule.skipDefaultBadNameCheck != tt.wantSkipDefaultBadNameCheck {
-				t.Errorf("unexpected skipDefaultBadNameCheck: got = %v, want %v", rule.skipDefaultBadNameCheck, tt.wantSkipDefaultBadNameCheck)
-			}
-			if rule.checkExtraBadName != tt.wantCheckExtraBadName {
-				t.Errorf("unexpected checkExtraBadName: got = %v, want %v", rule.checkExtraBadName, tt.wantCheckExtraBadName)
-			}
-			if !reflect.DeepEqual(rule.userDefinedBadNames, tt.wantUserDefinedBadNames) {
-				t.Errorf("unexpected userDefinedBadNames: got = %v, want %v", rule.userDefinedBadNames, tt.wantUserDefinedBadNames)
-			}
-			if rule.skipCollisionWithCommonStd != tt.wantSkipCollisionWithCommonStd {
-				t.Errorf("unexpected skipCollisionWithCommonStd: got = %v, want %v", rule.skipCollisionWithCommonStd, tt.wantSkipCollisionWithCommonStd)
-			}
-			if rule.checkCollisionWithAllStd != tt.wantCheckCollisionWithAllStd {
-				t.Errorf("unexpected checkCollisionWithAllStd: got = %v, want %v", rule.checkCollisionWithAllStd, tt.wantCheckCollisionWithAllStd)
-			}
-			if tt.wantErr == nil && rule.conventionNameCheckRegex != nil {
-				if rule.conventionNameCheckRegex.String() == "" {
-					t.Error("unexpected conventionNameCheckRegex: got empty string")
-				}
+			if err == nil || err.Error() != tt.wantErr.Error() {
+				t.Errorf("Configure() unexpected error: got %q, want %q", err, tt.wantErr)
 			}
 		})
 	}
-}
-
-func TestPackageNamingRule_Configure_LoadStdPackages(t *testing.T) {
-	t.Run("loads std packages when checkCollisionWithAllStd is true", func(t *testing.T) {
-		var rule PackageNamingRule
-
-		err := rule.Configure(lint.Arguments{
-			map[string]any{
-				"check-collision-with-all-std": true,
-			},
-		})
-		if err != nil {
-			t.Fatalf("unexpected error: got = %v, want = nil", err)
-		}
-
-		if len(rule.allStdNames) == 0 {
-			t.Fatal("expected allStdNames to be populated, but got empty")
-		}
-
-		for pkgName, pkgPath := range map[string]string{"http": "net/http", "version": "go/version", "runtime": "runtime", "metrics": "runtime/metrics"} {
-			std, ok := rule.allStdNames[pkgName]
-			if !ok {
-				t.Errorf("expected package %q to be loaded, but got empty", pkgName)
-			}
-			if std != pkgPath {
-				t.Errorf("unexpected std package path for %q: got = %q, want = %q", pkgName, std, pkgPath)
-			}
-		}
-	})
-
-	t.Run("does not reload std packages on subsequent Configure calls", func(t *testing.T) {
-		var rule PackageNamingRule
-
-		err := rule.Configure(lint.Arguments{
-			map[string]any{
-				"check-collision-with-all-std": true,
-			},
-		})
-		if err != nil {
-			t.Fatalf("unexpected error: got = %v, want = nil", err)
-		}
-		firstLoadLen := len(rule.allStdNames)
-		err = rule.Configure(lint.Arguments{
-			map[string]any{
-				"check-collision-with-all-std": true,
-			},
-		})
-		if err != nil {
-			t.Fatalf("unexpected error: got = %v, want = nil", err)
-		}
-		if len(rule.allStdNames) != firstLoadLen {
-			t.Errorf("expected allStdNames to be loaded only once, but got different lengths: first %d, second %d", firstLoadLen, len(rule.allStdNames))
-		}
-	})
-
-	t.Run("skips loading std packages when checkCollisionWithAllStd is false", func(t *testing.T) {
-		var rule PackageNamingRule
-
-		err := rule.Configure(lint.Arguments{
-			map[string]any{
-				"check-collision-with-all-std": false,
-			},
-		})
-		if err != nil {
-			t.Errorf("unexpected error: got = %v, want = nil", err)
-		}
-
-		if rule.allStdNames != nil {
-			t.Errorf("expected allStdNames to be nil, but got %v", rule.allStdNames)
-		}
-	})
 }

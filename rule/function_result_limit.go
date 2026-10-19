@@ -33,6 +33,7 @@ func (r *FunctionResultsLimitRule) Apply(file *lint.File, _ lint.Arguments) []li
 		}
 
 		failures = append(failures, lint.Failure{
+			Category:   lint.FailureCategoryMaintenance,
 			Confidence: 1,
 			Failure:    fmt.Sprintf("maximum number of return results per function exceeded; max %d but got %d", r.max, num),
 			Node:       funcDecl.Type,
@@ -48,6 +49,8 @@ func (*FunctionResultsLimitRule) Name() string {
 }
 
 const defaultResultsLimit = 3
+
+var _ lint.ConfigurableRule = (*FunctionResultsLimitRule)(nil)
 
 // Configure validates the rule configuration, and configures the rule accordingly.
 //

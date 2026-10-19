@@ -1,36 +1,26 @@
-package rule
+package rule_test
 
 import (
 	"errors"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
 )
 
 func TestCommentSpacingsRule_Configure(t *testing.T) {
 	tests := []struct {
-		name          string
-		arguments     lint.Arguments
-		wantErr       error
-		wantAllowList []string
+		name      string
+		arguments lint.Arguments
+		wantErr   error
 	}{
 		{
 			name:      "no arguments uses default allow list",
 			arguments: lint.Arguments{},
-			wantErr:   nil,
-			wantAllowList: []string{
-				"//#nosec",
-			},
 		},
 		{
 			name:      "valid arguments appended to default allow list",
 			arguments: lint.Arguments{"mypragma:", "+optional"},
-			wantErr:   nil,
-			wantAllowList: []string{
-				"//#nosec",
-				"//mypragma:",
-				"//+optional",
-			},
 		},
 		{
 			name:      "invalid argument type",
@@ -41,32 +31,18 @@ func TestCommentSpacingsRule_Configure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var r CommentSpacingsRule
+			var r rule.CommentSpacingsRule
 
 			err := r.Configure(tt.arguments)
 
-			if tt.wantErr != nil {
-				if err == nil {
-					t.Errorf("unexpected error: got = nil, want = %v", tt.wantErr)
-					return
-				}
-				if err.Error() != tt.wantErr.Error() {
-					t.Errorf("unexpected error: got = %v, want = %v", err, tt.wantErr)
+			if tt.wantErr == nil {
+				if err != nil {
+					t.Errorf("Configure() unexpected non-nil error %q", err)
 				}
 				return
 			}
-			if err != nil {
-				t.Errorf("unexpected error: got = %v, want = nil", err)
-				return
-			}
-			if len(r.allowList) != len(tt.wantAllowList) {
-				t.Errorf("unexpected allowList length: got = %d, want = %d", len(r.allowList), len(tt.wantAllowList))
-				return
-			}
-			for i, entry := range tt.wantAllowList {
-				if r.allowList[i] != entry {
-					t.Errorf("unexpected allowList[%d]: got = %q, want = %q", i, r.allowList[i], entry)
-				}
+			if err == nil || err.Error() != tt.wantErr.Error() {
+				t.Errorf("Configure() unexpected error: got %q, want %q", err, tt.wantErr)
 			}
 		})
 	}

@@ -15,6 +15,8 @@ type ArgumentsLimitRule struct {
 
 const defaultArgumentsLimit = 8
 
+var _ lint.ConfigurableRule = (*ArgumentsLimitRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
@@ -55,6 +57,7 @@ func (r *ArgumentsLimitRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 			Confidence: 1,
 			Failure:    fmt.Sprintf("maximum number of arguments per function exceeded; max %d but got %d", r.max, numParams),
 			Node:       funcDecl.Type,
+			Category:   lint.FailureCategoryMaintenance,
 		})
 	}
 

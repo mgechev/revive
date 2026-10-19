@@ -68,8 +68,11 @@ func (w *lintDeepExit) Visit(node ast.Node) ast.Visitor {
 	if astutils.IsCallToExitFunction(pkg, fn, ce.Args) {
 		msg := fmt.Sprintf("calls to %s.%s only in main() or init() functions", pkg, fn)
 
-		if pkg == "flag" && fn == "NewFlagSet" &&
-			len(ce.Args) == 2 && astutils.IsPkgDotName(ce.Args[1], "flag", "ExitOnError") {
+		switch {
+		case pkg == "flag" && fn == "Parse":
+			msg += "; move the call or refactor to use flag.NewFlagSet with flag.ContinueOnError"
+		case pkg == "flag" && fn == "NewFlagSet" &&
+			len(ce.Args) == 2 && astutils.IsPkgDotName(ce.Args[1], "flag", "ExitOnError"):
 			msg = "calls to flag.NewFlagSet with flag.ExitOnError only in main() or init() functions"
 		}
 		w.onFailure(lint.Failure{

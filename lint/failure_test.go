@@ -1,42 +1,46 @@
-package lint
+package lint_test
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/mgechev/revive/lint"
+)
 
 func TestFailureSeverityFor(t *testing.T) {
 	for name, tc := range map[string]struct {
-		config  *Config
-		failure Failure
-		want    Severity
+		config  *lint.Config
+		failure lint.Failure
+		want    lint.Severity
 	}{
 		"rule configured as error": {
-			config:  &Config{Rules: RulesConfig{"r": {Severity: SeverityError}}},
-			failure: Failure{RuleName: "r"},
-			want:    SeverityError,
+			config:  &lint.Config{Rules: lint.RulesConfig{"r": {Severity: lint.SeverityError}}},
+			failure: lint.Failure{RuleName: "r"},
+			want:    lint.SeverityError,
 		},
 		"rule configured as warning": {
-			config:  &Config{Rules: RulesConfig{"r": {Severity: SeverityWarning}}},
-			failure: Failure{RuleName: "r"},
-			want:    SeverityWarning,
+			config:  &lint.Config{Rules: lint.RulesConfig{"r": {Severity: lint.SeverityWarning}}},
+			failure: lint.Failure{RuleName: "r"},
+			want:    lint.SeverityWarning,
 		},
 		"directive configured as error": {
-			config:  &Config{Directives: DirectivesConfig{"d": {Severity: SeverityError}}},
-			failure: Failure{RuleName: "d"},
-			want:    SeverityError,
+			config:  &lint.Config{Directives: lint.DirectivesConfig{"d": {Severity: lint.SeverityError}}},
+			failure: lint.Failure{RuleName: "d"},
+			want:    lint.SeverityError,
 		},
 		"rule without severity defaults to warning": {
-			config:  &Config{Rules: RulesConfig{"r": {}}},
-			failure: Failure{RuleName: "r"},
-			want:    SeverityWarning,
+			config:  &lint.Config{Rules: lint.RulesConfig{"r": {}}},
+			failure: lint.Failure{RuleName: "r"},
+			want:    lint.SeverityWarning,
 		},
 		"rule not in config defaults to warning": {
-			config:  &Config{},
-			failure: Failure{RuleName: "unknown"},
-			want:    SeverityWarning,
+			config:  &lint.Config{},
+			failure: lint.Failure{RuleName: "unknown"},
+			want:    lint.SeverityWarning,
 		},
 		"nil config defaults to warning": {
 			config:  nil,
-			failure: Failure{RuleName: "r"},
-			want:    SeverityWarning,
+			failure: lint.Failure{RuleName: "r"},
+			want:    lint.SeverityWarning,
 		},
 	} {
 		t.Run(name, func(t *testing.T) {

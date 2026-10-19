@@ -2,6 +2,7 @@ package rule
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/mgechev/revive/lint"
@@ -18,11 +19,13 @@ type CommentSpacingsRule struct {
 	allowList []string
 }
 
+var _ lint.ConfigurableRule = (*CommentSpacingsRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
 func (r *CommentSpacingsRule) Configure(arguments lint.Arguments) error {
-	r.allowList = defaultAllowList
+	r.allowList = slices.Clone(defaultAllowList)
 	for _, arg := range arguments {
 		allow, ok := arg.(string) // Alt. non panicking version
 		if !ok {

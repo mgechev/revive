@@ -75,6 +75,7 @@ func (w bareReturnFinder) Visit(node ast.Node) ast.Visitor {
 	}
 
 	w.onFailure(lint.Failure{
+		Category:   lint.FailureCategoryStyle,
 		Confidence: 1,
 		Node:       rs,
 		Failure:    "avoid using bare returns, please add return expressions",

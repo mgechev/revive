@@ -22,7 +22,7 @@ type decodeAndValidateRequest struct {
 	OptionalStruct   *optionalStruct `json:"optionalStruct,omitempty"`
 	OptionalQuery    string          `json:"-" querystring:"queryfoo"`
 	optionalQuery    string          `json:"-" querystring:"queryfoo"` // MATCH /tag on not-exported field optionalQuery/
-	// No-reg test for bug https://github.com/mgechev/revive/issues/208
+	// No-reg test for bug https://github.com/revive-lint/revive/issues/208
 	Tiret       string `json:"-,"`
 	BadTiret    string `json:"other,"`               // MATCH /option can not be empty in json tag/
 	ForOmitzero string `json:"forOmitZero,omitzero"` // MATCH /prior Go 1.24, option "omitzero" is unsupported in json tag/
@@ -237,4 +237,12 @@ type Cbor struct {
 	ErrorsOk   string `cbor:"-1,keyasint"`
 	InputsOk2  string `cbor:"inputs,omitempty"`
 	OutputsOk2 string `cbor:",toarray"`
+}
+
+// Tag numbers of asn1, cbor and protobuf live in separate namespaces,
+// so reusing the same number across them is not a duplicate.
+type CrossFormatTagNumbers struct {
+	A int    `asn1:"tag:1"`
+	B string `cbor:"1,keyasint"`
+	C *int32 `protobuf:"varint,1,opt,name=c"`
 }

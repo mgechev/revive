@@ -121,10 +121,11 @@ func (p *Package) TypeCheck() error {
 		Importer: importer.Default(),
 	}
 	info := &types.Info{
-		Types:  map[ast.Expr]types.TypeAndValue{},
-		Defs:   map[*ast.Ident]types.Object{},
-		Uses:   map[*ast.Ident]types.Object{},
-		Scopes: map[ast.Node]*types.Scope{},
+		Types:      map[ast.Expr]types.TypeAndValue{},
+		Defs:       map[*ast.Ident]types.Object{},
+		Uses:       map[*ast.Ident]types.Object{},
+		Scopes:     map[ast.Node]*types.Scope{},
+		Selections: map[*ast.SelectorExpr]*types.Selection{},
 	}
 	var anyFile *File
 	var astFiles []*ast.File
@@ -138,7 +139,7 @@ func (p *Package) TypeCheck() error {
 		return errors.New("no ast.File found")
 	}
 
-	typesPkg, err := check(config, anyFile.AST.Name.Name, p.fset, astFiles, info)
+	typesPkg, err := config.Check(anyFile.AST.Name.Name, p.fset, astFiles, info)
 
 	// Remember the typechecking info, even if config.Check failed,
 	// since we will get partial information.
@@ -146,20 +147,6 @@ func (p *Package) TypeCheck() error {
 	p.typesInfo = info
 
 	return err
-}
-
-// check function encapsulates the call to [go/types.Config.Check] method and
-// recovers if the called method panics (see issue #59).
-func check(config *types.Config, n string, fset *token.FileSet, astFiles []*ast.File, info *types.Info) (p *types.Package, err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			err, _ = r.(error)
-			p = nil
-			return
-		}
-	}()
-
-	return config.Check(n, fset, astFiles, info)
 }
 
 // TypeOf returns the type of expression.

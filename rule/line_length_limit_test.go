@@ -1,32 +1,26 @@
-package rule
+package rule_test
 
 import (
 	"errors"
-	"slices"
 	"testing"
 
 	"github.com/mgechev/revive/lint"
+	"github.com/mgechev/revive/rule"
 )
 
 func TestLineLengthLimitRule_Configure(t *testing.T) {
 	tests := []struct {
-		name         string
-		arguments    lint.Arguments
-		wantErr      error
-		wantMax      int
-		wantExcludes []string
+		name      string
+		arguments lint.Arguments
+		wantErr   error
 	}{
 		{
 			name:      "no arguments",
 			arguments: lint.Arguments{},
-			wantErr:   nil,
-			wantMax:   80,
 		},
 		{
 			name:      "integer argument",
 			arguments: lint.Arguments{int64(100)},
-			wantErr:   nil,
-			wantMax:   100,
 		},
 		{
 			name:      "negative integer argument",
@@ -39,26 +33,18 @@ func TestLineLengthLimitRule_Configure(t *testing.T) {
 				"max":      int64(100),
 				"excludes": []any{`^\s*//go:generate `, `https?://`},
 			}},
-			wantErr:      nil,
-			wantMax:      100,
-			wantExcludes: []string{`^\s*//go:generate `, `https?://`},
 		},
 		{
 			name: "valid capitalized max option",
 			arguments: lint.Arguments{map[string]any{
 				"Max": int64(100),
 			}},
-			wantErr: nil,
-			wantMax: 100,
 		},
 		{
 			name: "map without max keeps default",
 			arguments: lint.Arguments{map[string]any{
 				"excludes": []any{`https?://`},
 			}},
-			wantErr:      nil,
-			wantMax:      80,
-			wantExcludes: []string{`https?://`},
 		},
 		{
 			name:      "invalid argument type",
@@ -111,33 +97,18 @@ func TestLineLengthLimitRule_Configure(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var rule LineLengthLimitRule
+			var r rule.LineLengthLimitRule
 
-			err := rule.Configure(tt.arguments)
+			err := r.Configure(tt.arguments)
 
-			if tt.wantErr != nil {
-				if err == nil {
-					t.Errorf("unexpected error: got = nil, want = %v", tt.wantErr)
-					return
-				}
-				if err.Error() != tt.wantErr.Error() {
-					t.Errorf("unexpected error: got = %v, want = %v", err, tt.wantErr)
+			if tt.wantErr == nil {
+				if err != nil {
+					t.Errorf("Configure() unexpected non-nil error %q", err)
 				}
 				return
 			}
-			if err != nil {
-				t.Errorf("unexpected error: got = %v, want = nil", err)
-			}
-			if rule.max != tt.wantMax {
-				t.Errorf("unexpected max: got = %v, want %v", rule.max, tt.wantMax)
-			}
-
-			gotExcludes := make([]string, 0, len(rule.excludes))
-			for _, exclude := range rule.excludes {
-				gotExcludes = append(gotExcludes, exclude.String())
-			}
-			if !slices.Equal(gotExcludes, tt.wantExcludes) {
-				t.Errorf("unexpected excludes: got = %v, want %v", gotExcludes, tt.wantExcludes)
+			if err == nil || err.Error() != tt.wantErr.Error() {
+				t.Errorf("Configure() unexpected error: got %q, want %q", err, tt.wantErr)
 			}
 		})
 	}

@@ -42,6 +42,8 @@ type EnforceMapStyleRule struct {
 	enforceMapStyle enforceMapStyleType
 }
 
+var _ lint.ConfigurableRule = (*EnforceMapStyleRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

@@ -17,6 +17,8 @@ type CyclomaticRule struct {
 
 const defaultMaxCyclomaticComplexity = 10
 
+var _ lint.ConfigurableRule = (*CyclomaticRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

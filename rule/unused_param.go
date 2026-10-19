@@ -18,6 +18,8 @@ type UnusedParamRule struct {
 	failureMsg string
 }
 
+var _ lint.ConfigurableRule = (*UnusedParamRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

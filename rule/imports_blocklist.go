@@ -14,6 +14,8 @@ type ImportsBlocklistRule struct {
 
 var replaceImportRegexp = regexp.MustCompile(`/?\*\*/?`)
 
+var _ lint.ConfigurableRule = (*ImportsBlocklistRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

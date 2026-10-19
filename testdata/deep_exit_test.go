@@ -31,3 +31,13 @@ func ExampleBar_Qux() {
 func ExampleBar(int) {
 	log.Fatal(errors.New("example")) // MATCH /calls to log.Fatal only in main() or init() functions/
 }
+
+// Not an example because the suffix does not start with an uppercase letter
+func Examplequux() {
+	log.Fatal(errors.New("example")) // MATCH /calls to log.Fatal only in main() or init() functions/
+}
+
+// Not an example because the name does not start with Example
+func notAnExample() {
+	log.Fatal(errors.New("example")) // MATCH /calls to log.Fatal only in main() or init() functions/
+}

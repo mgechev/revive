@@ -19,10 +19,14 @@ type UncheckedTypeAssertionRule struct {
 	acceptIgnoredAssertionResult bool
 }
 
+var _ lint.ConfigurableRule = (*UncheckedTypeAssertionRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
 func (r *UncheckedTypeAssertionRule) Configure(arguments lint.Arguments) error {
+	r.acceptIgnoredAssertionResult = false
+
 	if len(arguments) == 0 {
 		return nil
 	}

@@ -45,6 +45,8 @@ type EnforceRepeatedArgTypeStyleRule struct {
 	funcRetValStyle enforceRepeatedArgTypeStyleType
 }
 
+var _ lint.ConfigurableRule = (*EnforceRepeatedArgTypeStyleRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
@@ -96,7 +98,7 @@ func (r *EnforceRepeatedArgTypeStyleRule) Configure(arguments lint.Arguments) er
 			}
 		}
 	default:
-		return fmt.Errorf("invalid argument '%v' for 'import-alias-naming' rule. Expecting string or map[string]string, got %T", arguments[0], arguments[0])
+		return fmt.Errorf("invalid argument '%v' for 'enforce-repeated-arg-type-style' rule. Expecting string or map[string]string, got %T", arguments[0], arguments[0])
 	}
 	return nil
 }

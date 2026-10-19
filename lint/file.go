@@ -90,10 +90,9 @@ var basicTypeKinds = map[types.BasicKind]string{
 	types.UntypedString:  "string",
 }
 
-// IsUntypedConst reports whether expr is an untyped constant,
-// and indicates what its default type is.
+// IsUntypedConst reports whether expr is an untyped constant, and indicates what its default type is.
 // Scope may be nil.
-func (f *File) IsUntypedConst(expr ast.Expr) (defType string, ok bool) {
+func (f *File) IsUntypedConst(expr ast.Expr) (string, bool) {
 	// Re-evaluate expr outside its context to see if it's untyped.
 	// (An expr evaluated within, for example, an assignment context will get the type of the LHS.)
 	exprStr := f.Render(expr)
@@ -209,32 +208,36 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason, mustSpe
 		return result
 	}
 
-	handleConfig := func(isEnabled bool, line int, name string) {
+	// handleConfig records a state change for the rule and reports whether it changed anything.
+	// A directive that repeats the current state (e.g. a second disable) is a no-op.
+	handleConfig := func(isEnabled bool, line int, name string) bool {
 		existing, ok := enabledDisabledRulesMap[name]
 		if !ok {
 			existing = []enableDisableConfig{}
 			enabledDisabledRulesMap[name] = existing
 		}
-		if (len(existing) > 1 && existing[len(existing)-1].enabled == isEnabled) ||
-			(len(existing) == 0 && isEnabled) {
-			return
+		currentlyEnabled := len(existing) == 0 || existing[len(existing)-1].enabled
+		if currentlyEnabled == isEnabled {
+			return false
 		}
-		existing = append(existing, enableDisableConfig{
+		enabledDisabledRulesMap[name] = append(existing, enableDisableConfig{
 			enabled:  isEnabled,
 			position: line,
 		})
-		enabledDisabledRulesMap[name] = existing
+		return true
 	}
 
 	handleRules := func(modifier string, isEnabled bool, line int, ruleNames []string) {
 		for _, name := range ruleNames {
 			switch modifier {
 			case "line":
-				handleConfig(isEnabled, line, name)
-				handleConfig(!isEnabled, line, name)
+				if handleConfig(isEnabled, line, name) {
+					handleConfig(!isEnabled, line, name)
+				}
 			case "next-line":
-				handleConfig(isEnabled, line+1, name)
-				handleConfig(!isEnabled, line+1, name)
+				if handleConfig(isEnabled, line+1, name) {
+					handleConfig(!isEnabled, line+1, name)
+				}
 			default:
 				handleConfig(isEnabled, line, name)
 			}
@@ -260,6 +263,7 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason, mustSpe
 			mustCheckDisablingReason := mustSpecifyDisableReason && match[directivePos] == "disable"
 			if mustCheckDisablingReason && strings.Trim(match[reasonPos], " ") == "" {
 				failures <- Failure{
+					Category:   FailureCategoryComments,
 					Confidence: 1,
 					RuleName:   directiveSpecifyDisableReason,
 					Failure:    "reason of lint disabling not found",
@@ -272,6 +276,7 @@ func (f *File) disabledIntervals(rules []Rule, mustSpecifyDisableReason, mustSpe
 			mustCheckDisablingRules := mustSpecifyDisableRules && match[directivePos] == "disable"
 			if mustCheckDisablingRules && len(ruleNames) == 0 {
 				failures <- Failure{
+					Category:   FailureCategoryComments,
 					Confidence: 1,
 					RuleName:   directiveSpecifyDisableRule,
 					Failure:    "rule name for lint disabling not found",

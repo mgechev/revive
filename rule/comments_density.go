@@ -15,6 +15,8 @@ type CommentsDensityRule struct {
 
 const defaultMinimumCommentsPercentage = 0
 
+var _ lint.ConfigurableRule = (*CommentsDensityRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
@@ -41,6 +43,7 @@ func (r *CommentsDensityRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fa
 	if density < float32(r.minimumCommentsDensity) {
 		return []lint.Failure{
 			{
+				Category:   lint.FailureCategoryMaintenance,
 				Node:       file.AST,
 				Confidence: 1,
 				Failure: fmt.Sprintf("the file has a comment density of %2.f%% (%d comment lines for %d code lines) but expected a minimum of %d%%",

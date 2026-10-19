@@ -25,6 +25,8 @@ type DeferRule struct {
 	allow map[string]bool
 }
 
+var _ lint.ConfigurableRule = (*DeferRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.

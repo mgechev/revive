@@ -17,10 +17,13 @@ type UnhandledErrorRule struct {
 	ignoreList []*regexp.Regexp
 }
 
+var _ lint.ConfigurableRule = (*UnhandledErrorRule)(nil)
+
 // Configure validates the rule configuration, and configures the rule accordingly.
 //
 // Configuration implements the [lint.ConfigurableRule] interface.
 func (r *UnhandledErrorRule) Configure(arguments lint.Arguments) error {
+	r.ignoreList = nil
 	for _, arg := range arguments {
 		argStr, ok := arg.(string)
 		if !ok {
@@ -54,7 +57,7 @@ func (r *UnhandledErrorRule) Apply(file *lint.File, _ lint.Arguments) []lint.Fai
 		},
 	}
 
-	file.Pkg.TypeCheck()
+	file.Pkg.TypeCheck() //nolint:errcheck,gosec // G104: Errors unhandled
 	ast.Walk(walker, file.AST)
 
 	return failures
