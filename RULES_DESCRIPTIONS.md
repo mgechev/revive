@@ -39,7 +39,6 @@ List of all available rules.
 - [error-return](#error-return)
 - [error-strings](#error-strings)
 - [errorf](#errorf)
-- [exit-after-defer](#exit-after-defer)
 - [exported](#exported)
 - [file-header](#file-header)
 - [file-length-limit](#file-length-limit)
@@ -454,6 +453,7 @@ _Description_: This rule warns on some common mistakes when using `defer` statem
 | name              | description                                                                                                                                                                                     |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | call-chain        | even if deferring call-chains of the form `foo()()` is valid, it does not help code understanding (only the last call is deferred)                                                             |
+| exit-after-defer  | calling `os.Exit`, `log.Fatal` or another function that exits the program after a `defer` statement prevents the deferred calls from running                                                    |
 | loop              | deferring inside loops can be misleading (deferred functions are not executed at the end of the loop iteration but of the current function) and it could lead to exhausting the execution stack |
 | method-call       | deferring a call to a method can lead to subtle bugs if the method does not have a pointer receiver                                                                                             |
 | recover           | calling `recover` outside a deferred function has no effect                                                                                                                                     |
@@ -908,31 +908,6 @@ _Description_: It is possible to get a simpler program by replacing `errors.New(
 This rule spots that kind of simplification opportunities.
 
 _Configuration_: N/A
-
-## exit-after-defer
-
-_Go version_: 1.0.
-
-_Description_: Calls to `os.Exit`, `syscall.Exit` or the `log.Fatal` family stop the program immediately without running deferred functions.
-When such a call is reachable after a `defer` statement, the deferred call will never run, which is usually a mistake.
-
-`panic` and the `log.Panic` family are not reported because deferred functions still run while a panic unwinds the stack.
-
-_Configuration_: N/A
-
-### Examples (exit-after-defer)
-
-```go
-import "log"
-
-func run() {
-	defer cleanup()
-
-	if err := work(); err != nil {
-		log.Fatal(err) // cleanup is never called
-	}
-}
-```
 
 ## exported
 

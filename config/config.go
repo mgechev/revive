@@ -125,7 +125,6 @@ var allRules = append([]lint.Rule{
 	&rule.PackageNamingRule{},
 	&rule.MultilineIfInitRule{},
 	&rule.MarshalReceiverRule{},
-	&rule.ExitAfterDeferRule{},
 }, defaultRules...)
 
 // AllRules returns a copy of the list of all rules registered in revive.

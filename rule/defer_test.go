@@ -26,6 +26,7 @@ func TestDeferRule_Configure(t *testing.T) {
 				"return":           true,
 				"recover":          true,
 				"immediaterecover": true,
+				"exitafterdefer":   true,
 			},
 		},
 		{

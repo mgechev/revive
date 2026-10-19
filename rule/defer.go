@@ -3,6 +3,7 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"strings"
 
 	"github.com/mgechev/revive/internal/astutils"
 	"github.com/mgechev/revive/internal/config"
@@ -16,6 +17,7 @@ var (
 	deferOptionReturn           = config.NormalizeOption("return")
 	deferOptionRecover          = config.NormalizeOption("recover")
 	deferOptionImmediateRecover = config.NormalizeOption("immediateRecover")
+	deferOptionExitAfterDefer   = config.NormalizeOption("exitAfterDefer")
 )
 
 // DeferRule lints gotchas in defer statements.
@@ -45,6 +47,22 @@ func (r *DeferRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 
 	ast.Walk(w, file.AST)
 
+	if r.allow[deferOptionExitAfterDefer] {
+		ast.Inspect(file.AST, func(n ast.Node) bool {
+			switch fn := n.(type) {
+			case *ast.FuncDecl:
+				if fn.Body != nil {
+					checkExitAfterDefer(fn.Body, onFailure)
+				}
+				return false
+			case *ast.FuncLit:
+				checkExitAfterDefer(fn.Body, onFailure)
+				return false
+			}
+			return true
+		})
+	}
+
 	return failures
 }
 
@@ -62,6 +80,7 @@ func (*DeferRule) allowFromArgs(args lint.Arguments) (map[string]bool, error) {
 			deferOptionReturn:           true,
 			deferOptionRecover:          true,
 			deferOptionImmediateRecover: true,
+			deferOptionExitAfterDefer:   true,
 		}
 
 		return allow, nil
@@ -184,5 +203,54 @@ func (w lintDeferRule) newFailure(msg string, node ast.Node, confidence float64,
 		Node:       node,
 		Category:   cat,
 		Failure:    msg,
+	})
+}
+
+// checkExitAfterDefer reports exit calls that follow a defer statement within the same function scope.
+// Function literals are analyzed on their own because they introduce a new defer scope.
+func checkExitAfterDefer(body *ast.BlockStmt, onFailure func(lint.Failure)) {
+	deferred := false
+	ast.Inspect(body, func(n ast.Node) bool {
+		switch n := n.(type) {
+		case *ast.FuncLit:
+			checkExitAfterDefer(n.Body, onFailure)
+			return false
+		case *ast.DeferStmt:
+			deferred = true
+			// A deferred function literal has its own defer scope.
+			if lit, ok := n.Call.Fun.(*ast.FuncLit); ok {
+				checkExitAfterDefer(lit.Body, onFailure)
+			}
+			return false
+		case *ast.CallExpr:
+			if !deferred {
+				return true
+			}
+			sel, ok := n.Fun.(*ast.SelectorExpr)
+			if !ok {
+				return true
+			}
+			id, ok := sel.X.(*ast.Ident)
+			if !ok {
+				return true
+			}
+			pkg, fn := id.Name, sel.Sel.Name
+			// deferred functions still run while a panic unwinds the stack
+			if pkg == "log" && strings.HasPrefix(fn, "Panic") {
+				return true
+			}
+			if !astutils.IsCallToExitFunction(pkg, fn, n.Args) {
+				return true
+			}
+			// confidence is not 1 because the check is source-order only:
+			// the defer may not be registered on the path leading to the exit call
+			onFailure(lint.Failure{
+				Confidence: 0.8,
+				Node:       n,
+				Category:   lint.FailureCategoryBadPractice,
+				Failure:    fmt.Sprintf("%s.%s after a defer statement prevents deferred calls from running", pkg, fn),
+			})
+		}
+		return true
 	})
 }
