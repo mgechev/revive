@@ -3,6 +3,7 @@ package rule
 import (
 	"fmt"
 	"go/ast"
+	"strconv"
 	"strings"
 
 	"github.com/mgechev/revive/internal/astutils"
@@ -45,25 +46,9 @@ func (r *DeferRule) Apply(file *lint.File, _ lint.Arguments) []lint.Failure {
 	onFailure := func(failure lint.Failure) {
 		failures = append(failures, failure)
 	}
-	w := lintDeferRule{onFailure: onFailure, allow: r.allow}
+	w := lintDeferRule{onFailure: onFailure, allow: r.allow, deferred: new(bool), imports: importPathsByName(file.AST)}
 
 	ast.Walk(w, file.AST)
-
-	if r.allow[deferOptionExitAfterDefer] {
-		ast.Inspect(file.AST, func(n ast.Node) bool {
-			switch fn := n.(type) {
-			case *ast.FuncDecl:
-				if fn.Body != nil {
-					checkExitAfterDefer(fn.Body, onFailure)
-				}
-				return false
-			case *ast.FuncLit:
-				checkExitAfterDefer(fn.Body, onFailure)
-				return false
-			}
-			return true
-		})
-	}
 
 	return failures
 }
@@ -105,12 +90,16 @@ func (*DeferRule) allowFromArgs(args lint.Arguments) (map[string]bool, error) {
 	return allow, nil
 }
 
+var exitAfterDeferOnly = map[string]bool{deferOptionExitAfterDefer: true}
+
 type lintDeferRule struct {
 	onFailure  func(lint.Failure)
 	inALoop    bool
 	inADefer   bool
-	inAFuncLit byte // 0 = not in func lit, 1 = in top-level func lit, >1 = nested func lit
+	inAFuncLit byte  // 0 = not in func lit, 1 = in top-level func lit, >1 = nested func lit
+	deferred   *bool // whether a defer statement precedes the current node in the enclosing function
 	allow      map[string]bool
+	imports    map[string]string
 }
 
 func (w lintDeferRule) Visit(node ast.Node) ast.Visitor {
@@ -121,7 +110,14 @@ func (w lintDeferRule) Visit(node ast.Node) ast.Visitor {
 	case *ast.RangeStmt:
 		w.visitSubtree(n.Body, w.inADefer, true, w.inAFuncLit)
 		return nil
+	case *ast.FuncDecl:
+		if n.Body != nil {
+			w.deferred = new(bool)
+			ast.Walk(w, n.Body)
+		}
+		return nil
 	case *ast.FuncLit:
+		w.deferred = new(bool)
 		w.visitSubtree(n.Body, w.inADefer, false, w.inAFuncLit+1)
 		return nil
 	case *ast.ReturnStmt:
@@ -143,7 +139,14 @@ func (w lintDeferRule) Visit(node ast.Node) ast.Visitor {
 			// but it is very likely to be a misunderstanding of defer's behavior around arguments.
 			w.newFailure("recover must be called inside a deferred function, this is executing recover immediately", n, 1, lint.FailureCategoryLogic, deferOptionImmediateRecover)
 		}
-		return nil // no need to analyze the arguments of the function call
+		if *w.deferred {
+			w.checkExit(n)
+		}
+		if !w.allow[deferOptionExitAfterDefer] {
+			return nil // no need to analyze the arguments of the function call
+		}
+		// function literals in the call may contain exit calls, but the other subcases are not checked there
+		w.allow = exitAfterDeferOnly
 	case *ast.DeferStmt:
 		if astutils.IsIdent(n.Call.Fun, "recover") {
 			// defer recover()
@@ -152,6 +155,7 @@ func (w lintDeferRule) Visit(node ast.Node) ast.Visitor {
 			// but normally this doesn't suppress a panic, and even if it did it would silently discard the value.
 			w.newFailure("recover must be called inside a deferred function, this is executing recover immediately", n, 1, lint.FailureCategoryLogic, deferOptionImmediateRecover)
 		}
+		*w.deferred = true
 		w.visitSubtree(n.Call.Fun, true, false, 0)
 		for _, a := range n.Call.Args {
 			switch a.(type) {
@@ -185,13 +189,10 @@ func (w lintDeferRule) Visit(node ast.Node) ast.Visitor {
 }
 
 func (w lintDeferRule) visitSubtree(n ast.Node, inADefer, inALoop bool, inAFuncLit byte) {
-	nw := lintDeferRule{
-		onFailure:  w.onFailure,
-		inADefer:   inADefer,
-		inALoop:    inALoop,
-		inAFuncLit: inAFuncLit,
-		allow:      w.allow,
-	}
+	nw := w
+	nw.inADefer = inADefer
+	nw.inALoop = inALoop
+	nw.inAFuncLit = inAFuncLit
 	ast.Walk(nw, n)
 }
 
@@ -208,51 +209,45 @@ func (w lintDeferRule) newFailure(msg string, node ast.Node, confidence float64,
 	})
 }
 
-// checkExitAfterDefer reports exit calls that follow a defer statement within the same function scope.
-// Function literals are analyzed on their own because they introduce a new defer scope.
-func checkExitAfterDefer(body *ast.BlockStmt, onFailure func(lint.Failure)) {
-	deferred := false
-	ast.Inspect(body, func(n ast.Node) bool {
-		switch n := n.(type) {
-		case *ast.FuncLit:
-			checkExitAfterDefer(n.Body, onFailure)
-			return false
-		case *ast.DeferStmt:
-			deferred = true
-			// A deferred function literal has its own defer scope.
-			if lit, ok := n.Call.Fun.(*ast.FuncLit); ok {
-				checkExitAfterDefer(lit.Body, onFailure)
-			}
-			return false
-		case *ast.CallExpr:
-			if !deferred {
-				return true
-			}
-			sel, ok := n.Fun.(*ast.SelectorExpr)
-			if !ok {
-				return true
-			}
-			id, ok := sel.X.(*ast.Ident)
-			if !ok {
-				return true
-			}
-			pkg, fn := id.Name, sel.Sel.Name
-			// deferred functions still run while a panic unwinds the stack
-			if pkg == "log" && strings.HasPrefix(fn, "Panic") {
-				return true
-			}
-			if !astutils.IsCallToExitFunction(pkg, fn, n.Args) {
-				return true
-			}
-			// confidence is not 1 because the check is source-order only:
-			// the defer may not be registered on the path leading to the exit call
-			onFailure(lint.Failure{
-				Confidence: 0.8,
-				Node:       n,
-				Category:   lint.FailureCategoryBadPractice,
-				Failure:    fmt.Sprintf("%s.%s after a defer statement prevents deferred calls from running", pkg, fn),
-			})
+// importPathsByName maps the names under which packages are imported in the file to their import paths.
+func importPathsByName(file *ast.File) map[string]string {
+	imports := map[string]string{}
+	for _, imp := range file.Imports {
+		path, err := strconv.Unquote(imp.Path.Value)
+		if err != nil {
+			continue
 		}
-		return true
-	})
+		name := path[strings.LastIndex(path, "/")+1:]
+		if imp.Name != nil {
+			name = imp.Name.Name
+		}
+		imports[name] = path
+	}
+	return imports
+}
+
+// exitSkippingDefers lists std functions that terminate the program without running deferred calls.
+var exitSkippingDefers = map[string]map[string]bool{
+	"os":      {"Exit": true},
+	"syscall": {"Exit": true},
+	"log":     {"Fatal": true, "Fatalf": true, "Fatalln": true},
+}
+
+// checkExit reports a call that terminates the program without running the deferred calls.
+func (w lintDeferRule) checkExit(call *ast.CallExpr) {
+	sel, ok := call.Fun.(*ast.SelectorExpr)
+	if !ok {
+		return
+	}
+	id, ok := sel.X.(*ast.Ident)
+	if !ok {
+		return
+	}
+	pkg, fn := id.Name, sel.Sel.Name
+	if !exitSkippingDefers[w.imports[pkg]][fn] {
+		return
+	}
+	// confidence is not 1 because the check is source-order only:
+	// the defer may not be registered on the path leading to the exit call
+	w.newFailure(fmt.Sprintf("%s.%s after a defer statement prevents deferred calls from running", pkg, fn), call, 0.8, lint.FailureCategoryBadPractice, deferOptionExitAfterDefer)
 }

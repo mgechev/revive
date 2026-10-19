@@ -17,7 +17,6 @@ func TestDeferRule_Configure(t *testing.T) {
 		{
 			name:      "no arguments",
 			arguments: lint.Arguments{},
-			wantErr:   nil,
 		},
 		{
 			name: "valid arguments",

@@ -1,7 +1,9 @@
 package fixtures
 
 import (
+	"flag"
 	"log"
+	stdlog "log"
 	"os"
 	"syscall"
 )
@@ -66,4 +68,16 @@ func exitInFuncLitBeforeOuterDefer() {
 	}
 	defer println("cleanup")
 	f()
+}
+
+func flagParseAfterDeferIsFine() {
+	defer println("cleanup")
+	flag.Parse()
+	fs := flag.NewFlagSet("name", flag.ExitOnError)
+	_ = fs
+}
+
+func aliasedImportExitAfterDefer() {
+	defer println("cleanup")
+	stdlog.Fatal("boom") // MATCH /stdlog.Fatal after a defer statement prevents deferred calls from running/
 }
