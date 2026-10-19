@@ -587,7 +587,7 @@ List of all [available rules](./RULES_DESCRIPTIONS.md).
 | [`range`](./RULES_DESCRIPTIONS.md#range)               |  n/a   | Prevents redundant variables when iterating over a collection.   | 1.0 | [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0) |   yes    |  no   |
 | [`receiver-naming`](./RULES_DESCRIPTIONS.md#receiver-naming)     |  map (optional)   | Conventions around the naming of receivers.                      | 1.0 | [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0) |   yes    |  no   |
 | [`redefines-builtin-id`](./RULES_DESCRIPTIONS.md#redefines-builtin-id)|  n/a   | Warns on redefinitions of builtin identifiers                    | 1.0 | [v1.0.0](https://github.com/revive-lint/revive/releases/tag/v1.0.0) |    no    |  no   |
-| [`redundant-build-tag`](./RULES_DESCRIPTIONS.md#redundant-build-tag) | n/a   | Warns about redundant `// +build` comment lines | >= 1.17 | [v1.6.0](https://github.com/revive-lint/revive/releases/tag/v1.6.0) |   no    |  no   |
+| [`redundant-build-tag`](./RULES_DESCRIPTIONS.md#redundant-build-tag) | n/a   | Warns about build tags that are redundant: a `// +build` line, a `go1.X` constraint already guaranteed by go.mod, or a constraint implied by the file name | >= 1.17 | [v1.6.0](https://github.com/revive-lint/revive/releases/tag/v1.6.0) |   no    |  no   |
 | [`redundant-import-alias`](./RULES_DESCRIPTIONS.md#redundant-import-alias)          |  n/a   |  Warns on import aliases matching the imported package name | 1.0 | [v1.3.3](https://github.com/revive-lint/revive/releases/tag/v1.3.3) |    no    |  no   |
 | [`redundant-test-main-exit`](./RULES_DESCRIPTIONS.md#redundant-test-main-exit) |  n/a   | Suggests removing `Exit` call in `TestMain` function for test files | >= 1.15 | [v1.6.1](https://github.com/revive-lint/revive/releases/tag/v1.6.1) |    no    |  no   |
 | [`string-format`](./RULES_DESCRIPTIONS.md#string-format)          |  map   | Warns on specific string literals that fail one or more user-configured regular expressions            | 1.0 | [v1.0.7](https://github.com/revive-lint/revive/releases/tag/v1.0.7) |    no    |  no   |
@@ -723,7 +723,7 @@ func (f myRule) Name() string {
 	return "myRule"
 }
 
-func (f myRule) Apply(*lint.File, lint.Arguments) []lint.Failure {
+func (f myRule) Apply(file *lint.File, arguments lint.Arguments) []lint.Failure {
 	// ...
 }
 ```
