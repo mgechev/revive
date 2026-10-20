@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-// Done ends a measurement started by [Track] or [Rules.Track].
+// Done ends a measurement started by [Track].
 // The given attributes, if any, are appended to the emitted log record.
 type Done func(attrs ...any)
 
@@ -49,44 +49,35 @@ func Track(logger *slog.Logger, phase string, attrs ...any) Done {
 
 // Rules accumulates the time spent in each rule across all linted files.
 type Rules struct {
-	stats map[string]*ruleStat
+	stats map[string]*RuleStat
 }
 
-type ruleStat struct {
+// RuleStat accumulates the time spent in one rule. It is safe for concurrent use.
+type RuleStat struct {
 	totalNs atomic.Int64
 	calls   atomic.Int64
 }
 
-// NewRules creates an accumulator for the given rule names, or nil if logger does not record debug messages.
-func NewRules(logger *slog.Logger, names []string) *Rules {
-	if !Enabled(logger) {
-		return nil
-	}
-
-	stats := make(map[string]*ruleStat, len(names))
-	for _, name := range names {
-		stats[name] = &ruleStat{}
-	}
-	return &Rules{stats: stats}
+// NewRules creates an empty accumulator.
+func NewRules() *Rules {
+	return &Rules{stats: map[string]*RuleStat{}}
 }
 
-// Track starts measuring one application of the named rule.
-// It is safe for concurrent use.
-func (r *Rules) Track(name string) Done {
-	if r == nil {
-		return noop
-	}
-
+// Stat returns the accumulator of the named rule, creating it if needed.
+// It is not safe for concurrent use: get every accumulator before applying the rules.
+func (r *Rules) Stat(name string) *RuleStat {
 	stat, ok := r.stats[name]
 	if !ok {
-		return noop
+		stat = &RuleStat{}
+		r.stats[name] = stat
 	}
+	return stat
+}
 
-	start := time.Now()
-	return func(...any) {
-		stat.totalNs.Add(int64(time.Since(start)))
-		stat.calls.Add(1)
-	}
+// Add records one application of the rule that took d.
+func (s *RuleStat) Add(d time.Duration) {
+	s.totalNs.Add(int64(d))
+	s.calls.Add(1)
 }
 
 // Log reports the accumulated per-rule durations, slowest rule first.

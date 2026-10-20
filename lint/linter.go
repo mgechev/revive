@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	goversion "github.com/hashicorp/go-version"
 	"golang.org/x/mod/modfile"
@@ -75,6 +76,7 @@ func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-cha
 
 	doneVersions := timing.Track(l.logger, "go-version-detection")
 	perModVersions := map[string]*goversion.Version{}
+	modules := 0
 	perPkgVersions := make([]*goversion.Version, len(packages))
 	for n, files := range packages {
 		if len(files) == 0 {
@@ -87,6 +89,7 @@ func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-cha
 
 		dir, err := filepath.Abs(filepath.Dir(files[0]))
 		if err != nil {
+			doneVersions("error", err)
 			return nil, err
 		}
 
@@ -107,21 +110,22 @@ func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-cha
 			// No luck finding the go.mod file thus set the default Go version
 			v = defaultGoVersion
 			d = dir
-			l.logger.Debug("go module not found, using the default Go version", "dir", dir, "version", v)
+			l.logger.Debug("go module not found, using the default Go version", "dir", dir, "version", v, "error", err)
 		} else {
+			modules++
 			l.logger.Debug("go module detected", "dir", d, "version", v)
 		}
 		perModVersions[d] = v
 		perPkgVersions[n] = v
 	}
 
-	doneVersions("packages", len(packages), "modules", len(perModVersions))
+	doneVersions("packages", len(packages), "modules", modules)
 
-	ruleNames := make([]string, len(ruleSet))
-	for i, r := range ruleSet {
-		ruleNames[i] = r.Name()
+	var ruleTimings *timing.Rules
+	if timing.Enabled(l.logger) {
+		ruleTimings = timing.NewRules()
+		ruleSet = timedRules(ruleSet, ruleTimings)
 	}
-	ruleTimings := timing.NewRules(l.logger, ruleNames)
 
 	doneLint := timing.Track(l.logger, "lint")
 	var wg errgroup.Group
@@ -129,7 +133,7 @@ func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-cha
 		wg.Go(func() error {
 			pkg := packages[n]
 			gover := perPkgVersions[n]
-			if err := l.lintPackage(pkg, gover, ruleSet, config, ruleTimings, failures); err != nil {
+			if err := l.lintPackage(pkg, gover, ruleSet, config, failures); err != nil {
 				return fmt.Errorf("error during linting: %w", err)
 			}
 			return nil
@@ -149,7 +153,7 @@ func (l *Linter) Lint(packages [][]string, ruleSet []Rule, config Config) (<-cha
 	return failures, nil
 }
 
-func (l *Linter) lintPackage(filenames []string, gover *goversion.Version, ruleSet []Rule, config Config, ruleTimings *timing.Rules, failures chan Failure) error {
+func (l *Linter) lintPackage(filenames []string, gover *goversion.Version, ruleSet []Rule, config Config, failures chan Failure) error {
 	if len(filenames) == 0 {
 		return nil
 	}
@@ -159,11 +163,16 @@ func (l *Linter) lintPackage(filenames []string, gover *goversion.Version, ruleS
 		files:     map[string]*File{},
 		goVersion: gover,
 		logger:    l.logger,
-		timings:   ruleTimings,
 	}
 
-	donePackage := timing.Track(l.logger, "package-lint", "dir", filepath.Dir(filenames[0]))
-	defer func() { donePackage("files", len(pkg.files)) }()
+	// Timing attributes are boxed into interfaces, which allocates: build them only when they are logged.
+	timed := timing.Enabled(l.logger)
+	donePackage := timing.Track(l.logger, "package-lint")
+	defer func() {
+		if timed {
+			donePackage("dir", filepath.Dir(filenames[0]), "files", len(pkg.files))
+		}
+	}()
 
 	doneReadParse := timing.Track(l.logger, "package-read-parse")
 	var generated, invalid int
@@ -187,7 +196,9 @@ func (l *Linter) lintPackage(filenames []string, gover *goversion.Version, ruleS
 		file.logger = l.logger
 		pkg.files[filename] = file
 	}
-	doneReadParse("files", len(filenames), "generated", generated, "invalid", invalid)
+	if timed {
+		doneReadParse("files", len(filenames), "generated", generated, "invalid", invalid)
+	}
 
 	if len(pkg.files) == 0 {
 		return nil
@@ -300,4 +311,26 @@ func getPositionInvalidFile(filename, s string) FailurePosition {
 			Column:   column,
 		},
 	}
+}
+
+// timedRules wraps each rule to accumulate the time spent applying it into timings.
+func timedRules(rules []Rule, timings *timing.Rules) []Rule {
+	result := make([]Rule, len(rules))
+	for i, r := range rules {
+		result[i] = timedRule{Rule: r, stat: timings.Stat(r.Name())}
+	}
+	return result
+}
+
+type timedRule struct {
+	Rule
+
+	stat *timing.RuleStat
+}
+
+func (r timedRule) Apply(file *File, arguments Arguments) []Failure {
+	start := time.Now()
+	defer func() { r.stat.Add(time.Since(start)) }()
+
+	return r.Rule.Apply(file, arguments)
 }

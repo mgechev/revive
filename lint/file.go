@@ -123,11 +123,13 @@ const (
 func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 	// Timing attributes are boxed into interfaces, which allocates: build them only when they are logged.
 	timed := timing.Enabled(f.logger)
-	appliedRules, emittedFailures := 0, 0
-	if timed {
-		doneFile := timing.Track(f.logger, "file-lint", "file", f.Name)
-		defer func() { doneFile("rules", appliedRules, "failures", emittedFailures) }()
-	}
+	appliedRules, ruleFailures := 0, 0
+	doneFile := timing.Track(f.logger, "file-lint")
+	defer func() {
+		if timed {
+			doneFile("file", f.Name, "rules", appliedRules, "rule_failures", ruleFailures)
+		}
+	}()
 
 	rulesConfig := config.Rules
 	_, mustSpecifyDisableReason := config.Directives[directiveSpecifyDisableReason]
@@ -143,9 +145,7 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 			continue
 		}
 		appliedRules++
-		doneRule := f.Pkg.timings.Track(currentRule.Name())
 		currentFailures := currentRule.Apply(f, ruleConfig.Arguments)
-		doneRule()
 		filtered := currentFailures[:0]
 		for _, failure := range currentFailures {
 			// Log and skip internal failures: they signal a rule could not run on this file,
@@ -170,7 +170,7 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 		currentFailures = f.filterFailures(filtered, disabledIntervals)
 		for _, failure := range currentFailures {
 			if failure.Confidence >= config.Confidence {
-				emittedFailures++
+				ruleFailures++
 				failures <- failure
 			}
 		}

@@ -59,6 +59,7 @@ func New(
 	doneRules := timing.Track(logger, "rules-setup")
 	lintingRules, err := config.GetLintingRules(conf, extraRuleInstances)
 	if err != nil {
+		doneRules("error", err)
 		return nil, fmt.Errorf("initializing revive - getting lint rules: %w", err)
 	}
 	doneRules("rules", len(lintingRules))
@@ -95,9 +96,10 @@ func (r *Revive) Lint(patterns ...*LintPattern) (<-chan lint.Failure, error) {
 		excludePatterns = []string{"vendor/..."}
 	}
 
-	donePackages := timing.Track(r.logger, "package-resolution", "include", len(includePatterns), "exclude", len(excludePatterns))
+	donePackages := timing.Track(r.logger, "package-resolution")
 	packages, err := getPackages(includePatterns, excludePatterns)
 	if err != nil {
+		donePackages("error", err)
 		return nil, fmt.Errorf("linting - getting packages: %w", err)
 	}
 	donePackages("packages", len(packages), "files", timing.Value(func() any { return countFiles(packages) }))
@@ -166,7 +168,7 @@ func (r *Revive) Format(
 
 	// The formatter runs concurrently with linting, draining failuresChan above is what drives it:
 	// measure only the work left once every failure has been delivered.
-	doneFormat := timing.Track(r.logger, "format", "formatter", formatterName)
+	doneFormat := timing.Track(r.logger, "format", "formatter", formatter.Name())
 	close(formatChan)
 	<-exitChan
 	doneFormat("failures", reportedFailures)

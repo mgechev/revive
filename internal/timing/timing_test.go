@@ -7,7 +7,6 @@ import (
 	"strings"
 	"sync"
 	"testing"
-	"testing/synctest"
 	"time"
 
 	"github.com/mgechev/revive/internal/timing"
@@ -83,62 +82,55 @@ func TestValue(t *testing.T) {
 
 func TestRules(t *testing.T) {
 	t.Run("accumulates concurrent rule applications", func(t *testing.T) {
-		synctest.Test(t, func(t *testing.T) {
-			var buf bytes.Buffer
-			logger := debugLogger(&buf)
-			rules := timing.NewRules(logger, []string{"slow-rule", "fast-rule", "unused-rule"})
-
-			const calls = 10
-			var wg sync.WaitGroup
-			for range calls {
-				wg.Go(func() {
-					done := rules.Track("slow-rule")
-					time.Sleep(time.Second)
-					done()
-
-					rules.Track("fast-rule")()
-				})
-			}
-			wg.Wait()
-
-			rules.Log(logger)
-
-			got := buf.String()
-			lines := slices.Collect(strings.Lines(got))
-			if len(lines) != 2 {
-				t.Fatalf("expected 2 records (rules without calls are not reported), got %d: %q", len(lines), got)
-			}
-			for _, want := range []string{`rule=slow-rule`, `total=10s`, `calls=10`, `avg=1s`} {
-				if !strings.Contains(lines[0], want) {
-					t.Errorf("record %q does not contain %q", lines[0], want)
-				}
-			}
-			if want := `rule=fast-rule`; !strings.Contains(lines[1], want) {
-				t.Errorf("records are not sorted by total duration: %q", got)
-			}
-		})
-	})
-
-	t.Run("ignores unknown rules", func(t *testing.T) {
 		var buf bytes.Buffer
 		logger := debugLogger(&buf)
-		rules := timing.NewRules(logger, []string{"known-rule"})
-		rules.Track("unknown-rule")()
+		rules := timing.NewRules()
+		slow := rules.Stat("slow-rule")
+		fast := rules.Stat("fast-rule")
+		rules.Stat("unused-rule")
+
+		const calls = 10
+		var wg sync.WaitGroup
+		for range calls {
+			wg.Go(func() {
+				slow.Add(time.Second)
+				fast.Add(time.Millisecond)
+			})
+		}
+		wg.Wait()
+
 		rules.Log(logger)
 
-		if got := buf.String(); got != "" {
-			t.Errorf("expected no output, got %q", got)
+		got := buf.String()
+		lines := slices.Collect(strings.Lines(got))
+		if len(lines) != 2 {
+			t.Fatalf("expected 2 records (rules without calls are not reported), got %d: %q", len(lines), got)
+		}
+		for _, want := range []string{`rule=slow-rule`, `total=10s`, `calls=10`, `avg=1s`} {
+			if !strings.Contains(lines[0], want) {
+				t.Errorf("record %q does not contain %q", lines[0], want)
+			}
+		}
+		if want := `rule=fast-rule`; !strings.Contains(lines[1], want) {
+			t.Errorf("records are not sorted by total duration: %q", got)
 		}
 	})
 
-	t.Run("is nil when debug logging is disabled", func(t *testing.T) {
+	t.Run("returns the same accumulator for the same rule", func(t *testing.T) {
 		var buf bytes.Buffer
-		rules := timing.NewRules(slog.New(slog.DiscardHandler), []string{"some-rule"})
-		if rules != nil {
-			t.Fatalf("expected nil Rules, got %+v", rules)
-		}
+		rules := timing.NewRules()
+		rules.Stat("some-rule").Add(time.Second)
+		rules.Stat("some-rule").Add(time.Second)
+		rules.Log(debugLogger(&buf))
 
-		rules.Track("some-rule")()
+		if got, want := buf.String(), "calls=2"; !strings.Contains(got, want) {
+			t.Errorf("record %q does not contain %q", got, want)
+		}
+	})
+
+	t.Run("nil logs nothing", func(t *testing.T) {
+		var buf bytes.Buffer
+		var rules *timing.Rules
 		rules.Log(debugLogger(&buf))
 		if got := buf.String(); got != "" {
 			t.Errorf("expected no output, got %q", got)

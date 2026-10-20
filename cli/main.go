@@ -75,6 +75,7 @@ func runRevive(logger *slog.Logger, extraRules ...revivelib.ExtraRule) (int, err
 	doneConfig := timing.Track(logger, "config-load", "config", configPath)
 	conf, err := config.GetConfig(configPath)
 	if err != nil {
+		doneConfig("error", err)
 		return 0, err
 	}
 	doneConfig("rules", len(conf.Rules))

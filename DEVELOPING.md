@@ -81,23 +81,25 @@ Every measurement is a `phase completed` record carrying a `phase` and a `durati
 | `rules-setup` | once | instantiating and configuring the enabled rules |
 | `package-resolution` | once | expanding the given patterns into packages and files |
 | `go-version-detection` | once | locating `go.mod` files and detecting the Go version of every package |
-| `package-read-parse` | per package | reading the files and parsing them into ASTs |
+| `package-read-parse` | per package | reading the files and parsing them into ASTs, including waiting for a `-max_open_files` slot |
 | `type-check` | per package | type checking, triggered lazily by the first typed rule |
 | `scan-sortable` | per package | collecting the types implementing `sort.Interface` |
 | `package-lint` | per package | the whole package: read, parse, type check, and all rules |
 | `disabled-intervals` | per file | scanning the file for `revive:disable` directives |
-| `file-lint` | per file | applying all rules to the file |
+| `file-lint` | per file | applying all rules to the file; `rule_failures` excludes the directive failures counted in `disabled-intervals` |
 | `lint` | once | all packages |
 | `format` | once | finishing the formatter once every failure has been delivered to it |
 | `total` | once | the whole run |
 
 The formatter runs concurrently with linting, so `format` only covers what is left after `lint`, not the whole formatting work.
-Conversely, `file-lint` and `package-lint` include the time spent waiting for the formatter to accept each failure:
-with a slow formatter or many failures, they can be high even though the rules are fast.
+Conversely, every phase that reports failures includes the time spent waiting for the formatter to accept them:
+`file-lint` and `package-lint`, but also `disabled-intervals` (failures of the `specify-disable-*` directives) and `package-read-parse` (invalid files).
+With a slow formatter or many failures, they can be high even though the work itself is fast.
 
 After linting, each rule gets a `rule timing` record with its total duration, the number of applications, and the average, slowest rule first.
-A typed rule's duration includes the package type check when that rule triggers it, or waits for it while another file triggers it:
-compare it with the `type-check` records before blaming the rule.
+The type check of a package holds a lock that most package accessors also take (`IsMain`, `IsAtLeastGoVersion`, `Sortable`, `TypesInfo`, …).
+So a rule's duration includes the package type check when that rule triggers it, or the wait for it while another file triggers it,
+whether the rule is typed or not: compare it with the `type-check` records before blaming the rule.
 
 Timing is only collected when `REVIVE_LOG_LEVEL=debug`.
 
