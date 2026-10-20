@@ -6,12 +6,14 @@ import (
 	"go/importer"
 	"go/token"
 	"go/types"
+	"log/slog"
 	"sync"
 
 	goversion "github.com/hashicorp/go-version"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/mgechev/revive/internal/astutils"
+	"github.com/mgechev/revive/internal/timing"
 	"github.com/mgechev/revive/internal/typeparams"
 )
 
@@ -28,6 +30,8 @@ type Package struct {
 	sortable map[string]bool
 	// main is whether this is a "main" package.
 	main int
+
+	logger *slog.Logger
 }
 
 var (
@@ -107,6 +111,14 @@ func (p *Package) Sortable() map[string]bool {
 
 // TypeCheck performs type checking for given package.
 func (p *Package) TypeCheck() error {
+	// Deferred before the unlock to log once p.mu is released: rules waiting for it must not also wait for the log output.
+	var logTiming func()
+	defer func() {
+		if logTiming != nil {
+			logTiming()
+		}
+	}()
+
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
@@ -139,7 +151,11 @@ func (p *Package) TypeCheck() error {
 		return errors.New("no ast.File found")
 	}
 
+	done := timing.Track(p.logger, "type-check")
 	typesPkg, err := config.Check(anyFile.AST.Name.Name, p.fset, astFiles, info)
+	if timing.Enabled(p.logger) {
+		logTiming = func() { done("package", anyFile.AST.Name.Name, "files", len(astFiles), "error", err) }
+	}
 
 	// Remember the typechecking info, even if config.Check failed,
 	// since we will get partial information.
@@ -170,7 +186,8 @@ const (
 	bfSwap
 )
 
-func (p *Package) scanSortable() {
+// scanSortable collects the sortable types of the package and returns their number.
+func (p *Package) scanSortable() int {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
@@ -194,10 +211,16 @@ func (p *Package) scanSortable() {
 			p.sortable[typ] = true
 		}
 	}
+	return len(p.sortable)
 }
 
 func (p *Package) lint(rules []Rule, config Config, failures chan Failure) error {
-	p.scanSortable()
+	doneSortable := timing.Track(p.logger, "scan-sortable")
+	sortable := p.scanSortable()
+	if timing.Enabled(p.logger) {
+		doneSortable("sortable", sortable)
+	}
+
 	var eg errgroup.Group
 	for _, file := range p.Files() {
 		eg.Go(func() error {

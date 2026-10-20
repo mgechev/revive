@@ -11,6 +11,8 @@ import (
 	"math"
 	"regexp"
 	"strings"
+
+	"github.com/mgechev/revive/internal/timing"
 )
 
 // File abstraction used for representing files.
@@ -119,15 +121,30 @@ const (
 )
 
 func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
+	// Timing attributes are boxed into interfaces, which allocates: build them only when they are logged.
+	timed := timing.Enabled(f.logger)
+	appliedRules, ruleFailures := 0, 0
+	doneFile := timing.Track(f.logger, "file-lint")
+	defer func() {
+		if timed {
+			doneFile("file", f.Name, "rules", appliedRules, "rule_failures", ruleFailures)
+		}
+	}()
+
 	rulesConfig := config.Rules
 	_, mustSpecifyDisableReason := config.Directives[directiveSpecifyDisableReason]
 	_, mustSpecifyDisableRules := config.Directives[directiveSpecifyDisableRule]
+	doneIntervals := timing.Track(f.logger, "disabled-intervals")
 	disabledIntervals := f.disabledIntervals(rules, mustSpecifyDisableReason, mustSpecifyDisableRules, failures)
+	if timed {
+		doneIntervals("file", f.Name, "rules", len(disabledIntervals))
+	}
 	for _, currentRule := range rules {
 		ruleConfig := rulesConfig[currentRule.Name()]
 		if ruleConfig.MustExclude(f.Name) {
 			continue
 		}
+		appliedRules++
 		currentFailures := currentRule.Apply(f, ruleConfig.Arguments)
 		filtered := currentFailures[:0]
 		for _, failure := range currentFailures {
@@ -153,6 +170,7 @@ func (f *File) lint(rules []Rule, config Config, failures chan Failure) error {
 		currentFailures = f.filterFailures(filtered, disabledIntervals)
 		for _, failure := range currentFailures {
 			if failure.Confidence >= config.Confidence {
+				ruleFailures++
 				failures <- failure
 			}
 		}
